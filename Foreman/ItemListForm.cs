@@ -14,9 +14,7 @@ namespace Foreman
 
 		public ItemListForm()
 		{
-			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 			InitializeComponent();
-			UpdateStyles();
 		}
 
 		private void Form1_Load(object sender, EventArgs e)

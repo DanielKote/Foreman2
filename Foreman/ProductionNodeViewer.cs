@@ -55,8 +55,8 @@ namespace Foreman
 				RegisterEvents(child);
 			}
 		}
-		
-		private void ProductionNodeViewer_Paint(object sender, PaintEventArgs e)
+
+		public void UpdateText()
 		{
 			NameBox.Text = DisplayedNode.DisplayName;
 			if (DisplayedNode.GetType() == typeof(RecipeNode))
@@ -75,17 +75,17 @@ namespace Foreman
 
 		public void MouseMoveHandler(object sender, MouseEventArgs e)
 		{
-			//BackColor = Color.Black;
 			if (isBeingDragged)
 			{
 				Location = new Point(Location.X + e.X - dragOffsetX, Location.Y + e.Y - dragOffsetY);
+				//Invalidate();
+				Parent.Invalidate();
 			}
 		}
 
 		public void MouseDownHandler(object sender, MouseEventArgs e)
 		{
 			isBeingDragged = true;
-			//mousePanel.BackColor = Color.Pink;
 			dragOffsetX = e.X;
 			dragOffsetY = e.Y;
 		}
@@ -93,7 +93,6 @@ namespace Foreman
 		public void MouseUpHandler(object sender, MouseEventArgs e)
 		{
 			isBeingDragged = false;
-			//mousePanel.BackColor = Color.Blue;
 		} 
 	}
 }

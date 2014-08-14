@@ -13,9 +13,13 @@ namespace Foreman
 	{
 		Dictionary<ProductionNode, ProductionNodeViewer> nodeControls = new Dictionary<ProductionNode, ProductionNodeViewer>();
 		public ProductionGraph graph = new ProductionGraph();
-		private Item parentItem;
 		private List<Item> Demands = new List<Item>();
 		
+		public ProductionGraphViewer()
+		{
+			InitializeComponent();
+		}
+
 		public void AddDemand(Item item)
 		{	
 			graph.Nodes.Add(new ConsumerNode(item, 1f, graph));
@@ -24,7 +28,11 @@ namespace Foreman
 				graph.IterateNodeDemands();
 			}
 			CreateMissingControls();
-			Invalidate(true);
+
+			foreach (ProductionNodeViewer node in nodeControls.Values)
+			{
+				node.UpdateText();
+			}
 			PositionControls();
 			Invalidate(true);
 		}
@@ -43,10 +51,9 @@ namespace Foreman
 			}
 		}
 
-		private void DrawConnections()
+		private void DrawConnections(Graphics graphics)
 		{
 			Pen pen = new Pen(Color.DarkRed, 3f);
-			Graphics graphics = this.CreateGraphics();
 			graphics.Clear(this.BackColor);
 
 			foreach (var n in nodeControls.Keys)
@@ -63,7 +70,6 @@ namespace Foreman
 			}
 
 			pen.Dispose();
-			graphics.Dispose();
 		}
 
 		private void PositionControls()
@@ -130,16 +136,10 @@ namespace Foreman
 			Invalidate(true);
 		}
 
-		public ProductionGraphViewer()
-		{
-			InitializeComponent();
-			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-		}
-
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-			DrawConnections();
+			DrawConnections(e.Graphics);
 		}
 	}
 }

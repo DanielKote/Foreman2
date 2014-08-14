@@ -29,8 +29,8 @@
 		private void InitializeComponent()
 		{
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.RateBox = new System.Windows.Forms.Label();
 			this.NameBox = new System.Windows.Forms.Label();
+			this.RateBox = new System.Windows.Forms.Label();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -51,18 +51,6 @@
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(119, 42);
 			this.tableLayoutPanel1.TabIndex = 0;
 			// 
-			// RateBox
-			// 
-			this.RateBox.AutoSize = true;
-			this.RateBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.RateBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.RateBox.Location = new System.Drawing.Point(3, 17);
-			this.RateBox.Name = "RateBox";
-			this.RateBox.Size = new System.Drawing.Size(113, 25);
-			this.RateBox.TabIndex = 1;
-			this.RateBox.Text = "Empty label";
-			this.RateBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
 			// NameBox
 			// 
 			this.NameBox.AutoSize = true;
@@ -75,17 +63,28 @@
 			this.NameBox.Text = "Empty label";
 			this.NameBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
+			// RateBox
+			// 
+			this.RateBox.AutoSize = true;
+			this.RateBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.RateBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.RateBox.Location = new System.Drawing.Point(3, 17);
+			this.RateBox.Name = "RateBox";
+			this.RateBox.Size = new System.Drawing.Size(113, 25);
+			this.RateBox.TabIndex = 1;
+			this.RateBox.Text = "Empty label";
+			this.RateBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
 			// ProductionNodeViewer
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.BackColor = System.Drawing.Color.SteelBlue;
 			this.Controls.Add(this.tableLayoutPanel1);
+			this.DoubleBuffered = true;
 			this.Name = "ProductionNodeViewer";
 			this.Size = new System.Drawing.Size(119, 42);
-			this.Paint += new System.Windows.Forms.PaintEventHandler(this.ProductionNodeViewer_Paint);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);
