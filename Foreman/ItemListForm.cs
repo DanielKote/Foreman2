@@ -14,7 +14,9 @@ namespace Foreman
 
 		public ItemListForm()
 		{
+			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 			InitializeComponent();
+			UpdateStyles();
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -32,11 +34,19 @@ namespace Foreman
 
 		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			ProductionTree.ParentItem = DataCache.Items[listBox1.SelectedItem.ToString()];
+			ProductionTree.AddDemand(DataCache.Items[listBox1.SelectedItem.ToString()]);
 		}
 
 		private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
+		}
+
+		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Escape)
+			{
+				Close();
+			}
 		}		
 	}
 }

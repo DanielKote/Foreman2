@@ -64,10 +64,11 @@
 			// 
 			// ProductionTree
 			// 
+			this.ProductionTree.AutoScroll = true;
+			this.ProductionTree.BackColor = System.Drawing.Color.GhostWhite;
 			this.ProductionTree.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ProductionTree.Location = new System.Drawing.Point(253, 3);
 			this.ProductionTree.Name = "ProductionTree";
-			this.ProductionTree.ParentItem = null;
 			this.ProductionTree.Size = new System.Drawing.Size(773, 684);
 			this.ProductionTree.TabIndex = 1;
 			// 
@@ -77,9 +78,11 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1029, 690);
 			this.Controls.Add(this.tableLayoutPanel1);
+			this.KeyPreview = true;
 			this.Name = "ItemListForm";
 			this.Text = "Items";
 			this.Load += new System.EventHandler(this.Form1_Load);
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ItemListForm_KeyDown);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.ResumeLayout(false);
 

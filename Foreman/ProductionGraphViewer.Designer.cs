@@ -38,8 +38,6 @@
 			this.BackColor = System.Drawing.Color.GhostWhite;
 			this.Name = "ProductionTreeViewer";
 			this.Size = new System.Drawing.Size(891, 635);
-			this.Load += new System.EventHandler(this.RecipeTreeViewer_Load);
-			this.Click += new System.EventHandler(this.RecipeTreeViewer_Click);
 			this.ResumeLayout(false);
 
 		}

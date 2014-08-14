@@ -12,73 +12,35 @@ namespace Foreman
 	public partial class ProductionGraphViewer : UserControl
 	{
 		Dictionary<ProductionNode, ProductionNodeViewer> nodeControls = new Dictionary<ProductionNode, ProductionNodeViewer>();
-		public ProductionGraph graph { get; set; }
+		public ProductionGraph graph = new ProductionGraph();
 		private Item parentItem;
-		public Item ParentItem
-		{
-			get
+		private List<Item> Demands = new List<Item>();
+		
+		public void AddDemand(Item item)
+		{	
+			graph.Nodes.Add(new ConsumerNode(item, 1f, graph));
+			while (!graph.Complete)
 			{
-				return parentItem;
+				graph.IterateNodeDemands();
 			}
-			set
-			{
-				parentItem = value;
-				if (value != null)
-				{
-					graph = new ProductionGraph();
-					graph.Nodes.Add(new ConsumerNode(parentItem, 1f, graph));
-					while (!graph.Complete)
-					{
-						graph.IterateNodeDemands();
-					}
-
-					Controls.Clear();
-					nodeControls.Clear();
-					CreateMissingNodeControls();
-				}
-			}
+			CreateMissingControls();
+			Invalidate(true);
+			PositionControls();
+			Invalidate(true);
 		}
 
-		private void CreateMissingNodeControls()
+		private void CreateMissingControls()
 		{
 			foreach (ProductionNode node in graph.Nodes)
 			{
 				if (!nodeControls.ContainsKey(node))
 				{
-					if (node is RecipeNode)
-					{
-						RecipeNodeViewer recipeControl = new RecipeNodeViewer();
-						recipeControl.DisplayedNode = node as RecipeNode;
-						recipeControl.parentTreeViewer = this;
-						Controls.Add(recipeControl);
-						nodeControls.Add(node, recipeControl);
-					}
-					else if (node is SupplyNode)
-					{
-						SupplyNodeViewer supplyControl = new SupplyNodeViewer();
-						supplyControl.DisplayedNode = node as SupplyNode;
-						supplyControl.NameBox.Text = (node as SupplyNode).SuppliedItem.Name;
-						supplyControl.parentTreeViewer = this;
-						Controls.Add(supplyControl);
-						nodeControls.Add(node, supplyControl);
-					}
-					else if (node is ConsumerNode)
-					{
-						ConsumerNodeViewer consumerControl = new ConsumerNodeViewer();
-						consumerControl.DisplayedNode = node as ConsumerNode;
-						consumerControl.NameBox.Text = (node as ConsumerNode).ConsumedItem.Name;
-						consumerControl.parentTreeViewer = this;
-						Controls.Add(consumerControl);
-						nodeControls.Add(node, consumerControl);
-					}
+					ProductionNodeViewer control = new ProductionNodeViewer(node);
+					control.parentTreeViewer = this;
+					Controls.Add(control);
+					nodeControls.Add(node, control);
 				}
 			}
-
-			PositionControls();
-		}
-
-		private void GenerateRecipeControl(RecipeNode node)
-		{
 		}
 
 		private void DrawConnections()
@@ -164,65 +126,20 @@ namespace Foreman
 
 				y += maxHeight + 20;
 			}
+
+			Invalidate(true);
 		}
 
 		public ProductionGraphViewer()
 		{
 			InitializeComponent();
-		}
-
-		private void RecipeTreeViewer_Load(object sender, EventArgs e)
-		{
-
+			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-
 			DrawConnections();
-		}
-
-		public void UpdateNodeControlContents()
-		{
-			foreach (ProductionNode node in nodeControls.Keys)
-			{
-				ProductionNodeViewer control = nodeControls[node];
-
-				if (node is RecipeNode)
-				{
-					if ((control as RecipeNodeViewer).RateTextBox.ReadOnly)
-					{
-						(control as RecipeNodeViewer).NameBox.Text = (node as RecipeNode).BaseRecipe.Name;
-						(control as RecipeNodeViewer).RateTextBox.Text = (node as RecipeNode).Rate.ToString();
-					}
-				}
-				else if (node is SupplyNode)
-				{
-					if ((control as SupplyNodeViewer).RateTextBox.ReadOnly)
-					{
-						(control as SupplyNodeViewer).NameBox.Text = (node as SupplyNode).SuppliedItem.Name;
-						(control as SupplyNodeViewer).RateTextBox.Text = (node as SupplyNode).SupplyRate.ToString();
-					}
-				}
-				else if (node is ConsumerNode)
-				{
-					if ((control as ConsumerNodeViewer).RateTextBox.ReadOnly)
-					{
-						(control as ConsumerNodeViewer).NameBox.Text = (node as ConsumerNode).ConsumedItem.Name;
-						(control as ConsumerNodeViewer).RateTextBox.Text = (node as ConsumerNode).ConsumptionRate.ToString();
-					}
-				}
-			}
-		}
-
-		private void RecipeTreeViewer_Click(object sender, EventArgs e)
-		{
-			if (graph != null)
-			{
-				graph.IterateNodeDemands();
-				CreateMissingNodeControls();
-			}
 		}
 	}
 }

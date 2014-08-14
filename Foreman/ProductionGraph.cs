@@ -139,7 +139,7 @@ namespace Foreman
 				{
 					ProductionNode node;
 					node = Nodes.Find(n => n.OutputRate(item) > 0);
-					node.AddOutput(item, GetDemand(item) - GetSupply(item));
+					node.MatchDemand(item, GetDemand(item) - GetSupply(item) + node.OutputRate(item));
 				}
 				else
 				{
@@ -152,7 +152,7 @@ namespace Foreman
 					{
 						RecipeNode node = new RecipeNode(item.Recipes.First(), this);
 						Nodes.Add(node);
-						node.AddOutput(item, GetDemand(item) - GetSupply(item));
+						node.MatchDemand(item, GetDemand(item) - GetSupply(item));
 					}
 				}
 			}

@@ -56,12 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataCache.cs" />
-    <Compile Include="ConsumerNodeViewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ConsumerNodeViewer.Designer.cs">
-      <DependentUpon>ConsumerNodeViewer.cs</DependentUpon>
-    </Compile>
     <Compile Include="ItemListForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,21 +81,6 @@
     <Compile Include="ProductionNodeViewer.Designer.cs">
       <DependentUpon>ProductionNodeViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="RecipeNodeViewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="RecipeNodeViewer.Designer.cs">
-      <DependentUpon>RecipeNodeViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SupplyNodeViewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="SupplyNodeViewer.Designer.cs">
-      <DependentUpon>SupplyNodeViewer.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="ConsumerNodeViewer.resx">
-      <DependentUpon>ConsumerNodeViewer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="ItemListForm.resx">
       <DependentUpon>ItemListForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -120,12 +99,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ProductionNodeViewer.resx">
       <DependentUpon>ProductionNodeViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="RecipeNodeViewer.resx">
-      <DependentUpon>RecipeNodeViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SupplyNodeViewer.resx">
-      <DependentUpon>SupplyNodeViewer.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">

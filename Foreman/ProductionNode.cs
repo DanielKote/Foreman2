@@ -12,7 +12,9 @@ namespace Foreman
 		public abstract Dictionary<Item, float> Outputs { get; }
 		public abstract float OutputRate(Item item);
 		public abstract float InputRate(Item item);
-		public abstract void AddOutput(Item item, float rate);
+		public abstract void MatchDemand(Item item, float rate);
+		public abstract String DisplayName { get; }
+		public abstract float Rate { get; }
 
 		public ProductionNode(ProductionGraph graph)
 		{
@@ -43,12 +45,22 @@ namespace Foreman
 	public class RecipeNode : ProductionNode
 	{
 		public Recipe BaseRecipe { get; private set; }
-		public float Rate { get; set; }
+		public float CompletedPerSecond { get; set; }
 
 		public RecipeNode(Recipe baseRecipe, ProductionGraph graph)
 			: base(graph)
 		{
 			BaseRecipe = baseRecipe;
+		}
+
+		public override string DisplayName
+		{
+			get { return BaseRecipe.Name; }
+		}
+
+		public override float Rate
+		{
+			get { return CompletedPerSecond; }
 		}
 
 		public override Dictionary<Item, float> Outputs
@@ -77,11 +89,11 @@ namespace Foreman
 			}
 		}
 
-		public override void AddOutput(Item item, float rate)
+		public override void MatchDemand(Item item, float rate)
 		{
 			if (BaseRecipe.Results.ContainsKey(item))
 			{
-				Rate += rate / BaseRecipe.Results[item];
+				CompletedPerSecond += (rate - OutputRate(item)) / BaseRecipe.Results[item];
 			}
 			else
 			{
@@ -132,6 +144,16 @@ namespace Foreman
 			SupplyRate = rate;
 		}
 
+		public override string DisplayName
+		{
+			get { return SuppliedItem.Name; }
+		}
+
+		public override float Rate
+		{
+			get { return SupplyRate; }
+		}
+
 		public override Dictionary<Item, float> Outputs
 		{
 			get
@@ -150,11 +172,11 @@ namespace Foreman
 			}
 		}
 
-		public override void AddOutput(Item item, float rate)
+		public override void MatchDemand(Item item, float rate)
 		{
 			if (item == SuppliedItem)
 			{
-				SupplyRate += rate;
+				SupplyRate = rate;
 			}
 			else
 			{
@@ -184,6 +206,16 @@ namespace Foreman
 	{
 		public Item ConsumedItem { get; private set; }
 		public float ConsumptionRate { get; set; }
+
+		public override string DisplayName
+		{
+			get { return ConsumedItem.Name; }
+		}
+
+		public override float Rate
+		{
+			get { return ConsumptionRate; }
+		}
 
 		public ConsumerNode(Item item, float rate, ProductionGraph graph) : base(graph)
 		{
@@ -225,7 +257,7 @@ namespace Foreman
 			return 0.0f;
 		}
 
-		public override void AddOutput(Item item, float rate)
+		public override void MatchDemand(Item item, float rate)
 		{
 			if (item == ConsumedItem)
 			{
