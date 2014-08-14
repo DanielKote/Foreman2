@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Foreman</RootNamespace>
+    <AssemblyName>Foreman</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="KeraLua">
+      <HintPath>..\lib\KeraLua.dll</HintPath>
+    </Reference>
+    <Reference Include="NLua, Version=1.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <ExecutableExtension>.exe</ExecutableExtension>
+      <HintPath>..\lib\NLua.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataCache.cs" />
+    <Compile Include="ConsumerNodeViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ConsumerNodeViewer.Designer.cs">
+      <DependentUpon>ConsumerNodeViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ItemListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ItemListForm.Designer.cs">
+      <DependentUpon>ItemListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Item.cs" />
+    <Compile Include="MatrixStuff.cs" />
+    <Compile Include="ProductionNode.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Recipe.cs" />
+    <Compile Include="ProductionGraph.cs" />
+    <Compile Include="ProductionGraphViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ProductionGraphViewer.Designer.cs">
+      <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProductionNodeViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ProductionNodeViewer.Designer.cs">
+      <DependentUpon>ProductionNodeViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RecipeNodeViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RecipeNodeViewer.Designer.cs">
+      <DependentUpon>RecipeNodeViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SupplyNodeViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SupplyNodeViewer.Designer.cs">
+      <DependentUpon>SupplyNodeViewer.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="ConsumerNodeViewer.resx">
+      <DependentUpon>ConsumerNodeViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ItemListForm.resx">
+      <DependentUpon>ItemListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="ProductionGraphViewer.resx">
+      <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProductionNodeViewer.resx">
+      <DependentUpon>ProductionNodeViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RecipeNodeViewer.resx">
+      <DependentUpon>RecipeNodeViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SupplyNodeViewer.resx">
+      <DependentUpon>SupplyNodeViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Licences.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>XCOPY /y "$(SolutionDir)lib\lua52.dll" "."</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
