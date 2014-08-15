@@ -65,7 +65,7 @@
 			// ProductionTree
 			// 
 			this.ProductionTree.AutoScroll = true;
-			this.ProductionTree.BackColor = System.Drawing.Color.GhostWhite;
+			this.ProductionTree.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.ProductionTree.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ProductionTree.Location = new System.Drawing.Point(253, 3);
 			this.ProductionTree.Name = "ProductionTree";

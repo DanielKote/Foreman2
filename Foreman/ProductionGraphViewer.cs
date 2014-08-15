@@ -18,6 +18,8 @@ namespace Foreman
 		public ProductionGraphViewer()
 		{
 			InitializeComponent();
+
+			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
 		public void AddDemand(Item item)
@@ -53,7 +55,7 @@ namespace Foreman
 
 		private void DrawConnections(Graphics graphics)
 		{
-			Pen pen = new Pen(Color.DarkRed, 3f);
+			Pen pen = new Pen(Color.LightGray, 3f);
 			graphics.Clear(this.BackColor);
 
 			foreach (var n in nodeControls.Keys)
@@ -62,9 +64,13 @@ namespace Foreman
 				{
 					if (m.CanTakeFrom(n))
 					{
+
 						Point pointN = Point.Add(nodeControls[n].Location, new Size(nodeControls[n].Width / 2, 0));
 						Point pointM = Point.Add(nodeControls[m].Location, new Size(nodeControls[m].Width / 2, nodeControls[m].Height));
-						graphics.DrawLine(pen, pointN, pointM);
+						Point pointN2 = new Point(pointN.X, pointN.Y - (int)((pointN.Y - pointM.Y) / 2));
+						Point pointM2 = new Point(pointM.X, pointM.Y - (int)((pointM.Y - pointN.Y) / 2));
+
+						graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
 					}
 				}
 			}
@@ -110,12 +116,12 @@ namespace Foreman
 					nodePositions.First().Add(node);
 				}
 			}
-
-			int y = 20;
+			int margin = 60;
+			int y = margin;
 			foreach (var list in nodePositions)
 			{
 				int maxHeight = 0;
-				int x = 20;
+				int x = margin;
 
 				foreach (var node in list)
 				{
@@ -126,11 +132,11 @@ namespace Foreman
 					UserControl control = nodeControls[node];
 					control.Location = new Point(x, y);
 
-					x += control.Width + 20;
+					x += control.Width + margin;
 					maxHeight = Math.Max(control.Height, maxHeight);
 				}
 
-				y += maxHeight + 20;
+				y += maxHeight + margin;
 			}
 
 			Invalidate(true);

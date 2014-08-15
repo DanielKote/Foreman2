@@ -50,6 +50,7 @@
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(119, 42);
 			this.tableLayoutPanel1.TabIndex = 0;
+			this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
 			// 
 			// NameBox
 			// 
@@ -82,7 +83,6 @@
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.Controls.Add(this.tableLayoutPanel1);
-			this.DoubleBuffered = true;
 			this.Name = "ProductionNodeViewer";
 			this.Size = new System.Drawing.Size(119, 42);
 			this.tableLayoutPanel1.ResumeLayout(false);

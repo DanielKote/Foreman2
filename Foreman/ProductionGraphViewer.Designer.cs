@@ -35,10 +35,11 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoScroll = true;
-			this.BackColor = System.Drawing.Color.GhostWhite;
+			this.BackColor = System.Drawing.Color.White;
+			this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.DoubleBuffered = true;
 			this.Name = "ProductionGraphViewer";
-			this.Size = new System.Drawing.Size(891, 635);
+			this.Size = new System.Drawing.Size(889, 633);
 			this.ResumeLayout(false);
 
 		}
