@@ -15,6 +15,7 @@ namespace Foreman
 		public abstract void MatchDemand(Item item, float rate);
 		public abstract String DisplayName { get; }
 		public abstract float Rate { get; }
+		public Dictionary<ProductionNode, Item> CycleLinks = new Dictionary<ProductionNode, Item>();
 
 		public ProductionNode(ProductionGraph graph)
 		{

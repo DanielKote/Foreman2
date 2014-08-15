@@ -11,7 +11,7 @@ namespace Foreman
 {
 	public partial class ProductionGraphViewer : UserControl
 	{
-		Dictionary<ProductionNode, ProductionNodeViewer> nodeControls = new Dictionary<ProductionNode, ProductionNodeViewer>();
+		public Dictionary<ProductionNode, ProductionNodeViewer> nodeControls = new Dictionary<ProductionNode, ProductionNodeViewer>();
 		public ProductionGraph graph = new ProductionGraph();
 		private List<Item> Demands = new List<Item>();
 		
@@ -64,11 +64,10 @@ namespace Foreman
 				{
 					if (m.CanTakeFrom(n))
 					{
-
-						Point pointN = Point.Add(nodeControls[n].Location, new Size(nodeControls[n].Width / 2, 0));
-						Point pointM = Point.Add(nodeControls[m].Location, new Size(nodeControls[m].Width / 2, nodeControls[m].Height));
-						Point pointN2 = new Point(pointN.X, pointN.Y - (int)((pointN.Y - pointM.Y) / 2));
-						Point pointM2 = new Point(pointM.X, pointM.Y - (int)((pointM.Y - pointN.Y) / 2));
+						Point pointN = Point.Add(nodeControls[n].Location, new Size(nodeControls[n].Width / 2, 1));
+						Point pointM = Point.Add(nodeControls[m].Location, new Size(nodeControls[m].Width / 2, nodeControls[m].Height - 1));
+						Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
+						Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 
 						graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
 					}

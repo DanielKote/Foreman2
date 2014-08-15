@@ -33,6 +33,9 @@ namespace Foreman
 
 		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
+			ProductionTree.graph = new ProductionGraph();
+			ProductionTree.Controls.Clear();
+			ProductionTree.nodeControls.Clear();
 			ProductionTree.AddDemand(DataCache.Items[listBox1.SelectedItem.ToString()]);
 		}
 
