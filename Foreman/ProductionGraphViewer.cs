@@ -93,7 +93,8 @@ namespace Foreman
 				nodePositions[i] = new List<ProductionNode>();
 			}
 
-			foreach (ProductionNode node in nodeOrder)
+			nodePositions.First().AddRange(nodeOrder.OfType<ConsumerNode>());
+			foreach (RecipeNode node in nodeOrder.OfType<RecipeNode>())
 			{
 				bool PositionFound = false;
 
@@ -115,10 +116,14 @@ namespace Foreman
 					nodePositions.First().Add(node);
 				}
 			}
+			nodePositions.Last().AddRange(nodeOrder.OfType<SupplyNode>());
+
 			int margin = 60;
 			int y = margin;
-			foreach (var list in nodePositions)
+			int[] tierWidths = new int[nodePositions.Count()];
+			for (int i = 0; i < nodePositions.Count(); i++)
 			{
+				var list = nodePositions[i];
 				int maxHeight = 0;
 				int x = margin;
 
@@ -128,14 +133,30 @@ namespace Foreman
 					{
 						continue;
 					}
-					UserControl control = nodeControls[node];
+					ProductionNodeViewer control = nodeControls[node];
 					control.Location = new Point(x, y);
 
 					x += control.Width + margin;
 					maxHeight = Math.Max(control.Height, maxHeight);
 				}
 
-				y += maxHeight + margin;
+				if (maxHeight > 0) // Don't add any height for empty tiers
+				{
+					y += maxHeight + margin;
+				}
+
+				tierWidths[i] = x;
+			}
+
+			int centrePoint = tierWidths.Last(i => i > margin) / 2;
+			for (int i = tierWidths.Count() - 1; i >= 0; i--)
+			{
+				int offset = centrePoint - tierWidths[i] / 2;
+
+				foreach (var node in nodePositions[i])
+				{
+					nodeControls[node].Location = Point.Add(nodeControls[node].Location, new Size(offset, 0));
+				}
 			}
 
 			Invalidate(true);
