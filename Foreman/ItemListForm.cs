@@ -27,21 +27,12 @@ namespace Foreman
 			listBox1.Sorted = true;
 		}
 
-		private void label1_Click(object sender, EventArgs e)
-		{
-
-		}
-
 		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			//ProductionTree.graph = new ProductionGraph();
 			//ProductionTree.Controls.Clear();
 			//ProductionTree.nodeControls.Clear();
 			ProductionTree.AddDemand(DataCache.Items[listBox1.SelectedItem.ToString()]);
-		}
-
-		private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
-		{
 		}
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)

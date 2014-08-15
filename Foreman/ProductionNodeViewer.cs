@@ -117,21 +117,22 @@ namespace Foreman
 			const int Top = 0;
 			int Bottom = Height;
 			int Right = Width;
-			GraphicsPath path = new GraphicsPath();
-
-			path.StartFigure();
-
-			path.AddArc(Left, Top, 2 * radius, 2 * radius, 180, 90f);
-			path.AddArc(Right - radius2, Top, radius2, radius2, 270f, 90f);
-			path.AddArc(Right - radius2, Bottom - radius2, radius2, radius2, 0f, 90f);
-			path.AddArc(Left, Bottom - radius2, radius2, radius2, 90f, 90f);
-
-			path.CloseFigure();
-
-			//e.Graphics.Clear(this.BackColor);
-			using (SolidBrush brush = new SolidBrush(backgroundColour))
+			using (GraphicsPath path = new GraphicsPath())
 			{
-				e.Graphics.FillPath(brush, path);
+				path.StartFigure();
+
+				path.AddArc(Left, Top, 2 * radius, 2 * radius, 180, 90f);
+				path.AddArc(Right - radius2, Top, radius2, radius2, 270f, 90f);
+				path.AddArc(Right - radius2, Bottom - radius2, radius2, radius2, 0f, 90f);
+				path.AddArc(Left, Bottom - radius2, radius2, radius2, 90f, 90f);
+
+				path.CloseFigure();
+
+				//e.Graphics.Clear(this.BackColor);
+				using (SolidBrush brush = new SolidBrush(backgroundColour))
+				{
+					e.Graphics.FillPath(brush, path);
+				}
 			}
 		}
 	}
