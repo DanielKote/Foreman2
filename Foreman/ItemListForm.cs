@@ -24,6 +24,7 @@ namespace Foreman
 
 			listBox1.Items.Clear();
 			listBox1.Items.AddRange(DataCache.Items.Keys.ToArray());
+			listBox1.Sorted = true;
 		}
 
 		private void label1_Click(object sender, EventArgs e)
