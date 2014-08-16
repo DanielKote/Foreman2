@@ -15,6 +15,7 @@ namespace Foreman
 		private static String factorioPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		private const float defaultRecipeTime = 0.5f;
+		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		
 		public static void LoadRecipes()
 		{
@@ -81,6 +82,33 @@ namespace Foreman
 			{
 				return null;
 			}
+		}
+
+		public static Color IconAverageColour(Bitmap icon)
+		{
+			if (icon == null)
+			{
+				return Color.LightGray;
+			}
+
+			Color result;
+			if (colourCache.ContainsKey(icon))
+			{
+				result = colourCache[icon];
+			}
+			else
+			{
+				Bitmap pixel = new Bitmap(1, 1);
+
+				using (Graphics g = Graphics.FromImage(pixel))
+				{
+					g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+					g.DrawImage(icon, new Rectangle(0, 0, 1, 1)); //Scale the icon down to a 1-pixel image, which does the averaging for us
+				}
+				result = pixel.GetPixel(0, 0);
+			}
+
+			return result;
 		}
 
 		private static void InterpretLuaItem(String name, LuaTable values)

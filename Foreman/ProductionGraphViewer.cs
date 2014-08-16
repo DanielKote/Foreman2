@@ -55,8 +55,6 @@ namespace Foreman
 
 		private void DrawConnections(Graphics graphics)
 		{
-			using (Pen pen = new Pen(Color.LightGray, 3f))
-			{
 			graphics.Clear(this.BackColor);
 
 			foreach (var n in nodeControls.Keys)
@@ -72,13 +70,14 @@ namespace Foreman
 							Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 							Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 
-							graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
+							using (Pen pen = new Pen(DataCache.IconAverageColour(item.Icon), 3f))
+							{
+								graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
+							}
 						}
 					}
 				}
 			}
-
-		}
 		}
 
 		private void PositionControls()
