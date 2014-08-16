@@ -121,7 +121,7 @@ namespace Foreman
 		{
 			if (isBeingDragged)
 			{
-				Location = new Point(Location.X + e.X - dragOffsetX, Location.Y + e.Y - dragOffsetY);
+				Location = new Point(Location.X + e.X - dragOffsetX + Parent.AutoScrollOffset.X, Location.Y + e.Y - dragOffsetY + Parent.AutoScrollOffset.Y);
 				Invalidate();
 				Parent.Invalidate();
 				Parent.Update();
