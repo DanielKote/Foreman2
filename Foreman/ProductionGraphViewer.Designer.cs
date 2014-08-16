@@ -40,6 +40,10 @@
 			this.DoubleBuffered = true;
 			this.Name = "ProductionGraphViewer";
 			this.Size = new System.Drawing.Size(889, 633);
+			this.Scroll += new System.Windows.Forms.ScrollEventHandler(this.ProductionGraphViewer_Scroll);
+			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseDown);
+			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseMove);
+			this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseUp);
 			this.ResumeLayout(false);
 
 		}

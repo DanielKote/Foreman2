@@ -10,12 +10,11 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
-	public partial class ProductionNodeViewer : UserControl
+	public partial class ProductionNodeViewer
 	{
-		private bool isBeingDragged = false;
-		private int dragOffsetX;
-		private int dragOffsetY;
-		private Panel mousePanel = new Panel();
+		public bool IsBeingDragged = false;
+		public int DragOffsetX;
+		public int DragOffsetY;
 
 		private Color recipeColour = Color.FromArgb(190, 217, 212);
 		private Color supplyColour = Color.FromArgb(249, 237, 195);
@@ -25,19 +24,37 @@ namespace Foreman
 		public const int iconSize = 32;
 		public const int iconBorder = 4;
 
+		private string rateText = "";
+		private string nameText = "";
+
+		public int X;
+		public int Y;
+		public int Width;
+		public int Height;
+		public Rectangle bounds
+		{
+			get
+			{
+				return new Rectangle(X, Y, Width, Height);
+			}
+		}
+		public Rectangle screenBounds
+		{
+			get
+			{
+				return new Rectangle(Point.Add(Parent.AutoScrollPosition, new Size(X, Y)), new Size(Width, Height));
+			}
+		}
+
 		public ProductionNode DisplayedNode { get; private set; }
 
-		public ProductionGraphViewer parentTreeViewer;
+		public ProductionGraphViewer Parent;
 		public ProductionNodeViewer(ProductionNode node)
 		{
-			InitializeComponent();
-
-			SetStyle(ControlStyles.UserPaint | ControlStyles.SupportsTransparentBackColor, true);
+			Width = 100;
+			Height = 100;
 
 			DisplayedNode = node;
-			DoControlSettings(this);
-			OutputIconSizePanel.Height = InputIconSizePanel.Height = iconSize + iconBorder * 4;
-			this.BackColor = Color.Transparent;
 
 			if (DisplayedNode.GetType() == typeof(ConsumerNode))
 			{
@@ -51,44 +68,33 @@ namespace Foreman
 			{
 				backgroundColour = recipeColour;
 			}
-
 		}
-
-		private void DoControlSettings(Control control)
-		{
-			if (control != this)
-			{
-				control.BackColor = Color.Transparent;
-			}
-
-			control.MouseUp += new MouseEventHandler(MouseUpHandler);
-			control.MouseDown += new MouseEventHandler(MouseDownHandler);
-			control.MouseMove += new MouseEventHandler(MouseMoveHandler);
-
-			foreach (Control child in control.Controls)
-			{
-				DoControlSettings(child);
-			}
-		}
-
-		public void UpdateText()
-		{
-			NameBox.Text = DisplayedNode.DisplayName;
+		
+		public void Update()
+		{			
+			nameText = String.Format("Recipe: {0}", DisplayedNode.DisplayName);
 			if (DisplayedNode.GetType() == typeof(RecipeNode))
 			{
-				RateBox.Text = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
+				rateText = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
 			}
 			else if (DisplayedNode.GetType() == typeof(ConsumerNode))
 			{
-				RateBox.Text = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
+				rateText = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
 			}
 			else if (DisplayedNode.GetType() == typeof(SupplyNode))
 			{
-				RateBox.Text = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
+				rateText = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
 			}
 
-			OutputIconSizePanel.Width = DisplayedNode.Outputs.Count() * (iconSize + iconBorder * 6) + iconBorder;
-			InputIconSizePanel.Width = DisplayedNode.Inputs.Count() * (iconSize + iconBorder * 6) + iconBorder;
+			SizeF stringSize = Parent.CreateGraphics().MeasureString(nameText, SystemFonts.DefaultFont);
+			Width = Math.Max((int)stringSize.Width, getIconWidths());
+		}
+
+		private int getIconWidths()
+		{
+			return Math.Max(
+				(iconSize + iconBorder * 5) * DisplayedNode.Outputs.Count() + iconBorder,
+				(iconSize + iconBorder * 5) * DisplayedNode.Inputs.Count() + iconBorder);
 		}
 
 		public Point getOutputIconPoint(Item item)
@@ -109,54 +115,44 @@ namespace Foreman
 
 		public Point getOutputLineConnectionPoint(Item item)
 		{
-			 return Point.Add(getOutputIconPoint(item), new Size(Location.X, Location.Y - (iconSize + iconBorder + iconBorder) / 2));
+			 return Point.Add(getOutputIconPoint(item), new Size(X, Y - (iconSize + iconBorder + iconBorder) / 2));
 		}
 
 		public Point getInputLineConnectionPoint(Item item)
 		{
-			return Point.Add(getInputIconPoint(item), new Size(Location.X, Location.Y + (iconSize + iconBorder + iconBorder) / 2));
+			return Point.Add(getInputIconPoint(item), new Size(X, Y + (iconSize + iconBorder + iconBorder) / 2));
 		}
 
 		public void MouseMoveHandler(object sender, MouseEventArgs e)
 		{
-			if (isBeingDragged)
+			if (IsBeingDragged)
 			{
-				Location = new Point(Location.X + e.X - dragOffsetX + Parent.AutoScrollOffset.X, Location.Y + e.Y - dragOffsetY + Parent.AutoScrollOffset.Y);
-				Invalidate();
 				Parent.Invalidate();
 				Parent.Update();
 			}
 		}
 
-		public void MouseDownHandler(object sender, MouseEventArgs e)
+		public void Paint(Graphics graphics)
 		{
-			isBeingDragged = true;
-			dragOffsetX = e.X;
-			dragOffsetY = e.Y;
-		}
-
-		public void MouseUpHandler(object sender, MouseEventArgs e)
-		{
-			isBeingDragged = false;
-		}
-
-		protected void OnPaint(object sender, PaintEventArgs e)
-		{
-			base.OnPaint(e);
-			
-				using (SolidBrush brush = new SolidBrush(backgroundColour))
-				{
-					FillRoundRect(0, ((iconSize + iconBorder) / 2), Width, Height - (iconSize + iconBorder), 8, e.Graphics, brush);
-				}
+			using (SolidBrush brush = new SolidBrush(backgroundColour))
+			{
+				FillRoundRect(0, ((iconSize + iconBorder) / 2), Width, Height - (iconSize + iconBorder), 8, graphics, brush);
+			}
 
 			foreach (Item item in DisplayedNode.Outputs.Keys)
 			{
-				DrawItemIcon(item, getOutputIconPoint(item), e.Graphics);
+				DrawItemIcon(item, getOutputIconPoint(item), graphics);
 			}
 			foreach (Item item in DisplayedNode.Inputs.Keys)
 			{
-				DrawItemIcon(item, getInputIconPoint(item), e.Graphics);
+				DrawItemIcon(item, getInputIconPoint(item), graphics);
 			}
+
+			StringFormat centreFormat = new StringFormat();
+			centreFormat.Alignment = StringAlignment.Center;
+			centreFormat.LineAlignment = StringAlignment.Center;
+			graphics.DrawString(nameText, SystemFonts.DefaultFont, new SolidBrush(Color.Black), new PointF(Width / 2, Height/ 2), centreFormat);
+
 		}
 
 		private void DrawItemIcon(Item item, Point drawPoint, Graphics graphics)
@@ -175,7 +171,7 @@ namespace Foreman
 			}
 		}
 
-		private static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)
+		public static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)
 		{
 			int radius2 = radius * 2;
 			int Left = x;

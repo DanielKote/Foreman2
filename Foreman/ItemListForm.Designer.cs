@@ -30,7 +30,7 @@
 		{
 			this.listBox1 = new System.Windows.Forms.ListBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.ProductionTree = new Foreman.ProductionGraphViewer();
+			this.ProductionGraph = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -47,12 +47,11 @@
 			// 
 			// tableLayoutPanel1
 			// 
-			this.tableLayoutPanel1.AutoScroll = true;
 			this.tableLayoutPanel1.ColumnCount = 2;
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 250F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel1.Controls.Add(this.listBox1, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ProductionTree, 1, 0);
+			this.tableLayoutPanel1.Controls.Add(this.ProductionGraph, 1, 0);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -61,16 +60,16 @@
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(1029, 690);
 			this.tableLayoutPanel1.TabIndex = 1;
 			// 
-			// ProductionTree
+			// ProductionGraph
 			// 
-			this.ProductionTree.AutoScroll = true;
-			this.ProductionTree.BackColor = System.Drawing.Color.White;
-			this.ProductionTree.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.ProductionTree.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ProductionTree.Location = new System.Drawing.Point(253, 3);
-			this.ProductionTree.Name = "ProductionTree";
-			this.ProductionTree.Size = new System.Drawing.Size(773, 684);
-			this.ProductionTree.TabIndex = 1;
+			this.ProductionGraph.AutoScroll = true;
+			this.ProductionGraph.BackColor = System.Drawing.Color.White;
+			this.ProductionGraph.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.ProductionGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ProductionGraph.Location = new System.Drawing.Point(253, 3);
+			this.ProductionGraph.Name = "ProductionGraph";
+			this.ProductionGraph.Size = new System.Drawing.Size(773, 684);
+			this.ProductionGraph.TabIndex = 1;
 			// 
 			// ItemListForm
 			// 
@@ -93,7 +92,7 @@
 
 		private System.Windows.Forms.ListBox listBox1;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private ProductionGraphViewer ProductionTree;
+		private ProductionGraphViewer ProductionGraph;
 	}
 }
 

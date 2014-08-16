@@ -76,12 +76,7 @@
     <Compile Include="ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionNodeViewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ProductionNodeViewer.Designer.cs">
-      <DependentUpon>ProductionNodeViewer.cs</DependentUpon>
-    </Compile>
+    <Compile Include="ProductionNodeViewer.cs" />
     <EmbeddedResource Include="ItemListForm.resx">
       <DependentUpon>ItemListForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -97,9 +92,6 @@
     </Compile>
     <EmbeddedResource Include="ProductionGraphViewer.resx">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProductionNodeViewer.resx">
-      <DependentUpon>ProductionNodeViewer.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">

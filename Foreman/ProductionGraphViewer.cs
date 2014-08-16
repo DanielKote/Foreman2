@@ -33,7 +33,7 @@ namespace Foreman
 
 			foreach (ProductionNodeViewer node in nodeControls.Values)
 			{
-				node.UpdateText();
+				node.Update();
 			}
 			PositionControls();
 			Invalidate(true);
@@ -45,18 +45,15 @@ namespace Foreman
 			{
 				if (!nodeControls.ContainsKey(node))
 				{
-					ProductionNodeViewer control = new ProductionNodeViewer(node);
-					control.parentTreeViewer = this;
-					Controls.Add(control);
-					nodeControls.Add(node, control);
+					ProductionNodeViewer nodeViewer = new ProductionNodeViewer(node);
+					nodeViewer.Parent = this;
+					nodeControls.Add(node, nodeViewer);
 				}
 			}
 		}
 
 		private void DrawConnections(Graphics graphics)
 		{
-			graphics.Clear(this.BackColor);
-
 			foreach (var n in nodeControls.Keys)
 			{
 				foreach (var m in nodeControls.Keys)
@@ -137,7 +134,8 @@ namespace Foreman
 						continue;
 					}
 					ProductionNodeViewer control = nodeControls[node];
-					control.Location = new Point(x, y);
+					control.X = x;
+					control.Y = y;
 
 					x += control.Width + margin;
 					maxHeight = Math.Max(control.Height, maxHeight);
@@ -158,7 +156,7 @@ namespace Foreman
 
 				foreach (var node in nodePositions[i])
 				{
-					nodeControls[node].Location = Point.Add(nodeControls[node].Location, new Size(offset, 0));
+					nodeControls[node].X = nodeControls[node].X + offset;
 				}
 			}
 
@@ -168,7 +166,70 @@ namespace Foreman
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
+			e.Graphics.Clear(this.BackColor);
+			e.Graphics.TranslateTransform(AutoScrollPosition.X, AutoScrollPosition.Y);
 			DrawConnections(e.Graphics);
+
+			foreach (ProductionNodeViewer viewer in nodeControls.Values)
+			{
+				e.Graphics.TranslateTransform(viewer.X, viewer.Y);
+				viewer.Paint(e.Graphics);
+				e.Graphics.TranslateTransform(-viewer.X, -viewer.Y);
+			}
+		}
+
+		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
+		{
+			foreach (ProductionNodeViewer viewer in nodeControls.Values)
+			{
+				if (viewer.screenBounds.Contains(e.Location))
+				{
+					viewer.IsBeingDragged = true;
+					viewer.DragOffsetX = e.X - viewer.X;
+					viewer.DragOffsetY = e.Y - viewer.Y;
+					break;
+				}
+			}
+		}
+
+		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
+		{
+			foreach (ProductionNodeViewer viewer in nodeControls.Values)
+			{
+				viewer.IsBeingDragged = false;
+			}
+		}
+
+		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
+		{
+			foreach (ProductionNodeViewer viewer in nodeControls.Values)
+			{
+				if (viewer.IsBeingDragged)
+				{
+					viewer.X = e.X - viewer.DragOffsetX;
+					viewer.Y = e.Y - viewer.DragOffsetY;
+					Invalidate();
+				}
+			}
+			ResizeToFitContents();
+		}
+
+		private void ResizeToFitContents()
+		{
+			int newWidth =  0;
+			int newHeight = 0;
+			foreach (ProductionNodeViewer viewer in nodeControls.Values)
+			{
+				newHeight = Math.Max(viewer.Y + viewer.Height, newHeight);
+				newWidth = Math.Max(viewer.X + viewer.Width, newWidth);
+			}
+			this.AutoScrollMinSize = new Size(newWidth + 20, newHeight + 20);
+		}
+
+		private void ProductionGraphViewer_Scroll(object sender, ScrollEventArgs e)
+		{
+			Invalidate();
+			Update();
 		}
 	}
 }

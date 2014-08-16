@@ -25,11 +25,13 @@ namespace Foreman
 			listBox1.Items.Clear();
 			listBox1.Items.AddRange(DataCache.Items.Keys.ToArray());
 			listBox1.Sorted = true;
+			
+
 		}
 
 		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			ProductionTree.AddDemand(DataCache.Items[listBox1.SelectedItem.ToString()]);
+			ProductionGraph.AddDemand(DataCache.Items[listBox1.SelectedItem.ToString()]);
 		}
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
@@ -38,6 +40,6 @@ namespace Foreman
 			{
 				Close();
 			}
-		}		
+		}
 	}
 }
