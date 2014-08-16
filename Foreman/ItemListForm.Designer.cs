@@ -64,6 +64,7 @@
 			// ProductionTree
 			// 
 			this.ProductionTree.AutoScroll = true;
+			this.ProductionTree.BackColor = System.Drawing.Color.White;
 			this.ProductionTree.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.ProductionTree.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ProductionTree.Location = new System.Drawing.Point(253, 3);
@@ -77,6 +78,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1029, 690);
 			this.Controls.Add(this.tableLayoutPanel1);
+			this.DoubleBuffered = true;
 			this.KeyPreview = true;
 			this.Name = "ItemListForm";
 			this.Text = "Items";

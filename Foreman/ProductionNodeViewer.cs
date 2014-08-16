@@ -22,6 +22,9 @@ namespace Foreman
 		private Color consumerColour = Color.FromArgb(231, 214, 224);
 		private Color backgroundColour;
 
+		public const int iconSize = 32;
+		public const int iconBorder = 4;
+
 		public ProductionNode DisplayedNode { get; private set; }
 
 		public ProductionGraphViewer parentTreeViewer;
@@ -32,8 +35,9 @@ namespace Foreman
 			SetStyle(ControlStyles.UserPaint | ControlStyles.SupportsTransparentBackColor, true);
 
 			DisplayedNode = node;
-
-			ProcessControl(this);
+			DoControlSettings(this);
+			OutputIconSizePanel.Height = InputIconSizePanel.Height = iconSize + iconBorder * 4;
+			this.BackColor = Color.Transparent;
 
 			if (DisplayedNode.GetType() == typeof(ConsumerNode))
 			{
@@ -50,7 +54,7 @@ namespace Foreman
 
 		}
 
-		private void ProcessControl(Control control)
+		private void DoControlSettings(Control control)
 		{
 			if (control != this)
 			{
@@ -63,7 +67,7 @@ namespace Foreman
 
 			foreach (Control child in control.Controls)
 			{
-				ProcessControl(child);
+				DoControlSettings(child);
 			}
 		}
 
@@ -82,6 +86,35 @@ namespace Foreman
 			{
 				RateBox.Text = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
 			}
+
+			OutputIconSizePanel.Width = DisplayedNode.Outputs.Count() * (iconSize + iconBorder * 6) + iconBorder;
+			InputIconSizePanel.Width = DisplayedNode.Inputs.Count() * (iconSize + iconBorder * 6) + iconBorder;
+		}
+
+		public Point getOutputIconPoint(Item item)
+		{
+			var sortedOutputs = DisplayedNode.Outputs.Keys.OrderBy(i => i.Name).ToList();
+			int x = (Width / (sortedOutputs.Count() + 1)) * (sortedOutputs.IndexOf(item) + 1);
+			int y = (iconSize + iconBorder + iconBorder) / 2;
+			return new Point(x, y + 1);
+		}
+
+		public Point getInputIconPoint(Item item)
+		{
+			var sortedOutputs = DisplayedNode.Inputs.Keys.OrderBy(i => i.Name).ToList();
+			int x = (Width / (sortedOutputs.Count() + 1)) * (sortedOutputs.IndexOf(item) + 1);
+			int y = Height - (iconSize + iconBorder + iconBorder) / 2;
+			return new Point(x, y - 2);
+		}
+
+		public Point getOutputLineConnectionPoint(Item item)
+		{
+			 return Point.Add(getOutputIconPoint(item), new Size(Location.X, Location.Y - (iconSize + iconBorder + iconBorder) / 2));
+		}
+
+		public Point getInputLineConnectionPoint(Item item)
+		{
+			return Point.Add(getInputIconPoint(item), new Size(Location.X, Location.Y + (iconSize + iconBorder + iconBorder) / 2));
 		}
 
 		public void MouseMoveHandler(object sender, MouseEventArgs e)
@@ -110,13 +143,46 @@ namespace Foreman
 		protected void OnPaint(object sender, PaintEventArgs e)
 		{
 			base.OnPaint(e);
+			
+				using (SolidBrush brush = new SolidBrush(backgroundColour))
+				{
+					FillRoundRect(0, ((iconSize + iconBorder) / 2), Width, Height - (iconSize + iconBorder), 8, e.Graphics, brush);
+				}
 
-			const int radius = 7;
-			const int radius2 = radius * 2;
-			const int Left = 0;;
-			const int Top = 0;
-			int Bottom = Height;
-			int Right = Width;
+			foreach (Item item in DisplayedNode.Outputs.Keys)
+			{
+				DrawItemIcon(item, getOutputIconPoint(item), e.Graphics);
+			}
+			foreach (Item item in DisplayedNode.Inputs.Keys)
+			{
+				DrawItemIcon(item, getInputIconPoint(item), e.Graphics);
+			}
+		}
+
+		private void DrawItemIcon(Item item, Point drawPoint, Graphics graphics)
+		{
+			int boxSize = iconSize + iconBorder + iconBorder;
+
+			if (item.Icon != null)
+			{
+				using (Pen pen = new Pen(Color.Gray, 3))
+				using (Brush brush = new SolidBrush(Color.White))
+				{
+					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize, iconBorder, graphics, brush);
+					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize, iconBorder, graphics, pen);
+				}
+				graphics.DrawImage(item.Icon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
+			}
+		}
+
+		private static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)
+		{
+			int radius2 = radius * 2;
+			int Left = x;
+			int Top = y;
+			int Bottom = y + height;
+			int Right = x + width;
+
 			using (GraphicsPath path = new GraphicsPath())
 			{
 				path.StartFigure();
@@ -128,11 +194,30 @@ namespace Foreman
 
 				path.CloseFigure();
 
-				//e.Graphics.Clear(this.BackColor);
-				using (SolidBrush brush = new SolidBrush(backgroundColour))
-				{
-					e.Graphics.FillPath(brush, path);
-				}
+				graphics.DrawPath(pen, path);
+			}
+		}
+
+		private static void FillRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Brush brush)
+		{
+			int radius2 = radius * 2;
+			int Left = x;
+			int Top = y;
+			int Bottom = y + height;
+			int Right = x + width;
+
+			using (GraphicsPath path = new GraphicsPath())
+			{
+				path.StartFigure();
+
+				path.AddArc(Left, Top, 2 * radius, 2 * radius, 180, 90f);
+				path.AddArc(Right - radius2, Top, radius2, radius2, 270f, 90f);
+				path.AddArc(Right - radius2, Bottom - radius2, radius2, radius2, 0f, 90f);
+				path.AddArc(Left, Bottom - radius2, radius2, radius2, 90f, 90f);
+
+				path.CloseFigure();
+
+				graphics.FillPath(brush, path);
 			}
 		}
 	}

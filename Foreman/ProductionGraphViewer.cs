@@ -55,7 +55,8 @@ namespace Foreman
 
 		private void DrawConnections(Graphics graphics)
 		{
-			Pen pen = new Pen(Color.LightGray, 3f);
+			using (Pen pen = new Pen(Color.LightGray, 3f))
+			{
 			graphics.Clear(this.BackColor);
 
 			foreach (var n in nodeControls.Keys)
@@ -64,17 +65,20 @@ namespace Foreman
 				{
 					if (m.CanTakeFrom(n))
 					{
-						Point pointN = Point.Add(nodeControls[n].Location, new Size(nodeControls[n].Width / 2, 1));
-						Point pointM = Point.Add(nodeControls[m].Location, new Size(nodeControls[m].Width / 2, nodeControls[m].Height - 1));
-						Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
-						Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
+						foreach (Item item in m.Inputs.Keys.Intersect(n.Outputs.Keys))
+						{
+							Point pointN = nodeControls[n].getOutputLineConnectionPoint(item);
+							Point pointM = nodeControls[m].getInputLineConnectionPoint(item);
+							Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
+							Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 
-						graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
+							graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
+						}
 					}
 				}
 			}
 
-			pen.Dispose();
+		}
 		}
 
 		private void PositionControls()

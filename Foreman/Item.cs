@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace Foreman
 {
@@ -9,6 +10,7 @@ namespace Foreman
 	{
 		public String Name { get; private set; }
 		public HashSet<Recipe> Recipes { get; private set; }
+		public Bitmap Icon { get; set; }
 
 		private Item()
 		{

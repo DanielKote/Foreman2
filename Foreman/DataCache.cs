@@ -5,18 +5,19 @@ using System.Text;
 using NLua;
 using System.IO;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace Foreman
 {
 	static class DataCache
 	{
+		//Still hardcoded. Needs to ask the user if it can't be found.
 		private static String factorioPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		private const float defaultRecipeTime = 0.5f;
-
+		
 		public static void LoadRecipes()
 		{
-			factorioPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 			Lua lua = new Lua();
 			List<String> luaFiles = Directory.GetFiles(factorioPath, "*.lua", SearchOption.AllDirectories).ToList();
 
@@ -28,24 +29,70 @@ namespace Foreman
 
 			String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
 
-			List<String> recipeFiles = luaFiles.ToList();
-			recipeFiles.RemoveAll(f => !f.Contains("prototypes"));
-			recipeFiles.RemoveAll(f => !f.Contains("recipe"));
+			List<String> itemFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "item")).ToList();
+			List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
 
 			lua.DoFile(dataloaderFile);
+			itemFiles.ForEach(f => lua.DoFile(f));
 			recipeFiles.ForEach(f => lua.DoFile(f));
+			
+			LuaTable itemTable = lua.GetTable("data.raw")["item"] as LuaTable;
+
+			var enumerator = itemTable.GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				InterpretLuaItem(enumerator.Key as String, enumerator.Value as LuaTable);
+			}
 
 			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
 
-			var enumerator = recipeTable.GetEnumerator();
+			enumerator = recipeTable.GetEnumerator();
 			while (enumerator.MoveNext())
 			{
 				InterpretLuaRecipe(enumerator.Key as String, enumerator.Value as LuaTable);
 			}
 		}
 
-		//Adds the item name to the cache and returns the Item object
-		private static Item LoadItem(String itemName)
+		private static Bitmap LoadImage(String fileName)
+		{
+			string fullPath;
+			if (File.Exists(fileName))
+			{
+				fullPath = fileName;
+			}
+			else
+			{
+
+				string[] splitPath = fileName.Split('/');
+				splitPath[0] = splitPath[0].Trim('_');
+				fullPath = factorioPath;
+				foreach (String pathPart in splitPath)
+				{
+					fullPath = Path.Combine(fullPath, pathPart);
+				}
+			}
+
+			try
+			{
+				Bitmap image = new Bitmap(fullPath);
+				return image;
+			}
+			catch (Exception e)
+			{
+				return null;
+			}
+		}
+
+		private static void InterpretLuaItem(String name, LuaTable values)
+		{
+			Item newItem = new Item(name);
+			newItem.Icon = LoadImage(values["icon"] as String);
+
+			Items.Add(name, newItem);
+		}
+
+		//This is only if a recipe references an item that isn't in the item prototypes (which shouldn't really happen)
+		private static Item LoadItemFromRecipe(String itemName)
 		{
 			Item newItem;
 			if (!Items.ContainsKey(itemName))
@@ -81,7 +128,7 @@ namespace Foreman
 				{
 					resultCount = 1f;
 				}
-				results.Add(LoadItem(values["result"] as String), resultCount);
+				results.Add(LoadItemFromRecipe(values["result"] as String), resultCount);
 			}
 			else
 			{
@@ -89,7 +136,7 @@ namespace Foreman
 				while (resultEnumerator.MoveNext())
 				{
 					LuaTable resultTable = resultEnumerator.Value as LuaTable;
-					results.Add(LoadItem(resultTable["name"] as String), Convert.ToSingle(resultTable["amount"]));
+					results.Add(LoadItemFromRecipe(resultTable["name"] as String), Convert.ToSingle(resultTable["amount"]));
 				}
 			}
 
@@ -121,7 +168,7 @@ namespace Foreman
 				{
 					amount = Convert.ToSingle(ingredientTable[2]);
 				}
-				ingredients.Add(LoadItem(name), amount);
+				ingredients.Add(LoadItemFromRecipe(name), amount);
 			}
 
 			return ingredients;
