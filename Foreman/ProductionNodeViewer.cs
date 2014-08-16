@@ -100,16 +100,16 @@ namespace Foreman
 		public Point getOutputIconPoint(Item item)
 		{
 			var sortedOutputs = DisplayedNode.Outputs.Keys.OrderBy(i => i.Name).ToList();
-			int x = (Width / (sortedOutputs.Count() + 1)) * (sortedOutputs.IndexOf(item) + 1);
-			int y = (iconSize + iconBorder + iconBorder) / 2;
+			int x = Convert.ToInt32((float)Width / (sortedOutputs.Count()) * (sortedOutputs.IndexOf(item) + 0.5f));
+			int y = 0;
 			return new Point(x, y + 1);
 		}
 
 		public Point getInputIconPoint(Item item)
 		{
-			var sortedOutputs = DisplayedNode.Inputs.Keys.OrderBy(i => i.Name).ToList();
-			int x = (Width / (sortedOutputs.Count() + 1)) * (sortedOutputs.IndexOf(item) + 1);
-			int y = Height - (iconSize + iconBorder + iconBorder) / 2;
+			var sortedInputs = DisplayedNode.Inputs.Keys.OrderBy(i => i.Name).ToList();
+			int x = Convert.ToInt32((float)Width / (sortedInputs.Count()) * (sortedInputs.IndexOf(item) + 0.5f));
+			int y = Height;
 			return new Point(x, y - 2);
 		}
 
@@ -136,7 +136,7 @@ namespace Foreman
 		{
 			using (SolidBrush brush = new SolidBrush(backgroundColour))
 			{
-				FillRoundRect(0, ((iconSize + iconBorder) / 2), Width, Height - (iconSize + iconBorder), 8, graphics, brush);
+				FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
 			}
 
 			foreach (Item item in DisplayedNode.Outputs.Keys)
