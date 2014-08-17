@@ -42,7 +42,7 @@ namespace Foreman
 		{
 			get
 			{
-				return new Rectangle(Point.Add(Parent.AutoScrollPosition, new Size(X, Y)), new Size(Width, Height));
+				return new Rectangle(Parent.viewOffset.X + X, Parent.viewOffset.Y + Y, Width, Height);
 			}
 		}
 
