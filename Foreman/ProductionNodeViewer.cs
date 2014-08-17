@@ -53,7 +53,7 @@ namespace Foreman
 		public ProductionNodeViewer(ProductionNode node)
 		{
 			Width = 100;
-			Height = 100;
+			Height = 80;
 
 			DisplayedNode = node;
 
@@ -72,23 +72,22 @@ namespace Foreman
 		}
 		
 		public void Update()
-		{			
-			nameText = String.Format("Recipe: {0}", DisplayedNode.DisplayName);
+		{
 			if (DisplayedNode.GetType() == typeof(RecipeNode))
 			{
-				rateText = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
+				nameText = String.Format("Recipe: {0}", DisplayedNode.DisplayName);
 			}
 			else if (DisplayedNode.GetType() == typeof(ConsumerNode))
 			{
-				rateText = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
+				nameText = String.Format("Output: {0}", DisplayedNode.DisplayName);
 			}
 			else if (DisplayedNode.GetType() == typeof(SupplyNode))
 			{
-				rateText = String.Format("{0}/sec", DisplayedNode.Rate.ToString());
+				nameText = String.Format("Input: {0}", DisplayedNode.DisplayName);
 			}
 
 			SizeF stringSize = Parent.CreateGraphics().MeasureString(nameText, SystemFonts.DefaultFont);
-			Width = Math.Max((int)stringSize.Width, getIconWidths());
+			Width = Math.Max((int)stringSize.Width + iconBorder * 2, getIconWidths());
 		}
 
 		private int getIconWidths()
@@ -103,7 +102,7 @@ namespace Foreman
 			var sortedOutputs = DisplayedNode.Outputs.Keys.OrderBy(i => i.Name).ToList();
 			int x = Convert.ToInt32((float)Width / (sortedOutputs.Count()) * (sortedOutputs.IndexOf(item) + 0.5f));
 			int y = 0;
-			return new Point(x, y + 1);
+			return new Point(x, y + iconBorder);
 		}
 
 		public Point getInputIconPoint(Item item)
@@ -111,7 +110,7 @@ namespace Foreman
 			var sortedInputs = DisplayedNode.Inputs.Keys.OrderBy(i => i.Name).ToList();
 			int x = Convert.ToInt32((float)Width / (sortedInputs.Count()) * (sortedInputs.IndexOf(item) + 0.5f));
 			int y = Height;
-			return new Point(x, y - 2);
+			return new Point(x, y - iconBorder);
 		}
 
 		public Point getOutputLineConnectionPoint(Item item)
@@ -142,17 +141,17 @@ namespace Foreman
 
 			foreach (Item item in DisplayedNode.Outputs.Keys)
 			{
-				DrawItemIcon(item, getOutputIconPoint(item), true, DisplayedNode.OutputRate(item).ToString(".##"), graphics);
+				DrawItemIcon(item, getOutputIconPoint(item), true, DisplayedNode.OutputRate(item).ToString("0.##"), graphics);
 			}
 			foreach (Item item in DisplayedNode.Inputs.Keys)
 			{
-				DrawItemIcon(item, getInputIconPoint(item), false, DisplayedNode.InputRate(item).ToString(".##"), graphics);
+				DrawItemIcon(item, getInputIconPoint(item), false, DisplayedNode.InputRate(item).ToString("0.##"), graphics);
 			}
 
 			StringFormat centreFormat = new StringFormat();
 			centreFormat.Alignment = StringAlignment.Center;
 			centreFormat.LineAlignment = StringAlignment.Center;
-			graphics.DrawString(nameText, SystemFonts.DefaultFont, new SolidBrush(Color.Black), new PointF(Width / 2, Height/ 2), centreFormat);
+			graphics.DrawString(nameText, new Font(FontFamily.GenericSansSerif, 8), new SolidBrush(Color.Black), new PointF(Width / 2, Height/ 2), centreFormat);
 
 		}
 
@@ -171,13 +170,13 @@ namespace Foreman
 				{
 					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
 					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, SystemFonts.DefaultFont, textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight) / 2 + iconBorder), centreFormat);
+					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight) / 2 + iconBorder), centreFormat);
 				}
 				else
 				{
 					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
 					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, SystemFonts.DefaultFont, textBrush, new PointF(drawPoint.X, drawPoint.Y + (boxSize + iconTextHeight) / 2 - iconBorder), centreFormat);
+					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y + (boxSize + iconTextHeight) / 2 - iconBorder), centreFormat);
 				}
 			}
 			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
