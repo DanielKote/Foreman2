@@ -159,16 +159,13 @@ namespace Foreman
 		{
 			int boxSize = iconSize + iconBorder + iconBorder;
 
-			if (item.Icon != null)
-			{
 				using (Pen pen = new Pen(Color.Gray, 3))
 				using (Brush brush = new SolidBrush(Color.White))
 				{
 					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize, iconBorder, graphics, brush);
 					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize, iconBorder, graphics, pen);
 				}
-				graphics.DrawImage(item.Icon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
-			}
+				graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
 		}
 
 		public static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)

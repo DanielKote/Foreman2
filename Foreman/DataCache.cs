@@ -16,6 +16,7 @@ namespace Foreman
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
+		public static Bitmap UnknownIcon;
 		
 		public static void LoadRecipes()
 		{
@@ -52,6 +53,8 @@ namespace Foreman
 			{
 				InterpretLuaRecipe(enumerator.Key as String, enumerator.Value as LuaTable);
 			}
+
+			UnknownIcon = LoadImage("UnknownIcon.png");
 		}
 
 		private static void InterpretItems(Lua lua, String typeName)
