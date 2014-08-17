@@ -137,7 +137,7 @@ namespace Foreman
 			}
 			nodePositions.Last().AddRange(nodeOrder.OfType<SupplyNode>());
 
-			int margin = 60;
+			int margin = 100;
 			int y = margin;
 			int[] tierWidths = new int[nodePositions.Count()];
 			for (int i = 0; i < nodePositions.Count(); i++)

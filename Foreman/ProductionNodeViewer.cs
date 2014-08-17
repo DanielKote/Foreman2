@@ -23,6 +23,7 @@ namespace Foreman
 
 		public const int iconSize = 32;
 		public const int iconBorder = 4;
+		public const int iconTextHeight = 10;
 
 		private string rateText = "";
 		private string nameText = "";
@@ -115,12 +116,12 @@ namespace Foreman
 
 		public Point getOutputLineConnectionPoint(Item item)
 		{
-			 return Point.Add(getOutputIconPoint(item), new Size(X, Y - (iconSize + iconBorder + iconBorder) / 2));
+			return Point.Add(getOutputIconPoint(item), new Size(X, Y - (iconSize + iconBorder + iconBorder) / 2 - iconTextHeight));
 		}
 
 		public Point getInputLineConnectionPoint(Item item)
 		{
-			return Point.Add(getInputIconPoint(item), new Size(X, Y + (iconSize + iconBorder + iconBorder) / 2));
+			return Point.Add(getInputIconPoint(item), new Size(X, Y + (iconSize + iconBorder + iconBorder) / 2 + iconTextHeight));
 		}
 
 		public void MouseMoveHandler(object sender, MouseEventArgs e)
@@ -141,11 +142,11 @@ namespace Foreman
 
 			foreach (Item item in DisplayedNode.Outputs.Keys)
 			{
-				DrawItemIcon(item, getOutputIconPoint(item), graphics);
+				DrawItemIcon(item, getOutputIconPoint(item), true, DisplayedNode.OutputRate(item).ToString(".##"), graphics);
 			}
 			foreach (Item item in DisplayedNode.Inputs.Keys)
 			{
-				DrawItemIcon(item, getInputIconPoint(item), graphics);
+				DrawItemIcon(item, getInputIconPoint(item), false, DisplayedNode.InputRate(item).ToString(".##"), graphics);
 			}
 
 			StringFormat centreFormat = new StringFormat();
@@ -155,17 +156,31 @@ namespace Foreman
 
 		}
 
-		private void DrawItemIcon(Item item, Point drawPoint, Graphics graphics)
+		private void DrawItemIcon(Item item, Point drawPoint, bool output, String rateText, Graphics graphics)
 		{
 			int boxSize = iconSize + iconBorder + iconBorder;
+			StringFormat centreFormat = new StringFormat();
+			centreFormat.Alignment = StringAlignment.Center;
+			centreFormat.LineAlignment = StringAlignment.Center;
 
-				using (Pen pen = new Pen(Color.Gray, 3))
-				using (Brush brush = new SolidBrush(Color.White))
+			using (Pen borderPen = new Pen(Color.Gray, 3))
+			using (Brush fillBrush = new SolidBrush(Color.White))
+			using (Brush textBrush = new SolidBrush(Color.Black))
+			{
+				if (output)
 				{
-					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize, iconBorder, graphics, brush);
-					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize, iconBorder, graphics, pen);
+					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
+					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
+					graphics.DrawString(rateText, SystemFonts.DefaultFont, textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight) / 2 + iconBorder), centreFormat);
 				}
-				graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
+				else
+				{
+					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
+					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
+					graphics.DrawString(rateText, SystemFonts.DefaultFont, textBrush, new PointF(drawPoint.X, drawPoint.Y + (boxSize + iconTextHeight) / 2 - iconBorder), centreFormat);
+				}
+			}
+			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
 		}
 
 		public static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)
