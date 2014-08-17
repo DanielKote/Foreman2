@@ -57,11 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataCache.cs" />
-    <Compile Include="ItemListForm.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ItemListForm.Designer.cs">
-      <DependentUpon>ItemListForm.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Item.cs" />
     <Compile Include="MatrixStuff.cs" />
@@ -77,8 +77,8 @@
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="ProductionNodeViewer.cs" />
-    <EmbeddedResource Include="ItemListForm.resx">
-      <DependentUpon>ItemListForm.cs</DependentUpon>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

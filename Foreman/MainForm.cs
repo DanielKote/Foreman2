@@ -9,10 +9,10 @@ using System.Windows.Forms;
 
 namespace Foreman
 {	
-	public partial class ItemListForm : Form
+	public partial class MainForm : Form
 	{
 
-		public ItemListForm()
+		public MainForm()
 		{
 			InitializeComponent();
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);

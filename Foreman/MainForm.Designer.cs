@@ -1,6 +1,6 @@
 ﻿namespace Foreman
 {
-	partial class ItemListForm
+	partial class MainForm
 	{
 		/// <summary>
 		/// Required designer variable.

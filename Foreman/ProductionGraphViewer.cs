@@ -18,7 +18,6 @@ namespace Foreman
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
-		private Point mousePoint = Point.Empty;
 
 		private Rectangle graphBounds
 		{
@@ -190,7 +189,6 @@ namespace Foreman
 			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 			e.Graphics.ScaleTransform(ViewScale, ViewScale);
 			DrawConnections(e.Graphics);
-			e.Graphics.FillRectangle(Brushes.DeepPink, new Rectangle(new Point(mousePoint.X - 5, mousePoint.Y - 5), new Size(10, 10)));
 
 			foreach (ProductionNodeViewer viewer in nodeControls.Values)
 			{
@@ -259,7 +257,6 @@ namespace Foreman
 					break;
 				}
 			}
-			mousePoint = screenToGraph(e.Location.X, e.Location.Y);
 			Invalidate();
 		}
 

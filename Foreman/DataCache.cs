@@ -31,26 +31,40 @@ namespace Foreman
 			String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
 
 			List<String> itemFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "item")).ToList();
+			itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "fluid")).ToList());
+			itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "equipment")).ToList());
 			List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
 
 			lua.DoFile(dataloaderFile);
 			itemFiles.ForEach(f => lua.DoFile(f));
 			recipeFiles.ForEach(f => lua.DoFile(f));
+
+			InterpretItems(lua, "item");
+			InterpretItems(lua, "fluid");
+			InterpretItems(lua, "capsule");
+			InterpretItems(lua, "module");
+			InterpretItems(lua, "ammo");
 			
-			LuaTable itemTable = lua.GetTable("data.raw")["item"] as LuaTable;
-
-			var enumerator = itemTable.GetEnumerator();
-			while (enumerator.MoveNext())
-			{
-				InterpretLuaItem(enumerator.Key as String, enumerator.Value as LuaTable);
-			}
-
 			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
 
-			enumerator = recipeTable.GetEnumerator();
+			var enumerator = recipeTable.GetEnumerator();
 			while (enumerator.MoveNext())
 			{
 				InterpretLuaRecipe(enumerator.Key as String, enumerator.Value as LuaTable);
+			}
+		}
+
+		private static void InterpretItems(Lua lua, String typeName)
+		{
+			LuaTable itemTable = lua.GetTable("data.raw")[typeName] as LuaTable;
+
+			if (itemTable != null)
+			{
+				var enumerator = itemTable.GetEnumerator();
+				while (enumerator.MoveNext())
+				{
+					InterpretLuaItem(enumerator.Key as String, enumerator.Value as LuaTable);
+				}
 			}
 		}
 
@@ -118,7 +132,10 @@ namespace Foreman
 			Item newItem = new Item(name);
 			newItem.Icon = LoadImage(values["icon"] as String);
 
-			Items.Add(name, newItem);
+			if (!Items.ContainsKey(name))
+			{
+				Items.Add(name, newItem);
+			}
 		}
 
 		//This is only if a recipe references an item that isn't in the item prototypes (which shouldn't really happen)
