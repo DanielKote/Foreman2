@@ -123,7 +123,7 @@ namespace Foreman
 					g.DrawImage(icon, new Rectangle(0, 0, 1, 1)); //Scale the icon down to a 1-pixel image, which does the averaging for us
 				}
 				result = pixel.GetPixel(0, 0);
-				result = Color.FromArgb(128, result.R, result.G, result.B);
+				result = Color.FromArgb(255, result.R + (255 - result.R) / 2, result.G + (255 - result.G) / 2, result.B + (255 - result.B) / 2);
 				colourCache.Add(icon, result);
 			}
 
