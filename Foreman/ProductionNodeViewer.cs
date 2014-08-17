@@ -42,7 +42,7 @@ namespace Foreman
 		{
 			get
 			{
-				return new Rectangle(Parent.viewOffset.X + X, Parent.viewOffset.Y + Y, Width, Height);
+				return new Rectangle(Parent.ViewOffset.X + X, Parent.ViewOffset.Y + Y, Width, Height);
 			}
 		}
 

@@ -16,7 +16,9 @@ namespace Foreman
 		private List<Item> Demands = new List<Item>();
 		public bool IsBeingDragged { get; private set; }
 		private Point lastMouseDragPoint;
-		public Point viewOffset;
+		public Point ViewOffset;
+		public float ViewScale = 1f;
+		private Point mousePoint = Point.Empty;
 
 		private Rectangle graphBounds
 		{
@@ -29,16 +31,16 @@ namespace Foreman
 					height = Math.Max(viewer.Y + viewer.Height, height);
 					width = Math.Max(viewer.X + viewer.Width, width);
 				}
-				return new Rectangle(viewOffset.X, viewOffset.Y, width + 20, height + 20);
+				return new Rectangle(ViewOffset.X, ViewOffset.Y, width + 20, height + 20);
 			}
 		}
 		
 		public ProductionGraphViewer()
 		{
 			InitializeComponent();
-
-			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
 		}
+
 
 		public void AddDemand(Item item)
 		{	
@@ -185,8 +187,10 @@ namespace Foreman
 		{
 			base.OnPaint(e);
 			e.Graphics.Clear(this.BackColor);
-			e.Graphics.TranslateTransform(viewOffset.X, viewOffset.Y);
+			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
+			e.Graphics.ScaleTransform(ViewScale, ViewScale);
 			DrawConnections(e.Graphics);
+			e.Graphics.FillRectangle(Brushes.DeepPink, new Rectangle(new Point(mousePoint.X - 5, mousePoint.Y - 5), new Size(10, 10)));
 
 			foreach (ProductionNodeViewer viewer in nodeControls.Values)
 			{
@@ -203,11 +207,11 @@ namespace Foreman
 				case MouseButtons.Left:
 					foreach (ProductionNodeViewer viewer in nodeControls.Values)
 					{
-						if (viewer.screenBounds.Contains(e.Location))
+						if (viewer.bounds.Contains(screenToGraph(e.X, e.Y)))
 						{
 							viewer.IsBeingDragged = true;
-							viewer.DragOffsetX = e.X - viewer.X;
-							viewer.DragOffsetY = e.Y - viewer.Y;
+							viewer.DragOffsetX = screenToGraph(e.X, 0).X - viewer.X;
+							viewer.DragOffsetY = screenToGraph(0, e.Y).Y - viewer.Y;
 							break;
 						}
 					}
@@ -241,7 +245,7 @@ namespace Foreman
 		{
 			if (IsBeingDragged)
 			{
-				viewOffset = new Point(viewOffset.X + e.X - lastMouseDragPoint.X, viewOffset.Y + e.Y - lastMouseDragPoint.Y);
+				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
 				lastMouseDragPoint = e.Location;
 				Invalidate();
 			}
@@ -249,17 +253,32 @@ namespace Foreman
 			{
 				if (viewer.IsBeingDragged)
 				{
-					viewer.X = e.X - viewer.DragOffsetX;
-					viewer.Y = e.Y - viewer.DragOffsetY;
+					viewer.X = screenToGraph(e.X, 0).X - viewer.DragOffsetX;
+					viewer.Y = screenToGraph(0, e.Y).Y - viewer.DragOffsetY;
 					Invalidate();
 					break;
 				}
 			}
+			mousePoint = screenToGraph(e.Location.X, e.Location.Y);
+			Invalidate();
+		}
+
+		void ProductionGraphViewer_MouseWheel(object sender, MouseEventArgs e)
+		{
+			if (e.Delta > 0)
+			{
+				ViewScale *= 1.1f;
+			}
+			else
+			{
+				ViewScale /= 1.1f;
+			}
+			Invalidate();
 		}
 
 		private Point screenToGraph(int X, int Y)
 		{
-			return new Point(X + viewOffset.X, Y + viewOffset.Y);
+			return new Point((int)((X - ViewOffset.X) / ViewScale), (int)((Y - ViewOffset.Y) / ViewScale));
 		}
 	}
 }
