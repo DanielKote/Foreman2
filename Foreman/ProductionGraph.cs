@@ -26,6 +26,7 @@ namespace Foreman
 			}
 			return dict;
 		}
+
 		public static Dictionary<Item, float> GetSupply(this IEnumerable<ProductionNode> nodes)
 		{
 			var dict = new Dictionary<Item, float>();

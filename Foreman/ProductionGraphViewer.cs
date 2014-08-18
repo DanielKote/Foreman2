@@ -18,7 +18,7 @@ namespace Foreman
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
-		private ProductionNodeViewer selectedNode = null;
+		public ProductionNodeViewer SelectedNode = null;
 
 		private Rectangle graphBounds
 		{
@@ -221,20 +221,35 @@ namespace Foreman
 			}
 		}
 
+		private ProductionNodeViewer getNodeViewerAtScreenPoint(Point point)
+		{
+			foreach (ProductionNodeViewer node in nodeControls.Values)
+			{
+				if (node.bounds.Contains(screenToGraph(point.X, point.Y)))
+				{
+					return node;
+				}
+			}
+			return null;
+		}
+		
+
+		private void ProductionGraphViewer_MouseClick(object sender, MouseEventArgs e)
+		{
+			SelectedNode = getNodeViewerAtScreenPoint(e.Location);
+		}
+
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
 			switch (e.Button)
 			{
 				case MouseButtons.Left:
-					foreach (ProductionNodeViewer viewer in nodeControls.Values)
+					var node = getNodeViewerAtScreenPoint(e.Location);
+					if (node != null)
 					{
-						if (viewer.bounds.Contains(screenToGraph(e.X, e.Y)))
-						{
-							viewer.IsBeingDragged = true;
-							viewer.DragOffsetX = screenToGraph(e.X, 0).X - viewer.X;
-							viewer.DragOffsetY = screenToGraph(0, e.Y).Y - viewer.Y;
-							break;
-						}
+						node.IsBeingDragged = true;
+						node.DragOffsetX = screenToGraph(e.X, 0).X - node.X;
+						node.DragOffsetY = screenToGraph(0, e.Y).Y - node.Y;
 					}
 					break;
 
@@ -301,9 +316,5 @@ namespace Foreman
 			return new Point(Convert.ToInt32((X - ViewOffset.X) / ViewScale), Convert.ToInt32((Y - ViewOffset.Y) / ViewScale));
 		}
 
-		private void ProductionGraphViewer_MouseClick(object sender, MouseEventArgs e)
-		{
-
-		}
 	}
 }

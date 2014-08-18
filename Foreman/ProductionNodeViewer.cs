@@ -138,6 +138,13 @@ namespace Foreman
 			{
 				FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
 			}
+			if (Parent.SelectedNode == this)
+			{
+				using (Pen pen = new Pen(Color.DarkGray, 3f))
+				{
+					DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
+				}
+			}
 
 			foreach (Item item in DisplayedNode.Outputs.Keys)
 			{
@@ -152,7 +159,6 @@ namespace Foreman
 			centreFormat.Alignment = StringAlignment.Center;
 			centreFormat.LineAlignment = StringAlignment.Center;
 			graphics.DrawString(nameText, new Font(FontFamily.GenericSansSerif, 8), new SolidBrush(Color.Black), new PointF(Width / 2, Height/ 2), centreFormat);
-
 		}
 
 		private void DrawItemIcon(Item item, Point drawPoint, bool output, String rateText, Graphics graphics)
@@ -170,7 +176,7 @@ namespace Foreman
 				{
 					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
 					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight) / 2 + iconBorder), centreFormat);
+					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, iconTextHeight - iconBorder + 1), textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight) / 2 + iconBorder), centreFormat);
 				}
 				else
 				{

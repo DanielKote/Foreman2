@@ -36,14 +36,14 @@
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// listBox1
+			// ItemListBox
 			// 
 			this.tableLayoutPanel1.SetColumnSpan(this.ItemListBox, 2);
 			this.ItemListBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ItemListBox.FormattingEnabled = true;
 			this.ItemListBox.IntegralHeight = false;
 			this.ItemListBox.Location = new System.Drawing.Point(3, 3);
-			this.ItemListBox.Name = "listBox1";
+			this.ItemListBox.Name = "ItemListBox";
 			this.ItemListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.ItemListBox.Size = new System.Drawing.Size(194, 650);
 			this.ItemListBox.TabIndex = 0;
@@ -100,6 +100,7 @@
 			this.RemoveNodeButton.TabIndex = 3;
 			this.RemoveNodeButton.Text = "Remove Node";
 			this.RemoveNodeButton.UseVisualStyleBackColor = true;
+			this.RemoveNodeButton.Click += new System.EventHandler(this.RemoveNodeButton_Click);
 			// 
 			// MainForm
 			// 

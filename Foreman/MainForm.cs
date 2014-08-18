@@ -49,5 +49,11 @@ namespace Foreman
 			}
 			ProductionGraph.AddDemands(selectedItems);
 		}
+
+		private void RemoveNodeButton_Click(object sender, EventArgs e)
+		{
+			ProductionGraph.graph.Nodes.Remove(ProductionGraph.SelectedNode.DisplayedNode);
+			ProductionGraph.nodeControls.Remove(ProductionGraph.SelectedNode.DisplayedNode);
+		}
 	}
 }
