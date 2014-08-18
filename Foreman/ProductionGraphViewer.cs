@@ -18,6 +18,7 @@ namespace Foreman
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
+		private ProductionNodeViewer selectedNode = null;
 
 		private Rectangle graphBounds
 		{
@@ -298,6 +299,11 @@ namespace Foreman
 		private Point screenToGraph(int X, int Y)
 		{
 			return new Point(Convert.ToInt32((X - ViewOffset.X) / ViewScale), Convert.ToInt32((Y - ViewOffset.Y) / ViewScale));
+		}
+
+		private void ProductionGraphViewer_MouseClick(object sender, MouseEventArgs e)
+		{
+
 		}
 	}
 }

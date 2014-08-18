@@ -22,14 +22,13 @@ namespace Foreman
 		{
 			DataCache.LoadRecipes();
 
-			listBox1.Items.Clear();
-			listBox1.Items.AddRange(DataCache.Items.Keys.ToArray());
-			listBox1.Sorted = true;
+			ItemListBox.Items.Clear();
+			ItemListBox.Items.AddRange(DataCache.Items.Keys.ToArray());
+			ItemListBox.Sorted = true;
 		}
 
 		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			ProductionGraph.AddDemand(DataCache.Items[listBox1.SelectedItem.ToString()]);
 		}
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
@@ -38,6 +37,17 @@ namespace Foreman
 			{
 				Close();
 			}
+		}
+
+		private void AddItemButton_Click(object sender, EventArgs e)
+		{
+			List<Item> selectedItems = new List<Item>();
+
+			foreach (String itemName in ItemListBox.SelectedItems)
+			{
+				selectedItems.Add(DataCache.Items[itemName]);
+			}
+			ProductionGraph.AddDemands(selectedItems);
 		}
 	}
 }
