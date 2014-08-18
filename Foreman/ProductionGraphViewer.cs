@@ -40,10 +40,29 @@ namespace Foreman
 			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
 		}
 
+		public void AddDemands(IEnumerable<Item> list)
+		{
+			foreach (Item item in list)
+			{
+				new ConsumerNode(item, 1f, graph);
+			}
+			while (!graph.Complete)
+			{
+				graph.IterateNodeDemands();
+			}
+			CreateMissingControls();
+
+			foreach (ProductionNodeViewer node in nodeControls.Values)
+			{
+				node.Update();
+			}
+			PositionControls();
+			Invalidate(true);
+		}
 
 		public void AddDemand(Item item)
 		{	
-			graph.Nodes.Add(new ConsumerNode(item, 1f, graph));
+			new ConsumerNode(item, 1f, graph);
 			while (!graph.Complete)
 			{
 				graph.IterateNodeDemands();

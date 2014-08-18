@@ -20,6 +20,8 @@ namespace Foreman
 		public ProductionNode(ProductionGraph graph)
 		{
 			Graph = graph;
+			graph.Nodes.Add(this);
+			graph.InvalidateCaches();
 		}
 
 		public bool CanTakeFrom(ProductionNode node)
@@ -95,11 +97,13 @@ namespace Foreman
 			if (BaseRecipe.Results.ContainsKey(item))
 			{
 				CompletedPerSecond += (rate - OutputRate(item)) / BaseRecipe.Results[item];
+				Graph.InvalidateCaches();
 			}
 			else
 			{
 				throw new InvalidOperationException(String.Format("Tried make a RecipeNode ({0}) output an item ({1}) that the recipe doesn't produce", BaseRecipe.Name, item.Name));
 			}
+
 		}
 
 		public override float InputRate(Item item)
@@ -178,6 +182,7 @@ namespace Foreman
 			if (item == SuppliedItem)
 			{
 				SupplyRate = rate;
+				Graph.InvalidateCaches();
 			}
 			else
 			{
@@ -260,14 +265,6 @@ namespace Foreman
 
 		public override void MatchDemand(Item item, float rate)
 		{
-			if (item == ConsumedItem)
-			{
-				ConsumptionRate += rate;
-			}
-			else
-			{
-				throw new InvalidOperationException(String.Format("Tried to add output for item {0} to a node that only takes inputs", item.Name));
-			}
 		}
 	}
 }

@@ -74,8 +74,14 @@ namespace Foreman
 	public class ProductionGraph
 	{
 		public List<ProductionNode> Nodes = new List<ProductionNode>();
-		private int[,] pathMatrixCache;
-		private bool pathMatrixCacheInvalid = true;
+		private int[,] pathMatrixCache = null;
+		private int[,] adjacencyMatrixCache = null;
+
+		public void InvalidateCaches()
+		{
+			pathMatrixCache = null;
+			adjacencyMatrixCache = null;
+		}
 
 		public bool Complete {
 			get
@@ -95,18 +101,22 @@ namespace Foreman
 		{
 			get
 			{
-				int[,] matrix = new int[Nodes.Count(), Nodes.Count()];
-				for (int i = 0; i < Nodes.Count(); i++)
+				if (adjacencyMatrixCache == null)
 				{
-					for (int j = 0; j < Nodes.Count(); j++)
+					int[,] matrix = new int[Nodes.Count(), Nodes.Count()];
+					for (int i = 0; i < Nodes.Count(); i++)
 					{
-						if (Nodes[j].CanTakeFrom(Nodes[i]))
+						for (int j = 0; j < Nodes.Count(); j++)
 						{
-							matrix[i, j] = 1;
+							if (Nodes[j].CanTakeFrom(Nodes[i]))
+							{
+								matrix[i, j] = 1;
+							}
 						}
 					}
+					adjacencyMatrixCache = matrix;
 				}
-				return matrix;
+				return (int[,])adjacencyMatrixCache.Clone();
 			}
 		}
 
@@ -114,7 +124,7 @@ namespace Foreman
 		{
 			get
 			{
-				if (pathMatrixCacheInvalid)
+				if (pathMatrixCache == null)
 				{
 					int[,] adjacencyMatrix = AdjacencyMatrix;
 					List<int[,]> iterations = new List<int[,]>();
@@ -131,10 +141,9 @@ namespace Foreman
 						pathMatrix = pathMatrix.Add(matrix);
 					}
 					pathMatrixCache = pathMatrix;
-					pathMatrixCacheInvalid = false;
 				}
 
-				return pathMatrixCache;
+				return (int[,])pathMatrixCache.Clone();
 			}
 		}
 
@@ -166,45 +175,43 @@ namespace Foreman
 			{
 				if (Nodes.Any(n => n.OutputRate(item) > 0))
 				{
-					ProductionNode node;
-					node = Nodes.Find(n => n.OutputRate(item) > 0);
+					ProductionNode node = Nodes.Find(n => n.OutputRate(item) > 0);
 					node.MatchDemand(item, Nodes.GetDemand(item) - Nodes.GetSupply(item) + node.OutputRate(item));
 				}
 				else if (!item.Recipes.Any())
 				{
 					SupplyNode node = new SupplyNode(item, Nodes.GetDemand(item) - Nodes.GetSupply(item), this);
-					Nodes.Add(node);
 				}
 				else
 				{
 					RecipeNode node = new RecipeNode(item.Recipes.First(), this);
-					Nodes.Add(node);
 					node.MatchDemand(item, Nodes.GetDemand(item) - Nodes.GetSupply(item));
 				}
 			}
 
-			pathMatrixCacheInvalid = true;
 			ReplaceCycles();
+			InvalidateCaches();
 		}
 
 		//Replace recipe cycles with a simple supplier node so that they don't cause infinite loops. This is a workaround.
 		public void ReplaceCycles()
 		{
-			foreach (var StrongComponent in GetStronglyConnectedComponents().Where(scc => scc.Count() > 1)) //Give cycles a source for their items which doesn't come from within the cycle itself (to avoid infinite loops)
+			foreach (var StrongComponent in GetStronglyConnectedComponents().Where(scc => scc.Count() > 1))
 			{
 				var supply = StrongComponent.GetSupply();
 
 				Nodes.RemoveAll(n => StrongComponent.Contains(n));
+				InvalidateCaches();
+
 				foreach (Item item in supply.Keys)
 				{
 					if (Nodes.Except(StrongComponent).GetDemand(item) > 0)
 					{
 						SupplyNode node = new SupplyNode(item, Nodes.GetDemand(item) - Nodes.GetSupply(item), this);
-						Nodes.Add(node);
 					}
 				}
 			}
-			pathMatrixCacheInvalid = true;
+			InvalidateCaches();
 		}
 
 		public IEnumerable<ProductionNode> GetInputlessNodes()
