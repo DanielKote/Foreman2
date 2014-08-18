@@ -30,7 +30,7 @@ namespace Foreman
 					height = Math.Max(viewer.Y + viewer.Height, height);
 					width = Math.Max(viewer.X + viewer.Width, width);
 				}
-				return new Rectangle(ViewOffset.X, ViewOffset.Y, width + 20, height + 20);
+				return new Rectangle(0, 0, width + 20, height + 20);
 			}
 		}
 		
@@ -185,9 +185,12 @@ namespace Foreman
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
+			e.Graphics.ResetTransform();
+			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 			e.Graphics.Clear(this.BackColor);
 			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 			e.Graphics.ScaleTransform(ViewScale, ViewScale);
+
 			DrawConnections(e.Graphics);
 
 			foreach (ProductionNodeViewer viewer in nodeControls.Values)
@@ -247,12 +250,12 @@ namespace Foreman
 				lastMouseDragPoint = e.Location;
 				Invalidate();
 			}
-			foreach (ProductionNodeViewer viewer in nodeControls.Values)
+			foreach (ProductionNodeViewer node in nodeControls.Values)
 			{
-				if (viewer.IsBeingDragged)
+				if (node.IsBeingDragged)
 				{
-					viewer.X = screenToGraph(e.X, 0).X - viewer.DragOffsetX;
-					viewer.Y = screenToGraph(0, e.Y).Y - viewer.DragOffsetY;
+					node.X = screenToGraph(e.X, 0).X - node.DragOffsetX;
+					node.Y = screenToGraph(0, e.Y).Y - node.DragOffsetY;
 					Invalidate();
 					break;
 				}
@@ -275,7 +278,7 @@ namespace Foreman
 
 		private Point screenToGraph(int X, int Y)
 		{
-			return new Point((int)((X - ViewOffset.X) / ViewScale), (int)((Y - ViewOffset.Y) / ViewScale));
+			return new Point(Convert.ToInt32((X - ViewOffset.X) / ViewScale), Convert.ToInt32((Y - ViewOffset.Y) / ViewScale));
 		}
 	}
 }

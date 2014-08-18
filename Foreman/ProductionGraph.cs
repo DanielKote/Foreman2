@@ -74,6 +74,8 @@ namespace Foreman
 	public class ProductionGraph
 	{
 		public List<ProductionNode> Nodes = new List<ProductionNode>();
+		private int[,] pathMatrixCache;
+		private bool pathMatrixCacheInvalid = true;
 
 		public bool Complete {
 			get
@@ -108,26 +110,31 @@ namespace Foreman
 			}
 		}
 
-		public int[,] PathMatrix //O(n^4) time complexity. May need to be updated.
+		public int[,] PathMatrix
 		{
 			get
 			{
-				int[,] adjacencyMatrix = AdjacencyMatrix;
-				List<int[,]> iterations = new List<int[,]>();
-				iterations.Add(adjacencyMatrix);
-
-				for (int i = 0; i < Nodes.Count() - 1; i++)
+				if (pathMatrixCacheInvalid)
 				{
-					iterations.Add(iterations[i].Multiply(adjacencyMatrix));
+					int[,] adjacencyMatrix = AdjacencyMatrix;
+					List<int[,]> iterations = new List<int[,]>();
+					iterations.Add(adjacencyMatrix);
+
+					for (int i = 0; i < Nodes.Count() - 1; i++)
+					{
+						iterations.Add(iterations[i].Multiply(adjacencyMatrix));
+					}
+
+					int[,] pathMatrix = new int[Nodes.Count(), Nodes.Count()];
+					foreach (int[,] matrix in iterations)
+					{
+						pathMatrix = pathMatrix.Add(matrix);
+					}
+					pathMatrixCache = pathMatrix;
+					pathMatrixCacheInvalid = false;
 				}
 
-				int[,] pathMatrix = new int[Nodes.Count(), Nodes.Count()];
-				foreach (int[,] matrix in iterations)
-				{
-					pathMatrix = pathMatrix.Add(matrix);
-				}
-
-				return pathMatrix;
+				return pathMatrixCache;
 			}
 		}
 
@@ -176,6 +183,7 @@ namespace Foreman
 				}
 			}
 
+			pathMatrixCacheInvalid = true;
 			ReplaceCycles();
 		}
 
@@ -196,6 +204,7 @@ namespace Foreman
 					}
 				}
 			}
+			pathMatrixCacheInvalid = true;
 		}
 
 		public IEnumerable<ProductionNode> GetInputlessNodes()
