@@ -10,6 +10,8 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
+	public enum LinkType {Input, Output};
+
 	public partial class ProductionNodeViewer
 	{
 		public bool IsBeingDragged = false;
@@ -99,7 +101,7 @@ namespace Foreman
 
 		public Point getOutputIconPoint(Item item)
 		{
-			var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => i.Name).ToList();
+			var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
 			int x = Convert.ToInt32((float)Width / (sortedOutputs.Count()) * (sortedOutputs.IndexOf(item) + 0.5f));
 			int y = 0;
 			return new Point(x, y + iconBorder);
@@ -107,7 +109,7 @@ namespace Foreman
 
 		public Point getInputIconPoint(Item item)
 		{
-			var sortedInputs = DisplayedNode.Inputs.OrderBy(i => i.Name).ToList();
+			var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
 			int x = Convert.ToInt32((float)Width / (sortedInputs.Count()) * (sortedInputs.IndexOf(item) + 0.5f));
 			int y = Height;
 			return new Point(x, y - iconBorder);
@@ -121,6 +123,27 @@ namespace Foreman
 		public Point getInputLineConnectionPoint(Item item)
 		{
 			return Point.Add(getInputIconPoint(item), new Size(X, Y + (iconSize + iconBorder + iconBorder) / 2 + iconTextHeight));
+		}
+
+		//Used to sort items in the input/output lists
+		public int getXSortValue(Item item, LinkType linkType)
+		{
+			int total = 0;
+			if (linkType == LinkType.Input)
+			{
+				foreach (NodeLink link in DisplayedNode.InputLinks.Where(l => l.Item == item))
+				{
+					total += Parent.nodeControls[link.Supplier].X;
+				}
+			}
+			else
+			{
+				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(l => l.Item == item))
+				{
+					total += Parent.nodeControls[link.Consumer].X;
+				}
+			}
+			return total;
 		}
 
 		public void MouseMoveHandler(object sender, MouseEventArgs e)
