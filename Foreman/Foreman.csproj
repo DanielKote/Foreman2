@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataCache.cs" />
+    <Compile Include="GraphicsStuff.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -18,6 +18,9 @@ namespace Foreman
 		public int DragOffsetX;
 		public int DragOffsetY;
 
+		public bool Moused { get { return Parent.MousedNode == this; }}
+		public Point MousePosition = Point.Empty;
+
 		private Color recipeColour = Color.FromArgb(190, 217, 212);
 		private Color supplyColour = Color.FromArgb(249, 237, 195);
 		private Color consumerColour = Color.FromArgb(231, 214, 224);
@@ -175,28 +178,28 @@ namespace Foreman
 		{
 			using (SolidBrush brush = new SolidBrush(backgroundColour))
 			{
-				FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
+				GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
 			}
 
 			if (Parent.ClickedNode == this)
 			{
 				using (Pen pen = new Pen(Color.WhiteSmoke, 3f))
 				{
-					DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
+					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
 				}
 			}
 			else if (Parent.MousedNode == this)
 			{
 				using (Pen pen = new Pen(Color.LightGray, 3f))
 				{
-					DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
+					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
 				}
 			}
 			else if (Parent.SelectedNode == this)
 			{
 				using (Pen pen = new Pen(Color.DarkGray, 3f))
 				{
-					DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
+					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
 				}
 			}
 
@@ -220,8 +223,7 @@ namespace Foreman
 			}
 
 			StringFormat centreFormat = new StringFormat();
-			centreFormat.Alignment = StringAlignment.Center;
-			centreFormat.LineAlignment = StringAlignment.Center;
+			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 			graphics.DrawString(nameText, new Font(FontFamily.GenericSansSerif, 8), new SolidBrush(Color.Black), new PointF(Width / 2, Height / 2), centreFormat);
 		}
 
@@ -229,8 +231,7 @@ namespace Foreman
 		{
 			int boxSize = iconSize + iconBorder + iconBorder;
 			StringFormat centreFormat = new StringFormat();
-			centreFormat.Alignment = StringAlignment.Center;
-			centreFormat.LineAlignment = StringAlignment.Center;
+			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 
 			using (Pen borderPen = new Pen(Color.Gray, 3))
 			using (Brush fillBrush = new SolidBrush(Color.White))
@@ -238,64 +239,18 @@ namespace Foreman
 			{
 				if (linkType == LinkType.Output)
 				{
-					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
-					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
+					GraphicsStuff.FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
+					GraphicsStuff.DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
 					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, iconTextHeight - iconBorder + 1), textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight) / 2 + iconBorder), centreFormat);
 				}
 				else
 				{
-					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
-					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
+					GraphicsStuff.FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
+					GraphicsStuff.DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
 					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y + (boxSize + iconTextHeight) / 2 - iconBorder), centreFormat);
 				}
 			}
 			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
-		}
-
-		public static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)
-		{
-			int radius2 = radius * 2;
-			int Left = x;
-			int Top = y;
-			int Bottom = y + height;
-			int Right = x + width;
-
-			using (GraphicsPath path = new GraphicsPath())
-			{
-				path.StartFigure();
-
-				path.AddArc(Left, Top, 2 * radius, 2 * radius, 180, 90f);
-				path.AddArc(Right - radius2, Top, radius2, radius2, 270f, 90f);
-				path.AddArc(Right - radius2, Bottom - radius2, radius2, radius2, 0f, 90f);
-				path.AddArc(Left, Bottom - radius2, radius2, radius2, 90f, 90f);
-
-				path.CloseFigure();
-
-				graphics.DrawPath(pen, path);
-			}
-		}
-
-		private static void FillRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Brush brush)
-		{
-			int radius2 = radius * 2;
-			int Left = x;
-			int Top = y;
-			int Bottom = y + height;
-			int Right = x + width;
-
-			using (GraphicsPath path = new GraphicsPath())
-			{
-				path.StartFigure();
-
-				path.AddArc(Left, Top, 2 * radius, 2 * radius, 180, 90f);
-				path.AddArc(Right - radius2, Top, radius2, radius2, 270f, 90f);
-				path.AddArc(Right - radius2, Bottom - radius2, radius2, radius2, 0f, 90f);
-				path.AddArc(Left, Bottom - radius2, radius2, radius2, 90f, 90f);
-
-				path.CloseFigure();
-
-				graphics.FillPath(brush, path);
-			}
 		}
 	}
 }
