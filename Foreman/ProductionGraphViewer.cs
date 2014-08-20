@@ -45,12 +45,9 @@ namespace Foreman
 		{
 			foreach (Item item in list)
 			{
-				new ConsumerNode(item, 1f, graph);
+				ConsumerNode node = ConsumerNode.Create(item, graph);
 			}
-			while (!graph.Complete)
-			{
-				graph.IterateNodeDemands();
-			}
+			graph.SatisfyAllItemDemands();
 			CreateMissingControls();
 
 			foreach (ProductionNodeViewer node in nodeControls.Values)
@@ -62,20 +59,8 @@ namespace Foreman
 		}
 
 		public void AddDemand(Item item)
-		{	
-			new ConsumerNode(item, 1f, graph);
-			while (!graph.Complete)
-			{
-				graph.IterateNodeDemands();
-			}
-			CreateMissingControls();
-
-			foreach (ProductionNodeViewer node in nodeControls.Values)
-			{
-				node.Update();
-			}
-			PositionControls();
-			Invalidate(true);
+		{
+			AddDemands(new List<Item> { item });
 		}
 
 		private void CreateMissingControls()
@@ -95,22 +80,16 @@ namespace Foreman
 		{
 			foreach (var n in nodeControls.Keys)
 			{
-				foreach (var m in nodeControls.Keys)
+				foreach (NodeLink link in n.InputLinks)
 				{
-					if (m.CanTakeFrom(n))
-					{
-						foreach (Item item in m.Inputs.Keys.Intersect(n.Outputs.Keys))
-						{
-							Point pointN = nodeControls[n].getOutputLineConnectionPoint(item);
-							Point pointM = nodeControls[m].getInputLineConnectionPoint(item);
-							Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
-							Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
+					Point pointN = nodeControls[link.Supplier].getOutputLineConnectionPoint(link.Item);
+					Point pointM = nodeControls[link.Consumer].getInputLineConnectionPoint(link.Item);
+					Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
+					Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 
-							using (Pen pen = new Pen(DataCache.IconAverageColour(item.Icon), 3f))
-							{
-								graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
-							}
-						}
+					using (Pen pen = new Pen(DataCache.IconAverageColour(link.Item.Icon), 3f))
+					{
+						graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
 					}
 				}
 			}
@@ -157,14 +136,15 @@ namespace Foreman
 			}
 			nodePositions.Last().AddRange(nodeOrder.OfType<SupplyNode>());
 
-			int margin = 100;
-			int y = margin;
+			int marginX = 100;
+			int marginY = 200;
+			int y = marginY;
 			int[] tierWidths = new int[nodePositions.Count()];
 			for (int i = 0; i < nodePositions.Count(); i++)
 			{
 				var list = nodePositions[i];
 				int maxHeight = 0;
-				int x = margin;
+				int x = marginX;
 
 				foreach (var node in list)
 				{
@@ -176,19 +156,19 @@ namespace Foreman
 					control.X = x;
 					control.Y = y;
 
-					x += control.Width + margin;
+					x += control.Width + marginX;
 					maxHeight = Math.Max(control.Height, maxHeight);
 				}
 
 				if (maxHeight > 0) // Don't add any height for empty tiers
 				{
-					y += maxHeight + margin;
+					y += maxHeight + marginY;
 				}
 
 				tierWidths[i] = x;
 			}
 
-			int centrePoint = tierWidths.Last(i => i > margin) / 2;
+			int centrePoint = tierWidths.Last(i => i > marginX) / 2;
 			for (int i = tierWidths.Count() - 1; i >= 0; i--)
 			{
 				int offset = centrePoint - tierWidths[i] / 2;

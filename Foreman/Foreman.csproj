@@ -77,6 +77,7 @@
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="ProductionNodeViewer.cs" />
+    <Compile Include="NodeLink.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

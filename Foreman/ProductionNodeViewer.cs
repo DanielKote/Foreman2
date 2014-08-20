@@ -93,13 +93,13 @@ namespace Foreman
 		private int getIconWidths()
 		{
 			return Math.Max(
-				(iconSize + iconBorder * 5) * DisplayedNode.Outputs.Count() + iconBorder,
-				(iconSize + iconBorder * 5) * DisplayedNode.Inputs.Count() + iconBorder);
+				(iconSize + iconBorder * 5) * DisplayedNode.OutputLinks.Count() + iconBorder,
+				(iconSize + iconBorder * 5) * DisplayedNode.InputLinks.Count() + iconBorder);
 		}
 
 		public Point getOutputIconPoint(Item item)
 		{
-			var sortedOutputs = DisplayedNode.Outputs.Keys.OrderBy(i => i.Name).ToList();
+			var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => i.Name).ToList();
 			int x = Convert.ToInt32((float)Width / (sortedOutputs.Count()) * (sortedOutputs.IndexOf(item) + 0.5f));
 			int y = 0;
 			return new Point(x, y + iconBorder);
@@ -107,7 +107,7 @@ namespace Foreman
 
 		public Point getInputIconPoint(Item item)
 		{
-			var sortedInputs = DisplayedNode.Inputs.Keys.OrderBy(i => i.Name).ToList();
+			var sortedInputs = DisplayedNode.Inputs.OrderBy(i => i.Name).ToList();
 			int x = Convert.ToInt32((float)Width / (sortedInputs.Count()) * (sortedInputs.IndexOf(item) + 0.5f));
 			int y = Height;
 			return new Point(x, y - iconBorder);
@@ -146,13 +146,13 @@ namespace Foreman
 				}
 			}
 
-			foreach (Item item in DisplayedNode.Outputs.Keys)
+			foreach (Item item in DisplayedNode.OutputLinks.Select<NodeLink, Item>(l => l.Item))
 			{
-				DrawItemIcon(item, getOutputIconPoint(item), true, DisplayedNode.OutputRate(item).ToString("0.##"), graphics);
+				DrawItemIcon(item, getOutputIconPoint(item), true, DisplayedNode.GetTotalOutput(item).ToString("0.##"), graphics);
 			}
-			foreach (Item item in DisplayedNode.Inputs.Keys)
+			foreach (Item item in DisplayedNode.InputLinks.Select<NodeLink, Item>(l => l.Item))
 			{
-				DrawItemIcon(item, getInputIconPoint(item), false, DisplayedNode.InputRate(item).ToString("0.##"), graphics);
+				DrawItemIcon(item, getInputIconPoint(item), false, DisplayedNode.GetTotalInput(item).ToString("0.##"), graphics);
 			}
 
 			StringFormat centreFormat = new StringFormat();

@@ -5,99 +5,19 @@ using System.Text;
 
 namespace Foreman
 {
-	public static class GraphExtensions
-	{
-		public static Dictionary<Item, float> GetDemand(this IEnumerable<ProductionNode> nodes)
-		{
-			var dict = new Dictionary<Item, float>();
-			foreach (ProductionNode node in nodes)
-			{
-				foreach (Item item in node.Inputs.Keys)
-				{
-					if (dict.ContainsKey(item))
-					{
-						dict[item] += node.InputRate(item);
-					}
-					else
-					{
-						dict.Add(item, node.InputRate(item));
-					}
-				}
-			}
-			return dict;
-		}
-
-		public static Dictionary<Item, float> GetSupply(this IEnumerable<ProductionNode> nodes)
-		{
-			var dict = new Dictionary<Item, float>();
-			foreach (ProductionNode node in nodes)
-			{
-				foreach (Item item in node.Outputs.Keys)
-				{
-					if (dict.ContainsKey(item))
-					{
-						dict[item] += node.OutputRate(item);
-					}
-					else
-					{
-						dict.Add(item, node.OutputRate(item));
-					}
-				}
-			}
-			return dict;
-		}
-
-		public static float GetDemand(this IEnumerable<ProductionNode> nodes, Item item)
-		{
-			if (nodes.GetDemand().ContainsKey(item))
-			{
-				return nodes.GetDemand()[item];
-			}
-			else
-			{
-				return 0.0f;
-			}
-		}
-
-		public static float GetSupply(this IEnumerable<ProductionNode> nodes, Item item)
-		{
-			if (nodes.GetSupply().ContainsKey(item))
-			{
-				return nodes.GetSupply()[item];
-			}
-			else
-			{
-				return 0.0f;
-			}
-		}
-	}
-
 	public class ProductionGraph
 	{
 		public List<ProductionNode> Nodes = new List<ProductionNode>();
 		private int[,] pathMatrixCache = null;
 		private int[,] adjacencyMatrixCache = null;
+		public HashSet<Recipe> CyclicRecipes = new HashSet<Recipe>();
 
 		public void InvalidateCaches()
 		{
 			pathMatrixCache = null;
 			adjacencyMatrixCache = null;
 		}
-
-		public bool Complete {
-			get
-			{
-				foreach (Item item in Nodes.GetDemand().Keys)
-				{
-					if (Nodes.GetDemand(item) > Nodes.GetSupply(item))
-					{
-						return false;
-					}
-				}
-
-				return true;
-			}
-		}
+	
 		public int[,] AdjacencyMatrix
 		{
 			get
@@ -109,7 +29,7 @@ namespace Foreman
 					{
 						for (int j = 0; j < Nodes.Count(); j++)
 						{
-							if (Nodes[j].CanTakeFrom(Nodes[i]))
+							if (Nodes[j].InputLinks.Any(l => l.Supplier == Nodes[i]))
 							{
 								matrix[i, j] = 1;
 							}
@@ -152,7 +72,7 @@ namespace Foreman
 		{
 			foreach (ProductionNode node in Nodes)
 			{
-				if (node.OutputRate(item) > 0f)
+				if (node.Outputs.Contains(item))
 				{
 					yield return node;
 				}
@@ -163,35 +83,77 @@ namespace Foreman
 		{
 			foreach (ProductionNode node in Nodes)
 			{
-				if (node.InputRate(item) > 0f)
+				if (node.Inputs.Contains(item))
 				{
 					yield return node;
 				}
 			}
 		}
 
-		public void IterateNodeDemands()
+		public void SatisfyAllItemDemands()
 		{
-			foreach (Item item in Nodes.GetDemand().Keys.ToList().Where(i => Nodes.GetDemand(i) > Nodes.GetSupply(i)))
+			bool nodeChosen;
+
+			do
 			{
-				if (Nodes.Any(n => n.OutputRate(item) > 0))
+				nodeChosen = false;
+				ProductionNode chosenNode = null;
+				Item chosenItem = null;
+
+				foreach (ProductionNode node in Nodes)
 				{
-					ProductionNode node = Nodes.Find(n => n.OutputRate(item) > 0);
-					node.MatchDemand(item, Nodes.GetDemand(item) - Nodes.GetSupply(item) + node.OutputRate(item));
+					foreach (Item item in node.Inputs)
+					{
+						if (node.GetExcessDemand(item) > 0)
+						{
+							chosenNode = node;
+							chosenItem = item;
+							nodeChosen = true;
+							break;
+						}
+					}
+					if (nodeChosen)
+					{
+						break;
+					}
 				}
-				else if (!item.Recipes.Any())
+
+				if (nodeChosen)
 				{
-					SupplyNode node = new SupplyNode(item, Nodes.GetDemand(item) - Nodes.GetSupply(item), this);
+					SatisfyNodeDemand(chosenNode, chosenItem);
 				}
-				else
-				{
-					RecipeNode node = new RecipeNode(item.Recipes.First(), this);
-					node.MatchDemand(item, Nodes.GetDemand(item) - Nodes.GetSupply(item));
-				}
+			} while (nodeChosen);
+		}
+
+		public void SatisfyNodeDemand(ProductionNode node, Item item)
+		{
+			if  (node.GetExcessDemand(item) <= 0)
+			{
+				return;
+			}
+
+			if (node.InputLinks.Any(l => l.Item == item))	//Increase throughput of existing node link
+			{
+				NodeLink link = node.InputLinks.First(l => l.Item == item);
+				link.Amount += node.GetExcessDemand(item);
+			}
+			else if (Nodes.Any(n => n.Outputs.Contains(item)))	//Add link from existing node
+			{
+				ProductionNode existingNode = Nodes.Find(n => n.Outputs.Contains(item));
+				NodeLink.Create(existingNode, node, item, node.GetExcessDemand(item));
+			}
+			else if (item.Recipes.Any(r => !CyclicRecipes.Contains(r)))	//Create new recipe node and link from it
+			{
+				RecipeNode newNode = RecipeNode.Create(item.Recipes.First(r => !CyclicRecipes.Contains(r)), this);
+				NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
+			}
+			else	//Create new supply node and link from it
+			{
+				SupplyNode newNode = SupplyNode.Create(item, this);
+				NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
 			}
 
 			ReplaceCycles();
-			InvalidateCaches();
 		}
 
 		//Replace recipe cycles with a simple supplier node so that they don't cause infinite loops. This is a workaround.
@@ -199,17 +161,14 @@ namespace Foreman
 		{
 			foreach (var StrongComponent in GetStronglyConnectedComponents().Where(scc => scc.Count() > 1))
 			{
-				var supply = StrongComponent.GetSupply();
-
-				Nodes.RemoveAll(n => StrongComponent.Contains(n));
-				InvalidateCaches();
-
-				foreach (Item item in supply.Keys)
+				foreach (ProductionNode node in StrongComponent)
 				{
-					if (Nodes.Except(StrongComponent).GetDemand(item) > 0)
+					foreach (NodeLink link in node.InputLinks.ToList().Union(node.OutputLinks.ToList()))
 					{
-						SupplyNode node = new SupplyNode(item, Nodes.GetDemand(item) - Nodes.GetSupply(item), this);
+						link.Destroy();
 					}
+					CyclicRecipes.Add((node as RecipeNode).BaseRecipe);
+					Nodes.Remove(node);
 				}
 			}
 			InvalidateCaches();
@@ -350,8 +309,7 @@ namespace Foreman
 			{
 				for (int j = 0; j < matrix.GetLength(1); j++)
 				{
-					// Edges mean there's a cycle somewhere
-					//System.Diagnostics.Debug.Assert(matrix[i, j] == 0);
+					// Edges mean there's a cycle somewhere and the sort can't be completed
 				}
 			}
 

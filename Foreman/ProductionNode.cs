@@ -8,33 +8,51 @@ namespace Foreman
 	public abstract class ProductionNode
 	{
 		public ProductionGraph Graph { get; protected set; }
-		public abstract Dictionary<Item, float> Inputs { get; }
-		public abstract Dictionary<Item, float> Outputs { get; }
-		public abstract float OutputRate(Item item);
-		public abstract float InputRate(Item item);
-		public abstract void MatchDemand(Item item, float rate);
 		public abstract String DisplayName { get; }
-		public abstract float Rate { get; }
-		public Dictionary<ProductionNode, Item> CycleLinks = new Dictionary<ProductionNode, Item>();
+		public abstract IEnumerable<Item> Inputs { get; }
+		public abstract IEnumerable<Item> Outputs { get; }
+		public List<NodeLink> InputLinks = new List<NodeLink>();
+		public List<NodeLink> OutputLinks = new List<NodeLink>();
+		public abstract float GetExcessSupply(Item item);
+		public abstract float GetExcessDemand(Item item);
+		public abstract Dictionary<Item, float> GetExcessSupply();
+		public abstract Dictionary<Item, float> GetExcessDemand();
 
-		public ProductionNode(ProductionGraph graph)
+		protected ProductionNode(ProductionGraph graph)
 		{
 			Graph = graph;
-			graph.Nodes.Add(this);
-			graph.InvalidateCaches();
 		}
 
-		public bool CanTakeFrom(ProductionNode node)
+		public bool TakesFrom(ProductionNode node)
 		{
-			foreach (Item item in Inputs.Keys)
-			{
-				if (node.OutputRate(item) > 0.0f)
-				{
-					return true;
-				}
-			}
-			return false;
+			return node.OutputLinks.Any(l => l.Consumer == this);
 		}
+
+		public bool GivesTo(ProductionNode node)
+		{
+			return node.InputLinks.Any(l => l.Supplier == this);
+		}
+
+		public float GetTotalInput(Item item)
+		{
+			float total = 0f;
+			foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
+			{
+				total += link.Amount;
+			}
+			return total;
+		}
+
+		public float GetTotalOutput(Item item)
+		{
+			float total = 0f;
+			foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
+			{
+				total += link.Amount;
+			}
+			return total;
+		}
+
 
 		public bool CanUltimatelyTakeFrom(ProductionNode node) // Breadth-first search would probably be a better algorithm.
 		{
@@ -48,223 +66,228 @@ namespace Foreman
 	public class RecipeNode : ProductionNode
 	{
 		public Recipe BaseRecipe { get; private set; }
-		public float CompletedPerSecond { get; set; }
+		public float CompletionAmountLimit = float.PositiveInfinity;
 
-		public RecipeNode(Recipe baseRecipe, ProductionGraph graph)
+		protected RecipeNode(Recipe baseRecipe, ProductionGraph graph)
 			: base(graph)
 		{
 			BaseRecipe = baseRecipe;
+		}
+
+		public override IEnumerable<Item> Inputs
+		{
+			get
+			{
+				foreach (Item item in BaseRecipe.Ingredients.Keys)
+				{
+					yield return item;
+				}
+			}
+		}
+
+		public override IEnumerable<Item> Outputs
+		{
+			get
+			{
+				foreach (Item item in BaseRecipe.Results.Keys)
+				{
+					yield return item;
+				}
+			}
+		}
+
+		public static RecipeNode Create(Recipe baseRecipe, ProductionGraph graph)
+		{
+			RecipeNode node = new RecipeNode(baseRecipe, graph);
+			node.Graph.Nodes.Add(node);
+			node.Graph.InvalidateCaches();
+			return node;
+		}
+
+		public float GetRateAllowedByInputs()
+		{
+			float rate = 0;
+			foreach (Item inputItem in BaseRecipe.Ingredients.Keys)
+			{
+				rate = Math.Max(rate, GetTotalInput(inputItem) / BaseRecipe.Ingredients[inputItem]);
+			}
+			return rate;
+		}
+
+		public float GetRateRequiredByOutputs()
+		{
+			float rate = 0;
+			foreach (Item outputItem in BaseRecipe.Results.Keys)
+			{
+				rate = Math.Max(rate, GetTotalOutput(outputItem) / BaseRecipe.Results[outputItem]);
+			}
+			return rate;
+		}
+
+		public override float GetExcessDemand(Item item)
+		{
+			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
+			return (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
+		}
+
+		public override float GetExcessSupply(Item item)
+		{
+			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
+			return (rate * BaseRecipe.Ingredients[item]) - GetTotalOutput(item);
+		}
+
+		public override Dictionary<Item, float> GetExcessDemand()
+		{
+			Dictionary<Item, float> excessDemand = new Dictionary<Item, float>();
+			foreach (Item inputItem in BaseRecipe.Ingredients.Keys)
+			{
+				excessDemand.Add(inputItem, GetExcessDemand(inputItem));
+			}
+			return excessDemand;
+		}
+
+		public override Dictionary<Item, float> GetExcessSupply()
+		{
+			Dictionary<Item, float> excessSupply = new Dictionary<Item, float>();
+			foreach (Item inputItem in BaseRecipe.Ingredients.Keys)
+			{
+				excessSupply.Add(inputItem, GetExcessSupply(inputItem));
+			}
+			return excessSupply;
 		}
 
 		public override string DisplayName
 		{
 			get { return BaseRecipe.Name; }
 		}
-
-		public override float Rate
-		{
-			get { return CompletedPerSecond; }
-		}
-
-		public override Dictionary<Item, float> Outputs
-		{
-			get
-			{
-				var dict = new Dictionary<Item, float>();
-				foreach (Item item in BaseRecipe.Results.Keys)
-				{
-					dict.Add(item, BaseRecipe.Results[item] * Rate);
-				}
-				return dict;
-			}
-		}
-
-		public override Dictionary<Item, float> Inputs
-		{
-			get
-			{
-				var dict = new Dictionary<Item, float>();
-				foreach (Item item in BaseRecipe.Ingredients.Keys)
-				{
-					dict.Add(item, BaseRecipe.Ingredients[item] * Rate);
-				}
-				return dict;
-			}
-		}
-
-		public override void MatchDemand(Item item, float rate)
-		{
-			if (BaseRecipe.Results.ContainsKey(item))
-			{
-				CompletedPerSecond += (rate - OutputRate(item)) / BaseRecipe.Results[item];
-				Graph.InvalidateCaches();
-			}
-			else
-			{
-				throw new InvalidOperationException(String.Format("Tried make a RecipeNode ({0}) output an item ({1}) that the recipe doesn't produce", BaseRecipe.Name, item.Name));
-			}
-
-		}
-
-		public override float InputRate(Item item)
-		{
-			if (BaseRecipe.Ingredients.ContainsKey(item))
-			{
-				return BaseRecipe.Ingredients[item] * Rate;
-			}
-			else
-			{
-				return 0.0f;
-			}
-		}
-
-		public override float OutputRate(Item item)
-		{
-			if (BaseRecipe.Results.ContainsKey(item))
-			{
-				return BaseRecipe.Results[item] * Rate;
-			}
-			else
-			{
-				return 0.0f;
-			}
-		}
-
+				
 		public override string ToString()
 		{
 			return String.Format("Recipe Tree Node: {0}", BaseRecipe.Name);
 		}
 	}
 
-	// For items that can are created outside the production network
 	public class SupplyNode : ProductionNode
 	{
-		public Item SuppliedItem;
-		public float SupplyRate;
+		public Item SuppliedItem { get; private set; }
+		public float SupplyAmount = float.PositiveInfinity;
 
-		public SupplyNode(Item item, float rate, ProductionGraph graph)
+		protected SupplyNode(Item item, ProductionGraph graph)
 			: base(graph)
 		{
 			SuppliedItem = item;
-			SupplyRate = rate;
 		}
+
+		public override IEnumerable<Item> Inputs
+		{
+			get { return new List<Item>(); }
+		}
+
+		public override IEnumerable<Item> Outputs
+		{
+			get { yield return SuppliedItem; }
+		}
+
+		public static SupplyNode Create(Item item, ProductionGraph graph)
+		{
+			SupplyNode node = new SupplyNode(item, graph);
+			node.Graph.Nodes.Add(node);
+			node.Graph.InvalidateCaches();
+			return node;
+		}
+
+		public override float GetExcessDemand(Item item)
+		{
+			return 0f;
+		}
+
+		public override float GetExcessSupply(Item item)
+		{
+			float excessSupply = SupplyAmount;
+			foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
+			{
+				excessSupply -= link.Amount;
+			}
+			return excessSupply;
+		}
+
+		public override Dictionary<Item, float> GetExcessDemand()
+		{
+			return new Dictionary<Item, float>();
+		}
+
+		public override Dictionary<Item, float> GetExcessSupply()
+		{
+			Dictionary<Item, float> demands = new Dictionary<Item, float>();
+			demands.Add(SuppliedItem, GetExcessDemand(SuppliedItem));
+			return demands;
+		}
+
 
 		public override string DisplayName
 		{
 			get { return SuppliedItem.Name; }
-		}
-
-		public override float Rate
-		{
-			get { return SupplyRate; }
-		}
-
-		public override Dictionary<Item, float> Outputs
-		{
-			get
-			{
-				var dict = new Dictionary<Item, float>();
-				dict.Add(SuppliedItem, SupplyRate);
-				return dict;
-			}
-		}
-
-		public override Dictionary<Item, float> Inputs
-		{
-			get
-			{
-				return new Dictionary<Item, float>();
-			}
-		}
-
-		public override void MatchDemand(Item item, float rate)
-		{
-			if (item == SuppliedItem)
-			{
-				SupplyRate = rate;
-				Graph.InvalidateCaches();
-			}
-			else
-			{
-				throw new InvalidOperationException(String.Format("Tried to add {0} to a supply node that can only output {1}.", item.Name, SuppliedItem.Name));
-			}
-		}
-
-		public override float InputRate(Item item)
-		{
-			return 0.0f;
-		}
-
-		public override float OutputRate(Item item)
-		{
-			if (item == SuppliedItem)
-			{
-				return SupplyRate;
-			}
-			else
-			{
-				return 0.0f;
-			}
 		}
 	}
 
 	public class ConsumerNode : ProductionNode
 	{
 		public Item ConsumedItem { get; private set; }
-		public float ConsumptionRate { get; set; }
+		public float ConsumptionAmount = 1f;
 
 		public override string DisplayName
 		{
 			get { return ConsumedItem.Name; }
 		}
 
-		public override float Rate
+		public override IEnumerable<Item> Inputs
 		{
-			get { return ConsumptionRate; }
+			get { yield return ConsumedItem; }
 		}
 
-		public ConsumerNode(Item item, float rate, ProductionGraph graph) : base(graph)
+		public override IEnumerable<Item> Outputs
+		{
+			get { return new List<Item>(); }
+		}
+
+		protected ConsumerNode(Item item, ProductionGraph graph) : base(graph)
 		{
 			ConsumedItem = item;
-			ConsumptionRate = rate;
 		}
 
-		public override Dictionary<Item, float> Inputs
+		public override Dictionary<Item, float> GetExcessDemand()
 		{
-			get
-			{
-				var dict = new Dictionary<Item, float>();
-				dict.Add(ConsumedItem, ConsumptionRate);
-				return dict;
-			}
-		}
-		public override Dictionary<Item, float> Outputs
-		{
-			get
-			{
-				return new Dictionary<Item, float>();
-			}
+			Dictionary<Item, float> demands = new Dictionary<Item, float>();
+			demands.Add(ConsumedItem, GetExcessDemand(ConsumedItem));
+			return demands;
 		}
 
-		public override float InputRate(Item item)
+		public override Dictionary<Item, float> GetExcessSupply()
 		{
-			if (item == ConsumedItem)
-			{
-				return ConsumptionRate;
-			}
-			else
-			{
-				return 0.0f;
-			}
+			return new Dictionary<Item, float>();
 		}
 
-		public override float OutputRate(Item item)
+		public override float GetExcessDemand(Item item)
 		{
-			return 0.0f;
+			float excessDemand = ConsumptionAmount;
+			foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
+			{
+				excessDemand -= link.Amount;
+			}
+			return excessDemand;
 		}
 
-		public override void MatchDemand(Item item, float rate)
+		public override float GetExcessSupply(Item item)
 		{
+			return 0;
+		}
+
+		public static ConsumerNode Create(Item item, ProductionGraph graph)
+		{
+			ConsumerNode node = new ConsumerNode(item, graph);
+			node.Graph.Nodes.Add(node);
+			node.Graph.InvalidateCaches();
+			return node;
 		}
 	}
 }
