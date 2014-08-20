@@ -119,7 +119,7 @@ namespace Foreman
 			float rate = 0;
 			foreach (Item outputItem in BaseRecipe.Results.Keys)
 			{
-				rate = Math.Max(rate, GetTotalOutput(outputItem) / BaseRecipe.Results[outputItem]);
+				rate += Math.Max(rate, GetTotalOutput(outputItem) / BaseRecipe.Results[outputItem]);
 			}
 			return rate;
 		}

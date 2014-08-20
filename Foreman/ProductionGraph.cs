@@ -97,41 +97,24 @@ namespace Foreman
 			do
 			{
 				nodeChosen = false;
-				ProductionNode chosenNode = null;
-				Item chosenItem = null;
 
-				foreach (ProductionNode node in Nodes)
+				foreach (ProductionNode node in Nodes.ToList())
 				{
 					foreach (Item item in node.Inputs)
 					{
-						if (node.GetExcessDemand(item) > 0)
+						if (Math.Round(node.GetExcessDemand(item), 4) > 0)
 						{
-							chosenNode = node;
-							chosenItem = item;
 							nodeChosen = true;
+							SatisfyNodeDemand(node, item);
 							break;
 						}
 					}
-					if (nodeChosen)
-					{
-						break;
-					}
-				}
-
-				if (nodeChosen)
-				{
-					SatisfyNodeDemand(chosenNode, chosenItem);
 				}
 			} while (nodeChosen);
 		}
 
 		public void SatisfyNodeDemand(ProductionNode node, Item item)
 		{
-			if  (node.GetExcessDemand(item) <= 0)
-			{
-				return;
-			}
-
 			if (node.InputLinks.Any(l => l.Item == item))	//Increase throughput of existing node link
 			{
 				NodeLink link = node.InputLinks.First(l => l.Item == item);

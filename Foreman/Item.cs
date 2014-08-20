@@ -42,5 +42,10 @@ namespace Foreman
 
 			return false;
 		}
+
+		public override string ToString()
+		{
+			return String.Format("Item: {0}", Name);
+		}
 	}
 }
