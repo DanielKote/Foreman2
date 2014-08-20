@@ -99,6 +99,31 @@ namespace Foreman
 				(iconSize + iconBorder * 5) * DisplayedNode.Inputs.Count() + iconBorder);
 		}
 
+		public Rectangle GetIconBounds(Item item, LinkType linkType)
+		{
+			int X = 0;
+			int Y = 0;
+			int	Width = iconSize + iconBorder + iconBorder;
+			int	Height = iconSize + iconBorder + iconBorder + iconTextHeight;
+
+			if (linkType == LinkType.Output)
+			{
+				Point iconPoint = getOutputIconPoint(item);
+				var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
+				X = iconPoint.X - Width / 2;
+				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder + iconTextHeight) / 2;
+			}
+			else
+			{
+				Point iconPoint = getInputIconPoint(item);
+				var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
+				X = iconPoint.X - Width / 2;
+				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2;
+			}
+
+			return new Rectangle(X, Y, Width, Height);
+		}
+
 		public Point getOutputIconPoint(Item item)
 		{
 			var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
@@ -196,20 +221,20 @@ namespace Foreman
 			String formatString = "{0:0.##}{1}";
 			foreach (Item item in DisplayedNode.Outputs)
 			{
-				DrawItemIcon(item, getOutputIconPoint(item), true, String.Format(formatString, DisplayedNode.GetTotalOutput(item), unit), graphics);
+				DrawItemIcon(item, getOutputIconPoint(item), LinkType.Output, String.Format(formatString, DisplayedNode.GetTotalOutput(item), unit), graphics);
 			}
 			foreach (Item item in DisplayedNode.Inputs)
 			{
-				DrawItemIcon(item, getInputIconPoint(item), false, String.Format(formatString, DisplayedNode.GetTotalInput(item), unit), graphics);
+				DrawItemIcon(item, getInputIconPoint(item), LinkType.Input, String.Format(formatString, DisplayedNode.GetTotalInput(item), unit), graphics);
 			}
 
 			StringFormat centreFormat = new StringFormat();
 			centreFormat.Alignment = StringAlignment.Center;
 			centreFormat.LineAlignment = StringAlignment.Center;
-			graphics.DrawString(nameText, new Font(FontFamily.GenericSansSerif, 8), new SolidBrush(Color.Black), new PointF(Width / 2, Height/ 2), centreFormat);
+			graphics.DrawString(nameText, new Font(FontFamily.GenericSansSerif, 8), new SolidBrush(Color.Black), new PointF(Width / 2, Height / 2), centreFormat);
 		}
 
-		private void DrawItemIcon(Item item, Point drawPoint, bool output, String rateText, Graphics graphics)
+		private void DrawItemIcon(Item item, Point drawPoint, LinkType linkType, String rateText, Graphics graphics)
 		{
 			int boxSize = iconSize + iconBorder + iconBorder;
 			StringFormat centreFormat = new StringFormat();
@@ -220,7 +245,7 @@ namespace Foreman
 			using (Brush fillBrush = new SolidBrush(Color.White))
 			using (Brush textBrush = new SolidBrush(Color.Black))
 			{
-				if (output)
+				if (linkType == LinkType.Output)
 				{
 					FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
 					DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);

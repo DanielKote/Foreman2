@@ -203,13 +203,31 @@ namespace Foreman
 			}
 		}
 
-		private ProductionNodeViewer getNodeViewerAtScreenPoint(Point point)
+		private ProductionNodeViewer getNodeAtScreenPoint(Point point)
 		{
 			foreach (ProductionNodeViewer node in nodeControls.Values)
 			{
 				if (node.bounds.Contains(screenToGraph(point.X, point.Y)))
 				{
 					return node;
+				}
+				foreach (Item item in node.DisplayedNode.Inputs)
+				{
+					Rectangle iconBounds = node.GetIconBounds(item, LinkType.Input);
+					iconBounds.Offset(node.X, node.Y);
+					if (iconBounds.Contains(screenToGraph(point.X, point.Y)))
+					{
+						return node;
+					}
+				}
+				foreach (Item item in node.DisplayedNode.Outputs)
+				{
+					Rectangle iconBounds = node.GetIconBounds(item, LinkType.Output);
+					iconBounds.Offset(node.X, node.Y);
+					if (iconBounds.Contains(screenToGraph(point.X, point.Y)))
+					{
+						return node;
+					}
 				}
 			}
 			return null;
@@ -220,7 +238,7 @@ namespace Foreman
 			switch (e.Button)
 			{
 				case MouseButtons.Left:
-					var node = getNodeViewerAtScreenPoint(e.Location);
+					var node = getNodeAtScreenPoint(e.Location);
 					if (node != null)
 					{
 						node.IsBeingDragged = true;
@@ -245,7 +263,7 @@ namespace Foreman
 			switch (e.Button)
 			{
 				case MouseButtons.Left:
-					SelectedNode = getNodeViewerAtScreenPoint(e.Location);
+					SelectedNode = getNodeAtScreenPoint(e.Location);
 					ClickedNode = null;
 					foreach (ProductionNodeViewer viewer in nodeControls.Values)
 					{
@@ -261,10 +279,10 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
-			MousedNode = getNodeViewerAtScreenPoint(e.Location);
+			MousedNode = getNodeAtScreenPoint(e.Location);
 			if (IsBeingDragged)
 			{
-				SelectedNode = getNodeViewerAtScreenPoint(e.Location);
+				SelectedNode = getNodeAtScreenPoint(e.Location);
 				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
 				lastMouseDragPoint = e.Location;
 				Invalidate();
