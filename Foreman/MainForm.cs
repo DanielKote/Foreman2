@@ -31,10 +31,12 @@ namespace Foreman
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
 		{
+#if DEBUG
 			if (e.KeyCode == Keys.Escape)
 			{
 				Close();
 			}
+#endif
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)
