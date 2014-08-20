@@ -95,8 +95,8 @@ namespace Foreman
 		private int getIconWidths()
 		{
 			return Math.Max(
-				(iconSize + iconBorder * 5) * DisplayedNode.OutputLinks.Count() + iconBorder,
-				(iconSize + iconBorder * 5) * DisplayedNode.InputLinks.Count() + iconBorder);
+				(iconSize + iconBorder * 5) * DisplayedNode.Outputs.Count() + iconBorder,
+				(iconSize + iconBorder * 5) * DisplayedNode.Inputs.Count() + iconBorder);
 		}
 
 		public Point getOutputIconPoint(Item item)
