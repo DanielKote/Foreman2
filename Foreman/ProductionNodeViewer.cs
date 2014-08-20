@@ -161,7 +161,22 @@ namespace Foreman
 			{
 				FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
 			}
-			if (Parent.SelectedNode == this)
+
+			if (Parent.ClickedNode == this)
+			{
+				using (Pen pen = new Pen(Color.WhiteSmoke, 3f))
+				{
+					DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
+				}
+			}
+			else if (Parent.MousedNode == this)
+			{
+				using (Pen pen = new Pen(Color.LightGray, 3f))
+				{
+					DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
+				}
+			}
+			else if (Parent.SelectedNode == this)
 			{
 				using (Pen pen = new Pen(Color.DarkGray, 3f))
 				{
@@ -169,13 +184,23 @@ namespace Foreman
 				}
 			}
 
+			String unit = "";
+			if (Parent.graph.SelectedAmountType == AmountType.Rate && Parent.graph.SelectedUnit == RateUnit.PerSecond)
+			{
+				unit = "/s";
+			}
+			else if (Parent.graph.SelectedAmountType == AmountType.Rate && Parent.graph.SelectedUnit == RateUnit.PerMinute)
+			{
+				unit = "/m";
+			}
+			String formatString = "{0:0.##}{1}";
 			foreach (Item item in DisplayedNode.Outputs)
 			{
-				DrawItemIcon(item, getOutputIconPoint(item), true, DisplayedNode.GetTotalOutput(item).ToString("0.##"), graphics);
+				DrawItemIcon(item, getOutputIconPoint(item), true, String.Format(formatString, DisplayedNode.GetTotalOutput(item), unit), graphics);
 			}
 			foreach (Item item in DisplayedNode.Inputs)
 			{
-				DrawItemIcon(item, getInputIconPoint(item), false, DisplayedNode.GetTotalInput(item).ToString("0.##"), graphics);
+				DrawItemIcon(item, getInputIconPoint(item), false, String.Format(formatString, DisplayedNode.GetTotalInput(item), unit), graphics);
 			}
 
 			StringFormat centreFormat = new StringFormat();

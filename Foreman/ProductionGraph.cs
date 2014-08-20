@@ -5,19 +5,47 @@ using System.Text;
 
 namespace Foreman
 {
+	public enum AmountType { FixedAmount, Rate }
+	public enum RateUnit { PerMinute, PerSecond }
+
 	public class ProductionGraph
 	{
 		public List<ProductionNode> Nodes = new List<ProductionNode>();
 		private int[,] pathMatrixCache = null;
 		private int[,] adjacencyMatrixCache = null;
 		public HashSet<Recipe> CyclicRecipes = new HashSet<Recipe>();
+		private AmountType selectedAmountType = AmountType.FixedAmount;
+		public RateUnit SelectedUnit = RateUnit.PerSecond;
+
+		public AmountType SelectedAmountType
+		{
+			get
+			{
+				return selectedAmountType;
+			}
+			set
+			{
+				selectedAmountType = value;
+				UpdateNodeAmounts();
+			}
+		}
 
 		public void InvalidateCaches()
 		{
 			pathMatrixCache = null;
 			adjacencyMatrixCache = null;
 		}
-	
+
+		public void UpdateNodeAmounts()
+		{
+			var sortedNodes = GetTopologicalSort();
+
+			foreach (ProductionNode node in sortedNodes)
+			{
+				node.MinimiseInputs();
+			}
+		}
+
 		public int[,] AdjacencyMatrix
 		{
 			get

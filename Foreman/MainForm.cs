@@ -22,13 +22,11 @@ namespace Foreman
 		{
 			DataCache.LoadRecipes();
 
+			rateOptionsDropDown.SelectedIndex = 0;
+
 			ItemListBox.Items.Clear();
 			ItemListBox.Items.AddRange(DataCache.Items.Keys.ToArray());
 			ItemListBox.Sorted = true;
-		}
-
-		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-		{
 		}
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
@@ -54,6 +52,44 @@ namespace Foreman
 		{
 			ProductionGraph.graph.Nodes.Remove(ProductionGraph.SelectedNode.DisplayedNode);
 			ProductionGraph.nodeControls.Remove(ProductionGraph.SelectedNode.DisplayedNode);
+		}
+
+		private void rateButton_CheckedChanged(object sender, EventArgs e)
+		{
+			if ((sender as RadioButton).Checked)
+			{
+				this.ProductionGraph.graph.SelectedAmountType = AmountType.Rate;
+				rateOptionsDropDown.Enabled = true;
+			}
+			else
+			{
+				rateOptionsDropDown.Enabled = false;
+			}
+			ProductionGraph.Invalidate();
+		}
+
+		private void fixedAmountButton_CheckedChanged(object sender, EventArgs e)
+		{
+			if ((sender as RadioButton).Checked)
+			{
+				this.ProductionGraph.graph.SelectedAmountType = AmountType.FixedAmount;
+			}
+			ProductionGraph.Invalidate();
+		}
+
+		private void rateOptionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			switch ((sender as ComboBox).SelectedIndex)
+			{
+				case 0:
+					ProductionGraph.graph.SelectedUnit = RateUnit.PerSecond;
+					ProductionGraph.Invalidate();
+					break;
+				case 1:
+					ProductionGraph.graph.SelectedUnit = RateUnit.PerMinute;
+					ProductionGraph.Invalidate();
+					break;
+			}
 		}
 	}
 }

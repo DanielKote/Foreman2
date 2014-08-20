@@ -17,6 +17,7 @@ namespace Foreman
 		public abstract float GetExcessDemand(Item item);
 		public abstract Dictionary<Item, float> GetExcessSupply();
 		public abstract Dictionary<Item, float> GetExcessDemand();
+		public abstract void MinimiseInputs();
 
 		protected ProductionNode(ProductionGraph graph)
 		{
@@ -124,16 +125,40 @@ namespace Foreman
 			return rate;
 		}
 
+		public override void MinimiseInputs()
+		{
+			float rate = GetRateRequiredByOutputs();
+
+			foreach (NodeLink link in InputLinks)
+			{
+				link.Amount = ValidateItemAmount(rate * BaseRecipe.Ingredients[link.Item]);
+			}
+		}
+
 		public override float GetExcessDemand(Item item)
 		{
 			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
-			return (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
+			float itemRate = ValidateItemAmount(rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
+			return itemRate;
 		}
 
 		public override float GetExcessSupply(Item item)
 		{
 			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
-			return (rate * BaseRecipe.Ingredients[item]) - GetTotalOutput(item);
+			float itemRate = ValidateItemAmount(rate * BaseRecipe.Results[item]) - GetTotalOutput(item);
+			return itemRate;
+		}
+
+		private float ValidateItemAmount(float amount)
+		{
+			if (Graph.SelectedAmountType == AmountType.FixedAmount)
+			{
+				return (float)Math.Ceiling(amount - 0.00001f); //Subtracting a very small number stops the amount from getting rounded up due to FP errors. It's a bit hacky but it works for now.
+			}
+			else
+			{
+				return amount;
+			}
 		}
 
 		public override Dictionary<Item, float> GetExcessDemand()
@@ -149,9 +174,9 @@ namespace Foreman
 		public override Dictionary<Item, float> GetExcessSupply()
 		{
 			Dictionary<Item, float> excessSupply = new Dictionary<Item, float>();
-			foreach (Item inputItem in BaseRecipe.Ingredients.Keys)
+			foreach (Item outputItem in BaseRecipe.Results.Keys)
 			{
-				excessSupply.Add(inputItem, GetExcessSupply(inputItem));
+				excessSupply.Add(outputItem, GetExcessSupply(outputItem));
 			}
 			return excessSupply;
 		}
@@ -223,6 +248,10 @@ namespace Foreman
 			return demands;
 		}
 
+		public override void MinimiseInputs()
+		{
+			//No inputs to minimise.
+		}
 
 		public override string DisplayName
 		{
@@ -280,6 +309,14 @@ namespace Foreman
 		public override float GetExcessSupply(Item item)
 		{
 			return 0;
+		}
+
+		public override void MinimiseInputs()
+		{
+			foreach (NodeLink link in InputLinks)
+			{
+				link.Amount = ConsumptionAmount;
+			}
 		}
 
 		public static ConsumerNode Create(Item item, ProductionGraph graph)

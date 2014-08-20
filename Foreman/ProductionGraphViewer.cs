@@ -19,6 +19,8 @@ namespace Foreman
 		public Point ViewOffset;
 		public float ViewScale = 1f;
 		public ProductionNodeViewer SelectedNode = null;
+		public ProductionNodeViewer MousedNode = null;
+		public ProductionNodeViewer ClickedNode = null;
 
 		private Rectangle graphBounds
 		{
@@ -211,14 +213,8 @@ namespace Foreman
 				}
 			}
 			return null;
-		}
+		}		
 		
-
-		private void ProductionGraphViewer_MouseClick(object sender, MouseEventArgs e)
-		{
-			SelectedNode = getNodeViewerAtScreenPoint(e.Location);
-		}
-
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
 			switch (e.Button)
@@ -230,7 +226,9 @@ namespace Foreman
 						node.IsBeingDragged = true;
 						node.DragOffsetX = screenToGraph(e.X, 0).X - node.X;
 						node.DragOffsetY = screenToGraph(0, e.Y).Y - node.Y;
+						ClickedNode = node;
 					}
+
 					break;
 
 				case MouseButtons.Middle:
@@ -238,6 +236,8 @@ namespace Foreman
 					lastMouseDragPoint = new Point(e.X, e.Y);
 					break;
 			}
+
+			Invalidate();
 		}
 
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
@@ -245,6 +245,8 @@ namespace Foreman
 			switch (e.Button)
 			{
 				case MouseButtons.Left:
+					SelectedNode = getNodeViewerAtScreenPoint(e.Location);
+					ClickedNode = null;
 					foreach (ProductionNodeViewer viewer in nodeControls.Values)
 					{
 						viewer.IsBeingDragged = false;
@@ -259,8 +261,10 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
+			MousedNode = getNodeViewerAtScreenPoint(e.Location);
 			if (IsBeingDragged)
 			{
+				SelectedNode = getNodeViewerAtScreenPoint(e.Location);
 				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
 				lastMouseDragPoint = e.Location;
 				Invalidate();
