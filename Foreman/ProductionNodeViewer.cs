@@ -171,15 +171,6 @@ namespace Foreman
 			return total;
 		}
 
-		public void MouseMoveHandler(object sender, MouseEventArgs e)
-		{
-			if (IsBeingDragged)
-			{
-				Parent.Invalidate();
-				Parent.Update();
-			}
-		}
-
 		public void Paint(Graphics graphics)
 		{
 			using (SolidBrush brush = new SolidBrush(backgroundColour))
