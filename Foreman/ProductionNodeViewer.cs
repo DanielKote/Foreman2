@@ -169,11 +169,11 @@ namespace Foreman
 				}
 			}
 
-			foreach (Item item in DisplayedNode.OutputLinks.Select<NodeLink, Item>(l => l.Item))
+			foreach (Item item in DisplayedNode.Outputs)
 			{
 				DrawItemIcon(item, getOutputIconPoint(item), true, DisplayedNode.GetTotalOutput(item).ToString("0.##"), graphics);
 			}
-			foreach (Item item in DisplayedNode.InputLinks.Select<NodeLink, Item>(l => l.Item))
+			foreach (Item item in DisplayedNode.Inputs)
 			{
 				DrawItemIcon(item, getInputIconPoint(item), false, DisplayedNode.GetTotalInput(item).ToString("0.##"), graphics);
 			}
