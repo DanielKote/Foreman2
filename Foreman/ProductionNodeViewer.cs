@@ -268,7 +268,6 @@ namespace Foreman
 		public void MouseUp(Point location, MouseButtons button)
 		{
 			Item clickedItem = null;
-
 			foreach (Item item in DisplayedNode.Inputs)
 			{
 				if (GetIconBounds(item, LinkType.Input).Contains(location))
@@ -277,9 +276,32 @@ namespace Foreman
 				}
 			}
 
-			if (clickedItem != null && DisplayedNode is ConsumerNode)
+			if (button == MouseButtons.Left)
 			{
-				BeginEditingInputAmount(clickedItem);
+
+				if (clickedItem != null && DisplayedNode is ConsumerNode)
+				{
+					BeginEditingInputAmount(clickedItem);
+				}
+			}
+			else if (button == MouseButtons.Right)
+			{
+				if (clickedItem != null)
+				{
+					ContextMenu rightClickMenu = new ContextMenu();
+
+					if (DisplayedNode.GetExcessDemand(clickedItem) > 0)
+					{
+						rightClickMenu.MenuItems.Add(new MenuItem("Automatically satisfy this item's production requirements",
+							new EventHandler((o, e) =>
+							{
+								DisplayedNode.Graph.SatisfyNodeDemand(DisplayedNode, clickedItem);
+								Parent.CreateMissingControls();
+								Parent.Invalidate();
+							})));
+						rightClickMenu.Show(Parent, Parent.graphToScreen(Point.Add(location, new Size(X, Y))));
+					}
+				}
 			}
 		}
 

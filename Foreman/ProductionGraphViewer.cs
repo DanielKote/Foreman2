@@ -67,15 +67,8 @@ namespace Foreman
 			{
 				ConsumerNode node = ConsumerNode.Create(item, graph);
 			}
-			graph.SatisfyAllItemDemands();
-			CreateMissingControls();
 
-			foreach (ProductionNodeViewer node in nodeControls.Values)
-			{
-				node.Update();
-			}
-			PositionControls();
-			Invalidate(true);
+			CreateMissingControls();
 		}
 
 		public void AddDemand(Item item)
@@ -83,7 +76,7 @@ namespace Foreman
 			AddDemands(new List<Item> { item });
 		}
 
-		private void CreateMissingControls()
+		public void CreateMissingControls()
 		{
 			foreach (ProductionNode node in graph.Nodes)
 			{
@@ -94,6 +87,13 @@ namespace Foreman
 					nodeControls.Add(node, nodeViewer);
 				}
 			}
+
+			foreach (ProductionNodeViewer node in nodeControls.Values)
+			{
+				node.Update();
+			}
+			PositionControls();
+			Invalidate();
 		}
 
 		private void DrawConnections(Graphics graphics)
