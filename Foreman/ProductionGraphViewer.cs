@@ -33,7 +33,6 @@ namespace Foreman
 		private List<Item> Demands = new List<Item>();
 		public bool IsBeingDragged { get; private set; }
 		private Point lastMouseDragPoint;
-		private Point mousePosition;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
 		public ProductionNodeViewer SelectedNode = null;

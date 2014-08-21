@@ -39,6 +39,7 @@ namespace Foreman
 		public void UpdateNodeAmounts()
 		{
 			var sortedNodes = GetTopologicalSort();
+			sortedNodes.Reverse(); //The default order is supply nodes first, consumers last.
 
 			foreach (ProductionNode node in sortedNodes)
 			{
