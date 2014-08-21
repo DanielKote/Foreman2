@@ -12,10 +12,10 @@ namespace Foreman
 	public enum Direction { Up, Down, Left, Right }
 	public struct TooltipInfo
 	{
-		public Point Location;
-		public Point Size;
+		public Point ScreenLocation;
+		public Point ScreenSize;
 		public Direction Direction;
-		public String text;
+		public String Text;
 	}
 
 	public partial class ProductionGraphViewer : UserControl
@@ -232,14 +232,20 @@ namespace Foreman
 				}
 			}
 
-			//e.Graphics.ScaleTransform(-ViewScale, -ViewScale);
-			//e.Graphics.TranslateTransform(-ViewOffset.X, -ViewOffset.Y);
+			e.Graphics.ResetTransform();
 
 			while (toolTipsToDraw.Any())
 			{
 				var tt = toolTipsToDraw.Dequeue();
 
-				DrawTooltip(tt.Location, tt.Size, tt.Direction, e.Graphics);
+				if (tt.Text != null)
+				{
+					DrawTooltip(tt.ScreenLocation, tt.Text, tt.Direction, e.Graphics);
+				}
+				else
+				{
+					DrawTooltip(tt.ScreenLocation, tt.ScreenSize, tt.Direction, e.Graphics);
+				}
 			}
 		}
 
@@ -250,7 +256,7 @@ namespace Foreman
 			DrawTooltip(point, new Point((int)stringSize.Width, (int)stringSize.Height), direction, graphics, text);
 		}
 		
-		private void DrawTooltip(Point point, Point size, Direction direction, Graphics graphics, String text = "")
+		private void DrawTooltip(Point screenArrowPoint, Point screenSize, Direction direction, Graphics graphics, String text = "")
 		{
 			Font font = new Font(FontFamily.GenericSansSerif, 10);
 			int border = 2;
@@ -260,26 +266,26 @@ namespace Foreman
 
 			switch (direction){
 				case Direction.Down:
-					arrowPoint1 = new Point(point.X - arrowSize / 2, point.Y - arrowSize);
-					arrowPoint2 = new Point(point.X + arrowSize / 2, point.Y - arrowSize);
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y - arrowSize);
+					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y - arrowSize);
 					break;
 				case Direction.Left:
-					arrowPoint1 = new Point(point.X - arrowSize, point.Y - arrowSize / 2);
-					arrowPoint1 = new Point(point.X - arrowSize, point.Y + arrowSize / 2);
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y - arrowSize / 2);
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y + arrowSize / 2);
 					break;
 				case Direction.Up:
-					arrowPoint1 = new Point(point.X - arrowSize / 2, point.Y + arrowSize);
-					arrowPoint2 = new Point(point.X + arrowSize / 2, point.Y + arrowSize);
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y + arrowSize);
+					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y + arrowSize);
 					break;
 				case Direction.Right:
-					arrowPoint1 = new Point(point.X + arrowSize, point.Y - arrowSize / 2);
-					arrowPoint1 = new Point(point.X + arrowSize, point.Y + arrowSize / 2);
+					arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y - arrowSize / 2);
+					arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y + arrowSize / 2);
 					break;
 			}
 
-			Rectangle rect = getTooltipBounds(point, size, direction);
+			Rectangle rect = getTooltipScreenBounds(screenArrowPoint, screenSize, direction);
 
-			Point[] points = new Point[]{point, arrowPoint1, arrowPoint2};
+			Point[] points = new Point[]{screenArrowPoint, arrowPoint1, arrowPoint2};
 			graphics.FillPolygon(Brushes.DarkGray, points); 
 			GraphicsStuff.FillRoundRect(rect.X - border, rect.Y - border, rect.Width + border * 2, rect.Height + border * 2, 3, graphics, Brushes.DarkGray);
 
@@ -288,7 +294,7 @@ namespace Foreman
 			graphics.DrawString(text, font, Brushes.White, new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), centreFormat);
 		}
 
-		public Rectangle getTooltipBounds(Point point, Point size, Direction direction)
+		public Rectangle getTooltipScreenBounds(Point screenArrowPoint, Point screenSize, Direction direction)
 		{
 			Point centreOffset = new Point();
 			int arrowSize = 10;
@@ -296,22 +302,22 @@ namespace Foreman
 			switch (direction)
 			{
 				case Direction.Down:
-					centreOffset = new Point(0, -arrowSize - size.Y / 2);
+					centreOffset = new Point(0, -arrowSize - screenSize.Y / 2);
 					break;
 				case Direction.Left:
-					centreOffset = new Point(arrowSize + size.X / 2, 0);
+					centreOffset = new Point(arrowSize + screenSize.X / 2, 0);
 					break;
 				case Direction.Up:
-					centreOffset = new Point(0, arrowSize + size.Y / 2);
+					centreOffset = new Point(0, arrowSize + screenSize.Y / 2);
 					break;
 				case Direction.Right:
-					centreOffset = new Point(-arrowSize - size.X / 2, 0);
+					centreOffset = new Point(-arrowSize - screenSize.X / 2, 0);
 					break;
 			}
-			int X = (point.X + centreOffset.X - size.X / 2);
-			int Y = (point.Y + centreOffset.Y - size.Y / 2);
-			int Width = size.X;
-			int Height = size.Y;
+			int X = (screenArrowPoint.X + centreOffset.X - screenSize.X / 2);
+			int Y = (screenArrowPoint.Y + centreOffset.Y - screenSize.Y / 2);
+			int Width = screenSize.X;
+			int Height = screenSize.Y;
 
 			return new Rectangle(X, Y, Width, Height);
 		}

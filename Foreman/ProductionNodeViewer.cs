@@ -227,9 +227,9 @@ namespace Foreman
 			if (editorBox != null)
 			{
 				TooltipInfo ttinfo = new TooltipInfo();
-				ttinfo.Location = getInputLineConnectionPoint(editedItem);
+				ttinfo.ScreenLocation = Parent.graphToScreen(getInputLineConnectionPoint(editedItem));
 				ttinfo.Direction = Direction.Up;
-				ttinfo.Size = new Point(editorBox.Size);
+				ttinfo.ScreenSize = new Point(editorBox.Size);
 				Parent.AddTooltip(ttinfo);
 			}
 		}
@@ -296,8 +296,8 @@ namespace Foreman
 			editorBox.Text = (DisplayedNode as ConsumerNode).ConsumptionAmount.ToString();
 			editorBox.SelectAll();
 			editorBox.Size = new Size(100, 30);
-			Rectangle tooltipRect = Parent.getTooltipBounds(getInputLineConnectionPoint(item), new Point(editorBox.Size), Direction.Up);
-			editorBox.Location = Parent.graphToScreen(tooltipRect.X, tooltipRect.Y);
+			Rectangle tooltipRect = Parent.getTooltipScreenBounds(Parent.graphToScreen(getInputLineConnectionPoint(item)), new Point(editorBox.Size), Direction.Up);
+			editorBox.Location = new Point(tooltipRect.X, tooltipRect.Y);
 			Parent.Controls.Add(editorBox);
 			editorBox.Focus();
 			editorBox.TextChanged += editorBoxTextChanged;
