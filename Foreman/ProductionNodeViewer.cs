@@ -295,12 +295,31 @@ namespace Foreman
 						rightClickMenu.MenuItems.Add(new MenuItem("Automatically satisfy this item's production requirements",
 							new EventHandler((o, e) =>
 							{
-								DisplayedNode.Graph.SatisfyNodeDemand(DisplayedNode, clickedItem);
+								DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedItem);
 								Parent.CreateMissingControls();
 								Parent.Invalidate();
 							})));
-						rightClickMenu.Show(Parent, Parent.graphToScreen(Point.Add(location, new Size(X, Y))));
+						rightClickMenu.MenuItems.Add(new MenuItem("Choose a recipe to provide this item",
+							new EventHandler((o, e) =>
+								{
+									RecipeChooserForm form = new RecipeChooserForm(clickedItem);
+									var result = form.ShowDialog();
+									if (result == DialogResult.OK)
+									{
+										if (form.selectedRecipe != null)
+										{
+											DisplayedNode.Graph.SatisfyNodeDemandWithSpecificRecipe(DisplayedNode, clickedItem, form.selectedRecipe);
+										}
+										else
+										{
+											DisplayedNode.Graph.SatisfyNodeDemandWithSupplyNode(DisplayedNode, clickedItem);
+										}
+										Parent.CreateMissingControls();
+										Parent.Invalidate();
+									}
+								})));
 					}
+					rightClickMenu.Show(Parent, Parent.graphToScreen(Point.Add(location, new Size(X, Y))));
 				}
 			}
 		}

@@ -22,9 +22,19 @@ namespace Foreman
 
 		public static void Create(ProductionNode supplier, ProductionNode consumer, Item item, float amount)
 		{
-			NodeLink link = new NodeLink(supplier, consumer, item, amount);
-			supplier.OutputLinks.Add(link);
-			consumer.InputLinks.Add(link);
+			if (supplier.OutputLinks.Any(l => l.Consumer == consumer && l.Item == item))
+			{
+				//A link already exists
+				NodeLink existingLink = supplier.OutputLinks.First(l => l.Consumer == consumer && l.Item == item);
+				existingLink.Amount += amount;
+			}
+			else
+			{
+				NodeLink link = new NodeLink(supplier, consumer, item, amount);
+				supplier.OutputLinks.Add(link);
+				consumer.InputLinks.Add(link);
+				supplier.Graph.InvalidateCaches();
+			}
 		}
 
 		public void Destroy()

@@ -79,6 +79,24 @@
     </Compile>
     <Compile Include="ProductionNodeViewer.cs" />
     <Compile Include="NodeLink.cs" />
+    <Compile Include="RecipeChooserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RecipeChooserForm.Designer.cs">
+      <DependentUpon>RecipeChooserForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RecipeChooserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RecipeChooserControl.Designer.cs">
+      <DependentUpon>RecipeChooserControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SupplyNodeChooserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RecipeChooserSupplyNodeOption.Designer.cs">
+      <DependentUpon>SupplyNodeChooserControl.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -94,6 +112,15 @@
     </Compile>
     <EmbeddedResource Include="ProductionGraphViewer.resx">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RecipeChooserForm.resx">
+      <DependentUpon>RecipeChooserForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RecipeChooserControl.resx">
+      <DependentUpon>RecipeChooserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RecipeChooserSupplyNodeOption.resx">
+      <DependentUpon>SupplyNodeChooserControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
