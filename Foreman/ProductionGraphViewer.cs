@@ -10,6 +10,13 @@ using System.Windows.Forms;
 namespace Foreman
 {
 	public enum Direction { Up, Down, Left, Right }
+	public struct TooltipInfo
+	{
+		public Point Location;
+		public Point Size;
+		public Direction Direction;
+		public String text;
+	}
 
 	public partial class ProductionGraphViewer : UserControl
 	{
@@ -24,6 +31,7 @@ namespace Foreman
 		public ProductionNodeViewer SelectedNode = null;
 		public ProductionNodeViewer MousedNode = null;
 		public ProductionNodeViewer ClickedNode = null;
+		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 
 		private Rectangle graphBounds
 		{
@@ -223,60 +231,97 @@ namespace Foreman
 					}
 				}
 			}
+
+			//e.Graphics.ScaleTransform(-ViewScale, -ViewScale);
+			//e.Graphics.TranslateTransform(-ViewOffset.X, -ViewOffset.Y);
+
+			while (toolTipsToDraw.Any())
+			{
+				var tt = toolTipsToDraw.Dequeue();
+
+				DrawTooltip(tt.Location, tt.Size, tt.Direction, e.Graphics);
+			}
 		}
 
 		private void DrawTooltip(Point point, String text, Direction direction, Graphics graphics)
 		{
-			int border = 2;
 			Font font = new Font(FontFamily.GenericSansSerif, 10);
-			int arrowSize = 10;
 			SizeF stringSize = graphics.MeasureString(text, font);
-			Point centreOffset = new Point();
+			DrawTooltip(point, new Point((int)stringSize.Width, (int)stringSize.Height), direction, graphics, text);
+		}
+		
+		private void DrawTooltip(Point point, Point size, Direction direction, Graphics graphics, String text = "")
+		{
+			Font font = new Font(FontFamily.GenericSansSerif, 10);
+			int border = 2;
+			int arrowSize = 10;
 			Point arrowPoint1 = new Point();
 			Point arrowPoint2 = new Point();
 
 			switch (direction){
 				case Direction.Down:
-					centreOffset = new Point(0, -arrowSize - (int)stringSize.Height / 2);
 					arrowPoint1 = new Point(point.X - arrowSize / 2, point.Y - arrowSize);
 					arrowPoint2 = new Point(point.X + arrowSize / 2, point.Y - arrowSize);
 					break;
 				case Direction.Left:
-					centreOffset = new Point(arrowSize + (int)stringSize.Width / 2, 0);
 					arrowPoint1 = new Point(point.X - arrowSize, point.Y - arrowSize / 2);
 					arrowPoint1 = new Point(point.X - arrowSize, point.Y + arrowSize / 2);
 					break;
 				case Direction.Up:
-					centreOffset = new Point(0, arrowSize + (int)stringSize.Height / 2);
 					arrowPoint1 = new Point(point.X - arrowSize / 2, point.Y + arrowSize);
 					arrowPoint2 = new Point(point.X + arrowSize / 2, point.Y + arrowSize);
 					break;
 				case Direction.Right:
-					centreOffset = new Point(-arrowSize - (int)stringSize.Width / 2, 0);
 					arrowPoint1 = new Point(point.X + arrowSize, point.Y - arrowSize / 2);
 					arrowPoint1 = new Point(point.X + arrowSize, point.Y + arrowSize / 2);
 					break;
 			}
 
-			int X = (int)(point.X + centreOffset.X - stringSize.Width / 2) - border;
-			int Y = (int)(point.Y + centreOffset.Y - stringSize.Height / 2) - border;
-			int Width = (int)stringSize.Width + border * 2;
-			int Height = (int)stringSize.Height + border * 2;
+			Rectangle rect = getTooltipBounds(point, size, direction);
 
 			Point[] points = new Point[]{point, arrowPoint1, arrowPoint2};
 			graphics.FillPolygon(Brushes.DarkGray, points); 
-			GraphicsStuff.FillRoundRect(X, Y, Width, Height, 3, graphics, Brushes.DarkGray);
+			GraphicsStuff.FillRoundRect(rect.X - border, rect.Y - border, rect.Width + border * 2, rect.Height + border * 2, 3, graphics, Brushes.DarkGray);
 
 			StringFormat centreFormat = new StringFormat();
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-			graphics.DrawString(text, font, Brushes.White, Point.Add(point, new Size(centreOffset)), centreFormat);
+			graphics.DrawString(text, font, Brushes.White, new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), centreFormat);
 		}
 
-		private ProductionNodeViewer getNodeAtScreenPoint(Point point)
+		public Rectangle getTooltipBounds(Point point, Point size, Direction direction)
+		{
+			Point centreOffset = new Point();
+			int arrowSize = 10;
+
+			switch (direction)
+			{
+				case Direction.Down:
+					centreOffset = new Point(0, -arrowSize - size.Y / 2);
+					break;
+				case Direction.Left:
+					centreOffset = new Point(arrowSize + size.X / 2, 0);
+					break;
+				case Direction.Up:
+					centreOffset = new Point(0, arrowSize + size.Y / 2);
+					break;
+				case Direction.Right:
+					centreOffset = new Point(-arrowSize - size.X / 2, 0);
+					break;
+			}
+			int X = (point.X + centreOffset.X - size.X / 2);
+			int Y = (point.Y + centreOffset.Y - size.Y / 2);
+			int Width = size.X;
+			int Height = size.Y;
+
+			return new Rectangle(X, Y, Width, Height);
+		}
+
+		//Takes a graph point as an argument
+		private ProductionNodeViewer getNodeAtPoint(Point point)
 		{
 			foreach (ProductionNodeViewer node in nodeControls.Values)
 			{
-				if (node.bounds.Contains(screenToGraph(point.X, point.Y)))
+				if (node.bounds.Contains(point.X, point.Y))
 				{
 					return node;
 				}
@@ -284,7 +329,7 @@ namespace Foreman
 				{
 					Rectangle iconBounds = node.GetIconBounds(item, LinkType.Input);
 					iconBounds.Offset(node.X, node.Y);
-					if (iconBounds.Contains(screenToGraph(point.X, point.Y)))
+					if (iconBounds.Contains(point.X, point.Y))
 					{
 						return node;
 					}
@@ -293,7 +338,7 @@ namespace Foreman
 				{
 					Rectangle iconBounds = node.GetIconBounds(item, LinkType.Output);
 					iconBounds.Offset(node.X, node.Y);
-					if (iconBounds.Contains(screenToGraph(point.X, point.Y)))
+					if (iconBounds.Contains(point.X, point.Y))
 					{
 						return node;
 					}
@@ -304,19 +349,14 @@ namespace Foreman
 		
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
+			var node = getNodeAtPoint(screenToGraph(e.Location));
+			if (node != null)
+			{
+				NodeMouseDown(node, screenToGraph(e.Location), e.Button);
+			}
+
 			switch (e.Button)
 			{
-				case MouseButtons.Left:
-					var node = getNodeAtScreenPoint(e.Location);
-					if (node != null)
-					{
-						node.IsBeingDragged = true;
-						node.DragOffsetX = screenToGraph(e.X, 0).X - node.X;
-						node.DragOffsetY = screenToGraph(0, e.Y).Y - node.Y;
-						ClickedNode = node;
-					}
-					break;
-
 				case MouseButtons.Middle:
 					IsBeingDragged = true;
 					lastMouseDragPoint = new Point(e.X, e.Y);
@@ -326,19 +366,44 @@ namespace Foreman
 			Invalidate();
 		}
 
+		//Takes a location on the graph, not the screen
+		private void NodeMouseDown(ProductionNodeViewer node, Point location, MouseButtons button)
+		{
+			if (button == MouseButtons.Left)
+			{
+				node.IsBeingDragged = true;
+				node.DragOffsetX = location.X - node.X;
+				node.DragOffsetY = location.Y - node.Y;
+				ClickedNode = node;
+			}
+
+			node.MouseDown(Point.Add(location, new Size(-node.X, -node.Y)), button);
+		}
+		private void NodeMouseUp(ProductionNodeViewer node, Point location, MouseButtons button)
+		{
+			if (button == MouseButtons.Left)
+			{
+				SelectedNode = node;
+				ClickedNode = null;
+				foreach (ProductionNodeViewer otherNode in nodeControls.Values)
+				{
+					otherNode.IsBeingDragged = false;
+				}
+			}
+
+			node.MouseUp(Point.Add(location, new Size(-node.X, -node.Y)), button);
+		}
+
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
 		{
+			var node = getNodeAtPoint(screenToGraph(e.Location));
+			if (node != null)
+			{
+				NodeMouseUp(node, screenToGraph(e.Location), e.Button);
+			}
+
 			switch (e.Button)
 			{
-				case MouseButtons.Left:
-					SelectedNode = getNodeAtScreenPoint(e.Location);
-					ClickedNode = null;
-					foreach (ProductionNodeViewer viewer in nodeControls.Values)
-					{
-						viewer.IsBeingDragged = false;
-					}
-					break;
-
 				case MouseButtons.Middle:
 					IsBeingDragged = false;
 					break;
@@ -347,13 +412,17 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
-			MousedNode = getNodeAtScreenPoint(e.Location);
+			MousedNode = getNodeAtPoint(screenToGraph(e.Location));
 			mousePosition = e.Location;
 
 			if (IsBeingDragged)
 			{
-				SelectedNode = getNodeAtScreenPoint(e.Location);
 				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
+				foreach (ProductionNodeViewer node in nodeControls.Values)
+				{
+					node.GraphViewMoved();
+				}
+
 				lastMouseDragPoint = e.Location;
 				Invalidate();
 			}
@@ -381,13 +450,38 @@ namespace Foreman
 			{
 				ViewScale /= 1.1f;
 			}
+
+			foreach (var node in nodeControls.Values)
+			{
+				node.GraphViewMoved();
+			}
+
 			Invalidate();
 		}
 
-		private Point screenToGraph(int X, int Y)
+		public Point screenToGraph(Point point)
+		{
+			return screenToGraph(point.X, point.Y);
+		}
+
+		public Point screenToGraph(int X, int Y)
 		{
 			return new Point(Convert.ToInt32((X - ViewOffset.X) / ViewScale), Convert.ToInt32((Y - ViewOffset.Y) / ViewScale));
 		}
 
+		public Point graphToScreen(Point point)
+		{
+			return graphToScreen(point.X, point.Y);
+		}
+
+		public Point graphToScreen(int X, int Y)
+		{
+			return new Point(Convert.ToInt32((X * ViewScale) + ViewOffset.X), Convert.ToInt32((Y * ViewScale) + ViewOffset.Y));
+		}
+
+		public void AddTooltip(TooltipInfo info)
+		{
+			toolTipsToDraw.Enqueue(info);
+		}
 	}
 }

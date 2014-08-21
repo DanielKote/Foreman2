@@ -33,6 +33,11 @@ namespace Foreman
 		private string rateText = "";
 		private string nameText = "";
 
+		TextBox editorBox;
+		Item editedItem;
+		LinkType editedLinkType;
+		float originalEditorValue;
+
 		public int X;
 		public int Y;
 		public int Width;
@@ -42,13 +47,6 @@ namespace Foreman
 			get
 			{
 				return new Rectangle(X, Y, Width, Height);
-			}
-		}
-		public Rectangle screenBounds
-		{
-			get
-			{
-				return new Rectangle(Parent.ViewOffset.X + X, Parent.ViewOffset.Y + Y, Width, Height);
 			}
 		}
 
@@ -225,6 +223,15 @@ namespace Foreman
 			StringFormat centreFormat = new StringFormat();
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 			graphics.DrawString(nameText, new Font(FontFamily.GenericSansSerif, 8), new SolidBrush(Color.Black), new PointF(Width / 2, Height / 2), centreFormat);
+
+			if (editorBox != null)
+			{
+				TooltipInfo ttinfo = new TooltipInfo();
+				ttinfo.Location = getInputLineConnectionPoint(editedItem);
+				ttinfo.Direction = Direction.Up;
+				ttinfo.Size = new Point(editorBox.Size);
+				Parent.AddTooltip(ttinfo);
+			}
 		}
 
 		private void DrawItemIcon(Item item, Point drawPoint, LinkType linkType, String rateText, Graphics graphics)
@@ -251,6 +258,94 @@ namespace Foreman
 				}
 			}
 			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
+		}
+
+		public void MouseDown(Point location, MouseButtons button)
+		{
+
+		}
+
+		public void MouseUp(Point location, MouseButtons button)
+		{
+			Item clickedItem = null;
+
+			foreach (Item item in DisplayedNode.Inputs)
+			{
+				if (GetIconBounds(item, LinkType.Input).Contains(location))
+				{
+					clickedItem = item;
+				}
+			}
+
+			if (clickedItem != null && DisplayedNode is ConsumerNode)
+			{
+				BeginEditingInputAmount(clickedItem);
+			}
+		}
+
+		public void BeginEditingInputAmount(Item item)
+		{
+			if (editorBox != null)
+			{
+				StopEditingInputAmount();
+			}
+
+			editorBox = new TextBox();
+			editedItem = item;
+			editedLinkType = LinkType.Input;
+			editorBox.Text = (DisplayedNode as ConsumerNode).ConsumptionAmount.ToString();
+			editorBox.SelectAll();
+			editorBox.Size = new Size(100, 30);
+			Rectangle tooltipRect = Parent.getTooltipBounds(getInputLineConnectionPoint(item), new Point(editorBox.Size), Direction.Up);
+			editorBox.Location = Parent.graphToScreen(tooltipRect.X, tooltipRect.Y);
+			Parent.Controls.Add(editorBox);
+			editorBox.Focus();
+			editorBox.TextChanged += editorBoxTextChanged;
+			editorBox.KeyDown += new KeyEventHandler(editorBoxKeyDown);
+		}
+
+		public void StopEditingInputAmount()
+		{
+			Parent.Controls.Remove(editorBox);
+			editorBox.Dispose();
+			editorBox = null;
+			editedItem = null;
+			Parent.Focus();
+		}
+
+		public void GraphViewMoved()
+		{
+			if (editorBox != null)
+			{
+				StopEditingInputAmount();
+			}
+		}
+
+		public void editorBoxTextChanged(object sender, EventArgs e)
+		{
+			float amount;
+			bool amountIsValid = float.TryParse((sender as TextBox).Text, out amount);
+
+			if (amountIsValid)
+			{
+				(DisplayedNode as ConsumerNode).ConsumptionAmount = amount;
+				DisplayedNode.Graph.UpdateNodeAmounts();
+				Parent.Invalidate();
+			}
+		}
+
+		public void editorBoxKeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				StopEditingInputAmount();
+			}
+			else if (e.KeyCode == Keys.Escape)
+			{
+				editorBox.Text = originalEditorValue.ToString();
+				StopEditingInputAmount();
+			}
+			
 		}
 	}
 }
