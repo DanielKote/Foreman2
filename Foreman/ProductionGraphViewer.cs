@@ -12,6 +12,14 @@ namespace Foreman
 	public enum Direction { Up, Down, Left, Right }
 	public struct TooltipInfo
 	{
+		public TooltipInfo(Point screenLocation, Point screenSize, Direction direction, String text)
+		{
+			ScreenLocation = screenLocation;
+			ScreenSize = screenSize;
+			Direction = direction;
+			Text = text;
+		}
+
 		public Point ScreenLocation;
 		public Point ScreenSize;
 		public Direction Direction;
@@ -213,27 +221,7 @@ namespace Foreman
 				e.Graphics.TranslateTransform(-viewer.X, -viewer.Y);
 			}
 			
-			if (MousedNode != null)
-			{
-				Point offsetMousePosition = Point.Add(screenToGraph(mousePosition.X, mousePosition.Y), new Size(-MousedNode.X, -MousedNode.Y));
-				foreach (Item item in MousedNode.DisplayedNode.Inputs)
-				{
-					if (MousedNode.GetIconBounds(item, LinkType.Input).Contains(offsetMousePosition))
-					{
-						DrawTooltip(MousedNode.getInputLineConnectionPoint(item), item.Name, Direction.Up, e.Graphics);
-					}
-				}
-				foreach (Item item in MousedNode.DisplayedNode.Outputs)
-				{
-					if (MousedNode.GetIconBounds(item, LinkType.Output).Contains(offsetMousePosition))
-					{
-						DrawTooltip(MousedNode.getOutputLineConnectionPoint(item), item.Name, Direction.Down, e.Graphics);
-					}
-				}
-			}
-
 			e.Graphics.ResetTransform();
-
 			while (toolTipsToDraw.Any())
 			{
 				var tt = toolTipsToDraw.Dequeue();
@@ -419,7 +407,11 @@ namespace Foreman
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
 			MousedNode = getNodeAtPoint(screenToGraph(e.Location));
-			mousePosition = e.Location;
+
+			if (MousedNode != null)
+			{
+				MousedNode.MouseMoved(Point.Add(screenToGraph(e.Location), new Size(-MousedNode.X, -MousedNode.Y)));
+			}
 
 			if (IsBeingDragged)
 			{
@@ -485,6 +477,7 @@ namespace Foreman
 			return new Point(Convert.ToInt32((X * ViewScale) + ViewOffset.X), Convert.ToInt32((Y * ViewScale) + ViewOffset.Y));
 		}
 
+		//Tooltips added with this method will be drawn the next time the graph is repainted.
 		public void AddTooltip(TooltipInfo info)
 		{
 			toolTipsToDraw.Enqueue(info);

@@ -347,5 +347,26 @@ namespace Foreman
 			}
 			
 		}
+
+		public void MouseMoved(Point location)
+		{
+			if (editorBox == null)
+			{
+				foreach (Item item in DisplayedNode.Inputs)
+				{
+					if (GetIconBounds(item, LinkType.Input).Contains(location))
+					{
+						Parent.AddTooltip(new TooltipInfo(Parent.graphToScreen(getInputLineConnectionPoint(item)), new Point(), Direction.Up, item.Name));
+					}
+				}
+				foreach (Item item in DisplayedNode.Outputs)
+				{
+					if (GetIconBounds(item, LinkType.Output).Contains(location))
+					{
+						Parent.AddTooltip(new TooltipInfo(Parent.graphToScreen(getOutputLineConnectionPoint(item)), new Point(), Direction.Down, item.Name));
+					}
+				}
+			}
+		}
 	}
 }
