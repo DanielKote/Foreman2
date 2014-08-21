@@ -294,6 +294,7 @@ namespace Foreman
 			editedItem = item;
 			editedLinkType = LinkType.Input;
 			editorBox.Text = (DisplayedNode as ConsumerNode).ConsumptionAmount.ToString();
+			originalEditorValue = (DisplayedNode as ConsumerNode).ConsumptionAmount;
 			editorBox.SelectAll();
 			editorBox.Size = new Size(100, 30);
 			Rectangle tooltipRect = Parent.getTooltipScreenBounds(Parent.graphToScreen(getInputLineConnectionPoint(item)), new Point(editorBox.Size), Direction.Up);
@@ -356,7 +357,17 @@ namespace Foreman
 				{
 					if (GetIconBounds(item, LinkType.Input).Contains(location))
 					{
-						Parent.AddTooltip(new TooltipInfo(Parent.graphToScreen(getInputLineConnectionPoint(item)), new Point(), Direction.Up, item.Name));
+						String tooltipText;
+						if (DisplayedNode is ConsumerNode)
+						{
+							tooltipText = String.Format("{0} (Click to edit amount)", item.Name);
+						}
+						else
+						{
+							tooltipText = item.Name;
+						}
+
+						Parent.AddTooltip(new TooltipInfo(Parent.graphToScreen(getInputLineConnectionPoint(item)), new Point(), Direction.Up, tooltipText));
 					}
 				}
 				foreach (Item item in DisplayedNode.Outputs)
