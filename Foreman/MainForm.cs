@@ -52,8 +52,13 @@ namespace Foreman
 
 		private void RemoveNodeButton_Click(object sender, EventArgs e)
 		{
-			ProductionGraph.graph.Nodes.Remove(ProductionGraph.SelectedNode.DisplayedNode);
-			ProductionGraph.nodeControls.Remove(ProductionGraph.SelectedNode.DisplayedNode);
+			if (ProductionGraph.SelectedNode != null)
+			{
+				ProductionGraph.SelectedNode.DisplayedNode.Destroy();
+				ProductionGraph.nodeControls.Remove(ProductionGraph.SelectedNode.DisplayedNode);
+				ProductionGraph.graph.UpdateNodeAmounts();
+				ProductionGraph.Invalidate();
+			}
 		}
 
 		private void rateButton_CheckedChanged(object sender, EventArgs e)

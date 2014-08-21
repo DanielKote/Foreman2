@@ -62,6 +62,16 @@ namespace Foreman
 
 			return (Graph.PathMatrix[otherIndex, thisIndex] > 0) ;
 		}
+
+		public void Destroy()
+		{
+			foreach (NodeLink link in InputLinks.ToList().Union(OutputLinks.ToList()))
+			{
+				link.Destroy();
+			}
+			Graph.Nodes.Remove(this);
+			Graph.InvalidateCaches();
+		}
 	}
 
 	public class RecipeNode : ProductionNode

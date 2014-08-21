@@ -345,8 +345,7 @@ namespace Foreman
 			{
 				editorBox.Text = originalEditorValue.ToString();
 				StopEditingInputAmount();
-			}
-			
+			}			
 		}
 
 		public void MouseMoved(Point location)
