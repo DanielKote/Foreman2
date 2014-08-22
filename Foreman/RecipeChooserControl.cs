@@ -30,7 +30,7 @@ namespace Foreman
 			{
 				outputListBox.Items.Add(String.Format("{0} ({1})", result.FriendlyName, DisplayedRecipe.Results[result]));
 			}
-			iconPictureBox.Image = DataCache.UnknownIcon;
+			iconPictureBox.Image = DisplayedRecipe.Icon;
 			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
 
 			RegisterMouseEvents(this);

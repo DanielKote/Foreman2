@@ -254,9 +254,18 @@ namespace Foreman
 			Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
 			Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
 
+			Recipe newRecipe = new Recipe(name, time == 0.0f ? defaultRecipeTime : time, ingredients, results);
+
+			String iconFile = values["icon"] as String;
+			if (iconFile != null)
+			{
+				Bitmap icon = LoadImage(iconFile);
+				newRecipe.Icon = icon;
+			}
+
 			foreach (Item result in results.Keys)
 			{
-				result.Recipes.Add(new Recipe(name, time == 0.0f ? defaultRecipeTime : time, ingredients, results));
+				result.Recipes.Add(newRecipe);
 			}
 		}
 

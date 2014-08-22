@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace Foreman
 {
@@ -11,6 +12,29 @@ namespace Foreman
 		public float Time { get; private set; }
 		public Dictionary<Item, float> Results { get; set; }
 		public Dictionary<Item, float> Ingredients { get; set; }
+		private Bitmap uniqueIcon = null;
+		public Bitmap Icon
+		{
+			get
+			{
+				if (uniqueIcon != null)
+				{
+					return uniqueIcon;
+				}
+				else if (Results.Count == 1)
+				{
+					return Results.Keys.First().Icon;
+				}
+				else
+				{
+					return DataCache.UnknownIcon;
+				}
+			}
+			set
+			{
+				uniqueIcon = value;
+			}
+		}
 		public String FriendlyName
 		{
 			get
