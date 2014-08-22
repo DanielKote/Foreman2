@@ -45,6 +45,7 @@ namespace Foreman
 			InterpretItems(lua, "capsule");
 			InterpretItems(lua, "module");
 			InterpretItems(lua, "ammo");
+			InterpretItems(lua, "gun");
 			
 			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
 
