@@ -481,5 +481,24 @@ namespace Foreman
 		{
 			toolTipsToDraw.Enqueue(info);
 		}
+
+		private void ProductionGraphViewer_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Delete)
+			{
+				RemoveNode(SelectedNode);
+			}
+		}
+
+		public void RemoveNode(ProductionNodeViewer node)
+		{
+			if (node != null)
+			{
+				SelectedNode.DisplayedNode.Destroy();
+				nodeControls.Remove(node.DisplayedNode);
+				graph.UpdateNodeAmounts();
+				Invalidate();
+			}
+		}
 	}
 }

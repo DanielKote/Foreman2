@@ -39,6 +39,7 @@
 			this.DoubleBuffered = true;
 			this.Name = "ProductionGraphViewer";
 			this.Size = new System.Drawing.Size(889, 633);
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ProductionGraphViewer_KeyDown);
 			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseDown);
 			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseMove);
 			this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseUp);
