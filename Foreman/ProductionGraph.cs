@@ -168,32 +168,16 @@ namespace Foreman
 			ReplaceCycles();
 		}
 
-		public void SatisfyNodeDemandWithSpecificRecipe(ProductionNode node, Item item, Recipe recipe)
+		public void CreateRecipeNodeToSatisfyItemDemand(ProductionNode node, Item item, Recipe recipe)
 		{
-			if (Nodes.OfType<RecipeNode>().Any(n => n.BaseRecipe == recipe))
-			{
-				RecipeNode existingNode = Nodes.OfType<RecipeNode>().First(n => n.BaseRecipe == recipe);
-				NodeLink.Create(existingNode, node, item, node.GetExcessDemand(item));
-			}
-			else
-			{
-				RecipeNode newNode = RecipeNode.Create(recipe, this);
-				NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
-			}
+			RecipeNode newNode = RecipeNode.Create(recipe, this);
+			NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
 		}
 
-		public void SatisfyNodeDemandWithSupplyNode(ProductionNode node, Item item)
+		public void CreateSupplyNodeToSatisfyItemDemand(ProductionNode node, Item item)
 		{
-			if (Nodes.OfType<SupplyNode>().Any(n => n.SuppliedItem == item))
-			{
-				SupplyNode existingNode = Nodes.OfType<SupplyNode>().First(n => n.SuppliedItem == item);
-				NodeLink.Create(existingNode, node, item, node.GetExcessDemand(item));
-			}
-			else
-			{
-				SupplyNode newNode = SupplyNode.Create(item, node.Graph);
-				NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
-			}
+			SupplyNode newNode = SupplyNode.Create(item, node.Graph);
+			NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
 		}
 
 		//Replace recipe cycles with a simple supplier node so that they don't cause infinite loops. This is a workaround.

@@ -127,18 +127,32 @@ namespace Foreman
 
 		public Point getOutputIconPoint(Item item)
 		{
-			var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
-			int x = Convert.ToInt32((float)Width / (sortedOutputs.Count()) * (sortedOutputs.IndexOf(item) + 0.5f));
-			int y = 0;
-			return new Point(x, y + iconBorder);
+			if (DisplayedNode.Outputs.Contains(item))
+			{
+				var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
+				int x = Convert.ToInt32((float)Width / (sortedOutputs.Count()) * (sortedOutputs.IndexOf(item) + 0.5f));
+				int y = 0;
+				return new Point(x, y + iconBorder);
+			}
+			else
+			{
+				return new Point();
+			}
 		}
 
 		public Point getInputIconPoint(Item item)
 		{
-			var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
-			int x = Convert.ToInt32((float)Width / (sortedInputs.Count()) * (sortedInputs.IndexOf(item) + 0.5f));
-			int y = Height;
-			return new Point(x, y - iconBorder);
+			if (DisplayedNode.Inputs.Contains(item))
+			{
+				var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
+				int x = Convert.ToInt32((float)Width / (sortedInputs.Count()) * (sortedInputs.IndexOf(item) + 0.5f));
+				int y = Height;
+				return new Point(x, y - iconBorder);
+			}
+			else
+			{
+				return new Point();
+			}
 		}
 
 		public Point getOutputLineConnectionPoint(Item item)
@@ -268,18 +282,27 @@ namespace Foreman
 		public void MouseUp(Point location, MouseButtons button)
 		{
 			Item clickedItem = null;
+			LinkType clickedLinkType = LinkType.Input;
 			foreach (Item item in DisplayedNode.Inputs)
 			{
 				if (GetIconBounds(item, LinkType.Input).Contains(location))
 				{
 					clickedItem = item;
+					clickedLinkType = LinkType.Input;
+				}
+			}
+			foreach (Item item in DisplayedNode.Outputs)
+			{
+				if (GetIconBounds(item, LinkType.Output).Contains(location))
+				{
+					clickedItem = item;
+					clickedLinkType = LinkType.Output;
 				}
 			}
 
 			if (button == MouseButtons.Left)
 			{
-
-				if (clickedItem != null && DisplayedNode is ConsumerNode)
+				if (clickedItem != null && clickedLinkType == LinkType.Input && DisplayedNode is ConsumerNode)
 				{
 					BeginEditingInputAmount(clickedItem);
 				}
@@ -289,45 +312,55 @@ namespace Foreman
 				ContextMenu rightClickMenu = new ContextMenu();
 				if (clickedItem != null)
 				{
-
-					if (DisplayedNode.GetExcessDemand(clickedItem) > 0)
+					if (clickedLinkType == LinkType.Input)
 					{
-						rightClickMenu.MenuItems.Add(new MenuItem("Automatically satisfy this item's production requirements",
-							new EventHandler((o, e) =>
-							{
-								DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedItem);
-								Parent.CreateMissingControls();
-								Parent.Invalidate();
-							})));
-						rightClickMenu.MenuItems.Add(new MenuItem("Choose a node to produce this item",
-							new EventHandler((o, e) =>
+						if (DisplayedNode.GetExcessDemand(clickedItem) > 0)
+						{
+							rightClickMenu.MenuItems.Add(new MenuItem("Automatically choose/create a node to produce this item",
+								new EventHandler((o, e) =>
 								{
-									RecipeChooserForm form = new RecipeChooserForm(clickedItem);
-									var result = form.ShowDialog();
-									if (result == DialogResult.OK)
-									{
-										if (form.selectedRecipe != null)
-										{
-											DisplayedNode.Graph.SatisfyNodeDemandWithSpecificRecipe(DisplayedNode, clickedItem, form.selectedRecipe);
-										}
-										else
-										{
-											DisplayedNode.Graph.SatisfyNodeDemandWithSupplyNode(DisplayedNode, clickedItem);
-										}
-										Parent.CreateMissingControls();
-										Parent.Invalidate();
-									}
+									DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedItem);
+									Parent.CreateMissingControls();
+									Parent.Invalidate();
 								})));
+
+							rightClickMenu.MenuItems.Add(new MenuItem("Manually create a node to produce this item",
+								new EventHandler((o, e) =>
+									{
+										RecipeChooserForm form = new RecipeChooserForm(clickedItem);
+										var result = form.ShowDialog();
+										if (result == DialogResult.OK)
+										{
+											if (form.selectedRecipe != null)
+											{
+												DisplayedNode.Graph.CreateRecipeNodeToSatisfyItemDemand(DisplayedNode, clickedItem, form.selectedRecipe);
+											}
+											else
+											{
+												DisplayedNode.Graph.CreateSupplyNodeToSatisfyItemDemand(DisplayedNode, clickedItem);
+											}
+											Parent.CreateMissingControls();
+											Parent.Invalidate();
+										}
+									})));
+
+							rightClickMenu.MenuItems.Add(new MenuItem("Choose an existing node to produce this item",
+								new EventHandler((o, e) =>
+									{
+										Parent.LinkDragStartNode = this;
+										Parent.LinkDragItem = clickedItem;
+										Parent.LinkDragStartLinkType = clickedLinkType;
+									})));
+						}
 					}
 				}
-				else
-				{
-					rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-						new EventHandler((o, e) =>
-							{
-								Parent.DeleteNode(this);
-							})));
-				}
+
+				rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+					new EventHandler((o, e) =>
+						{
+							Parent.DeleteNode(this);
+						})));
+
 				rightClickMenu.Show(Parent, Parent.graphToScreen(Point.Add(location, new Size(X, Y))));
 			}
 		}

@@ -40,6 +40,11 @@ namespace Foreman
 		public ProductionNodeViewer ClickedNode = null;
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 
+		public ProductionNodeViewer LinkDragStartNode = null;
+		public Item LinkDragItem = null;
+		public LinkType LinkDragStartLinkType;
+		public ProductionNodeViewer LinkDragEndNode = null;
+
 		private Rectangle graphBounds
 		{
 			get
@@ -102,16 +107,54 @@ namespace Foreman
 			{
 				foreach (NodeLink link in n.InputLinks)
 				{
-					Point pointN = nodeControls[link.Supplier].getOutputLineConnectionPoint(link.Item);
-					Point pointM = nodeControls[link.Consumer].getInputLineConnectionPoint(link.Item);
-					Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
-					Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 
-					using (Pen pen = new Pen(DataCache.IconAverageColour(link.Item.Icon), 3f))
+					Point outpoint = nodeControls[link.Supplier].getOutputLineConnectionPoint(link.Item);
+					Point inpoint = nodeControls[link.Consumer].getInputLineConnectionPoint(link.Item);
+
+					DrawSingleConnection(graphics, outpoint, inpoint, link.Item, 3f);
+				}
+			}
+	
+			if (LinkDragStartNode != null)
+			{
+				Point inpoint, outpoint;
+				if (LinkDragStartLinkType == LinkType.Input)
+				{
+					inpoint = LinkDragStartNode.getInputLineConnectionPoint(LinkDragItem);
+					if (LinkDragEndNode != null)
 					{
-						graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
+						outpoint = LinkDragEndNode.getOutputLineConnectionPoint(LinkDragItem);
+					}
+					else
+					{
+						outpoint = screenToGraph(PointToClient(Cursor.Position));
 					}
 				}
+				else
+				{
+					outpoint = LinkDragStartNode.getOutputLineConnectionPoint(LinkDragItem);
+					if (LinkDragEndNode != null)
+					{
+						inpoint = LinkDragEndNode.getInputLineConnectionPoint(LinkDragItem);
+					}
+					else
+					{
+						inpoint = screenToGraph(PointToClient(Cursor.Position));
+					}
+				}
+
+				DrawSingleConnection(graphics, outpoint, inpoint, LinkDragItem, 3f);
+			}
+		}
+
+		private void DrawSingleConnection(Graphics graphics, Point outputPoint, Point inputPoint, Item item, float thickness)
+		{
+			Point outpoint2 = new Point(outputPoint.X, outputPoint.Y - Math.Max((int)((outputPoint.Y - inputPoint.Y) / 2), 40));
+			Point inpoint2 = new Point(inputPoint.X, inputPoint.Y + Math.Max((int)((outputPoint.Y - inputPoint.Y) / 2), 40));
+
+			using (Pen pen = new Pen(DataCache.IconAverageColour(item.Icon), thickness))
+			{
+				graphics.DrawBezier(pen, outputPoint, outpoint2, inpoint2, inputPoint);
 			}
 		}
 
@@ -347,6 +390,10 @@ namespace Foreman
 			{
 				NodeMouseDown(node, screenToGraph(e.Location), e.Button);
 			}
+			else
+			{
+				LinkDragStartNode = null;
+			}
 
 			switch (e.Button)
 			{
@@ -368,6 +415,22 @@ namespace Foreman
 				node.DragOffsetX = location.X - node.X;
 				node.DragOffsetY = location.Y - node.Y;
 				ClickedNode = node;
+
+				if (LinkDragStartNode != null)
+				{
+					if (LinkDragEndNode != null)
+					{
+						if (LinkDragStartLinkType == LinkType.Input)
+						{
+							NodeLink.Create(LinkDragEndNode.DisplayedNode, LinkDragStartNode.DisplayedNode, LinkDragItem, LinkDragStartNode.DisplayedNode.GetExcessDemand(LinkDragItem));
+						}
+						else
+						{
+							NodeLink.Create(LinkDragStartNode.DisplayedNode, LinkDragEndNode.DisplayedNode, LinkDragItem, LinkDragEndNode.DisplayedNode.GetExcessDemand(LinkDragItem));
+						}
+						LinkDragStartNode = null;
+					}
+				}
 			}
 
 			node.MouseDown(Point.Add(location, new Size(-node.X, -node.Y)), button);
@@ -409,7 +472,23 @@ namespace Foreman
 
 			if (MousedNode != null)
 			{
+				if (LinkDragStartNode != null)
+				{
+					if (LinkDragStartLinkType == LinkType.Input && MousedNode.DisplayedNode.Outputs.Contains(LinkDragItem) && MousedNode != LinkDragStartNode)
+					{
+						LinkDragEndNode = MousedNode;
+					}
+					else if (LinkDragStartLinkType == LinkType.Output && MousedNode.DisplayedNode.Inputs.Contains(LinkDragItem) && MousedNode != LinkDragStartNode)
+					{
+						LinkDragEndNode = MousedNode;
+					}
+				}
+
 				MousedNode.MouseMoved(Point.Add(screenToGraph(e.Location), new Size(-MousedNode.X, -MousedNode.Y)));
+			}
+			else
+			{
+				LinkDragEndNode = null;
 			}
 
 			if (IsBeingDragged)
