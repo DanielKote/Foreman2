@@ -103,6 +103,38 @@ namespace Foreman
 		{
 			GraphViewer.graph.Nodes.Clear();
 			GraphViewer.nodeControls.Clear();
+			GraphViewer.Invalidate();
+		}
+
+		private void ItemListBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (ItemListBox.SelectedItems.Count == 0)
+			{
+				AddItemButton.Enabled = false;
+			}
+			else if (ItemListBox.SelectedItems.Count == 1)
+			{
+				AddItemButton.Enabled = true;
+				AddItemButton.Text = "Add Output";
+			}
+			else if (ItemListBox.SelectedItems.Count > 1)
+			{
+				AddItemButton.Enabled = true;
+				AddItemButton.Text = "Add Outputs";
+			}
+		}
+
+		private void RemoveUnusedButton_Click(object sender, EventArgs e)
+		{
+			foreach (ProductionNode node in GraphViewer.graph.GetTopologicalSort().Reverse<ProductionNode>())
+			{
+				if (node.Outputs.All(i => node.GetTotalOutput(i) == 0))
+				{
+					node.Destroy();
+					GraphViewer.nodeControls.Remove(node);
+					GraphViewer.Invalidate();
+				}
+			}
 		}
 	}
 }

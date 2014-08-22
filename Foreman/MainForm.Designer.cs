@@ -31,14 +31,14 @@
 			this.ItemListBox = new System.Windows.Forms.ListBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.AddItemButton = new System.Windows.Forms.Button();
-			this.RemoveNodeButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.rateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.rateButton = new System.Windows.Forms.RadioButton();
 			this.fixedAmountButton = new System.Windows.Forms.RadioButton();
 			this.AutomaticCompleteButton = new System.Windows.Forms.Button();
-			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.ClearButton = new System.Windows.Forms.Button();
+			this.RemoveUnusedButton = new System.Windows.Forms.Button();
+			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
@@ -49,11 +49,12 @@
 			this.ItemListBox.Dock = System.Windows.Forms.DockStyle.Right;
 			this.ItemListBox.FormattingEnabled = true;
 			this.ItemListBox.IntegralHeight = false;
-			this.ItemListBox.Location = new System.Drawing.Point(3, 153);
+			this.ItemListBox.Location = new System.Drawing.Point(3, 182);
 			this.ItemListBox.Name = "ItemListBox";
 			this.ItemListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.ItemListBox.Size = new System.Drawing.Size(194, 504);
+			this.ItemListBox.Size = new System.Drawing.Size(194, 475);
 			this.ItemListBox.TabIndex = 0;
+			this.ItemListBox.SelectedIndexChanged += new System.EventHandler(this.ItemListBox_SelectedIndexChanged);
 			// 
 			// tableLayoutPanel1
 			// 
@@ -62,16 +63,17 @@
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel1.Controls.Add(this.GraphViewer, 2, 0);
-			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 4);
-			this.tableLayoutPanel1.Controls.Add(this.RemoveNodeButton, 1, 4);
+			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 5);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 3);
+			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 4);
 			this.tableLayoutPanel1.Controls.Add(this.AutomaticCompleteButton, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.ClearButton, 0, 2);
+			this.tableLayoutPanel1.Controls.Add(this.RemoveUnusedButton, 0, 3);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 5;
+			this.tableLayoutPanel1.RowCount = 6;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -82,23 +84,14 @@
 			// 
 			// AddItemButton
 			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.AddItemButton, 2);
 			this.AddItemButton.Location = new System.Drawing.Point(3, 663);
 			this.AddItemButton.Name = "AddItemButton";
-			this.AddItemButton.Size = new System.Drawing.Size(94, 24);
+			this.AddItemButton.Size = new System.Drawing.Size(194, 24);
 			this.AddItemButton.TabIndex = 2;
-			this.AddItemButton.Text = "Add Output(s)";
+			this.AddItemButton.Text = "Add Output";
 			this.AddItemButton.UseVisualStyleBackColor = true;
 			this.AddItemButton.Click += new System.EventHandler(this.AddItemButton_Click);
-			// 
-			// RemoveNodeButton
-			// 
-			this.RemoveNodeButton.Location = new System.Drawing.Point(103, 663);
-			this.RemoveNodeButton.Name = "RemoveNodeButton";
-			this.RemoveNodeButton.Size = new System.Drawing.Size(94, 24);
-			this.RemoveNodeButton.TabIndex = 3;
-			this.RemoveNodeButton.Text = "Remove Node";
-			this.RemoveNodeButton.UseVisualStyleBackColor = true;
-			this.RemoveNodeButton.Click += new System.EventHandler(this.RemoveNodeButton_Click);
 			// 
 			// groupBox1
 			// 
@@ -165,18 +158,6 @@
 			this.AutomaticCompleteButton.UseVisualStyleBackColor = true;
 			this.AutomaticCompleteButton.Click += new System.EventHandler(this.AutomaticCompleteButton_Click);
 			// 
-			// ProductionGraph
-			// 
-			this.GraphViewer.AutoScroll = true;
-			this.GraphViewer.BackColor = System.Drawing.Color.White;
-			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.GraphViewer.Location = new System.Drawing.Point(203, 3);
-			this.GraphViewer.Name = "ProductionGraph";
-			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 5);
-			this.GraphViewer.Size = new System.Drawing.Size(823, 684);
-			this.GraphViewer.TabIndex = 1;
-			// 
 			// ClearButton
 			// 
 			this.tableLayoutPanel1.SetColumnSpan(this.ClearButton, 2);
@@ -189,6 +170,30 @@
 			this.ClearButton.UseVisualStyleBackColor = true;
 			this.ClearButton.Click += new System.EventHandler(this.ClearButton_Click);
 			// 
+			// RemoveUnusedButton
+			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.RemoveUnusedButton, 2);
+			this.RemoveUnusedButton.Dock = System.Windows.Forms.DockStyle.Top;
+			this.RemoveUnusedButton.Location = new System.Drawing.Point(3, 153);
+			this.RemoveUnusedButton.Name = "RemoveUnusedButton";
+			this.RemoveUnusedButton.Size = new System.Drawing.Size(194, 23);
+			this.RemoveUnusedButton.TabIndex = 7;
+			this.RemoveUnusedButton.Text = "Remove dead-end nodes";
+			this.RemoveUnusedButton.UseVisualStyleBackColor = true;
+			this.RemoveUnusedButton.Click += new System.EventHandler(this.RemoveUnusedButton_Click);
+			// 
+			// GraphViewer
+			// 
+			this.GraphViewer.AutoScroll = true;
+			this.GraphViewer.BackColor = System.Drawing.Color.White;
+			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphViewer.Location = new System.Drawing.Point(203, 3);
+			this.GraphViewer.Name = "GraphViewer";
+			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 6);
+			this.GraphViewer.Size = new System.Drawing.Size(823, 684);
+			this.GraphViewer.TabIndex = 1;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -198,7 +203,7 @@
 			this.DoubleBuffered = true;
 			this.KeyPreview = true;
 			this.Name = "MainForm";
-			this.Text = "Items";
+			this.Text = "Foreman";
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ItemListForm_KeyDown);
 			this.tableLayoutPanel1.ResumeLayout(false);
@@ -215,13 +220,13 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private ProductionGraphViewer GraphViewer;
 		private System.Windows.Forms.Button AddItemButton;
-		private System.Windows.Forms.Button RemoveNodeButton;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.ComboBox rateOptionsDropDown;
 		private System.Windows.Forms.RadioButton rateButton;
 		private System.Windows.Forms.RadioButton fixedAmountButton;
 		private System.Windows.Forms.Button AutomaticCompleteButton;
 		private System.Windows.Forms.Button ClearButton;
+		private System.Windows.Forms.Button RemoveUnusedButton;
 	}
 }
 
