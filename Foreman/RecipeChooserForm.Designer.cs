@@ -54,6 +54,7 @@
 			this.ClientSize = new System.Drawing.Size(320, 315);
 			this.Controls.Add(this.recipeListPanel);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+			this.KeyPreview = true;
 			this.Name = "RecipeChooserForm";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

@@ -16,13 +16,12 @@ namespace Foreman
 		public RecipeChooserControl(Recipe recipe)
 		{
 			InitializeComponent();
-
 			DisplayedRecipe = recipe;
 		}
 
 		private void RecipeChooserOption_Load(object sender, EventArgs e)
 		{
-			nameLabel.Text = String.Format("Recipe name: {0}", DisplayedRecipe.Name);
+			nameLabel.Text = String.Format("Use recipe '{0}'", DisplayedRecipe.Name);
 			foreach (Item ingredient in DisplayedRecipe.Ingredients.Keys)
 			{
 				inputListBox.Items.Add(String.Format("{0} ({1})", ingredient.Name, DisplayedRecipe.Ingredients[ingredient]));

@@ -299,7 +299,7 @@ namespace Foreman
 								Parent.CreateMissingControls();
 								Parent.Invalidate();
 							})));
-						rightClickMenu.MenuItems.Add(new MenuItem("Choose a recipe to provide this item",
+						rightClickMenu.MenuItems.Add(new MenuItem("Choose a node to produce this item",
 							new EventHandler((o, e) =>
 								{
 									RecipeChooserForm form = new RecipeChooserForm(clickedItem);
