@@ -486,15 +486,15 @@ namespace Foreman
 		{
 			if (e.KeyCode == Keys.Delete)
 			{
-				RemoveNode(SelectedNode);
+				DeleteNode(SelectedNode);
 			}
 		}
 
-		public void RemoveNode(ProductionNodeViewer node)
+		public void DeleteNode(ProductionNodeViewer node)
 		{
 			if (node != null)
 			{
-				SelectedNode.DisplayedNode.Destroy();
+				node.DisplayedNode.Destroy();
 				nodeControls.Remove(node.DisplayedNode);
 				graph.UpdateNodeAmounts();
 				Invalidate();

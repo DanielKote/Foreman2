@@ -286,9 +286,9 @@ namespace Foreman
 			}
 			else if (button == MouseButtons.Right)
 			{
+				ContextMenu rightClickMenu = new ContextMenu();
 				if (clickedItem != null)
 				{
-					ContextMenu rightClickMenu = new ContextMenu();
 
 					if (DisplayedNode.GetExcessDemand(clickedItem) > 0)
 					{
@@ -319,8 +319,16 @@ namespace Foreman
 									}
 								})));
 					}
-					rightClickMenu.Show(Parent, Parent.graphToScreen(Point.Add(location, new Size(X, Y))));
 				}
+				else
+				{
+					rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+						new EventHandler((o, e) =>
+							{
+								Parent.DeleteNode(this);
+							})));
+				}
+				rightClickMenu.Show(Parent, Parent.graphToScreen(Point.Add(location, new Size(X, Y))));
 			}
 		}
 
