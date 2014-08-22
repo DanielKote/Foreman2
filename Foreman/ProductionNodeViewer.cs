@@ -344,7 +344,7 @@ namespace Foreman
 										}
 									})));
 
-							rightClickMenu.MenuItems.Add(new MenuItem("Choose an existing node to produce this item",
+							rightClickMenu.MenuItems.Add(new MenuItem("Connect this input to an existing node",
 								new EventHandler((o, e) =>
 									{
 										Parent.LinkDragStartNode = this;
@@ -352,6 +352,16 @@ namespace Foreman
 										Parent.LinkDragStartLinkType = clickedLinkType;
 									})));
 						}
+					}
+					else
+					{
+						rightClickMenu.MenuItems.Add(new MenuItem("Connect this output to an existing node",
+							new EventHandler((o, e) =>
+								{
+									Parent.LinkDragStartNode = this;
+									Parent.LinkDragItem = clickedItem;
+									Parent.LinkDragStartLinkType = clickedLinkType;
+								})));
 					}
 				}
 
