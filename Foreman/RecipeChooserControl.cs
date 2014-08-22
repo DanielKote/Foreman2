@@ -21,7 +21,7 @@ namespace Foreman
 
 		private void RecipeChooserOption_Load(object sender, EventArgs e)
 		{
-			nameLabel.Text = String.Format("Use recipe '{0}'", DisplayedRecipe.Name);
+			nameLabel.Text = String.Format("Use recipe '{0}'", DisplayedRecipe.FriendlyName);
 			foreach (Item ingredient in DisplayedRecipe.Ingredients.Keys)
 			{
 				inputListBox.Items.Add(String.Format("{0} ({1})", ingredient.FriendlyName, DisplayedRecipe.Ingredients[ingredient]));

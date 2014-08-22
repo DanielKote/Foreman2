@@ -17,6 +17,7 @@ namespace Foreman
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
+		public static Dictionary<String, String> KnownRecipeNames = new Dictionary<string, string>();
 		
 		public static void LoadRecipes()
 		{
@@ -57,10 +58,10 @@ namespace Foreman
 
 			UnknownIcon = LoadImage("UnknownIcon.png");
 
-			GetItemNames("item-names.cfg", "[item-name]");
-			GetItemNames("fluids.cfg", "[fluid-name]");
-			GetItemNames("entity-names.cfg", "[entity-name]");
-			GetItemNames("equipment-names.cfg", "[equipment-name]");
+			LoadItemNames("item-names.cfg", "[item-name]");
+			LoadItemNames("fluids.cfg", "[fluid-name]");
+			LoadItemNames("entity-names.cfg", "[entity-name]");
+			LoadItemNames("equipment-names.cfg", "[equipment-name]");
 		}
 
 		private static void InterpretItems(Lua lua, String typeName)
@@ -77,38 +78,83 @@ namespace Foreman
 			}
 		}
 
-		private static void GetItemNames(String fileName, String iniSectionName)
+		private static void LoadItemNames(String fileName, String iniSectionName, String locale = "en")
 		{
 			foreach (String dir in Directory.GetDirectories(factorioPath))
 			{
-				String fullFilePath = Path.Combine(dir, "locale", "en", fileName);
+				String fullFilePath = Path.Combine(dir, "locale", locale, fileName);
 				if (File.Exists(fullFilePath))
 				{
-					StreamReader fStream = new StreamReader(fullFilePath);
-					bool inItemNamesSection = false;
-
-					while (!fStream.EndOfStream)
+					using (StreamReader fStream = new StreamReader(fullFilePath))
 					{
-						String line = fStream.ReadLine();
-						if (line.StartsWith("[") && line.EndsWith("]"))
+						bool inItemNamesSection = false;
+
+						while (!fStream.EndOfStream)
 						{
-							if (line == iniSectionName)
+							String line = fStream.ReadLine();
+							if (line.StartsWith("[") && line.EndsWith("]"))
 							{
-								inItemNamesSection = true;
+								if (line == iniSectionName)
+								{
+									inItemNamesSection = true;
+								}
+								else
+								{
+									inItemNamesSection = false;
+								}
+							}
+							else if (inItemNamesSection)
+							{
+								String[] split = line.Split('=');
+								if (split.Count() == 2)
+								{
+									if (Items.ContainsKey(split[0]))
+									{
+										Items[split[0]].friendlyName = split[1];
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private static void LoadRecipeNames(String locale = "en")
+		{
+			foreach (String dir in Directory.GetDirectories(factorioPath))
+			{
+				String fullFilePath = Path.Combine(dir, "locale", locale, "recipe-names.cfg");
+				if (File.Exists(fullFilePath))
+				{
+					using (StreamReader fStream = new StreamReader(fullFilePath))
+					{
+						bool inRecipeNamesSection = false;
+						while (!fStream.EndOfStream)
+						{
+							String line = fStream.ReadLine();
+							if (line.StartsWith("[") && line.EndsWith("]"))
+							{
+								if (line == "[recipe-name]")
+								{
+									inRecipeNamesSection = true;
+								}
+								else
+								{
+									inRecipeNamesSection = false;
+								}
 							}
 							else
 							{
-								inItemNamesSection = false;
-							}
-						}
-						else if (inItemNamesSection)
-						{
-							String[] split = line.Split('=');
-							if (split.Count() == 2)
-							{
-								if (Items.ContainsKey(split[0]))
+								String[] split = line.Split('=');
+								if (split.Count() == 2)
 								{
-									Items[split[0]].friendlyName = split[1];
+									if (KnownRecipeNames.ContainsKey(split[0]))
+									{
+										KnownRecipeNames[split[0]] = split[1];
+									} else {
+										KnownRecipeNames.Add(split[0], split[1]);
+									}
 								}
 							}
 						}

@@ -11,6 +11,24 @@ namespace Foreman
 		public float Time { get; private set; }
 		public Dictionary<Item, float> Results { get; set; }
 		public Dictionary<Item, float> Ingredients { get; set; }
+		public String FriendlyName
+		{
+			get
+			{
+				if (DataCache.KnownRecipeNames.ContainsKey(Name))
+				{
+					return DataCache.KnownRecipeNames[Name];
+				}
+				else if (Results.Count == 1)
+				{
+					return Results.Keys.First().FriendlyName;
+				}
+				else
+				{
+					return Name;
+				}
+			}
+		}
 
 		public Recipe(String name, float time, Dictionary<Item, float> ingredients, Dictionary<Item, float> results)
 		{
@@ -40,21 +58,4 @@ namespace Foreman
 			return false;
 		}
 	}
-
-	//public class Ingredient
-	//{
-	//    public String ItemName { get; private set; }
-	//    public float Amount { get; private set; }
-
-	//    public Ingredient(String name, float number)
-	//    {
-	//        ItemName = name;
-	//        Amount = number;
-	//    }
-
-	//    public override string ToString()
-	//    {
-	//        return String.Format("Ingredient: {0} ({1})", ItemName, Amount);
-	//    }
-	//}
 }

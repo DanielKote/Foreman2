@@ -193,7 +193,7 @@ namespace Foreman
 
 		public override string DisplayName
 		{
-			get { return BaseRecipe.Name; }
+			get { return BaseRecipe.FriendlyName; }
 		}
 				
 		public override string ToString()
