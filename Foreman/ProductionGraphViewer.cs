@@ -334,6 +334,8 @@ namespace Foreman
 		
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
+			Focus();
+
 			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
 			foreach (GraphElement element in elements.ToList())
 			{
@@ -347,16 +349,17 @@ namespace Foreman
 					lastMouseDragPoint = new Point(e.X, e.Y);
 					break;
 			}
-
-			Invalidate();
 		}
 
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
 		{
+			Focus();
+
 			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
-			foreach (GraphElement element in elements)
+
+			if (elements.Any())
 			{
-				element.MouseUp(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)), e.Button);
+				elements.First().MouseUp(Point.Add(ScreenToGraph(e.Location), new Size(-elements.First().X, -elements.First().Y)), e.Button);
 			}
 			DraggedElement = null;
 		
@@ -372,9 +375,9 @@ namespace Foreman
 		{
 			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
 
-			foreach (GraphElement element in elements)
+			if (elements.Any())
 			{
-				element.MouseMoved(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)));
+				elements.First().MouseMoved(Point.Add(ScreenToGraph(e.Location), new Size(-elements.First().X, -elements.First().Y)));
 			}
 
 			if (DraggedElement != null)
@@ -385,11 +388,6 @@ namespace Foreman
 			if (IsBeingDragged)
 			{
 				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
-				foreach (NodeElement element in Elements.OfType<NodeElement>())
-				{
-					element.GraphViewMoved();
-				}
-
 				lastMouseDragPoint = e.Location;
 				Invalidate();
 			}
@@ -406,11 +404,6 @@ namespace Foreman
 			else
 			{
 				ViewScale /= 1.1f;
-			}
-
-			foreach (var element in Elements.OfType<NodeElement>())
-			{
-				element.GraphViewMoved();
 			}
 
 			Invalidate();

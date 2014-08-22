@@ -358,7 +358,7 @@ namespace Foreman
 		{
 			if (editorBox != null)
 			{
-				StopEditingInputAmount();
+				stopEditingInputAmount();
 			}
 
 			editorBox = new TextBox();
@@ -374,26 +374,21 @@ namespace Foreman
 			editorBox.Focus();
 			editorBox.TextChanged += editorBoxTextChanged;
 			editorBox.KeyDown += new KeyEventHandler(editorBoxKeyDown);
+			editorBox.LostFocus += new EventHandler((sender, e) => stopEditingInputAmount());
 		}
 
-		public void StopEditingInputAmount()
+		private void stopEditingInputAmount()
 		{
-			Parent.Controls.Remove(editorBox);
-			editorBox.Dispose();
-			editorBox = null;
-			editedItem = null;
-			Parent.Focus();
-		}
-
-		public void GraphViewMoved()
-		{
-			if (editorBox != null)
+			if (editorBox != null && !editorBox.IsDisposed)
 			{
-				StopEditingInputAmount();
+				Parent.Controls.Remove(editorBox);
+				editorBox = null;
+				editedItem = null;
+				Parent.Focus();
 			}
 		}
 
-		public void editorBoxTextChanged(object sender, EventArgs e)
+		private void editorBoxTextChanged(object sender, EventArgs e)
 		{
 			float amount;
 			bool amountIsValid = float.TryParse((sender as TextBox).Text, out amount);
@@ -406,16 +401,19 @@ namespace Foreman
 			}
 		}
 
-		public void editorBoxKeyDown(object sender, KeyEventArgs e)
+		private void editorBoxKeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				StopEditingInputAmount();
+				stopEditingInputAmount();
 			}
 			else if (e.KeyCode == Keys.Escape)
 			{
-				editorBox.Text = originalEditorValue.ToString();
-				StopEditingInputAmount();
+				if (editorBox != null) //This line only happens if the window is closed with the esc button with the editor box open.
+				{
+					editorBox.Text = originalEditorValue.ToString();
+				}
+				stopEditingInputAmount();
 			}			
 		}
 
