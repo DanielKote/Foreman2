@@ -265,7 +265,7 @@ namespace Foreman
 
 		public override string DisplayName
 		{
-			get { return SuppliedItem.Name; }
+			get { return SuppliedItem.FriendlyName; }
 		}
 	}
 
@@ -276,7 +276,7 @@ namespace Foreman
 
 		public override string DisplayName
 		{
-			get { return ConsumedItem.Name; }
+			get { return ConsumedItem.FriendlyName; }
 		}
 
 		public override IEnumerable<Item> Inputs

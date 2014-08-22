@@ -11,6 +11,21 @@ namespace Foreman
 		public String Name { get; private set; }
 		public HashSet<Recipe> Recipes { get; private set; }
 		public Bitmap Icon { get; set; }
+		public String friendlyName;
+		public String FriendlyName
+		{
+			get
+			{
+				if (!String.IsNullOrWhiteSpace(friendlyName))
+				{
+					return friendlyName;
+				}
+				else
+				{
+					return Name;
+				}
+			}
+		}
 
 		private Item()
 		{

@@ -48,7 +48,7 @@ namespace Foreman
 			InterpretItems(lua, "gun");
 			
 			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
-
+			
 			var enumerator = recipeTable.GetEnumerator();
 			while (enumerator.MoveNext())
 			{
@@ -56,6 +56,11 @@ namespace Foreman
 			}
 
 			UnknownIcon = LoadImage("UnknownIcon.png");
+
+			GetItemNames("item-names.cfg", "[item-name]");
+			GetItemNames("fluids.cfg", "[fluid-name]");
+			GetItemNames("entity-names.cfg", "[entity-name]");
+			GetItemNames("equipment-names.cfg", "[equipment-name]");
 		}
 
 		private static void InterpretItems(Lua lua, String typeName)
@@ -68,6 +73,46 @@ namespace Foreman
 				while (enumerator.MoveNext())
 				{
 					InterpretLuaItem(enumerator.Key as String, enumerator.Value as LuaTable);
+				}
+			}
+		}
+
+		private static void GetItemNames(String fileName, String iniSectionName)
+		{
+			foreach (String dir in Directory.GetDirectories(factorioPath))
+			{
+				String fullFilePath = Path.Combine(dir, "locale", "en", fileName);
+				if (File.Exists(fullFilePath))
+				{
+					StreamReader fStream = new StreamReader(fullFilePath);
+					bool inItemNamesSection = false;
+
+					while (!fStream.EndOfStream)
+					{
+						String line = fStream.ReadLine();
+						if (line.StartsWith("[") && line.EndsWith("]"))
+						{
+							if (line == iniSectionName)
+							{
+								inItemNamesSection = true;
+							}
+							else
+							{
+								inItemNamesSection = false;
+							}
+						}
+						else if (inItemNamesSection)
+						{
+							String[] split = line.Split('=');
+							if (split.Count() == 2)
+							{
+								if (Items.ContainsKey(split[0]))
+								{
+									Items[split[0]].friendlyName = split[1];
+								}
+							}
+						}
+					}
 				}
 			}
 		}

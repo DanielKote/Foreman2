@@ -25,7 +25,8 @@ namespace Foreman
 			rateOptionsDropDown.SelectedIndex = 0;
 
 			ItemListBox.Items.Clear();
-			ItemListBox.Items.AddRange(DataCache.Items.Keys.ToArray());
+			ItemListBox.Items.AddRange(DataCache.Items.Values.ToArray());
+			ItemListBox.DisplayMember = "FriendlyName";
 			ItemListBox.Sorted = true;
 		}
 
@@ -41,13 +42,7 @@ namespace Foreman
 
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
-			List<Item> selectedItems = new List<Item>();
-
-			foreach (String itemName in ItemListBox.SelectedItems)
-			{
-				selectedItems.Add(DataCache.Items[itemName]);
-			}
-			GraphViewer.AddDemands(selectedItems);
+			GraphViewer.AddDemands(ItemListBox.SelectedItems.Cast<Item>());
 		}
 
 		private void RemoveNodeButton_Click(object sender, EventArgs e)

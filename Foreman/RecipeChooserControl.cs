@@ -24,11 +24,11 @@ namespace Foreman
 			nameLabel.Text = String.Format("Use recipe '{0}'", DisplayedRecipe.Name);
 			foreach (Item ingredient in DisplayedRecipe.Ingredients.Keys)
 			{
-				inputListBox.Items.Add(String.Format("{0} ({1})", ingredient.Name, DisplayedRecipe.Ingredients[ingredient]));
+				inputListBox.Items.Add(String.Format("{0} ({1})", ingredient.FriendlyName, DisplayedRecipe.Ingredients[ingredient]));
 			}
 			foreach (Item result in DisplayedRecipe.Results.Keys)
 			{
-				outputListBox.Items.Add(String.Format("{0} ({1})", result.Name, DisplayedRecipe.Results[result]));
+				outputListBox.Items.Add(String.Format("{0} ({1})", result.FriendlyName, DisplayedRecipe.Results[result]));
 			}
 			iconPictureBox.Image = DataCache.UnknownIcon;
 			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
