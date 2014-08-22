@@ -30,6 +30,17 @@ namespace Foreman
 			}
 		}
 
+		public IEnumerable<NodeLink> GetAllNodeLinks()
+		{
+			foreach (ProductionNode node in Nodes)
+			{
+				foreach (NodeLink link in node.InputLinks)
+				{
+					yield return link;
+				}
+			}
+		}
+
 		public void InvalidateCaches()
 		{
 			pathMatrixCache = null;

@@ -110,7 +110,7 @@ namespace Foreman
 								{
 									if (Items.ContainsKey(split[0]))
 									{
-										Items[split[0]].friendlyName = split[1];
+										Items[split[0]].FriendlyName = split[1];
 									}
 								}
 							}
@@ -146,14 +146,19 @@ namespace Foreman
 							}
 							else
 							{
-								String[] split = line.Split('=');
-								if (split.Count() == 2)
+								if (inRecipeNamesSection)
 								{
-									if (KnownRecipeNames.ContainsKey(split[0]))
+									String[] split = line.Split('=');
+									if (split.Count() == 2)
 									{
-										KnownRecipeNames[split[0]] = split[1];
-									} else {
-										KnownRecipeNames.Add(split[0], split[1]);
+										if (KnownRecipeNames.ContainsKey(split[0]))
+										{
+											KnownRecipeNames[split[0]] = split[1];
+										}
+										else
+										{
+											KnownRecipeNames.Add(split[0], split[1]);
+										}
 									}
 								}
 							}

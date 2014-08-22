@@ -28,22 +28,23 @@ namespace Foreman
 
 	public partial class ProductionGraphViewer : UserControl
 	{
-		public Dictionary<ProductionNode, ProductionNodeViewer> nodeControls = new Dictionary<ProductionNode, ProductionNodeViewer>();
-		public ProductionGraph graph = new ProductionGraph();
+		public HashSet<GraphElement> Elements = new HashSet<GraphElement>();
+		public ProductionGraph Graph = new ProductionGraph();
 		private List<Item> Demands = new List<Item>();
 		public bool IsBeingDragged { get; private set; }
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
-		public ProductionNodeViewer SelectedNode = null;
-		public ProductionNodeViewer MousedNode = null;
-		public ProductionNodeViewer ClickedNode = null;
+		public NodeElement SelectedNode = null;
+		public NodeElement MousedNode = null;
+		public NodeElement ClickedNode = null;
+		public GraphElement DraggedElement = null;
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 
-		public ProductionNodeViewer LinkDragStartNode = null;
+		public NodeElement LinkDragStartNode = null;
 		public Item LinkDragItem = null;
 		public LinkType LinkDragStartLinkType;
-		public ProductionNodeViewer LinkDragEndNode = null;
+		public NodeElement LinkDragEndNode = null;
 
 		private Rectangle graphBounds
 		{
@@ -51,10 +52,10 @@ namespace Foreman
 			{
 				int width = 0;
 				int height = 0;
-				foreach (ProductionNodeViewer viewer in nodeControls.Values)
+				foreach (NodeElement element in Elements.OfType<NodeElement>())
 				{
-					height = Math.Max(viewer.Y + viewer.Height, height);
-					width = Math.Max(viewer.X + viewer.Width, width);
+					height = Math.Max(element.Y + element.Height, height);
+					width = Math.Max(element.X + element.Width, width);
 				}
 				return new Rectangle(0, 0, width + 20, height + 20);
 			}
@@ -70,10 +71,10 @@ namespace Foreman
 		{
 			foreach (Item item in list)
 			{
-				ConsumerNode node = ConsumerNode.Create(item, graph);
+				ConsumerNode node = ConsumerNode.Create(item, Graph);
 			}
 
-			CreateMissingControls();
+			UpdateElements();
 		}
 
 		public void AddDemand(Item item)
@@ -81,19 +82,28 @@ namespace Foreman
 			AddDemands(new List<Item> { item });
 		}
 
-		public void CreateMissingControls()
+		public void UpdateElements()
 		{
-			foreach (ProductionNode node in graph.Nodes)
+			Elements.RemoveWhere(e => e is LinkElement && !Graph.GetAllNodeLinks().Contains((e as LinkElement).DisplayedLink));
+			Elements.RemoveWhere(e => e is NodeElement && !Graph.Nodes.Contains((e as NodeElement).DisplayedNode));
+
+			foreach (ProductionNode node in Graph.Nodes)
 			{
-				if (!nodeControls.ContainsKey(node))
+				if (!Elements.OfType<NodeElement>().Any(e => e.DisplayedNode == node))
 				{
-					ProductionNodeViewer nodeViewer = new ProductionNodeViewer(node);
-					nodeViewer.Parent = this;
-					nodeControls.Add(node, nodeViewer);
+					Elements.Add(new NodeElement(node, this));
 				}
 			}
 
-			foreach (ProductionNodeViewer node in nodeControls.Values)
+			foreach (NodeLink link in Graph.GetAllNodeLinks())
+			{
+				if (!Elements.OfType<LinkElement>().Any(e => e.DisplayedLink == link))
+				{
+					Elements.Add(new LinkElement(this, link));
+				}
+			}
+
+			foreach (NodeElement node in Elements.OfType<NodeElement>())
 			{
 				node.Update();
 			}
@@ -101,72 +111,20 @@ namespace Foreman
 			Invalidate();
 		}
 
-		private void DrawConnections(Graphics graphics)
+		public NodeElement GetElementForNode(ProductionNode node)
 		{
-			foreach (var n in nodeControls.Keys)
-			{
-				foreach (NodeLink link in n.InputLinks)
-				{
-
-					Point outpoint = nodeControls[link.Supplier].getOutputLineConnectionPoint(link.Item);
-					Point inpoint = nodeControls[link.Consumer].getInputLineConnectionPoint(link.Item);
-
-					DrawSingleConnection(graphics, outpoint, inpoint, link.Item, 3f);
-				}
-			}
-	
-			if (LinkDragStartNode != null)
-			{
-				Point inpoint, outpoint;
-				if (LinkDragStartLinkType == LinkType.Input)
-				{
-					inpoint = LinkDragStartNode.getInputLineConnectionPoint(LinkDragItem);
-					if (LinkDragEndNode != null)
-					{
-						outpoint = LinkDragEndNode.getOutputLineConnectionPoint(LinkDragItem);
-					}
-					else
-					{
-						outpoint = screenToGraph(PointToClient(Cursor.Position));
-					}
-				}
-				else
-				{
-					outpoint = LinkDragStartNode.getOutputLineConnectionPoint(LinkDragItem);
-					if (LinkDragEndNode != null)
-					{
-						inpoint = LinkDragEndNode.getInputLineConnectionPoint(LinkDragItem);
-					}
-					else
-					{
-						inpoint = screenToGraph(PointToClient(Cursor.Position));
-					}
-				}
-
-				DrawSingleConnection(graphics, outpoint, inpoint, LinkDragItem, 3f);
-			}
-		}
-
-		private void DrawSingleConnection(Graphics graphics, Point outputPoint, Point inputPoint, Item item, float thickness)
-		{
-			Point outpoint2 = new Point(outputPoint.X, outputPoint.Y - Math.Max((int)((outputPoint.Y - inputPoint.Y) / 2), 40));
-			Point inpoint2 = new Point(inputPoint.X, inputPoint.Y + Math.Max((int)((outputPoint.Y - inputPoint.Y) / 2), 40));
-
-			using (Pen pen = new Pen(DataCache.IconAverageColour(item.Icon), thickness))
-			{
-				graphics.DrawBezier(pen, outputPoint, outpoint2, inpoint2, inputPoint);
-			}
+			return Elements.OfType<NodeElement>().First(e => e.DisplayedNode == node);
 		}
 
 		private void PositionControls()
 		{
-			if (!nodeControls.Any())
+			if (!Elements.Any())
 			{
 				return;
 			}
-			var nodeOrder = graph.GetTopologicalSort();
+			var nodeOrder = Graph.GetTopologicalSort();
 			nodeOrder.Reverse();
-			var pathMatrix = graph.PathMatrix;
+			var pathMatrix = Graph.PathMatrix;
 
 			List<ProductionNode>[] nodePositions = new List<ProductionNode>[nodeOrder.Count()];
 			for (int i = 0; i < nodePositions.Count(); i++)
@@ -211,11 +169,7 @@ namespace Foreman
 
 				foreach (var node in list)
 				{
-					if (!nodeControls.ContainsKey(node))
-					{
-						continue;
-					}
-					ProductionNodeViewer control = nodeControls[node];
+					NodeElement control = GetElementForNode(node);
 					control.X = x;
 					control.Y = y;
 
@@ -238,11 +192,28 @@ namespace Foreman
 
 				foreach (var node in nodePositions[i])
 				{
-					nodeControls[node].X = nodeControls[node].X + offset;
+					NodeElement element = GetElementForNode(node);
+					element.X = element.X + offset;
 				}
 			}
 
 			Invalidate(true);
+		}
+
+		public IEnumerable<GraphElement> GetPaintingOrder()
+		{
+			foreach (LinkElement element in Elements.OfType<LinkElement>())
+			{
+				yield return element;
+			}
+			foreach (NodeElement element in Elements.OfType<NodeElement>())
+			{
+				yield return element;
+			}
+			foreach (GraphElement element in Elements.Where(e => !(e is NodeElement) || !(e is LinkElement)))
+			{
+				yield return element;
+			}
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
@@ -253,14 +224,12 @@ namespace Foreman
 			e.Graphics.Clear(this.BackColor);
 			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 			e.Graphics.ScaleTransform(ViewScale, ViewScale);
-
-			DrawConnections(e.Graphics);
-
-			foreach (ProductionNodeViewer viewer in nodeControls.Values)
+			
+			foreach (GraphElement element in GetPaintingOrder())
 			{
-				e.Graphics.TranslateTransform(viewer.X, viewer.Y);
-				viewer.Paint(e.Graphics);
-				e.Graphics.TranslateTransform(-viewer.X, -viewer.Y);
+				e.Graphics.TranslateTransform(element.X, element.Y);
+				element.Paint(e.Graphics);
+				e.Graphics.TranslateTransform(-element.X, -element.Y);
 			}
 			
 			e.Graphics.ResetTransform();
@@ -352,47 +321,23 @@ namespace Foreman
 			return new Rectangle(X, Y, Width, Height);
 		}
 
-		//Takes a graph point as an argument
-		private ProductionNodeViewer getNodeAtPoint(Point point)
+		public IEnumerable<GraphElement> GetElementsAtPoint(Point point)
 		{
-			foreach (ProductionNodeViewer node in nodeControls.Values)
+			foreach (GraphElement element in Elements)
 			{
-				if (node.bounds.Contains(point.X, point.Y))
+				if (element.ContainsPoint(Point.Add(point, new Size(-element.X, -element.Y))))
 				{
-					return node;
-				}
-				foreach (Item item in node.DisplayedNode.Inputs)
-				{
-					Rectangle iconBounds = node.GetIconBounds(item, LinkType.Input);
-					iconBounds.Offset(node.X, node.Y);
-					if (iconBounds.Contains(point.X, point.Y))
-					{
-						return node;
-					}
-				}
-				foreach (Item item in node.DisplayedNode.Outputs)
-				{
-					Rectangle iconBounds = node.GetIconBounds(item, LinkType.Output);
-					iconBounds.Offset(node.X, node.Y);
-					if (iconBounds.Contains(point.X, point.Y))
-					{
-						return node;
-					}
+					yield return element;
 				}
 			}
-			return null;
 		}		
 		
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
-			var node = getNodeAtPoint(screenToGraph(e.Location));
-			if (node != null)
+			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
+			foreach (GraphElement element in elements.ToList())
 			{
-				NodeMouseDown(node, screenToGraph(e.Location), e.Button);
-			}
-			else
-			{
-				LinkDragStartNode = null;
+				element.MouseDown(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)), e.Button);
 			}
 
 			switch (e.Button)
@@ -406,58 +351,15 @@ namespace Foreman
 			Invalidate();
 		}
 
-		//Takes a location on the graph, not the screen
-		private void NodeMouseDown(ProductionNodeViewer node, Point location, MouseButtons button)
-		{
-			if (button == MouseButtons.Left)
-			{
-				node.IsBeingDragged = true;
-				node.DragOffsetX = location.X - node.X;
-				node.DragOffsetY = location.Y - node.Y;
-				ClickedNode = node;
-
-				if (LinkDragStartNode != null)
-				{
-					if (LinkDragEndNode != null)
-					{
-						if (LinkDragStartLinkType == LinkType.Input)
-						{
-							NodeLink.Create(LinkDragEndNode.DisplayedNode, LinkDragStartNode.DisplayedNode, LinkDragItem, LinkDragStartNode.DisplayedNode.GetExcessDemand(LinkDragItem));
-						}
-						else
-						{
-							NodeLink.Create(LinkDragStartNode.DisplayedNode, LinkDragEndNode.DisplayedNode, LinkDragItem, LinkDragEndNode.DisplayedNode.GetExcessDemand(LinkDragItem));
-						}
-						LinkDragStartNode = null;
-					}
-				}
-			}
-
-			node.MouseDown(Point.Add(location, new Size(-node.X, -node.Y)), button);
-		}
-		private void NodeMouseUp(ProductionNodeViewer node, Point location, MouseButtons button)
-		{
-			if (button == MouseButtons.Left)
-			{
-				SelectedNode = node;
-				ClickedNode = null;
-				foreach (ProductionNodeViewer otherNode in nodeControls.Values)
-				{
-					otherNode.IsBeingDragged = false;
-				}
-			}
-
-			node.MouseUp(Point.Add(location, new Size(-node.X, -node.Y)), button);
-		}
-
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
 		{
-			var node = getNodeAtPoint(screenToGraph(e.Location));
-			if (node != null)
+			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
+			foreach (GraphElement element in elements)
 			{
-				NodeMouseUp(node, screenToGraph(e.Location), e.Button);
+				element.MouseUp(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)), e.Button);
 			}
-
+			DraggedElement = null;
+		
 			switch (e.Button)
 			{
 				case MouseButtons.Middle:
@@ -468,49 +370,28 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
-			MousedNode = getNodeAtPoint(screenToGraph(e.Location));
+			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
 
-			if (MousedNode != null)
+			foreach (GraphElement element in elements)
 			{
-				if (LinkDragStartNode != null)
-				{
-					if (LinkDragStartLinkType == LinkType.Input && MousedNode.DisplayedNode.Outputs.Contains(LinkDragItem) && MousedNode != LinkDragStartNode)
-					{
-						LinkDragEndNode = MousedNode;
-					}
-					else if (LinkDragStartLinkType == LinkType.Output && MousedNode.DisplayedNode.Inputs.Contains(LinkDragItem) && MousedNode != LinkDragStartNode)
-					{
-						LinkDragEndNode = MousedNode;
-					}
-				}
-
-				MousedNode.MouseMoved(Point.Add(screenToGraph(e.Location), new Size(-MousedNode.X, -MousedNode.Y)));
+				element.MouseMoved(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)));
 			}
-			else
+
+			if (DraggedElement != null)
 			{
-				LinkDragEndNode = null;
+				DraggedElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-DraggedElement.X, -DraggedElement.Y)));
 			}
 
 			if (IsBeingDragged)
 			{
 				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
-				foreach (ProductionNodeViewer node in nodeControls.Values)
+				foreach (NodeElement element in Elements.OfType<NodeElement>())
 				{
-					node.GraphViewMoved();
+					element.GraphViewMoved();
 				}
 
 				lastMouseDragPoint = e.Location;
 				Invalidate();
-			}
-			foreach (ProductionNodeViewer node in nodeControls.Values)
-			{
-				if (node.IsBeingDragged)
-				{
-					node.X = screenToGraph(e.X, 0).X - node.DragOffsetX;
-					node.Y = screenToGraph(0, e.Y).Y - node.DragOffsetY;
-					Invalidate();
-					break;
-				}
 			}
 			
 			Invalidate();
@@ -527,30 +408,30 @@ namespace Foreman
 				ViewScale /= 1.1f;
 			}
 
-			foreach (var node in nodeControls.Values)
+			foreach (var element in Elements.OfType<NodeElement>())
 			{
-				node.GraphViewMoved();
+				element.GraphViewMoved();
 			}
 
 			Invalidate();
 		}
 
-		public Point screenToGraph(Point point)
+		public Point ScreenToGraph(Point point)
 		{
-			return screenToGraph(point.X, point.Y);
+			return ScreenToGraph(point.X, point.Y);
 		}
 
-		public Point screenToGraph(int X, int Y)
+		public Point ScreenToGraph(int X, int Y)
 		{
 			return new Point(Convert.ToInt32((X - ViewOffset.X) / ViewScale), Convert.ToInt32((Y - ViewOffset.Y) / ViewScale));
 		}
 
-		public Point graphToScreen(Point point)
+		public Point GraphToScreen(Point point)
 		{
-			return graphToScreen(point.X, point.Y);
+			return GraphToScreen(point.X, point.Y);
 		}
 
-		public Point graphToScreen(int X, int Y)
+		public Point GraphToScreen(int X, int Y)
 		{
 			return new Point(Convert.ToInt32((X * ViewScale) + ViewOffset.X), Convert.ToInt32((Y * ViewScale) + ViewOffset.Y));
 		}
@@ -569,13 +450,13 @@ namespace Foreman
 			}
 		}
 
-		public void DeleteNode(ProductionNodeViewer node)
+		public void DeleteNode(NodeElement node)
 		{
 			if (node != null)
 			{
 				node.DisplayedNode.Destroy();
-				nodeControls.Remove(node.DisplayedNode);
-				graph.UpdateNodeAmounts();
+				Elements.Remove(node);
+				Graph.UpdateNodeAmounts();
 				Invalidate();
 			}
 		}

@@ -12,9 +12,8 @@ namespace Foreman
 {
 	public enum LinkType {Input, Output};
 
-	public partial class ProductionNodeViewer
+	public partial class NodeElement : GraphElement
 	{
-		public bool IsBeingDragged = false;
 		public int DragOffsetX;
 		public int DragOffsetY;
 
@@ -37,23 +36,10 @@ namespace Foreman
 		Item editedItem;
 		LinkType editedLinkType;
 		float originalEditorValue;
-
-		public int X;
-		public int Y;
-		public int Width;
-		public int Height;
-		public Rectangle bounds
-		{
-			get
-			{
-				return new Rectangle(X, Y, Width, Height);
-			}
-		}
-
+		
 		public ProductionNode DisplayedNode { get; private set; }
 
-		public ProductionGraphViewer Parent;
-		public ProductionNodeViewer(ProductionNode node)
+		public NodeElement(ProductionNode node, ProductionGraphViewer parent) : base(parent)
 		{
 			Width = 100;
 			Height = 80;
@@ -109,14 +95,14 @@ namespace Foreman
 
 			if (linkType == LinkType.Output)
 			{
-				Point iconPoint = getOutputIconPoint(item);
+				Point iconPoint = GetOutputIconPoint(item);
 				var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
 				X = iconPoint.X - Width / 2;
 				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder + iconTextHeight) / 2;
 			}
 			else
 			{
-				Point iconPoint = getInputIconPoint(item);
+				Point iconPoint = GetInputIconPoint(item);
 				var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
 				X = iconPoint.X - Width / 2;
 				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2;
@@ -125,7 +111,7 @@ namespace Foreman
 			return new Rectangle(X, Y, Width, Height);
 		}
 
-		public Point getOutputIconPoint(Item item)
+		public Point GetOutputIconPoint(Item item)
 		{
 			if (DisplayedNode.Outputs.Contains(item))
 			{
@@ -140,7 +126,7 @@ namespace Foreman
 			}
 		}
 
-		public Point getInputIconPoint(Item item)
+		public Point GetInputIconPoint(Item item)
 		{
 			if (DisplayedNode.Inputs.Contains(item))
 			{
@@ -155,14 +141,14 @@ namespace Foreman
 			}
 		}
 
-		public Point getOutputLineConnectionPoint(Item item)
+		public Point GetOutputLineConnectionPoint(Item item)
 		{
-			return Point.Add(getOutputIconPoint(item), new Size(X, Y - (iconSize + iconBorder + iconBorder) / 2 - iconTextHeight));
+			return Point.Add(GetOutputIconPoint(item), new Size(X, Y - (iconSize + iconBorder + iconBorder) / 2 - iconTextHeight));
 		}
 
-		public Point getInputLineConnectionPoint(Item item)
+		public Point GetInputLineConnectionPoint(Item item)
 		{
-			return Point.Add(getInputIconPoint(item), new Size(X, Y + (iconSize + iconBorder + iconBorder) / 2 + iconTextHeight));
+			return Point.Add(GetInputIconPoint(item), new Size(X, Y + (iconSize + iconBorder + iconBorder) / 2 + iconTextHeight));
 		}
 
 		//Used to sort items in the input/output lists
@@ -173,20 +159,20 @@ namespace Foreman
 			{
 				foreach (NodeLink link in DisplayedNode.InputLinks.Where(l => l.Item == item))
 				{
-					total += Parent.nodeControls[link.Supplier].X;
+					total += Parent.GetElementForNode(link.Supplier).X;
 				}
 			}
 			else
 			{
 				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(l => l.Item == item))
 				{
-					total += Parent.nodeControls[link.Consumer].X;
+					total += Parent.GetElementForNode(link.Consumer).X;
 				}
 			}
 			return total;
 		}
 
-		public void Paint(Graphics graphics)
+		public override void Paint(Graphics graphics)
 		{
 			using (SolidBrush brush = new SolidBrush(backgroundColour))
 			{
@@ -216,22 +202,22 @@ namespace Foreman
 			}
 
 			String unit = "";
-			if (Parent.graph.SelectedAmountType == AmountType.Rate && Parent.graph.SelectedUnit == RateUnit.PerSecond)
+			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerSecond)
 			{
 				unit = "/s";
 			}
-			else if (Parent.graph.SelectedAmountType == AmountType.Rate && Parent.graph.SelectedUnit == RateUnit.PerMinute)
+			else if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
 			{
 				unit = "/m";
 			}
 			String formatString = "{0:0.##}{1}";
 			foreach (Item item in DisplayedNode.Outputs)
 			{
-				DrawItemIcon(item, getOutputIconPoint(item), LinkType.Output, String.Format(formatString, DisplayedNode.GetTotalOutput(item), unit), graphics);
+				DrawItemIcon(item, GetOutputIconPoint(item), LinkType.Output, String.Format(formatString, DisplayedNode.GetTotalOutput(item), unit), graphics);
 			}
 			foreach (Item item in DisplayedNode.Inputs)
 			{
-				DrawItemIcon(item, getInputIconPoint(item), LinkType.Input, String.Format(formatString, DisplayedNode.GetTotalInput(item), unit), graphics);
+				DrawItemIcon(item, GetInputIconPoint(item), LinkType.Input, String.Format(formatString, DisplayedNode.GetTotalInput(item), unit), graphics);
 			}
 
 			StringFormat centreFormat = new StringFormat();
@@ -241,7 +227,7 @@ namespace Foreman
 			if (editorBox != null)
 			{
 				TooltipInfo ttinfo = new TooltipInfo();
-				ttinfo.ScreenLocation = Parent.graphToScreen(getInputLineConnectionPoint(editedItem));
+				ttinfo.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(editedItem));
 				ttinfo.Direction = Direction.Up;
 				ttinfo.ScreenSize = new Point(editorBox.Size);
 				Parent.AddTooltip(ttinfo);
@@ -274,12 +260,7 @@ namespace Foreman
 			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
 		}
 
-		public void MouseDown(Point location, MouseButtons button)
-		{
-
-		}
-
-		public void MouseUp(Point location, MouseButtons button)
+		public override void MouseUp(Point location, MouseButtons button)
 		{
 			Item clickedItem = null;
 			LinkType clickedLinkType = LinkType.Input;
@@ -320,7 +301,7 @@ namespace Foreman
 								new EventHandler((o, e) =>
 								{
 									DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedItem);
-									Parent.CreateMissingControls();
+									Parent.UpdateElements();
 									Parent.Invalidate();
 								})));
 
@@ -339,17 +320,16 @@ namespace Foreman
 											{
 												DisplayedNode.Graph.CreateSupplyNodeToSatisfyItemDemand(DisplayedNode, clickedItem);
 											}
-											Parent.CreateMissingControls();
+											Parent.UpdateElements();
 											Parent.Invalidate();
 										}
 									})));
 
 							rightClickMenu.MenuItems.Add(new MenuItem("Connect this input to an existing node",
 								new EventHandler((o, e) =>
-									{
-										Parent.LinkDragStartNode = this;
-										Parent.LinkDragItem = clickedItem;
-										Parent.LinkDragStartLinkType = clickedLinkType;
+								{
+									DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Input, clickedItem);
+									newLink.ConsumerElement = this;
 									})));
 						}
 					}
@@ -358,9 +338,8 @@ namespace Foreman
 						rightClickMenu.MenuItems.Add(new MenuItem("Connect this output to an existing node",
 							new EventHandler((o, e) =>
 								{
-									Parent.LinkDragStartNode = this;
-									Parent.LinkDragItem = clickedItem;
-									Parent.LinkDragStartLinkType = clickedLinkType;
+									DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Output, clickedItem);
+									newLink.SupplierElement = this;
 								})));
 					}
 				}
@@ -371,7 +350,7 @@ namespace Foreman
 							Parent.DeleteNode(this);
 						})));
 
-				rightClickMenu.Show(Parent, Parent.graphToScreen(Point.Add(location, new Size(X, Y))));
+				rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
 			}
 		}
 
@@ -389,7 +368,7 @@ namespace Foreman
 			originalEditorValue = (DisplayedNode as ConsumerNode).ConsumptionAmount;
 			editorBox.SelectAll();
 			editorBox.Size = new Size(100, 30);
-			Rectangle tooltipRect = Parent.getTooltipScreenBounds(Parent.graphToScreen(getInputLineConnectionPoint(item)), new Point(editorBox.Size), Direction.Up);
+			Rectangle tooltipRect = Parent.getTooltipScreenBounds(Parent.GraphToScreen(GetInputLineConnectionPoint(item)), new Point(editorBox.Size), Direction.Up);
 			editorBox.Location = new Point(tooltipRect.X, tooltipRect.Y);
 			Parent.Controls.Add(editorBox);
 			editorBox.Focus();
@@ -440,7 +419,7 @@ namespace Foreman
 			}			
 		}
 
-		public void MouseMoved(Point location)
+		public override void MouseMoved(Point location)
 		{
 			if (editorBox == null)
 			{
@@ -458,17 +437,59 @@ namespace Foreman
 							tooltipText = item.Name;
 						}
 
-						Parent.AddTooltip(new TooltipInfo(Parent.graphToScreen(getInputLineConnectionPoint(item)), new Point(), Direction.Up, tooltipText));
+						Parent.AddTooltip(new TooltipInfo(Parent.GraphToScreen(GetInputLineConnectionPoint(item)), new Point(), Direction.Up, tooltipText));
 					}
 				}
 				foreach (Item item in DisplayedNode.Outputs)
 				{
 					if (GetIconBounds(item, LinkType.Output).Contains(location))
 					{
-						Parent.AddTooltip(new TooltipInfo(Parent.graphToScreen(getOutputLineConnectionPoint(item)), new Point(), Direction.Down, item.Name));
+						Parent.AddTooltip(new TooltipInfo(Parent.GraphToScreen(GetOutputLineConnectionPoint(item)), new Point(), Direction.Down, item.Name));
 					}
 				}
 			}
+		}
+
+		public override bool ContainsPoint(Point point)
+		{
+			if (new Rectangle(0, 0, Width, Height).Contains(point.X, point.Y))
+			{
+				return true;
+			}
+			foreach (Item item in DisplayedNode.Inputs)
+			{
+				Rectangle iconBounds = GetIconBounds(item, LinkType.Input);
+				if (iconBounds.Contains(point.X, point.Y))
+				{
+					return true;
+				}
+			}
+			foreach (Item item in DisplayedNode.Outputs)
+			{
+				Rectangle iconBounds = GetIconBounds(item, LinkType.Output);
+				iconBounds.Offset(X, Y);
+				if (iconBounds.Contains(point.X, point.Y))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public override void MouseDown(Point location, MouseButtons button)
+		{
+			if (button == MouseButtons.Left)
+			{
+				Parent.DraggedElement = this;
+				DragOffsetX = location.X;
+				DragOffsetY = location.Y;
+			}
+		}
+
+		public override void Dragged(Point location)
+		{
+			X += location.X - DragOffsetX;
+			Y += location.Y - DragOffsetY;
 		}
 	}
 }

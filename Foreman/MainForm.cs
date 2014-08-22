@@ -54,7 +54,7 @@ namespace Foreman
 		{
 			if ((sender as RadioButton).Checked)
 			{
-				this.GraphViewer.graph.SelectedAmountType = AmountType.Rate;
+				this.GraphViewer.Graph.SelectedAmountType = AmountType.Rate;
 				rateOptionsDropDown.Enabled = true;
 			}
 			else
@@ -68,7 +68,7 @@ namespace Foreman
 		{
 			if ((sender as RadioButton).Checked)
 			{
-				this.GraphViewer.graph.SelectedAmountType = AmountType.FixedAmount;
+				this.GraphViewer.Graph.SelectedAmountType = AmountType.FixedAmount;
 			}
 			GraphViewer.Invalidate();
 		}
@@ -78,11 +78,11 @@ namespace Foreman
 			switch ((sender as ComboBox).SelectedIndex)
 			{
 				case 0:
-					GraphViewer.graph.SelectedUnit = RateUnit.PerSecond;
+					GraphViewer.Graph.SelectedUnit = RateUnit.PerSecond;
 					GraphViewer.Invalidate();
 					break;
 				case 1:
-					GraphViewer.graph.SelectedUnit = RateUnit.PerMinute;
+					GraphViewer.Graph.SelectedUnit = RateUnit.PerMinute;
 					GraphViewer.Invalidate();
 					break;
 			}
@@ -90,14 +90,14 @@ namespace Foreman
 
 		private void AutomaticCompleteButton_Click(object sender, EventArgs e)
 		{
-			GraphViewer.graph.SatisfyAllItemDemands();
-			GraphViewer.CreateMissingControls();
+			GraphViewer.Graph.SatisfyAllItemDemands();
+			GraphViewer.UpdateElements();
 		}
 
 		private void ClearButton_Click(object sender, EventArgs e)
 		{
-			GraphViewer.graph.Nodes.Clear();
-			GraphViewer.nodeControls.Clear();
+			GraphViewer.Graph.Nodes.Clear();
+			GraphViewer.Elements.Clear();
 			GraphViewer.Invalidate();
 		}
 
@@ -121,12 +121,12 @@ namespace Foreman
 
 		private void RemoveUnusedButton_Click(object sender, EventArgs e)
 		{
-			foreach (ProductionNode node in GraphViewer.graph.GetTopologicalSort().Reverse<ProductionNode>())
+			foreach (ProductionNode node in GraphViewer.Graph.GetTopologicalSort().Reverse<ProductionNode>())
 			{
 				if (node.Outputs.All(i => node.GetTotalOutput(i) == 0))
 				{
 					node.Destroy();
-					GraphViewer.nodeControls.Remove(node);
+					GraphViewer.Elements.Remove(GraphViewer.GetElementForNode(node));
 					GraphViewer.Invalidate();
 				}
 			}

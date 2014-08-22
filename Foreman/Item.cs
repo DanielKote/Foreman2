@@ -11,7 +11,7 @@ namespace Foreman
 		public String Name { get; private set; }
 		public HashSet<Recipe> Recipes { get; private set; }
 		public Bitmap Icon { get; set; }
-		public String friendlyName;
+		private String friendlyName;
 		public String FriendlyName
 		{
 			get
@@ -24,6 +24,10 @@ namespace Foreman
 				{
 					return Name;
 				}
+			}
+			set
+			{
+				friendlyName = value;
 			}
 		}
 
