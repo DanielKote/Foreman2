@@ -30,13 +30,15 @@
 		{
 			this.ItemListBox = new System.Windows.Forms.ListBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.ProductionGraph = new Foreman.ProductionGraphViewer();
 			this.AddItemButton = new System.Windows.Forms.Button();
 			this.RemoveNodeButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.rateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.rateButton = new System.Windows.Forms.RadioButton();
 			this.fixedAmountButton = new System.Windows.Forms.RadioButton();
+			this.AutomaticCompleteButton = new System.Windows.Forms.Button();
+			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.ClearButton = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
@@ -47,10 +49,10 @@
 			this.ItemListBox.Dock = System.Windows.Forms.DockStyle.Right;
 			this.ItemListBox.FormattingEnabled = true;
 			this.ItemListBox.IntegralHeight = false;
-			this.ItemListBox.Location = new System.Drawing.Point(3, 91);
+			this.ItemListBox.Location = new System.Drawing.Point(3, 153);
 			this.ItemListBox.Name = "ItemListBox";
 			this.ItemListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.ItemListBox.Size = new System.Drawing.Size(194, 566);
+			this.ItemListBox.Size = new System.Drawing.Size(194, 504);
 			this.ItemListBox.TabIndex = 0;
 			// 
 			// tableLayoutPanel1
@@ -59,32 +61,24 @@
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.Controls.Add(this.ProductionGraph, 2, 0);
-			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 2);
-			this.tableLayoutPanel1.Controls.Add(this.RemoveNodeButton, 1, 2);
+			this.tableLayoutPanel1.Controls.Add(this.GraphViewer, 2, 0);
+			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 4);
+			this.tableLayoutPanel1.Controls.Add(this.RemoveNodeButton, 1, 4);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 1);
+			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 3);
+			this.tableLayoutPanel1.Controls.Add(this.AutomaticCompleteButton, 0, 1);
+			this.tableLayoutPanel1.Controls.Add(this.ClearButton, 0, 2);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 3;
+			this.tableLayoutPanel1.RowCount = 5;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(1029, 690);
 			this.tableLayoutPanel1.TabIndex = 1;
-			// 
-			// ProductionGraph
-			// 
-			this.ProductionGraph.AutoScroll = true;
-			this.ProductionGraph.BackColor = System.Drawing.Color.White;
-			this.ProductionGraph.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.ProductionGraph.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ProductionGraph.Location = new System.Drawing.Point(203, 3);
-			this.ProductionGraph.Name = "ProductionGraph";
-			this.tableLayoutPanel1.SetRowSpan(this.ProductionGraph, 3);
-			this.ProductionGraph.Size = new System.Drawing.Size(823, 684);
-			this.ProductionGraph.TabIndex = 1;
 			// 
 			// AddItemButton
 			// 
@@ -160,6 +154,41 @@
 			this.fixedAmountButton.UseVisualStyleBackColor = true;
 			this.fixedAmountButton.CheckedChanged += new System.EventHandler(this.fixedAmountButton_CheckedChanged);
 			// 
+			// AutomaticCompleteButton
+			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.AutomaticCompleteButton, 2);
+			this.AutomaticCompleteButton.Location = new System.Drawing.Point(3, 91);
+			this.AutomaticCompleteButton.Name = "AutomaticCompleteButton";
+			this.AutomaticCompleteButton.Size = new System.Drawing.Size(194, 25);
+			this.AutomaticCompleteButton.TabIndex = 5;
+			this.AutomaticCompleteButton.Text = "Automatically complete flowchart";
+			this.AutomaticCompleteButton.UseVisualStyleBackColor = true;
+			this.AutomaticCompleteButton.Click += new System.EventHandler(this.AutomaticCompleteButton_Click);
+			// 
+			// ProductionGraph
+			// 
+			this.GraphViewer.AutoScroll = true;
+			this.GraphViewer.BackColor = System.Drawing.Color.White;
+			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphViewer.Location = new System.Drawing.Point(203, 3);
+			this.GraphViewer.Name = "ProductionGraph";
+			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 5);
+			this.GraphViewer.Size = new System.Drawing.Size(823, 684);
+			this.GraphViewer.TabIndex = 1;
+			// 
+			// ClearButton
+			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.ClearButton, 2);
+			this.ClearButton.Dock = System.Windows.Forms.DockStyle.Top;
+			this.ClearButton.Location = new System.Drawing.Point(3, 122);
+			this.ClearButton.Name = "ClearButton";
+			this.ClearButton.Size = new System.Drawing.Size(194, 25);
+			this.ClearButton.TabIndex = 6;
+			this.ClearButton.Text = "Clear flowchart";
+			this.ClearButton.UseVisualStyleBackColor = true;
+			this.ClearButton.Click += new System.EventHandler(this.ClearButton_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -184,13 +213,15 @@
 
 		private System.Windows.Forms.ListBox ItemListBox;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private ProductionGraphViewer ProductionGraph;
+		private ProductionGraphViewer GraphViewer;
 		private System.Windows.Forms.Button AddItemButton;
 		private System.Windows.Forms.Button RemoveNodeButton;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.ComboBox rateOptionsDropDown;
 		private System.Windows.Forms.RadioButton rateButton;
 		private System.Windows.Forms.RadioButton fixedAmountButton;
+		private System.Windows.Forms.Button AutomaticCompleteButton;
+		private System.Windows.Forms.Button ClearButton;
 	}
 }
 

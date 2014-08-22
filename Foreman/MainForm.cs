@@ -47,35 +47,35 @@ namespace Foreman
 			{
 				selectedItems.Add(DataCache.Items[itemName]);
 			}
-			ProductionGraph.AddDemands(selectedItems);
+			GraphViewer.AddDemands(selectedItems);
 		}
 
 		private void RemoveNodeButton_Click(object sender, EventArgs e)
 		{
-			ProductionGraph.DeleteNode(ProductionGraph.SelectedNode);
+			GraphViewer.DeleteNode(GraphViewer.SelectedNode);
 		}
 
 		private void rateButton_CheckedChanged(object sender, EventArgs e)
 		{
 			if ((sender as RadioButton).Checked)
 			{
-				this.ProductionGraph.graph.SelectedAmountType = AmountType.Rate;
+				this.GraphViewer.graph.SelectedAmountType = AmountType.Rate;
 				rateOptionsDropDown.Enabled = true;
 			}
 			else
 			{
 				rateOptionsDropDown.Enabled = false;
 			}
-			ProductionGraph.Invalidate();
+			GraphViewer.Invalidate();
 		}
 
 		private void fixedAmountButton_CheckedChanged(object sender, EventArgs e)
 		{
 			if ((sender as RadioButton).Checked)
 			{
-				this.ProductionGraph.graph.SelectedAmountType = AmountType.FixedAmount;
+				this.GraphViewer.graph.SelectedAmountType = AmountType.FixedAmount;
 			}
-			ProductionGraph.Invalidate();
+			GraphViewer.Invalidate();
 		}
 
 		private void rateOptionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
@@ -83,14 +83,26 @@ namespace Foreman
 			switch ((sender as ComboBox).SelectedIndex)
 			{
 				case 0:
-					ProductionGraph.graph.SelectedUnit = RateUnit.PerSecond;
-					ProductionGraph.Invalidate();
+					GraphViewer.graph.SelectedUnit = RateUnit.PerSecond;
+					GraphViewer.Invalidate();
 					break;
 				case 1:
-					ProductionGraph.graph.SelectedUnit = RateUnit.PerMinute;
-					ProductionGraph.Invalidate();
+					GraphViewer.graph.SelectedUnit = RateUnit.PerMinute;
+					GraphViewer.Invalidate();
 					break;
 			}
+		}
+
+		private void AutomaticCompleteButton_Click(object sender, EventArgs e)
+		{
+			GraphViewer.graph.SatisfyAllItemDemands();
+			GraphViewer.CreateMissingControls();
+		}
+
+		private void ClearButton_Click(object sender, EventArgs e)
+		{
+			GraphViewer.graph.Nodes.Clear();
+			GraphViewer.nodeControls.Clear();
 		}
 	}
 }
