@@ -35,7 +35,7 @@
 			// 
 			this.recipeListPanel.AutoSize = true;
 			this.recipeListPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.recipeListPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(134)))), ((int)(((byte)(158)))));
+			this.recipeListPanel.BackColor = System.Drawing.SystemColors.Control;
 			this.recipeListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.recipeListPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.recipeListPanel.Location = new System.Drawing.Point(0, 0);
@@ -50,11 +50,14 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.BackColor = System.Drawing.Color.Gray;
+			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(320, 315);
 			this.Controls.Add(this.recipeListPanel);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+			this.DoubleBuffered = true;
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.KeyPreview = true;
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "RecipeChooserForm";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

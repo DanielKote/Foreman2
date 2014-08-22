@@ -104,6 +104,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.White;
 			this.Controls.Add(this.tableLayoutPanel1);
+			this.DoubleBuffered = true;
 			this.Name = "RecipeChooserControl";
 			this.Size = new System.Drawing.Size(300, 80);
 			this.Load += new System.EventHandler(this.RecipeChooserOption_Load);
