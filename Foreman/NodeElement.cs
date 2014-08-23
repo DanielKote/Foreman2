@@ -25,9 +25,10 @@ namespace Foreman
 		private Color consumerColour = Color.FromArgb(231, 214, 224);
 		private Color backgroundColour;
 
-		public const int iconSize = 32;
-		public const int iconBorder = 4;
-		public const int iconTextHeight = 21;
+		private const int iconSize = 32;
+		private const int iconBorder = 4;
+		private const int iconTextHeight = 11;
+		private const int iconTextHeight2Line = 21;
 
 		private string rateText = "";
 		private string nameText = "";
@@ -88,17 +89,23 @@ namespace Foreman
 
 		public Rectangle GetIconBounds(Item item, LinkType linkType)
 		{
+			int textHeight = iconTextHeight;
+			if (linkType == LinkType.Input && DisplayedNode.GetExcessDemand(item) > 0)
+			{
+				textHeight = iconTextHeight2Line;
+			}
+
 			int X = 0;
 			int Y = 0;
 			int	Width = iconSize + iconBorder + iconBorder;
-			int	Height = iconSize + iconBorder + iconBorder + iconTextHeight;
+			int	Height = iconSize + iconBorder + iconBorder + textHeight;
 
 			if (linkType == LinkType.Output)
 			{
 				Point iconPoint = GetOutputIconPoint(item);
 				var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
 				X = iconPoint.X - Width / 2;
-				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder + iconTextHeight) / 2;
+				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2 - textHeight;
 			}
 			else
 			{
@@ -227,7 +234,7 @@ namespace Foreman
 		private String getIconString(Item item, LinkType linkType)
 		{
 			String line1Format = "{0}{1}";
-			String line2Format = "({0:0.##}{1})";
+			String line2Format = "\n({0:0.##}{1})";
 			String finalString = "";
 
 			String unit = "";
@@ -242,11 +249,13 @@ namespace Foreman
 
 			if (linkType == LinkType.Input)
 			{
-				finalString = String.Format(line2Format, DisplayedNode.GetTotalDemand(item), unit);
-				finalString += "\n" + String.Format(line1Format, DisplayedNode.GetTotalInput(item), unit);
+				finalString = String.Format(line1Format, DisplayedNode.GetTotalInput(item), unit);
+				if (DisplayedNode.GetTotalDemand(item) > DisplayedNode.GetTotalInput(item))
+				{
+					finalString += String.Format(line2Format, DisplayedNode.GetTotalDemand(item), unit);
+				}
 			} else {
 				finalString = String.Format(line1Format, DisplayedNode.GetTotalOutput(item), unit);
-				finalString += "\n" + String.Format(line2Format, DisplayedNode.GetTotalSupply(item), unit);
 			}
 
 			return finalString;
@@ -260,42 +269,40 @@ namespace Foreman
 
 			if (linkType == LinkType.Input)
 			{
-				if (DisplayedNode.GetTotalDemand(item) == DisplayedNode.GetTotalInput(item))
+				if (DisplayedNode.GetTotalDemand(item) <= DisplayedNode.GetTotalInput(item))
 				{
 					return enough;
 				}
-				else if (DisplayedNode.GetTotalDemand(item) > DisplayedNode.GetTotalInput(item))
-				{
-					return notEnough;
-				}
 				else
 				{
-					return tooMuch;
+					return notEnough;
 				}
 			}
 			else
 			{
-				if (DisplayedNode.GetTotalSupply(item) == DisplayedNode.GetTotalOutput(item))
+				if (DisplayedNode.GetTotalOutput(item) >= DisplayedNode.GetUsedOutput(item))
 				{
 					return enough;
-				}
-				else if (DisplayedNode.GetTotalSupply(item) < DisplayedNode.GetTotalOutput(item))
-				{
-					return notEnough;
 				}
 				else
 				{
 					return tooMuch;
 				}
 			}
-
 		}
 
 		private void DrawItemIcon(Item item, Point drawPoint, LinkType linkType, String rateText, Graphics graphics, Color fillColour)
 		{
-			int boxSize = iconSize + iconBorder + iconBorder;
+			int textHeight = iconTextHeight;
+			if (linkType == LinkType.Input && DisplayedNode.GetExcessDemand(item) > 0)
+			{
+				textHeight = iconTextHeight2Line;
+			}
+
 			StringFormat centreFormat = new StringFormat();
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
+
+			Rectangle iconBounds = GetIconBounds(item, linkType);
 
 			using (Pen borderPen = new Pen(Color.Gray, 3))
 			using (Brush fillBrush = new SolidBrush(fillColour))
@@ -303,15 +310,15 @@ namespace Foreman
 			{
 				if (linkType == LinkType.Output)
 				{
-					GraphicsStuff.FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
-					GraphicsStuff.DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight - iconBorder) / 2), centreFormat);
+					GraphicsStuff.FillRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, fillBrush);
+					GraphicsStuff.DrawRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, borderPen);
+					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(iconBounds.X + iconBounds.Width / 2, iconBounds.Y + (textHeight + iconBorder) / 2), centreFormat);
 				}
 				else
 				{
-					GraphicsStuff.FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
-					GraphicsStuff.DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y + (boxSize + iconTextHeight - iconBorder) / 2), centreFormat);
+					GraphicsStuff.FillRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, fillBrush);
+					GraphicsStuff.DrawRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, borderPen);
+					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(iconBounds.X + iconBounds.Width / 2, iconBounds.Y + iconBounds.Height - (textHeight + iconBorder) / 2), centreFormat);
 				}
 			}
 			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
@@ -522,7 +529,6 @@ namespace Foreman
 			foreach (Item item in DisplayedNode.Outputs)
 			{
 				Rectangle iconBounds = GetIconBounds(item, LinkType.Output);
-				iconBounds.Offset(X, Y);
 				if (iconBounds.Contains(point.X, point.Y))
 				{
 					return true;

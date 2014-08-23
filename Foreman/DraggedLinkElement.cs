@@ -100,7 +100,7 @@ namespace Foreman
 						}
 						else
 						{
-							NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, SupplierElement.DisplayedNode.GetExcessSupply(Item));
+							NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, SupplierElement.DisplayedNode.GetExcessOutput(Item));
 						}
 					}
 					break;

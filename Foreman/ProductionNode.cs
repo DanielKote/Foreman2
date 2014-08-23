@@ -13,11 +13,11 @@ namespace Foreman
 		public abstract IEnumerable<Item> Outputs { get; }
 		public List<NodeLink> InputLinks = new List<NodeLink>();
 		public List<NodeLink> OutputLinks = new List<NodeLink>();
-		public abstract float GetExcessSupply(Item item);
+		public abstract float GetExcessOutput(Item item);
 		public abstract float GetExcessDemand(Item item);
-		public abstract float GetTotalSupply(Item item);
+		public abstract float GetTotalOutput(Item item);
 		public abstract float GetTotalDemand(Item item);
-		public abstract Dictionary<Item, float> GetExcessSupply();
+		public abstract Dictionary<Item, float> GetExcessOutput();
 		public abstract Dictionary<Item, float> GetExcessDemand();
 		public abstract void MinimiseInputs();
 
@@ -46,7 +46,7 @@ namespace Foreman
 			return total;
 		}
 
-		public float GetTotalOutput(Item item)
+		public float GetUsedOutput(Item item)
 		{
 			float total = 0f;
 			foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
@@ -119,10 +119,10 @@ namespace Foreman
 
 		public float GetRateAllowedByInputs()
 		{
-			float rate = 0;
+			float rate = float.PositiveInfinity;
 			foreach (Item inputItem in BaseRecipe.Ingredients.Keys)
 			{
-				rate = Math.Max(rate, GetTotalInput(inputItem) / BaseRecipe.Ingredients[inputItem]);
+				rate = Math.Min(rate, GetTotalInput(inputItem) / BaseRecipe.Ingredients[inputItem]);
 			}
 			return rate;
 		}
@@ -132,7 +132,7 @@ namespace Foreman
 			float rate = 0;
 			foreach (Item outputItem in BaseRecipe.Results.Keys)
 			{
-				rate += Math.Max(rate, GetTotalOutput(outputItem) / BaseRecipe.Results[outputItem]);
+				rate += Math.Max(rate, GetUsedOutput(outputItem) / BaseRecipe.Results[outputItem]);
 			}
 			return rate;
 		}
@@ -154,10 +154,10 @@ namespace Foreman
 			return itemRate;
 		}
 
-		public override float GetExcessSupply(Item item)
+		public override float GetExcessOutput(Item item)
 		{
 			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
-			float itemRate = ValidateItemAmount(rate * BaseRecipe.Results[item]) - GetTotalOutput(item);
+			float itemRate = ValidateItemAmount(rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
 			return itemRate;
 		}
 
@@ -167,11 +167,11 @@ namespace Foreman
 			return ValidateItemAmount(rate * BaseRecipe.Ingredients[item]);
 		}
 
-		public override float GetTotalSupply(Item item)
-		{
-			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
-			return ValidateItemAmount(rate * BaseRecipe.Results[item]);
-		}
+        public override float GetTotalOutput(Item item)
+        {
+            float rate = GetRateAllowedByInputs();
+            return BaseRecipe.Results[item] * rate;
+        }
 
 		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to require half an item, for example)
 		private float ValidateItemAmount(float amount)
@@ -196,12 +196,12 @@ namespace Foreman
 			return excessDemand;
 		}
 
-		public override Dictionary<Item, float> GetExcessSupply()
+		public override Dictionary<Item, float> GetExcessOutput()
 		{
 			Dictionary<Item, float> excessSupply = new Dictionary<Item, float>();
 			foreach (Item outputItem in BaseRecipe.Results.Keys)
 			{
-				excessSupply.Add(outputItem, GetExcessSupply(outputItem));
+				excessSupply.Add(outputItem, GetExcessOutput(outputItem));
 			}
 			return excessSupply;
 		}
@@ -251,7 +251,7 @@ namespace Foreman
 			return 0f;
 		}
 
-		public override float GetExcessSupply(Item item)
+		public override float GetExcessOutput(Item item)
 		{
 			float excessSupply = SupplyAmount;
 			foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
@@ -266,7 +266,7 @@ namespace Foreman
 			return 0f;
 		}
 
-		public override float GetTotalSupply(Item item)
+		public override float GetTotalOutput(Item item)
 		{
 			return SupplyAmount;
 		}
@@ -276,7 +276,7 @@ namespace Foreman
 			return new Dictionary<Item, float>();
 		}
 
-		public override Dictionary<Item, float> GetExcessSupply()
+		public override Dictionary<Item, float> GetExcessOutput()
 		{
 			Dictionary<Item, float> demands = new Dictionary<Item, float>();
 			demands.Add(SuppliedItem, GetExcessDemand(SuppliedItem));
@@ -326,7 +326,7 @@ namespace Foreman
 			return demands;
 		}
 
-		public override Dictionary<Item, float> GetExcessSupply()
+		public override Dictionary<Item, float> GetExcessOutput()
 		{
 			return new Dictionary<Item, float>();
 		}
@@ -341,7 +341,7 @@ namespace Foreman
 			return excessDemand;
 		}
 
-		public override float GetExcessSupply(Item item)
+		public override float GetExcessOutput(Item item)
 		{
 			return 0;
 		}
@@ -351,7 +351,7 @@ namespace Foreman
 			return ConsumptionAmount;
 		}
 
-		public override float GetTotalSupply(Item item)
+		public override float GetTotalOutput(Item item)
 		{
 			return 0;
 		}

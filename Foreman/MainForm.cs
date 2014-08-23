@@ -123,7 +123,7 @@ namespace Foreman
 		{
 			foreach (ProductionNode node in GraphViewer.Graph.GetTopologicalSort().Reverse<ProductionNode>())
 			{
-				if (node.Outputs.All(i => node.GetTotalOutput(i) == 0))
+				if (node.Outputs.All(i => node.GetUsedOutput(i) == 0))
 				{
 					node.Destroy();
 					GraphViewer.Elements.Remove(GraphViewer.GetElementForNode(node));
