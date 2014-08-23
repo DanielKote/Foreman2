@@ -125,9 +125,7 @@ namespace Foreman
 			{
 				if (node.Outputs.All(i => node.GetUsedOutput(i) == 0))
 				{
-					node.Destroy();
-					GraphViewer.Elements.Remove(GraphViewer.GetElementForNode(node));
-					GraphViewer.Invalidate();
+					GraphViewer.DeleteNode(GraphViewer.GetElementForNode(node));
 				}
 			}
 		}

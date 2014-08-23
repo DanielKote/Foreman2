@@ -30,7 +30,6 @@ namespace Foreman
 		private const int iconTextHeight = 11;
 		private const int iconTextHeight2Line = 21;
 
-		private string rateText = "";
 		private string nameText = "";
 
 		TextBox editorBox;

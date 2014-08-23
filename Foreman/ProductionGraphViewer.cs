@@ -447,11 +447,14 @@ namespace Foreman
 		{
 			if (node != null)
 			{
-				node.DisplayedNode.Destroy();
+				foreach (NodeLink link in node.DisplayedNode.InputLinks.ToList().Union(node.DisplayedNode.OutputLinks.ToList()))
+				{
+					Elements.RemoveWhere(le => le is LinkElement && (le as LinkElement).DisplayedLink == link);
+				}
 				Elements.Remove(node);
-				Graph.UpdateNodeAmounts();
+				node.DisplayedNode.Destroy();
 				Invalidate();
-			}
+			}			
 		}
 	}
 }
