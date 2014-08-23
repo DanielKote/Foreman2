@@ -493,7 +493,7 @@ namespace Foreman
 						String tooltipText;
 						if (DisplayedNode is ConsumerNode)
 						{
-							tooltipText = String.Format("{0} (Click to edit amount)", item.Name);
+							tooltipText = String.Format("{0} (Click to edit amount)", item.FriendlyName);
 						}
 						else
 						{
