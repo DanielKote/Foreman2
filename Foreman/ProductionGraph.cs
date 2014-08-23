@@ -54,7 +54,7 @@ namespace Foreman
 
 			foreach (ProductionNode node in sortedNodes)
 			{
-				node.MinimiseInputs();
+				//node.MinimiseInputs();
 			}
 		}
 
@@ -142,7 +142,7 @@ namespace Foreman
 				{
 					foreach (Item item in node.Inputs)
 					{
-						if (Math.Round(node.GetExcessDemand(item), 4) > 0)
+						if (Math.Round(node.GetUnsatisfiedDemand(item), 4) > 0)
 						{
 							nodeChosen = true;
 							AutoSatisfyNodeDemand(node, item);
@@ -158,22 +158,22 @@ namespace Foreman
 			if (node.InputLinks.Any(l => l.Item == item))	//Increase throughput of existing node link
 			{
 				NodeLink link = node.InputLinks.First(l => l.Item == item);
-				link.Amount += node.GetExcessDemand(item);
+				//link.Amount += node.GetExcessDemand(item);
 			}
 			else if (Nodes.Any(n => n.Outputs.Contains(item)))	//Add link from existing node
 			{
 				ProductionNode existingNode = Nodes.Find(n => n.Outputs.Contains(item));
-				NodeLink.Create(existingNode, node, item, node.GetExcessDemand(item));
+				NodeLink.Create(existingNode, node, item);
 			}
 			else if (item.Recipes.Any(r => !CyclicRecipes.Contains(r)))	//Create new recipe node and link from it
 			{
 				RecipeNode newNode = RecipeNode.Create(item.Recipes.First(r => !CyclicRecipes.Contains(r)), this);
-				NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
+				NodeLink.Create(newNode, node, item);
 			}
 			else	//Create new supply node and link from it
 			{
 				SupplyNode newNode = SupplyNode.Create(item, this);
-				NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
+				NodeLink.Create(newNode, node, item, node.GetUnsatisfiedDemand(item));
 			}
 
 			ReplaceCycles();
@@ -182,13 +182,13 @@ namespace Foreman
 		public void CreateRecipeNodeToSatisfyItemDemand(ProductionNode node, Item item, Recipe recipe)
 		{
 			RecipeNode newNode = RecipeNode.Create(recipe, this);
-			NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
+			NodeLink.Create(newNode, node, item, node.GetUnsatisfiedDemand(item));
 		}
 
 		public void CreateSupplyNodeToSatisfyItemDemand(ProductionNode node, Item item)
 		{
 			SupplyNode newNode = SupplyNode.Create(item, node.Graph);
-			NodeLink.Create(newNode, node, item, node.GetExcessDemand(item));
+			NodeLink.Create(newNode, node, item, node.GetUnsatisfiedDemand(item));
 		}
 
 		//Replace recipe cycles with a simple supplier node so that they don't cause infinite loops. This is a workaround.

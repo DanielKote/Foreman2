@@ -90,32 +90,32 @@ namespace Foreman
 		public Rectangle GetIconBounds(Item item, LinkType linkType)
 		{
 			int textHeight = iconTextHeight;
-			if (linkType == LinkType.Input && DisplayedNode.GetExcessDemand(item) > 0)
+			if (linkType == LinkType.Input && DisplayedNode.GetUnsatisfiedDemand(item) > 0)
 			{
 				textHeight = iconTextHeight2Line;
 			}
 
-			int X = 0;
-			int Y = 0;
-			int	Width = iconSize + iconBorder + iconBorder;
-			int	Height = iconSize + iconBorder + iconBorder + textHeight;
+			int rectX = 0;
+			int rectY = 0;
+			int	rectWidth = iconSize + iconBorder + iconBorder;
+			int	rectHeight = iconSize + iconBorder + iconBorder + textHeight;
 
 			if (linkType == LinkType.Output)
 			{
 				Point iconPoint = GetOutputIconPoint(item);
 				var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
-				X = iconPoint.X - Width / 2;
-				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2 - textHeight;
+				rectX = iconPoint.X - rectWidth / 2;
+				rectY = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2 - textHeight;
 			}
 			else
 			{
 				Point iconPoint = GetInputIconPoint(item);
 				var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
-				X = iconPoint.X - Width / 2;
-				Y = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2;
+				rectX = iconPoint.X - rectWidth / 2;
+				rectY = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2;
 			}
 
-			return new Rectangle(X, Y, Width, Height);
+			return new Rectangle(rectX, rectY, rectWidth, rectHeight);
 		}
 
 		public Point GetOutputIconPoint(Item item)
@@ -150,12 +150,14 @@ namespace Foreman
 
 		public Point GetOutputLineConnectionPoint(Item item)
 		{
-			return Point.Add(GetOutputIconPoint(item), new Size(X, Y - (iconSize + iconBorder + iconBorder) / 2 - iconTextHeight));
+			Rectangle iconRect = GetIconBounds(item, LinkType.Output);
+			return new Point(X + iconRect.X + iconRect.Width / 2, Y + iconRect.Y);
 		}
 
 		public Point GetInputLineConnectionPoint(Item item)
 		{
-			return Point.Add(GetInputIconPoint(item), new Size(X, Y + (iconSize + iconBorder + iconBorder) / 2 + iconTextHeight));
+			Rectangle iconRect = GetIconBounds(item, LinkType.Input);
+			return new Point(X + iconRect.X + iconRect.Width / 2, Y + iconRect.Y + iconRect.Height);
 		}
 
 		//Used to sort items in the input/output lists
@@ -250,9 +252,9 @@ namespace Foreman
 			if (linkType == LinkType.Input)
 			{
 				finalString = String.Format(line1Format, DisplayedNode.GetTotalInput(item), unit);
-				if (DisplayedNode.GetTotalDemand(item) > DisplayedNode.GetTotalInput(item))
+				if (DisplayedNode.GetRequiredInput(item) > DisplayedNode.GetTotalInput(item))
 				{
-					finalString += String.Format(line2Format, DisplayedNode.GetTotalDemand(item), unit);
+					finalString += String.Format(line2Format, DisplayedNode.GetRequiredInput(item), unit);
 				}
 			} else {
 				finalString = String.Format(line1Format, DisplayedNode.GetTotalOutput(item), unit);
@@ -269,7 +271,7 @@ namespace Foreman
 
 			if (linkType == LinkType.Input)
 			{
-				if (DisplayedNode.GetTotalDemand(item) <= DisplayedNode.GetTotalInput(item))
+				if (DisplayedNode.GetRequiredInput(item) <= DisplayedNode.GetTotalInput(item))
 				{
 					return enough;
 				}
@@ -280,13 +282,13 @@ namespace Foreman
 			}
 			else
 			{
-				if (DisplayedNode.GetTotalOutput(item) >= DisplayedNode.GetUsedOutput(item))
+				if (DisplayedNode.GetTotalOutput(item) > DisplayedNode.GetRequiredOutput(item))
 				{
-					return enough;
+					return tooMuch;
 				}
 				else
 				{
-					return tooMuch;
+					return enough;
 				}
 			}
 		}
@@ -294,7 +296,7 @@ namespace Foreman
 		private void DrawItemIcon(Item item, Point drawPoint, LinkType linkType, String rateText, Graphics graphics, Color fillColour)
 		{
 			int textHeight = iconTextHeight;
-			if (linkType == LinkType.Input && DisplayedNode.GetExcessDemand(item) > 0)
+			if (linkType == LinkType.Input && DisplayedNode.GetUnsatisfiedDemand(item) > 0)
 			{
 				textHeight = iconTextHeight2Line;
 			}
@@ -359,7 +361,7 @@ namespace Foreman
 				{
 					if (clickedLinkType == LinkType.Input)
 					{
-						if (DisplayedNode.GetExcessDemand(clickedItem) > 0)
+						if (DisplayedNode.GetUnsatisfiedDemand(clickedItem) > 0)
 						{
 							rightClickMenu.MenuItems.Add(new MenuItem("Automatically choose/create a node to produce this item",
 								new EventHandler((o, e) =>
