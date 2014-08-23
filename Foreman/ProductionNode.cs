@@ -15,6 +15,8 @@ namespace Foreman
 		public List<NodeLink> OutputLinks = new List<NodeLink>();
 		public abstract float GetExcessSupply(Item item);
 		public abstract float GetExcessDemand(Item item);
+		public abstract float GetTotalSupply(Item item);
+		public abstract float GetTotalDemand(Item item);
 		public abstract Dictionary<Item, float> GetExcessSupply();
 		public abstract Dictionary<Item, float> GetExcessDemand();
 		public abstract void MinimiseInputs();
@@ -159,6 +161,19 @@ namespace Foreman
 			return itemRate;
 		}
 
+		public override float GetTotalDemand(Item item)
+		{
+			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
+			return ValidateItemAmount(rate * BaseRecipe.Ingredients[item]);
+		}
+
+		public override float GetTotalSupply(Item item)
+		{
+			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
+			return ValidateItemAmount(rate * BaseRecipe.Results[item]);
+		}
+
+		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to require half an item, for example)
 		private float ValidateItemAmount(float amount)
 		{
 			if (Graph.SelectedAmountType == AmountType.FixedAmount)
@@ -246,6 +261,16 @@ namespace Foreman
 			return excessSupply;
 		}
 
+		public override float GetTotalDemand(Item item)
+		{
+			return 0f;
+		}
+
+		public override float GetTotalSupply(Item item)
+		{
+			return SupplyAmount;
+		}
+
 		public override Dictionary<Item, float> GetExcessDemand()
 		{
 			return new Dictionary<Item, float>();
@@ -317,6 +342,16 @@ namespace Foreman
 		}
 
 		public override float GetExcessSupply(Item item)
+		{
+			return 0;
+		}
+
+		public override float GetTotalDemand(Item item)
+		{
+			return ConsumptionAmount;
+		}
+
+		public override float GetTotalSupply(Item item)
 		{
 			return 0;
 		}

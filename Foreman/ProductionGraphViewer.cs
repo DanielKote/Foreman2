@@ -113,7 +113,7 @@ namespace Foreman
 
 		public NodeElement GetElementForNode(ProductionNode node)
 		{
-			return Elements.OfType<NodeElement>().First(e => e.DisplayedNode == node);
+			return Elements.OfType<NodeElement>().FirstOrDefault(e => e.DisplayedNode == node);
 		}
 
 		private void PositionControls()

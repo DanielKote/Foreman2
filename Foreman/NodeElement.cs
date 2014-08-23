@@ -27,7 +27,7 @@ namespace Foreman
 
 		public const int iconSize = 32;
 		public const int iconBorder = 4;
-		public const int iconTextHeight = 10;
+		public const int iconTextHeight = 21;
 
 		private string rateText = "";
 		private string nameText = "";
@@ -201,23 +201,13 @@ namespace Foreman
 				}
 			}
 
-			String unit = "";
-			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerSecond)
-			{
-				unit = "/s";
-			}
-			else if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
-			{
-				unit = "/m";
-			}
-			String formatString = "{0:0.##}{1}";
 			foreach (Item item in DisplayedNode.Outputs)
 			{
-				DrawItemIcon(item, GetOutputIconPoint(item), LinkType.Output, String.Format(formatString, DisplayedNode.GetTotalOutput(item), unit), graphics);
+				DrawItemIcon(item, GetOutputIconPoint(item), LinkType.Output, getIconString(item, LinkType.Output), graphics, chooseIconColour(item, LinkType.Output));
 			}
 			foreach (Item item in DisplayedNode.Inputs)
 			{
-				DrawItemIcon(item, GetInputIconPoint(item), LinkType.Input, String.Format(formatString, DisplayedNode.GetTotalInput(item), unit), graphics);
+				DrawItemIcon(item, GetInputIconPoint(item), LinkType.Input, getIconString(item, LinkType.Input), graphics, chooseIconColour(item, LinkType.Input));
 			}
 
 			StringFormat centreFormat = new StringFormat();
@@ -234,27 +224,94 @@ namespace Foreman
 			}
 		}
 
-		private void DrawItemIcon(Item item, Point drawPoint, LinkType linkType, String rateText, Graphics graphics)
+		private String getIconString(Item item, LinkType linkType)
+		{
+			String line1Format = "{0}{1}";
+			String line2Format = "({0:0.##}{1})";
+			String finalString = "";
+
+			String unit = "";
+			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerSecond)
+			{
+				unit = "/s";
+			}
+			else if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
+			{
+				unit = "/m";
+			}
+
+			if (linkType == LinkType.Input)
+			{
+				finalString = String.Format(line2Format, DisplayedNode.GetTotalDemand(item), unit);
+				finalString += "\n" + String.Format(line1Format, DisplayedNode.GetTotalInput(item), unit);
+			} else {
+				finalString = String.Format(line1Format, DisplayedNode.GetTotalOutput(item), unit);
+				finalString += "\n" + String.Format(line2Format, DisplayedNode.GetTotalSupply(item), unit);
+			}
+
+			return finalString;
+		}
+
+		private Color chooseIconColour(Item item, LinkType linkType)
+		{
+			Color notEnough = Color.FromArgb(255, 255, 193, 193);
+			Color enough = Color.White;
+			Color tooMuch = Color.FromArgb(255, 174, 198, 206);
+
+			if (linkType == LinkType.Input)
+			{
+				if (DisplayedNode.GetTotalDemand(item) == DisplayedNode.GetTotalInput(item))
+				{
+					return enough;
+				}
+				else if (DisplayedNode.GetTotalDemand(item) > DisplayedNode.GetTotalInput(item))
+				{
+					return notEnough;
+				}
+				else
+				{
+					return tooMuch;
+				}
+			}
+			else
+			{
+				if (DisplayedNode.GetTotalSupply(item) == DisplayedNode.GetTotalOutput(item))
+				{
+					return enough;
+				}
+				else if (DisplayedNode.GetTotalSupply(item) < DisplayedNode.GetTotalOutput(item))
+				{
+					return notEnough;
+				}
+				else
+				{
+					return tooMuch;
+				}
+			}
+
+		}
+
+		private void DrawItemIcon(Item item, Point drawPoint, LinkType linkType, String rateText, Graphics graphics, Color fillColour)
 		{
 			int boxSize = iconSize + iconBorder + iconBorder;
 			StringFormat centreFormat = new StringFormat();
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 
 			using (Pen borderPen = new Pen(Color.Gray, 3))
-			using (Brush fillBrush = new SolidBrush(Color.White))
+			using (Brush fillBrush = new SolidBrush(fillColour))
 			using (Brush textBrush = new SolidBrush(Color.Black))
 			{
 				if (linkType == LinkType.Output)
 				{
 					GraphicsStuff.FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
 					GraphicsStuff.DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2) - iconTextHeight, boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, iconTextHeight - iconBorder + 1), textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight) / 2 + iconBorder), centreFormat);
+					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y - (boxSize + iconTextHeight - iconBorder) / 2), centreFormat);
 				}
 				else
 				{
 					GraphicsStuff.FillRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, fillBrush);
 					GraphicsStuff.DrawRoundRect(drawPoint.X - (boxSize / 2), drawPoint.Y - (boxSize / 2), boxSize, boxSize + iconTextHeight, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y + (boxSize + iconTextHeight) / 2 - iconBorder), centreFormat);
+					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(drawPoint.X, drawPoint.Y + (boxSize + iconTextHeight - iconBorder) / 2), centreFormat);
 				}
 			}
 			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
