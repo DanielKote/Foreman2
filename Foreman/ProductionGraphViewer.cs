@@ -38,7 +38,13 @@ namespace Foreman
 		public NodeElement SelectedNode = null;
 		public NodeElement MousedNode = null;
 		public NodeElement ClickedNode = null;
-		public GraphElement DraggedElement = null;
+		private GraphElement draggedElement;
+		public GraphElement DraggedElement
+		{
+			get { return draggedElement; }
+			set { dragStartScreenPoint = Control.MousePosition; draggedElement = value; }
+		}
+		private Point dragStartScreenPoint;
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 
 		public NodeElement LinkDragStartNode = null;
@@ -378,13 +384,17 @@ namespace Foreman
 			{
 				element.MouseMoved(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)));
 			}
-			
+
 			if (DraggedElement != null)
 			{
-				DraggedElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-DraggedElement.X, -DraggedElement.Y)));
+				Point dragDiff = Point.Add(Control.MousePosition, new Size(-dragStartScreenPoint.X, -dragStartScreenPoint.Y));
+				if (dragDiff.X * dragDiff.X + dragDiff.Y * dragDiff.Y > 9) //Only drag if the mouse has moved more than three pixels. This avoids dragging when the user is trying to click.
+				{
+					DraggedElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-DraggedElement.X, -DraggedElement.Y)));
+				}
 			}
 
-			if (IsBeingDragged)
+			if ((Control.MouseButtons & MouseButtons.Middle) != 0)
 			{
 				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
 				lastMouseDragPoint = e.Location;
