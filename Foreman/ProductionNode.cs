@@ -307,15 +307,7 @@ namespace Foreman
 		{
 			return 0;
 		}
-
-		//public override void MinimiseInputs()
-		//{
-		//    foreach (NodeLink link in InputLinks)
-		//    {
-		//        link.Amount = ConsumptionAmount;
-		//    }
-		//}
-
+		
 		public static ConsumerNode Create(Item item, ProductionGraph graph)
 		{
 			ConsumerNode node = new ConsumerNode(item, graph);
