@@ -15,6 +15,7 @@ namespace Foreman
 		private static String factorioPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
+		public static Dictionary<String, Assembler> Assemblers = new Dictionary<string, Assembler>();
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
@@ -23,24 +24,39 @@ namespace Foreman
 		public static void LoadRecipes()
 		{
 			Lua lua = new Lua();
+			
 			List<String> luaFiles = Directory.GetFiles(factorioPath, "*.lua", SearchOption.AllDirectories).ToList();
+			List<String> luaDirs = Directory.GetDirectories(factorioPath, "*", SearchOption.AllDirectories).ToList();
 
 			//Add all these files to the Lua path variable
-			foreach (String f in luaFiles)
+			foreach (String d in luaDirs)
 			{
-				lua.DoString(String.Format("package.path = package.path .. '{0};'", f.Replace("\\", "\\\\")));
+				lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", d.Replace("\\", "\\\\")));
 			}
 
 			String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
+			String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
+			String datafile = luaFiles.Find(f => f.EndsWith("data.lua"));
 
 			List<String> itemFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "item")).ToList();
 			itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "fluid")).ToList());
 			itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "equipment")).ToList());
 			List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
+			List<String> entityFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "entity")).ToList();
 
 			lua.DoFile(dataloaderFile);
-			itemFiles.ForEach(f => lua.DoFile(f));
-			recipeFiles.ForEach(f => lua.DoFile(f));
+			lua.DoFile(autoplaceFile);
+			foreach (String f in itemFiles.Union(recipeFiles).Union(entityFiles))
+			{
+				try
+				{
+					lua.DoFile(f);
+				}
+				catch (NLua.Exceptions.LuaScriptException e)
+				{
+
+				}
+			}
 
 			InterpretItems(lua, "item");
 			InterpretItems(lua, "fluid");
@@ -50,12 +66,19 @@ namespace Foreman
 			InterpretItems(lua, "gun");
 			InterpretItems(lua, "armor");
 			
-			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
 			
-			var enumerator = recipeTable.GetEnumerator();
-			while (enumerator.MoveNext())
+			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
+			var recipeEnumerator = recipeTable.GetEnumerator();
+			while (recipeEnumerator.MoveNext())
 			{
-				InterpretLuaRecipe(enumerator.Key as String, enumerator.Value as LuaTable);
+				InterpretLuaRecipe(recipeEnumerator.Key as String, recipeEnumerator.Value as LuaTable);
+			}
+
+			LuaTable assemblerTable = lua.GetTable("data.raw")["assembling-machine"] as LuaTable;
+			var assemblerEnumerator = assemblerTable.GetEnumerator();
+			while (assemblerEnumerator.MoveNext())
+			{
+				InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
 			}
 
 			UnknownIcon = LoadImage("UnknownIcon.png");
@@ -275,6 +298,32 @@ namespace Foreman
 				result.Recipes.Add(newRecipe);
 			}
 			Recipes.Add(newRecipe.Name, newRecipe);
+		}
+
+		private static void InterpretAssemblingMachine(String name, LuaTable values)
+		{
+			Assembler newAssembler = new Assembler(name);
+
+			newAssembler.Icon = LoadImage(values["icon"] as String);
+			newAssembler.MaxIngredients = Convert.ToInt32(values["ingredient_count"]);
+			newAssembler.ModuleSlots = Convert.ToInt32(values["module_slots"]);
+			if (newAssembler.ModuleSlots == 0) newAssembler.ModuleSlots = 2;
+			newAssembler.Speed = Convert.ToSingle(values["crafting_speed"]);
+
+			LuaTable effects = values["allowed_effects"] as LuaTable;
+			if (effects != null)
+			{
+				foreach (String effect in effects.Values)
+				{
+					newAssembler.AllowedEffects.Add(effect);
+				}
+			}
+			foreach (String category in (values["crafting_categories"] as LuaTable).Values)
+			{
+				newAssembler.Categories.Add(category);
+			}
+
+			Assemblers.Add(newAssembler.Name, newAssembler);
 		}
 
 		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
