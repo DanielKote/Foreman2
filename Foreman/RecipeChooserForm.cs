@@ -11,7 +11,9 @@ namespace Foreman
 {
 	public partial class RecipeChooserForm : Form
 	{
-		private Item itemToChooseFor;
+		private List<Item> items;
+		private List<Recipe> recipes;
+
 		public UserControl selectedControl = null;
 		public UserControl SelectedControl
 		{
@@ -46,18 +48,36 @@ namespace Foreman
 				}
 			}
 		}
+		public Item selectedItem
+		{
+			get
+			{
+				if (selectedControl is ItemChooserControl)
+				{
+					return (selectedControl as ItemChooserControl).DisplayedItem;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
 
-		public RecipeChooserForm(Item item)
+		public RecipeChooserForm(IEnumerable<Recipe> recipes, IEnumerable<Item> items)
 		{
 			InitializeComponent();
 
-			itemToChooseFor = item;
+			this.recipes = recipes.ToList();
+			this.items = items.ToList();
 		}
 
 		private void RecipeChooserForm_Load(object sender, EventArgs e)
 		{
-			recipeListPanel.Controls.Add(new SupplyNodeChooserControl(itemToChooseFor));
-			foreach (Recipe recipe in itemToChooseFor.Recipes)
+			foreach (Item item in items)
+			{
+				recipeListPanel.Controls.Add(new ItemChooserControl(item));
+			}
+			foreach (Recipe recipe in recipes)
 			{
 				recipeListPanel.Controls.Add(new RecipeChooserControl(recipe));
 			}

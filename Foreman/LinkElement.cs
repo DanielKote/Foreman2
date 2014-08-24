@@ -8,7 +8,6 @@ namespace Foreman
 {
 	class LinkElement : GraphElement
 	{
-		public bool BeingDragged { get; set; }
 		public NodeLink DisplayedLink { get; private set; }
 		public ProductionNode Supplier { get { return DisplayedLink.Supplier; } }
 		public ProductionNode Consumer { get { return DisplayedLink.Consumer; } }

@@ -5,6 +5,8 @@ using System.Text;
 
 namespace Foreman
 {
+	public enum NodeType { Recipe, Supply, Consumer };
+
 	public abstract class ProductionNode
 	{
 		public ProductionGraph Graph { get; protected set; }

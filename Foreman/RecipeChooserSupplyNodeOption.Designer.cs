@@ -1,6 +1,6 @@
 ﻿namespace Foreman
 {
-	partial class SupplyNodeChooserControl
+	partial class ItemChooserControl
 	{
 		/// <summary> 
 		/// Required designer variable.

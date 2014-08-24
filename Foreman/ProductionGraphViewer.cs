@@ -75,6 +75,7 @@ namespace Foreman
 			}
 
 			UpdateElements();
+			PositionControls();
 		}
 
 		public void AddDemand(Item item)
@@ -107,7 +108,6 @@ namespace Foreman
 			{
 				node.Update();
 			}
-			PositionControls();
 			Invalidate();
 		}
 
@@ -210,7 +210,7 @@ namespace Foreman
 			{
 				yield return element;
 			}
-			foreach (GraphElement element in Elements.Where(e => !(e is NodeElement) || !(e is LinkElement)))
+			foreach (DraggedLinkElement element in Elements.OfType<DraggedLinkElement>())
 			{
 				yield return element;
 			}
@@ -323,21 +323,21 @@ namespace Foreman
 
 		public IEnumerable<GraphElement> GetElementsAtPoint(Point point)
 		{
-			foreach (GraphElement element in Elements)
+			foreach (GraphElement element in GetPaintingOrder().Reverse<GraphElement>())
 			{
 				if (element.ContainsPoint(Point.Add(point, new Size(-element.X, -element.Y))))
 				{
 					yield return element;
 				}
 			}
-		}		
-		
+		}
+
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
 			Focus();
 
-			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
-			foreach (GraphElement element in elements.ToList())
+			var element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
+			if (element != null)
 			{
 				element.MouseDown(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)), e.Button);
 			}
@@ -355,14 +355,14 @@ namespace Foreman
 		{
 			Focus();
 
-			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
-
-			if (elements.Any())
+			GraphElement element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
+			if (element != null)
 			{
-				elements.First().MouseUp(Point.Add(ScreenToGraph(e.Location), new Size(-elements.First().X, -elements.First().Y)), e.Button);
+				element.MouseUp(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)), e.Button);
 			}
+
 			DraggedElement = null;
-		
+
 			switch (e.Button)
 			{
 				case MouseButtons.Middle:
@@ -373,13 +373,12 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
-			var elements = GetElementsAtPoint(ScreenToGraph(e.Location));
-
-			if (elements.Any())
+			var element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
+			if (element != null)
 			{
-				elements.First().MouseMoved(Point.Add(ScreenToGraph(e.Location), new Size(-elements.First().X, -elements.First().Y)));
+				element.MouseMoved(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)));
 			}
-
+			
 			if (DraggedElement != null)
 			{
 				DraggedElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-DraggedElement.X, -DraggedElement.Y)));

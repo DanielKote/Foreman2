@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
-	public enum LinkType {Input, Output};
+	public enum LinkType { Input, Output };
 
 	public partial class NodeElement : GraphElement
 	{
@@ -34,7 +34,6 @@ namespace Foreman
 
 		TextBox editorBox;
 		Item editedItem;
-		LinkType editedLinkType;
 		float originalEditorValue;
 		
 		public ProductionNode DisplayedNode { get; private set; }
@@ -350,7 +349,7 @@ namespace Foreman
 			{
 				if (clickedItem != null && clickedLinkType == LinkType.Input && DisplayedNode is ConsumerNode)
 				{
-					BeginEditingInputAmount(clickedItem);
+					beginEditingInputAmount(clickedItem);
 				}
 			}
 			else if (button == MouseButtons.Right)
@@ -373,7 +372,7 @@ namespace Foreman
 							rightClickMenu.MenuItems.Add(new MenuItem("Manually create a node to produce this item",
 								new EventHandler((o, e) =>
 									{
-										RecipeChooserForm form = new RecipeChooserForm(clickedItem);
+										RecipeChooserForm form = new RecipeChooserForm(clickedItem.Recipes, new List<Item>{clickedItem});
 										var result = form.ShowDialog();
 										if (result == DialogResult.OK)
 										{
@@ -389,23 +388,7 @@ namespace Foreman
 											Parent.Invalidate();
 										}
 									})));
-
-							rightClickMenu.MenuItems.Add(new MenuItem("Connect this input to an existing node",
-								new EventHandler((o, e) =>
-								{
-									DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Input, clickedItem);
-									newLink.ConsumerElement = this;
-									})));
-						}
-					}
-					else
-					{
-						rightClickMenu.MenuItems.Add(new MenuItem("Connect this output to an existing node",
-							new EventHandler((o, e) =>
-								{
-									DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Output, clickedItem);
-									newLink.SupplierElement = this;
-								})));
+							}
 					}
 				}
 
@@ -419,7 +402,7 @@ namespace Foreman
 			}
 		}
 
-		public void BeginEditingInputAmount(Item item)
+		public void beginEditingInputAmount(Item item)
 		{
 			if (editorBox != null)
 			{
@@ -428,7 +411,6 @@ namespace Foreman
 
 			editorBox = new TextBox();
 			editedItem = item;
-			editedLinkType = LinkType.Input;
 			editorBox.Text = (DisplayedNode as ConsumerNode).ConsumptionAmount.ToString();
 			originalEditorValue = (DisplayedNode as ConsumerNode).ConsumptionAmount;
 			editorBox.SelectAll();
@@ -550,6 +532,24 @@ namespace Foreman
 
 		public override void Dragged(Point location)
 		{
+			foreach (Item item in DisplayedNode.Inputs)
+			{
+				if (GetIconBounds(item, LinkType.Input).Contains(location))
+				{
+					DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Input, item);
+					newLink.ConsumerElement = this;
+					Parent.DraggedElement = newLink;
+				}
+			}
+			foreach (Item item in DisplayedNode.Outputs)
+			{
+				if (GetIconBounds(item, LinkType.Output).Contains(location))
+				{
+					DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Output, item);
+					newLink.SupplierElement = this;
+					Parent.DraggedElement = newLink;
+				}
+			}
 			X += location.X - DragOffsetX;
 			Y += location.Y - DragOffsetY;
 		}

@@ -9,20 +9,20 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
-	public partial class SupplyNodeChooserControl : UserControl
+	public partial class ItemChooserControl : UserControl
 	{
-		private Item displayedItem;
+		public Item DisplayedItem;
 
-		public SupplyNodeChooserControl(Item item)
+		public ItemChooserControl(Item item)
 		{
 			InitializeComponent();
 
-			displayedItem = item;
+			DisplayedItem = item;
 		}
 
 		private void RecipeChooserSupplyNodeOption_Load(object sender, EventArgs e)
 		{
-			iconPictureBox.Image = displayedItem.Icon;
+			iconPictureBox.Image = DisplayedItem.Icon;
 			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
 
 			RegisterMouseEvents(this);

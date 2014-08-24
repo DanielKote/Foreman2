@@ -14,6 +14,7 @@ namespace Foreman
 		//Still hardcoded. Needs to ask the user if it can't be found.
 		private static String factorioPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
+		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
@@ -272,6 +273,7 @@ namespace Foreman
 			{
 				result.Recipes.Add(newRecipe);
 			}
+			Recipes.Add(newRecipe.Name, newRecipe);
 		}
 
 		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)

@@ -7,12 +7,15 @@ using System.Drawing;
 
 namespace Foreman
 {
+	public enum DragType { MouseDown, MouseUp }
+
 	class DraggedLinkElement : GraphElement
 	{
 		public NodeElement SupplierElement { get; set; }
 		public NodeElement ConsumerElement { get; set; }
 		public Item Item { get; set; }
 		public LinkType StartConnectionType { get; private set; }
+		public DragType DragType;
 
 		public override Point Location
 		{
@@ -58,6 +61,14 @@ namespace Foreman
 			}
 			StartConnectionType = startConnectionType;
 			Item = item;
+			if ((Control.MouseButtons & MouseButtons.Left) != 0)
+			{
+				DragType = DragType.MouseDown;
+			}
+			else
+			{
+				DragType = DragType.MouseUp;
+			}
 		}
 
 		public override void Paint(System.Drawing.Graphics graphics)
@@ -87,28 +98,84 @@ namespace Foreman
 			return true;
 		}
 
+		private void EndDrag(Point location)
+		{
+			if (SupplierElement != null && ConsumerElement != null)
+			{
+				if (StartConnectionType == LinkType.Input)
+				{
+					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, ConsumerElement.DisplayedNode.GetUnsatisfiedDemand(Item));
+				}
+				else
+				{
+					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, SupplierElement.DisplayedNode.GetExcessOutput(Item));
+				}
+			}
+			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
+			{
+				var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)), new List<Item>());
+				var result = form.ShowDialog();
+				if (result == DialogResult.OK)
+				{
+					NodeElement newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+					newElement.Location = Point.Add(location, new Size(newElement.Width / 2, newElement.Height / 2));
+					new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
+				}
+			}
+			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
+			{
+				var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)), new List<Item> { Item });
+				var result = form.ShowDialog();
+				if (result == DialogResult.OK)
+				{
+					NodeElement newElement = null;
+					if (form.selectedRecipe != null)
+					{
+						newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+					}
+					else if (form.selectedItem != null)
+					{
+						newElement = new NodeElement(SupplyNode.Create(form.selectedItem, Parent.Graph), Parent);
+					}
+					newElement.Location = location;
+					new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
+				}
+			}
+
+			Parent.UpdateElements();
+			Dispose();
+		}
+
 		public override void MouseDown(Point location, MouseButtons button)
 		{
 			switch (button)
 			{
 				case MouseButtons.Left:
-					if (SupplierElement != null && ConsumerElement != null)
+					if (DragType == DragType.MouseUp)
 					{
-						if (StartConnectionType == LinkType.Input)
-						{
-							NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, ConsumerElement.DisplayedNode.GetUnsatisfiedDemand(Item));
-						}
-						else
-						{
-							NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, SupplierElement.DisplayedNode.GetExcessOutput(Item));
-						}
+						EndDrag(location);
 					}
 					break;
+
 				case MouseButtons.Right:
 					Dispose();
 					break;
 			}
 		}
+
+		public override void MouseUp(Point location, MouseButtons button)
+		{
+			switch (button)
+			{
+				case MouseButtons.Left:
+					if (DragType == DragType.MouseDown)
+					{
+						EndDrag(location);
+					}
+					break;
+			}
+		}
+
 
 		public override void MouseMoved(Point location)
 		{
@@ -128,6 +195,17 @@ namespace Foreman
 					{
 						ConsumerElement = mousedElement;
 					}
+				}
+			}
+			else
+			{
+				if (StartConnectionType == LinkType.Input)
+				{
+					SupplierElement = null;
+				}
+				else
+				{
+					ConsumerElement = null;
 				}
 			}
 		}

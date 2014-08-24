@@ -32,19 +32,13 @@ namespace Foreman
 			Item = item;
 		}
 
-		public static void Create(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
+		public static NodeLink Create(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
 		{
-			if (supplier.OutputLinks.Any(l => l.Consumer == consumer && l.Item == item))
-			{
-				//A link already exists
-			}
-			else
-			{
 				NodeLink link = new NodeLink(supplier, consumer, item, maxAmount);
 				supplier.OutputLinks.Add(link);
 				consumer.InputLinks.Add(link);
 				supplier.Graph.InvalidateCaches();
-			}
+				return link;
 		}
 
 		public void Destroy()
