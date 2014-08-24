@@ -254,7 +254,9 @@ namespace Foreman
 				{
 					finalString += String.Format(line2Format, DisplayedNode.GetRequiredInput(item), unit);
 				}
-			} else {
+			}
+			else
+			{
 				finalString = String.Format(line1Format, DisplayedNode.GetTotalOutput(item), unit);
 			}
 

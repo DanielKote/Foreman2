@@ -64,8 +64,7 @@ namespace Foreman
 			InterpretItems(lua, "module");
 			InterpretItems(lua, "ammo");
 			InterpretItems(lua, "gun");
-			InterpretItems(lua, "armor");
-			
+			InterpretItems(lua, "armor");			
 			
 			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
 			var recipeEnumerator = recipeTable.GetEnumerator();
@@ -285,6 +284,8 @@ namespace Foreman
 			Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
 
 			Recipe newRecipe = new Recipe(name, time == 0.0f ? defaultRecipeTime : time, ingredients, results);
+
+			newRecipe.Category = values["category"] as String ?? "crafting";
 
 			String iconFile = values["icon"] as String;
 			if (iconFile != null)

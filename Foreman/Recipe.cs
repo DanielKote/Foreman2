@@ -10,6 +10,7 @@ namespace Foreman
 	{
 		public String Name { get; private set; }
 		public float Time { get; private set; }
+		public String Category { get; set; }
 		public Dictionary<Item, float> Results { get; set; }
 		public Dictionary<Item, float> Ingredients { get; set; }
 		private Bitmap uniqueIcon = null;
