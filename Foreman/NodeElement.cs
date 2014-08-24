@@ -468,30 +468,34 @@ namespace Foreman
 		{
 			if (editorBox == null)
 			{
+				TooltipInfo tti = new TooltipInfo();
+
 				foreach (Item item in DisplayedNode.Inputs)
 				{
 					if (GetIconBounds(item, LinkType.Input).Contains(location))
 					{
-						String tooltipText;
+						tti.Text = item.FriendlyName;
 						if (DisplayedNode is ConsumerNode)
 						{
-							tooltipText = String.Format("{0} (Click to edit amount)", item.FriendlyName);
+							tti.Text += "\nClick to edit desired amount";
 						}
-						else
-						{
-							tooltipText = item.Name;
-						}
-
-						Parent.AddTooltip(new TooltipInfo(Parent.GraphToScreen(GetInputLineConnectionPoint(item)), new Point(), Direction.Up, tooltipText));
+						tti.Text += "\nDrag to create a new connection";
+						tti.Direction = Direction.Up;
+						tti.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(item));
 					}
 				}
 				foreach (Item item in DisplayedNode.Outputs)
 				{
 					if (GetIconBounds(item, LinkType.Output).Contains(location))
 					{
-						Parent.AddTooltip(new TooltipInfo(Parent.GraphToScreen(GetOutputLineConnectionPoint(item)), new Point(), Direction.Down, item.Name));
+						tti.Text = item.FriendlyName;
+						tti.Text += "\nDrag to create a new connection";
+						tti.Direction = Direction.Up;
+						tti.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(item));
 					}
 				}
+
+				Parent.AddTooltip(tti);
 			}
 		}
 
