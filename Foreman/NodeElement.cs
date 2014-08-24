@@ -532,9 +532,11 @@ namespace Foreman
 
 		public override void Dragged(Point location)
 		{
+			X += location.X - DragOffsetX;
+			Y += location.Y - DragOffsetY;
 			foreach (Item item in DisplayedNode.Inputs)
 			{
-				if (GetIconBounds(item, LinkType.Input).Contains(location))
+				if (GetIconBounds(item, LinkType.Input).Contains(new Point(DragOffsetX, DragOffsetY)))
 				{
 					DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Input, item);
 					newLink.ConsumerElement = this;
@@ -543,15 +545,13 @@ namespace Foreman
 			}
 			foreach (Item item in DisplayedNode.Outputs)
 			{
-				if (GetIconBounds(item, LinkType.Output).Contains(location))
+				if (GetIconBounds(item, LinkType.Output).Contains(new Point(DragOffsetX, DragOffsetY)))
 				{
 					DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Output, item);
 					newLink.SupplierElement = this;
 					Parent.DraggedElement = newLink;
 				}
 			}
-			X += location.X - DragOffsetX;
-			Y += location.Y - DragOffsetY;
 		}
 	}
 }
