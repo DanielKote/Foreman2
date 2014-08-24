@@ -92,6 +92,7 @@ namespace Foreman
 		{
 			GraphViewer.Graph.SatisfyAllItemDemands();
 			GraphViewer.UpdateElements();
+			GraphViewer.PositionNodes();
 		}
 
 		private void ClearButton_Click(object sender, EventArgs e)

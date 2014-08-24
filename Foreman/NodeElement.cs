@@ -491,7 +491,7 @@ namespace Foreman
 						tti.Text = item.FriendlyName;
 						tti.Text += "\nDrag to create a new connection";
 						tti.Direction = Direction.Up;
-						tti.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(item));
+						tti.ScreenLocation = Parent.GraphToScreen(GetOutputLineConnectionPoint(item));
 					}
 				}
 

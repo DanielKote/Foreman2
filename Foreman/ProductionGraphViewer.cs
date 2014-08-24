@@ -81,7 +81,7 @@ namespace Foreman
 			}
 
 			UpdateElements();
-			PositionControls();
+			PositionNodes();
 		}
 
 		public void AddDemand(Item item)
@@ -122,7 +122,7 @@ namespace Foreman
 			return Elements.OfType<NodeElement>().FirstOrDefault(e => e.DisplayedNode == node);
 		}
 
-		private void PositionControls()
+		public void PositionNodes()
 		{
 			if (!Elements.Any())
 			{
