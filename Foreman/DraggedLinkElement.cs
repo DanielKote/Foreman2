@@ -142,6 +142,7 @@ namespace Foreman
 				}
 			}
 
+			Parent.AddRemoveElements();
 			Parent.UpdateNodes();
 			Dispose();
 		}
