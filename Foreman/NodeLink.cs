@@ -14,7 +14,7 @@ namespace Foreman
 		{
 			get
 			{
-				return Consumer.GetRequiredInput(Item);
+				return Consumer.GetRequiredInput(Item) / Consumer.InputLinks.Where(l => l.Item == Item).Count();
 			}
 		}
 		public float Amount
@@ -34,11 +34,11 @@ namespace Foreman
 
 		public static NodeLink Create(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
 		{
-				NodeLink link = new NodeLink(supplier, consumer, item, maxAmount);
-				supplier.OutputLinks.Add(link);
-				consumer.InputLinks.Add(link);
-				supplier.Graph.InvalidateCaches();
-				return link;
+			NodeLink link = new NodeLink(supplier, consumer, item, maxAmount);
+			supplier.OutputLinks.Add(link);
+			consumer.InputLinks.Add(link);
+			supplier.Graph.InvalidateCaches();
+			return link;
 		}
 
 		public void Destroy()

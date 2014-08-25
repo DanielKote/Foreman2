@@ -44,12 +44,7 @@ namespace Foreman
 		{
 			GraphViewer.AddDemands(ItemListBox.SelectedItems.Cast<Item>());
 		}
-
-		private void RemoveNodeButton_Click(object sender, EventArgs e)
-		{
-			GraphViewer.DeleteNode(GraphViewer.SelectedNode);
-		}
-
+		
 		private void rateButton_CheckedChanged(object sender, EventArgs e)
 		{
 			if ((sender as RadioButton).Checked)

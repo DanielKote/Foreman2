@@ -35,9 +35,6 @@ namespace Foreman
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
-		public NodeElement SelectedNode = null;
-		public NodeElement MousedNode = null;
-		public NodeElement ClickedNode = null;
 		private GraphElement draggedElement;
 		public GraphElement DraggedElement
 		{
@@ -447,14 +444,6 @@ namespace Foreman
 		public void AddTooltip(TooltipInfo info)
 		{
 			toolTipsToDraw.Enqueue(info);
-		}
-
-		private void ProductionGraphViewer_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.KeyCode == Keys.Delete)
-			{
-				DeleteNode(SelectedNode);
-			}
 		}
 
 		public void DeleteNode(NodeElement node)

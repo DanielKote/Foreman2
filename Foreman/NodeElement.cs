@@ -17,7 +17,6 @@ namespace Foreman
 		public int DragOffsetX;
 		public int DragOffsetY;
 
-		public bool Moused { get { return Parent.MousedNode == this; }}
 		public Point MousePosition = Point.Empty;
 
 		private Color recipeColour = Color.FromArgb(190, 217, 212);
@@ -190,28 +189,6 @@ namespace Foreman
 			using (SolidBrush brush = new SolidBrush(backgroundColour))
 			{
 				GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
-			}
-
-			if (Parent.ClickedNode == this)
-			{
-				using (Pen pen = new Pen(Color.WhiteSmoke, 3f))
-				{
-					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
-				}
-			}
-			else if (Parent.MousedNode == this)
-			{
-				using (Pen pen = new Pen(Color.LightGray, 3f))
-				{
-					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
-				}
-			}
-			else if (Parent.SelectedNode == this)
-			{
-				using (Pen pen = new Pen(Color.DarkGray, 3f))
-				{
-					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, 8, graphics, pen);
-				}
 			}
 
 			if (editorBox != null)
