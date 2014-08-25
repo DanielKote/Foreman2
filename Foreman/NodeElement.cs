@@ -281,7 +281,7 @@ namespace Foreman
 		{
 			Color notEnough = Color.FromArgb(255, 255, 193, 193);
 			Color enough = Color.White;
-			Color tooMuch = Color.FromArgb(255, 174, 198, 206);
+			Color tooMuch = Color.FromArgb(255, 214, 226, 230);
 
 			if (linkType == LinkType.Input)
 			{
