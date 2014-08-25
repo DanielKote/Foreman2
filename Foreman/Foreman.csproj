@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
+    <Compile Include="AssemblerBox.cs" />
     <Compile Include="DataCache.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="GraphicsStuff.cs" />

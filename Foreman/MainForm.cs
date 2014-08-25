@@ -61,6 +61,7 @@ namespace Foreman
 			{
 				rateOptionsDropDown.Enabled = false;
 			}
+			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
 		}
 
@@ -70,6 +71,7 @@ namespace Foreman
 			{
 				this.GraphViewer.Graph.SelectedAmountType = AmountType.FixedAmount;
 			}
+			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
 		}
 
@@ -80,10 +82,12 @@ namespace Foreman
 				case 0:
 					GraphViewer.Graph.SelectedUnit = RateUnit.PerSecond;
 					GraphViewer.Invalidate();
+					GraphViewer.UpdateNodes();
 					break;
 				case 1:
 					GraphViewer.Graph.SelectedUnit = RateUnit.PerMinute;
 					GraphViewer.Invalidate();
+					GraphViewer.UpdateNodes();
 					break;
 			}
 		}
@@ -91,7 +95,7 @@ namespace Foreman
 		private void AutomaticCompleteButton_Click(object sender, EventArgs e)
 		{
 			GraphViewer.Graph.SatisfyAllItemDemands();
-			GraphViewer.UpdateElements();
+			GraphViewer.AddRemoveElements();
 			GraphViewer.PositionNodes();
 		}
 

@@ -27,7 +27,6 @@ namespace Foreman
 			set
 			{
 				selectedAmountType = value;
-				UpdateNodeAmounts();
 			}
 		}
 
@@ -46,17 +45,6 @@ namespace Foreman
 		{
 			pathMatrixCache = null;
 			adjacencyMatrixCache = null;
-		}
-
-		public void UpdateNodeAmounts()
-		{
-			var sortedNodes = GetTopologicalSort();
-			sortedNodes.Reverse(); //The default order is supply nodes first, consumers last.
-
-			foreach (ProductionNode node in sortedNodes)
-			{
-				//node.MinimiseInputs();
-			}
 		}
 
 		public int[,] AdjacencyMatrix

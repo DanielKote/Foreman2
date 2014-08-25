@@ -80,7 +80,7 @@ namespace Foreman
 				ConsumerNode node = ConsumerNode.Create(item, Graph);
 			}
 
-			UpdateElements();
+			AddRemoveElements();
 			PositionNodes();
 		}
 
@@ -89,7 +89,16 @@ namespace Foreman
 			AddDemands(new List<Item> { item });
 		}
 
-		public void UpdateElements()
+		public void UpdateNodes()
+		{
+			foreach (NodeElement node in Elements.OfType<NodeElement>())
+			{
+				node.Update();
+			}
+			Invalidate();
+		}
+
+		public void AddRemoveElements()
 		{
 			Elements.RemoveWhere(e => e is LinkElement && !Graph.GetAllNodeLinks().Contains((e as LinkElement).DisplayedLink));
 			Elements.RemoveWhere(e => e is NodeElement && !Graph.Nodes.Contains((e as NodeElement).DisplayedNode));
@@ -109,11 +118,7 @@ namespace Foreman
 					Elements.Add(new LinkElement(this, link));
 				}
 			}
-
-			foreach (NodeElement node in Elements.OfType<NodeElement>())
-			{
-				node.Update();
-			}
+			UpdateNodes();
 			Invalidate();
 		}
 
@@ -462,6 +467,7 @@ namespace Foreman
 				}
 				Elements.Remove(node);
 				node.DisplayedNode.Destroy();
+				UpdateNodes();
 				Invalidate();
 			}			
 		}

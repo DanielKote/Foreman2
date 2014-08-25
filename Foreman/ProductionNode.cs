@@ -187,21 +187,46 @@ namespace Foreman
 			}
 		}
 
-		public Dictionary<Assembler, int> GetMinimumAssemblers(OptimisationGoal goal)
+		public Dictionary<Assembler, int> GetMinimumAssemblers()
 		{
 			Dictionary<Assembler, int> results = new Dictionary<Assembler, int>();
-			
-			if (goal == OptimisationGoal.Count)
-			{
-				float requiredRate = GetRateRequiredByOutputs();
-				List<Assembler> sortedAssemblers = DataCache.Assemblers.Values.OrderBy(a => a.GetRate(BaseRecipe)).Reverse().ToList();
 
+			float requiredRate = GetRateRequiredByOutputs();
+			List<Assembler> sortedAssemblers = DataCache.Assemblers.Values
+				.Where(a => a.Categories.Contains(BaseRecipe.Category) && a.MaxIngredients >= BaseRecipe.Ingredients.Count)
+				.OrderBy(a => a.GetRate(BaseRecipe)).ToList();
+
+			if (sortedAssemblers.Any())
+			{
 				float totalRateSoFar = 0;
-				foreach (Assembler assembler in sortedAssemblers)
+
+				while (totalRateSoFar < requiredRate)
 				{
-					float thisRate = assembler.GetRate(BaseRecipe);
-					results.Add(assembler, Convert.ToInt32(Math.Ceiling(requiredRate / thisRate)));
-					break;
+					float remainingRate = requiredRate - totalRateSoFar;
+					Assembler assemblerToAdd = sortedAssemblers.LastOrDefault(a => a.GetRate(BaseRecipe) < remainingRate);
+
+					if (assemblerToAdd != null)
+					{
+						results.Add(assemblerToAdd, Convert.ToInt32(Math.Floor(remainingRate / assemblerToAdd.GetRate(BaseRecipe))));
+					}
+					else
+					{
+						assemblerToAdd = sortedAssemblers.FirstOrDefault(a => a.GetRate(BaseRecipe) > remainingRate);
+						int amount = Convert.ToInt32(Math.Ceiling(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
+						if (results.ContainsKey(assemblerToAdd))
+						{
+							results[assemblerToAdd] += amount;
+						}
+						else
+						{
+							results.Add(assemblerToAdd, amount);
+						}
+					}
+					totalRateSoFar = 0;
+					foreach (var a in results)
+					{
+						totalRateSoFar += a.Key.GetRate(BaseRecipe) * a.Value;
+					}
 				}
 			}
 

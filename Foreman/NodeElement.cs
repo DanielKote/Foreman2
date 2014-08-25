@@ -35,8 +35,9 @@ namespace Foreman
 		Item editedItem;
 		float originalEditorValue;
 
-		private List<ItemTab> inputTabOrder = new List<ItemTab>();
-		private List<ItemTab> outputTabOrder = new List<ItemTab>();
+		private AssemblerBox assemblerBox;
+		private List<ItemTab> inputTabs = new List<ItemTab>();
+		private List<ItemTab> outputTabs = new List<ItemTab>();
 		
 		public ProductionNode DisplayedNode { get; private set; }
 
@@ -64,13 +65,22 @@ namespace Foreman
 			{
 				ItemTab newTab = new ItemTab(item, LinkType.Input, Parent);
 				SubElements.Add(newTab);
-				inputTabOrder.Add(newTab);
+				inputTabs.Add(newTab);
 			}
 			foreach (Item item in node.Outputs)
 			{
 				ItemTab newTab = new ItemTab(item, LinkType.Output, Parent);
 				SubElements.Add(newTab);
-				outputTabOrder.Add(newTab);
+				outputTabs.Add(newTab);
+			}
+
+			if (DisplayedNode is RecipeNode)
+			{
+				assemblerBox = new AssemblerBox(Parent);
+				SubElements.Add(assemblerBox);
+				assemblerBox.Height = 50;
+				assemblerBox.Width = 50;
+				Height = 120;
 			}
 		}
 
@@ -82,7 +92,7 @@ namespace Foreman
 		private int GetInputIconWidths()
 		{
 			int result = tabPadding;
-			foreach (ItemTab tab in inputTabOrder)
+			foreach (ItemTab tab in inputTabs)
 			{
 				result += tab.Width + tabPadding;
 			}
@@ -91,7 +101,7 @@ namespace Foreman
 		private int GetOutputIconWidths()
 		{
 			int result = tabPadding;
-			foreach (ItemTab tab in outputTabOrder)
+			foreach (ItemTab tab in outputTabs)
 			{
 				result += tab.Width + tabPadding;
 			}
@@ -100,19 +110,12 @@ namespace Foreman
 		
 		public void Update()
 		{
-			//if (DisplayedNode is RecipeNode)
-			//{
-			//    Width = Math.Max(Width, GetAssemblerBoxSize().X);
-			//    Height = GetAssemblerBoxSize().Y;
-			//}
+			UpdateTabOrder();
 
-			inputTabOrder.OrderBy(it => GetItemTabXHeuristic(it));
-			outputTabOrder.OrderBy(it => GetItemTabXHeuristic(it));
-
-			Width = getIconWidths();
+			Width = Math.Max(75, getIconWidths());
 
 			int x = (Width - GetOutputIconWidths()) / 2;
-			foreach (ItemTab tab in outputTabOrder)
+			foreach (ItemTab tab in outputTabs)
 			{
 				x += tabPadding;
 				tab.X = x;
@@ -123,7 +126,7 @@ namespace Foreman
 				tab.Text = getIconString(tab.Item, tab.Type);
 			}
 			x = (Width - GetInputIconWidths()) / 2;
-			foreach (ItemTab tab in inputTabOrder)
+			foreach (ItemTab tab in inputTabs)
 			{
 				x += tabPadding;
 				tab.X = x;
@@ -133,6 +136,19 @@ namespace Foreman
 				tab.FillColour = chooseIconColour(tab.Item, tab.Type);
 				tab.Text = getIconString(tab.Item, tab.Type);
 			}
+
+			if (DisplayedNode is RecipeNode)
+			{
+				assemblerBox.AssemblerList = (DisplayedNode as RecipeNode).GetMinimumAssemblers();
+				assemblerBox.X = (Width - assemblerBox.Width) / 2;
+				assemblerBox.Y = (Height - assemblerBox.Height) / 2;
+			}
+		}
+
+		public void UpdateTabOrder()
+		{
+			inputTabs = inputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
+			outputTabs = outputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
 		}
 
 		public int GetItemTabXHeuristic(ItemTab tab)
@@ -157,35 +173,15 @@ namespace Foreman
 
 		public Point GetOutputLineConnectionPoint(Item item)
 		{
-			ItemTab tab = outputTabOrder.First(it => it.Item == item);
+			ItemTab tab = outputTabs.First(it => it.Item == item);
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y);
 		}
 
 		public Point GetInputLineConnectionPoint(Item item)
 		{
-			ItemTab tab = inputTabOrder.First(it => it.Item == item);
+			ItemTab tab = inputTabs.First(it => it.Item == item);
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y + tab.Height);
 		}
-
-		//private Point GetAssemblerBoxSize(Graphics graphics)
-		//{
-		//    Point size = new Point();
-
-		//    if (DisplayedNode is RecipeNode)
-		//    {
-		//        var assemblers = (DisplayedNode as RecipeNode).GetMinimumAssemblers(OptimisationGoal.Count);
-
-		//        size.X = assemblers.Count * (assemblerSize + assemblerBorderX) + assemblerBorderX;
-		//        size.Y = assemblerBorderY * 2 + assemblerSize;
-
-		//        foreach (Assembler assembler in assemblers)
-		//        {
-		//            size.X += graphics.MeasureString("*", 
-		//        }
-		//    }
-
-		//    return size;
-		//}
 		
 		public override void Paint(Graphics graphics)
 		{
@@ -216,20 +212,6 @@ namespace Foreman
 				}
 			}
 
-			if (DisplayedNode is RecipeNode)
-			{
-				//var assemblers = (DisplayedNode as RecipeNode).GetMinimumAssemblers(OptimisationGoal.Count);
-				//Point assemblerBoxSize = GetAssemblerBoxSize();
-				//int x = (Width - assemblerBoxSize.X) / 2 + assemblerBorderX;
-				//int y = (Height - assemblerSize) / 2;
-
-				//foreach (Assembler assembler in assemblers.Keys)
-				//{
-				//    graphics.DrawImage(assembler.Icon, x, y, assemblerSize, assemblerSize);
-				//    x += assemblerSize + assemblerBorderX;
-				//}
-			}
-
 			if (editorBox != null)
 			{
 				TooltipInfo ttinfo = new TooltipInfo();
@@ -249,6 +231,18 @@ namespace Foreman
 			String finalString = "";
 
 			String unit = "";
+
+			float actualAmount = 0; 
+			float desiredAmount = 0;
+			if (linkType == LinkType.Input)
+			{
+				actualAmount = DisplayedNode.GetTotalInput(item);
+				desiredAmount = DisplayedNode.GetRequiredInput(item);
+			}
+			else
+			{
+				actualAmount = DisplayedNode.GetTotalOutput(item);
+			}
 			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerSecond)
 			{
 				unit = "/s";
@@ -256,19 +250,21 @@ namespace Foreman
 			else if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
 			{
 				unit = "/m";
+				actualAmount *= 60;
+				desiredAmount *= 60;
 			}
 
 			if (linkType == LinkType.Input)
 			{
-				finalString = String.Format(line1Format, DisplayedNode.GetTotalInput(item), unit);
+				finalString = String.Format(line1Format, actualAmount, unit);
 				if (DisplayedNode.GetRequiredInput(item) > DisplayedNode.GetTotalInput(item))
 				{
-					finalString += String.Format(line2Format, DisplayedNode.GetRequiredInput(item), unit);
+					finalString += String.Format(line2Format, desiredAmount, unit);
 				}
 			}
 			else
 			{
-				finalString = String.Format(line1Format, DisplayedNode.GetTotalOutput(item), unit);
+				finalString = String.Format(line1Format, actualAmount, unit);
 			}
 
 			return finalString;
@@ -335,7 +331,7 @@ namespace Foreman
 								new EventHandler((o, e) =>
 								{
 									DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedTab.Item);
-									Parent.UpdateElements();
+									Parent.UpdateNodes();
 									Parent.Invalidate();
 								})));
 
@@ -354,7 +350,7 @@ namespace Foreman
 											{
 												DisplayedNode.Graph.CreateSupplyNodeToSatisfyItemDemand(DisplayedNode, clickedTab.Item);
 											}
-											Parent.UpdateElements();
+											Parent.UpdateNodes();
 											Parent.Invalidate();
 										}
 									})));
@@ -381,8 +377,13 @@ namespace Foreman
 
 			editorBox = new TextBox();
 			editedItem = item;
-			editorBox.Text = (DisplayedNode as ConsumerNode).ConsumptionAmount.ToString();
-			originalEditorValue = (DisplayedNode as ConsumerNode).ConsumptionAmount;
+			float amountToShow = (DisplayedNode as ConsumerNode).ConsumptionAmount;
+			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
+			{
+				amountToShow *= 60;
+			}
+			editorBox.Text = amountToShow.ToString();
+			originalEditorValue = amountToShow;
 			editorBox.SelectAll();
 			editorBox.Size = new Size(100, 30);
 			Rectangle tooltipRect = Parent.getTooltipScreenBounds(Parent.GraphToScreen(GetInputLineConnectionPoint(item)), new Point(editorBox.Size), Direction.Up);
@@ -412,8 +413,12 @@ namespace Foreman
 
 			if (amountIsValid)
 			{
+				if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
+				{
+					amount /= 60;
+				}
 				(DisplayedNode as ConsumerNode).ConsumptionAmount = amount;
-				DisplayedNode.Graph.UpdateNodeAmounts();
+				Parent.UpdateNodes();
 				Parent.Invalidate();
 			}
 		}
@@ -502,9 +507,6 @@ namespace Foreman
 
 		public override void Dragged(Point location)
 		{
-			X += location.X - DragOffsetX;
-			Y += location.Y - DragOffsetY;
-
 			ItemTab draggedTab = null;
 
 			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
@@ -527,6 +529,20 @@ namespace Foreman
 					newLink.SupplierElement = this;
 				}
 				Parent.DraggedElement = newLink;
+			}
+			else
+			{
+				X += location.X - DragOffsetX;
+				Y += location.Y - DragOffsetY;
+
+				foreach (ProductionNode node in DisplayedNode.InputLinks.Select<NodeLink, ProductionNode>(l => l.Supplier))
+				{
+					Parent.GetElementForNode(node).UpdateTabOrder();
+				}
+				foreach (ProductionNode node in DisplayedNode.OutputLinks.Select<NodeLink, ProductionNode>(l => l.Consumer))
+				{
+					Parent.GetElementForNode(node).UpdateTabOrder();
+				}
 			}
 		}
 	}
