@@ -65,6 +65,13 @@ namespace Foreman
 			if ((sender as RadioButton).Checked)
 			{
 				this.GraphViewer.Graph.SelectedAmountType = AmountType.FixedAmount;
+				AssemblerDisplayCheckBox.Checked = false;
+				AssemblerDisplayCheckBox.Enabled = false;
+			}
+			else
+			{
+				AssemblerDisplayCheckBox.Checked = true;
+				AssemblerDisplayCheckBox.Enabled = true;
 			}
 			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
@@ -128,6 +135,12 @@ namespace Foreman
 					GraphViewer.DeleteNode(GraphViewer.GetElementForNode(node));
 				}
 			}
+		}
+
+		private void AssemblerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
+			GraphViewer.UpdateNodes();
 		}
 	}
 }

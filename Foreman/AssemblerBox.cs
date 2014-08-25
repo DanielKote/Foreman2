@@ -50,7 +50,6 @@ namespace Foreman
 
 				if (i == AssemblerList.Count - 1 && AssemblerList.Count % 2 != 0)
 				{
-					//element.X += this.Width / 2;
 					element.Width = this.Width;
 				}
 

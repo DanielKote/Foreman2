@@ -44,10 +44,7 @@ namespace Foreman
 		private Point dragStartScreenPoint;
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 
-		public NodeElement LinkDragStartNode = null;
-		public Item LinkDragItem = null;
-		public LinkType LinkDragStartLinkType;
-		public NodeElement LinkDragEndNode = null;
+		public bool ShowAssemblers = true;
 
 		private Rectangle graphBounds
 		{
