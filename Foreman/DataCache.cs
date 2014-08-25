@@ -58,13 +58,10 @@ namespace Foreman
 				}
 			}
 
-			InterpretItems(lua, "item");
-			InterpretItems(lua, "fluid");
-			InterpretItems(lua, "capsule");
-			InterpretItems(lua, "module");
-			InterpretItems(lua, "ammo");
-			InterpretItems(lua, "gun");
-			InterpretItems(lua, "armor");			
+			foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item" })
+			{
+				InterpretItems(lua, type);
+			}
 			
 			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
 			var recipeEnumerator = recipeTable.GetEnumerator();
