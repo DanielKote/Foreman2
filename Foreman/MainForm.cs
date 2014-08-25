@@ -142,5 +142,11 @@ namespace Foreman
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
 			GraphViewer.UpdateNodes();
 		}
+
+		private void SingleAssemblerPerRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.Graph.OneAssemblerPerRecipe = (sender as CheckBox).Checked;
+			GraphViewer.UpdateNodes();
+		}
 	}
 }

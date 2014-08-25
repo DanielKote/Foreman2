@@ -17,6 +17,7 @@ namespace Foreman
 		public HashSet<Recipe> CyclicRecipes = new HashSet<Recipe>();
 		private AmountType selectedAmountType = AmountType.FixedAmount;
 		public RateUnit SelectedUnit = RateUnit.PerSecond;
+		public bool OneAssemblerPerRecipe = false;
 
 		public AmountType SelectedAmountType
 		{

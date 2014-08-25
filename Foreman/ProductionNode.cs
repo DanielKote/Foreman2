@@ -207,7 +207,16 @@ namespace Foreman
 
 					if (assemblerToAdd != null)
 					{
-						results.Add(assemblerToAdd, Convert.ToInt32(Math.Floor(remainingRate / assemblerToAdd.GetRate(BaseRecipe))));
+						int numberToAdd;
+						if (Graph.OneAssemblerPerRecipe)
+						{
+							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
+						}
+						else
+						{
+							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
+						}
+						results.Add(assemblerToAdd, numberToAdd);
 					}
 					else
 					{

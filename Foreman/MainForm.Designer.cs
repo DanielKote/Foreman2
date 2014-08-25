@@ -40,6 +40,7 @@
 			this.rateButton = new System.Windows.Forms.RadioButton();
 			this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.SingleAssemblerPerRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -51,10 +52,10 @@
 			this.ItemListBox.Dock = System.Windows.Forms.DockStyle.Right;
 			this.ItemListBox.FormattingEnabled = true;
 			this.ItemListBox.IntegralHeight = false;
-			this.ItemListBox.Location = new System.Drawing.Point(3, 215);
+			this.ItemListBox.Location = new System.Drawing.Point(3, 238);
 			this.ItemListBox.Name = "ItemListBox";
 			this.ItemListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.ItemListBox.Size = new System.Drawing.Size(194, 442);
+			this.ItemListBox.Size = new System.Drawing.Size(194, 419);
 			this.ItemListBox.TabIndex = 0;
 			this.ItemListBox.SelectedIndexChanged += new System.EventHandler(this.ItemListBox_SelectedIndexChanged);
 			// 
@@ -152,11 +153,12 @@
 			this.groupBox2.AutoSize = true;
 			this.groupBox2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.tableLayoutPanel1.SetColumnSpan(this.groupBox2, 2);
+			this.groupBox2.Controls.Add(this.SingleAssemblerPerRecipeCheckBox);
 			this.groupBox2.Controls.Add(this.AssemblerDisplayCheckBox);
 			this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox2.Location = new System.Drawing.Point(3, 153);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(194, 56);
+			this.groupBox2.Size = new System.Drawing.Size(194, 79);
 			this.groupBox2.TabIndex = 7;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Assemblers";
@@ -211,6 +213,17 @@
 			this.GraphViewer.Size = new System.Drawing.Size(823, 684);
 			this.GraphViewer.TabIndex = 1;
 			// 
+			// SingleAssemblerPerRecipeCheckBox
+			// 
+			this.SingleAssemblerPerRecipeCheckBox.AutoSize = true;
+			this.SingleAssemblerPerRecipeCheckBox.Location = new System.Drawing.Point(7, 43);
+			this.SingleAssemblerPerRecipeCheckBox.Name = "SingleAssemblerPerRecipeCheckBox";
+			this.SingleAssemblerPerRecipeCheckBox.Size = new System.Drawing.Size(169, 17);
+			this.SingleAssemblerPerRecipeCheckBox.TabIndex = 1;
+			this.SingleAssemblerPerRecipeCheckBox.Text = "One assembler type per recipe";
+			this.SingleAssemblerPerRecipeCheckBox.UseVisualStyleBackColor = true;
+			this.SingleAssemblerPerRecipeCheckBox.CheckedChanged += new System.EventHandler(this.SingleAssemblerPerRecipeCheckBox_CheckedChanged);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -247,6 +260,7 @@
 		private System.Windows.Forms.RadioButton rateButton;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.CheckBox AssemblerDisplayCheckBox;
+		private System.Windows.Forms.CheckBox SingleAssemblerPerRecipeCheckBox;
 	}
 }
 
