@@ -199,6 +199,24 @@ namespace Foreman
 				GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
 			}
 
+			using (Font font = new Font(FontFamily.GenericSansSerif, 10))
+			{
+				StringFormat centreFormat = new StringFormat();
+				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
+				if (DisplayedNode is SupplyNode)
+				{
+					graphics.DrawString("Input", font, Brushes.White, Width / 2, Height / 2, centreFormat);
+				}
+				else if (DisplayedNode is ConsumerNode)
+				{
+					graphics.DrawString("Output", font, Brushes.White, Width / 2, Height / 2, centreFormat);
+				}
+				else if (DisplayedNode is RecipeNode && !Parent.ShowAssemblers)
+				{					
+					graphics.DrawString("Recipe", font, Brushes.White, Width / 2, Height / 2, centreFormat);
+				}
+			}
+
 			if (editorBox != null)
 			{
 				TooltipInfo ttinfo = new TooltipInfo();

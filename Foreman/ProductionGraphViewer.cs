@@ -44,7 +44,7 @@ namespace Foreman
 		private Point dragStartScreenPoint;
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 
-		public bool ShowAssemblers = true;
+		public bool ShowAssemblers = false;
 
 		private Rectangle graphBounds
 		{
