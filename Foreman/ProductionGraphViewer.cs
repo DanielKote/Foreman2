@@ -91,7 +91,7 @@ namespace Foreman
 
 		public void UpdateNodes()
 		{
-			foreach (NodeElement node in Elements.OfType<NodeElement>())
+			foreach (NodeElement node in Elements.OfType<NodeElement>().ToList())
 			{
 				node.Update();
 			}

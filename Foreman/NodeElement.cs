@@ -79,7 +79,7 @@ namespace Foreman
 				assemblerBox = new AssemblerBox(Parent);
 				SubElements.Add(assemblerBox);
 				assemblerBox.Height = 50;
-				assemblerBox.Width = 50;
+				assemblerBox.Width = Width;
 				Height = 120;
 			}
 		}
@@ -140,8 +140,10 @@ namespace Foreman
 			if (DisplayedNode is RecipeNode)
 			{
 				assemblerBox.AssemblerList = (DisplayedNode as RecipeNode).GetMinimumAssemblers();
+				assemblerBox.Width = Width;
 				assemblerBox.X = (Width - assemblerBox.Width) / 2;
 				assemblerBox.Y = (Height - assemblerBox.Height) / 2;
+				assemblerBox.Update();
 			}
 		}
 

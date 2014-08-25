@@ -191,18 +191,18 @@ namespace Foreman
 		{
 			Dictionary<Assembler, int> results = new Dictionary<Assembler, int>();
 
-			float requiredRate = GetRateRequiredByOutputs();
+			double requiredRate = GetRateRequiredByOutputs();
 			List<Assembler> sortedAssemblers = DataCache.Assemblers.Values
 				.Where(a => a.Categories.Contains(BaseRecipe.Category) && a.MaxIngredients >= BaseRecipe.Ingredients.Count)
 				.OrderBy(a => a.GetRate(BaseRecipe)).ToList();
 
 			if (sortedAssemblers.Any())
 			{
-				float totalRateSoFar = 0;
+				double totalRateSoFar = 0;
 
 				while (totalRateSoFar < requiredRate)
 				{
-					float remainingRate = requiredRate - totalRateSoFar;
+					double remainingRate = requiredRate - totalRateSoFar;
 					Assembler assemblerToAdd = sortedAssemblers.LastOrDefault(a => a.GetRate(BaseRecipe) < remainingRate);
 
 					if (assemblerToAdd != null)

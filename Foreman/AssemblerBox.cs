@@ -16,33 +16,79 @@ namespace Foreman
 		{
 			AssemblerList = new Dictionary<Assembler, int>();
 		}
-		
-		public override void Paint(System.Drawing.Graphics graphics)
+
+		public void Update()
 		{
-			if (AssemblerList.Any())
+			foreach (AssemblerIconElement element in SubElements.OfType<AssemblerIconElement>().ToList())
 			{
-				int heightPerAssembler = (Height - padding) / AssemblerList.Count() - padding;
-				int y = padding;
-				StringFormat centreFormat = new StringFormat();
-				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-
-				using (Font numberFont = new System.Drawing.Font(FontFamily.GenericSansSerif, heightPerAssembler / 3))
+				if (!AssemblerList.Keys.Contains(element.DisplayedAssembler))
 				{
-					foreach (var assemblerKVP in AssemblerList)
-					{
-
-						String numberString = assemblerKVP.Value.ToString();
-						float stringWidth = graphics.MeasureString(numberString, numberFont).Width;
-
-						graphics.DrawImage(assemblerKVP.Key.Icon, (Width + stringWidth + heightPerAssembler) / 2 - heightPerAssembler, y, heightPerAssembler, heightPerAssembler);
-						graphics.DrawString(numberString, numberFont, Brushes.White, new PointF((Width - stringWidth - heightPerAssembler) / 2 + stringWidth / 2, y + heightPerAssembler / 2), centreFormat);
-
-						y += heightPerAssembler + padding;
-					}
+					SubElements.Remove(element);
 				}
 			}
 
+			foreach (var kvp in AssemblerList)
+			{
+				if (!SubElements.OfType<AssemblerIconElement>().Any(aie => aie.DisplayedAssembler == kvp.Key))
+				{
+					SubElements.Add(new AssemblerIconElement(kvp.Key, kvp.Value, Parent));
+				}
+			}
+
+			int height = (int)(Height / Math.Ceiling(AssemblerList.Count / 2d));
+			int width = this.Width / 2;
+			
+			int i = 0;
+			foreach (AssemblerIconElement element in SubElements.OfType<AssemblerIconElement>())
+			{
+				element.DisplayedNumber = AssemblerList[element.DisplayedAssembler];
+
+				element.Width = width;
+				element.Height = height;
+				element.X = (i % 2) * width;
+				element.Y = (int)Math.Floor(i / 2d) * height;
+
+				if (i == AssemblerList.Count - 1 && AssemblerList.Count % 2 != 0)
+				{
+					//element.X += this.Width / 2;
+					element.Width = this.Width;
+				}
+
+				i++;
+			}
+		}
+
+		public override void Paint(System.Drawing.Graphics graphics)
+		{
 			base.Paint(graphics);
+		}
+	}
+
+	public class AssemblerIconElement : GraphElement
+	{
+		const int maxFontSize = 14;
+		public Assembler DisplayedAssembler { get; set; }
+		public int DisplayedNumber { get; set; }
+
+		public AssemblerIconElement(Assembler assembler, int number, ProductionGraphViewer parent) : base(parent)
+		{
+			DisplayedAssembler = assembler;
+			DisplayedNumber = number;
+		}
+
+		public override void Paint(Graphics graphics)
+		{
+			StringFormat centreFormat = new StringFormat();
+			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
+
+			using (Font font = new Font(FontFamily.GenericSansSerif,  Math.Min(Height / 2, maxFontSize)))
+			{
+				float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
+				int iconSize = (int)Math.Min(Width - StringWidth, Height);
+
+				graphics.DrawImage(DisplayedAssembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
+				graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
+			}
 		}
 	}
 }
