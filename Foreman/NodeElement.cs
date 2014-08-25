@@ -226,7 +226,7 @@ namespace Foreman
 
 		private String getIconString(Item item, LinkType linkType)
 		{
-			String line1Format = "{0}{1}";
+			String line1Format = "{0:0.##}{1}";
 			String line2Format = "\n({0:0.##}{1})";
 			String finalString = "";
 
