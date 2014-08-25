@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace Foreman
 {
-	class Assembler
+	public class Assembler
 	{
 		public String Name { get; private set; }
 		public Bitmap Icon { get; set; }
@@ -40,6 +40,11 @@ namespace Foreman
 			Name = name;
 			Categories = new List<string>();
 			AllowedEffects = new List<string>();
+		}
+
+		public float GetRate(Recipe recipe)
+		{
+			return 1 / recipe.Time * (1 + Speed);
 		}
 
 		public override string ToString()

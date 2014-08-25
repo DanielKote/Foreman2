@@ -187,6 +187,27 @@ namespace Foreman
 			}
 		}
 
+		public Dictionary<Assembler, int> GetMinimumAssemblers(OptimisationGoal goal)
+		{
+			Dictionary<Assembler, int> results = new Dictionary<Assembler, int>();
+			
+			if (goal == OptimisationGoal.Count)
+			{
+				float requiredRate = GetRateRequiredByOutputs();
+				List<Assembler> sortedAssemblers = DataCache.Assemblers.Values.OrderBy(a => a.GetRate(BaseRecipe)).Reverse().ToList();
+
+				float totalRateSoFar = 0;
+				foreach (Assembler assembler in sortedAssemblers)
+				{
+					float thisRate = assembler.GetRate(BaseRecipe);
+					results.Add(assembler, Convert.ToInt32(Math.Ceiling(requiredRate / thisRate)));
+					break;
+				}
+			}
+
+			return results;
+		}
+
 		public override string DisplayName
 		{
 			get { return BaseRecipe.FriendlyName; }

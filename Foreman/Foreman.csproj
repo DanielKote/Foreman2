@@ -61,6 +61,7 @@
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
+    <Compile Include="ItemTab.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

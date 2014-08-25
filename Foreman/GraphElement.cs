@@ -9,6 +9,7 @@ namespace Foreman
 {
 	public abstract class GraphElement : IDisposable
 	{
+		public HashSet<GraphElement> SubElements { get; private set; }
 		public virtual Point Location { get; set; }
 		public virtual int X { get { return Location.X; } set { Location = new Point(value, Location.Y); } }
 		public virtual int Y { get { return Location.Y; } set { Location = new Point(Location.X, value); } }
@@ -35,10 +36,19 @@ namespace Foreman
 		{
 			Parent = parent;
 			Parent.Elements.Add(this);
+			SubElements = new HashSet<GraphElement>();
 		}
 
 		public virtual bool ContainsPoint(Point point) { return false; }
-		public virtual void Paint(Graphics graphics) { }
+		public virtual void Paint(Graphics graphics)
+		{
+			foreach (GraphElement element in SubElements)
+			{
+				graphics.TranslateTransform(element.X, element.Y);
+				element.Paint(graphics);
+				graphics.TranslateTransform(-element.X, -element.Y);
+			}
+		}
 		public virtual void MouseMoved(Point location) { }
 		public virtual void MouseDown(Point location, MouseButtons button) { }
 		public virtual void MouseUp(Point location, MouseButtons button) { }

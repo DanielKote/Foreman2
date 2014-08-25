@@ -24,17 +24,19 @@ namespace Foreman
 		private Color supplyColour = Color.FromArgb(249, 237, 195);
 		private Color consumerColour = Color.FromArgb(231, 214, 224);
 		private Color backgroundColour;
+		
+		private const int assemblerSize = 32;
+		private const int assemblerBorderX = 10;
+		private const int assemblerBorderY = 30;
 
-		private const int iconSize = 32;
-		private const int iconBorder = 4;
-		private const int iconTextHeight = 11;
-		private const int iconTextHeight2Line = 21;
-
-		private string nameText = "";
-
+		private const int tabPadding = 8;
+		
 		TextBox editorBox;
 		Item editedItem;
 		float originalEditorValue;
+
+		private List<ItemTab> inputTabOrder = new List<ItemTab>();
+		private List<ItemTab> outputTabOrder = new List<ItemTab>();
 		
 		public ProductionNode DisplayedNode { get; private set; }
 
@@ -57,121 +59,95 @@ namespace Foreman
 			{
 				backgroundColour = recipeColour;
 			}
-		}
-		
-		public void Update()
-		{
-			if (DisplayedNode.GetType() == typeof(RecipeNode))
-			{
-				nameText = String.Format("Recipe: {0}", DisplayedNode.DisplayName);
-			}
-			else if (DisplayedNode.GetType() == typeof(ConsumerNode))
-			{
-				nameText = String.Format("Output: {0}", DisplayedNode.DisplayName);
-			}
-			else if (DisplayedNode.GetType() == typeof(SupplyNode))
-			{
-				nameText = String.Format("Input: {0}", DisplayedNode.DisplayName);
-			}
 
-			SizeF stringSize = Parent.CreateGraphics().MeasureString(nameText, SystemFonts.DefaultFont);
-			Width = Math.Max((int)stringSize.Width + iconBorder * 2, getIconWidths());
+			foreach (Item item in node.Inputs)
+			{
+				ItemTab newTab = new ItemTab(item, LinkType.Input, Parent);
+				SubElements.Add(newTab);
+				inputTabOrder.Add(newTab);
+			}
+			foreach (Item item in node.Outputs)
+			{
+				ItemTab newTab = new ItemTab(item, LinkType.Output, Parent);
+				SubElements.Add(newTab);
+				outputTabOrder.Add(newTab);
+			}
 		}
 
 		private int getIconWidths()
 		{
-			return Math.Max(
-				(iconSize + iconBorder * 5) * DisplayedNode.Outputs.Count() + iconBorder,
-				(iconSize + iconBorder * 5) * DisplayedNode.Inputs.Count() + iconBorder);
+			return Math.Max(GetInputIconWidths(), GetOutputIconWidths());
 		}
 
-		public Rectangle GetIconBounds(Item item, LinkType linkType)
+		private int GetInputIconWidths()
 		{
-			int textHeight = iconTextHeight;
-			if (linkType == LinkType.Input && DisplayedNode.GetUnsatisfiedDemand(item) > 0)
+			int result = tabPadding;
+			foreach (ItemTab tab in inputTabOrder)
 			{
-				textHeight = iconTextHeight2Line;
+				result += tab.Width + tabPadding;
 			}
-
-			int rectX = 0;
-			int rectY = 0;
-			int	rectWidth = iconSize + iconBorder + iconBorder;
-			int	rectHeight = iconSize + iconBorder + iconBorder + textHeight;
-
-			if (linkType == LinkType.Output)
-			{
-				Point iconPoint = GetOutputIconPoint(item);
-				var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
-				rectX = iconPoint.X - rectWidth / 2;
-				rectY = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2 - textHeight;
-			}
-			else
-			{
-				Point iconPoint = GetInputIconPoint(item);
-				var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
-				rectX = iconPoint.X - rectWidth / 2;
-				rectY = iconPoint.Y -(iconSize + iconBorder + iconBorder) / 2;
-			}
-
-			return new Rectangle(rectX, rectY, rectWidth, rectHeight);
+			return result;
 		}
-
-		public Point GetOutputIconPoint(Item item)
+		private int GetOutputIconWidths()
 		{
-			if (DisplayedNode.Outputs.Contains(item))
+			int result = tabPadding;
+			foreach (ItemTab tab in outputTabOrder)
 			{
-				var sortedOutputs = DisplayedNode.Outputs.OrderBy(i => getXSortValue(i, LinkType.Output)).ToList();
-				int x = Convert.ToInt32((float)Width / (sortedOutputs.Count()) * (sortedOutputs.IndexOf(item) + 0.5f));
-				int y = 0;
-				return new Point(x, y + iconBorder);
+				result += tab.Width + tabPadding;
 			}
-			else
-			{
-				return new Point();
-			}
+			return result;
 		}
-
-		public Point GetInputIconPoint(Item item)
+		
+		public void Update()
 		{
-			if (DisplayedNode.Inputs.Contains(item))
+			//if (DisplayedNode is RecipeNode)
+			//{
+			//    Width = Math.Max(Width, GetAssemblerBoxSize().X);
+			//    Height = GetAssemblerBoxSize().Y;
+			//}
+
+			inputTabOrder.OrderBy(it => GetItemTabXHeuristic(it));
+			outputTabOrder.OrderBy(it => GetItemTabXHeuristic(it));
+
+			Width = getIconWidths();
+
+			int x = (Width - GetOutputIconWidths()) / 2;
+			foreach (ItemTab tab in outputTabOrder)
 			{
-				var sortedInputs = DisplayedNode.Inputs.OrderBy(i => getXSortValue(i, LinkType.Input)).ToList();
-				int x = Convert.ToInt32((float)Width / (sortedInputs.Count()) * (sortedInputs.IndexOf(item) + 0.5f));
-				int y = Height;
-				return new Point(x, y - iconBorder);
+				x += tabPadding;
+				tab.X = x;
+				tab.Y = -tab.Height / 2;
+				x += tab.Width;
+
+				tab.FillColour = chooseIconColour(tab.Item, tab.Type);
+				tab.Text = getIconString(tab.Item, tab.Type);
 			}
-			else
+			x = (Width - GetInputIconWidths()) / 2;
+			foreach (ItemTab tab in inputTabOrder)
 			{
-				return new Point();
+				x += tabPadding;
+				tab.X = x;
+				tab.Y = Height - tab.Height / 2;
+				x += tab.Width;
+
+				tab.FillColour = chooseIconColour(tab.Item, tab.Type);
+				tab.Text = getIconString(tab.Item, tab.Type);
 			}
 		}
 
-		public Point GetOutputLineConnectionPoint(Item item)
-		{
-			Rectangle iconRect = GetIconBounds(item, LinkType.Output);
-			return new Point(X + iconRect.X + iconRect.Width / 2, Y + iconRect.Y);
-		}
-
-		public Point GetInputLineConnectionPoint(Item item)
-		{
-			Rectangle iconRect = GetIconBounds(item, LinkType.Input);
-			return new Point(X + iconRect.X + iconRect.Width / 2, Y + iconRect.Y + iconRect.Height);
-		}
-
-		//Used to sort items in the input/output lists
-		public int getXSortValue(Item item, LinkType linkType)
+		public int GetItemTabXHeuristic(ItemTab tab)
 		{
 			int total = 0;
-			if (linkType == LinkType.Input)
+			if (tab.Type == LinkType.Input)
 			{
-				foreach (NodeLink link in DisplayedNode.InputLinks.Where(l => l.Item == item))
+				foreach (NodeLink link in DisplayedNode.InputLinks.Where(l => l.Item == tab.Item))
 				{
 					total += Parent.GetElementForNode(link.Supplier).X;
 				}
 			}
 			else
 			{
-				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(l => l.Item == item))
+				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(l => l.Item == tab.Item))
 				{
 					total += Parent.GetElementForNode(link.Consumer).X;
 				}
@@ -179,6 +155,38 @@ namespace Foreman
 			return total;
 		}
 
+		public Point GetOutputLineConnectionPoint(Item item)
+		{
+			ItemTab tab = outputTabOrder.First(it => it.Item == item);
+			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y);
+		}
+
+		public Point GetInputLineConnectionPoint(Item item)
+		{
+			ItemTab tab = inputTabOrder.First(it => it.Item == item);
+			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y + tab.Height);
+		}
+
+		//private Point GetAssemblerBoxSize(Graphics graphics)
+		//{
+		//    Point size = new Point();
+
+		//    if (DisplayedNode is RecipeNode)
+		//    {
+		//        var assemblers = (DisplayedNode as RecipeNode).GetMinimumAssemblers(OptimisationGoal.Count);
+
+		//        size.X = assemblers.Count * (assemblerSize + assemblerBorderX) + assemblerBorderX;
+		//        size.Y = assemblerBorderY * 2 + assemblerSize;
+
+		//        foreach (Assembler assembler in assemblers)
+		//        {
+		//            size.X += graphics.MeasureString("*", 
+		//        }
+		//    }
+
+		//    return size;
+		//}
+		
 		public override void Paint(Graphics graphics)
 		{
 			using (SolidBrush brush = new SolidBrush(backgroundColour))
@@ -208,18 +216,19 @@ namespace Foreman
 				}
 			}
 
-			foreach (Item item in DisplayedNode.Outputs)
+			if (DisplayedNode is RecipeNode)
 			{
-				DrawItemIcon(item, GetOutputIconPoint(item), LinkType.Output, getIconString(item, LinkType.Output), graphics, chooseIconColour(item, LinkType.Output));
-			}
-			foreach (Item item in DisplayedNode.Inputs)
-			{
-				DrawItemIcon(item, GetInputIconPoint(item), LinkType.Input, getIconString(item, LinkType.Input), graphics, chooseIconColour(item, LinkType.Input));
-			}
+				//var assemblers = (DisplayedNode as RecipeNode).GetMinimumAssemblers(OptimisationGoal.Count);
+				//Point assemblerBoxSize = GetAssemblerBoxSize();
+				//int x = (Width - assemblerBoxSize.X) / 2 + assemblerBorderX;
+				//int y = (Height - assemblerSize) / 2;
 
-			StringFormat centreFormat = new StringFormat();
-			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-			graphics.DrawString(nameText, new Font(FontFamily.GenericSansSerif, 8), new SolidBrush(Color.Black), new PointF(Width / 2, Height / 2), centreFormat);
+				//foreach (Assembler assembler in assemblers.Keys)
+				//{
+				//    graphics.DrawImage(assembler.Icon, x, y, assemblerSize, assemblerSize);
+				//    x += assemblerSize + assemblerBorderX;
+				//}
+			}
 
 			if (editorBox != null)
 			{
@@ -229,6 +238,8 @@ namespace Foreman
 				ttinfo.ScreenSize = new Point(editorBox.Size);
 				Parent.AddTooltip(ttinfo);
 			}
+
+			base.Paint(graphics);
 		}
 
 		private String getIconString(Item item, LinkType linkType)
@@ -293,80 +304,37 @@ namespace Foreman
 			}
 		}
 
-		private void DrawItemIcon(Item item, Point drawPoint, LinkType linkType, String rateText, Graphics graphics, Color fillColour)
-		{
-			int textHeight = iconTextHeight;
-			if (linkType == LinkType.Input && DisplayedNode.GetUnsatisfiedDemand(item) > 0)
-			{
-				textHeight = iconTextHeight2Line;
-			}
-
-			StringFormat centreFormat = new StringFormat();
-			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-
-			Rectangle iconBounds = GetIconBounds(item, linkType);
-
-			using (Pen borderPen = new Pen(Color.Gray, 3))
-			using (Brush fillBrush = new SolidBrush(fillColour))
-			using (Brush textBrush = new SolidBrush(Color.Black))
-			{
-				if (linkType == LinkType.Output)
-				{
-					GraphicsStuff.FillRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, fillBrush);
-					GraphicsStuff.DrawRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(iconBounds.X + iconBounds.Width / 2, iconBounds.Y + (textHeight + iconBorder) / 2), centreFormat);
-				}
-				else
-				{
-					GraphicsStuff.FillRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, fillBrush);
-					GraphicsStuff.DrawRoundRect(iconBounds.X, iconBounds.Y, iconBounds.Width, iconBounds.Height, iconBorder, graphics, borderPen);
-					graphics.DrawString(rateText, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(iconBounds.X + iconBounds.Width / 2, iconBounds.Y + iconBounds.Height - (textHeight + iconBorder) / 2), centreFormat);
-				}
-			}
-			graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, drawPoint.X - iconSize / 2, drawPoint.Y - iconSize / 2, iconSize, iconSize);
-		}
-
 		public override void MouseUp(Point location, MouseButtons button)
 		{
-			Item clickedItem = null;
-			LinkType clickedLinkType = LinkType.Input;
-			foreach (Item item in DisplayedNode.Inputs)
+			ItemTab clickedTab = null;
+			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
 			{
-				if (GetIconBounds(item, LinkType.Input).Contains(location))
+				if (tab.bounds.Contains(location))
 				{
-					clickedItem = item;
-					clickedLinkType = LinkType.Input;
-				}
-			}
-			foreach (Item item in DisplayedNode.Outputs)
-			{
-				if (GetIconBounds(item, LinkType.Output).Contains(location))
-				{
-					clickedItem = item;
-					clickedLinkType = LinkType.Output;
+					clickedTab = tab;
 				}
 			}
 
 			if (button == MouseButtons.Left)
 			{
-				if (clickedItem != null && clickedLinkType == LinkType.Input && DisplayedNode is ConsumerNode)
+				if (clickedTab != null && clickedTab.Type == LinkType.Input && DisplayedNode is ConsumerNode)
 				{
-					beginEditingInputAmount(clickedItem);
+					beginEditingInputAmount(clickedTab.Item);
 				}
 			}
 			else if (button == MouseButtons.Right)
 			{
 				ContextMenu rightClickMenu = new ContextMenu();
-				if (clickedItem != null)
+				if (clickedTab != null)
 				{
-					if (clickedLinkType == LinkType.Input)
+					if (clickedTab.Type == LinkType.Input)
 					{
-						if (DisplayedNode.GetUnsatisfiedDemand(clickedItem) > 0)
+						if (DisplayedNode.GetUnsatisfiedDemand(clickedTab.Item) > 0)
 						{
 							rightClickMenu.MenuItems.Add(new MenuItem("Automatically choose/create a node to produce this item",
 								new EventHandler((o, e) =>
 								{
-									DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedItem);
+									DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedTab.Item);
 									Parent.UpdateElements();
 									Parent.Invalidate();
 								})));
@@ -374,17 +342,17 @@ namespace Foreman
 							rightClickMenu.MenuItems.Add(new MenuItem("Manually create a node to produce this item",
 								new EventHandler((o, e) =>
 									{
-										RecipeChooserForm form = new RecipeChooserForm(clickedItem.Recipes, new List<Item>{clickedItem});
+										RecipeChooserForm form = new RecipeChooserForm(clickedTab.Item.Recipes, new List<Item>{clickedTab.Item});
 										var result = form.ShowDialog();
 										if (result == DialogResult.OK)
 										{
 											if (form.selectedRecipe != null)
 											{
-												DisplayedNode.Graph.CreateRecipeNodeToSatisfyItemDemand(DisplayedNode, clickedItem, form.selectedRecipe);
+												DisplayedNode.Graph.CreateRecipeNodeToSatisfyItemDemand(DisplayedNode, clickedTab.Item, form.selectedRecipe);
 											}
 											else
 											{
-												DisplayedNode.Graph.CreateSupplyNodeToSatisfyItemDemand(DisplayedNode, clickedItem);
+												DisplayedNode.Graph.CreateSupplyNodeToSatisfyItemDemand(DisplayedNode, clickedTab.Item);
 											}
 											Parent.UpdateElements();
 											Parent.Invalidate();
@@ -470,30 +438,35 @@ namespace Foreman
 		{
 			if (editorBox == null)
 			{
-				TooltipInfo tti = new TooltipInfo();
-
-				foreach (Item item in DisplayedNode.Inputs)
+				ItemTab mousedTab = null;
+				foreach (ItemTab tab in SubElements.OfType<ItemTab>())
 				{
-					if (GetIconBounds(item, LinkType.Input).Contains(location))
+					if (tab.bounds.Contains(location))
 					{
-						tti.Text = item.FriendlyName;
+						mousedTab = tab;
+					}
+				}
+
+				TooltipInfo tti = new TooltipInfo();
+				if (mousedTab != null)
+				{
+					tti.Text = mousedTab.Item.FriendlyName;
+					if (mousedTab.Type == LinkType.Input)
+					{
 						if (DisplayedNode is ConsumerNode)
 						{
 							tti.Text += "\nClick to edit desired amount";
 						}
 						tti.Text += "\nDrag to create a new connection";
 						tti.Direction = Direction.Up;
-						tti.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(item));
+						tti.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(mousedTab.Item));
 					}
-				}
-				foreach (Item item in DisplayedNode.Outputs)
-				{
-					if (GetIconBounds(item, LinkType.Output).Contains(location))
+					else
 					{
-						tti.Text = item.FriendlyName;
+						tti.Text = mousedTab.Item.FriendlyName;
 						tti.Text += "\nDrag to create a new connection";
-						tti.Direction = Direction.Up;
-						tti.ScreenLocation = Parent.GraphToScreen(GetOutputLineConnectionPoint(item));
+						tti.Direction = Direction.Down;
+						tti.ScreenLocation = Parent.GraphToScreen(GetOutputLineConnectionPoint(mousedTab.Item));
 					}
 				}
 
@@ -507,18 +480,9 @@ namespace Foreman
 			{
 				return true;
 			}
-			foreach (Item item in DisplayedNode.Inputs)
+			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
 			{
-				Rectangle iconBounds = GetIconBounds(item, LinkType.Input);
-				if (iconBounds.Contains(point.X, point.Y))
-				{
-					return true;
-				}
-			}
-			foreach (Item item in DisplayedNode.Outputs)
-			{
-				Rectangle iconBounds = GetIconBounds(item, LinkType.Output);
-				if (iconBounds.Contains(point.X, point.Y))
+				if (tab.bounds.Contains(point))
 				{
 					return true;
 				}
@@ -540,23 +504,29 @@ namespace Foreman
 		{
 			X += location.X - DragOffsetX;
 			Y += location.Y - DragOffsetY;
-			foreach (Item item in DisplayedNode.Inputs)
+
+			ItemTab draggedTab = null;
+
+			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
 			{
-				if (GetIconBounds(item, LinkType.Input).Contains(new Point(DragOffsetX, DragOffsetY)))
+				if (tab.bounds.Contains(new Point(DragOffsetX, DragOffsetY)))
 				{
-					DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Input, item);
-					newLink.ConsumerElement = this;
-					Parent.DraggedElement = newLink;
+					draggedTab = tab;
 				}
 			}
-			foreach (Item item in DisplayedNode.Outputs)
+
+			if (draggedTab != null)
 			{
-				if (GetIconBounds(item, LinkType.Output).Contains(new Point(DragOffsetX, DragOffsetY)))
+				DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, draggedTab.Type, draggedTab.Item);
+				if (draggedTab.Type == LinkType.Input)
 				{
-					DraggedLinkElement newLink = new DraggedLinkElement(Parent, this, LinkType.Output, item);
-					newLink.SupplierElement = this;
-					Parent.DraggedElement = newLink;
+					newLink.ConsumerElement = this;
 				}
+				else
+				{
+					newLink.SupplierElement = this;
+				}
+				Parent.DraggedElement = newLink;
 			}
 		}
 	}
