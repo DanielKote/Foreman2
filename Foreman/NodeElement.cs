@@ -328,49 +328,11 @@ namespace Foreman
 			else if (button == MouseButtons.Right)
 			{
 				ContextMenu rightClickMenu = new ContextMenu();
-				if (clickedTab != null)
-				{
-					if (clickedTab.Type == LinkType.Input)
-					{
-						if (DisplayedNode.GetUnsatisfiedDemand(clickedTab.Item) > 0)
-						{
-							rightClickMenu.MenuItems.Add(new MenuItem("Automatically choose/create a node to produce this item",
-								new EventHandler((o, e) =>
-								{
-									DisplayedNode.Graph.AutoSatisfyNodeDemand(DisplayedNode, clickedTab.Item);
-									Parent.UpdateNodes();
-									Parent.Invalidate();
-								})));
-
-							rightClickMenu.MenuItems.Add(new MenuItem("Manually create a node to produce this item",
-								new EventHandler((o, e) =>
-									{
-										RecipeChooserForm form = new RecipeChooserForm(clickedTab.Item.Recipes, new List<Item>{clickedTab.Item});
-										var result = form.ShowDialog();
-										if (result == DialogResult.OK)
-										{
-											if (form.selectedRecipe != null)
-											{
-												DisplayedNode.Graph.CreateRecipeNodeToSatisfyItemDemand(DisplayedNode, clickedTab.Item, form.selectedRecipe);
-											}
-											else
-											{
-												DisplayedNode.Graph.CreateSupplyNodeToSatisfyItemDemand(DisplayedNode, clickedTab.Item);
-											}
-											Parent.UpdateNodes();
-											Parent.Invalidate();
-										}
-									})));
-							}
-					}
-				}
-
 				rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
 					new EventHandler((o, e) =>
 						{
 							Parent.DeleteNode(this);
 						})));
-
 				rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
 			}
 		}
