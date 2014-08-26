@@ -83,6 +83,10 @@ namespace Foreman
 			LoadItemNames("fluids.cfg", "[fluid-name]");
 			LoadItemNames("entity-names.cfg", "[entity-name]");
 			LoadItemNames("equipment-names.cfg", "[equipment-name]");
+
+			LoadRecipeNames();
+
+			LoadAssemblerNames();
 		}
 
 		private static void InterpretItems(Lua lua, String typeName)
@@ -179,6 +183,50 @@ namespace Foreman
 										else
 										{
 											KnownRecipeNames.Add(split[0], split[1]);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private static void LoadAssemblerNames(String locale = "en")
+		{
+			foreach (String dir in Directory.GetDirectories(factorioPath))
+			{
+				String fullFilePath = Path.Combine(dir, "locale", locale, "entity-names.cfg");
+				if (File.Exists(fullFilePath))
+				{
+					using (StreamReader fStream = new StreamReader(fullFilePath))
+					{
+						bool inEntityNamesSection = false;
+						while (!fStream.EndOfStream)
+						{
+							String line = fStream.ReadLine();
+							if (line.StartsWith("[") && line.EndsWith("]"))
+							{
+								if (line == "[entity-name]")
+								{
+									inEntityNamesSection = true;
+								}
+								else
+								{
+									inEntityNamesSection = false;
+								}
+							}
+							else
+							{
+								if (inEntityNamesSection)
+								{
+									String[] split = line.Split('=');
+									if (split.Count() == 2)
+									{
+										if (Assemblers.ContainsKey(split[0]))
+										{
+											Assemblers[split[0]].FriendlyName = split[1];
 										}
 									}
 								}
