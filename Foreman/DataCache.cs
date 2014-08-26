@@ -76,6 +76,12 @@ namespace Foreman
 			{
 				InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
 			}
+			LuaTable furnaceTable = lua.GetTable("data.raw")["furnace"] as LuaTable;
+			var furnaceEnumerator = furnaceTable.GetEnumerator();
+			while (furnaceEnumerator.MoveNext())
+			{
+				InterpretFurnace(furnaceEnumerator.Key as String, furnaceEnumerator.Value as LuaTable);
+			}
 
 			UnknownIcon = LoadImage("UnknownIcon.png");
 
@@ -370,6 +376,23 @@ namespace Foreman
 			}
 
 			Assemblers.Add(newAssembler.Name, newAssembler);
+		}
+
+		private static void InterpretFurnace(String name, LuaTable values)
+		{
+			Assembler newFurnace = new Assembler(name);
+
+			newFurnace.Icon = LoadImage(values["icon"] as String);
+			newFurnace.MaxIngredients = 1;
+			newFurnace.ModuleSlots = Convert.ToInt32(values["module_slots"]);
+			newFurnace.Speed = Convert.ToSingle(values["smelting_speed"]) - 1f;
+
+			foreach (String category in (values["smelting_categories"] as LuaTable).Values)
+			{
+				newFurnace.Categories.Add(category);
+			}
+
+			Assemblers.Add(newFurnace.Name, newFurnace);
 		}
 
 		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
