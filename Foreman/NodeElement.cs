@@ -37,6 +37,8 @@ namespace Foreman
 		private AssemblerBox assemblerBox;
 		private List<ItemTab> inputTabs = new List<ItemTab>();
 		private List<ItemTab> outputTabs = new List<ItemTab>();
+
+		private ContextMenu rightClickMenu = new ContextMenu();
 		
 		public ProductionNode DisplayedNode { get; private set; }
 
@@ -200,8 +202,8 @@ namespace Foreman
 			}
 
 			using (Font font = new Font(FontFamily.GenericSansSerif, 10))
+			using (StringFormat centreFormat = new StringFormat())
 			{
-				StringFormat centreFormat = new StringFormat();
 				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 				if (DisplayedNode is SupplyNode)
 				{
@@ -330,7 +332,7 @@ namespace Foreman
 			}
 			else if (button == MouseButtons.Right)
 			{
-				ContextMenu rightClickMenu = new ContextMenu();
+				rightClickMenu.MenuItems.Clear();
 				rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
 					new EventHandler((o, e) =>
 						{
@@ -541,6 +543,20 @@ namespace Foreman
 					Parent.GetElementForNode(node).UpdateTabOrder();
 				}
 			}
+		}
+
+		public override void Dispose()
+		{
+			if (assemblerBox != null)
+			{
+				assemblerBox.Dispose();
+			}
+			rightClickMenu.Dispose();
+			if (editorBox != null)
+			{
+				editorBox.Dispose();
+			}
+			base.Dispose();
 		}
 	}
 }

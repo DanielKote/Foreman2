@@ -126,17 +126,6 @@ namespace Foreman
 			}
 		}
 
-		private void RemoveUnusedButton_Click(object sender, EventArgs e)
-		{
-			foreach (ProductionNode node in GraphViewer.Graph.GetTopologicalSort().Reverse<ProductionNode>())
-			{
-				if (node.Outputs.All(i => node.GetUsedOutput(i) == 0))
-				{
-					GraphViewer.DeleteNode(GraphViewer.GetElementForNode(node));
-				}
-			}
-		}
-
 		private void AssemblerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;

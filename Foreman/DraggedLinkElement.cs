@@ -113,32 +113,36 @@ namespace Foreman
 			}
 			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
 			{
-				var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)), new List<Item>());
-				var result = form.ShowDialog();
-				if (result == DialogResult.OK)
+				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)), new List<Item>()))
 				{
-					NodeElement newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
-					newElement.Location = Point.Add(location, new Size(newElement.Width / 2, newElement.Height / 2));
-					new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
+					var result = form.ShowDialog();
+					if (result == DialogResult.OK)
+					{
+						NodeElement newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+						newElement.Location = Point.Add(location, new Size(newElement.Width / 2, newElement.Height / 2));
+						new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
+					}
 				}
 			}
 			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
 			{
-				var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)), new List<Item> { Item });
-				var result = form.ShowDialog();
-				if (result == DialogResult.OK)
+				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)), new List<Item> { Item }))
 				{
-					NodeElement newElement = null;
-					if (form.selectedRecipe != null)
+					var result = form.ShowDialog();
+					if (result == DialogResult.OK)
 					{
-						newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+						NodeElement newElement = null;
+						if (form.selectedRecipe != null)
+						{
+							newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+						}
+						else if (form.selectedItem != null)
+						{
+							newElement = new NodeElement(SupplyNode.Create(form.selectedItem, Parent.Graph), Parent);
+						}
+						newElement.Location = location;
+						new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
 					}
-					else if (form.selectedItem != null)
-					{
-						newElement = new NodeElement(SupplyNode.Create(form.selectedItem, Parent.Graph), Parent);
-					}
-					newElement.Location = location;
-					new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
 				}
 			}
 

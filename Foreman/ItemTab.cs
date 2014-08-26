@@ -23,10 +23,11 @@ namespace Foreman
 			set
 			{
 				text = value;
-				textHeight = (int)Parent.CreateGraphics().MeasureString(value, new Font(FontFamily.GenericSansSerif, 7)).Height;
+				textHeight = (int)Parent.CreateGraphics().MeasureString(value, font).Height;
 			}
 		}
 
+		public Font font = new Font(FontFamily.GenericSansSerif, 7);
 		public Item Item { get; private set; }
 
 		public ItemTab(Item item, LinkType type, ProductionGraphViewer parent)
@@ -59,27 +60,34 @@ namespace Foreman
 				iconPoint = new Point((int)(border * 1.5), (int)(border * 1.5));
 			}
 
-			StringFormat centreFormat = new StringFormat();
-			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 			
+			using (StringFormat centreFormat = new StringFormat())
 			using (Pen borderPen = new Pen(Color.Gray, 3))
 			using (Brush fillBrush = new SolidBrush(FillColour))
 			using (Brush textBrush = new SolidBrush(Color.Black))
 			{
+				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
+
 				if (Type == LinkType.Output)
 				{
 					GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
 					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
-					graphics.DrawString(Text, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(Width / 2, (textHeight + border) / 2), centreFormat);
+					graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, (textHeight + border) / 2), centreFormat);
 				}
 				else
 				{
 					GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
 					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
-					graphics.DrawString(Text, new Font(FontFamily.GenericSansSerif, 7), textBrush, new PointF(Width / 2, Height - (textHeight + border) / 2), centreFormat);
+					graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, Height - (textHeight + border) / 2), centreFormat);
 				}
 			}
 			graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
+		}
+
+		public override void Dispose()
+		{
+			font.Dispose();
+			base.Dispose();
 		}
 	}
 }

@@ -9,7 +9,6 @@ namespace Foreman
 	public class AssemblerBox : GraphElement
 	{
 		public Dictionary<Assembler, int> AssemblerList;
-		int padding = 4;
 
 		public AssemblerBox(ProductionGraphViewer parent)
 			: base(parent)
@@ -77,16 +76,18 @@ namespace Foreman
 
 		public override void Paint(Graphics graphics)
 		{
-			StringFormat centreFormat = new StringFormat();
-			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-
-			using (Font font = new Font(FontFamily.GenericSansSerif,  Math.Min(Height / 2, maxFontSize)))
+			using (StringFormat centreFormat = new StringFormat())
 			{
-				float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
-				int iconSize = (int)Math.Min(Width - StringWidth, Height);
+				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 
-				graphics.DrawImage(DisplayedAssembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
-				graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
+				using (Font font = new Font(FontFamily.GenericSansSerif, Math.Min(Height / 2, maxFontSize)))
+				{
+					float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
+					int iconSize = (int)Math.Min(Width - StringWidth, Height);
+
+					graphics.DrawImage(DisplayedAssembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
+					graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
+				}
 			}
 		}
 	}

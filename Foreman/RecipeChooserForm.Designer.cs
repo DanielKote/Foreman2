@@ -61,7 +61,7 @@
 			this.Name = "RecipeChooserForm";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "RecipeChooserForm";
+			this.Text = "Choose a node to create";
 			this.Load += new System.EventHandler(this.RecipeChooserForm_Load);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RecipeChooserForm_KeyDown);
 			this.MouseLeave += new System.EventHandler(this.RecipeChooserForm_MouseLeave);

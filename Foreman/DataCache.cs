@@ -20,79 +20,80 @@ namespace Foreman
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
 		public static Dictionary<String, String> KnownRecipeNames = new Dictionary<string, string>();
-		
+
 		public static void LoadRecipes()
 		{
-			Lua lua = new Lua();
-			
-			List<String> luaFiles = Directory.GetFiles(factorioPath, "*.lua", SearchOption.AllDirectories).ToList();
-			List<String> luaDirs = Directory.GetDirectories(factorioPath, "*", SearchOption.AllDirectories).ToList();
-
-			//Add all these files to the Lua path variable
-			foreach (String d in luaDirs)
+			using (Lua lua = new Lua())
 			{
-				lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", d.Replace("\\", "\\\\")));
-			}
+				List<String> luaFiles = Directory.GetFiles(factorioPath, "*.lua", SearchOption.AllDirectories).ToList();
+				List<String> luaDirs = Directory.GetDirectories(factorioPath, "*", SearchOption.AllDirectories).ToList();
 
-			String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
-			String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
-			String datafile = luaFiles.Find(f => f.EndsWith("data.lua"));
-
-			List<String> itemFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "item")).ToList();
-			itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "fluid")).ToList());
-			itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "equipment")).ToList());
-			List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
-			List<String> entityFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "entity")).ToList();
-
-			lua.DoFile(dataloaderFile);
-			lua.DoFile(autoplaceFile);
-			foreach (String f in itemFiles.Union(recipeFiles).Union(entityFiles))
-			{
-				try
+				//Add all these files to the Lua path variable
+				foreach (String d in luaDirs)
 				{
-					lua.DoFile(f);
+					lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", d.Replace("\\", "\\\\")));
 				}
-				catch (NLua.Exceptions.LuaScriptException e)
+
+				String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
+				String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
+				String datafile = luaFiles.Find(f => f.EndsWith("data.lua"));
+
+				List<String> itemFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "item")).ToList();
+				itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "fluid")).ToList());
+				itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "equipment")).ToList());
+				List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
+				List<String> entityFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "entity")).ToList();
+
+				lua.DoFile(dataloaderFile);
+				lua.DoFile(autoplaceFile);
+				foreach (String f in itemFiles.Union(recipeFiles).Union(entityFiles))
 				{
+					try
+					{
+						lua.DoFile(f);
+					}
+					catch (NLua.Exceptions.LuaScriptException e)
+					{
 
+					}
 				}
+
+				foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item" })
+				{
+					InterpretItems(lua, type);
+				}
+
+				LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
+				var recipeEnumerator = recipeTable.GetEnumerator();
+				while (recipeEnumerator.MoveNext())
+				{
+					InterpretLuaRecipe(recipeEnumerator.Key as String, recipeEnumerator.Value as LuaTable);
+				}
+
+				LuaTable assemblerTable = lua.GetTable("data.raw")["assembling-machine"] as LuaTable;
+				var assemblerEnumerator = assemblerTable.GetEnumerator();
+				while (assemblerEnumerator.MoveNext())
+				{
+					InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
+				}
+				LuaTable furnaceTable = lua.GetTable("data.raw")["furnace"] as LuaTable;
+				var furnaceEnumerator = furnaceTable.GetEnumerator();
+				while (furnaceEnumerator.MoveNext())
+				{
+					InterpretFurnace(furnaceEnumerator.Key as String, furnaceEnumerator.Value as LuaTable);
+				}
+
+				UnknownIcon = LoadImage("UnknownIcon.png");
+
+				LoadItemNames("item-names.cfg", "[item-name]");
+				LoadItemNames("fluids.cfg", "[fluid-name]");
+				LoadItemNames("entity-names.cfg", "[entity-name]");
+				LoadItemNames("equipment-names.cfg", "[equipment-name]");
+
+				LoadRecipeNames();
+
+				LoadAssemblerNames();
 			}
-
-			foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item" })
-			{
-				InterpretItems(lua, type);
-			}
-			
-			LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
-			var recipeEnumerator = recipeTable.GetEnumerator();
-			while (recipeEnumerator.MoveNext())
-			{
-				InterpretLuaRecipe(recipeEnumerator.Key as String, recipeEnumerator.Value as LuaTable);
-			}
-
-			LuaTable assemblerTable = lua.GetTable("data.raw")["assembling-machine"] as LuaTable;
-			var assemblerEnumerator = assemblerTable.GetEnumerator();
-			while (assemblerEnumerator.MoveNext())
-			{
-				InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
-			}
-			LuaTable furnaceTable = lua.GetTable("data.raw")["furnace"] as LuaTable;
-			var furnaceEnumerator = furnaceTable.GetEnumerator();
-			while (furnaceEnumerator.MoveNext())
-			{
-				InterpretFurnace(furnaceEnumerator.Key as String, furnaceEnumerator.Value as LuaTable);
-			}
-
-			UnknownIcon = LoadImage("UnknownIcon.png");
-
-			LoadItemNames("item-names.cfg", "[item-name]");
-			LoadItemNames("fluids.cfg", "[fluid-name]");
-			LoadItemNames("entity-names.cfg", "[entity-name]");
-			LoadItemNames("equipment-names.cfg", "[equipment-name]");
-
-			LoadRecipeNames();
-
-			LoadAssemblerNames();
 		}
 
 		private static void InterpretItems(Lua lua, String typeName)
@@ -287,14 +288,13 @@ namespace Foreman
 			}
 			else
 			{
-				Bitmap pixel = new Bitmap(1, 1);
-
+				using (Bitmap pixel = new Bitmap(1, 1))
 				using (Graphics g = Graphics.FromImage(pixel))
 				{
 					g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 					g.DrawImage(icon, new Rectangle(0, 0, 1, 1)); //Scale the icon down to a 1-pixel image, which does the averaging for us
+					result = pixel.GetPixel(0, 0);
 				}
-				result = pixel.GetPixel(0, 0);
 				result = Color.FromArgb(255, result.R + (255 - result.R) / 2, result.G + (255 - result.G) / 2, result.B + (255 - result.B) / 2);
 				colourCache.Add(icon, result);
 			}

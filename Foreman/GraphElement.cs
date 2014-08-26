@@ -53,7 +53,7 @@ namespace Foreman
 		public virtual void MouseDown(Point location, MouseButtons button) { }
 		public virtual void MouseUp(Point location, MouseButtons button) { }
 		public virtual void Dragged(Point location) { }
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			Parent.Elements.Remove(this);
 			Parent.Invalidate();
