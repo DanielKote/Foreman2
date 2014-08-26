@@ -47,18 +47,25 @@ namespace Foreman
 		public bool ShowAssemblers = false;
 		StringFormat stringFormat = new StringFormat();
 
-		private Rectangle graphBounds
+		public Rectangle graphBounds
 		{
 			get
 			{
+				int x = int.MaxValue;
+				int y = int.MaxValue;
+				foreach (NodeElement element in Elements.OfType<NodeElement>())
+				{
+					x = Math.Min(element.X, x);
+					y = Math.Min(element.Y, y);
+				}
 				int width = 0;
 				int height = 0;
 				foreach (NodeElement element in Elements.OfType<NodeElement>())
 				{
-					height = Math.Max(element.Y + element.Height, height);
-					width = Math.Max(element.X + element.Width, width);
+					height = Math.Max(element.Y + element.Height - y, height);
+					width = Math.Max(element.X + element.Width - x, width);
 				}
-				return new Rectangle(0, 0, width + 20, height + 20);
+				return new Rectangle(x - 80, y - 80, width + 160, height + 160);
 			}
 		}
 		
@@ -230,26 +237,31 @@ namespace Foreman
 			e.Graphics.Clear(this.BackColor);
 			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 			e.Graphics.ScaleTransform(ViewScale, ViewScale);
-			
+
+			Paint(e.Graphics);
+		}
+
+		public new void Paint(Graphics graphics)
+		{
 			foreach (GraphElement element in GetPaintingOrder())
 			{
-				e.Graphics.TranslateTransform(element.X, element.Y);
-				element.Paint(e.Graphics);
-				e.Graphics.TranslateTransform(-element.X, -element.Y);
+				graphics.TranslateTransform(element.X, element.Y);
+				element.Paint(graphics);
+				graphics.TranslateTransform(-element.X, -element.Y);
 			}
-			
-			e.Graphics.ResetTransform();
+
+			graphics.ResetTransform();
 			while (toolTipsToDraw.Any())
 			{
 				var tt = toolTipsToDraw.Dequeue();
 
 				if (tt.Text != null)
 				{
-					DrawTooltip(tt.ScreenLocation, tt.Text, tt.Direction, e.Graphics);
+					DrawTooltip(tt.ScreenLocation, tt.Text, tt.Direction, graphics);
 				}
 				else
 				{
-					DrawTooltip(tt.ScreenLocation, tt.ScreenSize, tt.Direction, e.Graphics);
+					DrawTooltip(tt.ScreenLocation, tt.ScreenSize, tt.Direction, graphics);
 				}
 			}
 		}

@@ -32,15 +32,16 @@
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.AddItemButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.rateOptionsDropDown = new System.Windows.Forms.ComboBox();
+			this.rateButton = new System.Windows.Forms.RadioButton();
 			this.fixedAmountButton = new System.Windows.Forms.RadioButton();
 			this.AutomaticCompleteButton = new System.Windows.Forms.Button();
 			this.ClearButton = new System.Windows.Forms.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.rateOptionsDropDown = new System.Windows.Forms.ComboBox();
-			this.rateButton = new System.Windows.Forms.RadioButton();
+			this.SingleAssemblerPerRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
-			this.SingleAssemblerPerRecipeCheckBox = new System.Windows.Forms.CheckBox();
+			this.ExportImageButton = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -52,10 +53,10 @@
 			this.ItemListBox.Dock = System.Windows.Forms.DockStyle.Right;
 			this.ItemListBox.FormattingEnabled = true;
 			this.ItemListBox.IntegralHeight = false;
-			this.ItemListBox.Location = new System.Drawing.Point(3, 238);
+			this.ItemListBox.Location = new System.Drawing.Point(3, 269);
 			this.ItemListBox.Name = "ItemListBox";
 			this.ItemListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.ItemListBox.Size = new System.Drawing.Size(194, 419);
+			this.ItemListBox.Size = new System.Drawing.Size(194, 388);
 			this.ItemListBox.TabIndex = 0;
 			this.ItemListBox.SelectedIndexChanged += new System.EventHandler(this.ItemListBox_SelectedIndexChanged);
 			// 
@@ -66,16 +67,18 @@
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel1.Controls.Add(this.GraphViewer, 2, 0);
-			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 5);
+			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 6);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 4);
+			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 5);
 			this.tableLayoutPanel1.Controls.Add(this.AutomaticCompleteButton, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.ClearButton, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox2, 0, 3);
+			this.tableLayoutPanel1.Controls.Add(this.ExportImageButton, 0, 4);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 6;
+			this.tableLayoutPanel1.RowCount = 7;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -111,6 +114,31 @@
 			this.groupBox1.TabIndex = 4;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Show production amounts as...";
+			// 
+			// rateOptionsDropDown
+			// 
+			this.rateOptionsDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.rateOptionsDropDown.Enabled = false;
+			this.rateOptionsDropDown.FormattingEnabled = true;
+			this.rateOptionsDropDown.Items.AddRange(new object[] {
+            "per Second",
+            "per Minute"});
+			this.rateOptionsDropDown.Location = new System.Drawing.Point(63, 42);
+			this.rateOptionsDropDown.Name = "rateOptionsDropDown";
+			this.rateOptionsDropDown.Size = new System.Drawing.Size(119, 21);
+			this.rateOptionsDropDown.TabIndex = 2;
+			this.rateOptionsDropDown.SelectedIndexChanged += new System.EventHandler(this.rateOptionsDropDown_SelectedIndexChanged);
+			// 
+			// rateButton
+			// 
+			this.rateButton.AutoSize = true;
+			this.rateButton.Location = new System.Drawing.Point(9, 42);
+			this.rateButton.Name = "rateButton";
+			this.rateButton.Size = new System.Drawing.Size(48, 17);
+			this.rateButton.TabIndex = 1;
+			this.rateButton.Text = "Rate";
+			this.rateButton.UseVisualStyleBackColor = true;
+			this.rateButton.CheckedChanged += new System.EventHandler(this.rateButton_CheckedChanged);
 			// 
 			// fixedAmountButton
 			// 
@@ -163,30 +191,16 @@
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Assemblers";
 			// 
-			// rateOptionsDropDown
+			// SingleAssemblerPerRecipeCheckBox
 			// 
-			this.rateOptionsDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.rateOptionsDropDown.Enabled = false;
-			this.rateOptionsDropDown.FormattingEnabled = true;
-			this.rateOptionsDropDown.Items.AddRange(new object[] {
-            "per Second",
-            "per Minute"});
-			this.rateOptionsDropDown.Location = new System.Drawing.Point(63, 42);
-			this.rateOptionsDropDown.Name = "rateOptionsDropDown";
-			this.rateOptionsDropDown.Size = new System.Drawing.Size(119, 21);
-			this.rateOptionsDropDown.TabIndex = 2;
-			this.rateOptionsDropDown.SelectedIndexChanged += new System.EventHandler(this.rateOptionsDropDown_SelectedIndexChanged);
-			// 
-			// rateButton
-			// 
-			this.rateButton.AutoSize = true;
-			this.rateButton.Location = new System.Drawing.Point(9, 42);
-			this.rateButton.Name = "rateButton";
-			this.rateButton.Size = new System.Drawing.Size(48, 17);
-			this.rateButton.TabIndex = 1;
-			this.rateButton.Text = "Rate";
-			this.rateButton.UseVisualStyleBackColor = true;
-			this.rateButton.CheckedChanged += new System.EventHandler(this.rateButton_CheckedChanged);
+			this.SingleAssemblerPerRecipeCheckBox.AutoSize = true;
+			this.SingleAssemblerPerRecipeCheckBox.Location = new System.Drawing.Point(7, 43);
+			this.SingleAssemblerPerRecipeCheckBox.Name = "SingleAssemblerPerRecipeCheckBox";
+			this.SingleAssemblerPerRecipeCheckBox.Size = new System.Drawing.Size(169, 17);
+			this.SingleAssemblerPerRecipeCheckBox.TabIndex = 1;
+			this.SingleAssemblerPerRecipeCheckBox.Text = "One assembler type per recipe";
+			this.SingleAssemblerPerRecipeCheckBox.UseVisualStyleBackColor = true;
+			this.SingleAssemblerPerRecipeCheckBox.CheckedChanged += new System.EventHandler(this.SingleAssemblerPerRecipeCheckBox_CheckedChanged);
 			// 
 			// AssemblerDisplayCheckBox
 			// 
@@ -209,20 +223,21 @@
 			this.GraphViewer.DraggedElement = null;
 			this.GraphViewer.Location = new System.Drawing.Point(203, 3);
 			this.GraphViewer.Name = "GraphViewer";
-			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 6);
+			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 7);
 			this.GraphViewer.Size = new System.Drawing.Size(823, 684);
 			this.GraphViewer.TabIndex = 1;
 			// 
-			// SingleAssemblerPerRecipeCheckBox
+			// ExportImageButton
 			// 
-			this.SingleAssemblerPerRecipeCheckBox.AutoSize = true;
-			this.SingleAssemblerPerRecipeCheckBox.Location = new System.Drawing.Point(7, 43);
-			this.SingleAssemblerPerRecipeCheckBox.Name = "SingleAssemblerPerRecipeCheckBox";
-			this.SingleAssemblerPerRecipeCheckBox.Size = new System.Drawing.Size(169, 17);
-			this.SingleAssemblerPerRecipeCheckBox.TabIndex = 1;
-			this.SingleAssemblerPerRecipeCheckBox.Text = "One assembler type per recipe";
-			this.SingleAssemblerPerRecipeCheckBox.UseVisualStyleBackColor = true;
-			this.SingleAssemblerPerRecipeCheckBox.CheckedChanged += new System.EventHandler(this.SingleAssemblerPerRecipeCheckBox_CheckedChanged);
+			this.tableLayoutPanel1.SetColumnSpan(this.ExportImageButton, 2);
+			this.ExportImageButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ExportImageButton.Location = new System.Drawing.Point(3, 238);
+			this.ExportImageButton.Name = "ExportImageButton";
+			this.ExportImageButton.Size = new System.Drawing.Size(194, 25);
+			this.ExportImageButton.TabIndex = 8;
+			this.ExportImageButton.Text = "Export as Image";
+			this.ExportImageButton.UseVisualStyleBackColor = true;
+			this.ExportImageButton.Click += new System.EventHandler(this.ExportImageButton_Click);
 			// 
 			// MainForm
 			// 
@@ -261,6 +276,7 @@
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.CheckBox AssemblerDisplayCheckBox;
 		private System.Windows.Forms.CheckBox SingleAssemblerPerRecipeCheckBox;
+		private System.Windows.Forms.Button ExportImageButton;
 	}
 }
 

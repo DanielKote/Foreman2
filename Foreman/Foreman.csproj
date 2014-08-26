@@ -62,6 +62,12 @@
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
+    <Compile Include="ImageExportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageExportForm.Designer.cs">
+      <DependentUpon>ImageExportForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ItemTab.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -103,6 +109,9 @@
     <Compile Include="RecipeChooserSupplyNodeOption.Designer.cs">
       <DependentUpon>SupplyNodeChooserControl.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ImageExportForm.resx">
+      <DependentUpon>ImageExportForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

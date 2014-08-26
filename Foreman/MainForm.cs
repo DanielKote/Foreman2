@@ -137,5 +137,11 @@ namespace Foreman
 			GraphViewer.Graph.OneAssemblerPerRecipe = (sender as CheckBox).Checked;
 			GraphViewer.UpdateNodes();
 		}
+
+		private void ExportImageButton_Click(object sender, EventArgs e)
+		{
+			ImageExportForm form = new ImageExportForm(GraphViewer);			
+			form.Show();
+		}
 	}
 }
