@@ -12,12 +12,15 @@ namespace Foreman
 	public partial class ItemChooserControl : UserControl
 	{
 		public Item DisplayedItem;
+		public String text;
 
-		public ItemChooserControl(Item item)
+		public ItemChooserControl(Item item, String text)
 		{
 			InitializeComponent();
 
 			DisplayedItem = item;
+			this.text = text;
+			TextLabel.Text = text;
 		}
 
 		private void RecipeChooserSupplyNodeOption_Load(object sender, EventArgs e)

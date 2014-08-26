@@ -13,6 +13,8 @@ namespace Foreman
 	{
 		private List<Item> items;
 		private List<Recipe> recipes;
+		private String itemText = "";
+		private String recipeText = "";
 
 		public UserControl selectedControl = null;
 		public UserControl SelectedControl
@@ -63,23 +65,25 @@ namespace Foreman
 			}
 		}
 
-		public RecipeChooserForm(IEnumerable<Recipe> recipes, IEnumerable<Item> items)
+		public RecipeChooserForm(IEnumerable<Recipe> recipes, IEnumerable<Item> items, String itemText, String recipeText)
 		{
 			InitializeComponent();
 
 			this.recipes = recipes.ToList();
 			this.items = items.ToList();
+			this.itemText = itemText;
+			this.recipeText = recipeText;
 		}
 
 		private void RecipeChooserForm_Load(object sender, EventArgs e)
 		{
 			foreach (Item item in items)
 			{
-				recipeListPanel.Controls.Add(new ItemChooserControl(item));
+				recipeListPanel.Controls.Add(new ItemChooserControl(item, itemText));
 			}
 			foreach (Recipe recipe in recipes)
 			{
-				recipeListPanel.Controls.Add(new RecipeChooserControl(recipe));
+				recipeListPanel.Controls.Add(new RecipeChooserControl(recipe, recipeText));
 			}
 		}
 

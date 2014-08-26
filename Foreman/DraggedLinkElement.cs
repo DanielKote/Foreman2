@@ -113,12 +113,20 @@ namespace Foreman
 			}
 			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
 			{
-				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)), new List<Item>()))
+				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)), new List<Item> { Item }, "Create output node", "Use recipe {0}"))
 				{
 					var result = form.ShowDialog();
 					if (result == DialogResult.OK)
 					{
-						NodeElement newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+						NodeElement newElement = null;
+						if (form.selectedRecipe != null)
+						{
+							newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+						}
+						else if (form.selectedItem != null)
+						{
+							newElement = new NodeElement(ConsumerNode.Create(form.selectedItem, Parent.Graph), Parent);
+						}
 						newElement.Location = Point.Add(location, new Size(newElement.Width / 2, newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
 					}
@@ -126,7 +134,7 @@ namespace Foreman
 			}
 			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
 			{
-				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)), new List<Item> { Item }))
+				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)), new List<Item> { Item }, "Create infinite supply node", "Use recipe {0}"))
 				{
 					var result = form.ShowDialog();
 					if (result == DialogResult.OK)
