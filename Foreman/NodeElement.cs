@@ -42,6 +42,10 @@ namespace Foreman
 		
 		public ProductionNode DisplayedNode { get; private set; }
 
+		private Brush backgroundBrush;
+		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
+		private StringFormat centreFormat = new StringFormat();
+
 		public NodeElement(ProductionNode node, ProductionGraphViewer parent) : base(parent)
 		{
 			Width = 100;
@@ -61,6 +65,7 @@ namespace Foreman
 			{
 				backgroundColour = recipeColour;
 			}
+			backgroundBrush = new SolidBrush(backgroundColour);
 
 			foreach (Item item in node.Inputs)
 			{
@@ -81,6 +86,8 @@ namespace Foreman
 				SubElements.Add(assemblerBox);
 				assemblerBox.Height = assemblerBox.Width = 50;
 			}
+
+			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 		}
 
 		private int getIconWidths()
@@ -193,30 +200,22 @@ namespace Foreman
 			ItemTab tab = inputTabs.First(it => it.Item == item);
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y + tab.Height);
 		}
-		
+
 		public override void Paint(Graphics graphics)
 		{
-			using (SolidBrush brush = new SolidBrush(backgroundColour))
-			{
-				GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, brush);
-			}
+			GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, backgroundBrush);
 
-			using (Font font = new Font(FontFamily.GenericSansSerif, 10))
-			using (StringFormat centreFormat = new StringFormat())
+			if (DisplayedNode is SupplyNode)
 			{
-				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-				if (DisplayedNode is SupplyNode)
-				{
-					graphics.DrawString("Input", font, Brushes.White, Width / 2, Height / 2, centreFormat);
-				}
-				else if (DisplayedNode is ConsumerNode)
-				{
-					graphics.DrawString("Output", font, Brushes.White, Width / 2, Height / 2, centreFormat);
-				}
-				else if (DisplayedNode is RecipeNode && !Parent.ShowAssemblers)
-				{					
-					graphics.DrawString("Recipe", font, Brushes.White, Width / 2, Height / 2, centreFormat);
-				}
+				graphics.DrawString("Input", size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
+			}
+			else if (DisplayedNode is ConsumerNode)
+			{
+				graphics.DrawString("Output", size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
+			}
+			else if (DisplayedNode is RecipeNode && !Parent.ShowAssemblers)
+			{
+				graphics.DrawString("Recipe", size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
 			}
 
 			if (editorBox != null)

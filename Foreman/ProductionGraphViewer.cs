@@ -44,8 +44,8 @@ namespace Foreman
 		private Point dragStartScreenPoint;
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
-
 		public bool ShowAssemblers = false;
+		StringFormat stringFormat = new StringFormat();
 
 		private Rectangle graphBounds
 		{
@@ -267,51 +267,49 @@ namespace Foreman
 			Point arrowPoint1 = new Point();
 			Point arrowPoint2 = new Point();
 
-			using (StringFormat stringFormat = new StringFormat())
+			stringFormat.LineAlignment = StringAlignment.Center;
+
+			switch (direction)
 			{
-				stringFormat.LineAlignment = StringAlignment.Center;
-
-				switch (direction)
-				{
-					case Direction.Down:
-						arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y - arrowSize);
-						arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y - arrowSize);
-						stringFormat.Alignment = StringAlignment.Center;
-						break;
-					case Direction.Left:
-						arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y - arrowSize / 2);
-						arrowPoint2 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y + arrowSize / 2);
-						stringFormat.Alignment = StringAlignment.Near;
-						break;
-					case Direction.Up:
-						arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y + arrowSize);
-						arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y + arrowSize);
-						stringFormat.Alignment = StringAlignment.Center;
-						break;
-					case Direction.Right:
-						arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y - arrowSize / 2);
-						arrowPoint2 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y + arrowSize / 2);
-						stringFormat.Alignment = StringAlignment.Near;
-						break;
-				}
-
-				Rectangle rect = getTooltipScreenBounds(screenArrowPoint, screenSize, direction);
-
-				Point[] points = new Point[] { screenArrowPoint, arrowPoint1, arrowPoint2 };
-				graphics.FillPolygon(Brushes.DarkGray, points);
-				GraphicsStuff.FillRoundRect(rect.X - border, rect.Y - border, rect.Width + border * 2, rect.Height + border * 2, 3, graphics, Brushes.DarkGray);
-
-				Point point;
-				if (stringFormat.Alignment == StringAlignment.Center)
-				{
-					point = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
-				}
-				else
-				{
-					point = new Point(rect.X, rect.Y + rect.Height / 2);
-				}
-				graphics.DrawString(text, size10Font, Brushes.White, point, stringFormat);
+				case Direction.Down:
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y - arrowSize);
+					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y - arrowSize);
+					stringFormat.Alignment = StringAlignment.Center;
+					break;
+				case Direction.Left:
+					arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y - arrowSize / 2);
+					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y + arrowSize / 2);
+					stringFormat.Alignment = StringAlignment.Near;
+					break;
+				case Direction.Up:
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y + arrowSize);
+					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y + arrowSize);
+					stringFormat.Alignment = StringAlignment.Center;
+					break;
+				case Direction.Right:
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y - arrowSize / 2);
+					arrowPoint2 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y + arrowSize / 2);
+					stringFormat.Alignment = StringAlignment.Near;
+					break;
 			}
+
+			Rectangle rect = getTooltipScreenBounds(screenArrowPoint, screenSize, direction);
+
+			Point[] points = new Point[] { screenArrowPoint, arrowPoint1, arrowPoint2 };
+			graphics.FillPolygon(Brushes.DarkGray, points);
+			GraphicsStuff.FillRoundRect(rect.X - border, rect.Y - border, rect.Width + border * 2, rect.Height + border * 2, 3, graphics, Brushes.DarkGray);
+
+			Point point;
+			if (stringFormat.Alignment == StringAlignment.Center)
+			{
+				point = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
+			}
+			else
+			{
+				point = new Point(rect.X, rect.Y + rect.Height / 2);
+			}
+			graphics.DrawString(text, size10Font, Brushes.White, point, stringFormat);
+
 		}
 
 		public Rectangle getTooltipScreenBounds(Point screenArrowPoint, Point screenSize, Direction direction)
@@ -476,6 +474,7 @@ namespace Foreman
 		//Stolen from the designer file
 		protected override void Dispose(bool disposing)
 		{
+			stringFormat.Dispose();
 			foreach (var element in Elements.ToList())
 			{
 				element.Dispose();

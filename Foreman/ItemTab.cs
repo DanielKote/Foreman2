@@ -13,8 +13,27 @@ namespace Foreman
 		private const int iconSize = 32;
 		private const int border = 4;
 		private int textHeight = 11;
+		private StringFormat centreFormat = new StringFormat();
+		private Pen borderPen = new Pen(Color.Gray, 3);
+		private Brush textBrush = new SolidBrush(Color.Black);
+		private Brush fillBrush;
 
-		public Color FillColour { get; set; }
+		private Color fillColour;
+		public Color FillColour
+		{
+			get
+			{
+				return fillColour;
+			}
+			set {
+				fillColour = value;
+				if (fillBrush != null)
+				{
+					fillBrush.Dispose();
+				}
+				fillBrush = new SolidBrush(value);
+			}
+		}
 
 		private string text = "";
 		public String Text
@@ -35,6 +54,7 @@ namespace Foreman
 		{
 			this.Item = item;
 			this.Type = type;
+			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 		}
 		
 		public override System.Drawing.Point Size
@@ -60,26 +80,17 @@ namespace Foreman
 				iconPoint = new Point((int)(border * 1.5), (int)(border * 1.5));
 			}
 
-			
-			using (StringFormat centreFormat = new StringFormat())
-			using (Pen borderPen = new Pen(Color.Gray, 3))
-			using (Brush fillBrush = new SolidBrush(FillColour))
-			using (Brush textBrush = new SolidBrush(Color.Black))
+			if (Type == LinkType.Output)
 			{
-				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-
-				if (Type == LinkType.Output)
-				{
-					GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
-					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
-					graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, (textHeight + border) / 2), centreFormat);
-				}
-				else
-				{
-					GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
-					GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
-					graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, Height - (textHeight + border) / 2), centreFormat);
-				}
+				GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
+				GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
+				graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, (textHeight + border) / 2), centreFormat);
+			}
+			else
+			{
+				GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
+				GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
+				graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, Height - (textHeight + border) / 2), centreFormat);
 			}
 			graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
 		}

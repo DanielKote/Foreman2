@@ -36,7 +36,6 @@ namespace Foreman
 
 				String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
 				String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
-				String datafile = luaFiles.Find(f => f.EndsWith("data.lua"));
 
 				List<String> itemFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "item")).ToList();
 				itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "fluid")).ToList());

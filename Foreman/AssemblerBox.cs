@@ -67,27 +67,25 @@ namespace Foreman
 		const int maxFontSize = 14;
 		public Assembler DisplayedAssembler { get; set; }
 		public int DisplayedNumber { get; set; }
+		private StringFormat centreFormat = new StringFormat();
 
-		public AssemblerIconElement(Assembler assembler, int number, ProductionGraphViewer parent) : base(parent)
+		public AssemblerIconElement(Assembler assembler, int number, ProductionGraphViewer parent)
+			: base(parent)
 		{
 			DisplayedAssembler = assembler;
 			DisplayedNumber = number;
+			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 		}
 
 		public override void Paint(Graphics graphics)
 		{
-			using (StringFormat centreFormat = new StringFormat())
+			using (Font font = new Font(FontFamily.GenericSansSerif, Math.Min(Height / 2, maxFontSize)))
 			{
-				centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
+				float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
+				int iconSize = (int)Math.Min(Width - StringWidth, Height);
 
-				using (Font font = new Font(FontFamily.GenericSansSerif, Math.Min(Height / 2, maxFontSize)))
-				{
-					float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
-					int iconSize = (int)Math.Min(Width - StringWidth, Height);
-
-					graphics.DrawImage(DisplayedAssembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
-					graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
-				}
+				graphics.DrawImage(DisplayedAssembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
+				graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
 			}
 		}
 	}
