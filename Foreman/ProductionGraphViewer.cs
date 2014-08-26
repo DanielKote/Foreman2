@@ -268,22 +268,29 @@ namespace Foreman
 			Point arrowPoint1 = new Point();
 			Point arrowPoint2 = new Point();
 
+			StringFormat stringFormat = new StringFormat();
+			stringFormat.LineAlignment = StringAlignment.Center;
+
 			switch (direction){
 				case Direction.Down:
 					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y - arrowSize);
 					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y - arrowSize);
+					stringFormat.Alignment = StringAlignment.Center;
 					break;
 				case Direction.Left:
-					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y - arrowSize / 2);
-					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y + arrowSize / 2);
+					arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y - arrowSize / 2);
+					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y + arrowSize / 2);
+					stringFormat.Alignment = StringAlignment.Near;
 					break;
 				case Direction.Up:
 					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y + arrowSize);
 					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y + arrowSize);
+					stringFormat.Alignment = StringAlignment.Center;
 					break;
 				case Direction.Right:
-					arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y - arrowSize / 2);
-					arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y + arrowSize / 2);
+					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y - arrowSize / 2);
+					arrowPoint2 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y + arrowSize / 2);
+					stringFormat.Alignment = StringAlignment.Near;
 					break;
 			}
 
@@ -293,9 +300,14 @@ namespace Foreman
 			graphics.FillPolygon(Brushes.DarkGray, points); 
 			GraphicsStuff.FillRoundRect(rect.X - border, rect.Y - border, rect.Width + border * 2, rect.Height + border * 2, 3, graphics, Brushes.DarkGray);
 
-			StringFormat centreFormat = new StringFormat();
-			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-			graphics.DrawString(text, font, Brushes.White, new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), centreFormat);
+			Point point;
+			if (stringFormat.Alignment == StringAlignment.Center)
+			{
+				point = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
+			} else {
+				point = new Point(rect.X, rect.Y + rect.Height / 2);
+			}
+			graphics.DrawString(text, font, Brushes.White, point, stringFormat);
 		}
 
 		public Rectangle getTooltipScreenBounds(Point screenArrowPoint, Point screenSize, Direction direction)
@@ -397,9 +409,8 @@ namespace Foreman
 			{
 				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
 				lastMouseDragPoint = e.Location;
-				Invalidate();
 			}
-			
+
 			Invalidate();
 		}
 

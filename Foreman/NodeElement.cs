@@ -445,9 +445,34 @@ namespace Foreman
 						tti.Direction = Direction.Down;
 						tti.ScreenLocation = Parent.GraphToScreen(GetOutputLineConnectionPoint(mousedTab.Item));
 					}
+					Parent.AddTooltip(tti);
 				}
-
-				Parent.AddTooltip(tti);
+				else if (DisplayedNode is RecipeNode)
+				{
+					tti.Direction = Direction.Left;
+					tti.ScreenLocation = Parent.GraphToScreen(Point.Add(Location, new Size(Width, Height / 2)));
+					tti.Text = String.Format("Recipe: {0}", (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName);
+					tti.Text += String.Format("\n--Base Time: {0}s", (DisplayedNode as RecipeNode).BaseRecipe.Time);
+					tti.Text += String.Format("\n--Base Ingredients:");
+					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.Ingredients)
+					{
+						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
+					}
+					tti.Text += String.Format("\n--Base Results:");
+					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.Results)
+					{
+						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
+					}
+					if (Parent.ShowAssemblers)
+					{
+						tti.Text += String.Format("\n\nAssemblers:");
+						foreach(var kvp in assemblerBox.AssemblerList)
+						{
+							tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
+						}
+					}
+					Parent.AddTooltip(tti);
+				}
 			}
 		}
 
