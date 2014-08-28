@@ -244,8 +244,6 @@ namespace Foreman
 
 		public new void Paint(Graphics graphics)
 		{
-			graphics.FillRectangle(Brushes.Red, ScreenToGraph(PointToClient(Control.MousePosition)).X - 2, ScreenToGraph(PointToClient(Control.MousePosition)).Y - 2, 4, 4);
-
 			foreach (GraphElement element in GetPaintingOrder())
 			{
 				graphics.TranslateTransform(element.X, element.Y);
