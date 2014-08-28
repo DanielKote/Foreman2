@@ -29,6 +29,8 @@ namespace Foreman
 		private const int assemblerBorderY = 30;
 
 		private const int tabPadding = 8;
+
+		public String text = "";
 		
 		TextBox editorBox;
 		Item editedItem;
@@ -49,7 +51,7 @@ namespace Foreman
 		public NodeElement(ProductionNode node, ProductionGraphViewer parent) : base(parent)
 		{
 			Width = 100;
-			Height = 80;
+			Height = 90;
 
 			DisplayedNode = node;
 
@@ -118,7 +120,31 @@ namespace Foreman
 		{
 			UpdateTabOrder();
 
+			if (DisplayedNode is SupplyNode)
+			{
+				text = "Input: " + (DisplayedNode as SupplyNode).SuppliedItem.FriendlyName;
+			}
+			else if (DisplayedNode is ConsumerNode)
+			{
+				text = "Output: " + (DisplayedNode as ConsumerNode).ConsumedItem.FriendlyName;
+			}
+			else if (DisplayedNode is RecipeNode)
+			{
+				if (!Parent.ShowAssemblers)
+				{
+					text = "Recipe: " + (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName;
+				}
+				else
+				{
+					text = "";
+				}
+			}
+
+			Graphics graphics = Parent.CreateGraphics();
+			int minWidth = (int)graphics.MeasureString(text, size10Font).Width;
+
 			Width = Math.Max(75, getIconWidths());
+			Width = Math.Max(Width, minWidth);
 
 			if (DisplayedNode is RecipeNode)
 			{
@@ -133,7 +159,7 @@ namespace Foreman
 				}
 				else
 				{
-					Height = 80;
+					Height = 90;
 					assemblerBox.AssemblerList.Clear();
 					assemblerBox.Update();
 				}
@@ -212,19 +238,7 @@ namespace Foreman
 		public override void Paint(Graphics graphics)
 		{
 			GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, backgroundBrush);
-
-			if (DisplayedNode is SupplyNode)
-			{
-				graphics.DrawString("Input", size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
-			}
-			else if (DisplayedNode is ConsumerNode)
-			{
-				graphics.DrawString("Output", size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
-			}
-			else if (DisplayedNode is RecipeNode && !Parent.ShowAssemblers)
-			{
-				graphics.DrawString("Recipe", size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
-			}
+			graphics.DrawString(text, size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
 
 			if (editorBox != null)
 			{
