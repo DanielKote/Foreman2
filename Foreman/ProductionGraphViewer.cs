@@ -138,7 +138,6 @@ namespace Foreman
 			}
 			var nodeOrder = Graph.GetTopologicalSort();
 			nodeOrder.Reverse();
-			var pathMatrix = Graph.PathMatrix;
 
 			List<ProductionNode>[] nodePositions = new List<ProductionNode>[nodeOrder.Count()];
 			for (int i = 0; i < nodePositions.Count(); i++)

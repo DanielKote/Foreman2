@@ -69,34 +69,7 @@ namespace Foreman
 				return (int[,])adjacencyMatrixCache.Clone();
 			}
 		}
-
-		public int[,] PathMatrix
-		{
-			get
-			{
-				if (pathMatrixCache == null)
-				{
-					int[,] adjacencyMatrix = AdjacencyMatrix;
-					List<int[,]> iterations = new List<int[,]>();
-					iterations.Add(adjacencyMatrix);
-
-					for (int i = 0; i < Nodes.Count() - 1; i++)
-					{
-						iterations.Add(iterations[i].Multiply(adjacencyMatrix));
-					}
-
-					int[,] pathMatrix = new int[Nodes.Count(), Nodes.Count()];
-					foreach (int[,] matrix in iterations)
-					{
-						pathMatrix = pathMatrix.Add(matrix);
-					}
-					pathMatrixCache = pathMatrix;
-				}
-
-				return (int[,])pathMatrixCache.Clone();
-			}
-		}
-
+		
 		public IEnumerable<ProductionNode> GetSuppliers(Item item)
 		{
 			foreach (ProductionNode node in Nodes)
@@ -200,18 +173,11 @@ namespace Foreman
 
 		public IEnumerable<ProductionNode> GetInputlessNodes()
 		{
-			var matrix = AdjacencyMatrix;
-
-			for (int i = 0; i < matrix.GetLength(0); i++)
+			foreach (ProductionNode node in Nodes)
 			{
-				int incomingEdgeSum = 0;
-				for (int j = 0; j < matrix.GetLength(1); j++)
+				if (!node.InputLinks.Any())
 				{
-					incomingEdgeSum += matrix[j, i];
-				}
-				if (incomingEdgeSum == 0)
-				{
-					yield return Nodes[i];
+					yield return node;
 				}
 			}
 		}
@@ -233,21 +199,21 @@ namespace Foreman
 		{
 			List<List<ProductionNode>> strongList = new List<List<ProductionNode>>();
 			Stack<TarjanNode> S = new Stack<TarjanNode>();
-			Dictionary<int, TarjanNode> tNodes = new Dictionary<int, TarjanNode>();
+			Dictionary<ProductionNode, TarjanNode> tNodes = new Dictionary<ProductionNode, TarjanNode>();
 			int indexCounter = 0;
 
-			for (int i = 0; i < Nodes.Count(); i++)
+			foreach (ProductionNode n in Nodes)
 			{
-				tNodes.Add(i, new TarjanNode(Nodes[i]));
+				tNodes.Add(n, new TarjanNode(n));
 			}
 
-			for (int i = 0; i < Nodes.Count(); i++)
+			foreach (ProductionNode n in Nodes)
 			{
-				for (int j = 0; j < Nodes.Count(); j++)
+				foreach (ProductionNode m in Nodes)
 				{
-					if (AdjacencyMatrix[i, j] > 0)
+					if (m.InputLinks.Any(l => l.Supplier == n))
 					{
-						tNodes[i].Links.Add(tNodes[j]);
+						tNodes[n].Links.Add(tNodes[m]);
 					}
 				}
 			}
@@ -326,7 +292,6 @@ namespace Foreman
 						}
 					}
 				}
-
 			}
 
 			for (int i = 0; i < matrix.GetLength(0); i++)

@@ -68,12 +68,32 @@ namespace Foreman
 			return amount;
 		}
 
-		public bool CanUltimatelyTakeFrom(ProductionNode node) // Breadth-first search would probably be a better algorithm.
+		public bool CanUltimatelyTakeFrom(ProductionNode node)
 		{
-			int thisIndex = Graph.Nodes.IndexOf(this);	//I should somehow cache this index in the graph so I don't have to do a linear search each time.
-			int otherIndex = Graph.Nodes.IndexOf(node);
+			Queue<ProductionNode> Q = new Queue<ProductionNode>();
+			HashSet<ProductionNode> V = new HashSet<ProductionNode>();
 
-			return (Graph.PathMatrix[otherIndex, thisIndex] > 0) ;
+			V.Add(this);
+			Q.Enqueue(this);
+
+			while (Q.Any())
+			{
+				ProductionNode t = Q.Dequeue();
+				if (t == node)
+				{
+					return true;
+				}
+				foreach (NodeLink e in t.InputLinks)
+				{
+					ProductionNode u = e.Supplier;
+					if (!V.Contains(u))
+					{
+						V.Add(u);
+						Q.Enqueue(u);
+					}
+				}
+			}
+			return false;
 		}
 
 		public void Destroy()
