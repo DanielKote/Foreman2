@@ -442,6 +442,8 @@ namespace Foreman
 			{
 				ViewScale /= 1.1f;
 			}
+			ViewScale = Math.Max(ViewScale, 0.3f);
+			ViewScale = Math.Min(ViewScale, 3f);
 
 			Invalidate();
 		}
