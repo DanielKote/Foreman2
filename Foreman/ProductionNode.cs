@@ -135,7 +135,7 @@ namespace Foreman
 			{
 				rate = Math.Min(rate, GetTotalInput(inputItem) / BaseRecipe.Ingredients[inputItem]);
 			}
-			return rate;
+			return ValidateRecipeRate(rate);
 		}
 
 		public float GetRateRequiredByOutputs()
@@ -145,27 +145,27 @@ namespace Foreman
 			{
 				rate = Math.Max(rate, GetRequiredOutput(outputItem) / BaseRecipe.Results[outputItem]);
 			}
-			return rate;
+			return ValidateRecipeRate(rate);
 		}
 
 		public override float GetUnsatisfiedDemand(Item item)
 		{
 			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
-			float itemRate = ValidateItemAmount(rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
+			float itemRate = (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
 			return itemRate;
 		}
 
 		public override float GetExcessOutput(Item item)
 		{
 			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
-			float itemRate = ValidateItemAmount(rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
+			float itemRate = (rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
 			return itemRate;
 		}
 
 		public override float GetRequiredInput(Item item)
 		{
 			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
-			return ValidateItemAmount(rate * BaseRecipe.Ingredients[item]);
+			return rate * BaseRecipe.Ingredients[item];
 		}
 
         public override float GetTotalOutput(Item item)
@@ -175,7 +175,7 @@ namespace Foreman
         }
 
 		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to require half an item, for example)
-		private float ValidateItemAmount(float amount)
+		private float ValidateRecipeRate(float amount)
 		{
 			if (Graph.SelectedAmountType == AmountType.FixedAmount)
 			{
