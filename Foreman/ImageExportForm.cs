@@ -46,9 +46,9 @@ namespace Foreman
 			if (Scale2xCheckBox.Checked)
 			{
 				scale = 2;
-			} else if (Scale5xCheckBox.Checked)
+			} else if (Scale3xCheckBox.Checked)
 			{
-				scale = 5;
+				scale = 3;
 			}
 
 			Bitmap image = new Bitmap(graphViewer.graphBounds.Width * scale, graphViewer.graphBounds.Height * scale);

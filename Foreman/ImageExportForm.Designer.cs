@@ -34,7 +34,7 @@
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.Scale1xCheckBox = new System.Windows.Forms.RadioButton();
 			this.Scale2xCheckBox = new System.Windows.Forms.RadioButton();
-			this.Scale5xCheckBox = new System.Windows.Forms.RadioButton();
+			this.Scale3xCheckBox = new System.Windows.Forms.RadioButton();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -68,7 +68,7 @@
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.Scale5xCheckBox);
+			this.groupBox1.Controls.Add(this.Scale3xCheckBox);
 			this.groupBox1.Controls.Add(this.Scale2xCheckBox);
 			this.groupBox1.Controls.Add(this.Scale1xCheckBox);
 			this.groupBox1.Location = new System.Drawing.Point(13, 42);
@@ -102,13 +102,13 @@
 			// 
 			// Scale5xCheckBox
 			// 
-			this.Scale5xCheckBox.AutoSize = true;
-			this.Scale5xCheckBox.Location = new System.Drawing.Point(91, 19);
-			this.Scale5xCheckBox.Name = "Scale5xCheckBox";
-			this.Scale5xCheckBox.Size = new System.Drawing.Size(36, 17);
-			this.Scale5xCheckBox.TabIndex = 2;
-			this.Scale5xCheckBox.Text = "5x";
-			this.Scale5xCheckBox.UseVisualStyleBackColor = true;
+			this.Scale3xCheckBox.AutoSize = true;
+			this.Scale3xCheckBox.Location = new System.Drawing.Point(91, 19);
+			this.Scale3xCheckBox.Name = "Scale3xCheckBox";
+			this.Scale3xCheckBox.Size = new System.Drawing.Size(36, 17);
+			this.Scale3xCheckBox.TabIndex = 2;
+			this.Scale3xCheckBox.Text = "3x";
+			this.Scale3xCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// ImageExportForm
 			// 
@@ -138,7 +138,7 @@
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button ExportButton;
 		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.RadioButton Scale5xCheckBox;
+		private System.Windows.Forms.RadioButton Scale3xCheckBox;
 		private System.Windows.Forms.RadioButton Scale2xCheckBox;
 		private System.Windows.Forms.RadioButton Scale1xCheckBox;
 	}
