@@ -127,7 +127,8 @@ namespace Foreman
 						{
 							newElement = new NodeElement(ConsumerNode.Create(form.selectedItem, Parent.Graph), Parent);
 						}
-						newElement.Location = Point.Add(location, new Size(newElement.Width / 2, newElement.Height / 2));
+						newElement.Update();
+						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
 					}
 				}
@@ -148,7 +149,8 @@ namespace Foreman
 						{
 							newElement = new NodeElement(SupplyNode.Create(form.selectedItem, Parent.Graph), Parent);
 						}
-						newElement.Location = location;
+						newElement.Update();
+						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
 					}
 				}
