@@ -70,7 +70,6 @@ namespace Foreman
 					{
 						image.Save(fileTextBox.Text, ImageFormat.Png);
 						Close();
-						Dispose();
 					}
 					catch (Exception exception)
 					{
