@@ -31,6 +31,12 @@ namespace Foreman
 						path = form.SelectedPath;
 						path = Path.Combine(path, "data");
 					}
+					else
+					{
+						Close();
+						Dispose();
+						return;
+					}
 				}
 			}
 
