@@ -13,6 +13,7 @@ namespace Foreman
 	{
 		//Still hardcoded. Needs to ask the user if it can't be found.
 		public static String FactorioDataPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
+		public static String AppDataModPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Factorio", "mods");
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
 		public static Dictionary<String, Assembler> Assemblers = new Dictionary<string, Assembler>();
@@ -25,8 +26,8 @@ namespace Foreman
 		{
 			using (Lua lua = new Lua())
 			{
-				List<String> luaFiles = Directory.GetFiles(FactorioDataPath, "*.lua", SearchOption.AllDirectories).ToList();
-				List<String> luaDirs = Directory.GetDirectories(FactorioDataPath, "*", SearchOption.AllDirectories).ToList();
+				List<String> luaFiles = getAllLuaFiles().ToList();
+				List<String> luaDirs = getAllModDirs().ToList();
 
 				//Add all these files to the Lua path variable
 				foreach (String d in luaDirs)
@@ -95,6 +96,42 @@ namespace Foreman
 			}
 		}
 
+		private static IEnumerable<String> getAllLuaFiles()
+		{
+			if (Directory.Exists(FactorioDataPath))
+			{
+				foreach (String file in Directory.GetFiles(FactorioDataPath, "*.lua", SearchOption.AllDirectories))
+				{
+					yield return file;
+				}
+			}
+			if (Directory.Exists(AppDataModPath))
+			{
+				foreach (String file in Directory.GetFiles(AppDataModPath, "*.lua", SearchOption.AllDirectories))
+				{
+					yield return file;
+				}
+			}
+		}
+
+		private static IEnumerable<String> getAllModDirs()
+		{
+			if (Directory.Exists(AppDataModPath))
+			{
+				foreach (String dir in Directory.GetDirectories(FactorioDataPath, "*", SearchOption.TopDirectoryOnly).ToList())
+				{
+					yield return dir;
+				}
+			}
+			if (Directory.Exists(FactorioDataPath))
+			{
+				foreach (String dir in Directory.GetDirectories(AppDataModPath, "*", SearchOption.TopDirectoryOnly).ToList())
+				{
+					yield return dir;
+				}
+			}
+		}
+
 		private static void InterpretItems(Lua lua, String typeName)
 		{
 			LuaTable itemTable = lua.GetTable("data.raw")[typeName] as LuaTable;
@@ -111,7 +148,7 @@ namespace Foreman
 
 		private static void LoadItemNames(String fileName, String iniSectionName, String locale = "en")
 		{
-			foreach (String dir in Directory.GetDirectories(FactorioDataPath))
+			foreach (String dir in getAllModDirs())
 			{
 				String fullFilePath = Path.Combine(dir, "locale", locale, fileName);
 				if (File.Exists(fullFilePath))
@@ -153,7 +190,7 @@ namespace Foreman
 
 		private static void LoadRecipeNames(String locale = "en")
 		{
-			foreach (String dir in Directory.GetDirectories(FactorioDataPath))
+			foreach (String dir in getAllModDirs())
 			{
 				String fullFilePath = Path.Combine(dir, "locale", locale, "recipe-names.cfg");
 				if (File.Exists(fullFilePath))
@@ -201,7 +238,7 @@ namespace Foreman
 
 		private static void LoadAssemblerNames(String locale = "en")
 		{
-			foreach (String dir in Directory.GetDirectories(FactorioDataPath))
+			foreach (String dir in getAllModDirs())
 			{
 				String fullFilePath = Path.Combine(dir, "locale", locale, "entity-names.cfg");
 				if (File.Exists(fullFilePath))
@@ -252,13 +289,16 @@ namespace Foreman
 			}
 			else
 			{
-
 				string[] splitPath = fileName.Split('/');
 				splitPath[0] = splitPath[0].Trim('_');
-				fullPath = FactorioDataPath;
-				foreach (String pathPart in splitPath)
+				fullPath = getAllModDirs().FirstOrDefault(d => Path.GetFileName(d) == splitPath[0]);
+
+				if (!String.IsNullOrEmpty(fullPath))
 				{
-					fullPath = Path.Combine(fullPath, pathPart);
+					for (int i = 1; i < splitPath.Count(); i++ ) //Skip the first split section because it's the same as the end of the path already
+					{
+						fullPath = Path.Combine(fullPath, splitPath[i]);
+					}
 				}
 			}
 
