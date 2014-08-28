@@ -178,14 +178,20 @@ namespace Foreman
 			{
 				foreach (NodeLink link in DisplayedNode.InputLinks.Where(l => l.Item == tab.Item))
 				{
-					total += Parent.GetElementForNode(link.Supplier).X;
+					NodeElement node = Parent.GetElementForNode(link.Supplier);
+					Point diff = Point.Subtract(new Point(node.Location.X + node.Width / 2, node.Location.Y + node.Height / 2), new Size(Location.X + Width / 2, Location.Y + Height / 2));
+					diff.Y = Math.Max(0, diff.Y);
+					total += Convert.ToInt32(Math.Atan2(diff.X, diff.Y) * 1000);
 				}
 			}
 			else
 			{
 				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(l => l.Item == tab.Item))
 				{
-					total += Parent.GetElementForNode(link.Consumer).X;
+					NodeElement node = Parent.GetElementForNode(link.Consumer);
+					Point diff = Point.Subtract(new Point(node.Location.X + node.Width / 2, -node.Location.Y + -node.Height / 2), new Size(Location.X + Width / 2, -Location.Y + -Height / 2));
+					diff.Y = Math.Max(0, diff.Y);
+					total += Convert.ToInt32(Math.Atan2(diff.X, diff.Y) * 1000);
 				}
 			}
 			return total;
