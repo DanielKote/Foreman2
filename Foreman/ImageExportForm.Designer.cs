@@ -32,9 +32,10 @@
 			this.button1 = new System.Windows.Forms.Button();
 			this.ExportButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.Scale1xCheckBox = new System.Windows.Forms.RadioButton();
-			this.Scale2xCheckBox = new System.Windows.Forms.RadioButton();
 			this.Scale3xCheckBox = new System.Windows.Forms.RadioButton();
+			this.Scale2xCheckBox = new System.Windows.Forms.RadioButton();
+			this.Scale1xCheckBox = new System.Windows.Forms.RadioButton();
+			this.TransparencyCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -60,7 +61,7 @@
 			// 
 			this.ExportButton.Location = new System.Drawing.Point(157, 42);
 			this.ExportButton.Name = "ExportButton";
-			this.ExportButton.Size = new System.Drawing.Size(179, 52);
+			this.ExportButton.Size = new System.Drawing.Size(179, 76);
 			this.ExportButton.TabIndex = 2;
 			this.ExportButton.Text = "Export";
 			this.ExportButton.UseVisualStyleBackColor = true;
@@ -78,6 +79,26 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Scale";
 			// 
+			// Scale3xCheckBox
+			// 
+			this.Scale3xCheckBox.AutoSize = true;
+			this.Scale3xCheckBox.Location = new System.Drawing.Point(91, 19);
+			this.Scale3xCheckBox.Name = "Scale3xCheckBox";
+			this.Scale3xCheckBox.Size = new System.Drawing.Size(36, 17);
+			this.Scale3xCheckBox.TabIndex = 2;
+			this.Scale3xCheckBox.Text = "3x";
+			this.Scale3xCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// Scale2xCheckBox
+			// 
+			this.Scale2xCheckBox.AutoSize = true;
+			this.Scale2xCheckBox.Location = new System.Drawing.Point(49, 20);
+			this.Scale2xCheckBox.Name = "Scale2xCheckBox";
+			this.Scale2xCheckBox.Size = new System.Drawing.Size(36, 17);
+			this.Scale2xCheckBox.TabIndex = 1;
+			this.Scale2xCheckBox.Text = "2x";
+			this.Scale2xCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// Scale1xCheckBox
 			// 
 			this.Scale1xCheckBox.AutoSize = true;
@@ -90,31 +111,22 @@
 			this.Scale1xCheckBox.Text = "1x";
 			this.Scale1xCheckBox.UseVisualStyleBackColor = true;
 			// 
-			// Scale2xCheckBox
+			// TransparencyCheckBox
 			// 
-			this.Scale2xCheckBox.AutoSize = true;
-			this.Scale2xCheckBox.Location = new System.Drawing.Point(49, 20);
-			this.Scale2xCheckBox.Name = "Scale2xCheckBox";
-			this.Scale2xCheckBox.Size = new System.Drawing.Size(36, 17);
-			this.Scale2xCheckBox.TabIndex = 1;
-			this.Scale2xCheckBox.Text = "2x";
-			this.Scale2xCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// Scale5xCheckBox
-			// 
-			this.Scale3xCheckBox.AutoSize = true;
-			this.Scale3xCheckBox.Location = new System.Drawing.Point(91, 19);
-			this.Scale3xCheckBox.Name = "Scale3xCheckBox";
-			this.Scale3xCheckBox.Size = new System.Drawing.Size(36, 17);
-			this.Scale3xCheckBox.TabIndex = 2;
-			this.Scale3xCheckBox.Text = "3x";
-			this.Scale3xCheckBox.UseVisualStyleBackColor = true;
+			this.TransparencyCheckBox.AutoSize = true;
+			this.TransparencyCheckBox.Location = new System.Drawing.Point(13, 100);
+			this.TransparencyCheckBox.Name = "TransparencyCheckBox";
+			this.TransparencyCheckBox.Size = new System.Drawing.Size(144, 17);
+			this.TransparencyCheckBox.TabIndex = 4;
+			this.TransparencyCheckBox.Text = "Transparent Background";
+			this.TransparencyCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// ImageExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(348, 103);
+			this.ClientSize = new System.Drawing.Size(348, 123);
+			this.Controls.Add(this.TransparencyCheckBox);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.ExportButton);
 			this.Controls.Add(this.button1);
@@ -141,5 +153,6 @@
 		private System.Windows.Forms.RadioButton Scale3xCheckBox;
 		private System.Windows.Forms.RadioButton Scale2xCheckBox;
 		private System.Windows.Forms.RadioButton Scale1xCheckBox;
+		private System.Windows.Forms.CheckBox TransparencyCheckBox;
 	}
 }

@@ -58,6 +58,11 @@ namespace Foreman
 				graphics.TranslateTransform(-graphViewer.GraphBounds.X, -graphViewer.GraphBounds.Y);
 				graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
+				if (!TransparencyCheckBox.Checked)
+				{
+					graphics.Clear(Color.White);
+				}
+
 				graphViewer.Paint(graphics);
 
 				if (!Directory.Exists(Path.GetDirectoryName(fileTextBox.Text)))
