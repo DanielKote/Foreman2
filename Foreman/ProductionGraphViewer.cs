@@ -73,6 +73,7 @@ namespace Foreman
 		{
 			InitializeComponent();
 			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
+			ViewOffset = new Point(Width / -2, Height / -2);
 		}
 
 		public void AddDemands(IEnumerable<Item> list)
