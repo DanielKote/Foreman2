@@ -235,19 +235,23 @@ namespace Foreman
 			e.Graphics.ResetTransform();
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 			e.Graphics.Clear(this.BackColor);
-			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
+			e.Graphics.TranslateTransform(Width / 2, Height / 2);
 			e.Graphics.ScaleTransform(ViewScale, ViewScale);
+			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 
 			Paint(e.Graphics);
 		}
 
 		public new void Paint(Graphics graphics)
 		{
+			graphics.FillRectangle(Brushes.Red, ScreenToGraph(PointToClient(Control.MousePosition)).X - 2, ScreenToGraph(PointToClient(Control.MousePosition)).Y - 2, 4, 4);
+
 			foreach (GraphElement element in GetPaintingOrder())
 			{
 				graphics.TranslateTransform(element.X, element.Y);
 				element.Paint(graphics);
 				graphics.TranslateTransform(-element.X, -element.Y);
+				
 			}
 
 			graphics.ResetTransform();
@@ -421,7 +425,7 @@ namespace Foreman
 
 			if ((Control.MouseButtons & MouseButtons.Middle) != 0)
 			{
-				ViewOffset = new Point(ViewOffset.X + e.X - lastMouseDragPoint.X, ViewOffset.Y + e.Y - lastMouseDragPoint.Y);
+				ViewOffset = new Point(ViewOffset.X + (int)((e.X - lastMouseDragPoint.X) / ViewScale), ViewOffset.Y + (int)((e.Y - lastMouseDragPoint.Y) / ViewScale));
 				lastMouseDragPoint = e.Location;
 			}
 
@@ -449,7 +453,7 @@ namespace Foreman
 
 		public Point ScreenToGraph(int X, int Y)
 		{
-			return new Point(Convert.ToInt32((X - ViewOffset.X) / ViewScale), Convert.ToInt32((Y - ViewOffset.Y) / ViewScale));
+			return new Point(Convert.ToInt32(((X - Width / 2) / ViewScale) - ViewOffset.X), Convert.ToInt32(((Y - Height / 2) / ViewScale) - ViewOffset.Y));
 		}
 
 		public Point GraphToScreen(Point point)
@@ -459,7 +463,7 @@ namespace Foreman
 
 		public Point GraphToScreen(int X, int Y)
 		{
-			return new Point(Convert.ToInt32((X * ViewScale) + ViewOffset.X), Convert.ToInt32((Y * ViewScale) + ViewOffset.Y));
+			return new Point(Convert.ToInt32(((X + ViewOffset.X) * ViewScale) + Width / 2), Convert.ToInt32(((Y + ViewOffset.Y) * ViewScale) + Height / 2));
 		}
 
 		//Tooltips added with this method will be drawn the next time the graph is repainted.
