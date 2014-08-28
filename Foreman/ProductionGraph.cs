@@ -7,7 +7,6 @@ namespace Foreman
 {
 	public enum AmountType { FixedAmount, Rate }
 	public enum RateUnit { PerMinute, PerSecond }
-	public enum OptimisationGoal { Time, Energy, Count, ItemCost }
 
 	public class ProductionGraph
 	{

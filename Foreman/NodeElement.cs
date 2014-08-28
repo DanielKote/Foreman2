@@ -568,6 +568,9 @@ namespace Foreman
 
 		public override void Dispose()
 		{
+			size10Font.Dispose();
+			centreFormat.Dispose();
+			backgroundBrush.Dispose();
 			if (assemblerBox != null)
 			{
 				assemblerBox.Dispose();

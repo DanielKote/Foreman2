@@ -97,6 +97,10 @@ namespace Foreman
 
 		public override void Dispose()
 		{
+			textBrush.Dispose();
+			fillBrush.Dispose();
+			centreFormat.Dispose();
+			borderPen.Dispose();
 			font.Dispose();
 			base.Dispose();
 		}
