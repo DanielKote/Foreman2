@@ -211,6 +211,7 @@ namespace Foreman
 				}
 			}
 
+			UpdateNodes();
 			LimitViewToBounds();
 			Invalidate(true);
 		}

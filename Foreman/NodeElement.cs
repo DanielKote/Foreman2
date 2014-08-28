@@ -139,6 +139,20 @@ namespace Foreman
 				}
 			}
 
+			foreach (ItemTab tab in inputTabs.Union(outputTabs))
+			{
+				tab.FillColour = chooseIconColour(tab.Item, tab.Type);
+				tab.Text = getIconString(tab.Item, tab.Type);
+			}
+
+			UpdateTabOrder();
+		}
+
+		public void UpdateTabOrder()
+		{
+			inputTabs = inputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
+			outputTabs = outputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
+
 			int x = (Width - GetOutputIconWidths()) / 2;
 			foreach (ItemTab tab in outputTabs)
 			{
@@ -146,9 +160,6 @@ namespace Foreman
 				tab.X = x;
 				tab.Y = -tab.Height / 2;
 				x += tab.Width;
-
-				tab.FillColour = chooseIconColour(tab.Item, tab.Type);
-				tab.Text = getIconString(tab.Item, tab.Type);
 			}
 			x = (Width - GetInputIconWidths()) / 2;
 			foreach (ItemTab tab in inputTabs)
@@ -157,16 +168,7 @@ namespace Foreman
 				tab.X = x;
 				tab.Y = Height - tab.Height / 2;
 				x += tab.Width;
-
-				tab.FillColour = chooseIconColour(tab.Item, tab.Type);
-				tab.Text = getIconString(tab.Item, tab.Type);
 			}
-		}
-
-		public void UpdateTabOrder()
-		{
-			inputTabs = inputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
-			outputTabs = outputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
 		}
 
 		public int GetItemTabXHeuristic(ItemTab tab)
