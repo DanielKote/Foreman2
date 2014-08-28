@@ -59,6 +59,12 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="AssemblerBox.cs" />
     <Compile Include="DataCache.cs" />
+    <Compile Include="DirectoryChooserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DirectoryChooserForm.Designer.cs">
+      <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
@@ -109,6 +115,9 @@
     <Compile Include="RecipeChooserSupplyNodeOption.Designer.cs">
       <DependentUpon>SupplyNodeChooserControl.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="DirectoryChooserForm.resx">
+      <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ImageExportForm.resx">
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </EmbeddedResource>

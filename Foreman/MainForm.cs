@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Foreman
 {	
@@ -20,6 +21,20 @@ namespace Foreman
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
+			String path = DataCache.FactorioDataPath;
+			if (!Directory.Exists(path))
+			{
+				using (DirectoryChooserForm form = new DirectoryChooserForm())
+				{
+					if (form.ShowDialog() == DialogResult.OK)
+					{
+						path = form.SelectedPath;
+						path = Path.Combine(path, "data");
+					}
+				}
+			}
+
+			DataCache.FactorioDataPath = path;
 			DataCache.LoadRecipes();
 
 			rateOptionsDropDown.SelectedIndex = 0;

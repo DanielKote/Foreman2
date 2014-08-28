@@ -12,7 +12,7 @@ namespace Foreman
 	static class DataCache
 	{
 		//Still hardcoded. Needs to ask the user if it can't be found.
-		private static String factorioPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
+		public static String FactorioDataPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
 		public static Dictionary<String, Assembler> Assemblers = new Dictionary<string, Assembler>();
@@ -25,8 +25,8 @@ namespace Foreman
 		{
 			using (Lua lua = new Lua())
 			{
-				List<String> luaFiles = Directory.GetFiles(factorioPath, "*.lua", SearchOption.AllDirectories).ToList();
-				List<String> luaDirs = Directory.GetDirectories(factorioPath, "*", SearchOption.AllDirectories).ToList();
+				List<String> luaFiles = Directory.GetFiles(FactorioDataPath, "*.lua", SearchOption.AllDirectories).ToList();
+				List<String> luaDirs = Directory.GetDirectories(FactorioDataPath, "*", SearchOption.AllDirectories).ToList();
 
 				//Add all these files to the Lua path variable
 				foreach (String d in luaDirs)
@@ -111,7 +111,7 @@ namespace Foreman
 
 		private static void LoadItemNames(String fileName, String iniSectionName, String locale = "en")
 		{
-			foreach (String dir in Directory.GetDirectories(factorioPath))
+			foreach (String dir in Directory.GetDirectories(FactorioDataPath))
 			{
 				String fullFilePath = Path.Combine(dir, "locale", locale, fileName);
 				if (File.Exists(fullFilePath))
@@ -153,7 +153,7 @@ namespace Foreman
 
 		private static void LoadRecipeNames(String locale = "en")
 		{
-			foreach (String dir in Directory.GetDirectories(factorioPath))
+			foreach (String dir in Directory.GetDirectories(FactorioDataPath))
 			{
 				String fullFilePath = Path.Combine(dir, "locale", locale, "recipe-names.cfg");
 				if (File.Exists(fullFilePath))
@@ -201,7 +201,7 @@ namespace Foreman
 
 		private static void LoadAssemblerNames(String locale = "en")
 		{
-			foreach (String dir in Directory.GetDirectories(factorioPath))
+			foreach (String dir in Directory.GetDirectories(FactorioDataPath))
 			{
 				String fullFilePath = Path.Combine(dir, "locale", locale, "entity-names.cfg");
 				if (File.Exists(fullFilePath))
@@ -255,7 +255,7 @@ namespace Foreman
 
 				string[] splitPath = fileName.Split('/');
 				splitPath[0] = splitPath[0].Trim('_');
-				fullPath = factorioPath;
+				fullPath = FactorioDataPath;
 				foreach (String pathPart in splitPath)
 				{
 					fullPath = Path.Combine(fullPath, pathPart);
