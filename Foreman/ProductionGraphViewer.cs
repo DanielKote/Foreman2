@@ -47,7 +47,7 @@ namespace Foreman
 		public bool ShowAssemblers = false;
 		StringFormat stringFormat = new StringFormat();
 
-		public Rectangle graphBounds
+		public Rectangle GraphBounds
 		{
 			get
 			{
@@ -211,6 +211,7 @@ namespace Foreman
 				}
 			}
 
+			LimitViewToBounds();
 			Invalidate(true);
 		}
 
@@ -425,6 +426,7 @@ namespace Foreman
 			if ((Control.MouseButtons & MouseButtons.Middle) != 0)
 			{
 				ViewOffset = new Point(ViewOffset.X + (int)((e.X - lastMouseDragPoint.X) / ViewScale), ViewOffset.Y + (int)((e.Y - lastMouseDragPoint.Y) / ViewScale));
+				LimitViewToBounds();
 				lastMouseDragPoint = e.Location;
 			}
 
@@ -443,6 +445,8 @@ namespace Foreman
 			}
 			ViewScale = Math.Max(ViewScale, 0.3f);
 			ViewScale = Math.Min(ViewScale, 3f);
+
+			LimitViewToBounds();
 
 			Invalidate();
 		}
@@ -486,6 +490,16 @@ namespace Foreman
 				UpdateNodes();
 				Invalidate();
 			}			
+		}
+
+		public void LimitViewToBounds()
+		{
+			Rectangle bounds = GraphBounds;
+			Point screenCentre = ScreenToGraph(Width / 2, Height / 2);
+			if (screenCentre.X < bounds.X) { ViewOffset.X -= bounds.X - screenCentre.X; }
+			if (screenCentre.Y < bounds.Y) { ViewOffset.Y -= bounds.Y - screenCentre.Y; }
+			if (screenCentre.X > bounds.X + bounds.Width) { ViewOffset.X -= bounds.X + bounds.Width - screenCentre.X; }
+			if (screenCentre.Y > bounds.Y + bounds.Height) { ViewOffset.Y -= bounds.Y + bounds.Height - screenCentre.Y; }
 		}
 
 		//Stolen from the designer file
