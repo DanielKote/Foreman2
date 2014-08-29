@@ -146,7 +146,7 @@ namespace Foreman
 
 				LoadRecipeNames();
 
-				LoadAssemblerNames();
+				LoadEntityNames();
 			}
 		}
 
@@ -275,13 +275,17 @@ namespace Foreman
 			}
 		}
 
-		private static void LoadAssemblerNames(String locale = "en")
+		private static void LoadEntityNames(String locale = "en")
 		{
 			foreach (var kvp in LocaleFiles["entity-name"])
 			{
 				if (Assemblers.ContainsKey(kvp.Key))
 				{
 					Assemblers[kvp.Key].FriendlyName = kvp.Value;
+				}
+				if (Miners.ContainsKey(kvp.Key))
+				{
+					Miners[kvp.Key].FriendlyName = kvp.Value;
 				}
 			}
 		}
