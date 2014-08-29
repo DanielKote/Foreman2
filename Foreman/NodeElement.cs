@@ -155,7 +155,8 @@ namespace Foreman
 
 			if (assemblerBox != null)
 			{
-				if (Parent.ShowAssemblers)
+				if ((DisplayedNode is RecipeNode && Parent.ShowAssemblers)
+					|| (DisplayedNode is SupplyNode && Parent.ShowMiners))
 				{
 					Height = 120;
 					if (DisplayedNode is RecipeNode)
