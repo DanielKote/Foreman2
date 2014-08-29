@@ -82,10 +82,10 @@ namespace Foreman
 				outputTabs.Add(newTab);
 			}
 
-			if (DisplayedNode is RecipeNode)
+			if (DisplayedNode is RecipeNode || DisplayedNode is SupplyNode)
 			{
 				assemblerBox = new AssemblerBox(Parent);
-				SubElements.Add(assemblerBox);
+				SubElements.Add(assemblerBox); 
 				assemblerBox.Height = assemblerBox.Width = 50;
 			}
 
@@ -146,24 +146,34 @@ namespace Foreman
 			Width = Math.Max(75, getIconWidths());
 			Width = Math.Max(Width, minWidth);
 
-			if (DisplayedNode is RecipeNode)
+			if (assemblerBox != null)
 			{
 				if (Parent.ShowAssemblers)
 				{
 					Height = 120;
-					assemblerBox.AssemblerList = (DisplayedNode as RecipeNode).GetMinimumAssemblers();
+					if (DisplayedNode is RecipeNode)
+					{
+						assemblerBox.AssemblerList = (DisplayedNode as RecipeNode).GetMinimumAssemblers();
+					}
+					else if (DisplayedNode is SupplyNode)
+					{
+						assemblerBox.AssemblerList = (DisplayedNode as SupplyNode).GetMinimumMiners();
+					}
 					assemblerBox.Width = Width - 4;
 					assemblerBox.X = (Width - assemblerBox.Width) / 2 + 2;
 					assemblerBox.Y = (Height - assemblerBox.Height) / 2 + 2;
-					assemblerBox.Update();
 				}
 				else
 				{
-					Height = 90;
 					assemblerBox.AssemblerList.Clear();
-					assemblerBox.Update();
 				}
+				assemblerBox.Update();
 			}
+
+			else
+			{
+				Height = 90;
+			}			
 
 			foreach (ItemTab tab in inputTabs.Union(outputTabs))
 			{

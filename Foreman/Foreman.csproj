@@ -84,6 +84,7 @@
     <Compile Include="Item.cs" />
     <Compile Include="MatrixStuff.cs" />
     <Compile Include="LinkElement.cs" />
+    <Compile Include="Miner.cs" />
     <Compile Include="ProductionNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -8,12 +8,12 @@ namespace Foreman
 {
 	public class AssemblerBox : GraphElement
 	{
-		public Dictionary<Assembler, int> AssemblerList;
+		public Dictionary<ProductionEntity, int> AssemblerList;
 
 		public AssemblerBox(ProductionGraphViewer parent)
 			: base(parent)
 		{
-			AssemblerList = new Dictionary<Assembler, int>();
+			AssemblerList = new Dictionary<ProductionEntity, int>();
 		}
 
 		public void Update()
@@ -65,11 +65,11 @@ namespace Foreman
 	public class AssemblerIconElement : GraphElement
 	{
 		const int maxFontSize = 14;
-		public Assembler DisplayedAssembler { get; set; }
+		public ProductionEntity DisplayedAssembler { get; set; }
 		public int DisplayedNumber { get; set; }
 		private StringFormat centreFormat = new StringFormat();
 
-		public AssemblerIconElement(Assembler assembler, int number, ProductionGraphViewer parent)
+		public AssemblerIconElement(ProductionEntity assembler, int number, ProductionGraphViewer parent)
 			: base(parent)
 		{
 			DisplayedAssembler = assembler;

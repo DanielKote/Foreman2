@@ -6,16 +6,12 @@ using System.Drawing;
 
 namespace Foreman
 {
-	public class Assembler
+	public abstract class ProductionEntity
 	{
+		public String Name { get; protected set; }
 		public bool Enabled { get; set; }
-		public String Name { get; private set; }
 		public Bitmap Icon { get; set; }
-		public List<String> Categories { get; private set; }
-		public float Speed { get; set; }
-		public int MaxIngredients { get; set; }
 		public int ModuleSlots { get; set; }
-		public List<string> AllowedEffects { get; private set; }
 		private String friendlyName;
 		public String FriendlyName
 		{
@@ -35,6 +31,14 @@ namespace Foreman
 				friendlyName = value;
 			}
 		}
+	}
+
+	public class Assembler : ProductionEntity
+	{
+		public List<String> Categories { get; private set; }
+		public float Speed { get; set; }
+		public int MaxIngredients { get; set; }
+		public List<string> AllowedEffects { get; private set; }
 
 		public Assembler(String name)
 		{

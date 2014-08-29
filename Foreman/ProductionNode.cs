@@ -207,9 +207,9 @@ namespace Foreman
 			}
 		}
 
-		public Dictionary<Assembler, int> GetMinimumAssemblers()
+		public Dictionary<ProductionEntity, int> GetMinimumAssemblers()
 		{
-			Dictionary<Assembler, int> results = new Dictionary<Assembler, int>();
+			Dictionary<ProductionEntity, int> results = new Dictionary<ProductionEntity, int>();
 
 			double requiredRate = GetRateRequiredByOutputs();
 			List<Assembler> sortedAssemblers = DataCache.Assemblers.Values
@@ -256,7 +256,7 @@ namespace Foreman
 					totalRateSoFar = 0;
 					foreach (var a in results)
 					{
-						totalRateSoFar += a.Key.GetRate(BaseRecipe) * a.Value;
+						totalRateSoFar += (a.Key as Assembler).GetRate(BaseRecipe) * a.Value;
 					}
 				}
 			}
@@ -332,6 +332,35 @@ namespace Foreman
 		public override string DisplayName
 		{
 			get { return SuppliedItem.FriendlyName; }
+		}
+		
+		public Dictionary<ProductionEntity, int> GetMinimumMiners()
+		{
+			Dictionary<ProductionEntity, int> results = new Dictionary<ProductionEntity, int>();
+
+			Resource resource = DataCache.Resources.Values.FirstOrDefault(r => r.result == SuppliedItem.Name);
+			if (resource == null)
+			{
+				return results;
+			}
+
+			List<Miner> sortedMiners = DataCache.Miners.Values
+				.Where(m => m.Enabled)
+				.Where(m => m.ResourceCategories.Contains(resource.Category))
+				.OrderBy(m => m.GetRate(resource)).ToList();
+
+			if (sortedMiners.Any())
+			{
+				float requiredRate = GetRequiredOutput(SuppliedItem);
+				Miner minerToAdd = sortedMiners.LastOrDefault(a => a.GetRate(resource) < requiredRate);
+				if (minerToAdd != null)
+				{
+					int numberToAdd = Convert.ToInt32(Math.Ceiling(requiredRate / minerToAdd.GetRate(resource)));
+					results.Add(minerToAdd, numberToAdd);
+				}
+			}
+
+			return results;
 		}
 	}
 

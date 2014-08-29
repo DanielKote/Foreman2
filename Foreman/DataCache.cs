@@ -17,6 +17,8 @@ namespace Foreman
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
 		public static Dictionary<String, Assembler> Assemblers = new Dictionary<string, Assembler>();
+		public static Dictionary<String, Miner> Miners = new Dictionary<string, Miner>();
+		public static Dictionary<String, Resource> Resources = new Dictionary<string, Resource>();
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
@@ -102,6 +104,7 @@ namespace Foreman
 						InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
 					}
 				}
+
 				LuaTable furnaceTable = lua.GetTable("data.raw")["furnace"] as LuaTable;
 				if (furnaceTable != null)
 				{
@@ -109,6 +112,26 @@ namespace Foreman
 					while (furnaceEnumerator.MoveNext())
 					{
 						InterpretFurnace(furnaceEnumerator.Key as String, furnaceEnumerator.Value as LuaTable);
+					}
+				}
+
+				LuaTable minerTable = lua.GetTable("data.raw")["mining-drill"] as LuaTable;
+				if (minerTable != null)
+				{
+					var minerEnumerator = minerTable.GetEnumerator();
+					while (minerEnumerator.MoveNext())
+					{
+						InterpretMiner(minerEnumerator.Key as String, minerEnumerator.Value as LuaTable);
+					}
+				}
+
+				LuaTable resourceTable = lua.GetTable("data.raw")["resource"] as LuaTable;
+				if (resourceTable != null)
+				{
+					var resourceEnumerator = resourceTable.GetEnumerator();
+					while (resourceEnumerator.MoveNext())
+					{
+						InterpretResource(resourceEnumerator.Key as String, resourceEnumerator.Value as LuaTable);
 					}
 				}
 
@@ -415,6 +438,51 @@ namespace Foreman
 			}
 
 			Assemblers.Add(newFurnace.Name, newFurnace);
+		}
+
+		private static void InterpretMiner(String name, LuaTable values)
+		{
+			Miner newMiner = new Miner(name);
+
+			newMiner.Icon = LoadImage(values["icon"] as String);
+			newMiner.MiningPower = Convert.ToSingle(values["mining_power"]);
+			newMiner.MiningSpeed = Convert.ToSingle(values["mining_speed"]);
+			newMiner.ModuleSlots = Convert.ToInt32(values["module_slots"]);
+
+			LuaTable categories = values["resource_categories"] as LuaTable;
+			if (categories != null)
+			{
+				foreach (String category in categories.Values)
+				{
+					newMiner.ResourceCategories.Add(category);
+				}
+			}
+
+			Miners.Add(name, newMiner);
+		}
+
+		private static void InterpretResource(String name, LuaTable values)
+		{
+			Resource newResource = new Resource(name);
+			newResource.Category = values["category"] as String;
+			if (String.IsNullOrEmpty(newResource.Category))
+			{
+				newResource.Category = "basic-solid";
+			}
+			LuaTable minableTable = values["minable"] as LuaTable;
+			newResource.Hardness = Convert.ToSingle(minableTable["hardness"]);
+			newResource.Time = Convert.ToSingle(minableTable["mining_time"]);
+
+			if (minableTable["result"] != null)
+			{
+				newResource.result = minableTable["result"] as String;
+			}
+			else
+			{
+				newResource.result = ((minableTable["results"] as LuaTable)[1] as LuaTable)["name"] as String;
+			}
+
+			Resources.Add(name, newResource);
 		}
 
 		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
