@@ -22,6 +22,7 @@ namespace Foreman
 		public static Bitmap UnknownIcon;
 		public static Dictionary<String, String> KnownRecipeNames = new Dictionary<string, string>();
 		public static Dictionary<String, Dictionary<String, String>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
+		public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
 
 		public static void LoadRecipes()
 		{
@@ -31,10 +32,12 @@ namespace Foreman
 				List<String> luaDirs = getAllModDirs().ToList();
 
 				//Add all these files to the Lua path variable
-				foreach (String d in luaDirs)
+				foreach (String dir in luaDirs)
 				{
-					lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", d.Replace("\\", "\\\\")));
+					lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", dir.Replace("\\", "\\\\"))); //Prototype folder matches package hierarchy so this is enough.
 				}
+
+				lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", Path.Combine(luaDirs[0], "lualib").Replace("\\", "\\\\"))); //Add lualib dir
 
 				String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
 				String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
@@ -45,8 +48,24 @@ namespace Foreman
 				List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
 				List<String> entityFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "entity")).ToList();
 
-				lua.DoFile(dataloaderFile);
-				lua.DoFile(autoplaceFile);
+
+				try
+				{
+					lua.DoFile(dataloaderFile);
+				}
+				catch (Exception e)
+				{
+					failedFiles[dataloaderFile] = e;
+					return; //There's no way to load anything else without this file.
+				}
+				try
+				{
+					lua.DoFile(autoplaceFile);
+				}
+				catch (Exception e)
+				{
+					failedFiles[autoplaceFile] = e;
+				}
 				foreach (String f in itemFiles.Union(recipeFiles).Union(entityFiles))
 				{
 					try
@@ -55,7 +74,7 @@ namespace Foreman
 					}
 					catch (NLua.Exceptions.LuaScriptException e)
 					{
-
+						failedFiles[f] = e;
 					}
 				}
 
@@ -119,20 +138,30 @@ namespace Foreman
 
 		private static IEnumerable<String> getAllModDirs()
 		{
+			List<String> dirs = new List<String>();
 			if (Directory.Exists(AppDataModPath))
 			{
 				foreach (String dir in Directory.GetDirectories(FactorioDataPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
-					yield return dir;
+					dirs.Add(dir);
 				}
 			}
 			if (Directory.Exists(FactorioDataPath))
 			{
 				foreach (String dir in Directory.GetDirectories(AppDataModPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
-					yield return dir;
+					dirs.Add(dir);
 				}
 			}
+
+			String baseDir = dirs.Find(d => Path.GetFileName(d) == "base");
+			String coreDir = dirs.Find(d => Path.GetFileName(d) == "core");
+			dirs.Remove(baseDir);
+			dirs.Remove(coreDir);
+			dirs.Insert(0, baseDir);
+			dirs.Insert(0, coreDir);
+
+			return dirs;
 		}
 
 		private static void InterpretItems(Lua lua, String typeName)
@@ -158,30 +187,37 @@ namespace Foreman
 				{
 					foreach (String file in Directory.GetFiles(localeDir, "*.cfg"))
 					{
-						using (StreamReader fStream = new StreamReader(file))
+						try
 						{
-							string currentIniSection = "none";
-
-							while (!fStream.EndOfStream)
+							using (StreamReader fStream = new StreamReader(file))
 							{
-								String line = fStream.ReadLine();
-								if (line.StartsWith("[") && line.EndsWith("]"))
+								string currentIniSection = "none";
+
+								while (!fStream.EndOfStream)
 								{
-									currentIniSection = line.Trim('[', ']');
-								}
-								else
-								{
-									if (!LocaleFiles.ContainsKey(currentIniSection))
+									String line = fStream.ReadLine();
+									if (line.StartsWith("[") && line.EndsWith("]"))
 									{
-										LocaleFiles.Add(currentIniSection, new Dictionary<string, string>());
+										currentIniSection = line.Trim('[', ']');
 									}
-									String[] split = line.Split('=');
-									if (split.Count() == 2)
+									else
 									{
-										LocaleFiles[currentIniSection][split[0]] = split[1];
+										if (!LocaleFiles.ContainsKey(currentIniSection))
+										{
+											LocaleFiles.Add(currentIniSection, new Dictionary<string, string>());
+										}
+										String[] split = line.Split('=');
+										if (split.Count() == 2)
+										{
+											LocaleFiles[currentIniSection][split[0]] = split[1];
+										}
 									}
 								}
 							}
+						}
+						catch (Exception e)
+						{
+							failedFiles[file] = e;
 						}
 					}
 				}
