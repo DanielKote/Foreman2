@@ -84,23 +84,32 @@ namespace Foreman
 				}
 
 				LuaTable recipeTable = lua.GetTable("data.raw")["recipe"] as LuaTable;
-				var recipeEnumerator = recipeTable.GetEnumerator();
-				while (recipeEnumerator.MoveNext())
+				if (recipeTable != null)
 				{
-					InterpretLuaRecipe(recipeEnumerator.Key as String, recipeEnumerator.Value as LuaTable);
+					var recipeEnumerator = recipeTable.GetEnumerator();
+					while (recipeEnumerator.MoveNext())
+					{
+						InterpretLuaRecipe(recipeEnumerator.Key as String, recipeEnumerator.Value as LuaTable);
+					}
 				}
 
 				LuaTable assemblerTable = lua.GetTable("data.raw")["assembling-machine"] as LuaTable;
-				var assemblerEnumerator = assemblerTable.GetEnumerator();
-				while (assemblerEnumerator.MoveNext())
+				if (assemblerTable != null)
 				{
-					InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
+					var assemblerEnumerator = assemblerTable.GetEnumerator();
+					while (assemblerEnumerator.MoveNext())
+					{
+						InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
+					}
 				}
 				LuaTable furnaceTable = lua.GetTable("data.raw")["furnace"] as LuaTable;
-				var furnaceEnumerator = furnaceTable.GetEnumerator();
-				while (furnaceEnumerator.MoveNext())
+				if (furnaceTable != null)
 				{
-					InterpretFurnace(furnaceEnumerator.Key as String, furnaceEnumerator.Value as LuaTable);
+					var furnaceEnumerator = furnaceTable.GetEnumerator();
+					while (furnaceEnumerator.MoveNext())
+					{
+						InterpretFurnace(furnaceEnumerator.Key as String, furnaceEnumerator.Value as LuaTable);
+					}
 				}
 
 				UnknownIcon = LoadImage("UnknownIcon.png");
