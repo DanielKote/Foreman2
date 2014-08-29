@@ -45,6 +45,7 @@ namespace Foreman
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 		public bool ShowAssemblers = false;
+		public bool ShowMiners = false;
 		StringFormat stringFormat = new StringFormat();
 
 		public Rectangle GraphBounds

@@ -122,7 +122,14 @@ namespace Foreman
 
 			if (DisplayedNode is SupplyNode)
 			{
-				text = "Input: " + (DisplayedNode as SupplyNode).SuppliedItem.FriendlyName;
+				if (!Parent.ShowMiners)
+				{
+					text = "Input: " + (DisplayedNode as SupplyNode).SuppliedItem.FriendlyName;
+				}
+				else
+				{
+					text = "";
+				}
 			}
 			else if (DisplayedNode is ConsumerNode)
 			{

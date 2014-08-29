@@ -63,6 +63,14 @@ namespace Foreman
 				AssemblerSelectionBox.SetItemChecked(i, true);
 			}
 
+			MinerSelectionBox.Items.AddRange(DataCache.Miners.Values.ToArray());
+			MinerSelectionBox.Sorted = true;
+			MinerSelectionBox.DisplayMember = "FriendlyName";
+			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+			{
+				MinerSelectionBox.SetItemChecked(i, true);
+			}
+
 			ItemListBox.Items.Clear();
 			ItemListBox.Items.AddRange(DataCache.Items.Values.ToArray());
 			ItemListBox.DisplayMember = "FriendlyName";
@@ -104,14 +112,14 @@ namespace Foreman
 			if ((sender as RadioButton).Checked)
 			{
 				this.GraphViewer.Graph.SelectedAmountType = AmountType.FixedAmount;
-				AssemblerDisplayCheckBox.Checked = false;
-				AssemblerDisplayCheckBox.Enabled = false;
 			}
-			else
-			{
-				AssemblerDisplayCheckBox.Checked = true;
-				AssemblerDisplayCheckBox.Enabled = true;
-			}
+
+				MinerDisplayCheckBox.Checked 
+					= MinerDisplayCheckBox.Enabled
+					= AssemblerDisplayCheckBox.Enabled
+					= AssemblerDisplayCheckBox.Checked
+					= !(sender as RadioButton).Checked;
+			
 			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
 		}
@@ -186,6 +194,18 @@ namespace Foreman
 		private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
 		{
 			((Assembler)AssemblerSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
+			GraphViewer.UpdateNodes();
+		}
+
+		private void MinerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
+			GraphViewer.UpdateNodes();
+		}
+
+		private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+		{
+			((Miner)MinerSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
 			GraphViewer.UpdateNodes();
 		}
 	}

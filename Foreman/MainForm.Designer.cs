@@ -44,9 +44,14 @@
 			this.SingleAssemblerPerRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
 			this.ExportImageButton = new System.Windows.Forms.Button();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.MinerSelectionBox = new System.Windows.Forms.CheckedListBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
+			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// ItemListBox
@@ -55,10 +60,10 @@
 			this.ItemListBox.Dock = System.Windows.Forms.DockStyle.Right;
 			this.ItemListBox.FormattingEnabled = true;
 			this.ItemListBox.IntegralHeight = false;
-			this.ItemListBox.Location = new System.Drawing.Point(3, 351);
+			this.ItemListBox.Location = new System.Drawing.Point(3, 472);
 			this.ItemListBox.Name = "ItemListBox";
 			this.ItemListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.ItemListBox.Size = new System.Drawing.Size(194, 306);
+			this.ItemListBox.Size = new System.Drawing.Size(194, 185);
 			this.ItemListBox.TabIndex = 0;
 			this.ItemListBox.SelectedIndexChanged += new System.EventHandler(this.ItemListBox_SelectedIndexChanged);
 			// 
@@ -69,17 +74,19 @@
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel1.Controls.Add(this.GraphViewer, 2, 0);
-			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 6);
+			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 7);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 5);
+			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 6);
 			this.tableLayoutPanel1.Controls.Add(this.AutomaticCompleteButton, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.ClearButton, 0, 2);
-			this.tableLayoutPanel1.Controls.Add(this.groupBox2, 0, 3);
-			this.tableLayoutPanel1.Controls.Add(this.ExportImageButton, 0, 4);
+			this.tableLayoutPanel1.Controls.Add(this.groupBox2, 0, 4);
+			this.tableLayoutPanel1.Controls.Add(this.ExportImageButton, 0, 3);
+			this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 5);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 7;
+			this.tableLayoutPanel1.RowCount = 8;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -99,7 +106,7 @@
 			this.GraphViewer.DraggedElement = null;
 			this.GraphViewer.Location = new System.Drawing.Point(203, 3);
 			this.GraphViewer.Name = "GraphViewer";
-			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 7);
+			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 8);
 			this.GraphViewer.Size = new System.Drawing.Size(823, 684);
 			this.GraphViewer.TabIndex = 1;
 			// 
@@ -202,10 +209,10 @@
 			this.groupBox2.Controls.Add(this.SingleAssemblerPerRecipeCheckBox);
 			this.groupBox2.Controls.Add(this.AssemblerDisplayCheckBox);
 			this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.groupBox2.Location = new System.Drawing.Point(3, 150);
+			this.groupBox2.Location = new System.Drawing.Point(3, 181);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.groupBox2.Size = new System.Drawing.Size(194, 164);
+			this.groupBox2.Size = new System.Drawing.Size(194, 161);
 			this.groupBox2.TabIndex = 7;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Assemblers";
@@ -215,6 +222,7 @@
 			this.AssemblerSelectionBox.CheckOnClick = true;
 			this.AssemblerSelectionBox.FormattingEnabled = true;
 			this.AssemblerSelectionBox.Location = new System.Drawing.Point(7, 84);
+			this.AssemblerSelectionBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.AssemblerSelectionBox.Name = "AssemblerSelectionBox";
 			this.AssemblerSelectionBox.Size = new System.Drawing.Size(179, 64);
 			this.AssemblerSelectionBox.TabIndex = 4;
@@ -256,13 +264,62 @@
 			// 
 			this.tableLayoutPanel1.SetColumnSpan(this.ExportImageButton, 2);
 			this.ExportImageButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ExportImageButton.Location = new System.Drawing.Point(3, 320);
+			this.ExportImageButton.Location = new System.Drawing.Point(3, 150);
 			this.ExportImageButton.Name = "ExportImageButton";
 			this.ExportImageButton.Size = new System.Drawing.Size(194, 25);
 			this.ExportImageButton.TabIndex = 8;
 			this.ExportImageButton.Text = "Export as Image";
 			this.ExportImageButton.UseVisualStyleBackColor = true;
 			this.ExportImageButton.Click += new System.EventHandler(this.ExportImageButton_Click);
+			// 
+			// groupBox3
+			// 
+			this.groupBox3.AutoSize = true;
+			this.groupBox3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.tableLayoutPanel1.SetColumnSpan(this.groupBox3, 2);
+			this.groupBox3.Controls.Add(this.MinerSelectionBox);
+			this.groupBox3.Controls.Add(this.label2);
+			this.groupBox3.Controls.Add(this.MinerDisplayCheckBox);
+			this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.groupBox3.Location = new System.Drawing.Point(3, 348);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.groupBox3.Size = new System.Drawing.Size(194, 118);
+			this.groupBox3.TabIndex = 9;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "MinerGroupBox";
+			// 
+			// MinerSelectionBox
+			// 
+			this.MinerSelectionBox.CheckOnClick = true;
+			this.MinerSelectionBox.FormattingEnabled = true;
+			this.MinerSelectionBox.Location = new System.Drawing.Point(6, 56);
+			this.MinerSelectionBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.MinerSelectionBox.Name = "MinerSelectionBox";
+			this.MinerSelectionBox.Size = new System.Drawing.Size(179, 49);
+			this.MinerSelectionBox.TabIndex = 5;
+			this.MinerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.MinerSelectionBox_ItemCheck);
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(6, 40);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(138, 13);
+			this.label2.TabIndex = 4;
+			this.label2.Text = "Enabled miners/pumpjacks:";
+			// 
+			// MinerDisplayCheckBox
+			// 
+			this.MinerDisplayCheckBox.AutoSize = true;
+			this.MinerDisplayCheckBox.Enabled = false;
+			this.MinerDisplayCheckBox.Location = new System.Drawing.Point(7, 20);
+			this.MinerDisplayCheckBox.Name = "MinerDisplayCheckBox";
+			this.MinerDisplayCheckBox.Size = new System.Drawing.Size(151, 17);
+			this.MinerDisplayCheckBox.TabIndex = 0;
+			this.MinerDisplayCheckBox.Text = "Display Miners/Pumpjacks";
+			this.MinerDisplayCheckBox.UseVisualStyleBackColor = true;
+			this.MinerDisplayCheckBox.CheckedChanged += new System.EventHandler(this.MinerDisplayCheckBox_CheckedChanged);
 			// 
 			// MainForm
 			// 
@@ -282,6 +339,8 @@
 			this.groupBox1.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
+			this.groupBox3.ResumeLayout(false);
+			this.groupBox3.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -301,9 +360,13 @@
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.CheckBox AssemblerDisplayCheckBox;
 		private System.Windows.Forms.CheckBox SingleAssemblerPerRecipeCheckBox;
-		private System.Windows.Forms.Button ExportImageButton;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.CheckedListBox AssemblerSelectionBox;
+		private System.Windows.Forms.Button ExportImageButton;
+		private System.Windows.Forms.GroupBox groupBox3;
+		private System.Windows.Forms.CheckBox MinerDisplayCheckBox;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.CheckedListBox MinerSelectionBox;
 	}
 }
 
