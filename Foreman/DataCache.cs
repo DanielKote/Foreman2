@@ -256,9 +256,9 @@ namespace Foreman
 		{
 			foreach (var kvp in LocaleFiles["entity-name"])
 			{
-				if (Recipes.ContainsKey(kvp.Key))
+				if (Assemblers.ContainsKey(kvp.Key))
 				{
-					Items[kvp.Key].FriendlyName = kvp.Value;
+					Assemblers[kvp.Key].FriendlyName = kvp.Value;
 				}
 			}
 		}
