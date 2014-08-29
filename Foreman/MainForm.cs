@@ -54,6 +54,15 @@ namespace Foreman
 
 			rateOptionsDropDown.SelectedIndex = 0;
 
+			AssemblerSelectionBox.Items.Clear();
+			AssemblerSelectionBox.Items.AddRange(DataCache.Assemblers.Values.ToArray());
+			AssemblerSelectionBox.Sorted = true;
+			AssemblerSelectionBox.DisplayMember = "FriendlyName";
+			for ( int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+			{
+				AssemblerSelectionBox.SetItemChecked(i, true);
+			}
+
 			ItemListBox.Items.Clear();
 			ItemListBox.Items.AddRange(DataCache.Items.Values.ToArray());
 			ItemListBox.DisplayMember = "FriendlyName";
@@ -172,6 +181,12 @@ namespace Foreman
 		{
 			ImageExportForm form = new ImageExportForm(GraphViewer);			
 			form.Show();
+		}
+
+		private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+		{
+			((Assembler)AssemblerSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
+			GraphViewer.UpdateNodes();
 		}
 	}
 }

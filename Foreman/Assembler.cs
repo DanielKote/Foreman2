@@ -8,6 +8,7 @@ namespace Foreman
 {
 	public class Assembler
 	{
+		public bool Enabled { get; set; }
 		public String Name { get; private set; }
 		public Bitmap Icon { get; set; }
 		public List<String> Categories { get; private set; }
@@ -37,6 +38,7 @@ namespace Foreman
 
 		public Assembler(String name)
 		{
+			Enabled = true;
 			Name = name;
 			Categories = new List<string>();
 			AllowedEffects = new List<string>();

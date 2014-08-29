@@ -213,7 +213,9 @@ namespace Foreman
 
 			double requiredRate = GetRateRequiredByOutputs();
 			List<Assembler> sortedAssemblers = DataCache.Assemblers.Values
-				.Where(a => a.Categories.Contains(BaseRecipe.Category) && a.MaxIngredients >= BaseRecipe.Ingredients.Count)
+				.Where(a => a.Enabled)
+				.Where(a => a.Categories.Contains(BaseRecipe.Category))
+				.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count)
 				.OrderBy(a => a.GetRate(BaseRecipe)).ToList();
 
 			if (sortedAssemblers.Any())
