@@ -434,7 +434,7 @@ namespace Foreman
 			newFurnace.Icon = LoadImage(values["icon"] as String);
 			newFurnace.MaxIngredients = 1;
 			newFurnace.ModuleSlots = Convert.ToInt32(values["module_slots"]);
-			newFurnace.Speed = Convert.ToSingle(values["smelting_speed"]) - 1f;
+			newFurnace.Speed = Convert.ToSingle(values["smelting_speed"]);
 
 			foreach (String category in (values["smelting_categories"] as LuaTable).Values)
 			{

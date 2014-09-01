@@ -50,7 +50,7 @@ namespace Foreman
 
 		public float GetRate(Recipe recipe)
 		{
-			return 1 / recipe.Time * (1 + Speed);
+			return 1 / recipe.Time * Speed;
 		}
 
 		public override string ToString()
