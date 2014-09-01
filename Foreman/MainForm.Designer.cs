@@ -287,7 +287,7 @@
 			this.groupBox3.Size = new System.Drawing.Size(194, 118);
 			this.groupBox3.TabIndex = 9;
 			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "MinerGroupBox";
+			this.groupBox3.Text = "Miners";
 			// 
 			// MinerSelectionBox
 			// 
