@@ -225,7 +225,7 @@ namespace Foreman
 				while (totalRateSoFar < requiredRate)
 				{
 					double remainingRate = requiredRate - totalRateSoFar;
-					Assembler assemblerToAdd = sortedAssemblers.LastOrDefault(a => a.GetRate(BaseRecipe) < remainingRate);
+					Assembler assemblerToAdd = sortedAssemblers.LastOrDefault(a => a.GetRate(BaseRecipe) <= remainingRate);
 
 					if (assemblerToAdd != null)
 					{
