@@ -71,6 +71,14 @@ namespace Foreman
 				MinerSelectionBox.SetItemChecked(i, true);
 			}
 
+			ModuleSelectionBox.Items.AddRange(DataCache.Modules.Values.ToArray());
+			ModuleSelectionBox.Sorted = true;
+			ModuleSelectionBox.DisplayMember = "FriendlyName";
+			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+			{
+				ModuleSelectionBox.SetItemChecked(i, true);
+			}
+
 			ItemListBox.Items.Clear();
 			ItemListBox.Items.AddRange(DataCache.Items.Values.ToArray());
 			ItemListBox.DisplayMember = "FriendlyName";

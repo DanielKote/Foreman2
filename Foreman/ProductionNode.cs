@@ -209,14 +209,15 @@ namespace Foreman
 
 		public Dictionary<ProductionEntity, int> GetMinimumAssemblers()
 		{
-			Dictionary<ProductionEntity, int> results = new Dictionary<ProductionEntity, int>();
+			var results = new Dictionary<ProductionEntity, int>();
 
 			double requiredRate = GetRateRequiredByOutputs();
-			List<Assembler> sortedAssemblers = DataCache.Assemblers.Values
+			List<Assembler> allowedAssemblers = DataCache.Assemblers.Values
 				.Where(a => a.Enabled)
 				.Where(a => a.Categories.Contains(BaseRecipe.Category))
-				.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count)
-				.OrderBy(a => a.GetRate(BaseRecipe)).ToList();
+				.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count).ToList();
+
+			var sortedAssemblers = allowedAssemblers.OrderBy(p => p.GetRate(BaseRecipe)).ToList();
 
 			if (sortedAssemblers.Any())
 			{
@@ -225,38 +226,38 @@ namespace Foreman
 				while (totalRateSoFar < requiredRate)
 				{
 					double remainingRate = requiredRate - totalRateSoFar;
-					Assembler assemblerToAdd = sortedAssemblers.LastOrDefault(a => a.GetRate(BaseRecipe) < remainingRate);
+					Assembler permutationToAdd = sortedAssemblers.LastOrDefault(a => a.GetRate(BaseRecipe) < remainingRate);
 
-					if (assemblerToAdd != null)
+					if (permutationToAdd != null)
 					{
 						int numberToAdd;
 						if (Graph.OneAssemblerPerRecipe)
 						{
-							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
+							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetRate(BaseRecipe)));
 						}
 						else
 						{
-							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
+							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / permutationToAdd.GetRate(BaseRecipe)));
 						}
-						results.Add(assemblerToAdd, numberToAdd);
+						results.Add(permutationToAdd, numberToAdd);
 					}
 					else
 					{
-						assemblerToAdd = sortedAssemblers.FirstOrDefault(a => a.GetRate(BaseRecipe) > remainingRate);
-						int amount = Convert.ToInt32(Math.Ceiling(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
-						if (results.ContainsKey(assemblerToAdd))
+						permutationToAdd = sortedAssemblers.FirstOrDefault(a => a.GetRate(BaseRecipe) > remainingRate);
+						int amount = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetRate(BaseRecipe)));
+						if (results.ContainsKey(permutationToAdd))
 						{
-							results[assemblerToAdd] += amount;
+							results[permutationToAdd] += amount;
 						}
 						else
 						{
-							results.Add(assemblerToAdd, amount);
+							results.Add(permutationToAdd, amount);
 						}
 					}
 					totalRateSoFar = 0;
 					foreach (var a in results)
 					{
-						totalRateSoFar += (a.Key as Assembler).GetRate(BaseRecipe) * a.Value;
+						totalRateSoFar += ((Assembler)a.Key).GetRate(BaseRecipe) * a.Value;
 					}
 				}
 			}
@@ -333,7 +334,7 @@ namespace Foreman
 		{
 			get { return SuppliedItem.FriendlyName; }
 		}
-		
+
 		public Dictionary<ProductionEntity, int> GetMinimumMiners()
 		{
 			Dictionary<ProductionEntity, int> results = new Dictionary<ProductionEntity, int>();
@@ -344,10 +345,11 @@ namespace Foreman
 				return results;
 			}
 
-			List<Miner> sortedMiners = DataCache.Miners.Values
+			List<Miner> allowedMiners = DataCache.Miners.Values
 				.Where(m => m.Enabled)
-				.Where(m => m.ResourceCategories.Contains(resource.Category))
-				.OrderBy(m => m.GetRate(resource)).ToList();
+				.Where(m => m.ResourceCategories.Contains(resource.Category)).ToList();
+
+			List<Miner> sortedMiners = allowedMiners.OrderBy(p => p.GetRate(resource)).ToList();
 
 			if (sortedMiners.Any())
 			{

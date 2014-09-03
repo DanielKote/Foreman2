@@ -19,11 +19,10 @@ namespace Foreman
 			Name = name;
 		}
 	}
-	
+
 	public class Miner : ProductionEntity
 	{
 		public List<String> ResourceCategories { get; private set; }
-		public float MiningSpeed { get; set; }
 		public float MiningPower { get; set; }
 
 		public Miner(String name)
@@ -36,7 +35,7 @@ namespace Foreman
 		public float GetRate(Resource resource)
 		{
 			//According to http://www.factorioforums.com/wiki/index.php?title=Mining_drill
-			return (MiningPower - resource.Hardness) * MiningSpeed / resource.Time;
+			return (MiningPower - resource.Hardness) * Speed / resource.Time;
 		}
 	}
 }

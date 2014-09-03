@@ -83,7 +83,7 @@ namespace Foreman
 			{
 				float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
 				int iconSize = (int)Math.Min(Width - StringWidth, Height);
-
+				
 				graphics.DrawImage(DisplayedAssembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
 				graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
 			}
