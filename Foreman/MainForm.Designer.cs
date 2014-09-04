@@ -350,6 +350,7 @@
 			this.ModuleSelectionBox.Name = "ModuleSelectionBox";
 			this.ModuleSelectionBox.Size = new System.Drawing.Size(179, 49);
 			this.ModuleSelectionBox.TabIndex = 6;
+			this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
 			// 
 			// MainForm
 			// 

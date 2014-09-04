@@ -216,5 +216,11 @@ namespace Foreman
 			((Miner)MinerSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
 			GraphViewer.UpdateNodes();
 		}
+
+		private void ModuleSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+		{
+			((Module)ModuleSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
+			GraphViewer.UpdateNodes();
+		}
 	}
 }
