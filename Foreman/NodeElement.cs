@@ -167,15 +167,19 @@ namespace Foreman
 					{
 						assemblerBox.AssemblerList = (DisplayedNode as SupplyNode).GetMinimumMiners();
 					}
-					assemblerBox.Width = Width - 4;
+					assemblerBox.Update();
+					Width = Math.Max(Width, assemblerBox.Width + 20);
+					Height = assemblerBox.Height + 80;
 					assemblerBox.X = (Width - assemblerBox.Width) / 2 + 2;
 					assemblerBox.Y = (Height - assemblerBox.Height) / 2 + 2;
 				}
 				else
 				{
 					assemblerBox.AssemblerList.Clear();
+					Width = Math.Max(100, Width);
+					Height = 90;
+					assemblerBox.Update();
 				}
-				assemblerBox.Update();
 			}
 
 			else

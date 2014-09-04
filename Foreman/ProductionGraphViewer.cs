@@ -122,6 +122,7 @@ namespace Foreman
 					Elements.Add(new LinkElement(this, link));
 				}
 			}
+
 			UpdateNodes();
 			Invalidate();
 		}
