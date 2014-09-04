@@ -8,19 +8,19 @@ namespace Foreman
 {
 	public class AssemblerBox : GraphElement
 	{
-		public Dictionary<ProductionEntity, int> AssemblerList;
+		public Dictionary<MachinePermutation, int> AssemblerList;
 
 		public AssemblerBox(ProductionGraphViewer parent)
 			: base(parent)
 		{
-			AssemblerList = new Dictionary<ProductionEntity, int>();
+			AssemblerList = new Dictionary<MachinePermutation, int>();
 		}
 
 		public void Update()
 		{
 			foreach (AssemblerIconElement element in SubElements.OfType<AssemblerIconElement>().ToList())
 			{
-				if (!AssemblerList.Keys.Contains(element.DisplayedAssembler))
+				if (!AssemblerList.Keys.Contains(element.DisplayedMachine))
 				{
 					SubElements.Remove(element);
 				}
@@ -28,9 +28,9 @@ namespace Foreman
 
 			foreach (var kvp in AssemblerList)
 			{
-				if (!SubElements.OfType<AssemblerIconElement>().Any(aie => aie.DisplayedAssembler == kvp.Key))
+				if (!SubElements.OfType<AssemblerIconElement>().Any(aie => aie.DisplayedMachine == kvp.Key))
 				{
-					SubElements.Add(new AssemblerIconElement(kvp.Key, kvp.Value, Parent));
+					SubElements.Add(new AssemblerIconElement(kvp.Key, kvp.Value, Parent));  
 				}
 			}
 
@@ -40,7 +40,7 @@ namespace Foreman
 			int i = 0;
 			foreach (AssemblerIconElement element in SubElements.OfType<AssemblerIconElement>())
 			{
-				element.DisplayedNumber = AssemblerList[element.DisplayedAssembler];
+				element.DisplayedNumber = AssemblerList[element.DisplayedMachine];
 
 				element.Width = width;
 				element.Height = height;
@@ -65,14 +65,14 @@ namespace Foreman
 	public class AssemblerIconElement : GraphElement
 	{
 		const int maxFontSize = 14;
-		public ProductionEntity DisplayedAssembler { get; set; }
+		public MachinePermutation DisplayedMachine { get; set; }
 		public int DisplayedNumber { get; set; }
 		private StringFormat centreFormat = new StringFormat();
 
-		public AssemblerIconElement(ProductionEntity assembler, int number, ProductionGraphViewer parent)
+		public AssemblerIconElement(MachinePermutation assembler, int number, ProductionGraphViewer parent)
 			: base(parent)
 		{
-			DisplayedAssembler = assembler;
+			DisplayedMachine = assembler;
 			DisplayedNumber = number;
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
 		}
@@ -84,7 +84,7 @@ namespace Foreman
 				float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
 				int iconSize = (int)Math.Min(Width - StringWidth, Height);
 				
-				graphics.DrawImage(DisplayedAssembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
+				graphics.DrawImage(DisplayedMachine.assembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
 				graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
 			}
 		}

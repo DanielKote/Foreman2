@@ -509,7 +509,7 @@ namespace Foreman
 						tti.Text += String.Format("\n\nAssemblers:");
 						foreach(var kvp in assemblerBox.AssemblerList)
 						{
-							tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
+							tti.Text += String.Format("\n----{0} ({1})", kvp.Key.assembler.FriendlyName, kvp.Value.ToString());
 						}
 					}
 					Parent.AddTooltip(tti);

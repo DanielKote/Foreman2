@@ -6,6 +6,29 @@ using System.Drawing;
 
 namespace Foreman
 {
+	public class MachinePermutation
+	{
+		public ProductionEntity assembler;
+		public List<Module> modules;
+
+		public float GetRate(float timeDivisor)
+		{
+			float speed = assembler.Speed;
+
+			foreach (Module module in modules.OfType<Module>())
+			{
+				speed += module.SpeedBonus;
+			}
+
+			return 1 / timeDivisor * speed;
+		}
+
+		public MachinePermutation(ProductionEntity machine, ICollection<Module> modules)
+		{
+			assembler = machine;
+			this.modules = modules.ToList();
+		}
+	}
 
 	public abstract class ProductionEntity
 	{
@@ -33,6 +56,32 @@ namespace Foreman
 				friendlyName = value;
 			}
 		}
+
+		public float GetRate(float timeDivisor)
+		{
+			return 1 / timeDivisor * Speed;
+		}
+
+		public IEnumerable<MachinePermutation> GetAllPermutations()
+		{
+			yield return new MachinePermutation(this, new List<Module>());
+
+			Module[] currentModules = new Module[ModuleSlots];
+
+			if (ModuleSlots <= 0)
+			{
+				yield break;
+			}
+
+			foreach (Module module in DataCache.Modules.Values.Where(m => m.Enabled))
+			{
+				for (int i = 0; i < ModuleSlots; i++)
+				{
+					currentModules[i] = module;
+					yield return new MachinePermutation(this, currentModules);
+				}
+			}
+		}
 	}
 
 	public class Assembler : ProductionEntity
@@ -47,11 +96,6 @@ namespace Foreman
 			Name = name;
 			Categories = new List<string>();
 			AllowedEffects = new List<string>();
-		}
-
-		public float GetRate(Recipe recipe)
-		{
-			return 1 / recipe.Time * Speed;
 		}
 
 		public override string ToString()
@@ -89,6 +133,7 @@ namespace Foreman
 		{
 			SpeedBonus = speedBonus;
 			Name = name;
+			Enabled = true;
 		}
 	}
 }
