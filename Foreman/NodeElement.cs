@@ -514,6 +514,10 @@ namespace Foreman
 						foreach(var kvp in assemblerBox.AssemblerList)
 						{
 							tti.Text += String.Format("\n----{0} ({1})", kvp.Key.assembler.FriendlyName, kvp.Value.ToString());
+							foreach (var Module in kvp.Key.modules)
+							{
+								tti.Text += String.Format("\n------{0}", Module.FriendlyName);
+							}
 						}
 					}
 					Parent.AddTooltip(tti);
