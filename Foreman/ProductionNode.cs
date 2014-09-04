@@ -233,7 +233,7 @@ namespace Foreman
 				while (totalRateSoFar < requiredRate)
 				{
 					double remainingRate = requiredRate - totalRateSoFar;
-					MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(p => p.GetRate(BaseRecipe.Time) < remainingRate);
+					MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(p => p.GetRate(BaseRecipe.Time) <= remainingRate);
 
 					if (permutationToAdd != null)
 					{
