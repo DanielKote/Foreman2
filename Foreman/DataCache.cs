@@ -39,10 +39,10 @@ namespace Foreman
 				//Add all these files to the Lua path variable
 				foreach (String dir in luaDirs)
 				{
-					lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", dir.Replace("\\", "\\\\"))); //Prototype folder matches package hierarchy so this is enough.
+					lua.DoString(String.Format("package.path = package.path .. ';{0}/?.lua'", dir)); //Prototype folder matches package hierarchy so this is enough.
 				}
 
-				lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", Path.Combine(luaDirs[0], "lualib").Replace("\\", "\\\\"))); //Add lualib dir
+				lua.DoString(String.Format("package.path = package.path .. ';{0}/?.lua'", Path.Combine(luaDirs[0], "lualib"))); //Add lualib dir
 
 				String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
 				String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
@@ -81,6 +81,17 @@ namespace Foreman
 						failedFiles[f] = e;
 					}
 				}
+
+				String errors = "";
+				foreach (String file in failedFiles.Keys)
+				{
+					if (!file.EndsWith("demo-turrets.lua") && !file.EndsWith("turrets.lua"))
+					{
+						// These two are known to fail (on Linux using lua 5.2 at least)
+						errors += String.Format("Failed to load file {0}: {1}", file, failedFiles[file]);
+					}
+				}
+				if(!errors.Equals("")) MessageBox.Show(errors);
 
 				foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item" })
 				{
@@ -181,14 +192,14 @@ namespace Foreman
 		private static IEnumerable<String> getAllModDirs()
 		{
 			List<String> dirs = new List<String>();
-			if (Directory.Exists(AppDataModPath))
+			if (Directory.Exists(FactorioDataPath))
 			{
 				foreach (String dir in Directory.GetDirectories(FactorioDataPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
 					dirs.Add(dir);
 				}
 			}
-			if (Directory.Exists(FactorioDataPath))
+			if (Directory.Exists(AppDataModPath))
 			{
 				foreach (String dir in Directory.GetDirectories(AppDataModPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
