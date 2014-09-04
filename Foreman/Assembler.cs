@@ -106,6 +106,14 @@ namespace Foreman
 
 	public class Module
 	{
+		public Bitmap Icon
+		{
+			get
+			{
+				//For each module there should be a corresponding item with the icon already loaded.
+				return DataCache.Items[Name].Icon;
+			}
+		}
 		public bool Enabled { get; set; }
 		public float SpeedBonus { get; set; }
 		public string Name { get; private set; }

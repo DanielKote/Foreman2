@@ -83,9 +83,38 @@ namespace Foreman
 			{
 				float StringWidth = graphics.MeasureString(DisplayedNumber.ToString(), font).Width;
 				int iconSize = (int)Math.Min(Width - StringWidth, Height);
-				
-				graphics.DrawImage(DisplayedMachine.assembler.Icon, (Width + iconSize + StringWidth) / 2 - iconSize, (Height - iconSize) / 2, iconSize, iconSize);
+				Point iconPoint = new Point((int)((Width + iconSize + StringWidth) / 2 - iconSize), (int)((Height - iconSize) / 2));
+
+				graphics.DrawImage(DisplayedMachine.assembler.Icon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
 				graphics.DrawString(DisplayedNumber.ToString(), font, Brushes.Black, new Point((int)((Width - iconSize - StringWidth) / 2 + StringWidth / 2), Height / 2), centreFormat);
+
+				if (DisplayedMachine.modules.Any())
+				{
+					int moduleCount = DisplayedMachine.modules.OfType<Module>().Count();
+					int numModuleRows = (int)Math.Ceiling(moduleCount / 2d);
+					int moduleSize = iconSize / 2 / numModuleRows;
+
+					int i = 0;
+					int x;
+					
+					if (moduleCount == 1)
+					{
+						x = iconPoint.X + (iconSize - moduleSize) / 2;
+					} else {
+						x = iconPoint.X + (iconSize - moduleSize - moduleSize) / 2;
+					}
+					int y = iconPoint.Y + (iconSize - (moduleSize * numModuleRows)) / 2;
+					for (int r = 0; r < numModuleRows; r++)
+					{
+						graphics.DrawImage(DisplayedMachine.modules[i].Icon, x, y + (r * moduleSize), moduleSize, moduleSize);
+						i++;
+						if (i < DisplayedMachine.modules.Count && DisplayedMachine.modules[i] != null)
+						{
+							graphics.DrawImage(DisplayedMachine.modules[i].Icon, x + moduleSize, y + (r * moduleSize), moduleSize, moduleSize);
+							i++;
+						}
+					}
+				}
 			}
 		}
 	}
