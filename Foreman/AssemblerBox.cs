@@ -133,37 +133,39 @@ namespace Foreman
 
 		public override void Paint(Graphics graphics)
 		{
-				Point iconPoint = new Point((int)((Width + iconSize + stringWidth) / 2 - iconSize), (int)((Height - iconSize) / 2));
+			Point iconPoint = new Point((int)((Width + iconSize + stringWidth) / 2 - iconSize), (int)((Height - iconSize) / 2));
 
-				graphics.DrawImage(DisplayedMachine.assembler.Icon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
-				graphics.DrawString(DisplayedNumber.ToString(), Font, Brushes.Black, new Point((int)((Width - iconSize - stringWidth) / 2 + stringWidth / 2), Height / 2), centreFormat);
+			graphics.DrawImage(DisplayedMachine.assembler.Icon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
+			graphics.DrawString(DisplayedNumber.ToString(), Font, Brushes.Black, new Point((int)((Width - iconSize - stringWidth) / 2 + stringWidth / 2), Height / 2), centreFormat);
 
-				if (DisplayedMachine.modules.Any())
+			if (DisplayedMachine.modules.Any())
+			{
+				int moduleCount = DisplayedMachine.modules.OfType<Module>().Count();
+				int numModuleRows = (int)Math.Ceiling(moduleCount / 2d);
+				int moduleSize = Math.Min((int)(iconSize / numModuleRows), iconSize / (2 - moduleCount % 2));
+
+				int i = 0;
+				int x;
+
+				if (moduleCount == 1)
 				{
-					int moduleCount = DisplayedMachine.modules.OfType<Module>().Count();
-					int numModuleRows = (int)Math.Ceiling(moduleCount / 2d);
-					int moduleSize = (int)(iconSize / 1.5f / numModuleRows);
-
-					int i = 0;
-					int x;
-					
-					if (moduleCount == 1)
+					x = iconPoint.X + (iconSize - moduleSize) / 2;
+				}
+				else
+				{
+					x = iconPoint.X + (iconSize - moduleSize - moduleSize) / 2;
+				}
+				int y = iconPoint.Y + (iconSize - (moduleSize * numModuleRows)) / 2;
+				for (int r = 0; r < numModuleRows; r++)
+				{
+					graphics.DrawImage(DisplayedMachine.modules[i].Icon, x, y + (r * moduleSize), moduleSize, moduleSize);
+					i++;
+					if (i < DisplayedMachine.modules.Count && DisplayedMachine.modules[i] != null)
 					{
-						x = iconPoint.X + (iconSize - moduleSize) / 2;
-					} else {
-						x = iconPoint.X + (iconSize - moduleSize - moduleSize) / 2;
-					}
-					int y = iconPoint.Y + (iconSize - (moduleSize * numModuleRows)) / 2;
-					for (int r = 0; r < numModuleRows; r++)
-					{
-						graphics.DrawImage(DisplayedMachine.modules[i].Icon, x, y + (r * moduleSize), moduleSize, moduleSize);
+						graphics.DrawImage(DisplayedMachine.modules[i].Icon, x + moduleSize, y + (r * moduleSize), moduleSize, moduleSize);
 						i++;
-						if (i < DisplayedMachine.modules.Count && DisplayedMachine.modules[i] != null)
-						{
-							graphics.DrawImage(DisplayedMachine.modules[i].Icon, x + moduleSize, y + (r * moduleSize), moduleSize, moduleSize);
-							i++;
-						}
 					}
+				}
 			}
 		}
 	}
