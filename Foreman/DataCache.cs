@@ -39,10 +39,10 @@ namespace Foreman
 				//Add all these files to the Lua path variable
 				foreach (String dir in luaDirs)
 				{
-					lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", dir.Replace("\\", "\\\\"))); //Prototype folder matches package hierarchy so this is enough.
+					AddLuaPackagePath(lua, dir); //Prototype folder matches package hierarchy so this is enough.
 				}
 
-				lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", Path.Combine(luaDirs[0], "lualib").Replace("\\", "\\\\"))); //Add lualib dir
+				AddLuaPackagePath(lua, Path.Combine(luaDirs[0], "lualib")); //Add lualib dir
 
 				String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
 				String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
@@ -158,6 +158,13 @@ namespace Foreman
 				LoadEntityNames();
 				LoadModuleNames();
 			}
+		}
+
+		private static void AddLuaPackagePath(Lua lua, string dir)
+		{
+			string luaCommand = String.Format("package.path = package.path .. ';{0}{1}?.lua'", dir, Path.DirectorySeparatorChar);
+			luaCommand.Replace("\\", "\\\\");
+			lua.DoString(luaCommand);
 		}
 
 		private static IEnumerable<String> getAllLuaFiles()
