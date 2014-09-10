@@ -181,14 +181,14 @@ namespace Foreman
 		private static IEnumerable<String> getAllModDirs()
 		{
 			List<String> dirs = new List<String>();
-			if (Directory.Exists(AppDataModPath))
+			if (Directory.Exists(FactorioDataPath))
 			{
 				foreach (String dir in Directory.GetDirectories(FactorioDataPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
 					dirs.Add(dir);
 				}
 			}
-			if (Directory.Exists(FactorioDataPath))
+			if (Directory.Exists(AppDataModPath))
 			{
 				foreach (String dir in Directory.GetDirectories(AppDataModPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
