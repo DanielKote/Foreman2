@@ -142,7 +142,7 @@ namespace Foreman
 			{
 				int moduleCount = DisplayedMachine.modules.OfType<Module>().Count();
 				int numModuleRows = (int)Math.Ceiling(moduleCount / 2d);
-				int moduleSize = Math.Min((int)(iconSize / numModuleRows), iconSize / (2 - moduleCount % 2));
+				int moduleSize = Math.Min((int)(iconSize / numModuleRows), iconSize / (2 - moduleCount % 2)) - 2;
 
 				int i = 0;
 				int x;

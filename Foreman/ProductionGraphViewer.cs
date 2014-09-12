@@ -373,18 +373,17 @@ namespace Foreman
 		{
 			Focus();
 
-			var element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
-			if (element != null)
+			var clickedElement = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
+			if (clickedElement != null)
 			{
-				element.MouseDown(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)), e.Button);
+				clickedElement.MouseDown(Point.Add(ScreenToGraph(e.Location), new Size(-clickedElement.X, -clickedElement.Y)), e.Button);
 			}
 
-			switch (e.Button)
+			if (e.Button == MouseButtons.Middle ||
+				(e.Button == MouseButtons.Left && clickedElement == null))
 			{
-				case MouseButtons.Middle:
-					IsBeingDragged = true;
-					lastMouseDragPoint = new Point(e.X, e.Y);
-					break;
+				IsBeingDragged = true;
+				lastMouseDragPoint = new Point(e.X, e.Y);
 			}
 		}
 
@@ -403,6 +402,7 @@ namespace Foreman
 			switch (e.Button)
 			{
 				case MouseButtons.Middle:
+				case MouseButtons.Left:
 					IsBeingDragged = false;
 					break;
 			}
@@ -425,7 +425,8 @@ namespace Foreman
 				}
 			}
 
-			if ((Control.MouseButtons & MouseButtons.Middle) != 0)
+			if ((Control.MouseButtons & MouseButtons.Middle) != 0
+				|| ((Control.MouseButtons & MouseButtons.Left) != 0 && DraggedElement == null))
 			{
 				ViewOffset = new Point(ViewOffset.X + (int)((e.X - lastMouseDragPoint.X) / ViewScale), ViewOffset.Y + (int)((e.Y - lastMouseDragPoint.Y) / ViewScale));
 				LimitViewToBounds();
