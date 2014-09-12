@@ -163,7 +163,7 @@ namespace Foreman
 		private static void AddLuaPackagePath(Lua lua, string dir)
 		{
 			string luaCommand = String.Format("package.path = package.path .. ';{0}{1}?.lua'", dir, Path.DirectorySeparatorChar);
-			luaCommand.Replace("\\", "\\\\");
+			luaCommand = luaCommand.Replace("\\", "\\\\");
 			lua.DoString(luaCommand);
 		}
 
