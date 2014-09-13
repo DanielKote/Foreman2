@@ -194,7 +194,7 @@ namespace Foreman
             return BaseRecipe.Results[item] * rate;
         }
 
-		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to require half an item, for example)
+		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
 		private float ValidateRecipeRate(float amount)
 		{
 			if (Graph.SelectedAmountType == AmountType.FixedAmount)
@@ -207,56 +207,64 @@ namespace Foreman
 			}
 		}
 
-		public Dictionary<ProductionEntity, int> GetMinimumAssemblers()
+		public Dictionary<MachinePermutation, int> GetMinimumAssemblers()
 		{
-			Dictionary<ProductionEntity, int> results = new Dictionary<ProductionEntity, int>();
+			var results = new Dictionary<MachinePermutation, int>();
 
 			double requiredRate = GetRateRequiredByOutputs();
-			List<Assembler> sortedAssemblers = DataCache.Assemblers.Values
+			List<Assembler> allowedAssemblers = DataCache.Assemblers.Values
 				.Where(a => a.Enabled)
 				.Where(a => a.Categories.Contains(BaseRecipe.Category))
-				.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count)
-				.OrderBy(a => a.GetRate(BaseRecipe)).ToList();
+				.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count).ToList();
 
-			if (sortedAssemblers.Any())
+			List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
+
+			foreach (Assembler assembler in allowedAssemblers)
+			{
+				allowedPermutations.AddRange(assembler.GetAllPermutations());
+			}
+
+			var sortedPermutations = allowedPermutations.OrderBy(a => a.GetRate(BaseRecipe.Time)).ToList();
+
+			if (sortedPermutations.Any())
 			{
 				double totalRateSoFar = 0;
 
 				while (totalRateSoFar < requiredRate)
 				{
 					double remainingRate = requiredRate - totalRateSoFar;
-					Assembler assemblerToAdd = sortedAssemblers.LastOrDefault(a => a.GetRate(BaseRecipe) <= remainingRate);
+					MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(p => p.GetRate(BaseRecipe.Time) <= remainingRate);
 
-					if (assemblerToAdd != null)
+					if (permutationToAdd != null)
 					{
 						int numberToAdd;
 						if (Graph.OneAssemblerPerRecipe)
 						{
-							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
+							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetRate(BaseRecipe.Time)));
 						}
 						else
 						{
-							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
+							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / permutationToAdd.GetRate(BaseRecipe.Time)));
 						}
-						results.Add(assemblerToAdd, numberToAdd);
+						results.Add(permutationToAdd, numberToAdd);
 					}
 					else
 					{
-						assemblerToAdd = sortedAssemblers.FirstOrDefault(a => a.GetRate(BaseRecipe) > remainingRate);
-						int amount = Convert.ToInt32(Math.Ceiling(remainingRate / assemblerToAdd.GetRate(BaseRecipe)));
-						if (results.ContainsKey(assemblerToAdd))
+						permutationToAdd = sortedPermutations.FirstOrDefault(a => a.GetRate(BaseRecipe.Time) > remainingRate);
+						int amount = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetRate(BaseRecipe.Time)));
+						if (results.ContainsKey(permutationToAdd))
 						{
-							results[assemblerToAdd] += amount;
+							results[permutationToAdd] += amount;
 						}
 						else
 						{
-							results.Add(assemblerToAdd, amount);
+							results.Add(permutationToAdd, amount);
 						}
 					}
 					totalRateSoFar = 0;
 					foreach (var a in results)
 					{
-						totalRateSoFar += (a.Key as Assembler).GetRate(BaseRecipe) * a.Value;
+						totalRateSoFar += a.Key.GetRate(BaseRecipe.Time) * a.Value;
 					}
 				}
 			}
@@ -333,10 +341,10 @@ namespace Foreman
 		{
 			get { return SuppliedItem.FriendlyName; }
 		}
-		
-		public Dictionary<ProductionEntity, int> GetMinimumMiners()
+
+		public Dictionary<MachinePermutation, int> GetMinimumMiners()
 		{
-			Dictionary<ProductionEntity, int> results = new Dictionary<ProductionEntity, int>();
+			Dictionary<MachinePermutation, int> results = new Dictionary<MachinePermutation, int>();
 
 			Resource resource = DataCache.Resources.Values.FirstOrDefault(r => r.result == SuppliedItem.Name);
 			if (resource == null)
@@ -344,19 +352,26 @@ namespace Foreman
 				return results;
 			}
 
-			List<Miner> sortedMiners = DataCache.Miners.Values
+			List<Miner> allowedMiners = DataCache.Miners.Values
 				.Where(m => m.Enabled)
-				.Where(m => m.ResourceCategories.Contains(resource.Category))
-				.OrderBy(m => m.GetRate(resource)).ToList();
+				.Where(m => m.ResourceCategories.Contains(resource.Category)).ToList();
 
-			if (sortedMiners.Any())
+			List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
+			foreach (Miner miner in allowedMiners)
+			{
+				allowedPermutations.AddRange(miner.GetAllPermutations());
+			}
+
+			List<MachinePermutation> sortedPermutations = allowedPermutations.OrderBy(p => p.GetRate(resource.Time)).ToList();
+
+			if (sortedPermutations.Any())
 			{
 				float requiredRate = GetRequiredOutput(SuppliedItem);
-				Miner minerToAdd = sortedMiners.LastOrDefault(a => a.GetRate(resource) < requiredRate);
-				if (minerToAdd != null)
+				MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(a => a.GetRate(resource.Time) < requiredRate);
+				if (permutationToAdd != null)
 				{
-					int numberToAdd = Convert.ToInt32(Math.Ceiling(requiredRate / minerToAdd.GetRate(resource)));
-					results.Add(minerToAdd, numberToAdd);
+					int numberToAdd = Convert.ToInt32(Math.Ceiling(requiredRate / permutationToAdd.GetRate(resource.Time)));
+					results.Add(permutationToAdd, numberToAdd);
 				}
 			}
 

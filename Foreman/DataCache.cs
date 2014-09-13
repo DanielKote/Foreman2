@@ -14,11 +14,14 @@ namespace Foreman
 		//Still hardcoded. Needs to ask the user if it can't be found.
 		public static String FactorioDataPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 		public static String AppDataModPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Factorio", "mods");
+
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
 		public static Dictionary<String, Assembler> Assemblers = new Dictionary<string, Assembler>();
 		public static Dictionary<String, Miner> Miners = new Dictionary<string, Miner>();
 		public static Dictionary<String, Resource> Resources = new Dictionary<string, Resource>();
+		public static Dictionary<String, Module> Modules = new Dictionary<string, Module>();
+
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
@@ -36,10 +39,10 @@ namespace Foreman
 				//Add all these files to the Lua path variable
 				foreach (String dir in luaDirs)
 				{
-					lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", dir.Replace("\\", "\\\\"))); //Prototype folder matches package hierarchy so this is enough.
+					AddLuaPackagePath(lua, dir); //Prototype folder matches package hierarchy so this is enough.
 				}
 
-				lua.DoString(String.Format("package.path = package.path .. ';{0}\\\\?.lua'", Path.Combine(luaDirs[0], "lualib").Replace("\\", "\\\\"))); //Add lualib dir
+				AddLuaPackagePath(lua, Path.Combine(luaDirs[0], "lualib")); //Add lualib dir
 
 				String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
 				String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
@@ -49,8 +52,7 @@ namespace Foreman
 				itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "equipment")).ToList());
 				List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
 				List<String> entityFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "entity")).ToList();
-
-
+				
 				try
 				{
 					lua.DoFile(dataloaderFile);
@@ -135,6 +137,15 @@ namespace Foreman
 					}
 				}
 
+				LuaTable moduleTable = lua.GetTable("data.raw")["module"] as LuaTable;
+				if (moduleTable != null)
+				{
+					foreach (String moduleName in moduleTable.Keys)
+					{
+						InterpretModule(moduleName, moduleTable[moduleName] as LuaTable);
+					}
+				}
+
 				UnknownIcon = LoadImage("UnknownIcon.png");
 
 				LoadLocaleFiles();
@@ -143,11 +154,17 @@ namespace Foreman
 				LoadItemNames("fluid-name");
 				LoadItemNames("entity-name");
 				LoadItemNames("equipment-name");
-
 				LoadRecipeNames();
-
 				LoadEntityNames();
+				LoadModuleNames();
 			}
+		}
+
+		private static void AddLuaPackagePath(Lua lua, string dir)
+		{
+			string luaCommand = String.Format("package.path = package.path .. ';{0}{1}?.lua'", dir, Path.DirectorySeparatorChar);
+			luaCommand = luaCommand.Replace("\\", "\\\\");
+			lua.DoString(luaCommand);
 		}
 
 		private static IEnumerable<String> getAllLuaFiles()
@@ -171,14 +188,14 @@ namespace Foreman
 		private static IEnumerable<String> getAllModDirs()
 		{
 			List<String> dirs = new List<String>();
-			if (Directory.Exists(AppDataModPath))
+			if (Directory.Exists(FactorioDataPath))
 			{
 				foreach (String dir in Directory.GetDirectories(FactorioDataPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
 					dirs.Add(dir);
 				}
 			}
-			if (Directory.Exists(FactorioDataPath))
+			if (Directory.Exists(AppDataModPath))
 			{
 				foreach (String dir in Directory.GetDirectories(AppDataModPath, "*", SearchOption.TopDirectoryOnly).ToList())
 				{
@@ -286,6 +303,17 @@ namespace Foreman
 				if (Miners.ContainsKey(kvp.Key))
 				{
 					Miners[kvp.Key].FriendlyName = kvp.Value;
+				}
+			}
+		}
+
+		private static void LoadModuleNames(String locale = "en")
+		{
+			foreach (var kvp in LocaleFiles["item-name"])
+			{
+				if (Modules.ContainsKey(kvp.Key))
+				{
+					Modules[kvp.Key].FriendlyName = kvp.Value;
 				}
 			}
 		}
@@ -450,7 +478,7 @@ namespace Foreman
 
 			newMiner.Icon = LoadImage(values["icon"] as String);
 			newMiner.MiningPower = Convert.ToSingle(values["mining_power"]);
-			newMiner.MiningSpeed = Convert.ToSingle(values["mining_speed"]);
+			newMiner.Speed = Convert.ToSingle(values["mining_speed"]);
 			newMiner.ModuleSlots = Convert.ToInt32(values["module_slots"]);
 
 			LuaTable categories = values["resource_categories"] as LuaTable;
@@ -487,6 +515,25 @@ namespace Foreman
 			}
 
 			Resources.Add(name, newResource);
+		}
+
+		private static void InterpretModule(String name, LuaTable values)
+		{
+			float speedBonus = 0f;
+
+			LuaTable effectTable = values["effect"] as LuaTable;
+			LuaTable speed = effectTable["speed"] as LuaTable;
+			if (speed != null)
+			{
+				speedBonus = Convert.ToSingle(speed["bonus"]);
+			}
+
+			if (speed == null || speedBonus <= 0)
+			{
+				return;
+			}
+
+			Modules.Add(name, new Module(name, speedBonus));
 		}
 
 		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
