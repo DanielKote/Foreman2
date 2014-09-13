@@ -101,3 +101,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ===============================================================================
+
+lp_solve License
+----------------
+
+lp_solve is licensed under LGPL 2.1, provided in a separate file.
+
+===============================================================================
