@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using lpsolve55;
 
 namespace Foreman
 {
@@ -92,8 +94,175 @@ namespace Foreman
 			}
 		}
 
+        private Dictionary<Item, double> GetNeededItems()
+        {
+            Dictionary<Item, double> neededItems = new Dictionary<Item, double>();
+
+            foreach (ProductionNode node in Nodes.ToList())
+            {
+                foreach (Item item in node.Inputs)
+                {
+                    double amountNeeded = Math.Round(node.GetUnsatisfiedDemand(item), 4);
+                    if (amountNeeded > 0)
+                    {
+                        double priorDemand = 0;
+                        if (neededItems.TryGetValue(item, out priorDemand))
+                        {
+                            neededItems[item] = priorDemand + amountNeeded;
+                        }
+                        else
+                        {
+                            neededItems[item] = amountNeeded;
+                        }
+                    }
+                }
+            }
+
+            return neededItems;
+        }
+
+        private void HarvestReleventRecipes(Dictionary<Item, double> neededItems, HashSet<Item> rawItems, HashSet<Recipe> relevantRecipes, HashSet<Item> itemsVisited)
+        {
+            Queue<Item> itemsToVisit = new Queue<Item>(neededItems.Keys);
+
+            while (itemsToVisit.Count > 0)
+            {
+                Item curItem = itemsToVisit.Dequeue();
+                if (itemsVisited.Contains(curItem))
+                {
+                    continue;
+                }
+                relevantRecipes.UnionWith(curItem.Recipes);
+                relevantRecipes.RemoveWhere(r => CyclicRecipes.Contains(r)); // Keep the pool clean.
+                bool hasRecipe = false;
+                foreach (Recipe recipe in curItem.Recipes)
+                {
+                    if (CyclicRecipes.Contains(recipe))
+                    {
+                        continue;
+                    }
+                    hasRecipe = true;
+                    foreach (KeyValuePair<Item, float> inputItem in recipe.Ingredients)
+                    {
+                        if (!itemsVisited.Contains(inputItem.Key))
+                        {
+                            itemsToVisit.Enqueue(inputItem.Key);
+                        }
+                    }
+                }
+                if (!hasRecipe)
+                {
+                    rawItems.Add(curItem);
+                }
+
+                itemsVisited.Add(curItem);
+            }
+        }
+
 		public void SatisfyAllItemDemands()
 		{
+            Dictionary<Item, double> neededItems = GetNeededItems();
+
+            HashSet<Recipe> relevantRecipes = new HashSet<Recipe>();
+            HashSet<Item> rawItems = new HashSet<Item>();
+            HashSet<Item> itemsVisited = new HashSet<Item>();
+            HarvestReleventRecipes(neededItems, rawItems, relevantRecipes, itemsVisited);
+
+            // Make a strict ordering of production nodes, these form the columns of our solver
+            List<String> prodNodes = new List<String>();
+            lpsolve.Init(".");
+            int lp = lpsolve.make_lp(0, rawItems.Count() + relevantRecipes.Count());
+            int colIdx = 1;  // Yup, all arrays in lpsolve are 1-based.
+            foreach (Item item in rawItems)
+            {
+                prodNodes.Add(item.Name);
+                lpsolve.set_col_name(lp, colIdx, item.Name);
+                colIdx++;
+            }
+            foreach (Recipe recipe in relevantRecipes)
+            {
+                prodNodes.Add(recipe.Name);
+                lpsolve.set_col_name(lp, colIdx, recipe.Name);
+                colIdx++;
+            }
+
+            // Each row in the solution is an item involved, positive entry for sources, negative
+            // for costs.
+            int rowIdx = 1;
+            foreach (Item curItem in itemsVisited)
+            {
+                double[] row = new double[prodNodes.Count() + 1];
+                colIdx = 1;
+                foreach (Item rawItem in rawItems)
+                {
+                    if (rawItem.Name == curItem.Name)
+                    {
+                        row[colIdx] = 1;
+                    } else {
+                        row[colIdx] = 0;
+                    }
+                    colIdx++;
+                }
+                foreach (Recipe curRecipe in relevantRecipes)
+                {
+                    float amount;
+                    if (curRecipe.Ingredients.TryGetValue(curItem, out amount))
+                    {
+                        row[colIdx] -= amount;
+                    }
+                    if (curRecipe.Results.TryGetValue(curItem, out amount))
+                    {
+                        row[colIdx] += amount;
+                    }
+                    colIdx++;
+                }
+                double neededAmount = 0;
+                neededItems.TryGetValue(curItem, out neededAmount);
+                lpsolve.add_constraint(lp, row, lpsolve.lpsolve_constr_types.GE, neededAmount);
+                lpsolve.set_row_name(lp, rowIdx, curItem.Name);
+                rowIdx++;
+            }
+
+            double[] objectiveRow = new double[prodNodes.Count() + 1];
+            colIdx = 1;
+            foreach (string name in prodNodes)
+            {
+                // Going to probably need some kind of UI for defining cost for raw items, but 
+                // in the absense of that I'm just setting everything to 1 except for water.
+                if (name == "water")
+                {
+                    objectiveRow[colIdx] = .0000001;
+                }
+                else if (colIdx <= rawItems.Count())
+                {
+                    objectiveRow[colIdx] = 1;
+                }
+                else
+                {
+                    objectiveRow[colIdx] = 0;
+                }
+                colIdx++;
+            }
+
+            lpsolve.set_obj_fn(lp, objectiveRow);
+
+            lpsolve.set_outputfile(lp, "lpresult.txt");
+            lpsolve.solve(lp);
+            lpsolve.print_lp(lp);
+            lpsolve.print_solution(lp, 1);
+
+            double[] solutionRow = new double[prodNodes.Count()];
+            lpsolve.get_variables(lp, solutionRow);
+
+            // At this point I have no idea how to translate #of recipes as throughput into nodes in the graph,
+            // I'll just print them out to the debug output.
+            for (int j = 0; j < prodNodes.Count(); j++)
+                System.Diagnostics.Debug.WriteLine(lpsolve.get_col_name(lp, j + 1) + ": " + solutionRow[j]);
+
+            lpsolve.delete_lp(lp);
+
+
+            // Old code here since the above doesn't do anything useful yet:
 			bool nodeChosen;
 
 			do

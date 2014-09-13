@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -75,6 +76,7 @@
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ItemTab.cs" />
+    <Compile Include="lpsolve55.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,7 +173,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY /y "$(SolutionDir)lib\lua52.dll" "."</PostBuildEvent>
+    <PostBuildEvent>XCOPY /y "$(SolutionDir)lib\lua52.dll" "."
+XCOPY /y "$(SolutionDir)lib\lpsolve55.dll" "."</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
