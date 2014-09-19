@@ -148,15 +148,16 @@ namespace Foreman
 
 				UnknownIcon = LoadImage("UnknownIcon.png");
 
-				LoadLocaleFiles();
+                string locale = System.Configuration.ConfigurationManager.AppSettings["locale"];
+                LoadLocaleFiles(locale);
 
 				LoadItemNames("item-name");
 				LoadItemNames("fluid-name");
 				LoadItemNames("entity-name");
 				LoadItemNames("equipment-name");
-				LoadRecipeNames();
-				LoadEntityNames();
-				LoadModuleNames();
+                LoadRecipeNames(locale);
+                LoadEntityNames(locale);
+                LoadModuleNames(locale);
 			}
 		}
 
