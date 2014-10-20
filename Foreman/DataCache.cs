@@ -11,6 +11,19 @@ namespace Foreman
 {
 	static class DataCache
 	{
+		private class MissingPrototypeValueException : Exception
+		{
+			public LuaTable Table;
+			public String Key;
+
+			public MissingPrototypeValueException(LuaTable table, String key, String message = "")
+				: base(message)
+			{
+				Table = table;
+				Key = key;
+			}
+		}
+
 		//Still hardcoded. Needs to ask the user if it can't be found.
 		public static String FactorioDataPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
 		public static String AppDataModPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Factorio", "mods");
@@ -27,7 +40,9 @@ namespace Foreman
 		public static Bitmap UnknownIcon;
 		public static Dictionary<String, String> KnownRecipeNames = new Dictionary<string, string>();
 		public static Dictionary<String, Dictionary<String, String>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
+
 		public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
+		public static Dictionary<String, Exception> failedPathDirectories = new Dictionary<string, Exception>();
 
 		public static void LoadRecipes()
 		{
@@ -52,7 +67,7 @@ namespace Foreman
 				itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "equipment")).ToList());
 				List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
 				List<String> entityFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "entity")).ToList();
-				
+
 				try
 				{
 					lua.DoFile(dataloaderFile);
@@ -60,6 +75,7 @@ namespace Foreman
 				catch (Exception e)
 				{
 					failedFiles[dataloaderFile] = e;
+					ErrorLogging.LogLine(String.Format("Error loading dataloader.lua. This file is required to load any values from the prototypes. Message: '{0}'", e.Message));
 					return; //There's no way to load anything else without this file.
 				}
 				try
@@ -158,13 +174,132 @@ namespace Foreman
 				LoadEntityNames();
 				LoadModuleNames();
 			}
+
+			ReportErrors();
+		}
+
+		private static float ReadLuaFloat(LuaTable table, String key, Boolean canBeMissing = false, float defaultValue = 0f)
+		{
+			if (table[key] == null)
+			{
+				if (canBeMissing)
+				{
+					return defaultValue;
+				}
+				else
+				{
+					throw new MissingPrototypeValueException(table, key, "Key is missing");
+				}
+			}
+
+			try
+			{
+				return Convert.ToSingle(table[key]);
+			}
+			catch (FormatException e)
+			{
+				throw new MissingPrototypeValueException(table, key, string.Format("Expected a float, but the value ('{0}') isn't one", table[key]));
+			}
+		}
+
+		private static int ReadLuaInt(LuaTable table, String key, Boolean canBeMissing = false, int defaultValue = 0)
+		{
+			if (table[key] == null)
+			{
+				if (canBeMissing)
+				{
+					return defaultValue;
+				}
+				else
+				{
+					throw new MissingPrototypeValueException(table, key, "Key is missing");
+				}
+			}
+
+			try
+			{
+				return Convert.ToInt32(table[key]);
+			}
+			catch (FormatException e)
+			{
+				throw new MissingPrototypeValueException(table, key, String.Format("Expected an Int32, but the value ('{0]') isn't one", table[key]));
+			}
+		}
+
+		private static string ReadLuaString(LuaTable table, String key, Boolean canBeMissing = false, String defaultValue = null)
+		{
+			if (table[key] == null)
+			{
+				if (canBeMissing)
+				{
+					return defaultValue;
+				}
+				else
+				{
+					throw new MissingPrototypeValueException(table, key, "Key is missing");
+				}
+			}
+
+			return Convert.ToString(table[key]);
+		}
+
+		private static LuaTable ReadLuaLuaTable(LuaTable table, String key, Boolean canBeMissing = false)
+		{
+			if (table[key] == null)
+			{
+				if (canBeMissing)
+				{
+					return null;
+				}
+				else
+				{
+					throw new MissingPrototypeValueException(table, key, "Key is missing");
+				}
+			}
+
+			try
+			{
+				return table[key] as LuaTable;
+			}
+			catch (Exception e)
+			{
+				throw new MissingPrototypeValueException(table, key, "Could not convert key to LuaTable");
+			}
+		}
+
+		private static void ReportErrors()
+		{
+			if (failedPathDirectories.Any())
+			{
+				ErrorLogging.LogLine("There were errors setting the lua path variable for the following directories:");
+				foreach (String dir in DataCache.failedPathDirectories.Keys)
+				{
+					ErrorLogging.LogLine(String.Format("{0} ({1})", dir, DataCache.failedPathDirectories[dir].Message));
+				}
+			}
+
+			if (failedFiles.Any())
+			{
+				ErrorLogging.LogLine("The following files could not be loaded due to errors:");
+				foreach (String file in DataCache.failedFiles.Keys)
+				{
+					ErrorLogging.LogLine(String.Format("{0} ({1})", file, DataCache.failedFiles[file].Message));
+				}
+			}
 		}
 
 		private static void AddLuaPackagePath(Lua lua, string dir)
 		{
-			string luaCommand = String.Format("package.path = package.path .. ';{0}{1}?.lua'", dir, Path.DirectorySeparatorChar);
-			luaCommand = luaCommand.Replace("\\", "\\\\");
-			lua.DoString(luaCommand);
+			try
+			{
+				string luaCommand = String.Format("package.path = package.path .. ';{0}{1}?.lua'", dir, Path.DirectorySeparatorChar);
+				luaCommand = luaCommand.Replace("\\", "\\\\");
+				lua.DoString(luaCommand);
+			}
+			catch (Exception e)
+			{
+				failedPathDirectories[dir] = e;
+			}
 		}
 
 		private static IEnumerable<String> getAllLuaFiles()
@@ -208,7 +343,7 @@ namespace Foreman
 			dirs.Remove(baseDir);
 			dirs.Remove(coreDir);
 			dirs.Insert(0, baseDir);
-			dirs.Insert(0, coreDir);
+			dirs.Insert(0, coreDir);  //Put core and base at the top of the list so they're always read first.
 
 			return dirs;
 		}
@@ -333,7 +468,7 @@ namespace Foreman
 
 				if (!String.IsNullOrEmpty(fullPath))
 				{
-					for (int i = 1; i < splitPath.Count(); i++ ) //Skip the first split section because it's the same as the end of the path already
+					for (int i = 1; i < splitPath.Count(); i++) //Skip the first split section because it's the same as the end of the path already
 					{
 						fullPath = Path.Combine(fullPath, splitPath[i]);
 					}
@@ -372,6 +507,7 @@ namespace Foreman
 					g.DrawImage(icon, new Rectangle(0, 0, 1, 1)); //Scale the icon down to a 1-pixel image, which does the averaging for us
 					result = pixel.GetPixel(0, 0);
 				}
+				//Set alpha to 255, also lighten the colours to make them more pastel-y
 				result = Color.FromArgb(255, result.R + (255 - result.R) / 2, result.G + (255 - result.G) / 2, result.B + (255 - result.B) / 2);
 				colourCache.Add(icon, result);
 			}
@@ -382,7 +518,7 @@ namespace Foreman
 		private static void InterpretLuaItem(String name, LuaTable values)
 		{
 			Item newItem = new Item(name);
-			newItem.Icon = LoadImage(values["icon"] as String);
+			newItem.Icon = LoadImage(ReadLuaString(values, "icon", true));
 
 			if (!Items.ContainsKey(name))
 			{
@@ -407,154 +543,202 @@ namespace Foreman
 
 		private static void InterpretLuaRecipe(String name, LuaTable values)
 		{
-			float time = Convert.ToSingle(values["energy_required"]);
-			Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
-			Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
-
-			Recipe newRecipe = new Recipe(name, time == 0.0f ? defaultRecipeTime : time, ingredients, results);
-
-			newRecipe.Category = values["category"] as String ?? "crafting";
-
-			String iconFile = values["icon"] as String;
-			if (iconFile != null)
+			try
 			{
-				Bitmap icon = LoadImage(iconFile);
-				newRecipe.Icon = icon;
-			}
+				float time = ReadLuaFloat(values, "energy_required", true, 0.5f);
+				Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
+				Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
 
-			foreach (Item result in results.Keys)
-			{
-				result.Recipes.Add(newRecipe);
+				Recipe newRecipe = new Recipe(name, time == 0.0f ? defaultRecipeTime : time, ingredients, results);
+
+				newRecipe.Category = ReadLuaString(values, "category", true, "crafting");
+
+				String iconFile = ReadLuaString(values, "icon", true);
+				if (iconFile != null)
+				{
+					Bitmap icon = LoadImage(iconFile);
+					newRecipe.Icon = icon;
+				}
+
+				foreach (Item result in results.Keys)
+				{
+					result.Recipes.Add(newRecipe);
+				}
+
+				Recipes.Add(newRecipe.Name, newRecipe);
 			}
-			Recipes.Add(newRecipe.Name, newRecipe);
+			catch (MissingPrototypeValueException e)
+			{
+				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from recipe prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
+			}
 		}
 
 		private static void InterpretAssemblingMachine(String name, LuaTable values)
 		{
-			Assembler newAssembler = new Assembler(name);
-
-			newAssembler.Icon = LoadImage(values["icon"] as String);
-			newAssembler.MaxIngredients = Convert.ToInt32(values["ingredient_count"]);
-			newAssembler.ModuleSlots = Convert.ToInt32(values["module_slots"]);
-			if (newAssembler.ModuleSlots == 0) newAssembler.ModuleSlots = 2;
-			newAssembler.Speed = Convert.ToSingle(values["crafting_speed"]);
-
-			LuaTable effects = values["allowed_effects"] as LuaTable;
-			if (effects != null)
+			try
 			{
-				foreach (String effect in effects.Values)
+				Assembler newAssembler = new Assembler(name);
+
+				newAssembler.Icon = LoadImage(ReadLuaString(values, "icon", true));
+				newAssembler.MaxIngredients = ReadLuaInt(values, "ingredient_count");
+				newAssembler.ModuleSlots = ReadLuaInt(values, "module_slots", true, 2);
+				newAssembler.Speed = ReadLuaFloat(values, "crafting_speed");
+
+				LuaTable effects = ReadLuaLuaTable(values, "allowed_effects", true);
+				if (effects != null)
 				{
-					newAssembler.AllowedEffects.Add(effect);
+					foreach (String effect in effects.Values)
+					{
+						newAssembler.AllowedEffects.Add(effect);
+					}
 				}
-			}
-			foreach (String category in (values["crafting_categories"] as LuaTable).Values)
-			{
-				newAssembler.Categories.Add(category);
-			}
+				LuaTable categories = ReadLuaLuaTable(values, "crafting_categories");
+				foreach (String category in categories.Values)
+				{
+					newAssembler.Categories.Add(category);
+				}
 
-			Assemblers.Add(newAssembler.Name, newAssembler);
+				Assemblers.Add(newAssembler.Name, newAssembler);
+			}
+			catch (MissingPrototypeValueException e)
+			{
+				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from assembler prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
+			}
 		}
 
 		private static void InterpretFurnace(String name, LuaTable values)
 		{
-			Assembler newFurnace = new Assembler(name);
-
-			newFurnace.Icon = LoadImage(values["icon"] as String);
-			newFurnace.MaxIngredients = 1;
-			newFurnace.ModuleSlots = Convert.ToInt32(values["module_slots"]);
-			newFurnace.Speed = Convert.ToSingle(values["smelting_speed"]);
-
-			foreach (String category in (values["smelting_categories"] as LuaTable).Values)
+			try
 			{
-				newFurnace.Categories.Add(category);
-			}
+				Assembler newFurnace = new Assembler(name);
 
-			Assemblers.Add(newFurnace.Name, newFurnace);
+				newFurnace.Icon = LoadImage(ReadLuaString(values, "icon", true));
+				newFurnace.MaxIngredients = 1;
+				newFurnace.ModuleSlots = ReadLuaInt(values, "module_slots", true, 2);
+				newFurnace.Speed = ReadLuaFloat(values, "smelting_speed");
+
+				LuaTable categories = ReadLuaLuaTable(values, "smelting_categories");
+				foreach (String category in categories.Values)
+				{
+					newFurnace.Categories.Add(category);
+				}
+
+				Assemblers.Add(newFurnace.Name, newFurnace);
+			}
+			catch (MissingPrototypeValueException e)
+			{
+				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from furnace prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
+			}
 		}
 
 		private static void InterpretMiner(String name, LuaTable values)
 		{
-			Miner newMiner = new Miner(name);
-
-			newMiner.Icon = LoadImage(values["icon"] as String);
-			newMiner.MiningPower = Convert.ToSingle(values["mining_power"]);
-			newMiner.Speed = Convert.ToSingle(values["mining_speed"]);
-			newMiner.ModuleSlots = Convert.ToInt32(values["module_slots"]);
-
-			LuaTable categories = values["resource_categories"] as LuaTable;
-			if (categories != null)
+			try
 			{
-				foreach (String category in categories.Values)
-				{
-					newMiner.ResourceCategories.Add(category);
-				}
-			}
+				Miner newMiner = new Miner(name);
 
-			Miners.Add(name, newMiner);
+				newMiner.Icon = LoadImage(ReadLuaString(values, "icon", true));
+				newMiner.MiningPower = ReadLuaFloat(values, "mining_power");
+				newMiner.Speed = ReadLuaFloat(values, "mining_speed");
+				newMiner.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
+
+				LuaTable categories = ReadLuaLuaTable(values, "resource_categories");
+				if (categories != null)
+				{
+					foreach (String category in categories.Values)
+					{
+						newMiner.ResourceCategories.Add(category);
+					}
+				}
+
+				Miners.Add(name, newMiner);
+			}
+			catch (MissingPrototypeValueException e)
+			{
+				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from miner prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
+			}
 		}
 
 		private static void InterpretResource(String name, LuaTable values)
 		{
-			Resource newResource = new Resource(name);
-			newResource.Category = values["category"] as String;
-			if (String.IsNullOrEmpty(newResource.Category))
+			try
 			{
-				newResource.Category = "basic-solid";
-			}
-			LuaTable minableTable = values["minable"] as LuaTable;
-			newResource.Hardness = Convert.ToSingle(minableTable["hardness"]);
-			newResource.Time = Convert.ToSingle(minableTable["mining_time"]);
+				Resource newResource = new Resource(name);
+				newResource.Category = ReadLuaString(values, "category", true, "basic-solid");
+				LuaTable minableTable = ReadLuaLuaTable(values, "minable", true);
+				newResource.Hardness = ReadLuaFloat(minableTable, "hardness");
+				newResource.Time = ReadLuaFloat(minableTable, "mining_time");
 
-			if (minableTable["result"] != null)
-			{
-				newResource.result = minableTable["result"] as String;
-			}
-			else
-			{
-				newResource.result = ((minableTable["results"] as LuaTable)[1] as LuaTable)["name"] as String;
-			}
+				if (minableTable["result"] != null)
+				{
+					newResource.result = ReadLuaString(minableTable, "result");
+				}
+				else
+				{
+					try
+					{
+						newResource.result = ((minableTable["results"] as LuaTable)[1] as LuaTable)["name"] as String;
+					}
+					catch (Exception e)
+					{
+						throw new MissingPrototypeValueException(minableTable, "results", e.Message);
+					}
+				}
 
-			Resources.Add(name, newResource);
+				Resources.Add(name, newResource);
+			}
+			catch (MissingPrototypeValueException e)
+			{
+				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from resource prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
+			}
 		}
 
 		private static void InterpretModule(String name, LuaTable values)
 		{
-			float speedBonus = 0f;
-
-			LuaTable effectTable = values["effect"] as LuaTable;
-			LuaTable speed = effectTable["speed"] as LuaTable;
-			if (speed != null)
+			try
 			{
-				speedBonus = Convert.ToSingle(speed["bonus"]);
-			}
+				float speedBonus = 0f;
 
-			if (speed == null || speedBonus <= 0)
+				LuaTable effectTable = ReadLuaLuaTable(values, "effect");
+				LuaTable speed = ReadLuaLuaTable(effectTable, "speed", true);
+				if (speed != null)
+				{
+					speedBonus = ReadLuaFloat(speed, "bonus", true, -1f);
+				}
+
+				if (speed == null || speedBonus <= 0)
+				{
+					return;
+				}
+
+				Modules.Add(name, new Module(name, speedBonus));
+			}
+			catch (MissingPrototypeValueException e)
 			{
-				return;
+				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from module prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
 			}
-
-			Modules.Add(name, new Module(name, speedBonus));
 		}
 
 		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
 		{
 			Dictionary<Item, float> results = new Dictionary<Item, float>();
-			if (values["result"] is String)
+			if (values["result"] != null)
 			{
-				float resultCount = Convert.ToSingle(values["result_count"]);
+				String resultName = ReadLuaString(values, "result");
+				float resultCount = ReadLuaFloat(values, "result_count", true);
 				if (resultCount == 0f)
 				{
 					resultCount = 1f;
 				}
-				results.Add(LoadItemFromRecipe(values["result"] as String), resultCount);
+				results.Add(LoadItemFromRecipe(resultName), resultCount);
 			}
 			else
 			{
-				var resultEnumerator = (values["results"] as LuaTable).GetEnumerator();
+				var resultEnumerator = ReadLuaLuaTable(values, "results").GetEnumerator();
 				while (resultEnumerator.MoveNext())
 				{
 					LuaTable resultTable = resultEnumerator.Value as LuaTable;
-					results.Add(LoadItemFromRecipe(resultTable["name"] as String), Convert.ToSingle(resultTable["amount"]));
+					results.Add(LoadItemFromRecipe(ReadLuaString(resultTable, "name")), ReadLuaFloat(resultTable, "amount"));
 				}
 			}
 
@@ -564,7 +748,7 @@ namespace Foreman
 		private static Dictionary<Item, float> extractIngredientsFromLuaRecipe(LuaTable values)
 		{
 			Dictionary<Item, float> ingredients = new Dictionary<Item, float>();
-			var ingredientEnumerator = (values["ingredients"] as LuaTable).GetEnumerator();
+			var ingredientEnumerator = ReadLuaLuaTable(values, "ingredients").GetEnumerator();
 			while (ingredientEnumerator.MoveNext())
 			{
 				LuaTable ingredientTable = ingredientEnumerator.Value as LuaTable;
@@ -576,7 +760,7 @@ namespace Foreman
 				}
 				else
 				{
-					name = ingredientTable[1] as String;
+					name = ingredientTable[1] as String; //Name and amount often have no key in the prototype
 				}
 				if (ingredientTable["amount"] != null)
 				{

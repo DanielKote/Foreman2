@@ -42,15 +42,6 @@ namespace Foreman
 
 			DataCache.FactorioDataPath = path;
 			DataCache.LoadRecipes();
-			if (DataCache.failedFiles.Any())
-			{
-				String errorMessage = "The following files could not be loaded due to errors:\n";
-				foreach (String file in DataCache.failedFiles.Keys)
-				{
-					errorMessage += String.Format(file + "({0})\n", DataCache.failedFiles[file].Message);
-				}
-				File.AppendAllText(Path.Combine(Application.StartupPath, "errorlog.txt"), errorMessage + "\n");
-			}
 
 			rateOptionsDropDown.SelectedIndex = 0;
 

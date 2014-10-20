@@ -66,6 +66,7 @@
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DraggedLinkElement.cs" />
+    <Compile Include="ErrorLogging.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
     <Compile Include="ImageExportForm.cs">
