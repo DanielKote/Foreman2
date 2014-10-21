@@ -85,6 +85,8 @@ namespace Foreman
 			{
 				recipeListPanel.Controls.Add(new RecipeChooserControl(recipe, recipeText));
 			}
+
+			MaximumSize = new Size(Int32.MaxValue, 500);
 		}
 
 		private void RegisterKeyEvents(Control control)
