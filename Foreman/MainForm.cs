@@ -80,30 +80,30 @@ namespace Foreman
 			}
 
 
-            //Listview
-            ItemListView.Items.Clear();
-            ItemImageList.Images.Add(DataCache.UnknownIcon);
-            foreach (var aitem in DataCache.Items)
+			//Listview
+			ItemListView.Items.Clear();
+			ItemImageList.Images.Add(DataCache.UnknownIcon);
+			foreach (var aitem in DataCache.Items)
 			{
-                ListViewItem lvItem = new ListViewItem();
-                if (DataCache.Items[aitem.Key].Icon != null)
-                {
-                    ItemImageList.Images.Add(DataCache.Items[aitem.Key].Icon);
-                    lvItem.ImageIndex = ItemImageList.Images.Count - 1;
-                }
-                else
-                {
-                    lvItem.ImageIndex = 0;
-                }
-                lvItem.Text = aitem.Value.FriendlyName;
-                lvItem.Tag = aitem.Value;
-                ItemListView.Items.Add(lvItem);
-            }
+				ListViewItem lvItem = new ListViewItem();
+				if (DataCache.Items[aitem.Key].Icon != null)
+				{
+					ItemImageList.Images.Add(DataCache.Items[aitem.Key].Icon);
+					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
+				}
+				else
+				{
+					lvItem.ImageIndex = 0;
+				}
+				lvItem.Text = aitem.Value.FriendlyName;
+				lvItem.Tag = aitem.Value;
+				ItemListView.Items.Add(lvItem);
+			}
 
-            ItemListView.Sorting = SortOrder.Ascending;
-            ItemListView.Sort();
+			ItemListView.Sorting = SortOrder.Ascending;
+			ItemListView.Sort();
 
-        }
+		}
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
 		{
@@ -117,10 +117,10 @@ namespace Foreman
 
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
-            foreach (ListViewItem lvItem in ItemListView.SelectedItems)
-            {
-                GraphViewer.AddDemand((Item)lvItem.Tag);
-            }
+			foreach (ListViewItem lvItem in ItemListView.SelectedItems)
+			{
+				GraphViewer.AddDemand((Item)lvItem.Tag);
+			}
 		}
 		
 		private void rateButton_CheckedChanged(object sender, EventArgs e)
@@ -228,22 +228,22 @@ namespace Foreman
 			GraphViewer.UpdateNodes();
 		}
 
-        private void ItemListView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ItemListView.SelectedItems.Count == 0)
-            {
-                AddItemButton.Enabled = false;
-            }
-            else if (ItemListView.SelectedItems.Count == 1)
-            {
-                AddItemButton.Enabled = true;
-                AddItemButton.Text = "Add Output";
-            }
-            else if (ItemListView.SelectedItems.Count > 1)
-            {
-                AddItemButton.Enabled = true;
-                AddItemButton.Text = "Add Outputs";
-            }
-        }
+		private void ItemListView_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (ItemListView.SelectedItems.Count == 0)
+			{
+				AddItemButton.Enabled = false;
+			}
+			else if (ItemListView.SelectedItems.Count == 1)
+			{
+				AddItemButton.Enabled = true;
+				AddItemButton.Text = "Add Output";
+			}
+			else if (ItemListView.SelectedItems.Count > 1)
+			{
+				AddItemButton.Enabled = true;
+				AddItemButton.Text = "Add Outputs";
+			}
+		}
 	}
 }
