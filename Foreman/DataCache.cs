@@ -615,9 +615,9 @@ namespace Foreman
 				newFurnace.Icon = LoadImage(ReadLuaString(values, "icon", true));
 				newFurnace.MaxIngredients = 1;
 				newFurnace.ModuleSlots = ReadLuaInt(values, "module_slots", true, 2);
-				newFurnace.Speed = ReadLuaFloat(values, "smelting_speed");
+				newFurnace.Speed = ReadLuaFloat(values, "crafting_speed");
 
-				LuaTable categories = ReadLuaLuaTable(values, "smelting_categories");
+				LuaTable categories = ReadLuaLuaTable(values, "crafting_categories");
 				foreach (String category in categories.Values)
 				{
 					newFurnace.Categories.Add(category);
