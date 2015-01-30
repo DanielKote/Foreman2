@@ -245,5 +245,10 @@ namespace Foreman
 				AddItemButton.Text = "Add Outputs";
 			}
 		}
+
+		private void ItemListView_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			GraphViewer.AddDemand((Item)ItemListView.SelectedItems[0].Tag);
+		}
 	}
 }

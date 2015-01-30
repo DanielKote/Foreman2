@@ -50,9 +50,9 @@
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
 			this.ItemListView = new System.Windows.Forms.ListView();
+			this.h_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ItemImageList = new System.Windows.Forms.ImageList(this.components);
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
-			this.h_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tableLayoutPanel1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -127,8 +127,8 @@
 			this.rateOptionsDropDown.Enabled = false;
 			this.rateOptionsDropDown.FormattingEnabled = true;
 			this.rateOptionsDropDown.Items.AddRange(new object[] {
-			"per Second",
-			"per Minute"});
+            "per Second",
+            "per Minute"});
 			this.rateOptionsDropDown.Location = new System.Drawing.Point(63, 42);
 			this.rateOptionsDropDown.Name = "rateOptionsDropDown";
 			this.rateOptionsDropDown.Size = new System.Drawing.Size(123, 21);
@@ -333,13 +333,14 @@
 			// ItemListView
 			// 
 			this.ItemListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-			this.h_Name});
+            this.h_Name});
 			this.tableLayoutPanel1.SetColumnSpan(this.ItemListView, 2);
 			this.ItemListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ItemListView.FullRowSelect = true;
 			this.ItemListView.GridLines = true;
 			this.ItemListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.ItemListView.HideSelection = false;
+			this.ItemListView.LabelWrap = false;
 			this.ItemListView.Location = new System.Drawing.Point(3, 559);
 			this.ItemListView.Name = "ItemListView";
 			this.ItemListView.Size = new System.Drawing.Size(194, 208);
@@ -348,10 +349,16 @@
 			this.ItemListView.UseCompatibleStateImageBehavior = false;
 			this.ItemListView.View = System.Windows.Forms.View.Details;
 			this.ItemListView.SelectedIndexChanged += new System.EventHandler(this.ItemListView_SelectedIndexChanged);
+			this.ItemListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ItemListView_MouseDoubleClick);
+			// 
+			// h_Name
+			// 
+			this.h_Name.Text = "Name";
+			this.h_Name.Width = 180;
 			// 
 			// ItemImageList
 			// 
-			this.ItemImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+			this.ItemImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
 			this.ItemImageList.ImageSize = new System.Drawing.Size(16, 16);
 			this.ItemImageList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
@@ -367,11 +374,6 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 9);
 			this.GraphViewer.Size = new System.Drawing.Size(823, 794);
 			this.GraphViewer.TabIndex = 1;
-			// 
-			// h_Name
-			// 
-			this.h_Name.Text = "Name";
-			this.h_Name.Width = 180;
 			// 
 			// MainForm
 			// 
