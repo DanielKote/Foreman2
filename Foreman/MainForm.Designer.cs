@@ -28,9 +28,8 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.ItemListBox = new System.Windows.Forms.ListBox();
+			this.components = new System.ComponentModel.Container();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.AddItemButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.rateOptionsDropDown = new System.Windows.Forms.ComboBox();
@@ -50,25 +49,16 @@
 			this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
+			this.ItemListView = new System.Windows.Forms.ListView();
+			this.h_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ItemImageList = new System.Windows.Forms.ImageList(this.components);
+			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// ItemListBox
-			// 
-			this.tableLayoutPanel1.SetColumnSpan(this.ItemListBox, 2);
-			this.ItemListBox.Dock = System.Windows.Forms.DockStyle.Right;
-			this.ItemListBox.FormattingEnabled = true;
-			this.ItemListBox.IntegralHeight = false;
-			this.ItemListBox.Location = new System.Drawing.Point(3, 559);
-			this.ItemListBox.Name = "ItemListBox";
-			this.ItemListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.ItemListBox.Size = new System.Drawing.Size(194, 98);
-			this.ItemListBox.TabIndex = 0;
-			this.ItemListBox.SelectedIndexChanged += new System.EventHandler(this.ItemListBox_SelectedIndexChanged);
 			// 
 			// tableLayoutPanel1
 			// 
@@ -79,13 +69,13 @@
 			this.tableLayoutPanel1.Controls.Add(this.GraphViewer, 2, 0);
 			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 8);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ItemListBox, 0, 7);
 			this.tableLayoutPanel1.Controls.Add(this.AutomaticCompleteButton, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.ClearButton, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox2, 0, 4);
 			this.tableLayoutPanel1.Controls.Add(this.ExportImageButton, 0, 3);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 5);
 			this.tableLayoutPanel1.Controls.Add(this.groupBox4, 0, 6);
+			this.tableLayoutPanel1.Controls.Add(this.ItemListView, 0, 7);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -99,26 +89,14 @@
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(1029, 690);
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(1029, 800);
 			this.tableLayoutPanel1.TabIndex = 1;
-			// 
-			// GraphViewer
-			// 
-			this.GraphViewer.AutoScroll = true;
-			this.GraphViewer.BackColor = System.Drawing.Color.White;
-			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.GraphViewer.DraggedElement = null;
-			this.GraphViewer.Location = new System.Drawing.Point(203, 3);
-			this.GraphViewer.Name = "GraphViewer";
-			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 9);
-			this.GraphViewer.Size = new System.Drawing.Size(823, 684);
-			this.GraphViewer.TabIndex = 1;
 			// 
 			// AddItemButton
 			// 
 			this.tableLayoutPanel1.SetColumnSpan(this.AddItemButton, 2);
-			this.AddItemButton.Location = new System.Drawing.Point(3, 663);
+			this.AddItemButton.Location = new System.Drawing.Point(3, 773);
 			this.AddItemButton.Name = "AddItemButton";
 			this.AddItemButton.Size = new System.Drawing.Size(194, 24);
 			this.AddItemButton.TabIndex = 2;
@@ -352,11 +330,56 @@
 			this.ModuleSelectionBox.TabIndex = 6;
 			this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
 			// 
+			// ItemListView
+			// 
+			this.ItemListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.h_Name});
+			this.tableLayoutPanel1.SetColumnSpan(this.ItemListView, 2);
+			this.ItemListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ItemListView.FullRowSelect = true;
+			this.ItemListView.GridLines = true;
+			this.ItemListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.ItemListView.HideSelection = false;
+			this.ItemListView.LabelWrap = false;
+			this.ItemListView.Location = new System.Drawing.Point(3, 559);
+			this.ItemListView.Name = "ItemListView";
+			this.ItemListView.Size = new System.Drawing.Size(194, 208);
+			this.ItemListView.SmallImageList = this.ItemImageList;
+			this.ItemListView.TabIndex = 11;
+			this.ItemListView.UseCompatibleStateImageBehavior = false;
+			this.ItemListView.View = System.Windows.Forms.View.Details;
+			this.ItemListView.SelectedIndexChanged += new System.EventHandler(this.ItemListView_SelectedIndexChanged);
+			this.ItemListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ItemListView_MouseDoubleClick);
+			// 
+			// h_Name
+			// 
+			this.h_Name.Text = "Name";
+			this.h_Name.Width = 180;
+			// 
+			// ItemImageList
+			// 
+			this.ItemImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+			this.ItemImageList.ImageSize = new System.Drawing.Size(16, 16);
+			this.ItemImageList.TransparentColor = System.Drawing.Color.Transparent;
+			// 
+			// GraphViewer
+			// 
+			this.GraphViewer.AutoScroll = true;
+			this.GraphViewer.BackColor = System.Drawing.Color.White;
+			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphViewer.DraggedElement = null;
+			this.GraphViewer.Location = new System.Drawing.Point(203, 3);
+			this.GraphViewer.Name = "GraphViewer";
+			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 9);
+			this.GraphViewer.Size = new System.Drawing.Size(823, 794);
+			this.GraphViewer.TabIndex = 1;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1029, 690);
+			this.ClientSize = new System.Drawing.Size(1029, 800);
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.DoubleBuffered = true;
 			this.KeyPreview = true;
@@ -379,7 +402,6 @@
 
 		#endregion
 
-		private System.Windows.Forms.ListBox ItemListBox;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private ProductionGraphViewer GraphViewer;
 		private System.Windows.Forms.Button AddItemButton;
@@ -401,6 +423,9 @@
 		private System.Windows.Forms.CheckedListBox MinerSelectionBox;
 		private System.Windows.Forms.GroupBox groupBox4;
 		private System.Windows.Forms.CheckedListBox ModuleSelectionBox;
+		private System.Windows.Forms.ListView ItemListView;
+		private System.Windows.Forms.ImageList ItemImageList;
+		private System.Windows.Forms.ColumnHeader h_Name;
 	}
 }
 

@@ -70,10 +70,30 @@ namespace Foreman
 				ModuleSelectionBox.SetItemChecked(i, true);
 			}
 
-			ItemListBox.Items.Clear();
-			ItemListBox.Items.AddRange(DataCache.Items.Values.ToArray());
-			ItemListBox.DisplayMember = "FriendlyName";
-			ItemListBox.Sorted = true;
+
+			//Listview
+			ItemListView.Items.Clear();
+			ItemImageList.Images.Add(DataCache.UnknownIcon);
+			foreach (var aitem in DataCache.Items)
+			{
+				ListViewItem lvItem = new ListViewItem();
+				if (DataCache.Items[aitem.Key].Icon != null)
+				{
+					ItemImageList.Images.Add(DataCache.Items[aitem.Key].Icon);
+					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
+				}
+				else
+				{
+					lvItem.ImageIndex = 0;
+				}
+				lvItem.Text = aitem.Value.FriendlyName;
+				lvItem.Tag = aitem.Value;
+				ItemListView.Items.Add(lvItem);
+			}
+
+			ItemListView.Sorting = SortOrder.Ascending;
+			ItemListView.Sort();
+
 		}
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
@@ -88,7 +108,10 @@ namespace Foreman
 
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
-			GraphViewer.AddDemands(ItemListBox.SelectedItems.Cast<Item>());
+			foreach (ListViewItem lvItem in ItemListView.SelectedItems)
+			{
+				GraphViewer.AddDemand((Item)lvItem.Tag);
+			}
 		}
 		
 		private void rateButton_CheckedChanged(object sender, EventArgs e)
@@ -154,24 +177,6 @@ namespace Foreman
 			GraphViewer.Invalidate();
 		}
 
-		private void ItemListBox_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (ItemListBox.SelectedItems.Count == 0)
-			{
-				AddItemButton.Enabled = false;
-			}
-			else if (ItemListBox.SelectedItems.Count == 1)
-			{
-				AddItemButton.Enabled = true;
-				AddItemButton.Text = "Add Output";
-			}
-			else if (ItemListBox.SelectedItems.Count > 1)
-			{
-				AddItemButton.Enabled = true;
-				AddItemButton.Text = "Add Outputs";
-			}
-		}
-
 		private void AssemblerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
@@ -212,6 +217,29 @@ namespace Foreman
 		{
 			((Module)ModuleSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
 			GraphViewer.UpdateNodes();
+		}
+
+		private void ItemListView_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (ItemListView.SelectedItems.Count == 0)
+			{
+				AddItemButton.Enabled = false;
+			}
+			else if (ItemListView.SelectedItems.Count == 1)
+			{
+				AddItemButton.Enabled = true;
+				AddItemButton.Text = "Add Output";
+			}
+			else if (ItemListView.SelectedItems.Count > 1)
+			{
+				AddItemButton.Enabled = true;
+				AddItemButton.Text = "Add Outputs";
+			}
+		}
+
+		private void ItemListView_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			GraphViewer.AddDemand((Item)ItemListView.SelectedItems[0].Tag);
 		}
 	}
 }
