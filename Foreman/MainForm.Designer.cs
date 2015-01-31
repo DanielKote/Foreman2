@@ -113,7 +113,6 @@
 			this.ItemListView.View = System.Windows.Forms.View.Details;
 			this.ItemListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.ItemListView_ItemDrag);
 			this.ItemListView.SelectedIndexChanged += new System.EventHandler(this.ItemListView_SelectedIndexChanged);
-			this.ItemListView.DragLeave += new System.EventHandler(this.ItemListView_DragLeave);
 			this.ItemListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ItemListView_MouseDoubleClick);
 			// 
 			// h_Name
@@ -375,7 +374,6 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 2);
 			this.GraphViewer.Size = new System.Drawing.Size(943, 689);
 			this.GraphViewer.TabIndex = 12;
-			this.GraphViewer.DragEnter += new System.Windows.Forms.DragEventHandler(this.GraphViewer_DragEnter);
 			// 
 			// MainForm
 			// 

@@ -265,24 +265,5 @@ namespace Foreman
 			}
 			DoDragDrop(draggedItems, DragDropEffects.All);
 		}
-
-		private void ItemListView_DragLeave(object sender, EventArgs e)
-		{
-
-		}
-
-		private void GraphViewer_DragEnter(object sender, DragEventArgs e)
-		{
-			if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
-			{
-				e.Effect = DragDropEffects.All;
-				//GhostNodeElement newElement = new GhostNodeElement(GraphViewer);
-				//newElement.X = 100;//e.X;
-				//newElement.Y = 100;//e.Y;
-				//newElement.Items = e.Data.GetData(typeof(HashSet<Item>)) as HashSet<Item>;
-				//GraphViewer.DraggedElement = newElement;
-				//GraphViewer.Invalidate();
-			}
-		}
 	}
 }

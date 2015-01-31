@@ -78,6 +78,7 @@ namespace Foreman
 			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
 			DragOver += new DragEventHandler(HandleItemDragging);
 			DragDrop += new DragEventHandler(HandleItemDropping);
+			DragEnter += new DragEventHandler(HandleDragEntering);
 			ViewOffset = new Point(Width / -2, Height / -2);
 		}
 
@@ -529,6 +530,14 @@ namespace Foreman
 				components.Dispose();
 			}
 			base.Dispose(disposing);
+		}
+
+		void HandleDragEntering(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
+			{
+				e.Effect = DragDropEffects.All;
+			}
 		}
 
 		void HandleItemDragging(object sender, DragEventArgs e)
