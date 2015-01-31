@@ -24,8 +24,7 @@ namespace Foreman
 			}
 		}
 
-		//Still hardcoded. Needs to ask the user if it can't be found.
-		public static String FactorioDataPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "Program Files", "Factorio", "data");
+		public static String FactorioDataPath = "";
 		public static String AppDataModPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Factorio", "mods");
 
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();

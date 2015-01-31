@@ -21,15 +21,30 @@ namespace Foreman
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			String path = DataCache.FactorioDataPath;
-			if (!Directory.Exists(path))
+			if (!Directory.Exists(Properties.Settings.Default.FactorioDataPath))
+			{
+				foreach (String defaultPath in new String[]{
+												  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio", "Data"),
+												  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio", "Data"),
+												  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents", "data")}) //Not actually tested on a Mac
+				{
+					if (Directory.Exists(defaultPath))
+					{
+						Properties.Settings.Default["FactorioDataPath"] = defaultPath;
+						Properties.Settings.Default.Save();
+						break;
+					}
+				}
+			}
+
+			if (!Directory.Exists(Properties.Settings.Default.FactorioDataPath))
 			{
 				using (DirectoryChooserForm form = new DirectoryChooserForm())
 				{
 					if (form.ShowDialog() == DialogResult.OK)
 					{
-						path = form.SelectedPath;
-						path = Path.Combine(path, "data");
+						Properties.Settings.Default["FactorioDataPath"] = Path.Combine(form.SelectedPath, "data"); ;
+						Properties.Settings.Default.Save();
 					}
 					else
 					{
@@ -40,7 +55,7 @@ namespace Foreman
 				}
 			}
 
-			DataCache.FactorioDataPath = path;
+			DataCache.FactorioDataPath = Properties.Settings.Default.FactorioDataPath;
 			DataCache.LoadRecipes();
 
 			rateOptionsDropDown.SelectedIndex = 0;
