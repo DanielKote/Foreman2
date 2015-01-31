@@ -562,7 +562,26 @@ namespace Foreman
 			{
 				foreach (Item item in GhostDragElement.Items)
 				{
-					NodeElement newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
+					NodeElement newElement = null;
+
+					ItemChooserControl itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node");
+					ItemChooserControl itemOutputOption = new ItemChooserControl(item, "Create output node");
+					using (var form = new ChooserForm(new List<ChooserControl> { itemSupplyOption, itemOutputOption }))
+					{
+						var result = form.ShowDialog();
+						if (result == DialogResult.OK)
+						{
+							if (form.SelectedControl == itemSupplyOption)
+							{
+								newElement = new NodeElement(SupplyNode.Create(item, this.Graph), this);
+							}
+							else
+							{
+								newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
+							}
+						}
+					}
+
 					newElement.Update();
 					newElement.Location = Point.Add(GhostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 				}
