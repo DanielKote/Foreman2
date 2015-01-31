@@ -58,6 +58,9 @@
   <ItemGroup>
     <Compile Include="Assembler.cs" />
     <Compile Include="AssemblerBox.cs" />
+    <Compile Include="ChooserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="DataCache.cs" />
     <Compile Include="DirectoryChooserForm.cs">
       <SubType>Form</SubType>
@@ -100,11 +103,11 @@
     </Compile>
     <Compile Include="NodeElement.cs" />
     <Compile Include="NodeLink.cs" />
-    <Compile Include="RecipeChooserForm.cs">
+    <Compile Include="ChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RecipeChooserForm.Designer.cs">
-      <DependentUpon>RecipeChooserForm.cs</DependentUpon>
+    <Compile Include="ChooserForm.Designer.cs">
+      <DependentUpon>ChooserForm.cs</DependentUpon>
     </Compile>
     <Compile Include="RecipeChooserControl.cs">
       <SubType>UserControl</SubType>
@@ -112,12 +115,15 @@
     <Compile Include="RecipeChooserControl.Designer.cs">
       <DependentUpon>RecipeChooserControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="SupplyNodeChooserControl.cs">
+    <Compile Include="ItemChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="RecipeChooserSupplyNodeOption.Designer.cs">
-      <DependentUpon>SupplyNodeChooserControl.cs</DependentUpon>
+    <Compile Include="ItemChooserControl.Designer.cs">
+      <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ChooserControl.resx">
+      <DependentUpon>ChooserControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DirectoryChooserForm.resx">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -140,14 +146,14 @@
     <EmbeddedResource Include="ProductionGraphViewer.resx">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="RecipeChooserForm.resx">
-      <DependentUpon>RecipeChooserForm.cs</DependentUpon>
+    <EmbeddedResource Include="ChooserForm.resx">
+      <DependentUpon>ChooserForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RecipeChooserControl.resx">
       <DependentUpon>RecipeChooserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RecipeChooserSupplyNodeOption.resx">
-      <DependentUpon>SupplyNodeChooserControl.cs</DependentUpon>
+      <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">

@@ -113,19 +113,28 @@ namespace Foreman
 			}
 			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
 			{
-				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)), new List<Item> { Item }, "Create output node", "Use recipe {0}"))
+				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
+				recipeOptionList.Add(new ItemChooserControl(Item, "Create output node"));
+				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)))
+				{
+					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.Name));
+				}
+
+				using (var form = new ChooserForm(recipeOptionList))
 				{
 					var result = form.ShowDialog();
 					if (result == DialogResult.OK)
 					{
 						NodeElement newElement = null;
-						if (form.selectedRecipe != null)
+						if (form.SelectedControl is RecipeChooserControl)
 						{
-							newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+							Recipe selectedRecipe = (form.SelectedControl as RecipeChooserControl).DisplayedRecipe;
+							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
 						}
-						else if (form.selectedItem != null)
+						else if (form.SelectedControl is ItemChooserControl)
 						{
-							newElement = new NodeElement(ConsumerNode.Create(form.selectedItem, Parent.Graph), Parent);
+							Item selectedItem = (form.SelectedControl as ItemChooserControl).DisplayedItem;
+							newElement = new NodeElement(ConsumerNode.Create(selectedItem, Parent.Graph), Parent);
 						}
 						newElement.Update();
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
@@ -135,19 +144,28 @@ namespace Foreman
 			}
 			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
 			{
-				using (var form = new RecipeChooserForm(DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)), new List<Item> { Item }, "Create infinite supply node", "Use recipe {0}"))
+				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
+				recipeOptionList.Add(new ItemChooserControl(Item, "Create infinite supply node"));
+				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)))
+				{
+					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.Name));
+				}
+
+				using (var form = new ChooserForm(recipeOptionList))
 				{
 					var result = form.ShowDialog();
 					if (result == DialogResult.OK)
 					{
 						NodeElement newElement = null;
-						if (form.selectedRecipe != null)
+						if (form.SelectedControl is RecipeChooserControl)
 						{
-							newElement = new NodeElement(RecipeNode.Create(form.selectedRecipe, Parent.Graph), Parent);
+							Recipe selectedRecipe = (form.SelectedControl as RecipeChooserControl).DisplayedRecipe;
+							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
 						}
-						else if (form.selectedItem != null)
+						else if (form.SelectedControl is ItemChooserControl)
 						{
-							newElement = new NodeElement(SupplyNode.Create(form.selectedItem, Parent.Graph), Parent);
+							Item selectedItem = (form.SelectedControl as ItemChooserControl).DisplayedItem;
+							newElement = new NodeElement(SupplyNode.Create(selectedItem, Parent.Graph), Parent);
 						}
 						newElement.Update();
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));

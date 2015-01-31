@@ -1,6 +1,6 @@
 ﻿namespace Foreman
 {
-	partial class RecipeChooserForm
+	partial class ChooserForm
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -28,23 +28,23 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.recipeListPanel = new System.Windows.Forms.FlowLayoutPanel();
+			this.listPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.SuspendLayout();
 			// 
 			// recipeListPanel
 			// 
-			this.recipeListPanel.AutoScroll = true;
-			this.recipeListPanel.AutoSize = true;
-			this.recipeListPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.recipeListPanel.BackColor = System.Drawing.SystemColors.Control;
-			this.recipeListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.recipeListPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.recipeListPanel.Location = new System.Drawing.Point(0, 0);
-			this.recipeListPanel.Name = "recipeListPanel";
-			this.recipeListPanel.Size = new System.Drawing.Size(324, 38);
-			this.recipeListPanel.TabIndex = 0;
-			this.recipeListPanel.WrapContents = false;
-			this.recipeListPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.RecipeChooserForm_MouseMove);
+			this.listPanel.AutoScroll = true;
+			this.listPanel.AutoSize = true;
+			this.listPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.listPanel.BackColor = System.Drawing.SystemColors.Control;
+			this.listPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.listPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.listPanel.Location = new System.Drawing.Point(0, 0);
+			this.listPanel.Name = "recipeListPanel";
+			this.listPanel.Size = new System.Drawing.Size(324, 38);
+			this.listPanel.TabIndex = 0;
+			this.listPanel.WrapContents = false;
+			this.listPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.RecipeChooserForm_MouseMove);
 			// 
 			// RecipeChooserForm
 			// 
@@ -53,7 +53,7 @@
 			this.AutoSize = true;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(324, 38);
-			this.Controls.Add(this.recipeListPanel);
+			this.Controls.Add(this.listPanel);
 			this.DoubleBuffered = true;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.KeyPreview = true;
@@ -75,6 +75,6 @@
 
 		#endregion
 
-		private System.Windows.Forms.FlowLayoutPanel recipeListPanel;
+		private System.Windows.Forms.FlowLayoutPanel listPanel;
 	}
 }

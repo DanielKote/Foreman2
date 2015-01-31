@@ -9,15 +9,12 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
-	public partial class RecipeChooserForm : Form
+	public partial class ChooserForm : Form
 	{
-		private List<Item> items;
-		private List<Recipe> recipes;
-		private String itemText = "";
-		private String recipeText = "";
+		private List<ChooserControl> controls;
 
-		public UserControl selectedControl = null;
-		public UserControl SelectedControl
+		private ChooserControl selectedControl = null;
+		public ChooserControl SelectedControl
 		{
 			get
 			{
@@ -36,54 +33,19 @@ namespace Foreman
 				}
 			}
 		}
-		public Recipe selectedRecipe
-		{
-			get
-			{
-				if (selectedControl is RecipeChooserControl)
-				{
-					return (selectedControl as RecipeChooserControl).DisplayedRecipe;
-				}
-				else
-				{
-					return null;
-				}
-			}
-		}
-		public Item selectedItem
-		{
-			get
-			{
-				if (selectedControl is ItemChooserControl)
-				{
-					return (selectedControl as ItemChooserControl).DisplayedItem;
-				}
-				else
-				{
-					return null;
-				}
-			}
-		}
 
-		public RecipeChooserForm(IEnumerable<Recipe> recipes, IEnumerable<Item> items, String itemText, String recipeText)
+		public ChooserForm(IEnumerable<ChooserControl> controls)
 		{
 			InitializeComponent();
 
-			this.recipes = recipes.ToList();
-			this.items = items.ToList();
-			this.itemText = itemText;
-			this.recipeText = recipeText;
+			this.controls = controls.ToList();
 		}
 
 		private void RecipeChooserForm_Load(object sender, EventArgs e)
 		{
-			foreach (Item item in items)
+			foreach (ChooserControl control in controls)
 			{
-				recipeListPanel.Controls.Add(new ItemChooserControl(item, itemText));
-			}
-			foreach (Recipe recipe in recipes)
-			{
-				recipeListPanel.Controls.Add(new RecipeChooserControl(recipe, recipeText));
+				listPanel.Controls.Add(control);
 			}
 
 			MaximumSize = new Size(Int32.MaxValue, 500);
