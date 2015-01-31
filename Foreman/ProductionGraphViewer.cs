@@ -579,11 +579,12 @@ namespace Foreman
 							{
 								newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
 							}
+
+							newElement.Update();
+							newElement.Location = Point.Add(GhostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						}
 					}
 
-					newElement.Update();
-					newElement.Location = Point.Add(GhostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 				}
 
 				GhostDragElement.Dispose();
