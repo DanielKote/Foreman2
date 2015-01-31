@@ -54,6 +54,7 @@
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
 			this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -69,14 +70,16 @@
 			this.tableLayoutPanel1.ColumnCount = 2;
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 2);
-			this.tableLayoutPanel1.Controls.Add(this.ItemListView, 0, 1);
+			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 3);
+			this.tableLayoutPanel1.Controls.Add(this.ItemListView, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.MainToolbar, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.GraphViewer, 1, 1);
+			this.tableLayoutPanel1.Controls.Add(this.FilterTextBox, 0, 1);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 3;
+			this.tableLayoutPanel1.RowCount = 4;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
@@ -104,9 +107,9 @@
 			this.ItemListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.ItemListView.HideSelection = false;
 			this.ItemListView.LabelWrap = false;
-			this.ItemListView.Location = new System.Drawing.Point(3, 108);
+			this.ItemListView.Location = new System.Drawing.Point(3, 134);
 			this.ItemListView.Name = "ItemListView";
-			this.ItemListView.Size = new System.Drawing.Size(220, 659);
+			this.ItemListView.Size = new System.Drawing.Size(220, 633);
 			this.ItemListView.SmallImageList = this.ItemImageList;
 			this.ItemListView.TabIndex = 11;
 			this.ItemListView.UseCompatibleStateImageBehavior = false;
@@ -371,9 +374,18 @@
 			this.GraphViewer.DraggedElement = null;
 			this.GraphViewer.Location = new System.Drawing.Point(229, 108);
 			this.GraphViewer.Name = "GraphViewer";
-			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 2);
+			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
 			this.GraphViewer.Size = new System.Drawing.Size(943, 689);
 			this.GraphViewer.TabIndex = 12;
+			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
 			// 
 			// MainForm
 			// 
@@ -430,6 +442,7 @@
 		private System.Windows.Forms.GroupBox groupBox6;
 		private System.Windows.Forms.GroupBox groupBox7;
 		private ProductionGraphViewer GraphViewer;
+		private System.Windows.Forms.TextBox FilterTextBox;
 	}
 }
 

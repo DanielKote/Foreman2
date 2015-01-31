@@ -12,6 +12,9 @@ namespace Foreman
 {	
 	public partial class MainForm : Form
 	{
+		private List<ListViewItem> unfilteredItemList;
+		private string oldFilterText = "";
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -87,27 +90,28 @@ namespace Foreman
 
 			//Listview
 			ItemListView.Items.Clear();
+			unfilteredItemList = new List<ListViewItem>();
 			ItemImageList.Images.Add(DataCache.UnknownIcon);
-			foreach (var aitem in DataCache.Items)
+			foreach (var item in DataCache.Items)
 			{
 				ListViewItem lvItem = new ListViewItem();
-				if (DataCache.Items[aitem.Key].Icon != null)
+				if (DataCache.Items[item.Key].Icon != null)
 				{
-					ItemImageList.Images.Add(DataCache.Items[aitem.Key].Icon);
+					ItemImageList.Images.Add(DataCache.Items[item.Key].Icon);
 					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
 				}
 				else
 				{
 					lvItem.ImageIndex = 0;
 				}
-				lvItem.Text = aitem.Value.FriendlyName;
-				lvItem.Tag = aitem.Value;
+				lvItem.Text = item.Value.FriendlyName;
+				lvItem.Tag = item.Value;
+				unfilteredItemList.Add(lvItem);
 				ItemListView.Items.Add(lvItem);
 			}
 
 			ItemListView.Sorting = SortOrder.Ascending;
 			ItemListView.Sort();
-
 		}
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
@@ -264,6 +268,12 @@ namespace Foreman
 				draggedItems.Add((Item)item.Tag);
 			}
 			DoDragDrop(draggedItems, DragDropEffects.All);
+		}
+
+		private void FilterTextBox_TextChanged(object sender, EventArgs e)
+		{
+			ItemListView.Items.Clear();
+			ItemListView.Items.AddRange(unfilteredItemList.Where(i => i.Text.Contains(FilterTextBox.Text)).ToArray());
 		}
 	}
 }
