@@ -47,8 +47,7 @@ namespace Foreman
 		public bool ShowAssemblers = false;
 		public bool ShowMiners = false;
 		StringFormat stringFormat = new StringFormat();
-
-		private GhostNodeElement ghostDragElement = null;
+		public GhostNodeElement GhostDragElement = null;
 
 		public Rectangle GraphBounds
 		{
@@ -79,6 +78,7 @@ namespace Foreman
 			DragOver += new DragEventHandler(HandleItemDragging);
 			DragDrop += new DragEventHandler(HandleItemDropping);
 			DragEnter += new DragEventHandler(HandleDragEntering);
+			DragLeave += new EventHandler(HandleDragLeaving);
 			ViewOffset = new Point(Width / -2, Height / -2);
 		}
 
@@ -544,13 +544,13 @@ namespace Foreman
 		{
 			if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
 			{
-				if (ghostDragElement == null)
+				if (GhostDragElement == null)
 				{
-					ghostDragElement = new GhostNodeElement(this);
-					ghostDragElement.Items = e.Data.GetData(typeof(HashSet<Item>)) as HashSet<Item>;
+					GhostDragElement = new GhostNodeElement(this);
+					GhostDragElement.Items = e.Data.GetData(typeof(HashSet<Item>)) as HashSet<Item>;
 				}
 
-				ghostDragElement.Location = Point.Subtract(ScreenToGraph(e.X, e.Y), new Size(PointToScreen(Point.Empty)));
+				GhostDragElement.Location = Point.Subtract(ScreenToGraph(e.X, e.Y), new Size(PointToScreen(Point.Empty)));
 			}
 
 			Invalidate();
@@ -558,17 +558,24 @@ namespace Foreman
 
 		void HandleItemDropping(object sender, DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(typeof(HashSet<Item>)) && ghostDragElement != null)
+			if (e.Data.GetDataPresent(typeof(HashSet<Item>)) && GhostDragElement != null)
 			{
-				foreach (Item item in ghostDragElement.Items)
+				foreach (Item item in GhostDragElement.Items)
 				{
 					NodeElement newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
 					newElement.Update();
-					newElement.Location = Point.Add(ghostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+					newElement.Location = Point.Add(GhostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 				}
 
-				ghostDragElement.Dispose();
-				ghostDragElement = null;
+				GhostDragElement.Dispose();
+			}
+		}
+
+		void HandleDragLeaving(object sender, EventArgs e)
+		{
+			if (GhostDragElement != null)
+			{
+				GhostDragElement.Dispose();
 			}
 		}
 	}

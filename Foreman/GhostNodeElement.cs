@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace Foreman
 {
-	class GhostNodeElement : GraphElement
+	public class GhostNodeElement : GraphElement
 	{
 		public HashSet<Item> Items = new HashSet<Item>();
 
@@ -46,6 +46,15 @@ namespace Foreman
 			}
 
 			base.Paint(graphics);
+		}
+
+		public override void Dispose()
+		{
+			if (Parent.GhostDragElement == this)
+			{
+				Parent.GhostDragElement = null;
+			}
+			base.Dispose();
 		}
 	}
 }
