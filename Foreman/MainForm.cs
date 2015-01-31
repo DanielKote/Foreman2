@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.IO;
 
 namespace Foreman
-{	
+{
 	public partial class MainForm : Form
 	{
 		private List<ListViewItem> unfilteredItemList;
@@ -66,7 +66,7 @@ namespace Foreman
 			AssemblerSelectionBox.Items.AddRange(DataCache.Assemblers.Values.ToArray());
 			AssemblerSelectionBox.Sorted = true;
 			AssemblerSelectionBox.DisplayMember = "FriendlyName";
-			for ( int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
 			{
 				AssemblerSelectionBox.SetItemChecked(i, true);
 			}
@@ -131,7 +131,7 @@ namespace Foreman
 				GraphViewer.AddDemand((Item)lvItem.Tag);
 			}
 		}
-		
+
 		private void rateButton_CheckedChanged(object sender, EventArgs e)
 		{
 			if ((sender as RadioButton).Checked)
@@ -154,12 +154,12 @@ namespace Foreman
 				this.GraphViewer.Graph.SelectedAmountType = AmountType.FixedAmount;
 			}
 
-				MinerDisplayCheckBox.Checked 
-					= MinerDisplayCheckBox.Enabled
-					= AssemblerDisplayCheckBox.Enabled
-					= AssemblerDisplayCheckBox.Checked
-					= !(sender as RadioButton).Checked;
-			
+			MinerDisplayCheckBox.Checked
+				= MinerDisplayCheckBox.Enabled
+				= AssemblerDisplayCheckBox.Enabled
+				= AssemblerDisplayCheckBox.Checked
+				= !(sender as RadioButton).Checked;
+
 			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
 		}
@@ -209,7 +209,7 @@ namespace Foreman
 
 		private void ExportImageButton_Click(object sender, EventArgs e)
 		{
-			ImageExportForm form = new ImageExportForm(GraphViewer);			
+			ImageExportForm form = new ImageExportForm(GraphViewer);
 			form.Show();
 		}
 
@@ -259,7 +259,7 @@ namespace Foreman
 		{
 			GraphViewer.AddDemand((Item)ItemListView.SelectedItems[0].Tag);
 		}
-		
+
 		private void ItemListView_ItemDrag(object sender, ItemDragEventArgs e)
 		{
 			HashSet<Item> draggedItems = new HashSet<Item>();
@@ -273,7 +273,7 @@ namespace Foreman
 		private void FilterTextBox_TextChanged(object sender, EventArgs e)
 		{
 			ItemListView.Items.Clear();
-			ItemListView.Items.AddRange(unfilteredItemList.Where(i => i.Text.Contains(FilterTextBox.Text)).ToArray());
+			ItemListView.Items.AddRange(unfilteredItemList.Where(i => i.Text.ToLower().Contains(FilterTextBox.Text.ToLower())).ToArray());
 		}
 	}
 }
