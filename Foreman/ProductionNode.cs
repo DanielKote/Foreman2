@@ -188,11 +188,11 @@ namespace Foreman
 			return rate * BaseRecipe.Ingredients[item];
 		}
 
-        public override float GetTotalOutput(Item item)
-        {
-            float rate = GetRateAllowedByInputs();
-            return BaseRecipe.Results[item] * rate;
-        }
+		public override float GetTotalOutput(Item item)
+		{
+			float rate = GetRateAllowedByInputs();
+			return BaseRecipe.Results[item] * rate;
+		}
 
 		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
 		private float ValidateRecipeRate(float amount)
