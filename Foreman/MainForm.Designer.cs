@@ -53,8 +53,8 @@
 			this.MinerSelectionBox = new System.Windows.Forms.CheckedListBox();
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
 			this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
-			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -100,7 +100,7 @@
 			// ItemListView
 			// 
 			this.ItemListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-			this.h_Name});
+            this.h_Name});
 			this.ItemListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ItemListView.FullRowSelect = true;
 			this.ItemListView.GridLines = true;
@@ -126,7 +126,7 @@
 			// ItemImageList
 			// 
 			this.ItemImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-			this.ItemImageList.ImageSize = new System.Drawing.Size(16, 16);
+			this.ItemImageList.ImageSize = new System.Drawing.Size(32, 32);
 			this.ItemImageList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// MainToolbar
@@ -166,8 +166,8 @@
 			this.rateOptionsDropDown.Enabled = false;
 			this.rateOptionsDropDown.FormattingEnabled = true;
 			this.rateOptionsDropDown.Items.AddRange(new object[] {
-			"per Second",
-			"per Minute"});
+            "per Second",
+            "per Minute"});
 			this.rateOptionsDropDown.Location = new System.Drawing.Point(63, 42);
 			this.rateOptionsDropDown.Name = "rateOptionsDropDown";
 			this.rateOptionsDropDown.Size = new System.Drawing.Size(123, 21);
@@ -365,6 +365,15 @@
 			this.ModuleSelectionBox.TabIndex = 6;
 			this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
 			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			// 
 			// GraphViewer
 			// 
 			this.GraphViewer.AllowDrop = true;
@@ -377,15 +386,6 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
 			this.GraphViewer.Size = new System.Drawing.Size(943, 689);
 			this.GraphViewer.TabIndex = 12;
-			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
 			// 
 			// MainForm
 			// 
