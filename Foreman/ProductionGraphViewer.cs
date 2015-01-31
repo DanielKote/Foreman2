@@ -48,6 +48,8 @@ namespace Foreman
 		public bool ShowMiners = false;
 		StringFormat stringFormat = new StringFormat();
 
+		private GhostNodeElement ghostDragElement = null;
+
 		public Rectangle GraphBounds
 		{
 			get
@@ -74,6 +76,8 @@ namespace Foreman
 		{
 			InitializeComponent();
 			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
+			DragOver += new DragEventHandler(HandleItemDragging);
+			DragDrop += new DragEventHandler(HandleItemDropping);
 			ViewOffset = new Point(Width / -2, Height / -2);
 		}
 
@@ -228,6 +232,10 @@ namespace Foreman
 				yield return element;
 			}
 			foreach (DraggedLinkElement element in Elements.OfType<DraggedLinkElement>())
+			{
+				yield return element;
+			}
+			foreach (GhostNodeElement element in Elements.OfType<GhostNodeElement>())
 			{
 				yield return element;
 			}
@@ -521,6 +529,38 @@ namespace Foreman
 				components.Dispose();
 			}
 			base.Dispose(disposing);
+		}
+
+		void HandleItemDragging(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
+			{
+				if (ghostDragElement == null)
+				{
+					ghostDragElement = new GhostNodeElement(this);
+					ghostDragElement.Items = e.Data.GetData(typeof(HashSet<Item>)) as HashSet<Item>;
+				}
+
+				ghostDragElement.Location = Point.Subtract(ScreenToGraph(e.X, e.Y), new Size(PointToScreen(Point.Empty)));
+			}
+
+			Invalidate();
+		}
+
+		void HandleItemDropping(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(typeof(HashSet<Item>)) && ghostDragElement != null)
+			{
+				foreach (Item item in ghostDragElement.Items)
+				{
+					NodeElement newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
+					newElement.Update();
+					newElement.Location = Point.Add(ghostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+				}
+
+				ghostDragElement.Dispose();
+				ghostDragElement = null;
+			}
 		}
 	}
 }

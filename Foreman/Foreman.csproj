@@ -65,6 +65,7 @@
     <Compile Include="DirectoryChooserForm.Designer.cs">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GhostNodeElement.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="ErrorLogging.cs" />
     <Compile Include="GraphicsStuff.cs" />
