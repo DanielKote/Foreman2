@@ -17,4 +17,5 @@ By default, the program is set to display the requirements to create a fixed amo
 # Troubleshooting #
 
 **"Unable to load DLL 'lua52'."**
+
 Make sure Visual C++ 2012 is installed.
