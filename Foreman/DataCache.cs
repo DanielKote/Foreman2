@@ -601,7 +601,7 @@ namespace Foreman
 
 				newAssembler.Icon = LoadImage(ReadLuaString(values, "icon", true));
 				newAssembler.MaxIngredients = ReadLuaInt(values, "ingredient_count");
-				newAssembler.ModuleSlots = ReadLuaInt(values, "module_slots", true, 2);
+				newAssembler.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
 				newAssembler.Speed = ReadLuaFloat(values, "crafting_speed");
 
 				LuaTable effects = ReadLuaLuaTable(values, "allowed_effects", true);
@@ -634,7 +634,7 @@ namespace Foreman
 
 				newFurnace.Icon = LoadImage(ReadLuaString(values, "icon", true));
 				newFurnace.MaxIngredients = 1;
-				newFurnace.ModuleSlots = ReadLuaInt(values, "module_slots", true, 2);
+				newFurnace.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
 				newFurnace.Speed = ReadLuaFloat(values, "crafting_speed");
 
 				LuaTable categories = ReadLuaLuaTable(values, "crafting_categories");
