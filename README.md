@@ -4,6 +4,10 @@ This is a simple program for generating flowcharts for production lines in the g
 
 Requires .Net 4.0 or higher and Visual C++ 2012 to run.
 
+Here's an example of the kind of thing you can make with it:
+
+![Foreman Production Flowchart.png](https://bitbucket.org/repo/ary6LR/images/734263546-Foreman%20Production%20Flowchart.png)
+
 ## Usage ##
 
 Run Foreman.exe. It should automatically find your Factorio installation if you used the installer. Otherwise it will ask for its location.
@@ -27,3 +31,4 @@ Make sure Visual C++ 2012 is installed.
 This is because Foreman uses a very naive method for completing the graph. It doesn't try to optimise its choices at all, instead choosing the first recipe it finds for an item. This means that charts with oil processing in them aren't very useful at the moment.
 
 Sorry about that.
+
