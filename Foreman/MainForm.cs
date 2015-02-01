@@ -13,7 +13,6 @@ namespace Foreman
 	public partial class MainForm : Form
 	{
 		private List<ListViewItem> unfilteredItemList;
-		private string oldFilterText = "";
 
 		public MainForm()
 		{
@@ -58,7 +57,7 @@ namespace Foreman
 			}
 
 			DataCache.FactorioDataPath = Properties.Settings.Default.FactorioDataPath;
-			DataCache.LoadRecipes();
+			DataCache.LoadAllData();
 
 			rateOptionsDropDown.SelectedIndex = 0;
 

@@ -6,6 +6,7 @@ using NLua;
 using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
+using Newtonsoft.Json;
 
 namespace Foreman
 {
@@ -23,6 +24,18 @@ namespace Foreman
 				Key = key;
 			}
 		}
+
+		public class Mod
+		{
+			public String name = "";
+			public String title = "";
+			public String version = "";
+			public String dir = "";
+			public String description = "";
+			public String author = "";
+		}
+
+		public static List<Mod> Mods = new List<Mod>();
 
 		public static String FactorioDataPath = "";
 		public static String AppDataModPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Factorio", "mods");
@@ -43,30 +56,19 @@ namespace Foreman
 		public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
 		public static Dictionary<String, Exception> failedPathDirectories = new Dictionary<string, Exception>();
 
-		public static void LoadRecipes()
+		public static void LoadAllData()
 		{
 			using (Lua lua = new Lua())
 			{
-				List<String> luaFiles = getAllLuaFiles().ToList();
-				List<String> luaDirs = getAllModDirs().ToList();
+				FindAllMods();
 
-				//Add all these files to the Lua path variable
-				foreach (String dir in luaDirs)
+				foreach (Mod mod in Mods)
 				{
-					AddLuaPackagePath(lua, dir); //Prototype folder matches package hierarchy so this is enough.
+					AddLuaPackagePath(lua, mod.dir); //Prototype folder matches package hierarchy so this is enough.
 				}
+				AddLuaPackagePath(lua, Path.Combine(FactorioDataPath, "core", "lualib")); //Core lua functions
 
-				AddLuaPackagePath(lua, Path.Combine(luaDirs[0], "lualib")); //Add lualib dir
-
-				String dataloaderFile = luaFiles.Find(f => f.EndsWith("dataloader.lua"));
-				String autoplaceFile = luaFiles.Find(f => f.EndsWith("autoplace_utils.lua"));
-
-				List<String> itemFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "item")).ToList();
-				itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "fluid")).ToList());
-				itemFiles.AddRange(luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "equipment")).ToList());
-				List<String> recipeFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "recipe")).ToList();
-				List<String> entityFiles = luaFiles.Where(f => f.Contains("prototypes" + Path.DirectorySeparatorChar + "entity")).ToList();
-
+				String dataloaderFile = Path.Combine(FactorioDataPath, "core", "lualib", "dataloader.lua");
 				try
 				{
 					lua.DoFile(dataloaderFile);
@@ -75,29 +77,40 @@ namespace Foreman
 				{
 					failedFiles[dataloaderFile] = e;
 					ErrorLogging.LogLine(String.Format("Error loading dataloader.lua. This file is required to load any values from the prototypes. Message: '{0}'", e.Message));
-					return; //There's no way to load anything else without this file.
+					return;
 				}
-				try
+
+				lua.DoString(@"
+	function module(modname,...)
+	end
+	
+	require ""util""
+	util = {}
+	util.table = {}
+	util.table.deepcopy = table.deepcopy
+	util.multiplystripes = multiplystripes");
+
+				foreach (Mod mod in Mods)
 				{
-					lua.DoFile(autoplaceFile);
-				}
-				catch (Exception e)
-				{
-					failedFiles[autoplaceFile] = e;
-				}
-				foreach (String f in itemFiles.Union(recipeFiles).Union(entityFiles))
-				{
-					try
+					String dataFile = Path.Combine(mod.dir, "data.lua");
+					if (File.Exists(dataFile))
 					{
-						lua.DoFile(f);
-					}
-					catch (NLua.Exceptions.LuaScriptException e)
-					{
-						failedFiles[f] = e;
+						try
+						{
+							lua.DoFile(dataFile);
+						}
+						catch (Exception e)
+						{
+							failedFiles[dataFile] = e;
+						}
 					}
 				}
 
-				foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item" })
+				//------------------------------------------------------------------------------------------
+				// Lua files have all been executed, now it's time to extract their data from the lua engine
+				//------------------------------------------------------------------------------------------
+
+				foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item", "mining-tool", "repair-tool" })
 				{
 					InterpretItems(lua, type);
 				}
@@ -319,32 +332,37 @@ namespace Foreman
 			}
 		}
 
-		private static IEnumerable<String> getAllModDirs()
+		private static void FindAllMods() //Vanilla game counts as a mod too.
 		{
-			List<String> dirs = new List<String>();
-			if (Directory.Exists(FactorioDataPath))
+			foreach(String dir in Directory.EnumerateDirectories(FactorioDataPath))
 			{
-				foreach (String dir in Directory.GetDirectories(FactorioDataPath, "*", SearchOption.TopDirectoryOnly).ToList())
-				{
-					dirs.Add(dir);
-				}
+				ReadModInfoJson(dir);
 			}
-			if (Directory.Exists(AppDataModPath))
+			foreach (String dir in Directory.EnumerateDirectories(AppDataModPath))
 			{
-				foreach (String dir in Directory.GetDirectories(AppDataModPath, "*", SearchOption.TopDirectoryOnly).ToList())
-				{
-					dirs.Add(dir);
-				}
+				ReadModInfoJson(dir);
 			}
 
-			String baseDir = dirs.Find(d => Path.GetFileName(d) == "base");
-			String coreDir = dirs.Find(d => Path.GetFileName(d) == "core");
-			dirs.Remove(baseDir);
-			dirs.Remove(coreDir);
-			dirs.Insert(0, baseDir);
-			dirs.Insert(0, coreDir);  //Put core and base at the top of the list so they're always read first.
+			Mods.Sort((a, b) => //Really basic way of putting core and base at the top
+			{
+				if (a.name == "core") { return -1; }
+				if (b.name == "core") { return 1; }
+				if (a.name == "base") { return -1; }
+				if (b.name == "base") { return 1; }
+				return 0;
+			});
+		}
 
-			return dirs;
+		private static void ReadModInfoJson(String dir)
+		{
+			if (!File.Exists(Path.Combine(dir, "info.json")))
+			{
+				return;
+			}
+			String json = File.ReadAllText(Path.Combine(dir, "info.json"));
+			Mod newMod = JsonConvert.DeserializeObject<Mod>(json);
+			newMod.dir = dir;
+			Mods.Add(newMod);
 		}
 
 		private static void InterpretItems(Lua lua, String typeName)
@@ -363,9 +381,9 @@ namespace Foreman
 
 		private static void LoadLocaleFiles(String locale = "en")
 		{
-			foreach (String dir in getAllModDirs())
+			foreach (Mod mod in Mods)
 			{
-				String localeDir = Path.Combine(dir, "locale", locale);
+				String localeDir = Path.Combine(mod.dir, "locale", locale);
 				if (Directory.Exists(localeDir))
 				{
 					foreach (String file in Directory.GetFiles(localeDir, "*.cfg"))
@@ -463,11 +481,11 @@ namespace Foreman
 			{
 				string[] splitPath = fileName.Split('/');
 				splitPath[0] = splitPath[0].Trim('_');
-				fullPath = getAllModDirs().FirstOrDefault(d => Path.GetFileName(d) == splitPath[0]);
+				fullPath = Mods.FirstOrDefault(m => m.name == splitPath[0]).dir;
 
 				if (!String.IsNullOrEmpty(fullPath))
 				{
-					for (int i = 1; i < splitPath.Count(); i++) //Skip the first split section because it's the same as the end of the path already
+					for (int i = 1; i < splitPath.Count(); i++) //Skip the first split section because it's the mod name, not a directory
 					{
 						fullPath = Path.Combine(fullPath, splitPath[i]);
 					}
