@@ -90,18 +90,21 @@ namespace Foreman
 	util.table.deepcopy = table.deepcopy
 	util.multiplystripes = multiplystripes");
 
-				foreach (Mod mod in Mods)
+				foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
 				{
-					String dataFile = Path.Combine(mod.dir, "data.lua");
-					if (File.Exists(dataFile))
+					foreach (Mod mod in Mods)
 					{
-						try
+						String dataFile = Path.Combine(mod.dir, filename);
+						if (File.Exists(dataFile))
 						{
-							lua.DoFile(dataFile);
-						}
-						catch (Exception e)
-						{
-							failedFiles[dataFile] = e;
+							try
+							{
+								lua.DoFile(dataFile);
+							}
+							catch (Exception e)
+							{
+								failedFiles[dataFile] = e;
+							}
 						}
 					}
 				}
