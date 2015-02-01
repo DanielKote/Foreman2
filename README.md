@@ -32,3 +32,9 @@ This is because Foreman uses a very naive method for completing the graph. It do
 
 Sorry about that.
 
+## Motivate me! ##
+
+Entirely optional, of course.
+
+Paypal account: factorioforeman@gmail.com
+Bitcoin address: 1HACXKCkfRYNVQbTRsnpcqhs1YVwAXccnB
