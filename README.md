@@ -14,8 +14,16 @@ Click and drag an item from the top or bottom of a node to create a new item lin
 
 By default, the program is set to display the requirements to create a fixed amount of each item. If you want to instead show items being created at a specific rate, you can change it in the top left. This also lets you see the minimum number of assemblers, miners or furnaces it would take to produce an item at that rate (as well as applying speed modules to reduce the total number).
 
+If you get tired of connecting recipes together yourself, click "Automatically complete flowchart", and it will add in all the recipes you need to fulfil the requirements of the output nodes currently in the graph.
+
 ## Troubleshooting ##
 
 **"Unable to load DLL 'lua52'."**
 
 Make sure Visual C++ 2012 is installed.
+
+**Automatically completing the graph sometimes chooses very inefficient recipes (e.g. choosing basic oil processing over advanced oil processing when no heavy or light oil is required).**
+
+This is because Foreman uses a very naive method for completing the graph. It doesn't try to optimise its choices at all, instead choosing the first recipe it finds for an item. This means that charts with oil processing in them aren't very useful at the moment.
+
+Sorry about that.
