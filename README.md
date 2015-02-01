@@ -4,7 +4,7 @@ This is a simple program for generating flowcharts for production lines in the g
 
 Requires .Net 4.0 or higher and Visual C++ 2012 to run.
 
-# Usage #
+## Usage ##
 
 Run Foreman.exe. It should automatically find your Factorio installation if you used the installer. Otherwise it will ask for its location.
 
@@ -14,7 +14,7 @@ Click and drag an item from the top or bottom of a node to create a new item lin
 
 By default, the program is set to display the requirements to create a fixed amount of each item. If you want to instead show items being created at a specific rate, you can change it in the top left. This also lets you see the minimum number of assemblers, miners or furnaces it would take to produce an item at that rate (as well as applying speed modules to reduce the total number).
 
-# Troubleshooting #
+## Troubleshooting ##
 
 **"Unable to load DLL 'lua52'."**
 
