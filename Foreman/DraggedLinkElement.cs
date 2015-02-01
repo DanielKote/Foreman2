@@ -117,7 +117,7 @@ namespace Foreman
 				recipeOptionList.Add(new ItemChooserControl(Item, "Create output node"));
 				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)))
 				{
-					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.Name));
+					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName));
 				}
 
 				using (var form = new ChooserForm(recipeOptionList))
@@ -148,7 +148,7 @@ namespace Foreman
 				recipeOptionList.Add(new ItemChooserControl(Item, "Create infinite supply node"));
 				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)))
 				{
-					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.Name));
+					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName));
 				}
 
 				using (var form = new ChooserForm(recipeOptionList))
