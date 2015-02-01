@@ -36,5 +36,5 @@ Sorry about that.
 
 Entirely optional, of course.
 
-Paypal account: factorioforeman@gmail.com
+Paypal account: factorioforeman@gmail.com  
 Bitcoin address: 1HACXKCkfRYNVQbTRsnpcqhs1YVwAXccnB
