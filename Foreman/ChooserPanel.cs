@@ -115,7 +115,7 @@ namespace Foreman
 			SuspendLayout();
 			foreach (ChooserControl control in flowLayoutPanel1.Controls)
 			{
-				if (control.DisplayText.ToLower().Contains(FilterTextBox.Text.ToLower()))
+				if (control.FilterText.ToLower().Contains(FilterTextBox.Text.ToLower()))
 				{
 					control.Visible = true;
 				}
