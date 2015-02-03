@@ -64,6 +64,12 @@
     <Compile Include="ChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ChooserPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ChooserPanel.Designer.cs">
+      <DependentUpon>ChooserPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataCache.cs" />
     <Compile Include="DirectoryChooserForm.cs">
       <SubType>Form</SubType>
@@ -106,12 +112,6 @@
     </Compile>
     <Compile Include="NodeElement.cs" />
     <Compile Include="NodeLink.cs" />
-    <Compile Include="ChooserForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ChooserForm.Designer.cs">
-      <DependentUpon>ChooserForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="RecipeChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -126,6 +126,9 @@
     </Compile>
     <EmbeddedResource Include="ChooserControl.resx">
       <DependentUpon>ChooserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChooserPanel.resx">
+      <DependentUpon>ChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DirectoryChooserForm.resx">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
@@ -148,9 +151,6 @@
     </Compile>
     <EmbeddedResource Include="ProductionGraphViewer.resx">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ChooserForm.resx">
-      <DependentUpon>ChooserForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RecipeChooserControl.resx">
       <DependentUpon>RecipeChooserControl.cs</DependentUpon>

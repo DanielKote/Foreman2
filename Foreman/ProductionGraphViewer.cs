@@ -566,12 +566,15 @@ namespace Foreman
 
 					ItemChooserControl itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node");
 					ItemChooserControl itemOutputOption = new ItemChooserControl(item, "Create output node");
-					using (var form = new ChooserForm(new List<ChooserControl> { itemOutputOption, itemSupplyOption }))
+					var chooserPanel = new ChooserPanel(new List<ChooserControl> { itemOutputOption, itemSupplyOption }, this);
+
+					Point location = GhostDragElement.Location;
+
+					chooserPanel.Show(c =>
 					{
-						var result = form.ShowDialog();
-						if (result == DialogResult.OK)
+						if (c != null)
 						{
-							if (form.SelectedControl == itemSupplyOption)
+							if (c == itemSupplyOption)
 							{
 								newElement = new NodeElement(SupplyNode.Create(item, this.Graph), this);
 							}
@@ -581,10 +584,9 @@ namespace Foreman
 							}
 
 							newElement.Update();
-							newElement.Location = Point.Add(GhostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+							newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						}
-					}
-
+					});
 				}
 
 				GhostDragElement.Dispose();

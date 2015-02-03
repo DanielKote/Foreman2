@@ -50,7 +50,6 @@
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 1;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(300, 40);
 			this.tableLayoutPanel1.TabIndex = 2;
 			// 
 			// iconPictureBox
@@ -67,7 +66,6 @@
 			this.TextLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.TextLabel.Location = new System.Drawing.Point(39, 0);
 			this.TextLabel.Name = "TextLabel";
-			this.TextLabel.Size = new System.Drawing.Size(258, 41);
 			this.TextLabel.TabIndex = 1;
 			this.TextLabel.Text = "Use Infinite Supply Node";
 			this.TextLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -76,10 +74,11 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoSize = true;
+			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BackColor = System.Drawing.Color.White;
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.Name = "SupplyNodeChooserControl";
-			this.Size = new System.Drawing.Size(300, 40);
 			this.Load += new System.EventHandler(this.RecipeChooserSupplyNodeOption_Load);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).EndInit();

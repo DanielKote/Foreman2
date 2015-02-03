@@ -11,6 +11,8 @@ namespace Foreman
 	{
 		public String text = "";
 
+		public ChooserPanel ParentPanel = null;
+
 		public ChooserControl(String text)
 		{
 			this.text = text;
@@ -29,16 +31,15 @@ namespace Foreman
 		
 		private void MouseMoved(object sender, MouseEventArgs e)
 		{
-			(FindForm() as ChooserForm).SelectedControl = this;
+			ParentPanel.SelectedControl = this;
 		}
 
 		private void MouseClicked(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left)
 			{
-				(FindForm() as ChooserForm).SelectedControl = this;
-				(FindForm() as ChooserForm).DialogResult = DialogResult.OK;
-				(FindForm() as ChooserForm).Close();
+				ParentPanel.CallbackMethod.Invoke(this);
+				ParentPanel.Dispose();
 			}
 		}
 
@@ -48,8 +49,10 @@ namespace Foreman
 			// 
 			// ChooserControl
 			// 
+			this.AutoSize = true;
+			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.Name = "ChooserControl";
-			this.Size = new System.Drawing.Size(178, 88);
+			this.Size = new System.Drawing.Size(0, 0);
 			this.ResumeLayout(false);
 
 		}

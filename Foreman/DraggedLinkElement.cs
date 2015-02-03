@@ -120,27 +120,28 @@ namespace Foreman
 					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName));
 				}
 
-				using (var form = new ChooserForm(recipeOptionList))
+				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);
+				chooserPanel.Show(c =>
 				{
-					var result = form.ShowDialog();
-					if (result == DialogResult.OK)
+					if (c != null)
 					{
 						NodeElement newElement = null;
-						if (form.SelectedControl is RecipeChooserControl)
+						if (c is RecipeChooserControl)
 						{
-							Recipe selectedRecipe = (form.SelectedControl as RecipeChooserControl).DisplayedRecipe;
+							Recipe selectedRecipe = (c as RecipeChooserControl).DisplayedRecipe;
 							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
 						}
-						else if (form.SelectedControl is ItemChooserControl)
+						else if (c is ItemChooserControl)
 						{
-							Item selectedItem = (form.SelectedControl as ItemChooserControl).DisplayedItem;
+							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
 							newElement = new NodeElement(ConsumerNode.Create(selectedItem, Parent.Graph), Parent);
 						}
 						newElement.Update();
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
 					}
-				}
+				});
+
 			}
 			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
 			{
@@ -151,27 +152,29 @@ namespace Foreman
 					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName));
 				}
 
-				using (var form = new ChooserForm(recipeOptionList))
+				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);
+
+				chooserPanel.Show(c =>
 				{
-					var result = form.ShowDialog();
-					if (result == DialogResult.OK)
+					if (c != null)
 					{
 						NodeElement newElement = null;
-						if (form.SelectedControl is RecipeChooserControl)
+						if (c is RecipeChooserControl)
 						{
-							Recipe selectedRecipe = (form.SelectedControl as RecipeChooserControl).DisplayedRecipe;
+							Recipe selectedRecipe = (c as RecipeChooserControl).DisplayedRecipe;
 							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
 						}
-						else if (form.SelectedControl is ItemChooserControl)
+						else if (c is ItemChooserControl)
 						{
-							Item selectedItem = (form.SelectedControl as ItemChooserControl).DisplayedItem;
+							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
 							newElement = new NodeElement(SupplyNode.Create(selectedItem, Parent.Graph), Parent);
 						}
 						newElement.Update();
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
 					}
-				}
+				});
+
 			}
 
 			Parent.AddRemoveElements();

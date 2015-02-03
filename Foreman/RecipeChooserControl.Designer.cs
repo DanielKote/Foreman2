@@ -49,6 +49,8 @@
 			// 
 			// tableLayoutPanel1
 			// 
+			this.tableLayoutPanel1.AutoSize = true;
+			this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.tableLayoutPanel1.ColumnCount = 3;
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -63,7 +65,6 @@
 			this.tableLayoutPanel1.RowCount = 2;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(300, 80);
 			this.tableLayoutPanel1.TabIndex = 1;
 			// 
 			// nameLabel
@@ -73,7 +74,6 @@
 			this.nameLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.nameLabel.Location = new System.Drawing.Point(39, 0);
 			this.nameLabel.Name = "nameLabel";
-			this.nameLabel.Size = new System.Drawing.Size(258, 13);
 			this.nameLabel.TabIndex = 1;
 			this.nameLabel.Text = "Recipe name:";
 			this.nameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -85,7 +85,6 @@
 			this.inputListBox.Location = new System.Drawing.Point(39, 16);
 			this.inputListBox.Name = "inputListBox";
 			this.inputListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-			this.inputListBox.Size = new System.Drawing.Size(126, 61);
 			this.inputListBox.TabIndex = 2;
 			// 
 			// outputListBox
@@ -95,18 +94,18 @@
 			this.outputListBox.Location = new System.Drawing.Point(171, 16);
 			this.outputListBox.Name = "outputListBox";
 			this.outputListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-			this.outputListBox.Size = new System.Drawing.Size(126, 61);
 			this.outputListBox.TabIndex = 3;
 			// 
 			// RecipeChooserControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.AutoSize = true;
 			this.BackColor = System.Drawing.Color.White;
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.DoubleBuffered = true;
 			this.Name = "RecipeChooserControl";
-			this.Size = new System.Drawing.Size(300, 80);
 			this.Load += new System.EventHandler(this.RecipeChooserOption_Load);
 			((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).EndInit();
 			this.tableLayoutPanel1.ResumeLayout(false);
