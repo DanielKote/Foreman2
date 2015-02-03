@@ -109,5 +109,22 @@ namespace Foreman
 		{
 			SelectedControl = null;
 		}
+
+		private void FilterTextBox_TextChanged(object sender, EventArgs e)
+		{
+			SuspendLayout();
+			foreach (ChooserControl control in flowLayoutPanel1.Controls)
+			{
+				if (control.DisplayText.ToLower().Contains(FilterTextBox.Text.ToLower()))
+				{
+					control.Visible = true;
+				}
+				else
+				{
+					control.Visible = false;
+				}
+			}
+			ResumeLayout(false);
+		}
 	}
 }

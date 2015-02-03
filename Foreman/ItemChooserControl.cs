@@ -13,7 +13,7 @@ namespace Foreman
 	{
 		public Item DisplayedItem;
 
-		public ItemChooserControl(Item item, String text) : base(text)
+		public ItemChooserControl(Item item, String text, String filterText) : base(text, filterText)
 		{
 			InitializeComponent();
 

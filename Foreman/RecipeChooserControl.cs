@@ -13,7 +13,7 @@ namespace Foreman
 	{
 		public Recipe DisplayedRecipe;
 
-		public RecipeChooserControl(Recipe recipe, String text) : base(text)
+		public RecipeChooserControl(Recipe recipe, String text, String filterText) : base(text, filterText)
 		{
 			InitializeComponent();
 			DisplayedRecipe = recipe;
@@ -21,7 +21,7 @@ namespace Foreman
 
 		private void RecipeChooserOption_Load(object sender, EventArgs e)
 		{
-			nameLabel.Text = String.Format(text, DisplayedRecipe.FriendlyName);
+			nameLabel.Text = String.Format(DisplayText, DisplayedRecipe.FriendlyName);
 			foreach (Item ingredient in DisplayedRecipe.Ingredients.Keys)
 			{
 				inputListBox.Items.Add(String.Format("{0} ({1})", ingredient.FriendlyName, DisplayedRecipe.Ingredients[ingredient]));

@@ -564,8 +564,8 @@ namespace Foreman
 				{
 					NodeElement newElement = null;
 
-					ItemChooserControl itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node");
-					ItemChooserControl itemOutputOption = new ItemChooserControl(item, "Create output node");
+					ItemChooserControl itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
+					ItemChooserControl itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
 					var chooserPanel = new ChooserPanel(new List<ChooserControl> { itemOutputOption, itemSupplyOption }, this);
 
 					Point location = GhostDragElement.Location;

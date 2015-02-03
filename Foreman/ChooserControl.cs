@@ -9,13 +9,15 @@ namespace Foreman
 {
 	public class ChooserControl : UserControl
 	{
-		public String text = "";
+		public String DisplayText = "";
+		public String FilterText = "";
 
 		public ChooserPanel ParentPanel = null;
 
-		public ChooserControl(String text)
+		public ChooserControl(String text, String filterText)
 		{
-			this.text = text;
+			this.DisplayText = text;
+			this.FilterText = filterText;
 		}
 
 		protected void RegisterMouseEvents(Control control)

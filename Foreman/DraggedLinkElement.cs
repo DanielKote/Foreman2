@@ -114,10 +114,10 @@ namespace Foreman
 			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
 			{
 				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
-				recipeOptionList.Add(new ItemChooserControl(Item, "Create output node"));
+				recipeOptionList.Add(new ItemChooserControl(Item, "Create output node", Item.FriendlyName));
 				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)))
 				{
-					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName));
+					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
 				}
 
 				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);
@@ -146,10 +146,10 @@ namespace Foreman
 			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
 			{
 				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
-				recipeOptionList.Add(new ItemChooserControl(Item, "Create infinite supply node"));
+				recipeOptionList.Add(new ItemChooserControl(Item, "Create infinite supply node", Item.FriendlyName));
 				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)))
 				{
-					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName));
+					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
 				}
 
 				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);
