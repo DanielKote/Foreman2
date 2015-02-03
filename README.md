@@ -2,7 +2,7 @@
 
 This is a simple program for generating flowcharts for production lines in the game [Factorio](https://www.factorio.com/).
 
-Requires .Net 4.0 or higher and Visual C++ 2012 to run.
+Requires .Net 4.0 or higher and Visual C++ 2012 x86 to run.
 
 Here's an example of the kind of thing you can make with it:
 
@@ -24,7 +24,7 @@ If you get tired of connecting recipes together yourself, click "Automatically c
 
 **"Unable to load DLL 'lua52'."**
 
-Make sure Visual C++ 2012 is installed.
+Make sure Visual C++ 2012 x86 is installed.
 
 **Automatically completing the graph sometimes chooses very inefficient recipes (e.g. choosing basic oil processing over advanced oil processing when no heavy or light oil is required).**
 
