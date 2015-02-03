@@ -341,9 +341,12 @@ namespace Foreman
 			{
 				ReadModInfoJson(dir);
 			}
-			foreach (String dir in Directory.EnumerateDirectories(AppDataModPath))
+			if (Directory.Exists(AppDataModPath))
 			{
-				ReadModInfoJson(dir);
+				foreach (String dir in Directory.EnumerateDirectories(AppDataModPath))
+				{
+					ReadModInfoJson(dir);
+				}
 			}
 
 			Mods.Sort((a, b) => //Really basic way of putting core and base at the top
