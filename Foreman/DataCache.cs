@@ -35,11 +35,11 @@ namespace Foreman
 			public String author = "";
 		}
 
+		private static String DataPath { get { return Properties.Settings.Default.FactorioDataPath; } }
+		private static String ModPath { get { return Properties.Settings.Default.FactorioModPath; } }
+
 		public static List<Mod> Mods = new List<Mod>();
-
-		public static String FactorioDataPath = "";
-		public static String AppDataModPath = "";
-
+		
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
 		public static Dictionary<String, Assembler> Assemblers = new Dictionary<string, Assembler>();
@@ -66,9 +66,9 @@ namespace Foreman
 				{
 					AddLuaPackagePath(lua, mod.dir); //Prototype folder matches package hierarchy so this is enough.
 				}
-				AddLuaPackagePath(lua, Path.Combine(FactorioDataPath, "core", "lualib")); //Core lua functions
+				AddLuaPackagePath(lua, Path.Combine(DataPath, "core", "lualib")); //Core lua functions
 
-				String dataloaderFile = Path.Combine(FactorioDataPath, "core", "lualib", "dataloader.lua");
+				String dataloaderFile = Path.Combine(DataPath, "core", "lualib", "dataloader.lua");
 				try
 				{
 					lua.DoFile(dataloaderFile);
@@ -335,16 +335,16 @@ namespace Foreman
 
 		private static IEnumerable<String> getAllLuaFiles()
 		{
-			if (Directory.Exists(FactorioDataPath))
+			if (Directory.Exists(ModPath))
 			{
-				foreach (String file in Directory.GetFiles(FactorioDataPath, "*.lua", SearchOption.AllDirectories))
+				foreach (String file in Directory.GetFiles(DataPath, "*.lua", SearchOption.AllDirectories))
 				{
 					yield return file;
 				}
 			}
-			if (Directory.Exists(AppDataModPath))
+			if (Directory.Exists(ModPath))
 			{
-				foreach (String file in Directory.GetFiles(AppDataModPath, "*.lua", SearchOption.AllDirectories))
+				foreach (String file in Directory.GetFiles(ModPath, "*.lua", SearchOption.AllDirectories))
 				{
 					yield return file;
 				}
@@ -353,13 +353,13 @@ namespace Foreman
 
 		private static void FindAllMods() //Vanilla game counts as a mod too.
 		{
-			foreach(String dir in Directory.EnumerateDirectories(FactorioDataPath))
+			foreach(String dir in Directory.EnumerateDirectories(DataPath))
 			{
 				ReadModInfoJson(dir);
 			}
-			if (Directory.Exists(AppDataModPath))
+			if (Directory.Exists(Properties.Settings.Default.FactorioModPath))
 			{
-				foreach (String dir in Directory.EnumerateDirectories(AppDataModPath))
+				foreach (String dir in Directory.EnumerateDirectories(Properties.Settings.Default.FactorioModPath))
 				{
 					ReadModInfoJson(dir);
 				}
@@ -566,7 +566,7 @@ namespace Foreman
 		}
 
 		//This is only if a recipe references an item that isn't in the item prototypes (which shouldn't really happen)
-		private static Item LoadItemFromRecipe(String itemName)
+		private static Item FindOrCreateUnknownItem(String itemName)
 		{
 			Item newItem;
 			if (!Items.ContainsKey(itemName))
@@ -777,7 +777,7 @@ namespace Foreman
 				{
 					resultCount = 1f;
 				}
-				results.Add(LoadItemFromRecipe(resultName), resultCount);
+				results.Add(FindOrCreateUnknownItem(resultName), resultCount);
 			}
 			else
 			{
@@ -785,7 +785,7 @@ namespace Foreman
 				while (resultEnumerator.MoveNext())
 				{
 					LuaTable resultTable = resultEnumerator.Value as LuaTable;
-					results.Add(LoadItemFromRecipe(ReadLuaString(resultTable, "name")), ReadLuaFloat(resultTable, "amount"));
+					results.Add(FindOrCreateUnknownItem(ReadLuaString(resultTable, "name")), ReadLuaFloat(resultTable, "amount"));
 				}
 			}
 
@@ -817,7 +817,15 @@ namespace Foreman
 				{
 					amount = Convert.ToSingle(ingredientTable[2]);
 				}
-				ingredients.Add(LoadItemFromRecipe(name), amount);
+				Item ingredient = FindOrCreateUnknownItem(name);
+				if (!ingredients.ContainsKey(ingredient))
+				{
+					ingredients.Add(ingredient, amount);
+				}
+				else
+				{
+					ingredients[ingredient] += amount;
+				}
 			}
 
 			return ingredients;

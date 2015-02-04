@@ -59,13 +59,12 @@ namespace Foreman
 				{
 					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods");
 				}
-				if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods"))) ;
+				if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods")))
 				{
 					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods");
 				}
 			}
 			
-			DataCache.FactorioDataPath = Properties.Settings.Default.FactorioDataPath;
 			DataCache.LoadAllData();
 
 			rateOptionsDropDown.SelectedIndex = 0;
