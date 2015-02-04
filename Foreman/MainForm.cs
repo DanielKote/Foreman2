@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Foreman
 {
@@ -56,6 +53,18 @@ namespace Foreman
 				}
 			}
 
+			if (!Directory.Exists(Properties.Settings.Default.FactorioModPath))
+			{
+				if (Directory.Exists(Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods")))
+				{
+					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods");
+				}
+				if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods"))) ;
+				{
+					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods");
+				}
+			}
+			
 			DataCache.FactorioDataPath = Properties.Settings.Default.FactorioDataPath;
 			DataCache.LoadAllData();
 
@@ -290,6 +299,40 @@ namespace Foreman
 						if (GraphViewer.Elements.Any())
 						{
 							if (MessageBox.Show("Changing the factorio directory will reload the program and clear your current flowchart. Do you want to continue?", "Warning", MessageBoxButtons.OKCancel)
+								== DialogResult.OK)
+							{
+								DataCache.Clear();
+								new MainForm().Show();
+								this.Close();
+							}
+						}
+						else
+						{
+							DataCache.Clear();
+							new MainForm().Show();
+							this.Close();
+						}
+					}
+				}
+			}
+		}
+
+		private void ModDirectoryButton_Click(object sender, EventArgs e)
+		{
+			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioModPath, false))
+			{
+				form.Text = "Locate the mods directory";
+				if (form.ShowDialog() == DialogResult.OK)
+				{
+					if (form.SelectedPath != Properties.Settings.Default.FactorioModPath)
+					{
+						Properties.Settings.Default["FactorioModPath"] = form.SelectedPath;
+						Properties.Settings.Default.Save();
+
+						
+						if (GraphViewer.Elements.Any())
+						{
+							if (MessageBox.Show("Changing the mods directory will reload the program and clear your current flowchart. Do you want to continue?", "Warning", MessageBoxButtons.OKCancel)
 								== DialogResult.OK)
 							{
 								DataCache.Clear();

@@ -34,5 +34,17 @@ namespace Foreman.Properties {
                 this["FactorioDataPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FactorioModPath {
+            get {
+                return ((string)(this["FactorioModPath"]));
+            }
+            set {
+                this["FactorioModPath"] = value;
+            }
+        }
     }
 }

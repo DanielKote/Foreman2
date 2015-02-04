@@ -38,7 +38,7 @@ namespace Foreman
 		public static List<Mod> Mods = new List<Mod>();
 
 		public static String FactorioDataPath = "";
-		public static String AppDataModPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Factorio", "mods");
+		public static String AppDataModPath = "";
 
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
