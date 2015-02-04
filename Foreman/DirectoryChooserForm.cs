@@ -13,16 +13,25 @@ namespace Foreman
 	public partial class DirectoryChooserForm : Form
 	{
 		public String SelectedPath;
+		private bool factorioCheck;
 
-		public DirectoryChooserForm()
+		public DirectoryChooserForm(string defaultDirectory, bool doFactorioDirCheck)
 		{
+			SelectedPath = defaultDirectory;
+			factorioCheck = doFactorioDirCheck;
 			InitializeComponent();
+
+			DirTextBox.Text = SelectedPath;
 		}
 
 		private void BrowseButton_Click(object sender, EventArgs e)
 		{
 			using (FolderBrowserDialog dialog = new FolderBrowserDialog())
 			{
+				if (Directory.Exists(SelectedPath))
+				{
+					dialog.SelectedPath = SelectedPath;
+				}
 				var result = dialog.ShowDialog();
 
 				if (result == System.Windows.Forms.DialogResult.OK)
@@ -35,30 +44,42 @@ namespace Foreman
 
 		private void OKButton_Click(object sender, EventArgs e)
 		{
-			bool pathValid = true;
+			if (factorioCheck)
+			{
+				if (IsValidFactorioDirectory(SelectedPath))
+				{
+					DialogResult = DialogResult.OK;
+					Close();
+				}
 
-			if (!Directory.Exists(SelectedPath))
-			{
-				pathValid = false;
+				else
+				{
+					MessageBox.Show("That doesn't seem to be a valid directory");
+				}
 			}
-			if (!Directory.Exists(Path.Combine(SelectedPath, "data", "core")))
-			{
-				pathValid = false;
-			}
-			if (!Directory.Exists(Path.Combine(SelectedPath, "data", "base")))
-			{
-				pathValid = false;
-			}
-
-			if (pathValid)
+			else
 			{
 				DialogResult = DialogResult.OK;
 				Close();
 			}
-			else
+		}
+
+		private static bool IsValidFactorioDirectory(String dir)
+		{
+			if (!Directory.Exists(dir))
 			{
-				MessageBox.Show("That doesn't seem to be a valid Factorio directory");
+				return false;
 			}
+			if (!Directory.Exists(Path.Combine(dir, "data", "core")))
+			{
+				return false;
+			}
+			if (!Directory.Exists(Path.Combine(dir, "data", "base")))
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

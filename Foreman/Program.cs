@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows;
 
 namespace Foreman
 {
@@ -15,7 +16,8 @@ namespace Foreman
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
+			new MainForm().Show();
+			Application.Run();
 		}
 	}
 }

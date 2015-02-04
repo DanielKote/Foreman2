@@ -40,7 +40,7 @@ namespace Foreman
 
 			if (!Directory.Exists(Properties.Settings.Default.FactorioDataPath))
 			{
-				using (DirectoryChooserForm form = new DirectoryChooserForm())
+				using (DirectoryChooserForm form = new DirectoryChooserForm("", true))
 				{
 					if (form.ShowDialog() == DialogResult.OK)
 					{
@@ -273,6 +273,39 @@ namespace Foreman
 		{
 			ItemListView.Items.Clear();
 			ItemListView.Items.AddRange(unfilteredItemList.Where(i => i.Text.ToLower().Contains(FilterTextBox.Text.ToLower())).ToArray());
+		}
+
+		private void FactorioDirectoryButton_Click(object sender, EventArgs e)
+		{
+			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioDataPath, false))
+			{
+				form.Text = "Locate the factorio directory";
+				if (form.ShowDialog() == DialogResult.OK)
+				{
+					if (form.SelectedPath != Properties.Settings.Default.FactorioDataPath)
+					{
+						Properties.Settings.Default["FactorioDataPath"] = Path.Combine(form.SelectedPath, "data");
+						Properties.Settings.Default.Save();
+
+						if (GraphViewer.Elements.Any())
+						{
+							if (MessageBox.Show("Changing the factorio directory will reload the program and clear your current flowchart. Do you want to continue?", "Warning", MessageBoxButtons.OKCancel)
+								== DialogResult.OK)
+							{
+								DataCache.Clear();
+								new MainForm().Show();
+								this.Close();
+							}
+						}
+						else
+						{
+							DataCache.Clear();
+							new MainForm().Show();
+							this.Close();
+						}
+					}
+				}
+			}
 		}
 	}
 }

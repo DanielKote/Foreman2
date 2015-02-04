@@ -193,6 +193,22 @@ namespace Foreman
 			ReportErrors();
 		}
 
+		public static void Clear()
+		{
+			Mods.Clear();
+			Items.Clear();
+			Recipes.Clear();
+			Assemblers.Clear();
+			Miners.Clear();
+			Resources.Clear();
+			Modules.Clear();
+			colourCache.Clear();			
+			KnownRecipeNames.Clear();
+			LocaleFiles.Clear();
+			failedFiles.Clear();
+			failedPathDirectories.Clear();
+		}
+
 		private static float ReadLuaFloat(LuaTable table, String key, Boolean canBeMissing = false, float defaultValue = 0f)
 		{
 			if (table[key] == null)

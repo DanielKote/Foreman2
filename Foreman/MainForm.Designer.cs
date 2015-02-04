@@ -53,8 +53,11 @@
 			this.MinerSelectionBox = new System.Windows.Forms.CheckedListBox();
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
 			this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
-			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
+			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -63,6 +66,7 @@
 			this.groupBox5.SuspendLayout();
 			this.groupBox6.SuspendLayout();
 			this.groupBox7.SuspendLayout();
+			this.flowLayoutPanel2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -83,7 +87,7 @@
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(1175, 800);
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(1365, 800);
 			this.tableLayoutPanel1.TabIndex = 1;
 			// 
 			// AddItemButton
@@ -139,10 +143,11 @@
 			this.MainToolbar.Controls.Add(this.groupBox5);
 			this.MainToolbar.Controls.Add(this.groupBox6);
 			this.MainToolbar.Controls.Add(this.groupBox7);
+			this.MainToolbar.Controls.Add(this.flowLayoutPanel2);
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(3, 3);
 			this.MainToolbar.Name = "MainToolbar";
-			this.MainToolbar.Size = new System.Drawing.Size(1169, 99);
+			this.MainToolbar.Size = new System.Drawing.Size(1359, 99);
 			this.MainToolbar.TabIndex = 2;
 			// 
 			// groupBox1
@@ -365,15 +370,6 @@
 			this.ModuleSelectionBox.TabIndex = 6;
 			this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
 			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			// 
 			// GraphViewer
 			// 
 			this.GraphViewer.AllowDrop = true;
@@ -384,14 +380,55 @@
 			this.GraphViewer.Location = new System.Drawing.Point(229, 108);
 			this.GraphViewer.Name = "GraphViewer";
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
-			this.GraphViewer.Size = new System.Drawing.Size(943, 689);
+			this.GraphViewer.Size = new System.Drawing.Size(1133, 689);
 			this.GraphViewer.TabIndex = 12;
+			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			// 
+			// flowLayoutPanel2
+			// 
+			this.flowLayoutPanel2.AutoSize = true;
+			this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.flowLayoutPanel2.Controls.Add(this.FactorioDirectoryButton);
+			this.flowLayoutPanel2.Controls.Add(this.ModDirectoryButton);
+			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(1171, 20);
+			this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(3, 20, 3, 3);
+			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
+			this.flowLayoutPanel2.Size = new System.Drawing.Size(185, 62);
+			this.flowLayoutPanel2.TabIndex = 13;
+			// 
+			// FactorioDirectoryButton
+			// 
+			this.FactorioDirectoryButton.Location = new System.Drawing.Point(3, 3);
+			this.FactorioDirectoryButton.Name = "FactorioDirectoryButton";
+			this.FactorioDirectoryButton.Size = new System.Drawing.Size(179, 25);
+			this.FactorioDirectoryButton.TabIndex = 5;
+			this.FactorioDirectoryButton.Text = "Factorio Directory...";
+			this.FactorioDirectoryButton.UseVisualStyleBackColor = true;
+			this.FactorioDirectoryButton.Click += new System.EventHandler(this.FactorioDirectoryButton_Click);
+			// 
+			// ModDirectoryButton
+			// 
+			this.ModDirectoryButton.Location = new System.Drawing.Point(3, 34);
+			this.ModDirectoryButton.Name = "ModDirectoryButton";
+			this.ModDirectoryButton.Size = new System.Drawing.Size(179, 25);
+			this.ModDirectoryButton.TabIndex = 6;
+			this.ModDirectoryButton.Text = "Mod Directory...";
+			this.ModDirectoryButton.UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1175, 800);
+			this.ClientSize = new System.Drawing.Size(1365, 800);
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.DoubleBuffered = true;
 			this.KeyPreview = true;
@@ -411,6 +448,7 @@
 			this.groupBox5.ResumeLayout(false);
 			this.groupBox6.ResumeLayout(false);
 			this.groupBox7.ResumeLayout(false);
+			this.flowLayoutPanel2.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -443,6 +481,9 @@
 		private System.Windows.Forms.GroupBox groupBox7;
 		private ProductionGraphViewer GraphViewer;
 		private System.Windows.Forms.TextBox FilterTextBox;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
+		private System.Windows.Forms.Button FactorioDirectoryButton;
+		private System.Windows.Forms.Button ModDirectoryButton;
 	}
 }
 
