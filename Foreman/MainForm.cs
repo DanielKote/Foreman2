@@ -9,16 +9,21 @@ namespace Foreman
 {
 	public partial class MainForm : Form
 	{
+		private static HashSet<MainForm> MainFormList = new HashSet<MainForm>();
+
 		private List<ListViewItem> unfilteredItemList;
 
 		public MainForm()
 		{
 			InitializeComponent();
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+			MainFormList.Add(this);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
+			FormClosed += Closed;
+
 			if (!Directory.Exists(Properties.Settings.Default.FactorioDataPath))
 			{
 				foreach (String defaultPath in new String[]{
@@ -366,6 +371,15 @@ namespace Foreman
 				DataCache.Clear();
 				new MainForm().Show();
 				this.Close();
+			}
+		}
+
+		private void Closed(Object sender, FormClosedEventArgs e)
+		{
+			MainFormList.Remove(this);
+			if (!MainFormList.Any())
+			{
+				Application.Exit();
 			}
 		}
 	}
