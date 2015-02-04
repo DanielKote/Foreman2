@@ -785,7 +785,15 @@ namespace Foreman
 				while (resultEnumerator.MoveNext())
 				{
 					LuaTable resultTable = resultEnumerator.Value as LuaTable;
-					results.Add(FindOrCreateUnknownItem(ReadLuaString(resultTable, "name")), ReadLuaFloat(resultTable, "amount"));
+					Item result = FindOrCreateUnknownItem(ReadLuaString(resultTable, "name"));
+					if (!results.ContainsKey(result))
+					{
+						results.Add(result, ReadLuaFloat(resultTable, "amount"));
+					}
+					else
+					{
+						results[result] += ReadLuaFloat(resultTable, "amount");
+					}
 				}
 			}
 
