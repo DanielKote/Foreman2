@@ -58,6 +58,7 @@
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.ReloadButton = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -376,18 +377,18 @@
 			this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.flowLayoutPanel2.Controls.Add(this.FactorioDirectoryButton);
 			this.flowLayoutPanel2.Controls.Add(this.ModDirectoryButton);
+			this.flowLayoutPanel2.Controls.Add(this.ReloadButton);
 			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(1171, 12);
-			this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(3, 12, 3, 3);
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(1171, 3);
 			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-			this.flowLayoutPanel2.Size = new System.Drawing.Size(125, 70);
+			this.flowLayoutPanel2.Size = new System.Drawing.Size(125, 90);
 			this.flowLayoutPanel2.TabIndex = 13;
 			// 
 			// FactorioDirectoryButton
 			// 
 			this.FactorioDirectoryButton.Location = new System.Drawing.Point(3, 3);
 			this.FactorioDirectoryButton.Name = "FactorioDirectoryButton";
-			this.FactorioDirectoryButton.Size = new System.Drawing.Size(119, 29);
+			this.FactorioDirectoryButton.Size = new System.Drawing.Size(119, 24);
 			this.FactorioDirectoryButton.TabIndex = 5;
 			this.FactorioDirectoryButton.Text = "Factorio Directory...";
 			this.FactorioDirectoryButton.UseVisualStyleBackColor = true;
@@ -395,9 +396,9 @@
 			// 
 			// ModDirectoryButton
 			// 
-			this.ModDirectoryButton.Location = new System.Drawing.Point(3, 38);
+			this.ModDirectoryButton.Location = new System.Drawing.Point(3, 33);
 			this.ModDirectoryButton.Name = "ModDirectoryButton";
-			this.ModDirectoryButton.Size = new System.Drawing.Size(119, 29);
+			this.ModDirectoryButton.Size = new System.Drawing.Size(119, 24);
 			this.ModDirectoryButton.TabIndex = 6;
 			this.ModDirectoryButton.Text = "Mod Directory...";
 			this.ModDirectoryButton.UseVisualStyleBackColor = true;
@@ -424,6 +425,16 @@
 			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
 			this.FilterTextBox.TabIndex = 13;
 			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			// 
+			// ReloadButton
+			// 
+			this.ReloadButton.Location = new System.Drawing.Point(3, 63);
+			this.ReloadButton.Name = "ReloadButton";
+			this.ReloadButton.Size = new System.Drawing.Size(119, 24);
+			this.ReloadButton.TabIndex = 7;
+			this.ReloadButton.Text = "Reload";
+			this.ReloadButton.UseVisualStyleBackColor = true;
+			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
 			// MainForm
 			// 
@@ -485,6 +496,7 @@
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
 		private System.Windows.Forms.Button FactorioDirectoryButton;
 		private System.Windows.Forms.Button ModDirectoryButton;
+		private System.Windows.Forms.Button ReloadButton;
 	}
 }
 

@@ -327,7 +327,6 @@ namespace Foreman
 					{
 						Properties.Settings.Default["FactorioModPath"] = form.SelectedPath;
 						Properties.Settings.Default.Save();
-
 						
 						if (GraphViewer.Elements.Any())
 						{
@@ -347,6 +346,26 @@ namespace Foreman
 						}
 					}
 				}
+			}
+		}
+
+		private void ReloadButton_Click(object sender, EventArgs e)
+		{
+			if (GraphViewer.Elements.Any())
+			{
+				if (MessageBox.Show("Reloading will clear your current flowchart. Do you want to continue?", "Warning", MessageBoxButtons.OKCancel)
+					== DialogResult.OK)
+				{
+					DataCache.Clear();
+					new MainForm().Show();
+					this.Close();
+				}
+			}
+			else
+			{
+				DataCache.Clear();
+				new MainForm().Show();
+				this.Close();
 			}
 		}
 	}
