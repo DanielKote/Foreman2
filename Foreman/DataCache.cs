@@ -638,9 +638,17 @@ namespace Foreman
 				newFurnace.Icon = LoadImage(ReadLuaString(values, "icon", true));
 				newFurnace.MaxIngredients = 1;
 				newFurnace.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
-				newFurnace.Speed = ReadLuaFloat(values, "crafting_speed");
+				newFurnace.Speed = ReadLuaFloat(values, "crafting_speed", true, -1f);
+				if (newFurnace.Speed == -1f)
+				{	//In case we're still on Factorio 0.10
+					newFurnace.Speed = ReadLuaFloat(values, "smelting_speed");
+				}
 
-				LuaTable categories = ReadLuaLuaTable(values, "crafting_categories");
+				LuaTable categories = ReadLuaLuaTable(values, "crafting_categories", true);
+				if (categories == null)
+				{	//Another 0.10 compatibility thing.
+					categories = ReadLuaLuaTable(values, "smelting_categories");
+				}
 				foreach (String category in categories.Values)
 				{
 					newFurnace.Categories.Add(category);
