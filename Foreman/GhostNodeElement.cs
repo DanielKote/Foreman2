@@ -41,7 +41,7 @@ namespace Foreman
 					break;
 				}
 				Point position = Point.Subtract(OffsetOrder[i], new Size(iconSize / 2, iconSize / 2));
-				graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, position.X, position.Y, iconSize, iconSize);
+				graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, position.X, position.Y, iconSize, iconSize);
 				i++;
 			}
 
