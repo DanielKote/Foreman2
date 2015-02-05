@@ -71,6 +71,7 @@
       <DependentUpon>ChooserPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="DataCache.cs" />
+    <Compile Include="DependencyGraph.cs" />
     <Compile Include="DirectoryChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -99,6 +100,7 @@
     <Compile Include="MatrixStuff.cs" />
     <Compile Include="LinkElement.cs" />
     <Compile Include="Miner.cs" />
+    <Compile Include="Mod.cs" />
     <Compile Include="ProductionNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

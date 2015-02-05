@@ -25,16 +25,6 @@ namespace Foreman
 			}
 		}
 
-		public class Mod
-		{
-			public String name = "";
-			public String title = "";
-			public String version = "";
-			public String dir = "";
-			public String description = "";
-			public String author = "";
-		}
-
 		private static String DataPath { get { return Properties.Settings.Default.FactorioDataPath; } }
 		private static String ModPath { get { return Properties.Settings.Default.FactorioModPath; } }
 
@@ -62,7 +52,7 @@ namespace Foreman
 			{
 				FindAllMods();
 
-				foreach (Mod mod in Mods)
+				foreach (Mod mod in Mods.Where(m => m.enabled))
 				{
 					AddLuaPackagePath(lua, mod.dir); //Prototype folder matches package hierarchy so this is enough.
 				}
@@ -92,7 +82,7 @@ namespace Foreman
 
 				foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
 				{
-					foreach (Mod mod in Mods)
+					foreach (Mod mod in Mods.Where(m => m.enabled))
 					{
 						String dataFile = Path.Combine(mod.dir, filename);
 						if (File.Exists(dataFile))
@@ -373,20 +363,81 @@ namespace Foreman
 				if (b.name == "base") { return 1; }
 				return 0;
 			});
-		}
 
+			DependencyGraph modGraph = new DependencyGraph(Mods);
+			modGraph.DisableUnsatisfiedMods();
+			Mods = modGraph.SortMods();
+		}
+		
 		private static void ReadModInfoJson(String dir)
 		{
-			if (!File.Exists(Path.Combine(dir, "info.json")))
+			try
 			{
-				return;
+				if (!File.Exists(Path.Combine(dir, "info.json")))
+				{
+					return;
+				}
+				String json = File.ReadAllText(Path.Combine(dir, "info.json"));
+				Mod newMod = JsonConvert.DeserializeObject<Mod>(json);
+				newMod.dir = dir;
+
+				if (!Version.TryParse(newMod.version, out newMod.parsedVersion))
+				{
+					newMod.parsedVersion = new Version(0, 0, 0, 0);
+				}
+				ParseModDependencies(newMod);
+
+				Mods.Add(newMod);
 			}
-			String json = File.ReadAllText(Path.Combine(dir, "info.json"));
-			Mod newMod = JsonConvert.DeserializeObject<Mod>(json);
-			newMod.dir = dir;
-			Mods.Add(newMod);
+			catch (Exception)
+			{
+				ErrorLogging.LogLine(String.Format("The mod at '{0}' has an invalid info.json file", dir));
+			}
 		}
 
+		private static void ParseModDependencies(Mod mod)
+		{
+			foreach (String depString in mod.dependencies)
+			{
+				int token = 0;
+
+				ModDependency newDependency = new ModDependency();
+
+				string[] split = depString.Split(' ');
+
+				if (split[token] == "?")
+				{
+					newDependency.Optional = true;
+					token++;
+				}
+
+				newDependency.ModName = split[token];
+				token++;
+
+				if (split.Count() == token + 2)
+				{
+					switch (split[token])
+					{
+						case "=":
+							newDependency.VersionType = DependencyType.EqualTo;
+							break;
+						case ">":
+							newDependency.VersionType = DependencyType.GreaterThan;
+							break;
+						case ">=":
+							newDependency.VersionType = DependencyType.GreaterThanOrEqual;
+							break;
+					}
+					token++;
+
+					newDependency.Version = Version.Parse(split[token]);
+					token++;
+				}
+
+				mod.parsedDependencies.Add(newDependency);
+			}
+		}
+		
 		private static void InterpretItems(Lua lua, String typeName)
 		{
 			LuaTable itemTable = lua.GetTable("data.raw")[typeName] as LuaTable;
