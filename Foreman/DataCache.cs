@@ -454,7 +454,7 @@ namespace Foreman
 
 		private static void LoadLocaleFiles(String locale = "en")
 		{
-			foreach (Mod mod in Mods)
+			foreach (Mod mod in Mods.Where(m => m.enabled))
 			{
 				String localeDir = Path.Combine(mod.dir, "locale", locale);
 				if (Directory.Exists(localeDir))
