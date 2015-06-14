@@ -46,6 +46,7 @@ namespace Foreman
 		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 		public bool ShowAssemblers = false;
 		public bool ShowMiners = false;
+		public bool ShowInserters = true;
 		StringFormat stringFormat = new StringFormat();
 		public GhostNodeElement GhostDragElement = null;
 

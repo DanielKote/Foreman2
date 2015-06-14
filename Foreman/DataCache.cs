@@ -36,6 +36,7 @@ namespace Foreman
 		public static Dictionary<String, Miner> Miners = new Dictionary<string, Miner>();
 		public static Dictionary<String, Resource> Resources = new Dictionary<string, Resource>();
 		public static Dictionary<String, Module> Modules = new Dictionary<string, Module>();
+		public static Dictionary<String, Inserter> Inserters = new Dictionary<string, Inserter>();
 
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
@@ -814,6 +815,23 @@ namespace Foreman
 			catch (MissingPrototypeValueException e)
 			{
 				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from module prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
+			}
+		}
+
+		private static void InterpretInserter(String name, LuaTable values)
+		{
+			try
+			{
+				float rotationSpeed = ReadLuaFloat(values, "rotation_speed");
+				Inserter newInserter = new Inserter(name);
+				newInserter.RotationSpeed = rotationSpeed;
+				newInserter.Icon = LoadImage(ReadLuaString(values, "icon", true));
+
+				Inserters.Add(name, newInserter);
+			}
+			catch (MissingPrototypeValueException e)
+			{
+				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from inserter prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
 			}
 		}
 
