@@ -463,6 +463,16 @@ namespace Foreman
 			Invalidate();
 		}
 
+		public Point DesktopToGraph(Point point)
+		{
+			return ScreenToGraph(PointToClient(point));
+		}
+
+		public Point DesktopToGraph(int X, int Y)
+		{
+			return DesktopToGraph(new Point(X, Y));
+		}
+
 		public Point ScreenToGraph(Point point)
 		{
 			return ScreenToGraph(point.X, point.Y);
@@ -550,7 +560,7 @@ namespace Foreman
 					GhostDragElement.Items = e.Data.GetData(typeof(HashSet<Item>)) as HashSet<Item>;
 				}
 
-				GhostDragElement.Location = Point.Subtract(ScreenToGraph(e.X, e.Y), new Size(PointToScreen(Point.Empty)));
+				GhostDragElement.Location = DesktopToGraph(e.X, e.Y);
 			}
 
 			Invalidate();

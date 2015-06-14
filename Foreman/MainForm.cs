@@ -128,7 +128,7 @@ namespace Foreman
 
 		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
 		{
-#if DEBUG
+#if NOTDEBUG
 			if (e.KeyCode == Keys.Escape)
 			{
 				Close();
