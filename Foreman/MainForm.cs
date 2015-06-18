@@ -376,20 +376,39 @@ namespace Foreman
 
 		private void saveGraphButton_Click(object sender, EventArgs e)
 		{
+			SaveFileDialog dialog = new SaveFileDialog();
+			dialog.DefaultExt = ".json";
+			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|(*.*)";
+			dialog.AddExtension = true;
+			dialog.OverwritePrompt = true;
+			dialog.FileName = "Flowchart.json";
+			if (dialog.ShowDialog() != DialogResult.OK)
+			{
+				return;
+			}
+
 			var serialiser = JsonSerializer.Create();
 			serialiser.Formatting = Formatting.Indented;
-			var writer = new JsonTextWriter(new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Desktop", "Flowchart.json")));
+			var writer = new JsonTextWriter(new StreamWriter(dialog.FileName));
 			serialiser.Serialize(writer, GraphViewer.Graph);
 			writer.Close();
 		}
 
 		private void loadGraphButton_Click(object sender, EventArgs e)
 		{
+			OpenFileDialog dialog = new OpenFileDialog();
+			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|(*.*)";
+			dialog.CheckFileExists = true;
+			if (dialog.ShowDialog() != DialogResult.OK)
+			{
+				return;
+			}
+
 			GraphViewer.Graph.Nodes.Clear();
 			GraphViewer.Elements.Clear();
 
 			var deserialiser = JsonSerializer.Create();
-			var reader = new JsonTextReader(new StreamReader(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Desktop", "Flowchart.json")));
+			var reader = new JsonTextReader(new StreamReader(dialog.FileName));
 			GraphViewer.Graph = deserialiser.Deserialize<ProductionGraph>(reader);
 			reader.Close();
 
