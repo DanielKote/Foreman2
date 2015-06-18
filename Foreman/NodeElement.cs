@@ -247,12 +247,20 @@ namespace Foreman
 
 		public Point GetOutputLineConnectionPoint(Item item)
 		{
+			if (!outputTabs.Any())
+			{
+				return Point.Empty;
+			}
 			ItemTab tab = outputTabs.First(it => it.Item == item);
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y);
 		}
 
 		public Point GetInputLineConnectionPoint(Item item)
 		{
+			if (!inputTabs.Any())
+			{
+				return Point.Empty;
+			}
 			ItemTab tab = inputTabs.First(it => it.Item == item);
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y + tab.Height);
 		}

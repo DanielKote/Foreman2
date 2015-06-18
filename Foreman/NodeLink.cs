@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace Foreman
 {
-	public class NodeLink
+	[Serializable]
+	public class NodeLink: ISerializable
 	{
 		public ProductionNode Supplier;
 		public ProductionNode Consumer;
@@ -45,6 +47,17 @@ namespace Foreman
 		{
 			Supplier.OutputLinks.Remove(this);
 			Consumer.InputLinks.Remove(this);
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("Supplier", Supplier.Graph.Nodes.IndexOf(Supplier));
+			info.AddValue("Consumer", Consumer.Graph.Nodes.IndexOf(Consumer));
+			info.AddValue("Item", Item.Name);
+		}
+
+		public NodeLink(SerializationInfo info, StreamingContext context)
+		{
 		}
 	}
 }

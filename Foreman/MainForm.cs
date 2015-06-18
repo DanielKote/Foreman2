@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Foreman
 {
@@ -125,17 +126,7 @@ namespace Foreman
 			ItemListView.Sorting = SortOrder.Ascending;
 			ItemListView.Sort();
 		}
-
-		private void ItemListForm_KeyDown(object sender, KeyEventArgs e)
-		{
-#if NOTDEBUG
-			if (e.KeyCode == Keys.Escape)
-			{
-				Close();
-			}
-#endif
-		}
-
+		
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem lvItem in ItemListView.SelectedItems)
@@ -381,6 +372,30 @@ namespace Foreman
 			{
 				Application.Exit();
 			}
+		}
+
+		private void saveGraphButton_Click(object sender, EventArgs e)
+		{
+			var serialiser = JsonSerializer.Create();
+			serialiser.Formatting = Formatting.Indented;
+			var writer = new JsonTextWriter(new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Desktop", "Flowchart.json")));
+			serialiser.Serialize(writer, GraphViewer.Graph);
+			writer.Close();
+		}
+
+		private void loadGraphButton_Click(object sender, EventArgs e)
+		{
+			GraphViewer.Graph.Nodes.Clear();
+			GraphViewer.Elements.Clear();
+
+			var deserialiser = JsonSerializer.Create();
+			var reader = new JsonTextReader(new StreamReader(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Desktop", "Flowchart.json")));
+			GraphViewer.Graph = deserialiser.Deserialize<ProductionGraph>(reader);
+			reader.Close();
+
+			GraphViewer.AddRemoveElements();
+			GraphViewer.PositionNodes();
+			GraphViewer.Invalidate();
 		}
 	}
 }

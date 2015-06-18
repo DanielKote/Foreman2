@@ -11,8 +11,8 @@ namespace Foreman
 		public NodeLink DisplayedLink { get; private set; }
 		public ProductionNode Supplier { get { return DisplayedLink.Supplier; } }
 		public ProductionNode Consumer { get { return DisplayedLink.Consumer; } }
-		public NodeElement SupplierViewer { get { return Parent.GetElementForNode(Supplier); } }
-		public NodeElement ConsumerViewer { get { return Parent.GetElementForNode(Consumer); } }
+		public NodeElement SupplierElement { get { return Parent.GetElementForNode(Supplier); } }
+		public NodeElement ConsumerElement { get { return Parent.GetElementForNode(Consumer); } }
 		public Item Item { get { return DisplayedLink.Item; } }
 
 		public override Point Location
@@ -54,8 +54,8 @@ namespace Foreman
 
 		public override void Paint(Graphics graphics)
 		{
-			Point pointN = SupplierViewer.GetOutputLineConnectionPoint(Item);
-			Point pointM = ConsumerViewer.GetInputLineConnectionPoint(Item);
+			Point pointN = SupplierElement.GetOutputLineConnectionPoint(Item);
+			Point pointM = ConsumerElement.GetInputLineConnectionPoint(Item);
 			Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 			Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 

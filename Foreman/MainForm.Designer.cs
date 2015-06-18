@@ -43,6 +43,8 @@
 			this.AutomaticCompleteButton = new System.Windows.Forms.Button();
 			this.ClearButton = new System.Windows.Forms.Button();
 			this.ExportImageButton = new System.Windows.Forms.Button();
+			this.saveGraphButton = new System.Windows.Forms.Button();
+			this.loadGraphButton = new System.Windows.Forms.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.SingleAssemblerPerRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
@@ -56,9 +58,9 @@
 			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
+			this.ReloadButton = new System.Windows.Forms.Button();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
-			this.ReloadButton = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -112,9 +114,9 @@
 			this.ItemListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.ItemListView.HideSelection = false;
 			this.ItemListView.LabelWrap = false;
-			this.ItemListView.Location = new System.Drawing.Point(3, 134);
+			this.ItemListView.Location = new System.Drawing.Point(3, 196);
 			this.ItemListView.Name = "ItemListView";
-			this.ItemListView.Size = new System.Drawing.Size(220, 633);
+			this.ItemListView.Size = new System.Drawing.Size(220, 571);
 			this.ItemListView.SmallImageList = this.ItemImageList;
 			this.ItemListView.TabIndex = 11;
 			this.ItemListView.UseCompatibleStateImageBehavior = false;
@@ -148,7 +150,7 @@
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(3, 3);
 			this.MainToolbar.Name = "MainToolbar";
-			this.MainToolbar.Size = new System.Drawing.Size(1300, 99);
+			this.MainToolbar.Size = new System.Drawing.Size(1300, 161);
 			this.MainToolbar.TabIndex = 2;
 			// 
 			// groupBox1
@@ -211,10 +213,12 @@
 			this.flowLayoutPanel1.Controls.Add(this.AutomaticCompleteButton);
 			this.flowLayoutPanel1.Controls.Add(this.ClearButton);
 			this.flowLayoutPanel1.Controls.Add(this.ExportImageButton);
+			this.flowLayoutPanel1.Controls.Add(this.saveGraphButton);
+			this.flowLayoutPanel1.Controls.Add(this.loadGraphButton);
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(201, 3);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(185, 93);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(185, 155);
 			this.flowLayoutPanel1.TabIndex = 9;
 			// 
 			// AutomaticCompleteButton
@@ -246,6 +250,26 @@
 			this.ExportImageButton.Text = "Export as Image";
 			this.ExportImageButton.UseVisualStyleBackColor = true;
 			this.ExportImageButton.Click += new System.EventHandler(this.ExportImageButton_Click);
+			// 
+			// saveGraphButton
+			// 
+			this.saveGraphButton.Location = new System.Drawing.Point(3, 96);
+			this.saveGraphButton.Name = "saveGraphButton";
+			this.saveGraphButton.Size = new System.Drawing.Size(179, 25);
+			this.saveGraphButton.TabIndex = 9;
+			this.saveGraphButton.Text = "Save";
+			this.saveGraphButton.UseVisualStyleBackColor = true;
+			this.saveGraphButton.Click += new System.EventHandler(this.saveGraphButton_Click);
+			// 
+			// loadGraphButton
+			// 
+			this.loadGraphButton.Location = new System.Drawing.Point(3, 127);
+			this.loadGraphButton.Name = "loadGraphButton";
+			this.loadGraphButton.Size = new System.Drawing.Size(179, 25);
+			this.loadGraphButton.TabIndex = 10;
+			this.loadGraphButton.Text = "Load";
+			this.loadGraphButton.UseVisualStyleBackColor = true;
+			this.loadGraphButton.Click += new System.EventHandler(this.loadGraphButton_Click);
 			// 
 			// groupBox2
 			// 
@@ -404,28 +428,6 @@
 			this.ModDirectoryButton.UseVisualStyleBackColor = true;
 			this.ModDirectoryButton.Click += new System.EventHandler(this.ModDirectoryButton_Click);
 			// 
-			// GraphViewer
-			// 
-			this.GraphViewer.AllowDrop = true;
-			this.GraphViewer.BackColor = System.Drawing.Color.White;
-			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.GraphViewer.DraggedElement = null;
-			this.GraphViewer.Location = new System.Drawing.Point(229, 108);
-			this.GraphViewer.Name = "GraphViewer";
-			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
-			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
-			this.GraphViewer.TabIndex = 12;
-			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			// 
 			// ReloadButton
 			// 
 			this.ReloadButton.Location = new System.Drawing.Point(3, 63);
@@ -435,6 +437,28 @@
 			this.ReloadButton.Text = "Reload";
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
+			// 
+			// GraphViewer
+			// 
+			this.GraphViewer.AllowDrop = true;
+			this.GraphViewer.BackColor = System.Drawing.Color.White;
+			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphViewer.DraggedElement = null;
+			this.GraphViewer.Location = new System.Drawing.Point(229, 170);
+			this.GraphViewer.Name = "GraphViewer";
+			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
+			this.GraphViewer.Size = new System.Drawing.Size(1074, 627);
+			this.GraphViewer.TabIndex = 12;
+			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 170);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
 			// 
 			// MainForm
 			// 
@@ -447,7 +471,6 @@
 			this.Name = "MainForm";
 			this.Text = "Foreman";
 			this.Load += new System.EventHandler(this.Form1_Load);
-			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ItemListForm_KeyDown);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			this.MainToolbar.ResumeLayout(false);
@@ -497,6 +520,8 @@
 		private System.Windows.Forms.Button FactorioDirectoryButton;
 		private System.Windows.Forms.Button ModDirectoryButton;
 		private System.Windows.Forms.Button ReloadButton;
+		private System.Windows.Forms.Button saveGraphButton;
+		private System.Windows.Forms.Button loadGraphButton;
 	}
 }
 

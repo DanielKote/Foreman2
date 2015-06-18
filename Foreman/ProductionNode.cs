@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace Foreman
 {
 	public enum NodeType { Recipe, Supply, Consumer };
 
-	public abstract class ProductionNode
+	[Serializable]
+	public abstract class ProductionNode: ISerializable
 	{
 		public ProductionGraph Graph { get; protected set; }
 		public abstract String DisplayName { get; }
@@ -105,6 +107,8 @@ namespace Foreman
 			Graph.Nodes.Remove(this);
 			Graph.InvalidateCaches();
 		}
+
+		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
 	}
 
 	public class RecipeNode : ProductionNode
@@ -281,6 +285,12 @@ namespace Foreman
 		{
 			return String.Format("Recipe Tree Node: {0}", BaseRecipe.Name);
 		}
+
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("NodeType", "Recipe");
+			info.AddValue("RecipeName", BaseRecipe.Name);
+		}
 	}
 
 	public class SupplyNode : ProductionNode
@@ -377,6 +387,13 @@ namespace Foreman
 
 			return results;
 		}
+
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("NodeType", "Supply");
+			info.AddValue("ItemName", SuppliedItem.Name);
+			info.AddValue("SupplyAmount", SupplyAmount);
+		}
 	}
 
 	public class ConsumerNode : ProductionNode
@@ -435,6 +452,13 @@ namespace Foreman
 			node.Graph.Nodes.Add(node);
 			node.Graph.InvalidateCaches();
 			return node;
+		}
+
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("NodeType", "Consumer");
+			info.AddValue("ItemName", ConsumedItem.Name);
+			info.AddValue("ConsumptionAmount", ConsumptionAmount);
 		}
 	}
 }
