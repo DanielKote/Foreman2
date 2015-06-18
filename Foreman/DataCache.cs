@@ -53,7 +53,7 @@ namespace Foreman
 			{
 				FindAllMods();
 
-				foreach (Mod mod in Mods.Where(m => m.enabled))
+				foreach (Mod mod in Mods.Where(m => m.Enabled))
 				{
 					AddLuaPackagePath(lua, mod.dir); //Prototype folder matches package hierarchy so this is enough.
 				}
@@ -83,7 +83,7 @@ namespace Foreman
 
 				foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
 				{
-					foreach (Mod mod in Mods.Where(m => m.enabled))
+					foreach (Mod mod in Mods.Where(m => m.Enabled))
 					{
 						String dataFile = Path.Combine(mod.dir, filename);
 						if (File.Exists(dataFile))
@@ -455,7 +455,7 @@ namespace Foreman
 
 		private static void LoadLocaleFiles(String locale = "en")
 		{
-			foreach (Mod mod in Mods.Where(m => m.enabled))
+			foreach (Mod mod in Mods.Where(m => m.Enabled))
 			{
 				String localeDir = Path.Combine(mod.dir, "locale", locale);
 				if (Directory.Exists(localeDir))

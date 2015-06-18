@@ -49,27 +49,21 @@
 			this.SingleAssemblerPerRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
 			this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
-			this.groupBox5 = new System.Windows.Forms.GroupBox();
-			this.AssemblerSelectionBox = new System.Windows.Forms.CheckedListBox();
-			this.groupBox6 = new System.Windows.Forms.GroupBox();
-			this.MinerSelectionBox = new System.Windows.Forms.CheckedListBox();
-			this.groupBox7 = new System.Windows.Forms.GroupBox();
-			this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
 			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.ReloadButton = new System.Windows.Forms.Button();
-			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
+			this.EnableDisableButton = new System.Windows.Forms.Button();
+			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
-			this.groupBox5.SuspendLayout();
-			this.groupBox6.SuspendLayout();
-			this.groupBox7.SuspendLayout();
 			this.flowLayoutPanel2.SuspendLayout();
+			this.flowLayoutPanel3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -114,9 +108,9 @@
 			this.ItemListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.ItemListView.HideSelection = false;
 			this.ItemListView.LabelWrap = false;
-			this.ItemListView.Location = new System.Drawing.Point(3, 196);
+			this.ItemListView.Location = new System.Drawing.Point(3, 134);
 			this.ItemListView.Name = "ItemListView";
-			this.ItemListView.Size = new System.Drawing.Size(220, 571);
+			this.ItemListView.Size = new System.Drawing.Size(220, 633);
 			this.ItemListView.SmallImageList = this.ItemImageList;
 			this.ItemListView.TabIndex = 11;
 			this.ItemListView.UseCompatibleStateImageBehavior = false;
@@ -142,15 +136,13 @@
 			this.tableLayoutPanel1.SetColumnSpan(this.MainToolbar, 2);
 			this.MainToolbar.Controls.Add(this.groupBox1);
 			this.MainToolbar.Controls.Add(this.flowLayoutPanel1);
+			this.MainToolbar.Controls.Add(this.flowLayoutPanel3);
 			this.MainToolbar.Controls.Add(this.groupBox2);
-			this.MainToolbar.Controls.Add(this.groupBox5);
-			this.MainToolbar.Controls.Add(this.groupBox6);
-			this.MainToolbar.Controls.Add(this.groupBox7);
 			this.MainToolbar.Controls.Add(this.flowLayoutPanel2);
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(3, 3);
 			this.MainToolbar.Name = "MainToolbar";
-			this.MainToolbar.Size = new System.Drawing.Size(1300, 161);
+			this.MainToolbar.Size = new System.Drawing.Size(1300, 99);
 			this.MainToolbar.TabIndex = 2;
 			// 
 			// groupBox1
@@ -212,13 +204,11 @@
 			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.flowLayoutPanel1.Controls.Add(this.AutomaticCompleteButton);
 			this.flowLayoutPanel1.Controls.Add(this.ClearButton);
-			this.flowLayoutPanel1.Controls.Add(this.ExportImageButton);
-			this.flowLayoutPanel1.Controls.Add(this.saveGraphButton);
-			this.flowLayoutPanel1.Controls.Add(this.loadGraphButton);
+			this.flowLayoutPanel1.Controls.Add(this.EnableDisableButton);
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(201, 3);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(185, 155);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(185, 93);
 			this.flowLayoutPanel1.TabIndex = 9;
 			// 
 			// AutomaticCompleteButton
@@ -253,7 +243,7 @@
 			// 
 			// saveGraphButton
 			// 
-			this.saveGraphButton.Location = new System.Drawing.Point(3, 96);
+			this.saveGraphButton.Location = new System.Drawing.Point(3, 3);
 			this.saveGraphButton.Name = "saveGraphButton";
 			this.saveGraphButton.Size = new System.Drawing.Size(179, 25);
 			this.saveGraphButton.TabIndex = 9;
@@ -263,7 +253,7 @@
 			// 
 			// loadGraphButton
 			// 
-			this.loadGraphButton.Location = new System.Drawing.Point(3, 127);
+			this.loadGraphButton.Location = new System.Drawing.Point(3, 34);
 			this.loadGraphButton.Name = "loadGraphButton";
 			this.loadGraphButton.Size = new System.Drawing.Size(179, 25);
 			this.loadGraphButton.TabIndex = 10;
@@ -278,7 +268,7 @@
 			this.groupBox2.Controls.Add(this.SingleAssemblerPerRecipeCheckBox);
 			this.groupBox2.Controls.Add(this.AssemblerDisplayCheckBox);
 			this.groupBox2.Controls.Add(this.MinerDisplayCheckBox);
-			this.groupBox2.Location = new System.Drawing.Point(392, 3);
+			this.groupBox2.Location = new System.Drawing.Point(583, 3);
 			this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
@@ -321,79 +311,6 @@
 			this.MinerDisplayCheckBox.TabIndex = 0;
 			this.MinerDisplayCheckBox.Text = "Display Miners/Pumpjacks";
 			this.MinerDisplayCheckBox.UseVisualStyleBackColor = true;
-			this.MinerDisplayCheckBox.CheckedChanged += new System.EventHandler(this.MinerDisplayCheckBox_CheckedChanged);
-			// 
-			// groupBox5
-			// 
-			this.groupBox5.AutoSize = true;
-			this.groupBox5.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.groupBox5.Controls.Add(this.AssemblerSelectionBox);
-			this.groupBox5.Location = new System.Drawing.Point(580, 3);
-			this.groupBox5.Name = "groupBox5";
-			this.groupBox5.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.groupBox5.Size = new System.Drawing.Size(191, 93);
-			this.groupBox5.TabIndex = 10;
-			this.groupBox5.TabStop = false;
-			this.groupBox5.Text = "Enabled assemblers/smelters:";
-			// 
-			// AssemblerSelectionBox
-			// 
-			this.AssemblerSelectionBox.CheckOnClick = true;
-			this.AssemblerSelectionBox.FormattingEnabled = true;
-			this.AssemblerSelectionBox.Location = new System.Drawing.Point(6, 16);
-			this.AssemblerSelectionBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.AssemblerSelectionBox.Name = "AssemblerSelectionBox";
-			this.AssemblerSelectionBox.Size = new System.Drawing.Size(179, 64);
-			this.AssemblerSelectionBox.TabIndex = 4;
-			this.AssemblerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AssemblerSelectionBox_ItemCheck);
-			// 
-			// groupBox6
-			// 
-			this.groupBox6.AutoSize = true;
-			this.groupBox6.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.groupBox6.Controls.Add(this.MinerSelectionBox);
-			this.groupBox6.Location = new System.Drawing.Point(777, 3);
-			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.groupBox6.Size = new System.Drawing.Size(191, 93);
-			this.groupBox6.TabIndex = 11;
-			this.groupBox6.TabStop = false;
-			this.groupBox6.Text = "Enabled miners/pumpjacks";
-			// 
-			// MinerSelectionBox
-			// 
-			this.MinerSelectionBox.CheckOnClick = true;
-			this.MinerSelectionBox.FormattingEnabled = true;
-			this.MinerSelectionBox.Location = new System.Drawing.Point(6, 16);
-			this.MinerSelectionBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.MinerSelectionBox.Name = "MinerSelectionBox";
-			this.MinerSelectionBox.Size = new System.Drawing.Size(179, 64);
-			this.MinerSelectionBox.TabIndex = 5;
-			this.MinerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.MinerSelectionBox_ItemCheck);
-			// 
-			// groupBox7
-			// 
-			this.groupBox7.AutoSize = true;
-			this.groupBox7.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.groupBox7.Controls.Add(this.ModuleSelectionBox);
-			this.groupBox7.Location = new System.Drawing.Point(974, 3);
-			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.groupBox7.Size = new System.Drawing.Size(191, 93);
-			this.groupBox7.TabIndex = 12;
-			this.groupBox7.TabStop = false;
-			this.groupBox7.Text = "Enabled modules";
-			// 
-			// ModuleSelectionBox
-			// 
-			this.ModuleSelectionBox.CheckOnClick = true;
-			this.ModuleSelectionBox.FormattingEnabled = true;
-			this.ModuleSelectionBox.Location = new System.Drawing.Point(6, 16);
-			this.ModuleSelectionBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.ModuleSelectionBox.Name = "ModuleSelectionBox";
-			this.ModuleSelectionBox.Size = new System.Drawing.Size(179, 64);
-			this.ModuleSelectionBox.TabIndex = 6;
-			this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
 			// 
 			// flowLayoutPanel2
 			// 
@@ -403,7 +320,7 @@
 			this.flowLayoutPanel2.Controls.Add(this.ModDirectoryButton);
 			this.flowLayoutPanel2.Controls.Add(this.ReloadButton);
 			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(1171, 3);
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(771, 3);
 			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
 			this.flowLayoutPanel2.Size = new System.Drawing.Size(125, 90);
 			this.flowLayoutPanel2.TabIndex = 13;
@@ -438,6 +355,38 @@
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			// 
+			// flowLayoutPanel3
+			// 
+			this.flowLayoutPanel3.AutoSize = true;
+			this.flowLayoutPanel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.flowLayoutPanel3.Controls.Add(this.saveGraphButton);
+			this.flowLayoutPanel3.Controls.Add(this.loadGraphButton);
+			this.flowLayoutPanel3.Controls.Add(this.ExportImageButton);
+			this.flowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.flowLayoutPanel3.Location = new System.Drawing.Point(392, 3);
+			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
+			this.flowLayoutPanel3.Size = new System.Drawing.Size(185, 93);
+			this.flowLayoutPanel3.TabIndex = 14;
+			// 
+			// EnableDisableButton
+			// 
+			this.EnableDisableButton.Location = new System.Drawing.Point(3, 65);
+			this.EnableDisableButton.Name = "EnableDisableButton";
+			this.EnableDisableButton.Size = new System.Drawing.Size(179, 25);
+			this.EnableDisableButton.TabIndex = 7;
+			this.EnableDisableButton.Text = "Enable/disable objects";
+			this.EnableDisableButton.UseVisualStyleBackColor = true;
+			this.EnableDisableButton.Click += new System.EventHandler(this.EnableDisableButton_Click);
+			// 
 			// GraphViewer
 			// 
 			this.GraphViewer.AllowDrop = true;
@@ -445,20 +394,12 @@
 			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.GraphViewer.DraggedElement = null;
-			this.GraphViewer.Location = new System.Drawing.Point(229, 170);
+			this.GraphViewer.Location = new System.Drawing.Point(229, 108);
 			this.GraphViewer.Name = "GraphViewer";
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
-			this.GraphViewer.Size = new System.Drawing.Size(1074, 627);
+			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
 			this.GraphViewer.TabIndex = 12;
-			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 170);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			this.GraphViewer.Load += new System.EventHandler(this.GraphViewer_Load);
 			// 
 			// MainForm
 			// 
@@ -480,10 +421,8 @@
 			this.flowLayoutPanel1.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
-			this.groupBox5.ResumeLayout(false);
-			this.groupBox6.ResumeLayout(false);
-			this.groupBox7.ResumeLayout(false);
 			this.flowLayoutPanel2.ResumeLayout(false);
+			this.flowLayoutPanel3.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -492,8 +431,6 @@
 
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.Button AddItemButton;
-		private System.Windows.Forms.CheckedListBox MinerSelectionBox;
-		private System.Windows.Forms.CheckedListBox ModuleSelectionBox;
 		private System.Windows.Forms.ListView ItemListView;
 		private System.Windows.Forms.ImageList ItemImageList;
 		private System.Windows.Forms.ColumnHeader h_Name;
@@ -510,10 +447,6 @@
 		private System.Windows.Forms.CheckBox SingleAssemblerPerRecipeCheckBox;
 		private System.Windows.Forms.CheckBox AssemblerDisplayCheckBox;
 		private System.Windows.Forms.CheckBox MinerDisplayCheckBox;
-		private System.Windows.Forms.GroupBox groupBox5;
-		private System.Windows.Forms.CheckedListBox AssemblerSelectionBox;
-		private System.Windows.Forms.GroupBox groupBox6;
-		private System.Windows.Forms.GroupBox groupBox7;
 		private ProductionGraphViewer GraphViewer;
 		private System.Windows.Forms.TextBox FilterTextBox;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
@@ -522,6 +455,8 @@
 		private System.Windows.Forms.Button ReloadButton;
 		private System.Windows.Forms.Button saveGraphButton;
 		private System.Windows.Forms.Button loadGraphButton;
+		private System.Windows.Forms.Button EnableDisableButton;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
 	}
 }
 

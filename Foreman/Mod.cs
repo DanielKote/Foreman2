@@ -16,7 +16,7 @@ namespace Foreman
 		public String author = "";
 		public List<String> dependencies = new List<String>();
 		public List<ModDependency> parsedDependencies = new List<ModDependency>();
-		public bool enabled = true;
+		public bool Enabled = true;
 
 		public bool SatisfiesDependency(ModDependency dep)
 		{

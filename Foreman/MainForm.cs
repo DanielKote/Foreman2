@@ -75,32 +75,6 @@ namespace Foreman
 
 			rateOptionsDropDown.SelectedIndex = 0;
 
-			AssemblerSelectionBox.Items.Clear();
-			AssemblerSelectionBox.Items.AddRange(DataCache.Assemblers.Values.ToArray());
-			AssemblerSelectionBox.Sorted = true;
-			AssemblerSelectionBox.DisplayMember = "FriendlyName";
-			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
-			{
-				AssemblerSelectionBox.SetItemChecked(i, true);
-			}
-
-			MinerSelectionBox.Items.AddRange(DataCache.Miners.Values.ToArray());
-			MinerSelectionBox.Sorted = true;
-			MinerSelectionBox.DisplayMember = "FriendlyName";
-			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
-			{
-				MinerSelectionBox.SetItemChecked(i, true);
-			}
-
-			ModuleSelectionBox.Items.AddRange(DataCache.Modules.Values.ToArray());
-			ModuleSelectionBox.Sorted = true;
-			ModuleSelectionBox.DisplayMember = "FriendlyName";
-			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
-			{
-				ModuleSelectionBox.SetItemChecked(i, true);
-			}
-
-
 			//Listview
 			ItemListView.Items.Clear();
 			unfilteredItemList = new List<ListViewItem>();
@@ -216,27 +190,9 @@ namespace Foreman
 			form.Show();
 		}
 
-		private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
-		{
-			((Assembler)AssemblerSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
-			GraphViewer.UpdateNodes();
-		}
-
 		private void MinerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
-			GraphViewer.UpdateNodes();
-		}
-
-		private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
-		{
-			((Miner)MinerSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
-			GraphViewer.UpdateNodes();
-		}
-
-		private void ModuleSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
-		{
-			((Module)ModuleSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
 			GraphViewer.UpdateNodes();
 		}
 
@@ -364,7 +320,7 @@ namespace Foreman
 				this.Close();
 			}
 		}
-
+		
 		private void Closed(Object sender, FormClosedEventArgs e)
 		{
 			MainFormList.Remove(this);
@@ -378,7 +334,7 @@ namespace Foreman
 		{
 			SaveFileDialog dialog = new SaveFileDialog();
 			dialog.DefaultExt = ".json";
-			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|(*.*)";
+			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
 			dialog.AddExtension = true;
 			dialog.OverwritePrompt = true;
 			dialog.FileName = "Flowchart.json";
@@ -390,14 +346,25 @@ namespace Foreman
 			var serialiser = JsonSerializer.Create();
 			serialiser.Formatting = Formatting.Indented;
 			var writer = new JsonTextWriter(new StreamWriter(dialog.FileName));
-			serialiser.Serialize(writer, GraphViewer.Graph);
-			writer.Close();
+			try
+			{
+				serialiser.Serialize(writer, GraphViewer.Graph);
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show("Could not save this file. See log for more details");
+				ErrorLogging.LogLine(String.Format("Error saving file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+			}
+			finally
+			{
+				writer.Close();
+			}
 		}
 
 		private void loadGraphButton_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|(*.*)";
+			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
 			dialog.CheckFileExists = true;
 			if (dialog.ShowDialog() != DialogResult.OK)
 			{
@@ -409,12 +376,34 @@ namespace Foreman
 
 			var deserialiser = JsonSerializer.Create();
 			var reader = new JsonTextReader(new StreamReader(dialog.FileName));
-			GraphViewer.Graph = deserialiser.Deserialize<ProductionGraph>(reader);
-			reader.Close();
+			try
+			{
+				GraphViewer.Graph = deserialiser.Deserialize<ProductionGraph>(reader);
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show("Could not load this file. See log for more details");
+				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+			}
+			finally
+			{
+				reader.Close();
+			}
 
 			GraphViewer.AddRemoveElements();
 			GraphViewer.PositionNodes();
 			GraphViewer.Invalidate();
+		}
+
+		private void EnableDisableButton_Click(object sender, EventArgs e)
+		{
+			EnableDisableItemsForm form = new EnableDisableItemsForm();
+			form.ShowDialog();
+
+			if (form.ModsChanged)
+			{
+				//Reload
+			}
 		}
 	}
 }

@@ -28,10 +28,10 @@ namespace Foreman
 					{
 						if (!DependencySatisfied(dep))
 						{
-							if (mod.enabled)
+							if (mod.Enabled)
 							{
 								changeMade = true;
-								mod.enabled = false;
+								mod.Enabled = false;
 							}
 						}
 					}
@@ -129,7 +129,7 @@ namespace Foreman
 				return true;
 			}
 
-			foreach (Mod mod in mods.Where(m => m.enabled))
+			foreach (Mod mod in mods.Where(m => m.Enabled))
 			{
 				if (mod.SatisfiesDependency(dep))
 				{
