@@ -61,6 +61,8 @@ namespace Foreman
 					ModSelectionBox.SetItemChecked(i, true);
 				}
 			}
+
+			ModsChanged = false;
 		}
 
 		private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -80,7 +82,30 @@ namespace Foreman
 
 		private void ModSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
 		{
-			((Mod)ModSelectionBox.Items[e.Index]).Enabled = e.NewValue == CheckState.Checked;
+			Mod mod = (Mod)ModSelectionBox.Items[e.Index];
+			mod.Enabled = e.NewValue == CheckState.Checked;
+			if (!mod.Enabled)
+			{
+				for (int i = 0; i < ModSelectionBox.Items.Count; i++)
+				{
+					if (((Mod)ModSelectionBox.Items[i]).DependsOn(mod, true))
+					{
+						((Mod)ModSelectionBox.Items[i]).Enabled = false;
+						ModSelectionBox.SetItemChecked(i, false);
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < ModSelectionBox.Items.Count; i++)
+				{
+					if (mod.DependsOn((Mod)ModSelectionBox.Items[i], true))
+					{
+						((Mod)ModSelectionBox.Items[i]).Enabled = true;
+						ModSelectionBox.SetItemChecked(i, true);
+					}
+				}
+			}
 			ModsChanged = true;
 		}
 	}

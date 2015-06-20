@@ -47,11 +47,13 @@ namespace Foreman
 		public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
 		public static Dictionary<String, Exception> failedPathDirectories = new Dictionary<string, Exception>();
 
-		public static void LoadAllData()
+		public static void LoadAllData(List<String> enabledMods)
 		{
+			Clear();
+
 			using (Lua lua = new Lua())
 			{
-				FindAllMods();
+				FindAllMods(enabledMods);
 
 				foreach (Mod mod in Mods.Where(m => m.Enabled))
 				{
@@ -342,7 +344,7 @@ namespace Foreman
 			}
 		}
 
-		private static void FindAllMods() //Vanilla game counts as a mod too.
+		private static void FindAllMods(List<String> enabledMods) //Vanilla game counts as a mod too.
 		{
 			foreach(String dir in Directory.EnumerateDirectories(DataPath))
 			{
@@ -366,6 +368,14 @@ namespace Foreman
 
 						Mods.First(m => m.Name == modName).Enabled = enabled;
 					}
+				}
+			}
+
+			if (enabledMods != null)
+			{
+				foreach (Mod mod in Mods)
+				{
+					mod.Enabled = enabledMods.Contains(mod.Name);
 				}
 			}
 
@@ -514,47 +524,63 @@ namespace Foreman
 
 		private static void LoadItemNames(String category)
 		{
-			foreach (var kvp in LocaleFiles[category])
+			try
 			{
-				if (Items.ContainsKey(kvp.Key))
+				foreach (var kvp in LocaleFiles[category])
 				{
-					Items[kvp.Key].FriendlyName = kvp.Value;
+					if (Items.ContainsKey(kvp.Key))
+					{
+						Items[kvp.Key].FriendlyName = kvp.Value;
+					}
 				}
 			}
+			catch (KeyNotFoundException) { }
 		}
 
 		private static void LoadRecipeNames(String locale = "en")
 		{
-			foreach (var kvp in LocaleFiles["recipe-name"])
+			try
 			{
-				KnownRecipeNames[kvp.Key] = kvp.Value;
+				foreach (var kvp in LocaleFiles["recipe-name"])
+				{
+					KnownRecipeNames[kvp.Key] = kvp.Value;
+				}
 			}
+			catch (KeyNotFoundException) { }
 		}
 
 		private static void LoadEntityNames(String locale = "en")
 		{
-			foreach (var kvp in LocaleFiles["entity-name"])
+			try
 			{
-				if (Assemblers.ContainsKey(kvp.Key))
+				foreach (var kvp in LocaleFiles["entity-name"])
 				{
-					Assemblers[kvp.Key].FriendlyName = kvp.Value;
-				}
-				if (Miners.ContainsKey(kvp.Key))
-				{
-					Miners[kvp.Key].FriendlyName = kvp.Value;
+					if (Assemblers.ContainsKey(kvp.Key))
+					{
+						Assemblers[kvp.Key].FriendlyName = kvp.Value;
+					}
+					if (Miners.ContainsKey(kvp.Key))
+					{
+						Miners[kvp.Key].FriendlyName = kvp.Value;
+					}
 				}
 			}
+			catch (KeyNotFoundException) { }
 		}
 
 		private static void LoadModuleNames(String locale = "en")
 		{
-			foreach (var kvp in LocaleFiles["item-name"])
+			try
 			{
-				if (Modules.ContainsKey(kvp.Key))
+				foreach (var kvp in LocaleFiles["item-name"])
 				{
-					Modules[kvp.Key].FriendlyName = kvp.Value;
+					if (Modules.ContainsKey(kvp.Key))
+					{
+						Modules[kvp.Key].FriendlyName = kvp.Value;
+					}
 				}
 			}
+			catch (KeyNotFoundException) { }
 		}
 
 		private static Bitmap LoadImage(String fileName)

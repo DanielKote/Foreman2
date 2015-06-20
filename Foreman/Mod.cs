@@ -45,9 +45,16 @@ namespace Foreman
 			return true;
 		}
 
-		public bool DependsOn(Mod mod)
+		public bool DependsOn(Mod mod, bool ignoreOptional)
 		{
-			foreach (ModDependency dep in parsedDependencies)
+			IEnumerable<ModDependency> depList;
+			if (ignoreOptional)
+			{
+				depList = parsedDependencies.Where(d => !d.Optional);
+			} else {
+				depList = parsedDependencies;
+			}
+			foreach (ModDependency dep in depList)
 			{
 				if (mod.SatisfiesDependency(dep))
 				{

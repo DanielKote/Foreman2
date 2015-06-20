@@ -110,7 +110,7 @@ namespace Foreman
 			{
 				for (int j = 0; j < mods.Count; j++)
 				{
-					if (mods[i].DependsOn(mods[j]))
+					if (mods[i].DependsOn(mods[j], false))
 					{
 						adjacencyMatrix[i, j] = 1;
 					}

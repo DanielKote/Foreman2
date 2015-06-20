@@ -11,21 +11,16 @@ namespace Foreman
 {
 	public partial class MainForm : Form
 	{
-		private static HashSet<MainForm> MainFormList = new HashSet<MainForm>();
-
 		private List<ListViewItem> unfilteredItemList;
 
 		public MainForm()
 		{
 			InitializeComponent();
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-			MainFormList.Add(this);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			FormClosed += Closed;
-
 			if (!Directory.Exists(Properties.Settings.Default.FactorioDataPath))
 			{
 				foreach (String defaultPath in new String[]{
@@ -71,11 +66,15 @@ namespace Foreman
 					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods");
 				}
 			}
-			
-			DataCache.LoadAllData();
+
+			DataCache.LoadAllData(null);
+			LoadItemList();
 
 			rateOptionsDropDown.SelectedIndex = 0;
+		}
 
+		public void LoadItemList()
+		{
 			//Listview
 			ItemListView.Items.Clear();
 			unfilteredItemList = new List<ListViewItem>();
@@ -304,31 +303,8 @@ namespace Foreman
 
 		private void ReloadButton_Click(object sender, EventArgs e)
 		{
-			if (GraphViewer.Elements.Any())
-			{
-				if (MessageBox.Show("Reloading will clear your current flowchart. Do you want to continue?", "Warning", MessageBoxButtons.OKCancel)
-					== DialogResult.OK)
-				{
-					DataCache.Clear();
-					new MainForm().Show();
-					this.Close();
-				}
-			}
-			else
-			{
-				DataCache.Clear();
-				new MainForm().Show();
-				this.Close();
-			}
-		}
-		
-		private void Closed(Object sender, FormClosedEventArgs e)
-		{
-			MainFormList.Remove(this);
-			if (!MainFormList.Any())
-			{
-				Application.Exit();
-			}
+			GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+			LoadItemList();
 		}
 
 		private void saveGraphButton_Click(object sender, EventArgs e)
@@ -397,7 +373,8 @@ namespace Foreman
 
 			if (form.ModsChanged)
 			{
-				//Reload
+				GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+				LoadItemList();
 			}
 		}
 	}

@@ -631,6 +631,15 @@ namespace Foreman
 
 		public void LoadFromJson(JObject json)
 		{
+			//Has to go first, as all other data depends on which mods are loaded
+			List<String> EnabledMods = json["EnabledMods"].Select(t => (String)t).ToList();
+			foreach (Mod mod in DataCache.Mods)
+			{
+				mod.Enabled = EnabledMods.Contains(mod.Name);
+			}
+			List<String> enabledMods = DataCache.Mods.Where(m => m.Enabled).Select(m => m.Name).ToList();
+			DataCache.LoadAllData(enabledMods);
+
 			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
 			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
 			Graph.OneAssemblerPerRecipe = (Boolean)json["OneAssemblerPerRecipe"];
@@ -638,36 +647,54 @@ namespace Foreman
 			List<JToken> nodes = json["Nodes"].ToList<JToken>();
 			foreach (var node in nodes)
 			{
-				switch ((String)node["NodeType"])
+				String itemOrRecipeName = "";
+				try
 				{
-					case "Consumer":
-						{
-							Item item = DataCache.Items[(String)node["ItemName"]];
-							ConsumerNode.Create(item, Graph);
-							break;
-						}
-					case "Supply":
-						{
-							Item item = DataCache.Items[(String)node["ItemName"]];
-							SupplyNode.Create(item, Graph);
-							break;
-						}
-					case "Recipe":
-						{
-							Recipe recipe = DataCache.Recipes[(String)node["RecipeName"]];
-							RecipeNode.Create(recipe, Graph);
-							break;
-						}
+					switch ((String)node["NodeType"])
+					{
+						case "Consumer":
+							{
+								itemOrRecipeName = (String)node["ItemName"];
+								Item item = DataCache.Items[itemOrRecipeName];
+								ConsumerNode.Create(item, Graph);
+								break;
+							}
+						case "Supply":
+							{
+								itemOrRecipeName = (String)node["ItemName"];
+								Item item = DataCache.Items[itemOrRecipeName];
+								SupplyNode.Create(item, Graph);
+								break;
+							}
+						case "Recipe":
+							{
+								itemOrRecipeName = (String)node["RecipeName"];
+								Recipe recipe = DataCache.Recipes[itemOrRecipeName];
+								RecipeNode.Create(recipe, Graph);
+								break;
+							}
+					}
+				}
+				catch (KeyNotFoundException)
+				{
+					ErrorLogging.LogLine(String.Format("The item or recipe '{0}' does not appear to exist in the currently loaded mods", itemOrRecipeName));
 				}
 			}
 
 			List<JToken> nodeLinks = json["NodeLinks"].ToList<JToken>();
 			foreach (var nodelink in nodeLinks)
 			{
-				ProductionNode supplier = Graph.Nodes[(int)nodelink["Supplier"]];
-				ProductionNode consumer = Graph.Nodes[(int)nodelink["Consumer"]];
-				Item item = DataCache.Items[(String)nodelink["Item"]];
-				NodeLink.Create(supplier, consumer, item);
+				try
+				{
+					ProductionNode supplier = Graph.Nodes[(int)nodelink["Supplier"]];
+					ProductionNode consumer = Graph.Nodes[(int)nodelink["Consumer"]];
+					Item item = DataCache.Items[(String)nodelink["Item"]];
+					NodeLink.Create(supplier, consumer, item);
+				}
+				catch (KeyNotFoundException)
+				{
+					ErrorLogging.LogLine(String.Format("The item '{0}' does not appear to exist in the currently loaded mods", (String)nodelink["Item"]));
+				}
 			}
 
 			List<String> EnabledAssemblers = json["EnabledAssemblers"].Select(t => (String)t).ToList();
@@ -686,12 +713,6 @@ namespace Foreman
 			foreach (Module module in DataCache.Modules.Values)
 			{
 				module.Enabled = EnabledModules.Contains(module.Name);
-			}
-
-			List<String> EnabledMods = json["EnabledMods"].Select(t => (String)t).ToList();
-			foreach (Mod mod in DataCache.Mods)
-			{
-				mod.Enabled = EnabledMods.Contains(mod.Name);
 			}
 		}
 	}

@@ -16,8 +16,7 @@ namespace Foreman
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			new MainForm().Show();
-			Application.Run();
+			Application.Run(new MainForm());
 		}
 	}
 }
