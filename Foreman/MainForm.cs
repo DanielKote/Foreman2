@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Drawing;
 
 namespace Foreman
 {
@@ -100,12 +101,53 @@ namespace Foreman
 			ItemListView.Sorting = SortOrder.Ascending;
 			ItemListView.Sort();
 		}
-		
+
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem lvItem in ItemListView.SelectedItems)
 			{
-				GraphViewer.AddDemand((Item)lvItem.Tag);
+				Item item = (Item)lvItem.Tag;
+				NodeElement newElement = null;
+
+				var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
+				var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
+
+				var optionList = new List<ChooserControl>();
+				optionList.Add(itemSupplyOption);
+				foreach (Recipe recipe in DataCache.Recipes.Values)
+				{
+					if (recipe.Results.ContainsKey(item))
+					{
+						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+					}
+				}
+				optionList.Add(itemOutputOption);
+
+				var chooserPanel = new ChooserPanel(optionList, GraphViewer);
+
+				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
+
+				chooserPanel.Show(c =>
+				{
+					if (c != null)
+					{
+						if (c == itemSupplyOption)
+						{
+							newElement = new NodeElement(SupplyNode.Create(item, GraphViewer.Graph), GraphViewer);
+						}
+						else if (c is RecipeChooserControl)
+						{
+							newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, GraphViewer.Graph), GraphViewer);
+						}
+						else if (c == itemOutputOption)
+						{
+							newElement = new NodeElement(ConsumerNode.Create(item, GraphViewer.Graph), GraphViewer);
+						}
+
+						newElement.Update();
+						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+					}
+				});
 			}
 		}
 

@@ -579,9 +579,21 @@ namespace Foreman
 				{
 					NodeElement newElement = null;
 
-					ItemChooserControl itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
-					ItemChooserControl itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
-					var chooserPanel = new ChooserPanel(new List<ChooserControl> { itemOutputOption, itemSupplyOption }, this);
+					var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
+					var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
+
+					var optionList = new List<ChooserControl>();
+					optionList.Add(itemSupplyOption);
+					foreach (Recipe recipe in DataCache.Recipes.Values)
+					{
+						if (recipe.Results.ContainsKey(item))
+						{
+							optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+						}
+					}
+					optionList.Add(itemOutputOption);
+
+					var chooserPanel = new ChooserPanel(optionList, this);
 
 					Point location = GhostDragElement.Location;
 
@@ -593,7 +605,11 @@ namespace Foreman
 							{
 								newElement = new NodeElement(SupplyNode.Create(item, this.Graph), this);
 							}
-							else
+							else if (c is RecipeChooserControl)
+							{
+								newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, this.Graph), this);
+							}
+							else if (c == itemOutputOption)
 							{
 								newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
 							}
