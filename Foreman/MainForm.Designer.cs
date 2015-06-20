@@ -42,9 +42,11 @@
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.AutomaticCompleteButton = new System.Windows.Forms.Button();
 			this.ClearButton = new System.Windows.Forms.Button();
-			this.ExportImageButton = new System.Windows.Forms.Button();
+			this.EnableDisableButton = new System.Windows.Forms.Button();
+			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
 			this.saveGraphButton = new System.Windows.Forms.Button();
 			this.loadGraphButton = new System.Windows.Forms.Button();
+			this.ExportImageButton = new System.Windows.Forms.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.SingleAssemblerPerRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
@@ -53,17 +55,15 @@
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.ReloadButton = new System.Windows.Forms.Button();
-			this.FilterTextBox = new System.Windows.Forms.TextBox();
-			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
-			this.EnableDisableButton = new System.Windows.Forms.Button();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
+			this.flowLayoutPanel3.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.flowLayoutPanel2.SuspendLayout();
-			this.flowLayoutPanel3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -94,7 +94,7 @@
 			this.AddItemButton.Name = "AddItemButton";
 			this.AddItemButton.Size = new System.Drawing.Size(220, 24);
 			this.AddItemButton.TabIndex = 2;
-			this.AddItemButton.Text = "Add Output";
+			this.AddItemButton.Text = "Add Item";
 			this.AddItemButton.UseVisualStyleBackColor = true;
 			this.AddItemButton.Click += new System.EventHandler(this.AddItemButton_Click);
 			// 
@@ -231,15 +231,28 @@
 			this.ClearButton.UseVisualStyleBackColor = true;
 			this.ClearButton.Click += new System.EventHandler(this.ClearButton_Click);
 			// 
-			// ExportImageButton
+			// EnableDisableButton
 			// 
-			this.ExportImageButton.Location = new System.Drawing.Point(3, 65);
-			this.ExportImageButton.Name = "ExportImageButton";
-			this.ExportImageButton.Size = new System.Drawing.Size(179, 25);
-			this.ExportImageButton.TabIndex = 8;
-			this.ExportImageButton.Text = "Export as Image";
-			this.ExportImageButton.UseVisualStyleBackColor = true;
-			this.ExportImageButton.Click += new System.EventHandler(this.ExportImageButton_Click);
+			this.EnableDisableButton.Location = new System.Drawing.Point(3, 65);
+			this.EnableDisableButton.Name = "EnableDisableButton";
+			this.EnableDisableButton.Size = new System.Drawing.Size(179, 25);
+			this.EnableDisableButton.TabIndex = 7;
+			this.EnableDisableButton.Text = "Enable/disable objects";
+			this.EnableDisableButton.UseVisualStyleBackColor = true;
+			this.EnableDisableButton.Click += new System.EventHandler(this.EnableDisableButton_Click);
+			// 
+			// flowLayoutPanel3
+			// 
+			this.flowLayoutPanel3.AutoSize = true;
+			this.flowLayoutPanel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.flowLayoutPanel3.Controls.Add(this.saveGraphButton);
+			this.flowLayoutPanel3.Controls.Add(this.loadGraphButton);
+			this.flowLayoutPanel3.Controls.Add(this.ExportImageButton);
+			this.flowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.flowLayoutPanel3.Location = new System.Drawing.Point(392, 3);
+			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
+			this.flowLayoutPanel3.Size = new System.Drawing.Size(185, 93);
+			this.flowLayoutPanel3.TabIndex = 14;
 			// 
 			// saveGraphButton
 			// 
@@ -260,6 +273,16 @@
 			this.loadGraphButton.Text = "Load";
 			this.loadGraphButton.UseVisualStyleBackColor = true;
 			this.loadGraphButton.Click += new System.EventHandler(this.loadGraphButton_Click);
+			// 
+			// ExportImageButton
+			// 
+			this.ExportImageButton.Location = new System.Drawing.Point(3, 65);
+			this.ExportImageButton.Name = "ExportImageButton";
+			this.ExportImageButton.Size = new System.Drawing.Size(179, 25);
+			this.ExportImageButton.TabIndex = 8;
+			this.ExportImageButton.Text = "Export as Image";
+			this.ExportImageButton.UseVisualStyleBackColor = true;
+			this.ExportImageButton.Click += new System.EventHandler(this.ExportImageButton_Click);
 			// 
 			// groupBox2
 			// 
@@ -355,38 +378,6 @@
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			// 
-			// flowLayoutPanel3
-			// 
-			this.flowLayoutPanel3.AutoSize = true;
-			this.flowLayoutPanel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.flowLayoutPanel3.Controls.Add(this.saveGraphButton);
-			this.flowLayoutPanel3.Controls.Add(this.loadGraphButton);
-			this.flowLayoutPanel3.Controls.Add(this.ExportImageButton);
-			this.flowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel3.Location = new System.Drawing.Point(392, 3);
-			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-			this.flowLayoutPanel3.Size = new System.Drawing.Size(185, 93);
-			this.flowLayoutPanel3.TabIndex = 14;
-			// 
-			// EnableDisableButton
-			// 
-			this.EnableDisableButton.Location = new System.Drawing.Point(3, 65);
-			this.EnableDisableButton.Name = "EnableDisableButton";
-			this.EnableDisableButton.Size = new System.Drawing.Size(179, 25);
-			this.EnableDisableButton.TabIndex = 7;
-			this.EnableDisableButton.Text = "Enable/disable objects";
-			this.EnableDisableButton.UseVisualStyleBackColor = true;
-			this.EnableDisableButton.Click += new System.EventHandler(this.EnableDisableButton_Click);
-			// 
 			// GraphViewer
 			// 
 			this.GraphViewer.AllowDrop = true;
@@ -399,6 +390,15 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
 			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
 			this.GraphViewer.TabIndex = 12;
+			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
 			// 
 			// MainForm
 			// 
@@ -418,10 +418,10 @@
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			this.flowLayoutPanel1.ResumeLayout(false);
+			this.flowLayoutPanel3.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
 			this.flowLayoutPanel2.ResumeLayout(false);
-			this.flowLayoutPanel3.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
