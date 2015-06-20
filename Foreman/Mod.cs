@@ -7,7 +7,7 @@ namespace Foreman
 {
 	public class Mod
 	{
-		public String name = "";
+		public String Name = "";
 		public String title = "";
 		public String version = "";
 		public Version parsedVersion;
@@ -20,7 +20,7 @@ namespace Foreman
 
 		public bool SatisfiesDependency(ModDependency dep)
 		{
-			if (name != dep.ModName)
+			if (Name != dep.ModName)
 			{
 				return false;
 			}
@@ -59,7 +59,7 @@ namespace Foreman
 
 		public override string ToString()
 		{
-			return name;
+			return Name;
 		}
 	}
 

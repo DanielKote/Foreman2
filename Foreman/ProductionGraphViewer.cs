@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Foreman
 {
@@ -27,7 +29,8 @@ namespace Foreman
 		public String Text;
 	}
 
-	public partial class ProductionGraphViewer : UserControl
+	[Serializable]
+	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
 		public HashSet<GraphElement> Elements = new HashSet<GraphElement>();
 		public ProductionGraph Graph = new ProductionGraph();
@@ -72,7 +75,7 @@ namespace Foreman
 				return new Rectangle(x - 80, y - 80, width + 160, height + 160);
 			}
 		}
-		
+
 		public ProductionGraphViewer()
 		{
 			InitializeComponent();
@@ -264,7 +267,7 @@ namespace Foreman
 				graphics.TranslateTransform(element.X, element.Y);
 				element.Paint(graphics);
 				graphics.TranslateTransform(-element.X, -element.Y);
-				
+
 			}
 
 			graphics.ResetTransform();
@@ -513,7 +516,7 @@ namespace Foreman
 				node.DisplayedNode.Destroy();
 				UpdateNodes();
 				Invalidate();
-			}			
+			}
 		}
 
 		public void LimitViewToBounds()
@@ -610,6 +613,85 @@ namespace Foreman
 			if (GhostDragElement != null)
 			{
 				GhostDragElement.Dispose();
+			}
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("AmountType", Graph.SelectedAmountType);
+			info.AddValue("Unit", Graph.SelectedUnit);
+			info.AddValue("OneAssemblerPerRecipe", Graph.OneAssemblerPerRecipe);
+			info.AddValue("Nodes", Graph.Nodes);
+			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
+			info.AddValue("EnabledAssemblers", DataCache.Assemblers.Values.Where(a => a.Enabled).Select<Assembler, String>(a => a.Name));
+			info.AddValue("EnabledMiners", DataCache.Miners.Values.Where(m => m.Enabled).Select<Miner, String>(m => m.Name));
+			info.AddValue("EnabledModules", DataCache.Modules.Values.Where(m => m.Enabled).Select<Module, String>(m => m.Name));
+			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Enabled).Select<Mod, String>(m => m.Name));
+		}
+
+		public void LoadFromJson(JObject json)
+		{
+			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
+			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
+			Graph.OneAssemblerPerRecipe = (Boolean)json["OneAssemblerPerRecipe"];
+
+			List<JToken> nodes = json["Nodes"].ToList<JToken>();
+			foreach (var node in nodes)
+			{
+				switch ((String)node["NodeType"])
+				{
+					case "Consumer":
+						{
+							Item item = DataCache.Items[(String)node["ItemName"]];
+							ConsumerNode.Create(item, Graph);
+							break;
+						}
+					case "Supply":
+						{
+							Item item = DataCache.Items[(String)node["ItemName"]];
+							SupplyNode.Create(item, Graph);
+							break;
+						}
+					case "Recipe":
+						{
+							Recipe recipe = DataCache.Recipes[(String)node["RecipeName"]];
+							RecipeNode.Create(recipe, Graph);
+							break;
+						}
+				}
+			}
+
+			List<JToken> nodeLinks = json["NodeLinks"].ToList<JToken>();
+			foreach (var nodelink in nodeLinks)
+			{
+				ProductionNode supplier = Graph.Nodes[(int)nodelink["Supplier"]];
+				ProductionNode consumer = Graph.Nodes[(int)nodelink["Consumer"]];
+				Item item = DataCache.Items[(String)nodelink["Item"]];
+				NodeLink.Create(supplier, consumer, item);
+			}
+
+			List<String> EnabledAssemblers = json["EnabledAssemblers"].Select(t => (String)t).ToList();
+			foreach (Assembler assembler in DataCache.Assemblers.Values)
+			{
+				assembler.Enabled = EnabledAssemblers.Contains(assembler.Name);
+			}
+
+			List<String> EnabledMiners = json["EnabledMiners"].Select(t => (String)t).ToList();
+			foreach (Miner miner in DataCache.Miners.Values)
+			{
+				miner.Enabled = EnabledMiners.Contains(miner.Name);
+			}
+
+			List<String> EnabledModules = json["EnabledModules"].Select(t => (String)t).ToList();
+			foreach (Module module in DataCache.Modules.Values)
+			{
+				module.Enabled = EnabledModules.Contains(module.Name);
+			}
+
+			List<String> EnabledMods = json["EnabledMods"].Select(t => (String)t).ToList();
+			foreach (Mod mod in DataCache.Mods)
+			{
+				mod.Enabled = EnabledMods.Contains(mod.Name);
 			}
 		}
 	}

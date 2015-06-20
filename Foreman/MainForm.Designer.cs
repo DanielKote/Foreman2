@@ -399,7 +399,6 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
 			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
 			this.GraphViewer.TabIndex = 12;
-			this.GraphViewer.Load += new System.EventHandler(this.GraphViewer_Load);
 			// 
 			// MainForm
 			// 

@@ -354,14 +354,27 @@ namespace Foreman
 				{
 					ReadModInfoJson(dir);
 				}
+				string modListFile = Path.Combine(Properties.Settings.Default.FactorioModPath, "mod-list.json");
+				if (File.Exists(modListFile))
+				{
+					String json = File.ReadAllText(modListFile);
+					dynamic parsedJson = JsonConvert.DeserializeObject(json);
+					foreach (var mod in parsedJson.mods)
+					{
+						string modName = mod.name;
+						bool enabled = mod.enabled;
+
+						Mods.First(m => m.Name == modName).Enabled = enabled;
+					}
+				}
 			}
 
 			Mods.Sort((a, b) => //Really basic way of putting core and base at the top
 			{
-				if (a.name == "core") { return -1; }
-				if (b.name == "core") { return 1; }
-				if (a.name == "base") { return -1; }
-				if (b.name == "base") { return 1; }
+				if (a.Name == "core") { return -1; }
+				if (b.Name == "core") { return 1; }
+				if (a.Name == "base") { return -1; }
+				if (b.Name == "base") { return 1; }
 				return 0;
 			});
 
@@ -555,7 +568,7 @@ namespace Foreman
 			{
 				string[] splitPath = fileName.Split('/');
 				splitPath[0] = splitPath[0].Trim('_');
-				fullPath = Mods.FirstOrDefault(m => m.name == splitPath[0]).dir;
+				fullPath = Mods.FirstOrDefault(m => m.Name == splitPath[0]).dir;
 
 				if (!String.IsNullOrEmpty(fullPath))
 				{

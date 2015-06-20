@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Foreman
 {
@@ -348,7 +349,7 @@ namespace Foreman
 			var writer = new JsonTextWriter(new StreamWriter(dialog.FileName));
 			try
 			{
-				serialiser.Serialize(writer, GraphViewer.Graph);
+				serialiser.Serialize(writer, GraphViewer);
 			}
 			catch (Exception exception)
 			{
@@ -374,20 +375,14 @@ namespace Foreman
 			GraphViewer.Graph.Nodes.Clear();
 			GraphViewer.Elements.Clear();
 
-			var deserialiser = JsonSerializer.Create();
-			var reader = new JsonTextReader(new StreamReader(dialog.FileName));
 			try
 			{
-				GraphViewer.Graph = deserialiser.Deserialize<ProductionGraph>(reader);
+				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
 			}
 			catch (Exception exception)
 			{
 				MessageBox.Show("Could not load this file. See log for more details");
 				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
-			}
-			finally
-			{
-				reader.Close();
 			}
 
 			GraphViewer.AddRemoveElements();

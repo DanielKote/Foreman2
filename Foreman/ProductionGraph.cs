@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
 
 namespace Foreman
 {
 	public enum AmountType { FixedAmount, Rate }
 	public enum RateUnit { PerMinute, PerSecond }
 
-	[Serializable()]
-	public class ProductionGraph: ISerializable
+	public class ProductionGraph
 	{
 		public List<ProductionNode> Nodes = new List<ProductionNode>();
 		private int[,] pathMatrixCache = null;
@@ -308,70 +305,6 @@ namespace Foreman
 			}
 
 			return L;
-		}
-
-		public void GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			info.AddValue("AmountType", SelectedAmountType);
-			info.AddValue("Unit", SelectedUnit);
-			info.AddValue("OneAssemblerPerRecipe", OneAssemblerPerRecipe);
-			info.AddValue("Nodes", Nodes);
-			info.AddValue("NodeLinks", GetAllNodeLinks());
-
-			List<ProductionEntity> enabledAssemblers = new List<ProductionEntity>();
-		}
-
-		public ProductionGraph(SerializationInfo info, StreamingContext context)
-		{
-			var enumerator = info.GetEnumerator();
-
-			while (enumerator.MoveNext())
-			{
-				switch (enumerator.Name)
-				{
-					case "Nodes":
-						{
-							JArray nodes = (enumerator.Value as JArray);
-							foreach (var node in nodes)
-							{
-								switch (node.Value<String>("NodeType"))
-								{
-									case "Consumer":
-										{
-											Item item = DataCache.Items[node.Value<String>("ItemName")];
-											ConsumerNode.Create(item, this);
-											break;
-										}
-									case "Supply":
-										{
-											Item item = DataCache.Items[node.Value<String>("ItemName")];
-											SupplyNode.Create(item, this);
-											break;
-										}
-									case "Recipe":
-										{
-											Recipe recipe = DataCache.Recipes[node.Value<String>("RecipeName")];
-											RecipeNode.Create(recipe, this);
-											break;
-										}
-								}
-							}
-							break;
-						}
-					case "NodeLinks":
-						{
-							JArray nodelinks = (enumerator.Value as JArray);
-							foreach (var nodelink in nodelinks)
-							{
-								ProductionNode supplier = Nodes[nodelink.Value<int>("Supplier")];
-								ProductionNode consumer = Nodes[nodelink.Value<int>("Consumer")];
-								Item item = DataCache.Items[nodelink.Value<string>("Item")];
-								NodeLink.Create(supplier, consumer, item);
-							}
-							break;
-						}
-				}
-			}
 		}
 	}
 }
