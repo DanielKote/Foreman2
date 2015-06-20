@@ -220,7 +220,7 @@ namespace Foreman
 			{
 				return Convert.ToSingle(table[key]);
 			}
-			catch (FormatException e)
+			catch (FormatException)
 			{
 				throw new MissingPrototypeValueException(table, key, string.Format("Expected a float, but the value ('{0}') isn't one", table[key]));
 			}
@@ -244,9 +244,9 @@ namespace Foreman
 			{
 				return Convert.ToInt32(table[key]);
 			}
-			catch (FormatException e)
+			catch (FormatException)
 			{
-				throw new MissingPrototypeValueException(table, key, String.Format("Expected an Int32, but the value ('{0]') isn't one", table[key]));
+				throw new MissingPrototypeValueException(table, key, String.Format("Expected an Int32, but the value ('{0}') isn't one", table[key]));
 			}
 		}
 
@@ -285,7 +285,7 @@ namespace Foreman
 			{
 				return table[key] as LuaTable;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				throw new MissingPrototypeValueException(table, key, "Could not convert key to LuaTable");
 			}
@@ -610,7 +610,7 @@ namespace Foreman
 				Bitmap image = new Bitmap(fullPath);
 				return image;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return null;
 			}
