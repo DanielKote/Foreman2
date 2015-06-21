@@ -292,24 +292,13 @@ namespace Foreman
 						Properties.Settings.Default["FactorioDataPath"] = Path.Combine(form.SelectedPath, "data");
 						Properties.Settings.Default.Save();
 
-						if (GraphViewer.Elements.Any())
-						{
-							if (MessageBox.Show("Changing the factorio directory will reload the program and clear your current flowchart. Do you want to continue?", "Warning", MessageBoxButtons.OKCancel)
-								== DialogResult.OK)
-							{
-								DataCache.Clear();
-								new MainForm().Show();
-								this.Close();
-							}
-						}
-						else
-						{
-							DataCache.Clear();
-							new MainForm().Show();
-							this.Close();
-						}
+
+						JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
+						DataCache.LoadAllData(null);
+						GraphViewer.LoadFromJson(savedGraph);
+						LoadItemList();
 					}
-				}
+				}				
 			}
 		}
 
@@ -324,23 +313,11 @@ namespace Foreman
 					{
 						Properties.Settings.Default["FactorioModPath"] = form.SelectedPath;
 						Properties.Settings.Default.Save();
-						
-						if (GraphViewer.Elements.Any())
-						{
-							if (MessageBox.Show("Changing the mods directory will reload the program and clear your current flowchart. Do you want to continue?", "Warning", MessageBoxButtons.OKCancel)
-								== DialogResult.OK)
-							{
-								DataCache.Clear();
-								new MainForm().Show();
-								this.Close();
-							}
-						}
-						else
-						{
-							DataCache.Clear();
-							new MainForm().Show();
-							this.Close();
-						}
+
+						JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
+						DataCache.LoadAllData(null);
+						GraphViewer.LoadFromJson(savedGraph);
+						LoadItemList();
 					}
 				}
 			}
