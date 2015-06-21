@@ -8,26 +8,24 @@ namespace Foreman
 {
 	public class Item
 	{
+		public static List<String> localeCategories = new List<String> { "item-name", "fluid-name", "entity-name", "equipment-name" };
+
 		public String Name { get; private set; }
 		public HashSet<Recipe> Recipes { get; private set; }
 		public Bitmap Icon { get; set; }
-		private String friendlyName;
 		public String FriendlyName
 		{
 			get
 			{
-				if (!String.IsNullOrWhiteSpace(friendlyName))
+				foreach (String category in localeCategories)
 				{
-					return friendlyName;
+					if (DataCache.LocaleFiles[category].ContainsKey(Name))
+					{
+						return DataCache.LocaleFiles[category][Name];
+					}
 				}
-				else
-				{
-					return Name;
-				}
-			}
-			set
-			{
-				friendlyName = value;
+
+				return Name;
 			}
 		}
 

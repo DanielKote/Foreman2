@@ -72,6 +72,9 @@ namespace Foreman
 			LoadItemList();
 
 			rateOptionsDropDown.SelectedIndex = 0;
+
+			LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
+			LanguageDropDown.SelectedItem = DataCache.Languages.First(l => l.Name == Properties.Settings.Default.Language);
 		}
 
 		public void LoadItemList()
@@ -465,6 +468,21 @@ namespace Foreman
 			{
 				AddItemButton.PerformClick();
 			}
+		}
+
+		private void LanguageDropDown_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			String newLocale = (LanguageDropDown.SelectedItem as Language).Name;
+
+			DataCache.LocaleFiles.Clear();
+			DataCache.LoadLocaleFiles(newLocale);
+
+			GraphViewer.UpdateNodes();
+			GraphViewer.Invalidate();
+			LoadItemList();
+
+			Properties.Settings.Default["Language"] = newLocale;
+			Properties.Settings.Default.Save();
 		}
 	}
 }

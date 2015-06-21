@@ -7,9 +7,34 @@ using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Foreman
 {
+	class Language
+	{
+		public String Name;
+		private String localName;
+		public String LocalName
+		{
+			get
+			{
+				if (!String.IsNullOrWhiteSpace(localName))
+				{
+					return localName;
+				}
+				else
+				{
+					return Name;
+				}
+			}
+			set
+			{
+				localName = value;
+			}
+		}
+	}
+
 	static class DataCache
 	{
 		private class MissingPrototypeValueException : Exception
@@ -29,6 +54,7 @@ namespace Foreman
 		private static String ModPath { get { return Properties.Settings.Default.FactorioModPath; } }
 
 		public static List<Mod> Mods = new List<Mod>();
+		public static List<Language> Languages = new List<Language>();
 		
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
@@ -172,18 +198,29 @@ namespace Foreman
 
 				UnknownIcon = LoadImage("UnknownIcon.png");
 
+				LoadAllLanguages();
 				LoadLocaleFiles();
-
-				LoadItemNames("item-name");
-				LoadItemNames("fluid-name");
-				LoadItemNames("entity-name");
-				LoadItemNames("equipment-name");
-				LoadRecipeNames();
-				LoadEntityNames();
-				LoadModuleNames();
 			}
 
 			ReportErrors();
+		}
+
+		private static void LoadAllLanguages()
+		{
+			var dirList = Directory.EnumerateDirectories(Path.Combine(Mods.First(m => m.Name == "core").dir, "locale"));
+
+			foreach (String dir in dirList)
+			{
+				Language newLanguage = new Language();
+				newLanguage.Name = Path.GetFileName(dir);
+				try
+				{
+					String infoJson = File.ReadAllText(Path.Combine(dir, "info.json"));
+					newLanguage.LocalName = (String)JObject.Parse(infoJson)["language-name"];
+				}
+				catch { }
+				Languages.Add(newLanguage);
+			}
 		}
 
 		public static void Clear()
@@ -476,7 +513,7 @@ namespace Foreman
 			}
 		}
 
-		private static void LoadLocaleFiles(String locale = "en")
+		public static void LoadLocaleFiles(String locale = "en")
 		{
 			foreach (Mod mod in Mods.Where(m => m.Enabled))
 			{
@@ -521,68 +558,7 @@ namespace Foreman
 				}
 			}
 		}
-
-		private static void LoadItemNames(String category)
-		{
-			try
-			{
-				foreach (var kvp in LocaleFiles[category])
-				{
-					if (Items.ContainsKey(kvp.Key))
-					{
-						Items[kvp.Key].FriendlyName = kvp.Value;
-					}
-				}
-			}
-			catch (KeyNotFoundException) { }
-		}
-
-		private static void LoadRecipeNames(String locale = "en")
-		{
-			try
-			{
-				foreach (var kvp in LocaleFiles["recipe-name"])
-				{
-					KnownRecipeNames[kvp.Key] = kvp.Value;
-				}
-			}
-			catch (KeyNotFoundException) { }
-		}
-
-		private static void LoadEntityNames(String locale = "en")
-		{
-			try
-			{
-				foreach (var kvp in LocaleFiles["entity-name"])
-				{
-					if (Assemblers.ContainsKey(kvp.Key))
-					{
-						Assemblers[kvp.Key].FriendlyName = kvp.Value;
-					}
-					if (Miners.ContainsKey(kvp.Key))
-					{
-						Miners[kvp.Key].FriendlyName = kvp.Value;
-					}
-				}
-			}
-			catch (KeyNotFoundException) { }
-		}
-
-		private static void LoadModuleNames(String locale = "en")
-		{
-			try
-			{
-				foreach (var kvp in LocaleFiles["item-name"])
-				{
-					if (Modules.ContainsKey(kvp.Key))
-					{
-						Modules[kvp.Key].FriendlyName = kvp.Value;
-					}
-				}
-			}
-			catch (KeyNotFoundException) { }
-		}
-
+		
 		private static Bitmap LoadImage(String fileName)
 		{
 			string fullPath;
@@ -946,6 +922,5 @@ namespace Foreman
 
 			return ingredients;
 		}
-
 	}
 }

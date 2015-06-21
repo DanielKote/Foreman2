@@ -55,8 +55,10 @@
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.ReloadButton = new System.Windows.Forms.Button();
-			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.LanguageDropDown = new System.Windows.Forms.ComboBox();
+			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -64,6 +66,7 @@
 			this.flowLayoutPanel3.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.flowLayoutPanel2.SuspendLayout();
+			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -140,6 +143,7 @@
 			this.MainToolbar.Controls.Add(this.flowLayoutPanel3);
 			this.MainToolbar.Controls.Add(this.groupBox2);
 			this.MainToolbar.Controls.Add(this.flowLayoutPanel2);
+			this.MainToolbar.Controls.Add(this.groupBox3);
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(3, 3);
 			this.MainToolbar.Name = "MainToolbar";
@@ -252,14 +256,14 @@
 			this.flowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel3.Location = new System.Drawing.Point(392, 3);
 			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-			this.flowLayoutPanel3.Size = new System.Drawing.Size(185, 93);
+			this.flowLayoutPanel3.Size = new System.Drawing.Size(124, 93);
 			this.flowLayoutPanel3.TabIndex = 14;
 			// 
 			// saveGraphButton
 			// 
 			this.saveGraphButton.Location = new System.Drawing.Point(3, 3);
 			this.saveGraphButton.Name = "saveGraphButton";
-			this.saveGraphButton.Size = new System.Drawing.Size(179, 25);
+			this.saveGraphButton.Size = new System.Drawing.Size(118, 25);
 			this.saveGraphButton.TabIndex = 9;
 			this.saveGraphButton.Text = "Save";
 			this.saveGraphButton.UseVisualStyleBackColor = true;
@@ -269,7 +273,7 @@
 			// 
 			this.loadGraphButton.Location = new System.Drawing.Point(3, 34);
 			this.loadGraphButton.Name = "loadGraphButton";
-			this.loadGraphButton.Size = new System.Drawing.Size(179, 25);
+			this.loadGraphButton.Size = new System.Drawing.Size(118, 25);
 			this.loadGraphButton.TabIndex = 10;
 			this.loadGraphButton.Text = "Load";
 			this.loadGraphButton.UseVisualStyleBackColor = true;
@@ -279,7 +283,7 @@
 			// 
 			this.ExportImageButton.Location = new System.Drawing.Point(3, 65);
 			this.ExportImageButton.Name = "ExportImageButton";
-			this.ExportImageButton.Size = new System.Drawing.Size(179, 25);
+			this.ExportImageButton.Size = new System.Drawing.Size(118, 25);
 			this.ExportImageButton.TabIndex = 8;
 			this.ExportImageButton.Text = "Export as Image";
 			this.ExportImageButton.UseVisualStyleBackColor = true;
@@ -292,7 +296,7 @@
 			this.groupBox2.Controls.Add(this.SingleAssemblerPerRecipeCheckBox);
 			this.groupBox2.Controls.Add(this.AssemblerDisplayCheckBox);
 			this.groupBox2.Controls.Add(this.MinerDisplayCheckBox);
-			this.groupBox2.Location = new System.Drawing.Point(583, 3);
+			this.groupBox2.Location = new System.Drawing.Point(522, 3);
 			this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
@@ -344,7 +348,7 @@
 			this.flowLayoutPanel2.Controls.Add(this.ModDirectoryButton);
 			this.flowLayoutPanel2.Controls.Add(this.ReloadButton);
 			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(771, 3);
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(710, 3);
 			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
 			this.flowLayoutPanel2.Size = new System.Drawing.Size(125, 90);
 			this.flowLayoutPanel2.TabIndex = 13;
@@ -379,6 +383,43 @@
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
+			// 
+			// groupBox3
+			// 
+			this.groupBox3.AutoSize = true;
+			this.groupBox3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.groupBox3.Controls.Add(this.LanguageDropDown);
+			this.groupBox3.Location = new System.Drawing.Point(841, 3);
+			this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.groupBox3.Size = new System.Drawing.Size(133, 57);
+			this.groupBox3.TabIndex = 15;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "Language";
+			// 
+			// LanguageDropDown
+			// 
+			this.LanguageDropDown.DisplayMember = "LocalName";
+			this.LanguageDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.LanguageDropDown.FormattingEnabled = true;
+			this.LanguageDropDown.Location = new System.Drawing.Point(6, 20);
+			this.LanguageDropDown.MaxDropDownItems = 20;
+			this.LanguageDropDown.Name = "LanguageDropDown";
+			this.LanguageDropDown.Size = new System.Drawing.Size(121, 21);
+			this.LanguageDropDown.TabIndex = 1;
+			this.LanguageDropDown.ValueMember = "Name";
+			this.LanguageDropDown.SelectedIndexChanged += new System.EventHandler(this.LanguageDropDown_SelectedIndexChanged);
+			// 
 			// GraphViewer
 			// 
 			this.GraphViewer.AllowDrop = true;
@@ -391,16 +432,6 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
 			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
 			this.GraphViewer.TabIndex = 12;
-			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
 			// 
 			// MainForm
 			// 
@@ -424,6 +455,7 @@
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
 			this.flowLayoutPanel2.ResumeLayout(false);
+			this.groupBox3.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -458,6 +490,8 @@
 		private System.Windows.Forms.Button EnableDisableButton;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
 		private System.Windows.Forms.TextBox FilterTextBox;
+		private System.Windows.Forms.GroupBox groupBox3;
+		private System.Windows.Forms.ComboBox LanguageDropDown;
 	}
 }
 
