@@ -237,6 +237,8 @@ namespace Foreman
 			LocaleFiles.Clear();
 			failedFiles.Clear();
 			failedPathDirectories.Clear();
+			Inserters.Clear();
+			Languages.Clear();
 		}
 
 		private static float ReadLuaFloat(LuaTable table, String key, Boolean canBeMissing = false, float defaultValue = 0f)
@@ -383,9 +385,12 @@ namespace Foreman
 
 		private static void FindAllMods(List<String> enabledMods) //Vanilla game counts as a mod too.
 		{
-			foreach(String dir in Directory.EnumerateDirectories(DataPath))
+			if (Directory.Exists(DataPath))
 			{
-				ReadModInfoJson(dir);
+				foreach (String dir in Directory.EnumerateDirectories(DataPath))
+				{
+					ReadModInfoJson(dir);
+				}
 			}
 			if (Directory.Exists(Properties.Settings.Default.FactorioModPath))
 			{
@@ -403,7 +408,10 @@ namespace Foreman
 						string modName = mod.name;
 						bool enabled = mod.enabled;
 
-						Mods.First(m => m.Name == modName).Enabled = enabled;
+						if (Mods.Any(m => m.Name == modName))
+						{
+							Mods.First(m => m.Name == modName).Enabled = enabled;
+						}
 					}
 				}
 			}
@@ -416,6 +424,10 @@ namespace Foreman
 				}
 			}
 
+			DependencyGraph modGraph = new DependencyGraph(Mods);
+			modGraph.DisableUnsatisfiedMods();
+			Mods = modGraph.SortMods();
+
 			Mods.Sort((a, b) => //Really basic way of putting core and base at the top
 			{
 				if (a.Name == "core") { return -1; }
@@ -424,10 +436,6 @@ namespace Foreman
 				if (b.Name == "base") { return 1; }
 				return 0;
 			});
-
-			DependencyGraph modGraph = new DependencyGraph(Mods);
-			modGraph.DisableUnsatisfiedMods();
-			Mods = modGraph.SortMods();
 		}
 		
 		private static void ReadModInfoJson(String dir)
@@ -458,6 +466,11 @@ namespace Foreman
 
 		private static void ParseModDependencies(Mod mod)
 		{
+			if (mod.Name == "base")
+			{
+				mod.dependencies.Add("core");
+			}
+
 			foreach (String depString in mod.dependencies)
 			{
 				int token = 0;

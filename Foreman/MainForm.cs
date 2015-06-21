@@ -287,18 +287,21 @@ namespace Foreman
 				form.Text = "Locate the factorio directory";
 				if (form.ShowDialog() == DialogResult.OK)
 				{
-					if (form.SelectedPath != Properties.Settings.Default.FactorioDataPath)
+					if (Path.GetFileName(form.SelectedPath) != "data")
 					{
 						Properties.Settings.Default["FactorioDataPath"] = Path.Combine(form.SelectedPath, "data");
-						Properties.Settings.Default.Save();
-
-
-						JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
-						DataCache.LoadAllData(null);
-						GraphViewer.LoadFromJson(savedGraph);
-						LoadItemList();
 					}
-				}				
+					else
+					{
+						Properties.Settings.Default["FactorioDataPath"] = form.SelectedPath;
+					}
+					Properties.Settings.Default.Save();
+
+					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
+					DataCache.LoadAllData(null);
+					GraphViewer.LoadFromJson(savedGraph);
+					LoadItemList();
+				}
 			}
 		}
 
@@ -309,16 +312,13 @@ namespace Foreman
 				form.Text = "Locate the mods directory";
 				if (form.ShowDialog() == DialogResult.OK)
 				{
-					if (form.SelectedPath != Properties.Settings.Default.FactorioModPath)
-					{
-						Properties.Settings.Default["FactorioModPath"] = form.SelectedPath;
-						Properties.Settings.Default.Save();
+					Properties.Settings.Default["FactorioModPath"] = form.SelectedPath;
+					Properties.Settings.Default.Save();
 
-						JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
-						DataCache.LoadAllData(null);
-						GraphViewer.LoadFromJson(savedGraph);
-						LoadItemList();
-					}
+					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
+					DataCache.LoadAllData(null);
+					GraphViewer.LoadFromJson(savedGraph);
+					LoadItemList();
 				}
 			}
 		}
