@@ -30,7 +30,7 @@
 		{
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.FilterTextBox = new ChooserFilterTextBox(this);
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -102,6 +102,6 @@
 
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-		private System.Windows.Forms.TextBox FilterTextBox;
+		private ChooserFilterTextBox FilterTextBox;
 	}
 }

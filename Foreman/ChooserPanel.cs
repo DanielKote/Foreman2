@@ -47,8 +47,7 @@ namespace Foreman
 			this.Anchor = AnchorStyles.None;
 			parent.PerformLayout();
 
-			Focus();
-			parent.ActiveControl = this;
+			FilterTextBox.Focus();
 		}
 
 		private void ChooserPanel_Load(object sender, EventArgs e)
@@ -94,12 +93,25 @@ namespace Foreman
 			}
 		}
 
-		private void ChooserPanel_KeyDown(object sender, KeyEventArgs e)
+		public void ChooserPanel_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.Escape)
 			{
 				CallbackMethod(null);
 				this.Dispose();
+			}
+			else if (e.KeyCode == Keys.Down)
+			{
+				SelectedControl = controls[Math.Min(controls.IndexOf(selectedControl) + 1, controls.Count - 1)];
+			}
+			else if (e.KeyCode == Keys.Up)
+			{
+				SelectedControl = controls[Math.Max(controls.IndexOf(selectedControl) - 1, 0)];
+			}
+			else
+			{
+				FilterTextBox.Focus();
+				FilterTextBox.ChooserFilterTextBox_KeyDown(sender, e);
 			}
 		}
 
