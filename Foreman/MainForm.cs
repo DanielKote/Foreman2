@@ -419,5 +419,52 @@ namespace Foreman
 				LoadItemList();
 			}
 		}
+
+		private void ItemListView_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				AddItemButton.PerformClick();
+				e.Handled = true;
+			}
+		}
+
+		private void FilterTextBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (ItemListView.Items.Count == 0)
+			{
+				return;
+			}
+			int currentSelection;
+			if (ItemListView.SelectedIndices.Count == 0)
+			{
+				currentSelection = -1;
+			}
+			else
+			{
+				currentSelection = ItemListView.SelectedIndices[0];
+			}
+			if (e.KeyCode == Keys.Down)
+			{
+				int newSelection = currentSelection + 1;
+				if (newSelection >= ItemListView.Items.Count) newSelection = ItemListView.Items.Count - 1;
+				if (newSelection <= 0) newSelection = 0;
+				ItemListView.SelectedIndices.Clear();
+				ItemListView.SelectedIndices.Add(newSelection);
+				e.Handled = true;
+			}
+			else if (e.KeyCode == Keys.Up)
+			{
+				int newSelection = currentSelection - 1;
+				if (newSelection == -1) newSelection = 0;
+				ItemListView.SelectedIndices.Clear();
+				ItemListView.SelectedIndices.Add(newSelection);
+				e.Handled = true;
+			}
+			else if (e.KeyCode == Keys.Enter)
+			{
+				AddItemButton.PerformClick();
+			}
+		}
 	}
 }

@@ -30,7 +30,7 @@
 		{
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.FilterTextBox = new ChooserFilterTextBox(this);
+			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -72,6 +72,7 @@
 			this.FilterTextBox.Size = new System.Drawing.Size(1, 20);
 			this.FilterTextBox.TabIndex = 1;
 			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
 			// 
 			// ChooserPanel
 			// 
@@ -102,6 +103,6 @@
 
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-		private ChooserFilterTextBox FilterTextBox;
+		private System.Windows.Forms.TextBox FilterTextBox;
 	}
 }

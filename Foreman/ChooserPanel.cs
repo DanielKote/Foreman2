@@ -95,23 +95,26 @@ namespace Foreman
 
 		public void ChooserPanel_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode == Keys.Escape)
+			switch (e.KeyCode)
 			{
-				CallbackMethod(null);
-				this.Dispose();
-			}
-			else if (e.KeyCode == Keys.Down)
-			{
-				SelectedControl = controls[Math.Min(controls.IndexOf(selectedControl) + 1, controls.Count - 1)];
-			}
-			else if (e.KeyCode == Keys.Up)
-			{
-				SelectedControl = controls[Math.Max(controls.IndexOf(selectedControl) - 1, 0)];
-			}
-			else
-			{
-				FilterTextBox.Focus();
-				FilterTextBox.ChooserFilterTextBox_KeyDown(sender, e);
+				case Keys.Escape:
+					CallbackMethod(null);
+					Dispose();
+					break;
+				case Keys.Down:
+					SelectedControl = controls[Math.Min(controls.IndexOf(selectedControl) + 1, controls.Count - 1)];
+					break;
+				case Keys.Up:
+					SelectedControl = controls[Math.Max(controls.IndexOf(selectedControl) - 1, 0)];
+					break;
+				case Keys.Enter:
+					CallbackMethod(SelectedControl);
+					Dispose();
+					break;
+				default:
+					FilterTextBox.Focus();
+					SendKeys.Send(e.KeyCode.ToString());
+					break;
 			}
 		}
 
@@ -145,6 +148,15 @@ namespace Foreman
 		private void ChooserPanel_Leave(object sender, EventArgs e)
 		{
 			Dispose();
+		}
+
+		private void FilterTextBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Escape || e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Enter)
+			{
+				ChooserPanel_KeyDown(sender, e);
+				e.Handled = true;
+			}
 		}
 	}
 }

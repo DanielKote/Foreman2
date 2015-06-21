@@ -55,8 +55,8 @@
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.ReloadButton = new System.Windows.Forms.Button();
-			this.FilterTextBox = new ItemFilterTextBox(ItemListView, AddItemButton);
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -117,6 +117,7 @@
 			this.ItemListView.View = System.Windows.Forms.View.Details;
 			this.ItemListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.ItemListView_ItemDrag);
 			this.ItemListView.SelectedIndexChanged += new System.EventHandler(this.ItemListView_SelectedIndexChanged);
+			this.ItemListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ItemListView_KeyDown);
 			this.ItemListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ItemListView_MouseDoubleClick);
 			// 
 			// h_Name
@@ -378,15 +379,6 @@
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			// 
 			// GraphViewer
 			// 
 			this.GraphViewer.AllowDrop = true;
@@ -399,6 +391,16 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
 			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
 			this.GraphViewer.TabIndex = 12;
+			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
 			// 
 			// MainForm
 			// 
@@ -447,7 +449,6 @@
 		private System.Windows.Forms.CheckBox AssemblerDisplayCheckBox;
 		private System.Windows.Forms.CheckBox MinerDisplayCheckBox;
 		private ProductionGraphViewer GraphViewer;
-		private ItemFilterTextBox FilterTextBox;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
 		private System.Windows.Forms.Button FactorioDirectoryButton;
 		private System.Windows.Forms.Button ModDirectoryButton;
@@ -456,6 +457,7 @@
 		private System.Windows.Forms.Button loadGraphButton;
 		private System.Windows.Forms.Button EnableDisableButton;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
+		private System.Windows.Forms.TextBox FilterTextBox;
 	}
 }
 

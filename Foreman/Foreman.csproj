@@ -68,12 +68,6 @@
     <Compile Include="ChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ChooserFilterTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ChooserFilterTextBox.Designer.cs">
-      <DependentUpon>ChooserFilterTextBox.cs</DependentUpon>
-    </Compile>
     <Compile Include="ChooserPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -106,9 +100,6 @@
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Inserter.cs" />
-    <Compile Include="ItemFilterTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ItemTab.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -148,9 +139,6 @@
     </Compile>
     <EmbeddedResource Include="ChooserControl.resx">
       <DependentUpon>ChooserControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ChooserFilterTextBox.resx">
-      <DependentUpon>ChooserFilterTextBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ChooserPanel.resx">
       <DependentUpon>ChooserPanel.cs</DependentUpon>
