@@ -46,6 +46,9 @@ namespace Foreman
 			this.Location = new Point(parent.Width / 2 - Width / 2, parent.Height / 2 - Height / 2);
 			this.Anchor = AnchorStyles.None;
 			parent.PerformLayout();
+
+			Focus();
+			parent.ActiveControl = this;
 		}
 
 		private void ChooserPanel_Load(object sender, EventArgs e)
@@ -125,6 +128,11 @@ namespace Foreman
 				}
 			}
 			ResumeLayout(false);
+		}
+
+		private void ChooserPanel_Leave(object sender, EventArgs e)
+		{
+			Dispose();
 		}
 	}
 }

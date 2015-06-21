@@ -88,6 +88,7 @@
 			this.Size = new System.Drawing.Size(7, 32);
 			this.Load += new System.EventHandler(this.ChooserPanel_Load);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ChooserPanel_KeyDown);
+			this.Leave += new System.EventHandler(this.ChooserPanel_Leave);
 			this.MouseLeave += new System.EventHandler(this.ChooserPanel_MouseLeave);
 			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ChooserPanel_MouseMove);
 			this.tableLayoutPanel1.ResumeLayout(false);

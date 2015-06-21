@@ -386,6 +386,7 @@ namespace Foreman
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
 			Focus();
+			ActiveControl = null;
 
 			var clickedElement = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
 			if (clickedElement != null)
