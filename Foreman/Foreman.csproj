@@ -106,6 +106,9 @@
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Inserter.cs" />
+    <Compile Include="ItemFilterTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ItemTab.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
