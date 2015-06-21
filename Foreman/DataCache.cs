@@ -621,8 +621,10 @@ namespace Foreman
 
 			try
 			{
-				Bitmap image = new Bitmap(fullPath);
-				return image;
+				using (Bitmap image = new Bitmap(fullPath)) //If you don't do this, the file is locked for the lifetime of the bitmap
+				{
+					return new Bitmap(image);
+				}
 			}
 			catch (Exception)
 			{
