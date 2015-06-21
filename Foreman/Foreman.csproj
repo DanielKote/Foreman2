@@ -137,6 +137,7 @@
     <Compile Include="ItemChooserControl.Designer.cs">
       <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ZipStorer.cs" />
     <EmbeddedResource Include="ChooserControl.resx">
       <DependentUpon>ChooserControl.cs</DependentUpon>
     </EmbeddedResource>

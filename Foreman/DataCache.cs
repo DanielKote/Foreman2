@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO.Compression;
 
 namespace Foreman
 {
@@ -389,14 +390,19 @@ namespace Foreman
 			{
 				foreach (String dir in Directory.EnumerateDirectories(DataPath))
 				{
-					ReadModInfoJson(dir);
+					ReadModInfoFile(dir);
 				}
 			}
 			if (Directory.Exists(Properties.Settings.Default.FactorioModPath))
 			{
 				foreach (String dir in Directory.EnumerateDirectories(Properties.Settings.Default.FactorioModPath))
 				{
-					ReadModInfoJson(dir);
+					ReadModInfoFile(dir);
+				}
+				foreach (String zipFile in Directory.EnumerateFiles(Properties.Settings.Default.FactorioModPath, "*.zip"))
+				{
+					ReadModInfoZip(zipFile);
+					
 				}
 				string modListFile = Path.Combine(Properties.Settings.Default.FactorioModPath, "mod-list.json");
 				if (File.Exists(modListFile))
@@ -438,7 +444,7 @@ namespace Foreman
 			});
 		}
 		
-		private static void ReadModInfoJson(String dir)
+		private static void ReadModInfoFile(String dir)
 		{
 			try
 			{
@@ -447,21 +453,40 @@ namespace Foreman
 					return;
 				}
 				String json = File.ReadAllText(Path.Combine(dir, "info.json"));
-				Mod newMod = JsonConvert.DeserializeObject<Mod>(json);
-				newMod.dir = dir;
-
-				if (!Version.TryParse(newMod.version, out newMod.parsedVersion))
-				{
-					newMod.parsedVersion = new Version(0, 0, 0, 0);
-				}
-				ParseModDependencies(newMod);
-
-				Mods.Add(newMod);
+				ReadModInfo(json, dir);
 			}
 			catch (Exception)
 			{
 				ErrorLogging.LogLine(String.Format("The mod at '{0}' has an invalid info.json file", dir));
 			}
+		}
+
+		private static void ReadModInfoZip(String zipFile)
+		{
+			using (ZipStorer zip = ZipStorer.Open(zipFile, FileAccess.Read))
+			{
+				foreach (var fileEntry in zip.ReadCentralDir())
+				{
+					zip.ExtractFile(fileEntry, Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile), fileEntry.FilenameInZip));
+				}
+			}
+
+			String file = Directory.EnumerateFiles(Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile)), "info.json", SearchOption.AllDirectories).First();
+			ReadModInfo(File.ReadAllText(file), Path.GetDirectoryName(file));
+		}
+
+		private static void ReadModInfo(String json, String dir)
+		{
+			Mod newMod = JsonConvert.DeserializeObject<Mod>(json);
+			newMod.dir = dir;
+
+			if (!Version.TryParse(newMod.version, out newMod.parsedVersion))
+			{
+				newMod.parsedVersion = new Version(0, 0, 0, 0);
+			}
+			ParseModDependencies(newMod);
+
+			Mods.Add(newMod);
 		}
 
 		private static void ParseModDependencies(Mod mod)
