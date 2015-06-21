@@ -393,9 +393,6 @@ namespace Foreman
 				return;
 			}
 
-			GraphViewer.Graph.Nodes.Clear();
-			GraphViewer.Elements.Clear();
-
 			try
 			{
 				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
@@ -406,8 +403,6 @@ namespace Foreman
 				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
 			}
 
-			GraphViewer.AddRemoveElements();
-			GraphViewer.PositionNodes();
 			GraphViewer.Invalidate();
 		}
 

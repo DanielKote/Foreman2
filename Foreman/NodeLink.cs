@@ -55,9 +55,5 @@ namespace Foreman
 			info.AddValue("Consumer", Consumer.Graph.Nodes.IndexOf(Consumer));
 			info.AddValue("Item", Item.Name);
 		}
-
-		public NodeLink(SerializationInfo info, StreamingContext context)
-		{
-		}
 	}
 }

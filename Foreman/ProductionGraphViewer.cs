@@ -644,10 +644,19 @@ namespace Foreman
 			info.AddValue("EnabledMiners", DataCache.Miners.Values.Where(m => m.Enabled).Select<Miner, String>(m => m.Name));
 			info.AddValue("EnabledModules", DataCache.Modules.Values.Where(m => m.Enabled).Select<Module, String>(m => m.Name));
 			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Enabled).Select<Mod, String>(m => m.Name));
+			List<Point> elementLocations = new List<Point>();
+			foreach (ProductionNode node in Graph.Nodes)
+			{
+				elementLocations.Add(GetElementForNode(node).Location);
+			}
+			info.AddValue("ElementLocations", elementLocations);
 		}
 
 		public void LoadFromJson(JObject json)
 		{
+			Graph.Nodes.Clear();
+			Elements.Clear();
+
 			//Has to go first, as all other data depends on which mods are loaded
 			List<String> EnabledMods = json["EnabledMods"].Select(t => (String)t).ToList();
 			foreach (Mod mod in DataCache.Mods)
@@ -731,6 +740,18 @@ namespace Foreman
 			{
 				module.Enabled = EnabledModules.Contains(module.Name);
 			}
+
+			AddRemoveElements();
+
+			List<String> ElementLocations = json["ElementLocations"].Select(l => (String)l).ToList();
+			for (int i = 0; i < ElementLocations.Count; i++)
+			{
+				int[] splitPoint = ElementLocations[i].Split(',').Select(s => Convert.ToInt32(s)).ToArray();
+				GraphElement element = GetElementForNode(Graph.Nodes[i]);
+				element.Location = new Point(splitPoint[0], splitPoint[1]);
+			}
+
+			LimitViewToBounds();
 		}
 	}
 }
