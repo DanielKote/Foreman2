@@ -55,6 +55,7 @@ namespace Foreman
 			this.Item = item;
 			this.Type = type;
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
+			FillColour = Color.White;
 		}
 		
 		public override System.Drawing.Point Size

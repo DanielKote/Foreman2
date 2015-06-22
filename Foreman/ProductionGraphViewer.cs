@@ -673,54 +673,76 @@ namespace Foreman
 			List<JToken> nodes = json["Nodes"].ToList<JToken>();
 			foreach (var node in nodes)
 			{
-				String itemOrRecipeName = "";
-				try
-				{
 					switch ((String)node["NodeType"])
 					{
 						case "Consumer":
 							{
-								itemOrRecipeName = (String)node["ItemName"];
-								Item item = DataCache.Items[itemOrRecipeName];
-								ConsumerNode.Create(item, Graph);
+								String itemName = (String)node["ItemName"];
+								if (DataCache.Items.ContainsKey(itemName))
+								{
+									Item item = DataCache.Items[itemName];
+									ConsumerNode.Create(item, Graph);
+								}
+								else
+								{
+									Item missingItem = new Item(itemName);
+									missingItem.IsMissingItem = true;
+									ConsumerNode.Create(missingItem, Graph);
+								}
 								break;
 							}
 						case "Supply":
 							{
-								itemOrRecipeName = (String)node["ItemName"];
-								Item item = DataCache.Items[itemOrRecipeName];
-								SupplyNode.Create(item, Graph);
+								String itemName = (String)node["ItemName"];
+								if (DataCache.Items.ContainsKey(itemName))
+								{
+									Item item = DataCache.Items[itemName];
+									SupplyNode.Create(item, Graph);
+								}
+								else
+								{
+									Item missingItem = new Item(itemName);
+									missingItem.IsMissingItem = true;
+									DataCache.Items.Add(itemName, missingItem);
+									SupplyNode.Create(missingItem, Graph);
+								}
 								break;
 							}
 						case "Recipe":
 							{
-								itemOrRecipeName = (String)node["RecipeName"];
-								Recipe recipe = DataCache.Recipes[itemOrRecipeName];
-								RecipeNode.Create(recipe, Graph);
+								String recipeName = (String)node["RecipeName"];
+								if (DataCache.Recipes.ContainsKey(recipeName))
+								{
+									Recipe recipe = DataCache.Recipes[recipeName];
+									RecipeNode.Create(recipe, Graph);
+								}
+								else
+								{
+									Recipe missingRecipe = new Recipe(recipeName, 0f, new Dictionary<Item, float>(), new Dictionary<Item, float>());
+									missingRecipe.IsMissingRecipe = true;
+									DataCache.Recipes.Add(recipeName, missingRecipe);
+									RecipeNode.Create(missingRecipe, Graph);
+								}
 								break;
 							}
 					}
-				}
-				catch (KeyNotFoundException)
-				{
-					ErrorLogging.LogLine(String.Format("The item or recipe '{0}' does not appear to exist in the currently loaded mods", itemOrRecipeName));
-				}
 			}
 
 			List<JToken> nodeLinks = json["NodeLinks"].ToList<JToken>();
 			foreach (var nodelink in nodeLinks)
 			{
-				try
+				ProductionNode supplier = Graph.Nodes[(int)nodelink["Supplier"]];
+				ProductionNode consumer = Graph.Nodes[(int)nodelink["Consumer"]];
+
+				String itemName = (String)nodelink["Item"];
+				if (!DataCache.Items.ContainsKey(itemName))
 				{
-					ProductionNode supplier = Graph.Nodes[(int)nodelink["Supplier"]];
-					ProductionNode consumer = Graph.Nodes[(int)nodelink["Consumer"]];
-					Item item = DataCache.Items[(String)nodelink["Item"]];
-					NodeLink.Create(supplier, consumer, item);
+					Item missingItem = new Item(itemName);
+					missingItem.IsMissingItem = true;
+					DataCache.Items.Add(itemName, missingItem);
 				}
-				catch (KeyNotFoundException)
-				{
-					ErrorLogging.LogLine(String.Format("The item '{0}' does not appear to exist in the currently loaded mods", (String)nodelink["Item"]));
-				}
+				Item item = DataCache.Items[itemName];
+				NodeLink.Create(supplier, consumer, item);
 			}
 
 			List<String> EnabledAssemblers = json["EnabledAssemblers"].Select(t => (String)t).ToList();

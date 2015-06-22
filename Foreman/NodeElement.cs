@@ -249,7 +249,7 @@ namespace Foreman
 		{
 			if (!outputTabs.Any())
 			{
-				return Point.Empty;
+				return new Point(X + Width / 2, Y);
 			}
 			ItemTab tab = outputTabs.First(it => it.Item == item);
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y);
@@ -259,7 +259,7 @@ namespace Foreman
 		{
 			if (!inputTabs.Any())
 			{
-				return Point.Empty;
+				return new Point(X + Width / 2, Y + Height);
 			}
 			ItemTab tab = inputTabs.First(it => it.Item == item);
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y + tab.Height);

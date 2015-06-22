@@ -9,7 +9,7 @@ namespace Foreman
 	public enum NodeType { Recipe, Supply, Consumer };
 
 	[Serializable]
-	public abstract class ProductionNode: ISerializable
+	public abstract class ProductionNode : ISerializable
 	{
 		public ProductionGraph Graph { get; protected set; }
 		public abstract String DisplayName { get; }
@@ -46,7 +46,7 @@ namespace Foreman
 			}
 			return total;
 		}
-		
+
 		public float GetUsedOutput(Item item)
 		{
 			float total = 0f;
@@ -154,6 +154,8 @@ namespace Foreman
 
 		public float GetRateAllowedByInputs()
 		{
+			if (BaseRecipe.IsMissingRecipe) return 0f;
+
 			float rate = float.PositiveInfinity;
 			foreach (Item inputItem in BaseRecipe.Ingredients.Keys)
 			{
@@ -164,6 +166,8 @@ namespace Foreman
 
 		public float GetRateRequiredByOutputs()
 		{
+			if (BaseRecipe.IsMissingRecipe) return 0f;
+
 			float rate = 0;
 			foreach (Item outputItem in BaseRecipe.Results.Keys)
 			{
@@ -174,6 +178,8 @@ namespace Foreman
 
 		public override float GetUnsatisfiedDemand(Item item)
 		{
+			if (BaseRecipe.IsMissingRecipe) return 0f;
+
 			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
 			float itemRate = (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
 			return itemRate;
@@ -181,6 +187,8 @@ namespace Foreman
 
 		public override float GetExcessOutput(Item item)
 		{
+			if (BaseRecipe.IsMissingRecipe) return 0f;
+
 			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
 			float itemRate = (rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
 			return itemRate;
@@ -188,12 +196,16 @@ namespace Foreman
 
 		public override float GetRequiredInput(Item item)
 		{
+			if (BaseRecipe.IsMissingRecipe) return 0f;
+
 			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
 			return rate * BaseRecipe.Ingredients[item];
 		}
 
 		public override float GetTotalOutput(Item item)
 		{
+			if (BaseRecipe.IsMissingRecipe) return 0f;
+
 			float rate = GetRateAllowedByInputs();
 			return BaseRecipe.Results[item] * rate;
 		}
@@ -280,7 +292,7 @@ namespace Foreman
 		{
 			get { return BaseRecipe.FriendlyName; }
 		}
-				
+
 		public override string ToString()
 		{
 			return String.Format("Recipe Tree Node: {0}", BaseRecipe.Name);
@@ -416,7 +428,8 @@ namespace Foreman
 			get { return new List<Item>(); }
 		}
 
-		protected ConsumerNode(Item item, ProductionGraph graph) : base(graph)
+		protected ConsumerNode(Item item, ProductionGraph graph)
+			: base(graph)
 		{
 			ConsumedItem = item;
 		}
@@ -445,7 +458,7 @@ namespace Foreman
 		{
 			return 0;
 		}
-		
+
 		public static ConsumerNode Create(Item item, ProductionGraph graph)
 		{
 			ConsumerNode node = new ConsumerNode(item, graph);

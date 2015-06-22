@@ -13,6 +13,7 @@ namespace Foreman
 		public String Category { get; set; }
 		public Dictionary<Item, float> Results { get; private set; }
 		public Dictionary<Item, float> Ingredients { get; private set; }
+		public Boolean IsMissingRecipe = false;
 		private Bitmap uniqueIcon = null;
 		public Bitmap Icon
 		{
