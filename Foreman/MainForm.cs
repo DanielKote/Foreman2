@@ -370,15 +370,15 @@ namespace Foreman
 				return;
 			}
 
-			//try
-			//{
+			try
+			{
 				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
-			//}
-			//catch (Exception exception)
-			//{
-			//    MessageBox.Show("Could not load this file. See log for more details");
-			//    ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
-			//}
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show("Could not load this file. See log for more details");
+				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+			}
 
 			GraphViewer.Invalidate();
 		}
