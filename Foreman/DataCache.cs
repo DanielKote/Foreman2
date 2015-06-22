@@ -912,11 +912,31 @@ namespace Foreman
 					Item result = FindOrCreateUnknownItem(ReadLuaString(resultTable, "name"));
 					if (!results.ContainsKey(result))
 					{
-						results.Add(result, ReadLuaFloat(resultTable, "amount"));
+						if (resultTable["amount"] != null)
+						{
+							results.Add(result, ReadLuaFloat(resultTable, "amount"));
+						}
+						else
+						{
+							float amount_min = ReadLuaFloat(resultTable, "amount_min");
+							float amount_max = ReadLuaFloat(resultTable, "amount_max");
+							float probability = ReadLuaFloat(resultTable, "probability");
+							results.Add(result, ((amount_min + amount_max) / 2) * probability); //Just the average yield. Maybe in the future it should show more information about the probability
+						}
 					}
 					else
 					{
-						results[result] += ReadLuaFloat(resultTable, "amount");
+						if (resultTable["amount"] != null)
+						{
+							results[result] += ReadLuaFloat(resultTable, "amount");
+						}
+						else
+						{
+							float amount_min = ReadLuaFloat(resultTable, "amount_min");
+							float amount_max = ReadLuaFloat(resultTable, "amount_max");
+							float probability = ReadLuaFloat(resultTable, "probability");
+							results[result] += ((amount_min + amount_max) / 2) * probability;
+						}
 					}
 				}
 			}
