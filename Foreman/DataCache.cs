@@ -9,6 +9,7 @@ using System.Drawing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO.Compression;
+using System.Security.Cryptography;
 
 namespace Foreman
 {
@@ -73,6 +74,8 @@ namespace Foreman
 
 		public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
 		public static Dictionary<String, Exception> failedPathDirectories = new Dictionary<string, Exception>();
+
+		public static Dictionary<String, byte[]> zipHashes = new Dictionary<string, byte[]>();
 
 		public static void LoadAllData(List<String> enabledMods)
 		{
@@ -461,15 +464,54 @@ namespace Foreman
 			}
 		}
 
-		private static void ReadModInfoZip(String zipFile)
+		//returns path the file was unzipped to
+		private static String UnzipMod(String modZipFile)
 		{
-			using (ZipStorer zip = ZipStorer.Open(zipFile, FileAccess.Read))
+			String fullPath = Path.GetFullPath(modZipFile);
+			byte[] hash;
+			Boolean needsExtraction = false;
+
+			using (var md5 = MD5.Create())
 			{
-				foreach (var fileEntry in zip.ReadCentralDir())
+				using (var stream = File.OpenRead(fullPath))
 				{
-					zip.ExtractFile(fileEntry, Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile), fileEntry.FilenameInZip));
+					hash = md5.ComputeHash(stream);
 				}
 			}
+
+			if (zipHashes.ContainsKey(fullPath))
+			{
+				if (!zipHashes[fullPath].SequenceEqual(hash))
+				{
+					needsExtraction = true;
+					zipHashes[fullPath] = hash;
+				}
+			}
+			else
+			{
+				needsExtraction = true;
+				zipHashes.Add(fullPath, hash);
+			}
+
+			String outputDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(modZipFile));
+
+			if (needsExtraction)
+			{
+				using (ZipStorer zip = ZipStorer.Open(modZipFile, FileAccess.Read))
+				{
+					foreach (var fileEntry in zip.ReadCentralDir())
+					{
+						zip.ExtractFile(fileEntry, Path.Combine(outputDir, fileEntry.FilenameInZip));
+					}
+				}
+			}
+
+			return outputDir;
+		}
+
+		private static void ReadModInfoZip(String zipFile)
+		{
+			UnzipMod(zipFile);
 
 			String file = Directory.EnumerateFiles(Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile)), "info.json", SearchOption.AllDirectories).First();
 			ReadModInfo(File.ReadAllText(file), Path.GetDirectoryName(file));
