@@ -584,7 +584,7 @@ namespace Foreman
 					var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
 
 					var optionList = new List<ChooserControl>();
-					optionList.Add(itemSupplyOption);
+					optionList.Add(itemOutputOption);
 					foreach (Recipe recipe in DataCache.Recipes.Values)
 					{
 						if (recipe.Results.ContainsKey(item))
@@ -592,7 +592,7 @@ namespace Foreman
 							optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
 						}
 					}
-					optionList.Add(itemOutputOption);
+					optionList.Add(itemSupplyOption);
 
 					var chooserPanel = new ChooserPanel(optionList, this);
 
