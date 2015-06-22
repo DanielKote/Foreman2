@@ -250,12 +250,12 @@ namespace Foreman
 			else if (ItemListView.SelectedItems.Count == 1)
 			{
 				AddItemButton.Enabled = true;
-				AddItemButton.Text = "Add Output";
+				AddItemButton.Text = "Add Item";
 			}
 			else if (ItemListView.SelectedItems.Count > 1)
 			{
 				AddItemButton.Enabled = true;
-				AddItemButton.Text = "Add Outputs";
+				AddItemButton.Text = "Add Items";
 			}
 		}
 
