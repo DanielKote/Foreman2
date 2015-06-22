@@ -261,7 +261,7 @@ namespace Foreman
 
 		private void ItemListView_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
-			GraphViewer.AddDemand((Item)ItemListView.SelectedItems[0].Tag);
+			AddItemButton.PerformClick();
 		}
 
 		private void ItemListView_ItemDrag(object sender, ItemDragEventArgs e)
