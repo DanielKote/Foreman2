@@ -513,7 +513,11 @@ namespace Foreman
 		{
 			UnzipMod(zipFile);
 
-			String file = Directory.EnumerateFiles(Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile)), "info.json", SearchOption.AllDirectories).First();
+			String file = Directory.EnumerateFiles(Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile)), "info.json", SearchOption.AllDirectories).FirstOrDefault();
+			if (String.IsNullOrWhiteSpace(file))
+			{
+				return;
+			}
 			ReadModInfo(File.ReadAllText(file), Path.GetDirectoryName(file));
 		}
 
