@@ -22,6 +22,7 @@ namespace Foreman
 		private Color recipeColour = Color.FromArgb(190, 217, 212);
 		private Color supplyColour = Color.FromArgb(249, 237, 195);
 		private Color consumerColour = Color.FromArgb(231, 214, 224);
+		private Color missingColour = Color.FromArgb(0xff, 0x7f, 0x6b);
 		private Color backgroundColour;
 		
 		private const int assemblerSize = 32;
@@ -55,17 +56,29 @@ namespace Foreman
 
 			DisplayedNode = node;
 
-			if (DisplayedNode.GetType() == typeof(ConsumerNode))
+			if (DisplayedNode is ConsumerNode)
 			{
 				backgroundColour = supplyColour;
+				if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
+				{
+					backgroundColour = missingColour;
+				}
 			}
-			else if (DisplayedNode.GetType() == typeof(SupplyNode))
+			else if (DisplayedNode is SupplyNode)
 			{
 				backgroundColour = consumerColour;
+				if (((SupplyNode)DisplayedNode).SuppliedItem.IsMissingItem)
+				{
+					backgroundColour = missingColour;
+				}
 			}
-			else
+			else if (DisplayedNode is RecipeNode)
 			{
 				backgroundColour = recipeColour;
+				if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissingRecipe)
+				{
+					backgroundColour = missingColour;
+				}
 			}
 			backgroundBrush = new SolidBrush(backgroundColour);
 
@@ -122,9 +135,17 @@ namespace Foreman
 
 			if (DisplayedNode is SupplyNode)
 			{
+				SupplyNode node = (SupplyNode)DisplayedNode;
 				if (!Parent.ShowMiners)
 				{
-					text = "Input: " + (DisplayedNode as SupplyNode).SuppliedItem.FriendlyName;
+					if (node.SuppliedItem.IsMissingItem)
+					{
+						text = String.Format("Item not loaded! ({0})", node.DisplayName);
+					}
+					else
+					{
+						text = "Input: " + node.SuppliedItem.FriendlyName;
+					}
 				}
 				else
 				{
@@ -133,13 +154,29 @@ namespace Foreman
 			}
 			else if (DisplayedNode is ConsumerNode)
 			{
-				text = "Output: " + (DisplayedNode as ConsumerNode).ConsumedItem.FriendlyName;
+				ConsumerNode node = (ConsumerNode)DisplayedNode;
+				if (node.ConsumedItem.IsMissingItem)
+				{
+					text = String.Format("Item not loaded! ({0})", node.DisplayName);
+				}
+				else
+				{
+					text = "Output: " + node.ConsumedItem.FriendlyName;
+				}
 			}
 			else if (DisplayedNode is RecipeNode)
 			{
+				RecipeNode node = (RecipeNode)DisplayedNode;
 				if (!Parent.ShowAssemblers)
 				{
-					text = "Recipe: " + (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName;
+					if (node.BaseRecipe.IsMissingRecipe)
+					{
+						text = String.Format("Recipe not loaded! ({0})", node.DisplayName);
+					}
+					else
+					{
+						text = "Recipe: " + node.BaseRecipe.FriendlyName;
+					}
 				}
 				else
 				{
