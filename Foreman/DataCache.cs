@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace Foreman
 {
@@ -436,15 +437,6 @@ namespace Foreman
 			DependencyGraph modGraph = new DependencyGraph(Mods);
 			modGraph.DisableUnsatisfiedMods();
 			Mods = modGraph.SortMods();
-
-			Mods.Sort((a, b) => //Really basic way of putting core and base at the top
-			{
-				if (a.Name == "core") { return -1; }
-				if (b.Name == "core") { return 1; }
-				if (a.Name == "base") { return -1; }
-				if (b.Name == "base") { return 1; }
-				return 0;
-			});
 		}
 		
 		private static void ReadModInfoFile(String dir)
@@ -464,8 +456,7 @@ namespace Foreman
 			}
 		}
 
-		//returns path the file was unzipped to
-		private static String UnzipMod(String modZipFile)
+		private static void UnzipMod(String modZipFile)
 		{
 			String fullPath = Path.GetFullPath(modZipFile);
 			byte[] hash;
@@ -505,8 +496,6 @@ namespace Foreman
 					}
 				}
 			}
-
-			return outputDir;
 		}
 
 		private static void ReadModInfoZip(String zipFile)
@@ -586,6 +575,8 @@ namespace Foreman
 		private static void InterpretItems(Lua lua, String typeName)
 		{
 			LuaTable itemTable = lua.GetTable("data.raw")[typeName] as LuaTable;
+
+			var table = lua.GetTable("data.raw")["solar-panel"] as LuaTable;
 
 			if (itemTable != null)
 			{
@@ -863,6 +854,10 @@ namespace Foreman
 		{
 			try
 			{
+				if (values["minable"] == null)
+				{
+					return; //This means the resource is not usable by miners and is therefore not useful to us
+				}
 				Resource newResource = new Resource(name);
 				newResource.Category = ReadLuaString(values, "category", true, "basic-solid");
 				LuaTable minableTable = ReadLuaLuaTable(values, "minable", true);
