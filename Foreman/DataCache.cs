@@ -131,13 +131,10 @@ namespace Foreman
 								foreach (Match match in matches)
 								{
 									String moduleName = match.Groups["modulename"].Value;
-									if ((lua["package.loaded"] as LuaTable)[moduleName] != null)
+									String moduleFileName = Path.Combine(mod.dir, match.Groups["modulename"].Value + ".lua");
+									if (File.Exists(moduleFileName))
 									{
-										String moduleFileName = Path.Combine(mod.dir, match.Groups["modulename"].Value + ".lua");
-										if (File.Exists(moduleFileName))
-										{
-											lua.DoFile(moduleFileName);
-										}
+										lua.DoFile(moduleFileName);
 									}
 								}
 
