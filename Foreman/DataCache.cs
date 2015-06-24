@@ -968,38 +968,45 @@ namespace Foreman
 				while (resultEnumerator.MoveNext())
 				{
 					LuaTable resultTable = resultEnumerator.Value as LuaTable;
-					Item result = FindOrCreateUnknownItem(ReadLuaString(resultTable, "name"));
-					if (!results.ContainsKey(result))
+					Item result;
+					if (resultTable["name"] != null)
 					{
+						result = FindOrCreateUnknownItem(ReadLuaString(resultTable, "name"));
+					}
+					else
+					{
+						result = FindOrCreateUnknownItem((string)resultTable[1]);
+					}
+
+					float amount = 0f;
 						if (resultTable["amount"] != null)
 						{
 							results.Add(result, ReadLuaFloat(resultTable, "amount"));
 						}
-						else
+						else if (resultTable["probability"] != null)
 						{
 							float amount_min = ReadLuaFloat(resultTable, "amount_min");
 							float amount_max = ReadLuaFloat(resultTable, "amount_max");
 							float probability = ReadLuaFloat(resultTable, "probability");
-							results.Add(result, ((amount_min + amount_max) / 2) * probability); //Just the average yield. Maybe in the future it should show more information about the probability
-						}
-					}
-					else
-					{
-						if (resultTable["amount"] != null)
-						{
-							results[result] += ReadLuaFloat(resultTable, "amount");
+							amount = ((amount_min + amount_max) / 2) * probability; //Just the average yield. Maybe in the future it should show more information about the probability
 						}
 						else
 						{
-							float amount_min = ReadLuaFloat(resultTable, "amount_min");
-							float amount_max = ReadLuaFloat(resultTable, "amount_max");
-							float probability = ReadLuaFloat(resultTable, "probability");
-							results[result] += ((amount_min + amount_max) / 2) * probability;
+							amount = Convert.ToSingle(resultTable[2]);
 						}
-					}
+
+						if (results.ContainsKey(result))
+						{
+							results[result] += amount;
+						}
+						else
+						{
+							results.Add(result, amount);
+						}
+					
+					
 				}
 			}
-
 			return results;
 		}
 
