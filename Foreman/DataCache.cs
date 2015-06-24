@@ -114,6 +114,8 @@ namespace Foreman
 	util.table.deepcopy = table.deepcopy
 	util.multiplystripes = multiplystripes");
 
+				Regex requiresRegex = new Regex("require *\\(?(\"|')(?<modulename>[^\\.\"']+)(\"|')\\)?");
+
 				foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
 				{
 					foreach (Mod mod in Mods.Where(m => m.Enabled))
@@ -123,6 +125,22 @@ namespace Foreman
 						{
 							try
 							{
+								String fileContents = File.ReadAllText(dataFile);
+
+								var matches = requiresRegex.Matches(fileContents);	//This whole section is a dirty hack to force lua to run modules that it thinks have already been loaded (e.g. "config.lua" in DyTech)
+								foreach (Match match in matches)
+								{
+									String moduleName = match.Groups["modulename"].Value;
+									if ((lua["package.loaded"] as LuaTable)[moduleName] != null)
+									{
+										String moduleFileName = Path.Combine(mod.dir, match.Groups["modulename"].Value + ".lua");
+										if (File.Exists(moduleFileName))
+										{
+											lua.DoFile(moduleFileName);
+										}
+									}
+								}
+
 								lua.DoFile(dataFile);
 							}
 							catch (Exception e)
