@@ -33,10 +33,6 @@ namespace Foreman
 
 		public String text = "";
 		
-		TextBox editorBox;
-		Item editedItem;
-		float originalEditorValue;
-
 		private AssemblerBox assemblerBox;
 		private List<ItemTab> inputTabs = new List<ItemTab>();
 		private List<ItemTab> outputTabs = new List<ItemTab>();
@@ -48,6 +44,8 @@ namespace Foreman
 		private Brush backgroundBrush;
 		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 		private StringFormat centreFormat = new StringFormat();
+
+		public Boolean tooltipsEnabled = true;
 
 		public NodeElement(ProductionNode node, ProductionGraphViewer parent) : base(parent)
 		{
@@ -306,16 +304,7 @@ namespace Foreman
 		{
 			GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, backgroundBrush);
 			graphics.DrawString(text, size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
-
-			if (editorBox != null)
-			{
-				TooltipInfo ttinfo = new TooltipInfo();
-				ttinfo.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(editedItem));
-				ttinfo.Direction = Direction.Up;
-				ttinfo.ScreenSize = new Point(editorBox.Size);
-				Parent.AddTooltip(ttinfo);
-			}
-
+			
 			base.Paint(graphics);
 		}
 
@@ -432,88 +421,59 @@ namespace Foreman
 
 		public void beginEditingInputAmount(Item item)
 		{
-			if (editorBox != null)
-			{
-				stopEditingInputAmount();
-			}
+			tooltipsEnabled = false;
 
-			editorBox = new TextBox();
-			editedItem = item;
+			TextBox editorBox = new TextBox();
 			float amountToShow = (DisplayedNode as ConsumerNode).manualRate;
 			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
 			{
 				amountToShow *= 60;
 			}
 			editorBox.Text = amountToShow.ToString();
-			originalEditorValue = amountToShow;
 			editorBox.SelectAll();
 			editorBox.Size = new Size(100, 30);
-			Rectangle tooltipRect = Parent.getTooltipScreenBounds(Parent.GraphToScreen(GetInputLineConnectionPoint(item)), new Point(editorBox.Size), Direction.Up);
-			editorBox.Location = new Point(tooltipRect.X, tooltipRect.Y);
-			Parent.Controls.Add(editorBox);
 			editorBox.Focus();
-			editorBox.TextChanged += editorBoxTextChanged;
-			editorBox.KeyDown += new KeyEventHandler(editorBoxKeyDown);
-			editorBox.LostFocus += new EventHandler((sender, e) => stopEditingInputAmount());
-		}
-
-		private void stopEditingInputAmount()
-		{
-			if (editorBox != null && !editorBox.IsDisposed)
+			editorBox.TextChanged += new EventHandler((sender, e) =>
 			{
-				Parent.Controls.Remove(editorBox);
-				editorBox = null;
-				editedItem = null;
-				Parent.Focus();
-			}
-		}
+				float amount;
+				bool amountIsValid = float.TryParse((sender as TextBox).Text, out amount);
 
-		private void editorBoxTextChanged(object sender, EventArgs e)
-		{
-			float amount;
-			bool amountIsValid = float.TryParse((sender as TextBox).Text, out amount);
-
-			if (amountIsValid)
-			{
-				if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
+				if (amountIsValid)
 				{
-					amount /= 60;
+					if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
+					{
+						amount /= 60;
+					}
+					(DisplayedNode as ConsumerNode).manualRate = amount;
+					Parent.UpdateNodes();
+					Parent.Invalidate();
 				}
-				(DisplayedNode as ConsumerNode).manualRate = amount;
-				Parent.UpdateNodes();
-				Parent.Invalidate();
-			}
-		}
-
-		private void editorBoxKeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.KeyCode == Keys.Enter)
+			});
+			editorBox.KeyDown += new KeyEventHandler((sender, e) =>
 			{
-				stopEditingInputAmount();
-			}
-			else if (e.KeyCode == Keys.Escape)
-			{
-				if (editorBox != null) //This line only happens if the window is closed with the esc button with the editor box open.
+				if (e.KeyCode == Keys.Enter)
 				{
-					editorBox.Text = originalEditorValue.ToString();
+					Dispose();
 				}
-				stopEditingInputAmount();
-			}			
+			});
+			editorBox.LostFocus += new EventHandler((sender, e) => this.tooltipsEnabled = true);
+
+			new FloatingTooltipControl(editorBox, Direction.Up, GetInputLineConnectionPoint(item), Parent);
 		}
 
 		public override void MouseMoved(Point location)
 		{
-			if (editorBox == null)
+			ItemTab mousedTab = null;
+			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
 			{
-				ItemTab mousedTab = null;
-				foreach (ItemTab tab in SubElements.OfType<ItemTab>())
+				if (tab.bounds.Contains(location))
 				{
-					if (tab.bounds.Contains(location))
-					{
-						mousedTab = tab;
-					}
+					mousedTab = tab;
 				}
+			}
 
+			if (tooltipsEnabled)
+			{
 				TooltipInfo tti = new TooltipInfo();
 				if (mousedTab != null)
 				{
@@ -556,7 +516,7 @@ namespace Foreman
 					if (Parent.ShowAssemblers)
 					{
 						tti.Text += String.Format("\n\nAssemblers:");
-						foreach(var kvp in assemblerBox.AssemblerList)
+						foreach (var kvp in assemblerBox.AssemblerList)
 						{
 							tti.Text += String.Format("\n----{0} ({1})", kvp.Key.assembler.FriendlyName, kvp.Value.ToString());
 							foreach (var Module in kvp.Key.modules.Where(m => m != null))
@@ -647,10 +607,6 @@ namespace Foreman
 				assemblerBox.Dispose();
 			}
 			rightClickMenu.Dispose();
-			if (editorBox != null)
-			{
-				editorBox.Dispose();
-			}
 			base.Dispose();
 		}
 	}

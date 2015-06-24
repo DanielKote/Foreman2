@@ -29,6 +29,33 @@ namespace Foreman
 		public String Text;
 	}
 
+	public class FloatingTooltipControl
+	{
+		public Control Control { get; private set; }
+		public Direction Direction { get; private set; }
+		public Point GraphLocation { get; private set; }
+		public ProductionGraphViewer GraphViewer { get; private set; }
+
+		public FloatingTooltipControl(Control control, Direction direction, Point graphLocation, ProductionGraphViewer parent)
+		{
+			Control = control;
+			Direction = direction;
+			GraphLocation = graphLocation;
+			GraphViewer = parent;
+
+			parent.floatingTooltipControls.Add(this);
+			parent.Controls.Add(control);
+			Rectangle ttRect = parent.getTooltipScreenBounds(parent.GraphToScreen(graphLocation), new Point(control.Size), direction);
+			control.Location = ttRect.Location;
+			control.LostFocus += new EventHandler((sender, e) =>
+			{
+				GraphViewer.floatingTooltipControls.Remove(this);
+				control.Dispose();
+			});
+			control.Focus();
+		}
+	}
+
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
@@ -53,6 +80,7 @@ namespace Foreman
 		public bool ShowInserters = true;
 		StringFormat stringFormat = new StringFormat();
 		public GhostNodeElement GhostDragElement = null;
+		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
 
 		public Rectangle GraphBounds
 		{
@@ -267,7 +295,15 @@ namespace Foreman
 				graphics.TranslateTransform(element.X, element.Y);
 				element.Paint(graphics);
 				graphics.TranslateTransform(-element.X, -element.Y);
+			}
 
+			foreach (var fttp in floatingTooltipControls)
+			{
+				TooltipInfo ttinfo = new TooltipInfo();
+				ttinfo.ScreenLocation = GraphToScreen(fttp.GraphLocation);
+				ttinfo.Direction = fttp.Direction;
+				ttinfo.ScreenSize = new Point(fttp.Control.Size);
+				AddTooltip(ttinfo);
 			}
 
 			graphics.ResetTransform();
