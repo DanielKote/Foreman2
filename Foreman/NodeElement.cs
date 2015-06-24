@@ -436,10 +436,6 @@ namespace Foreman
 					tti.Text = mousedTab.Item.FriendlyName;
 					if (mousedTab.Type == LinkType.Input)
 					{
-						if (DisplayedNode is ConsumerNode)
-						{
-							tti.Text += "\nClick to edit desired amount";
-						}
 						tti.Text += "\nDrag to create a new connection";
 						tti.Direction = Direction.Up;
 						tti.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(mousedTab.Item));
@@ -483,6 +479,12 @@ namespace Foreman
 					}
 					Parent.AddTooltip(tti);
 				}
+
+				TooltipInfo helpToolTipInfo = new TooltipInfo();
+				helpToolTipInfo.Text = "Click on this node to\nedit how fast it runs!";
+				helpToolTipInfo.Direction = Direction.None;
+				helpToolTipInfo.ScreenLocation = new Point(10, 10);
+				Parent.AddTooltip(helpToolTipInfo);
 			}
 		}
 

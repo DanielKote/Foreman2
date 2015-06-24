@@ -12,6 +12,7 @@ namespace Foreman
 	[Serializable]
 	public abstract class ProductionNode : ISerializable
 	{
+		public static readonly int RoundingDP = 4;
 		public ProductionGraph Graph { get; protected set; }
 		public abstract String DisplayName { get; }
 		public abstract IEnumerable<Item> Inputs { get; }
@@ -47,7 +48,7 @@ namespace Foreman
 			{
 				total += link.Amount;
 			}
-			return total;
+			return (float)Math.Round(total, RoundingDP);
 		}
 
 		public float GetUsedOutput(Item item)
@@ -57,7 +58,7 @@ namespace Foreman
 			{
 				total += link.Amount;
 			}
-			return total;
+			return (float)Math.Round(total, RoundingDP);
 		}
 
 		public float GetRequiredOutput(Item item)
@@ -70,7 +71,7 @@ namespace Foreman
 					amount += link.Demand;
 				}
 			}
-			return amount;
+			return (float)Math.Round(amount, RoundingDP);
 		}
 
 		public bool CanUltimatelyTakeFrom(ProductionNode node)
@@ -192,7 +193,7 @@ namespace Foreman
 				rate = manualRate;
 			}
 			float itemRate = (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
-			return itemRate;
+			return (float)Math.Round(itemRate, RoundingDP);
 		}
 
 		public override float GetExcessOutput(Item item)
@@ -201,7 +202,7 @@ namespace Foreman
 
 			float rate = GetRateAllowedByInputs();
 			float itemRate = (rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
-			return itemRate;
+			return (float)Math.Round(itemRate, RoundingDP);
 		}
 
 		public override float GetRequiredInput(Item item)
@@ -217,7 +218,7 @@ namespace Foreman
 			{
 				rate = manualRate;
 			}
-			return rate * BaseRecipe.Ingredients[item];
+			return (float)Math.Round(rate * BaseRecipe.Ingredients[item], RoundingDP);
 		}
 
 		public override float GetTotalOutput(Item item)
@@ -233,7 +234,7 @@ namespace Foreman
 			{
 				rate = manualRate;
 			}
-			return BaseRecipe.Results[item] * rate;
+			return (float)Math.Round(BaseRecipe.Results[item] * rate, RoundingDP);
 		}
 
 		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
@@ -241,11 +242,11 @@ namespace Foreman
 		{
 			if (Graph.SelectedAmountType == AmountType.FixedAmount)
 			{
-				return (float)Math.Ceiling(Math.Round(amount, 4)); //Subtracting a very small number stops the amount from getting rounded up due to FP errors. It's a bit hacky but it works for now.
+				return (float)Math.Ceiling(Math.Round(amount, RoundingDP)); //Subtracting a very small number stops the amount from getting rounded up due to FP errors. It's a bit hacky but it works for now.
 			}
 			else
 			{
-				return amount;
+				return (float)Math.Round(amount, RoundingDP);
 			}
 		}
 
@@ -377,7 +378,7 @@ namespace Foreman
 				{
 					excessSupply -= link.Amount;
 				}
-				return excessSupply;
+				return (float)Math.Round(excessSupply, RoundingDP);
 			}
 		}
 
@@ -394,7 +395,7 @@ namespace Foreman
 			}
 			else
 			{
-				return manualRate;
+				return (float)Math.Round(manualRate, RoundingDP);
 			}
 		}
 
@@ -488,7 +489,7 @@ namespace Foreman
 				{
 					excessDemand -= link.Amount;
 				}
-				return excessDemand;
+				return (float)Math.Round(excessDemand, RoundingDP);
 			}
 		}
 
@@ -505,7 +506,7 @@ namespace Foreman
 			}
 			else
 			{
-				return manualRate;
+				return (float)Math.Round(manualRate, RoundingDP);
 			}
 		}
 

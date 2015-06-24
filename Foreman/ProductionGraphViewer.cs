@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Foreman
 {
-	public enum Direction { Up, Down, Left, Right }
+	public enum Direction { Up, Down, Left, Right, None }
 	public struct TooltipInfo
 	{
 		public TooltipInfo(Point screenLocation, Point screenSize, Direction direction, String text)
@@ -353,8 +353,14 @@ namespace Foreman
 			}
 
 			Rectangle rect = getTooltipScreenBounds(screenArrowPoint, screenSize, direction);
-
 			Point[] points = new Point[] { screenArrowPoint, arrowPoint1, arrowPoint2 };
+
+			if (direction == Direction.None)
+			{
+				rect = new Rectangle(screenArrowPoint, new Size(screenSize));
+				stringFormat.Alignment = StringAlignment.Center;
+			}
+
 			graphics.FillPolygon(Brushes.DarkGray, points);
 			GraphicsStuff.FillRoundRect(rect.X - border, rect.Y - border, rect.Width + border * 2, rect.Height + border * 2, 3, graphics, Brushes.DarkGray);
 
