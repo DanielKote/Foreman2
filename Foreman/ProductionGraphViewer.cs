@@ -29,12 +29,13 @@ namespace Foreman
 		public String Text;
 	}
 
-	public class FloatingTooltipControl
+	public class FloatingTooltipControl : IDisposable
 	{
 		public Control Control { get; private set; }
 		public Direction Direction { get; private set; }
 		public Point GraphLocation { get; private set; }
 		public ProductionGraphViewer GraphViewer { get; private set; }
+		public event EventHandler Closing;
 
 		public FloatingTooltipControl(Control control, Direction direction, Point graphLocation, ProductionGraphViewer parent)
 		{
@@ -47,12 +48,17 @@ namespace Foreman
 			parent.Controls.Add(control);
 			Rectangle ttRect = parent.getTooltipScreenBounds(parent.GraphToScreen(graphLocation), new Point(control.Size), direction);
 			control.Location = ttRect.Location;
-			control.LostFocus += new EventHandler((sender, e) =>
-			{
-				GraphViewer.floatingTooltipControls.Remove(this);
-				control.Dispose();
-			});
 			control.Focus();
+		}
+
+		public void Dispose()
+		{
+			Control.Dispose();
+			GraphViewer.floatingTooltipControls.Remove(this);
+			if (Closing != null)
+			{
+				Closing.Invoke(this, null);
+			}
 		}
 	}
 
@@ -73,6 +79,7 @@ namespace Foreman
 			set { dragStartScreenPoint = Control.MousePosition; draggedElement = value; }
 		}
 		private Point dragStartScreenPoint;
+		public Boolean clickHasBecomeDrag = false;
 		public Queue<TooltipInfo> toolTipsToDraw = new Queue<TooltipInfo>();
 		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 		public bool ShowAssemblers = false;
@@ -421,6 +428,8 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
+			ClearFloatingControls();
+
 			Focus();
 			ActiveControl = null;
 
@@ -440,6 +449,8 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
 		{
+			ClearFloatingControls();
+
 			Focus();
 
 			GraphElement element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
@@ -449,6 +460,7 @@ namespace Foreman
 			}
 
 			DraggedElement = null;
+			clickHasBecomeDrag = false;
 
 			switch (e.Button)
 			{
@@ -472,6 +484,7 @@ namespace Foreman
 				Point dragDiff = Point.Add(Control.MousePosition, new Size(-dragStartScreenPoint.X, -dragStartScreenPoint.Y));
 				if (dragDiff.X * dragDiff.X + dragDiff.Y * dragDiff.Y > 9) //Only drag if the mouse has moved more than three pixels. This avoids dragging when the user is trying to click.
 				{
+					clickHasBecomeDrag = true;
 					DraggedElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-DraggedElement.X, -DraggedElement.Y)));
 				}
 			}
@@ -489,6 +502,8 @@ namespace Foreman
 
 		void ProductionGraphViewer_MouseWheel(object sender, MouseEventArgs e)
 		{
+			ClearFloatingControls();
+
 			if (e.Delta > 0)
 			{
 				ViewScale *= 1.1f;
@@ -503,6 +518,14 @@ namespace Foreman
 			LimitViewToBounds();
 
 			Invalidate();
+		}
+
+		public void ClearFloatingControls()
+		{
+			foreach (var control in floatingTooltipControls.ToArray())
+			{
+				control.Dispose();
+			}
 		}
 
 		public Point DesktopToGraph(Point point)

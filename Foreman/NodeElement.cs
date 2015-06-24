@@ -391,31 +391,38 @@ namespace Foreman
 
 		public override void MouseUp(Point location, MouseButtons button)
 		{
-			ItemTab clickedTab = null;
-			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
+			if (Parent.DraggedElement == this && !Parent.clickHasBecomeDrag)
 			{
-				if (tab.bounds.Contains(location))
+				ItemTab clickedTab = null;
+				foreach (ItemTab tab in SubElements.OfType<ItemTab>())
 				{
-					clickedTab = tab;
+					if (tab.bounds.Contains(location))
+					{
+						clickedTab = tab;
+					}
 				}
-			}
 
-			if (button == MouseButtons.Left)
-			{
-				if (clickedTab != null && clickedTab.Type == LinkType.Input && DisplayedNode is ConsumerNode)
+				if (button == MouseButtons.Left)
 				{
-					beginEditingInputAmount(clickedTab.Item);
+					if (clickedTab != null && clickedTab.Type == LinkType.Input && DisplayedNode is ConsumerNode)
+					{
+						beginEditingInputAmount(clickedTab.Item);
+					}
+					else
+					{
+						beginEditingNodeRate();
+					}
 				}
-			}
-			else if (button == MouseButtons.Right)
-			{
-				rightClickMenu.MenuItems.Clear();
-				rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-					new EventHandler((o, e) =>
-						{
-							Parent.DeleteNode(this);
-						})));
-				rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+				else if (button == MouseButtons.Right)
+				{
+					rightClickMenu.MenuItems.Clear();
+					rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+						new EventHandler((o, e) =>
+							{
+								Parent.DeleteNode(this);
+							})));
+					rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+				}
 			}
 		}
 
@@ -449,16 +456,24 @@ namespace Foreman
 					Parent.Invalidate();
 				}
 			});
+
+			var fttc = new FloatingTooltipControl(editorBox, Direction.Up, GetInputLineConnectionPoint(item), Parent);
+
 			editorBox.KeyDown += new KeyEventHandler((sender, e) =>
 			{
 				if (e.KeyCode == Keys.Enter)
 				{
-					Dispose();
+					fttc.Dispose();
 				}
 			});
-			editorBox.LostFocus += new EventHandler((sender, e) => this.tooltipsEnabled = true);
 
-			new FloatingTooltipControl(editorBox, Direction.Up, GetInputLineConnectionPoint(item), Parent);
+			fttc.Closing += new EventHandler((sender, e) => tooltipsEnabled = true);
+		}
+
+		public void beginEditingNodeRate()
+		{
+			RateOptionsPanel newPanel = new RateOptionsPanel(DisplayedNode);
+			new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X, Location.Y + Height / 2), Parent);
 		}
 
 		public override void MouseMoved(Point location)

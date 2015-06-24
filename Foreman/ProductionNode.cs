@@ -23,7 +23,7 @@ namespace Foreman
 		public abstract float GetTotalOutput(Item item);
 		public abstract float GetRequiredInput(Item item);
 		public RateType rateType = RateType.Auto;
-		public float manualRate = 0f;
+		public float manualRate = 1f;
 
 		protected ProductionNode(ProductionGraph graph)
 		{
