@@ -122,22 +122,6 @@ namespace Foreman
 			ViewOffset = new Point(Width / -2, Height / -2);
 		}
 
-		public void AddDemands(IEnumerable<Item> list)
-		{
-			foreach (Item item in list)
-			{
-				ConsumerNode node = ConsumerNode.Create(item, Graph);
-			}
-
-			AddRemoveElements();
-			PositionNodes();
-		}
-
-		public void AddDemand(Item item)
-		{
-			AddDemands(new List<Item> { item });
-		}
-
 		public void UpdateNodes()
 		{
 			foreach (NodeElement node in Elements.OfType<NodeElement>().ToList())

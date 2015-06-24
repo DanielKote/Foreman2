@@ -393,86 +393,27 @@ namespace Foreman
 		{
 			if (Parent.DraggedElement == this && !Parent.clickHasBecomeDrag)
 			{
-				ItemTab clickedTab = null;
-				foreach (ItemTab tab in SubElements.OfType<ItemTab>())
-				{
-					if (tab.bounds.Contains(location))
-					{
-						clickedTab = tab;
-					}
-				}
-
 				if (button == MouseButtons.Left)
 				{
-					if (clickedTab != null && clickedTab.Type == LinkType.Input && DisplayedNode is ConsumerNode)
-					{
-						beginEditingInputAmount(clickedTab.Item);
-					}
-					else
-					{
-						beginEditingNodeRate();
-					}
-				}
-				else if (button == MouseButtons.Right)
-				{
-					rightClickMenu.MenuItems.Clear();
-					rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-						new EventHandler((o, e) =>
-							{
-								Parent.DeleteNode(this);
-							})));
-					rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+					beginEditingNodeRate();
 				}
 			}
-		}
 
-		public void beginEditingInputAmount(Item item)
-		{
-			tooltipsEnabled = false;
-
-			TextBox editorBox = new TextBox();
-			float amountToShow = (DisplayedNode as ConsumerNode).manualRate;
-			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
+			if (button == MouseButtons.Right)
 			{
-				amountToShow *= 60;
+				rightClickMenu.MenuItems.Clear();
+				rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+					new EventHandler((o, e) =>
+						{
+							Parent.DeleteNode(this);
+						})));
+				rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
 			}
-			editorBox.Text = amountToShow.ToString();
-			editorBox.SelectAll();
-			editorBox.Size = new Size(100, 30);
-			editorBox.Focus();
-			editorBox.TextChanged += new EventHandler((sender, e) =>
-			{
-				float amount;
-				bool amountIsValid = float.TryParse((sender as TextBox).Text, out amount);
-
-				if (amountIsValid)
-				{
-					if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
-					{
-						amount /= 60;
-					}
-					(DisplayedNode as ConsumerNode).manualRate = amount;
-					Parent.UpdateNodes();
-					Parent.Invalidate();
-				}
-			});
-
-			var fttc = new FloatingTooltipControl(editorBox, Direction.Up, GetInputLineConnectionPoint(item), Parent);
-
-			editorBox.KeyDown += new KeyEventHandler((sender, e) =>
-			{
-				if (e.KeyCode == Keys.Enter)
-				{
-					fttc.Dispose();
-				}
-			});
-
-			fttc.Closing += new EventHandler((sender, e) => tooltipsEnabled = true);
 		}
 
 		public void beginEditingNodeRate()
 		{
-			RateOptionsPanel newPanel = new RateOptionsPanel(DisplayedNode);
+			RateOptionsPanel newPanel = new RateOptionsPanel(DisplayedNode, Parent);
 			new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X, Location.Y + Height / 2), Parent);
 		}
 
