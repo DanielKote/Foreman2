@@ -174,7 +174,6 @@ namespace Foreman
 						new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
 					}
 				});
-
 			}
 
 			Parent.AddRemoveElements();

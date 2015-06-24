@@ -33,9 +33,25 @@ namespace Foreman
 			}
 
 			float amountToShow = baseNode.manualRate;
-			if (GraphViewer.Graph.SelectedAmountType == AmountType.Rate && GraphViewer.Graph.SelectedUnit == RateUnit.PerMinute)
+			if (GraphViewer.Graph.SelectedAmountType == AmountType.Rate)
 			{
-				amountToShow *= 60;
+				fixedTextBox.Width = 65;
+				unitLabel.Visible = true;
+
+				if (GraphViewer.Graph.SelectedUnit == RateUnit.PerMinute)
+				{
+					amountToShow *= 60;
+					unitLabel.Text = "/m";
+				}
+				else
+				{
+					unitLabel.Text = "/s";
+				}
+			}
+			else
+			{
+				unitLabel.Visible = false;
+				fixedTextBox.Width = 85;
 			}
 			fixedTextBox.Text = Convert.ToString(amountToShow);
 		}
