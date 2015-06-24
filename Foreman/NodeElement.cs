@@ -481,7 +481,7 @@ namespace Foreman
 				}
 
 				TooltipInfo helpToolTipInfo = new TooltipInfo();
-				helpToolTipInfo.Text = "Click on this node to\nedit how fast it runs!";
+				helpToolTipInfo.Text = "Left click on this node to edit how fast it runs\nRight click to delete it";
 				helpToolTipInfo.Direction = Direction.None;
 				helpToolTipInfo.ScreenLocation = new Point(10, 10);
 				Parent.AddTooltip(helpToolTipInfo);
