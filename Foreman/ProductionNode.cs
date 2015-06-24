@@ -7,7 +7,8 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public enum NodeType { Recipe, Supply, Consumer };
-
+	public enum RateType { Auto, Manual };
+	
 	[Serializable]
 	public abstract class ProductionNode : ISerializable
 	{
@@ -21,6 +22,8 @@ namespace Foreman
 		public abstract float GetUnsatisfiedDemand(Item item);
 		public abstract float GetTotalOutput(Item item);
 		public abstract float GetRequiredInput(Item item);
+		public RateType rateType = RateType.Auto;
+		public float manualRate = 0f;
 
 		protected ProductionNode(ProductionGraph graph)
 		{
@@ -114,7 +117,6 @@ namespace Foreman
 	public class RecipeNode : ProductionNode
 	{
 		public Recipe BaseRecipe { get; private set; }
-		public float CompletionAmountLimit = float.PositiveInfinity;
 
 		protected RecipeNode(Recipe baseRecipe, ProductionGraph graph)
 			: base(graph)
@@ -180,7 +182,15 @@ namespace Foreman
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
+			float rate;
+			if (rateType == RateType.Auto)
+			{
+				rate = GetRateRequiredByOutputs();
+			}
+			else
+			{
+				rate = manualRate;
+			}
 			float itemRate = (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
 			return itemRate;
 		}
@@ -189,7 +199,7 @@ namespace Foreman
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = Math.Min(CompletionAmountLimit, GetRateAllowedByInputs());
+			float rate = GetRateAllowedByInputs();
 			float itemRate = (rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
 			return itemRate;
 		}
@@ -198,7 +208,15 @@ namespace Foreman
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = Math.Min(CompletionAmountLimit, GetRateRequiredByOutputs());
+			float rate;
+			if (rateType == RateType.Auto)
+			{
+				rate = GetRateRequiredByOutputs();
+			}
+			else
+			{
+				rate = manualRate;
+			}
 			return rate * BaseRecipe.Ingredients[item];
 		}
 
@@ -206,7 +224,15 @@ namespace Foreman
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = GetRateAllowedByInputs();
+			float rate;
+			if (rateType == RateType.Auto)
+			{
+				rate = GetRateAllowedByInputs();
+			}
+			else
+			{
+				rate = manualRate;
+			}
 			return BaseRecipe.Results[item] * rate;
 		}
 
@@ -215,7 +241,7 @@ namespace Foreman
 		{
 			if (Graph.SelectedAmountType == AmountType.FixedAmount)
 			{
-				return (float)Math.Ceiling(amount - 0.00001f); //Subtracting a very small number stops the amount from getting rounded up due to FP errors. It's a bit hacky but it works for now.
+				return (float)Math.Ceiling(Math.Round(amount, 4)); //Subtracting a very small number stops the amount from getting rounded up due to FP errors. It's a bit hacky but it works for now.
 			}
 			else
 			{
@@ -308,7 +334,6 @@ namespace Foreman
 	public class SupplyNode : ProductionNode
 	{
 		public Item SuppliedItem { get; private set; }
-		public float SupplyAmount = float.PositiveInfinity;
 
 		protected SupplyNode(Item item, ProductionGraph graph)
 			: base(graph)
@@ -341,12 +366,19 @@ namespace Foreman
 
 		public override float GetExcessOutput(Item item)
 		{
-			float excessSupply = SupplyAmount;
-			foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
+			if (rateType == RateType.Auto)
 			{
-				excessSupply -= link.Amount;
+				return 0f;
 			}
-			return excessSupply;
+			else
+			{
+				float excessSupply = manualRate;
+				foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
+				{
+					excessSupply -= link.Amount;
+				}
+				return excessSupply;
+			}
 		}
 
 		public override float GetRequiredInput(Item item)
@@ -356,7 +388,14 @@ namespace Foreman
 
 		public override float GetTotalOutput(Item item)
 		{
-			return SupplyAmount;
+			if (rateType == RateType.Auto)
+			{
+				return float.PositiveInfinity;
+			}
+			else
+			{
+				return manualRate;
+			}
 		}
 
 		public override string DisplayName
@@ -404,14 +443,14 @@ namespace Foreman
 		{
 			info.AddValue("NodeType", "Supply");
 			info.AddValue("ItemName", SuppliedItem.Name);
-			info.AddValue("SupplyAmount", SupplyAmount);
+			info.AddValue("rateType", rateType);
+			info.AddValue("manualAmount", manualRate);
 		}
 	}
 
 	public class ConsumerNode : ProductionNode
 	{
 		public Item ConsumedItem { get; private set; }
-		public float ConsumptionAmount = 1f;
 
 		public override string DisplayName
 		{
@@ -432,16 +471,25 @@ namespace Foreman
 			: base(graph)
 		{
 			ConsumedItem = item;
+			rateType = RateType.Manual;
+			manualRate = 1f;
 		}
 
 		public override float GetUnsatisfiedDemand(Item item)
 		{
-			float excessDemand = ConsumptionAmount;
-			foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
+			if (rateType == RateType.Auto)
 			{
-				excessDemand -= link.Amount;
+				return 0f;
 			}
-			return excessDemand;
+			else
+			{
+				float excessDemand = manualRate;
+				foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
+				{
+					excessDemand -= link.Amount;
+				}
+				return excessDemand;
+			}
 		}
 
 		public override float GetExcessOutput(Item item)
@@ -451,7 +499,14 @@ namespace Foreman
 
 		public override float GetRequiredInput(Item item)
 		{
-			return ConsumptionAmount;
+			if (rateType == RateType.Auto)
+			{
+				return 0f;
+			}
+			else
+			{
+				return manualRate;
+			}
 		}
 
 		public override float GetTotalOutput(Item item)
@@ -471,7 +526,8 @@ namespace Foreman
 		{
 			info.AddValue("NodeType", "Consumer");
 			info.AddValue("ItemName", ConsumedItem.Name);
-			info.AddValue("ConsumptionAmount", ConsumptionAmount);
+			info.AddValue("rateType", rateType);
+			info.AddValue("manualRate", manualRate);
 		}
 	}
 }

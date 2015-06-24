@@ -439,7 +439,7 @@ namespace Foreman
 
 			editorBox = new TextBox();
 			editedItem = item;
-			float amountToShow = (DisplayedNode as ConsumerNode).ConsumptionAmount;
+			float amountToShow = (DisplayedNode as ConsumerNode).manualRate;
 			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerMinute)
 			{
 				amountToShow *= 60;
@@ -479,7 +479,7 @@ namespace Foreman
 				{
 					amount /= 60;
 				}
-				(DisplayedNode as ConsumerNode).ConsumptionAmount = amount;
+				(DisplayedNode as ConsumerNode).manualRate = amount;
 				Parent.UpdateNodes();
 				Parent.Invalidate();
 			}
