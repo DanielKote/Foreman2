@@ -71,17 +71,32 @@ namespace Foreman
 
 		public override bool Equals(object obj)
 		{
-			if (obj == null)
+			if (!(obj is Recipe))
+			{
+				return false;
+			}
+			
+			return (obj as Recipe) == this;
+		}
+
+		public static bool operator ==(Recipe recipe1, Recipe recipe2)
+		{
+			if (object.ReferenceEquals(recipe1, recipe2))
+			{
+				return true;
+			}
+
+			if ((object)recipe1 == null || (object)recipe2 == null)
 			{
 				return false;
 			}
 
-			if (obj is Recipe)
-			{
-				return (obj as Recipe).Name == this.Name;
-			}
+			return recipe1.Name == recipe2.Name;
+		}
 
-			return false;
+		public static bool operator !=(Recipe recipe1, Recipe recipe2)
+		{
+			return !(recipe1 == recipe2);
 		}
 	}
 }

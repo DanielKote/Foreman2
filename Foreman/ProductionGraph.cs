@@ -96,35 +96,34 @@ namespace Foreman
 
 		public void SatisfyAllItemDemands()
 		{
-			bool nodeChosen;
+			bool graphChanged;
 
 			do
 			{
-				nodeChosen = false;
+				graphChanged = false;
 
 				foreach (ProductionNode node in Nodes.ToList())
 				{
 					foreach (Item item in node.Inputs)
 					{
-						if (Math.Round(node.GetUnsatisfiedDemand(item), 4) > 0)
+						if (!node.InputLinks.Any(l => l.Item == item))
 						{
-							nodeChosen = true;
-							AutoSatisfyNodeDemand(node, item);
-							break;
+							CreateAppropriateLink(node, item);
+							graphChanged = true;
 						}
 					}
 				}
-			} while (nodeChosen);
+			} while (graphChanged);
 		}
 
-		public void AutoSatisfyNodeDemand(ProductionNode node, Item item)
+		public void CreateAppropriateLink(ProductionNode node, Item item)
 		{
-			if (node.InputLinks.Any(l => l.Item == item))	//Increase throughput of existing node link
+			if (node is RecipeNode && CyclicRecipes.Contains((node as RecipeNode).BaseRecipe))
 			{
-				NodeLink link = node.InputLinks.First(l => l.Item == item);
-				//link.Amount += node.GetExcessDemand(item);
+				return;
 			}
-			else if (Nodes.Any(n => n.Outputs.Contains(item)))	//Add link from existing node
+
+			if (Nodes.Any(n => n.Outputs.Contains(item)))	//Add link from existing node
 			{
 				ProductionNode existingNode = Nodes.Find(n => n.Outputs.Contains(item));
 				NodeLink.Create(existingNode, node, item);
@@ -134,7 +133,7 @@ namespace Foreman
 				RecipeNode newNode = RecipeNode.Create(item.Recipes.First(r => !CyclicRecipes.Contains(r)), this);
 				NodeLink.Create(newNode, node, item);
 			}
-			else	//Create new supply node and link from it
+			else //Create new supply node and link from it
 			{
 				SupplyNode newNode = SupplyNode.Create(item, this);
 				NodeLink.Create(newNode, node, item, node.GetUnsatisfiedDemand(item));

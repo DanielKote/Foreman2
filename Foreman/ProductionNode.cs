@@ -480,7 +480,7 @@ namespace Foreman
 		{
 			if (rateType == RateType.Auto)
 			{
-				return 0f;
+				return float.PositiveInfinity;
 			}
 			else
 			{
@@ -502,7 +502,7 @@ namespace Foreman
 		{
 			if (rateType == RateType.Auto)
 			{
-				return 0f;
+				return float.PositiveInfinity;
 			}
 			else
 			{
