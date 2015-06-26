@@ -17,7 +17,7 @@ namespace Foreman
 
 			foreach (Module module in modules.OfType<Module>())
 			{
-				speed += module.SpeedBonus;
+				speed += module.SpeedBonus * assembler.Speed;
 			}
 
 			return 1 / timeDivisor * speed;
