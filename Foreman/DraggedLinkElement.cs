@@ -176,6 +176,7 @@ namespace Foreman
 				});
 			}
 
+			Parent.Graph.UpdateNodeValues();
 			Parent.AddRemoveElements();
 			Parent.UpdateNodes();
 			Dispose();

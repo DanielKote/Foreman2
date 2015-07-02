@@ -152,6 +152,8 @@ namespace Foreman
 					}
 				});
 			}
+
+			GraphViewer.Graph.UpdateNodeValues();
 		}
 
 		private void rateButton_CheckedChanged(object sender, EventArgs e)
@@ -165,6 +167,7 @@ namespace Foreman
 			{
 				rateOptionsDropDown.Enabled = false;
 			}
+			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
 		}
@@ -182,6 +185,7 @@ namespace Foreman
 				= AssemblerDisplayCheckBox.Checked
 				= !(sender as RadioButton).Checked;
 
+			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
 		}
@@ -192,15 +196,14 @@ namespace Foreman
 			{
 				case 0:
 					GraphViewer.Graph.SelectedUnit = RateUnit.PerSecond;
-					GraphViewer.Invalidate();
-					GraphViewer.UpdateNodes();
 					break;
 				case 1:
 					GraphViewer.Graph.SelectedUnit = RateUnit.PerMinute;
-					GraphViewer.Invalidate();
-					GraphViewer.UpdateNodes();
 					break;
 			}
+			GraphViewer.Graph.UpdateNodeValues();
+			GraphViewer.Invalidate();
+			GraphViewer.UpdateNodes();
 		}
 
 		private void AutomaticCompleteButton_Click(object sender, EventArgs e)
@@ -221,15 +224,15 @@ namespace Foreman
 		private void AssemblerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
-			GraphViewer.UpdateNodes();
 			GraphViewer.Graph.UpdateNodeValues();
+			GraphViewer.UpdateNodes();
 		}
 
 		private void SingleAssemblerPerRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.Graph.OneAssemblerPerRecipe = (sender as CheckBox).Checked;
-			GraphViewer.UpdateNodes();
 			GraphViewer.Graph.UpdateNodeValues();
+			GraphViewer.UpdateNodes();
 		}
 
 		private void ExportImageButton_Click(object sender, EventArgs e)
@@ -241,8 +244,8 @@ namespace Foreman
 		private void MinerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
-			GraphViewer.UpdateNodes();
 			GraphViewer.Graph.UpdateNodeValues();
+			GraphViewer.UpdateNodes();
 		}
 
 		private void ItemListView_SelectedIndexChanged(object sender, EventArgs e)

@@ -665,6 +665,7 @@ namespace Foreman
 								newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
 							}
 
+							Graph.UpdateNodeValues();
 							newElement.Update();
 							newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						}

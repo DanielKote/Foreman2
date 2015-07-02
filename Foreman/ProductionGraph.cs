@@ -203,19 +203,7 @@ namespace Foreman
 
 			ReplaceCycles();
 		}
-
-		public void CreateRecipeNodeToSatisfyItemDemand(ProductionNode node, Item item, Recipe recipe)
-		{
-			RecipeNode newNode = RecipeNode.Create(recipe, this);
-			NodeLink.Create(newNode, node, item, node.GetUnsatisfiedDemand(item));
-		}
-
-		public void CreateSupplyNodeToSatisfyItemDemand(ProductionNode node, Item item)
-		{
-			SupplyNode newNode = SupplyNode.Create(item, node.Graph);
-			NodeLink.Create(newNode, node, item, node.GetUnsatisfiedDemand(item));
-		}
-
+		
 		//Replace recipe cycles with a simple supplier node so that they don't cause infinite loops. This is a workaround.
 		public void ReplaceCycles()
 		{
