@@ -978,7 +978,14 @@ namespace Foreman
 					float amount = 0f;
 						if (resultTable["amount"] != null)
 						{
-							results.Add(result, ReadLuaFloat(resultTable, "amount"));
+							if (results.ContainsKey(result))
+							{
+								results[result] += ReadLuaFloat(resultTable, "amount");
+							}
+							else
+							{
+								results.Add(result, ReadLuaFloat(resultTable, "amount"));
+							}
 						}
 						else if (resultTable["probability"] != null)
 						{
