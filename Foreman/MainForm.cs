@@ -205,7 +205,8 @@ namespace Foreman
 
 		private void AutomaticCompleteButton_Click(object sender, EventArgs e)
 		{
-			GraphViewer.Graph.SatisfyAllItemDemands();
+			GraphViewer.Graph.LinkUpAllInputs();
+			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.AddRemoveElements();
 			GraphViewer.PositionNodes();
 		}

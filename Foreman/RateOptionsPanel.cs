@@ -32,7 +32,7 @@ namespace Foreman
 				fixedTextBox.Enabled = true;
 			}
 
-			float amountToShow = baseNode.manualRate;
+			float amountToShow = baseNode.actualRate;
 			if (GraphViewer.Graph.SelectedAmountType == AmountType.Rate)
 			{
 				fixedTextBox.Width = 65;
@@ -79,7 +79,7 @@ namespace Foreman
 				{
 					newAmount /= 60;
 				}
-				BaseNode.manualRate = newAmount;
+				BaseNode.actualRate = newAmount;
 				GraphViewer.UpdateNodes();
 			}
 		}

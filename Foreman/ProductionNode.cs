@@ -24,7 +24,7 @@ namespace Foreman
 		public abstract float GetTotalOutput(Item item);
 		public abstract float GetRequiredInput(Item item);
 		public RateType rateType = RateType.Auto;
-		public float manualRate = 1f;
+		public float actualRate = 0f;
 
 		protected ProductionNode(ProductionGraph graph)
 		{
@@ -190,7 +190,7 @@ namespace Foreman
 			}
 			else
 			{
-				rate = manualRate;
+				rate = actualRate;
 			}
 			float itemRate = (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
 			return (float)Math.Round(itemRate, RoundingDP);
@@ -207,34 +207,24 @@ namespace Foreman
 
 		public override float GetRequiredInput(Item item)
 		{
-			if (BaseRecipe.IsMissingRecipe) return 0f;
-
-			float rate;
-			if (rateType == RateType.Auto)
+			if (BaseRecipe.IsMissingRecipe
+				|| !BaseRecipe.Ingredients.ContainsKey(item))
 			{
-				rate = GetRateRequiredByOutputs();
+				return 0f;
 			}
-			else
-			{
-				rate = manualRate;
-			}
-			return (float)Math.Round(rate * BaseRecipe.Ingredients[item], RoundingDP);
+						
+			return (float)Math.Round(actualRate * BaseRecipe.Ingredients[item], RoundingDP);
 		}
 
 		public override float GetTotalOutput(Item item)
 		{
-			if (BaseRecipe.IsMissingRecipe) return 0f;
+			if (BaseRecipe.IsMissingRecipe
+				|| !BaseRecipe.Results.ContainsKey(item))
+			{
+				return 0f;
+			}
 
-			float rate;
-			if (rateType == RateType.Auto)
-			{
-				rate = GetRateAllowedByInputs();
-			}
-			else
-			{
-				rate = manualRate;
-			}
-			return (float)Math.Round(BaseRecipe.Results[item] * rate, RoundingDP);
+			return (float)Math.Round(BaseRecipe.Results[item] * actualRate, RoundingDP);
 		}
 
 		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
@@ -255,6 +245,11 @@ namespace Foreman
 			var results = new Dictionary<MachinePermutation, int>();
 
 			double requiredRate = GetRateRequiredByOutputs();
+			if (requiredRate == double.PositiveInfinity)
+			{
+				return results;
+			}
+
 			List<Assembler> allowedAssemblers = DataCache.Assemblers.Values
 				.Where(a => a.Enabled)
 				.Where(a => a.Categories.Contains(BaseRecipe.Category))
@@ -373,7 +368,7 @@ namespace Foreman
 			}
 			else
 			{
-				float excessSupply = manualRate;
+				float excessSupply = actualRate;
 				foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
 				{
 					excessSupply -= link.Amount;
@@ -389,13 +384,13 @@ namespace Foreman
 
 		public override float GetTotalOutput(Item item)
 		{
-			if (rateType == RateType.Auto)
+			if (SuppliedItem != item)
 			{
-				return float.PositiveInfinity;
+				return 0f;
 			}
 			else
 			{
-				return (float)Math.Round(manualRate, RoundingDP);
+				return (float)Math.Round(actualRate, RoundingDP);
 			}
 		}
 
@@ -445,7 +440,7 @@ namespace Foreman
 			info.AddValue("NodeType", "Supply");
 			info.AddValue("ItemName", SuppliedItem.Name);
 			info.AddValue("rateType", rateType);
-			info.AddValue("manualAmount", manualRate);
+			info.AddValue("manualAmount", actualRate);
 		}
 	}
 
@@ -473,18 +468,18 @@ namespace Foreman
 		{
 			ConsumedItem = item;
 			rateType = RateType.Manual;
-			manualRate = 1f;
+			actualRate = 1f;
 		}
 
 		public override float GetUnsatisfiedDemand(Item item)
 		{
 			if (rateType == RateType.Auto)
 			{
-				return float.PositiveInfinity;
+				return 0f;
 			}
 			else
 			{
-				float excessDemand = manualRate;
+				float excessDemand = actualRate;
 				foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
 				{
 					excessDemand -= link.Amount;
@@ -500,13 +495,14 @@ namespace Foreman
 
 		public override float GetRequiredInput(Item item)
 		{
-			if (rateType == RateType.Auto)
+			if (rateType == RateType.Auto
+				|| ConsumedItem != item)
 			{
-				return float.PositiveInfinity;
+				return 0f;
 			}
 			else
 			{
-				return (float)Math.Round(manualRate, RoundingDP);
+				return (float)Math.Round(actualRate, RoundingDP);
 			}
 		}
 
@@ -528,7 +524,7 @@ namespace Foreman
 			info.AddValue("NodeType", "Consumer");
 			info.AddValue("ItemName", ConsumedItem.Name);
 			info.AddValue("rateType", rateType);
-			info.AddValue("manualRate", manualRate);
+			info.AddValue("manualRate", actualRate);
 		}
 	}
 }

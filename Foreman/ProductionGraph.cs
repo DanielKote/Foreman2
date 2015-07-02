@@ -94,7 +94,7 @@ namespace Foreman
 			}
 		}
 
-		public void SatisfyAllItemDemands()
+		public void LinkUpAllInputs()
 		{
 			bool graphChanged;
 
@@ -109,11 +109,59 @@ namespace Foreman
 						if (!node.InputLinks.Any(l => l.Item == item))
 						{
 							CreateAppropriateLink(node, item);
-							graphChanged = true;
+							//graphChanged = true;
 						}
 					}
 				}
 			} while (graphChanged);
+		}
+
+		public void UpdateNodeValues()
+		{
+			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Auto))
+			{
+				node.actualRate = 0f;
+			}
+
+			foreach (ProductionNode startingNode in Nodes.Where(n => n.rateType == RateType.Manual))
+			{
+				Stack<NodeLink> routeHome = new Stack<NodeLink>();	//The links we need to take to get back to the starting node
+				int[] linkIndices = new int[Nodes.Count];	//The size of this array just needs to be bigger than the number of hops from the starting node to the bottom of the graph
+
+				ProductionNode currentNode = startingNode;
+
+				do
+				{
+					if (linkIndices[routeHome.Count()] < currentNode.InputLinks.Count())
+					{
+						NodeLink nextLink = currentNode.InputLinks[linkIndices[routeHome.Count()]];
+						linkIndices[routeHome.Count()]++;
+						if (nextLink.Supplier.rateType == RateType.Auto)
+						{
+							routeHome.Push(nextLink);
+							float itemAmountNeeded = currentNode.GetRequiredInput(nextLink.Item);
+							currentNode = nextLink.Supplier;
+							if (currentNode is RecipeNode)
+							{
+								currentNode.actualRate += itemAmountNeeded / (currentNode as RecipeNode).BaseRecipe.Results[nextLink.Item];
+							}	
+							else
+							{
+								currentNode.actualRate += itemAmountNeeded; //THIS NEEDS TO BE LOWER IF NODE IS A RECIPE NODE WITH OUTPUT FOR THIS ITEM > 1
+							}
+						}
+					}
+					else
+					{
+						if (routeHome.Any())
+						{
+							linkIndices[routeHome.Count()] = 0;
+							currentNode = routeHome.Pop().Consumer;
+						}
+					}
+
+				} while (!(currentNode == startingNode && linkIndices[0] >= startingNode.InputLinks.Count()));
+			}
 		}
 
 		public void CreateAppropriateLink(ProductionNode node, Item item)
@@ -122,7 +170,7 @@ namespace Foreman
 			{
 				return;
 			}
-
+			
 			if (Nodes.Any(n => n.Outputs.Contains(item)))	//Add link from existing node
 			{
 				ProductionNode existingNode = Nodes.Find(n => n.Outputs.Contains(item));
