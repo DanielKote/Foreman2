@@ -22,9 +22,11 @@ namespace Foreman
 		public abstract float GetExcessOutput(Item item);
 		public abstract float GetUnsatisfiedDemand(Item item);
 		public abstract float GetTotalOutput(Item item);
-		public abstract float GetRequiredInput(Item item);
+		public abstract float GetTotalDemand(Item item);
+		public abstract float GetRateLimitedByInputs();
 		public RateType rateType = RateType.Auto;
 		public float actualRate = 0f;
+		public float desiredRate = 0f;
 
 		protected ProductionNode(ProductionGraph graph)
 		{
@@ -155,16 +157,16 @@ namespace Foreman
 			return node;
 		}
 
-		public float GetRateAllowedByInputs()
+		public override float GetRateLimitedByInputs()
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = float.PositiveInfinity;
-			foreach (Item inputItem in BaseRecipe.Ingredients.Keys)
+			float total = float.PositiveInfinity;
+			foreach (Item inputItem in Inputs)
 			{
-				rate = Math.Min(rate, GetTotalInput(inputItem) / BaseRecipe.Ingredients[inputItem]);
+				total = Math.Min(total, GetTotalInput(inputItem) / BaseRecipe.Ingredients[inputItem]);
 			}
-			return ValidateRecipeRate(rate);
+			return ValidateRecipeRate(total);
 		}
 
 		public float GetRateRequiredByOutputs()
@@ -183,16 +185,7 @@ namespace Foreman
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate;
-			if (rateType == RateType.Auto)
-			{
-				rate = GetRateRequiredByOutputs();
-			}
-			else
-			{
-				rate = actualRate;
-			}
-			float itemRate = (rate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
+			float itemRate = (desiredRate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
 			return (float)Math.Round(itemRate, RoundingDP);
 		}
 
@@ -200,12 +193,12 @@ namespace Foreman
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = GetRateAllowedByInputs();
+			float rate = GetRateLimitedByInputs();
 			float itemRate = (rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
 			return (float)Math.Round(itemRate, RoundingDP);
 		}
 
-		public override float GetRequiredInput(Item item)
+		public override float GetTotalDemand(Item item)
 		{
 			if (BaseRecipe.IsMissingRecipe
 				|| !BaseRecipe.Ingredients.ContainsKey(item))
@@ -213,7 +206,7 @@ namespace Foreman
 				return 0f;
 			}
 						
-			return (float)Math.Round(actualRate * BaseRecipe.Ingredients[item], RoundingDP);
+			return (float)Math.Round(desiredRate * BaseRecipe.Ingredients[item], RoundingDP);
 		}
 
 		public override float GetTotalOutput(Item item)
@@ -355,6 +348,11 @@ namespace Foreman
 			return node;
 		}
 
+		public override float GetRateLimitedByInputs()
+		{
+			return actualRate;
+		}
+
 		public override float GetUnsatisfiedDemand(Item item)
 		{
 			return 0f;
@@ -377,7 +375,7 @@ namespace Foreman
 			}
 		}
 
-		public override float GetRequiredInput(Item item)
+		public override float GetTotalDemand(Item item)
 		{
 			return 0f;
 		}
@@ -471,21 +469,14 @@ namespace Foreman
 			actualRate = 1f;
 		}
 
+		public override float GetRateLimitedByInputs()
+		{
+			return GetTotalInput(ConsumedItem);
+		}
+
 		public override float GetUnsatisfiedDemand(Item item)
 		{
-			if (rateType == RateType.Auto)
-			{
-				return 0f;
-			}
-			else
-			{
-				float excessDemand = actualRate;
-				foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
-				{
-					excessDemand -= link.Amount;
-				}
-				return (float)Math.Round(excessDemand, RoundingDP);
-			}
+			return (float)Math.Round(desiredRate - GetTotalInput(item), RoundingDP);
 		}
 
 		public override float GetExcessOutput(Item item)
@@ -493,16 +484,15 @@ namespace Foreman
 			return 0;
 		}
 
-		public override float GetRequiredInput(Item item)
+		public override float GetTotalDemand(Item item)
 		{
-			if (rateType == RateType.Auto
-				|| ConsumedItem != item)
+			if (ConsumedItem != item)
 			{
 				return 0f;
 			}
 			else
 			{
-				return (float)Math.Round(actualRate, RoundingDP);
+				return (float)Math.Round(desiredRate, RoundingDP);
 			}
 		}
 

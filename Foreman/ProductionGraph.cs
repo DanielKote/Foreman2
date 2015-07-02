@@ -118,11 +118,17 @@ namespace Foreman
 
 		public void UpdateNodeValues()
 		{
+			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Manual))
+			{
+				node.desiredRate = node.actualRate;
+			}
+
 			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Auto))
 			{
 				node.actualRate = 0f;
 			}
 
+			// Go down the list and increase each auto node's production rate to satisfy every manual node
 			foreach (ProductionNode startingNode in Nodes.Where(n => n.rateType == RateType.Manual))
 			{
 				Stack<NodeLink> routeHome = new Stack<NodeLink>();	//The links we need to take to get back to the starting node
@@ -139,9 +145,9 @@ namespace Foreman
 						if (nextLink.Supplier.rateType == RateType.Auto)
 						{
 							routeHome.Push(nextLink);
-							float itemAmountNeeded = currentNode.GetRequiredInput(nextLink.Item);
+							float itemAmountNeeded = currentNode.GetTotalDemand(nextLink.Item);
 							currentNode = nextLink.Supplier;
-							if (currentNode is RecipeNode)
+							if (currentNode is RecipeNode && !(currentNode as RecipeNode).BaseRecipe.IsMissingRecipe)
 							{
 								currentNode.actualRate += itemAmountNeeded / (currentNode as RecipeNode).BaseRecipe.Results[nextLink.Item];
 							}
@@ -149,6 +155,7 @@ namespace Foreman
 							{
 								currentNode.actualRate += itemAmountNeeded;
 							}
+							currentNode.desiredRate = currentNode.actualRate;
 						}
 					}
 					else
@@ -161,6 +168,13 @@ namespace Foreman
 					}
 
 				} while (!(currentNode == startingNode && linkIndices[0] >= startingNode.InputLinks.Count()));
+			}
+
+			//Go up the list and make each node go as fast as it can, given the amounts being input to it
+			var sortedNodes = GetTopologicalSort();
+			foreach (var node in sortedNodes.Where(n => n.rateType == RateType.Auto))
+			{
+				node.actualRate = node.GetRateLimitedByInputs();
 			}
 		}
 
