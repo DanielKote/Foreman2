@@ -222,12 +222,14 @@ namespace Foreman
 		{
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
 			GraphViewer.UpdateNodes();
+			GraphViewer.Graph.UpdateNodeValues();
 		}
 
 		private void SingleAssemblerPerRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.Graph.OneAssemblerPerRecipe = (sender as CheckBox).Checked;
 			GraphViewer.UpdateNodes();
+			GraphViewer.Graph.UpdateNodeValues();
 		}
 
 		private void ExportImageButton_Click(object sender, EventArgs e)
@@ -240,6 +242,7 @@ namespace Foreman
 		{
 			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
 			GraphViewer.UpdateNodes();
+			GraphViewer.Graph.UpdateNodeValues();
 		}
 
 		private void ItemListView_SelectedIndexChanged(object sender, EventArgs e)

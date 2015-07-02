@@ -67,6 +67,7 @@ namespace Foreman
 			{
 				BaseNode.rateType = RateType.Auto;
 			}
+			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.UpdateNodes();
 		}
 
@@ -80,6 +81,7 @@ namespace Foreman
 					newAmount /= 60;
 				}
 				BaseNode.actualRate = newAmount;
+				GraphViewer.Graph.UpdateNodeValues();
 				GraphViewer.UpdateNodes();
 			}
 		}
@@ -89,6 +91,7 @@ namespace Foreman
 			if (e.KeyCode == Keys.Enter)
 			{
 				GraphViewer.ClearFloatingControls();
+				GraphViewer.Graph.UpdateNodeValues();
 				GraphViewer.UpdateNodes();
 			}
 		}

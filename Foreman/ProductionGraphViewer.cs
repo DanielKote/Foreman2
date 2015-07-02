@@ -564,6 +564,7 @@ namespace Foreman
 				}
 				Elements.Remove(node);
 				node.DisplayedNode.Destroy();
+				Graph.UpdateNodeValues();
 				UpdateNodes();
 				Invalidate();
 			}
@@ -812,6 +813,7 @@ namespace Foreman
 				module.Enabled = EnabledModules.Contains(module.Name);
 			}
 
+			Graph.UpdateNodeValues();
 			AddRemoveElements();
 
 			List<String> ElementLocations = json["ElementLocations"].Select(l => (String)l).ToList();

@@ -144,10 +144,10 @@ namespace Foreman
 							if (currentNode is RecipeNode)
 							{
 								currentNode.actualRate += itemAmountNeeded / (currentNode as RecipeNode).BaseRecipe.Results[nextLink.Item];
-							}	
+							}
 							else
 							{
-								currentNode.actualRate += itemAmountNeeded; //THIS NEEDS TO BE LOWER IF NODE IS A RECIPE NODE WITH OUTPUT FOR THIS ITEM > 1
+								currentNode.actualRate += itemAmountNeeded;
 							}
 						}
 					}
