@@ -24,6 +24,7 @@ namespace Foreman
 		public abstract float GetTotalOutput(Item item);
 		public abstract float GetTotalDemand(Item item);
 		public abstract float GetRateLimitedByInputs();
+		public abstract float GetRateDemandedByOutputs();
 		public RateType rateType = RateType.Auto;
 		public float actualRate = 0f;
 		public float desiredRate = 0f;
@@ -48,7 +49,7 @@ namespace Foreman
 			float total = 0f;
 			foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
 			{
-				total += link.Amount;
+				total += link.Throughput;
 			}
 			return (float)Math.Round(total, RoundingDP);
 		}
@@ -58,7 +59,7 @@ namespace Foreman
 			float total = 0f;
 			foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
 			{
-				total += link.Amount;
+				total += link.Throughput;
 			}
 			return (float)Math.Round(total, RoundingDP);
 		}
@@ -169,22 +170,22 @@ namespace Foreman
 			return ValidateRecipeRate(total);
 		}
 
-		public float GetRateRequiredByOutputs()
+		public override float GetRateDemandedByOutputs()
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = 0;
+			float total = 0f;
 			foreach (Item outputItem in BaseRecipe.Results.Keys)
 			{
-				rate = Math.Max(rate, GetRequiredOutput(outputItem) / BaseRecipe.Results[outputItem]);
+				total = Math.Max(total, GetRequiredOutput(outputItem) / BaseRecipe.Results[outputItem]);
 			}
-			return ValidateRecipeRate(rate);
+			return ValidateRecipeRate(total);
 		}
 
 		public override float GetUnsatisfiedDemand(Item item)
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
-
+			
 			float itemRate = (desiredRate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
 			return (float)Math.Round(itemRate, RoundingDP);
 		}
@@ -237,7 +238,7 @@ namespace Foreman
 		{
 			var results = new Dictionary<MachinePermutation, int>();
 
-			double requiredRate = GetRateRequiredByOutputs();
+			double requiredRate = GetRateDemandedByOutputs();
 			if (requiredRate == double.PositiveInfinity)
 			{
 				return results;
@@ -353,6 +354,16 @@ namespace Foreman
 			return actualRate;
 		}
 
+		public override float GetRateDemandedByOutputs()
+		{
+			float total = 0f;
+			foreach (NodeLink link in OutputLinks)
+			{
+				total += link.Demand;
+			}
+			return total;
+		}
+
 		public override float GetUnsatisfiedDemand(Item item)
 		{
 			return 0f;
@@ -369,7 +380,7 @@ namespace Foreman
 				float excessSupply = actualRate;
 				foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
 				{
-					excessSupply -= link.Amount;
+					excessSupply -= link.Throughput;
 				}
 				return (float)Math.Round(excessSupply, RoundingDP);
 			}
@@ -472,6 +483,11 @@ namespace Foreman
 		public override float GetRateLimitedByInputs()
 		{
 			return GetTotalInput(ConsumedItem);
+		}
+
+		public override float GetRateDemandedByOutputs()
+		{
+			return 0f;
 		}
 
 		public override float GetUnsatisfiedDemand(Item item)

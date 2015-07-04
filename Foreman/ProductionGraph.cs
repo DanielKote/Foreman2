@@ -125,14 +125,19 @@ namespace Foreman
 
 			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Auto))
 			{
-				node.actualRate = 0f;
+				node.actualRate = node.desiredRate = 0f;
+			}
+
+			foreach (NodeLink link in GetAllNodeLinks())
+			{
+				link.Throughput = 0f;
 			}
 
 			// Go down the list and increase each auto node's production rate to satisfy every manual node
 			foreach (ProductionNode startingNode in Nodes.Where(n => n.rateType == RateType.Manual))
 			{
 				Stack<NodeLink> routeHome = new Stack<NodeLink>();	//The links we need to take to get back to the starting node
-				int[] linkIndices = new int[Nodes.Count];	//The size of this array just needs to be bigger than the number of hops from the starting node to the bottom of the graph
+				int[] linkIndices = new int[Nodes.Count];	//Record which link we took at each tier of the depth-first traversal. Increment it when we go back up from that tier and reset it to 0 when we go down a tier.
 
 				ProductionNode currentNode = startingNode;
 
@@ -145,16 +150,10 @@ namespace Foreman
 						if (nextLink.Supplier.rateType == RateType.Auto)
 						{
 							routeHome.Push(nextLink);
-							float itemAmountNeeded = currentNode.GetTotalDemand(nextLink.Item);
+							nextLink.Throughput += currentNode.GetUnsatisfiedDemand(nextLink.Item);
+
 							currentNode = nextLink.Supplier;
-							if (currentNode is RecipeNode && !(currentNode as RecipeNode).BaseRecipe.IsMissingRecipe)
-							{
-								currentNode.actualRate += itemAmountNeeded / (currentNode as RecipeNode).BaseRecipe.Results[nextLink.Item];
-							}
-							else
-							{
-								currentNode.actualRate += itemAmountNeeded;
-							}
+							currentNode.actualRate = currentNode.GetRateDemandedByOutputs();
 							currentNode.desiredRate = currentNode.actualRate;
 						}
 					}
@@ -172,8 +171,31 @@ namespace Foreman
 
 			//Go up the list and make each node go as fast as it can, given the amounts being input to it
 			var sortedNodes = GetTopologicalSort();
-			foreach (var node in sortedNodes.Where(n => n.rateType == RateType.Auto))
+			foreach (var node in sortedNodes)
 			{
+				if (node.rateType == RateType.Auto)
+				{
+					node.actualRate = node.GetRateLimitedByInputs();
+				}
+				foreach (Item item in node.Outputs)
+				{
+					float remainingOutput = node.GetTotalOutput(item);
+					foreach (NodeLink link in node.OutputLinks.Where(l => l.Item == item))
+					{
+						link.Throughput = Math.Min(link.Throughput, remainingOutput);
+						remainingOutput -= link.Throughput;
+					}
+				}
+			}
+
+			//Find any remaining auto nodes with rate = 0 and make them use as many items as they can
+			//These nodes are probably nodes at the top of the flowchart with nothing above them demanding items
+			foreach (var node in sortedNodes.Where(n => n.rateType == RateType.Auto && n.actualRate == 0))
+			{
+				foreach (NodeLink link in node.InputLinks)
+				{
+					link.Throughput = link.Supplier.GetTotalOutput(link.Item) - link.Supplier.GetUsedOutput(link.Item);
+				}
 				node.actualRate = node.GetRateLimitedByInputs();
 			}
 		}

@@ -19,13 +19,7 @@ namespace Foreman
 				return Consumer.GetTotalDemand(Item) / Consumer.InputLinks.Where(l => l.Item == Item).Count();
 			}
 		}
-		public float Amount
-		{
-			get
-			{
-				return Math.Min(Supplier.GetTotalOutput(Item), Demand);
-			}
-		}
+		public float Throughput;
 
 		private NodeLink(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
 		{
