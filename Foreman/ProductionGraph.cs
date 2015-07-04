@@ -109,7 +109,7 @@ namespace Foreman
 						if (!node.InputLinks.Any(l => l.Item == item))
 						{
 							CreateAppropriateLink(node, item);
-							//graphChanged = true;
+							graphChanged = true;
 						}
 					}
 				}
