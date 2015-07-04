@@ -108,8 +108,10 @@ namespace Foreman
 					{
 						if (!node.InputLinks.Any(l => l.Item == item))
 						{
-							CreateAppropriateLink(node, item);
-							graphChanged = true;
+							if (CreateAppropriateLink(node, item))
+							{
+								graphChanged = true;
+							}
 						}
 					}
 				}
@@ -213,16 +215,21 @@ namespace Foreman
 			}
 		}
 
-		public void CreateAppropriateLink(ProductionNode node, Item item)
+		//Returns true if a new link was created
+		public bool CreateAppropriateLink(ProductionNode node, Item item)
 		{
 			if (node is RecipeNode && CyclicRecipes.Contains((node as RecipeNode).BaseRecipe))
 			{
-				return;
+				return false;
 			}
 			
 			if (Nodes.Any(n => n.Outputs.Contains(item)))	//Add link from existing node
 			{
 				ProductionNode existingNode = Nodes.Find(n => n.Outputs.Contains(item));
+				if (existingNode == node)
+				{
+					return false;
+				}
 				NodeLink.Create(existingNode, node, item);
 			}
 			else if (item.Recipes.Any(r => !CyclicRecipes.Contains(r)))	//Create new recipe node and link from it
@@ -237,6 +244,7 @@ namespace Foreman
 			}
 
 			ReplaceCycles();
+			return true;
 		}
 		
 		//Replace recipe cycles with a simple supplier node so that they don't cause infinite loops. This is a workaround.
