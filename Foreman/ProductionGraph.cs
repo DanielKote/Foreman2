@@ -156,6 +156,10 @@ namespace Foreman
 							currentNode.actualRate = currentNode.GetRateDemandedByOutputs();
 							currentNode.desiredRate = currentNode.actualRate;
 						}
+						else
+						{
+							nextLink.Throughput += Math.Min(nextLink.Supplier.GetUnusedOutput(nextLink.Item), currentNode.GetUnsatisfiedDemand(nextLink.Item));
+						}
 					}
 					else
 					{
@@ -190,13 +194,22 @@ namespace Foreman
 
 			//Find any remaining auto nodes with rate = 0 and make them use as many items as they can
 			//These nodes are probably nodes at the top of the flowchart with nothing above them demanding items
-			foreach (var node in sortedNodes.Where(n => n.rateType == RateType.Auto && n.actualRate == 0))
+			foreach (var node in sortedNodes.Where(n => n.rateType == RateType.Auto && n.desiredRate == 0))
 			{
 				foreach (NodeLink link in node.InputLinks)
 				{
 					link.Throughput = link.Supplier.GetTotalOutput(link.Item) - link.Supplier.GetUsedOutput(link.Item);
 				}
 				node.actualRate = node.GetRateLimitedByInputs();
+				if (node.actualRate > 0)
+				{
+					node.desiredRate = node.actualRate;
+				}
+				else
+				{
+					//This node can't run with the available items, so free them up for another node to potentially use (and so the node doesn't display the wrong throughput for each item)
+					node.InputLinks.ForEach(l => l.Throughput = 0);
+				}
 			}
 		}
 

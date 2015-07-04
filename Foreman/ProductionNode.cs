@@ -63,6 +63,11 @@ namespace Foreman
 			}
 			return (float)Math.Round(total, RoundingDP);
 		}
+		
+		public float GetUnusedOutput(Item item)
+		{
+			return GetTotalOutput(item) - GetUsedOutput(item);
+		}
 
 		public float GetRequiredOutput(Item item)
 		{
