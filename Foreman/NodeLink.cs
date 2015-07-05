@@ -30,6 +30,10 @@ namespace Foreman
 
 		public static NodeLink Create(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
 		{
+			if (supplier.OutputLinks.Any(l => l.Item == item && l.Consumer == consumer))
+			{
+				return null;
+			}
 			NodeLink link = new NodeLink(supplier, consumer, item, maxAmount);
 			supplier.OutputLinks.Add(link);
 			consumer.InputLinks.Add(link);

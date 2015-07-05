@@ -227,6 +227,7 @@ namespace Foreman
 			GraphViewer.Graph.LinkUpAllInputs();
 			GraphViewer.Graph.LinkUpAllOutputs();
 			GraphViewer.Graph.UpdateNodeValues();
+			GraphViewer.Graph.LinkUpAllOutputs();
 			GraphViewer.AddRemoveElements();
 			GraphViewer.PositionNodes();
 		}

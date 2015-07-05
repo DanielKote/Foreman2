@@ -135,6 +135,7 @@ namespace Foreman
 						{
 							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
 							newElement = new NodeElement(ConsumerNode.Create(selectedItem, Parent.Graph), Parent);
+							(newElement.DisplayedNode as ConsumerNode).rateType = RateType.Auto;
 						}
 						newElement.Update();
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
@@ -184,6 +185,9 @@ namespace Foreman
 				});
 			}
 
+			Parent.Graph.UpdateNodeValues();
+			Parent.AddRemoveElements();
+			Parent.UpdateNodes();
 			Dispose();
 		}
 
