@@ -70,7 +70,6 @@ namespace Foreman
 		private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
-		public static Dictionary<String, String> KnownRecipeNames = new Dictionary<string, string>();
 		public static Dictionary<String, Dictionary<String, String>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
 
 		public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
@@ -252,8 +251,7 @@ namespace Foreman
 			Miners.Clear();
 			Resources.Clear();
 			Modules.Clear();
-			colourCache.Clear();			
-			KnownRecipeNames.Clear();
+			colourCache.Clear();
 			LocaleFiles.Clear();
 			failedFiles.Clear();
 			failedPathDirectories.Clear();
