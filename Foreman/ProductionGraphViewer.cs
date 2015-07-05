@@ -170,74 +170,77 @@ namespace Foreman
 			var nodeOrder = Graph.GetTopologicalSort();
 			nodeOrder.Reverse();
 
-			List<ProductionNode>[] nodePositions = new List<ProductionNode>[nodeOrder.Count()];
-			for (int i = 0; i < nodePositions.Count(); i++)
+			if (nodeOrder.Any())
 			{
-				nodePositions[i] = new List<ProductionNode>();
-			}
-
-			nodePositions.First().AddRange(nodeOrder.OfType<ConsumerNode>());
-			foreach (RecipeNode node in nodeOrder.OfType<RecipeNode>())
-			{
-				bool PositionFound = false;
-
-				for (int i = nodePositions.Count() - 1; i >= 0 && !PositionFound; i--)
+				List<ProductionNode>[] nodePositions = new List<ProductionNode>[nodeOrder.Count()];
+				for (int i = 0; i < nodePositions.Count(); i++)
 				{
-					foreach (ProductionNode listNode in nodePositions[i])
+					nodePositions[i] = new List<ProductionNode>();
+				}
+
+				nodePositions.First().AddRange(nodeOrder.OfType<ConsumerNode>());
+				foreach (RecipeNode node in nodeOrder.OfType<RecipeNode>())
+				{
+					bool PositionFound = false;
+
+					for (int i = nodePositions.Count() - 1; i >= 0 && !PositionFound; i--)
 					{
-						if (listNode.CanUltimatelyTakeFrom(node))
+						foreach (ProductionNode listNode in nodePositions[i])
 						{
-							nodePositions[i + 1].Add(node);
-							PositionFound = true;
-							break;
+							if (listNode.CanUltimatelyTakeFrom(node))
+							{
+								nodePositions[i + 1].Add(node);
+								PositionFound = true;
+								break;
+							}
 						}
 					}
+
+					if (!PositionFound)
+					{
+						nodePositions.First().Add(node);
+					}
+				}
+				nodePositions.Last().AddRange(nodeOrder.OfType<SupplyNode>());
+
+				int marginX = 100;
+				int marginY = 200;
+				int y = marginY;
+				int[] tierWidths = new int[nodePositions.Count()];
+				for (int i = 0; i < nodePositions.Count(); i++)
+				{
+					var list = nodePositions[i];
+					int maxHeight = 0;
+					int x = marginX;
+
+					foreach (var node in list)
+					{
+						NodeElement control = GetElementForNode(node);
+						control.X = x;
+						control.Y = y;
+
+						x += control.Width + marginX;
+						maxHeight = Math.Max(control.Height, maxHeight);
+					}
+
+					if (maxHeight > 0) // Don't add any height for empty tiers
+					{
+						y += maxHeight + marginY;
+					}
+
+					tierWidths[i] = x;
 				}
 
-				if (!PositionFound)
+				int centrePoint = tierWidths.Last(i => i > marginX) / 2;
+				for (int i = tierWidths.Count() - 1; i >= 0; i--)
 				{
-					nodePositions.First().Add(node);
-				}
-			}
-			nodePositions.Last().AddRange(nodeOrder.OfType<SupplyNode>());
+					int offset = centrePoint - tierWidths[i] / 2;
 
-			int marginX = 100;
-			int marginY = 200;
-			int y = marginY;
-			int[] tierWidths = new int[nodePositions.Count()];
-			for (int i = 0; i < nodePositions.Count(); i++)
-			{
-				var list = nodePositions[i];
-				int maxHeight = 0;
-				int x = marginX;
-
-				foreach (var node in list)
-				{
-					NodeElement control = GetElementForNode(node);
-					control.X = x;
-					control.Y = y;
-
-					x += control.Width + marginX;
-					maxHeight = Math.Max(control.Height, maxHeight);
-				}
-
-				if (maxHeight > 0) // Don't add any height for empty tiers
-				{
-					y += maxHeight + marginY;
-				}
-
-				tierWidths[i] = x;
-			}
-
-			int centrePoint = tierWidths.Last(i => i > marginX) / 2;
-			for (int i = tierWidths.Count() - 1; i >= 0; i--)
-			{
-				int offset = centrePoint - tierWidths[i] / 2;
-
-				foreach (var node in nodePositions[i])
-				{
-					NodeElement element = GetElementForNode(node);
-					element.X = element.X + offset;
+					foreach (var node in nodePositions[i])
+					{
+						NodeElement element = GetElementForNode(node);
+						element.X = element.X + offset;
+					}
 				}
 			}
 

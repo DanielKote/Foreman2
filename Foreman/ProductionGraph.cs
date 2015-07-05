@@ -139,6 +139,7 @@ namespace Foreman
 			foreach (ProductionNode startingNode in Nodes.Where(n => n.rateType == RateType.Manual))
 			{
 				Stack<NodeLink> routeHome = new Stack<NodeLink>();	//The links we need to take to get back to the starting node
+				HashSet<ProductionNode> nodesInStack = new HashSet<ProductionNode>{startingNode};
 				int[] linkIndices = new int[Nodes.Count];	//Record which link we took at each tier of the depth-first traversal. Increment it when we go back up from that tier and reset it to 0 when we go down a tier.
 
 				ProductionNode currentNode = startingNode;
@@ -149,7 +150,7 @@ namespace Foreman
 					{
 						NodeLink nextLink = currentNode.InputLinks[linkIndices[routeHome.Count()]];
 						linkIndices[routeHome.Count()]++;
-						if (nextLink.Supplier.rateType == RateType.Auto)
+						if (nextLink.Supplier.rateType == RateType.Auto && !nodesInStack.Contains(nextLink.Supplier))
 						{
 							routeHome.Push(nextLink);
 							nextLink.Throughput += currentNode.GetUnsatisfiedDemand(nextLink.Item);
@@ -157,6 +158,7 @@ namespace Foreman
 							currentNode = nextLink.Supplier;
 							currentNode.actualRate = currentNode.GetRateDemandedByOutputs();
 							currentNode.desiredRate = currentNode.actualRate;
+							nodesInStack.Add(currentNode);
 						}
 						else
 						{
@@ -168,6 +170,7 @@ namespace Foreman
 						if (routeHome.Any())
 						{
 							linkIndices[routeHome.Count()] = 0;
+							nodesInStack.Remove(currentNode);
 							currentNode = routeHome.Pop().Consumer;
 						}
 					}

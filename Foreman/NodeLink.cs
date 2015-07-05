@@ -16,7 +16,7 @@ namespace Foreman
 		{
 			get
 			{
-				return Consumer.GetTotalDemand(Item) / Consumer.InputLinks.Where(l => l.Item == Item).Count();
+				return Consumer.GetTotalDemand(Item);
 			}
 		}
 		public float Throughput;
