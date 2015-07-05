@@ -33,9 +33,9 @@ namespace Foreman
 			if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
 			{
 				foreach (String defaultPath in new String[]{
-												  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio", "Data"),
-												  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio", "Data"),
-												  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents", "data")}) //Not actually tested on a Mac
+												  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
+												  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
+												  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
 				{
 					if (Directory.Exists(defaultPath))
 					{
@@ -70,9 +70,9 @@ namespace Foreman
 				{
 					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
 				}
-				if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods")))
+				else if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods")))
 				{
-					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
+					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "mods");
 				}
 			}
 
@@ -87,7 +87,7 @@ namespace Foreman
 			rateOptionsDropDown.SelectedIndex = 0;
 
 			LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
-			LanguageDropDown.SelectedItem = DataCache.Languages.First(l => l.Name == Properties.Settings.Default.Language);
+			LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
 		}
 
 		public void LoadItemList()
@@ -95,7 +95,10 @@ namespace Foreman
 			//Listview
 			ItemListView.Items.Clear();
 			unfilteredItemList = new List<ListViewItem>();
-			ItemImageList.Images.Add(DataCache.UnknownIcon);
+			if (DataCache.UnknownIcon != null)
+			{
+				ItemImageList.Images.Add(DataCache.UnknownIcon);
+			}
 			foreach (var item in DataCache.Items)
 			{
 				ListViewItem lvItem = new ListViewItem();
