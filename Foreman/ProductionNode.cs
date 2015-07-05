@@ -199,8 +199,7 @@ namespace Foreman
 		{
 			if (BaseRecipe.IsMissingRecipe) return 0f;
 
-			float rate = GetRateLimitedByInputs();
-			float itemRate = (rate * BaseRecipe.Results[item]) - GetUsedOutput(item);
+			float itemRate = (actualRate * BaseRecipe.Results[item]) - GetUsedOutput(item);
 			return (float)Math.Round(itemRate, RoundingDP);
 		}
 

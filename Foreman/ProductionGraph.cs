@@ -118,6 +118,29 @@ namespace Foreman
 			} while (graphChanged);
 		}
 
+		public void LinkUpAllOutputs()
+		{
+			foreach (ProductionNode node in Nodes.ToList())
+			{
+				foreach (Item item in node.Outputs)
+				{
+					if (node.GetExcessOutput(item) > 0 || !node.OutputLinks.Any(l => l.Item == item))
+					{
+						if (Nodes.Any(n => n.Inputs.Contains(item) && (n.rateType == RateType.Auto) && !(n.InputLinks.Any(l => l.Supplier == node))))
+						{
+							NodeLink.Create(node, Nodes.First(n => n.Inputs.Contains(item)), item);
+						}
+						else
+						{
+							var newNode = ConsumerNode.Create(item, this);
+							newNode.rateType = RateType.Auto;
+							NodeLink.Create(node, newNode, item);
+						}
+					}
+				}
+			}
+		}
+
 		public void UpdateNodeValues()
 		{
 			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Manual))
