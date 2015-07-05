@@ -325,12 +325,7 @@ namespace Foreman
 			}
 			else
 			{
-				if (DisplayedNode is SupplyNode)
-				{
-					actualAmount = DisplayedNode.GetUsedOutput(item);
-				} else {
-					actualAmount = DisplayedNode.GetTotalOutput(item);
-				} 
+				actualAmount = DisplayedNode.GetTotalOutput(item);
 			}
 			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerSecond)
 			{
