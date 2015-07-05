@@ -418,24 +418,22 @@ namespace Foreman
 				}
 				foreach (String zipFile in Directory.EnumerateFiles(Properties.Settings.Default.FactorioModPath, "*.zip"))
 				{
-					ReadModInfoZip(zipFile);
-					
+					ReadModInfoZip(zipFile);					
 				}
-				string modListFile = Path.Combine(Properties.Settings.Default.FactorioModPath, "mod-list.json");
-				if (File.Exists(modListFile))
-				{
-					String json = File.ReadAllText(modListFile);
-					dynamic parsedJson = JsonConvert.DeserializeObject(json);
-					foreach (var mod in parsedJson.mods)
-					{
-						string modName = mod.name;
-						bool enabled = mod.enabled;
+			}
 
-						if (Mods.Any(m => m.Name == modName))
-						{
-							Mods.First(m => m.Name == modName).Enabled = enabled;
-						}
-					}
+			Dictionary<String, bool> enabledModsFromFile = new Dictionary<string,bool>();
+
+			string modListFile = Path.Combine(Properties.Settings.Default.FactorioModPath, "mod-list.json");
+			if (File.Exists(modListFile))
+			{
+				String json = File.ReadAllText(modListFile);
+				dynamic parsedJson = JsonConvert.DeserializeObject(json);
+				foreach (var mod in parsedJson.mods)
+				{
+					String name = mod.name;
+					Boolean enabled = (bool)mod.enabled;
+					enabledModsFromFile.Add(name, enabled);
 				}
 			}
 
@@ -444,6 +442,30 @@ namespace Foreman
 				foreach (Mod mod in Mods)
 				{
 					mod.Enabled = enabledMods.Contains(mod.Name);
+				}
+			}
+			else
+			{
+				Dictionary<String, String> splitModStrings = new Dictionary<string,string>();
+				foreach (String s in Properties.Settings.Default.EnabledMods)
+				{
+					var split = s.Split('|');
+					splitModStrings.Add(split[0], split[1]);
+				}
+				foreach (Mod mod in Mods)
+				{
+					if (splitModStrings.ContainsKey(mod.Name))
+					{
+						mod.Enabled = (splitModStrings[mod.Name] == "True");
+					}
+					else if (enabledModsFromFile.ContainsKey(mod.Name))
+					{
+						mod.Enabled = enabledModsFromFile[mod.Name];
+					}
+					else
+					{
+						mod.Enabled = true;
+					}
 				}
 			}
 
@@ -794,6 +816,14 @@ namespace Foreman
 					newAssembler.Categories.Add(category);
 				}
 
+				foreach (String s in Properties.Settings.Default.EnabledAssemblers)
+				{
+					if (s.Split('|')[0] == name)
+					{
+						newAssembler.Enabled = (s.Split('|')[1] == "True");
+					}
+				}
+
 				Assemblers.Add(newAssembler.Name, newAssembler);
 			}
 			catch (MissingPrototypeValueException e)
@@ -827,6 +857,14 @@ namespace Foreman
 					newFurnace.Categories.Add(category);
 				}
 
+				foreach (String s in Properties.Settings.Default.EnabledAssemblers)
+				{
+					if (s.Split('|')[0] == name)
+					{
+						newFurnace.Enabled = (s.Split('|')[1] == "True");
+					}
+				}
+
 				Assemblers.Add(newFurnace.Name, newFurnace);
 			}
 			catch (MissingPrototypeValueException e)
@@ -852,6 +890,14 @@ namespace Foreman
 					foreach (String category in categories.Values)
 					{
 						newMiner.ResourceCategories.Add(category);
+					}
+				}
+
+				foreach (String s in Properties.Settings.Default.EnabledMiners)
+				{
+					if (s.Split('|')[0] == name)
+					{
+						newMiner.Enabled = (s.Split('|')[1] == "True");
 					}
 				}
 
@@ -919,7 +965,17 @@ namespace Foreman
 					return;
 				}
 
-				Modules.Add(name, new Module(name, speedBonus));
+				Module newModule = new Module(name, speedBonus);
+
+				foreach (String s in Properties.Settings.Default.EnabledModules)
+				{
+					if (s.Split('|')[0] == name)
+					{
+						newModule.Enabled = (s.Split('|')[1] == "True");
+					}
+				}
+
+				Modules.Add(name, newModule);
 			}
 			catch (MissingPrototypeValueException e)
 			{

@@ -70,5 +70,49 @@ namespace Foreman.Properties {
                 this["FactorioPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection EnabledMods {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledMods"]));
+            }
+            set {
+                this["EnabledMods"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection EnabledAssemblers {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledAssemblers"]));
+            }
+            set {
+                this["EnabledAssemblers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection EnabledMiners {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledMiners"]));
+            }
+            set {
+                this["EnabledMiners"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection EnabledModules {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledModules"]));
+            }
+            set {
+                this["EnabledModules"] = value;
+            }
+        }
     }
 }

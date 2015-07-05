@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
+using System.Collections.Specialized;
 
 namespace Foreman
 {
@@ -74,6 +75,11 @@ namespace Foreman
 					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
 				}
 			}
+
+			if (Properties.Settings.Default.EnabledMods == null) Properties.Settings.Default.EnabledMods = new StringCollection();
+			if (Properties.Settings.Default.EnabledAssemblers == null) Properties.Settings.Default.EnabledAssemblers = new StringCollection();
+			if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
+			if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
 			DataCache.LoadAllData(null);
 			LoadItemList();
@@ -399,6 +405,7 @@ namespace Foreman
 		{
 			EnableDisableItemsForm form = new EnableDisableItemsForm();
 			form.ShowDialog();
+			SaveEnabledObjects();
 
 			if (form.ModsChanged)
 			{
@@ -406,6 +413,21 @@ namespace Foreman
 				UpdateControlValues();
 				LoadItemList();
 			}
+		}
+
+		private void SaveEnabledObjects()
+		{
+			Properties.Settings.Default.EnabledMods.Clear();
+			Properties.Settings.Default.EnabledAssemblers.Clear();
+			Properties.Settings.Default.EnabledMiners.Clear();
+			Properties.Settings.Default.EnabledModules.Clear();
+
+			Properties.Settings.Default.EnabledMods.AddRange(DataCache.Mods.Select<Mod, string>(m => m.Name + "|" + m.Enabled.ToString()).ToArray());
+			Properties.Settings.Default.EnabledAssemblers.AddRange(DataCache.Assemblers.Values.Select<Assembler, string>(a => a.Name + "|" + a.Enabled.ToString()).ToArray());
+			Properties.Settings.Default.EnabledMiners.AddRange(DataCache.Miners.Values.Select<Miner, string>(m => m.Name + "|" + m.Enabled.ToString()).ToArray());
+			Properties.Settings.Default.EnabledModules.AddRange(DataCache.Modules.Values.Select<Module, string>(m => m.Name + "|" + m.Enabled.ToString()).ToArray());
+
+			Properties.Settings.Default.Save();
 		}
 
 		private void ItemListView_KeyDown(object sender, KeyEventArgs e)
