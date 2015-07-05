@@ -308,6 +308,7 @@ namespace Foreman
 					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
 					DataCache.LoadAllData(null);
 					GraphViewer.LoadFromJson(savedGraph);
+					UpdateControlValues();
 					LoadItemList();
 				}
 			}
@@ -326,6 +327,7 @@ namespace Foreman
 					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
 					DataCache.LoadAllData(null);
 					GraphViewer.LoadFromJson(savedGraph);
+					UpdateControlValues();
 					LoadItemList();
 				}
 			}
@@ -334,6 +336,7 @@ namespace Foreman
 		private void ReloadButton_Click(object sender, EventArgs e)
 		{
 			GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+			UpdateControlValues();
 			LoadItemList();
 		}
 
@@ -388,6 +391,7 @@ namespace Foreman
 				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
 			}
 
+			UpdateControlValues();
 			GraphViewer.Invalidate();
 		}
 
@@ -399,6 +403,7 @@ namespace Foreman
 			if (form.ModsChanged)
 			{
 				GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+				UpdateControlValues();
 				LoadItemList();
 			}
 		}
@@ -463,6 +468,24 @@ namespace Foreman
 
 			Properties.Settings.Default["Language"] = newLocale;
 			Properties.Settings.Default.Save();
+		}
+
+		private void UpdateControlValues()
+		{
+			fixedAmountButton.Checked = GraphViewer.Graph.SelectedAmountType == AmountType.FixedAmount;
+			rateButton.Checked = GraphViewer.Graph.SelectedAmountType == AmountType.Rate;
+			if (GraphViewer.Graph.SelectedUnit == RateUnit.PerSecond)
+			{
+				rateOptionsDropDown.SelectedIndex = 0;
+			}
+			else
+			{
+				rateOptionsDropDown.SelectedIndex = 1;
+			}
+
+			AssemblerDisplayCheckBox.Checked = GraphViewer.ShowAssemblers;
+			SingleAssemblerPerRecipeCheckBox.Checked = GraphViewer.Graph.OneAssemblerPerRecipe;
+			MinerDisplayCheckBox.Checked = GraphViewer.ShowMiners;
 		}
 	}
 }
