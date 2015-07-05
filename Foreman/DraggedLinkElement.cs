@@ -140,6 +140,10 @@ namespace Foreman
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
 					}
+
+					Parent.Graph.UpdateNodeValues();
+					Parent.AddRemoveElements();
+					Parent.UpdateNodes();
 				});
 
 			}
@@ -173,12 +177,13 @@ namespace Foreman
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
 					}
+
+					Parent.Graph.UpdateNodeValues();
+					Parent.AddRemoveElements();
+					Parent.UpdateNodes();
 				});
 			}
 
-			Parent.Graph.UpdateNodeValues();
-			Parent.AddRemoveElements();
-			Parent.UpdateNodes();
 			Dispose();
 		}
 
