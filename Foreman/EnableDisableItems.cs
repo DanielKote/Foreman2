@@ -52,7 +52,6 @@ namespace Foreman
 			}
 
 			ModSelectionBox.Items.AddRange(DataCache.Mods.ToArray());
-			ModSelectionBox.Sorted = true;
 			ModSelectionBox.DisplayMember = "name";
 			for (int i = 0; i < ModSelectionBox.Items.Count; i++)
 			{
