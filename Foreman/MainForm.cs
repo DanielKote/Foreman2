@@ -22,7 +22,14 @@ namespace Foreman
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			if (!Directory.Exists(Properties.Settings.Default.FactorioDataPath))
+			//I changed the name of the variable, so this copies the value over for people who are upgrading their Foreman version
+			if (Properties.Settings.Default.FactorioPath == "" && Properties.Settings.Default.FactorioDataPath != "")
+			{
+				Properties.Settings.Default["FactorioPath"] = Path.GetDirectoryName(Properties.Settings.Default.FactorioDataPath);
+				Properties.Settings.Default["FactorioDataPath"] = "";
+			}
+
+			if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
 			{
 				foreach (String defaultPath in new String[]{
 												  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio", "Data"),
@@ -31,20 +38,20 @@ namespace Foreman
 				{
 					if (Directory.Exists(defaultPath))
 					{
-						Properties.Settings.Default["FactorioDataPath"] = defaultPath;
+						Properties.Settings.Default["FactorioPath"] = defaultPath;
 						Properties.Settings.Default.Save();
 						break;
 					}
 				}
 			}
 
-			if (!Directory.Exists(Properties.Settings.Default.FactorioDataPath))
+			if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
 			{
-				using (DirectoryChooserForm form = new DirectoryChooserForm("", true))
+				using (DirectoryChooserForm form = new DirectoryChooserForm(""))
 				{
 					if (form.ShowDialog() == DialogResult.OK)
 					{
-						Properties.Settings.Default["FactorioDataPath"] = Path.Combine(form.SelectedPath, "data"); ;
+						Properties.Settings.Default["FactorioPath"] = Path.Combine(form.SelectedPath, "data"); ;
 						Properties.Settings.Default.Save();
 					}
 					else
@@ -58,13 +65,13 @@ namespace Foreman
 
 			if (!Directory.Exists(Properties.Settings.Default.FactorioModPath))
 			{
-				if (Directory.Exists(Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods")))
+				if (Directory.Exists(Path.Combine(Properties.Settings.Default.FactorioPath, "mods")))
 				{
-					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods");
+					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
 				}
 				if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods")))
 				{
-					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioDataPath, "mods");
+					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
 				}
 			}
 
@@ -290,19 +297,12 @@ namespace Foreman
 
 		private void FactorioDirectoryButton_Click(object sender, EventArgs e)
 		{
-			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioDataPath, false))
+			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioPath))
 			{
 				form.Text = "Locate the factorio directory";
 				if (form.ShowDialog() == DialogResult.OK)
 				{
-					if (Path.GetFileName(form.SelectedPath) != "data")
-					{
-						Properties.Settings.Default["FactorioDataPath"] = Path.Combine(form.SelectedPath, "data");
-					}
-					else
-					{
-						Properties.Settings.Default["FactorioDataPath"] = form.SelectedPath;
-					}
+					Properties.Settings.Default["FactorioPath"] = form.SelectedPath;
 					Properties.Settings.Default.Save();
 
 					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
@@ -316,7 +316,7 @@ namespace Foreman
 
 		private void ModDirectoryButton_Click(object sender, EventArgs e)
 		{
-			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioModPath, false))
+			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioModPath))
 			{
 				form.Text = "Locate the mods directory";
 				if (form.ShowDialog() == DialogResult.OK)

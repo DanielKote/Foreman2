@@ -13,12 +13,10 @@ namespace Foreman
 	public partial class DirectoryChooserForm : Form
 	{
 		public String SelectedPath;
-		private bool factorioCheck;
 
-		public DirectoryChooserForm(string defaultDirectory, bool doFactorioDirCheck)
+		public DirectoryChooserForm(string defaultDirectory)
 		{
 			SelectedPath = defaultDirectory;
-			factorioCheck = doFactorioDirCheck;
 			InitializeComponent();
 
 			DirTextBox.Text = SelectedPath;
@@ -44,18 +42,9 @@ namespace Foreman
 
 		private void OKButton_Click(object sender, EventArgs e)
 		{
-			if (factorioCheck)
+			if (!Directory.Exists(SelectedPath))
 			{
-				if (IsValidFactorioDirectory(SelectedPath))
-				{
-					DialogResult = DialogResult.OK;
-					Close();
-				}
-
-				else
-				{
-					MessageBox.Show("That doesn't seem to be a valid directory");
-				}
+				MessageBox.Show("That directory doesn't seem to exist");
 			}
 			else
 			{
@@ -64,22 +53,9 @@ namespace Foreman
 			}
 		}
 
-		private static bool IsValidFactorioDirectory(String dir)
+		private void DirTextBox_TextChanged(object sender, EventArgs e)
 		{
-			if (!Directory.Exists(dir))
-			{
-				return false;
-			}
-			if (!Directory.Exists(Path.Combine(dir, "data", "core")))
-			{
-				return false;
-			}
-			if (!Directory.Exists(Path.Combine(dir, "data", "base")))
-			{
-				return false;
-			}
-
-			return true;
+			SelectedPath = DirTextBox.Text;
 		}
 	}
 }

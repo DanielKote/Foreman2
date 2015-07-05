@@ -37,9 +37,9 @@
 			// 
 			this.DirTextBox.Location = new System.Drawing.Point(14, 15);
 			this.DirTextBox.Name = "DirTextBox";
-			this.DirTextBox.ReadOnly = true;
 			this.DirTextBox.Size = new System.Drawing.Size(276, 20);
 			this.DirTextBox.TabIndex = 0;
+			this.DirTextBox.TextChanged += new System.EventHandler(this.DirTextBox_TextChanged);
 			// 
 			// BrowseButton
 			// 

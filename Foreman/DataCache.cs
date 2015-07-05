@@ -53,7 +53,7 @@ namespace Foreman
 			}
 		}
 
-		private static String DataPath { get { return Properties.Settings.Default.FactorioDataPath; } }
+		private static String DataPath { get { return Path.Combine(Properties.Settings.Default.FactorioPath, "data"); } }
 		private static String ModPath { get { return Properties.Settings.Default.FactorioModPath; } }
 
 		public static List<Mod> Mods = new List<Mod>();
