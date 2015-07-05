@@ -727,59 +727,67 @@ namespace Foreman
 			List<JToken> nodes = json["Nodes"].ToList<JToken>();
 			foreach (var node in nodes)
 			{
-					switch ((String)node["NodeType"])
-					{
-						case "Consumer":
+				ProductionNode newNode = null;
+
+				switch ((String)node["NodeType"])
+				{
+					case "Consumer":
+						{
+							String itemName = (String)node["ItemName"];
+							if (DataCache.Items.ContainsKey(itemName))
 							{
-								String itemName = (String)node["ItemName"];
-								if (DataCache.Items.ContainsKey(itemName))
-								{
-									Item item = DataCache.Items[itemName];
-									ConsumerNode.Create(item, Graph);
-								}
-								else
-								{
-									Item missingItem = new Item(itemName);
-									missingItem.IsMissingItem = true;
-									ConsumerNode.Create(missingItem, Graph);
-								}
-								break;
+								Item item = DataCache.Items[itemName];
+								newNode = ConsumerNode.Create(item, Graph);
 							}
-						case "Supply":
+							else
 							{
-								String itemName = (String)node["ItemName"];
-								if (DataCache.Items.ContainsKey(itemName))
-								{
-									Item item = DataCache.Items[itemName];
-									SupplyNode.Create(item, Graph);
-								}
-								else
-								{
-									Item missingItem = new Item(itemName);
-									missingItem.IsMissingItem = true;
-									DataCache.Items.Add(itemName, missingItem);
-									SupplyNode.Create(missingItem, Graph);
-								}
-								break;
+								Item missingItem = new Item(itemName);
+								missingItem.IsMissingItem = true;
+								newNode = ConsumerNode.Create(missingItem, Graph);
 							}
-						case "Recipe":
+							break;
+						}
+					case "Supply":
+						{
+							String itemName = (String)node["ItemName"];
+							if (DataCache.Items.ContainsKey(itemName))
 							{
-								String recipeName = (String)node["RecipeName"];
-								if (DataCache.Recipes.ContainsKey(recipeName))
-								{
-									Recipe recipe = DataCache.Recipes[recipeName];
-									RecipeNode.Create(recipe, Graph);
-								}
-								else
-								{
-									Recipe missingRecipe = new Recipe(recipeName, 0f, new Dictionary<Item, float>(), new Dictionary<Item, float>());
-									missingRecipe.IsMissingRecipe = true;
-									DataCache.Recipes.Add(recipeName, missingRecipe);
-									RecipeNode.Create(missingRecipe, Graph);
-								}
-								break;
+								Item item = DataCache.Items[itemName];
+								newNode = SupplyNode.Create(item, Graph);
 							}
-					}
+							else
+							{
+								Item missingItem = new Item(itemName);
+								missingItem.IsMissingItem = true;
+								DataCache.Items.Add(itemName, missingItem);
+								newNode = SupplyNode.Create(missingItem, Graph);
+							}
+							break;
+						}
+					case "Recipe":
+						{
+							String recipeName = (String)node["RecipeName"];
+							if (DataCache.Recipes.ContainsKey(recipeName))
+							{
+								Recipe recipe = DataCache.Recipes[recipeName];
+								newNode = RecipeNode.Create(recipe, Graph);
+							}
+							else
+							{
+								Recipe missingRecipe = new Recipe(recipeName, 0f, new Dictionary<Item, float>(), new Dictionary<Item, float>());
+								missingRecipe.IsMissingRecipe = true;
+								DataCache.Recipes.Add(recipeName, missingRecipe);
+								newNode = RecipeNode.Create(missingRecipe, Graph);
+							}
+							break;
+						}
+				}
+
+				if (newNode != null)
+				{
+					newNode.rateType = (RateType)(int)node["RateType"];
+					newNode.actualRate = (float)node["ActualRate"];
+				}
 			}
 
 			List<JToken> nodeLinks = json["NodeLinks"].ToList<JToken>();

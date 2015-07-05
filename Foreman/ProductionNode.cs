@@ -322,6 +322,8 @@ namespace Foreman
 		{
 			info.AddValue("NodeType", "Recipe");
 			info.AddValue("RecipeName", BaseRecipe.Name);
+			info.AddValue("RateType", rateType);
+			info.AddValue("ActualRate", actualRate);
 		}
 	}
 
@@ -452,8 +454,8 @@ namespace Foreman
 		{
 			info.AddValue("NodeType", "Supply");
 			info.AddValue("ItemName", SuppliedItem.Name);
-			info.AddValue("rateType", rateType);
-			info.AddValue("manualAmount", actualRate);
+			info.AddValue("RateType", rateType);
+			info.AddValue("ActualRate", actualRate);
 		}
 	}
 
@@ -533,8 +535,8 @@ namespace Foreman
 		{
 			info.AddValue("NodeType", "Consumer");
 			info.AddValue("ItemName", ConsumedItem.Name);
-			info.AddValue("rateType", rateType);
-			info.AddValue("manualRate", actualRate);
+			info.AddValue("RateType", rateType);
+			info.AddValue("ActualRate", actualRate);
 		}
 	}
 }
