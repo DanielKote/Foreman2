@@ -52,7 +52,7 @@ namespace Foreman
 				{
 					if (form.ShowDialog() == DialogResult.OK)
 					{
-						Properties.Settings.Default["FactorioPath"] = Path.Combine(form.SelectedPath, "data"); ;
+						Properties.Settings.Default["FactorioPath"] = form.SelectedPath; ;
 						Properties.Settings.Default.Save();
 					}
 					else
