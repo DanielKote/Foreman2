@@ -11,7 +11,7 @@ namespace Foreman
 		public ProductionEntity assembler;
 		public List<Module> modules;
 
-		public float GetRate(float timeDivisor)
+		public double GetRate(float timeDivisor)
 		{
 			float speed = assembler.Speed;
 
@@ -20,7 +20,7 @@ namespace Foreman
 				speed += module.SpeedBonus * assembler.Speed;
 			}
 
-			return 1 / timeDivisor * speed;
+			return Math.Round(1 / timeDivisor * speed, ProductionNode.RoundingDP);
 		}
 
 		public MachinePermutation(ProductionEntity machine, ICollection<Module> modules)

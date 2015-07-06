@@ -247,6 +247,7 @@ namespace Foreman
 			{
 				return results;
 			}
+			requiredRate = Math.Round(requiredRate, RoundingDP);
 
 			List<Assembler> allowedAssemblers = DataCache.Assemblers.Values
 				.Where(a => a.Enabled)
@@ -269,6 +270,7 @@ namespace Foreman
 				while (totalRateSoFar < requiredRate)
 				{
 					double remainingRate = requiredRate - totalRateSoFar;
+
 					MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(p => p.GetRate(BaseRecipe.Time) <= remainingRate);
 
 					if (permutationToAdd != null)
@@ -302,6 +304,7 @@ namespace Foreman
 					{
 						totalRateSoFar += a.Key.GetRate(BaseRecipe.Time) * a.Value;
 					}
+					totalRateSoFar = Math.Round(totalRateSoFar, RoundingDP);
 				}
 			}
 
