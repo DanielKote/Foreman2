@@ -151,7 +151,7 @@ namespace Foreman
 				// Lua files have all been executed, now it's time to extract their data from the lua engine
 				//------------------------------------------------------------------------------------------
 
-				foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item", "mining-tool", "repair-tool" })
+				foreach (String type in new List<String> { "item", "fluid", "capsule", "module", "ammo", "gun", "armor", "blueprint", "deconstruction-item", "mining-tool", "repair-tool", "tool" })
 				{
 					InterpretItems(lua, type);
 				}
