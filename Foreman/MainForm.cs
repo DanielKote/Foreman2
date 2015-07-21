@@ -242,6 +242,7 @@ namespace Foreman
 		private void AssemblerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
+			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
 			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.UpdateNodes();
 		}

@@ -800,6 +800,14 @@ namespace Foreman
 				newAssembler.Icon = LoadImage(ReadLuaString(values, "icon", true));
 				newAssembler.MaxIngredients = ReadLuaInt(values, "ingredient_count");
 				newAssembler.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
+				if (newAssembler.ModuleSlots == 0)
+				{
+					var moduleTable = ReadLuaLuaTable(values, "module_specification", true);
+					if (moduleTable != null)
+					{
+						newAssembler.ModuleSlots = ReadLuaInt(moduleTable, "module_slots", true, 0);
+					}
+				}
 				newAssembler.Speed = ReadLuaFloat(values, "crafting_speed");
 
 				LuaTable effects = ReadLuaLuaTable(values, "allowed_effects", true);
@@ -841,6 +849,14 @@ namespace Foreman
 				newFurnace.Icon = LoadImage(ReadLuaString(values, "icon", true));
 				newFurnace.MaxIngredients = 1;
 				newFurnace.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
+				if (newFurnace.ModuleSlots == 0)
+				{
+					var moduleTable = ReadLuaLuaTable(values, "module_specification", true);
+					if (moduleTable != null)
+					{
+						newFurnace.ModuleSlots = ReadLuaInt(moduleTable, "module_slots", true, 0);
+					}
+				}
 				newFurnace.Speed = ReadLuaFloat(values, "crafting_speed", true, -1f);
 				if (newFurnace.Speed == -1f)
 				{	//In case we're still on Factorio 0.10
@@ -883,6 +899,14 @@ namespace Foreman
 				newMiner.MiningPower = ReadLuaFloat(values, "mining_power");
 				newMiner.Speed = ReadLuaFloat(values, "mining_speed");
 				newMiner.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
+				if (newMiner.ModuleSlots == 0)
+				{
+					var moduleTable = ReadLuaLuaTable(values, "module_specification", true);
+					if (moduleTable != null)
+					{
+						newMiner.ModuleSlots = ReadLuaInt(moduleTable, "module_slots", true, 0);
+					}
+				}
 
 				LuaTable categories = ReadLuaLuaTable(values, "resource_categories");
 				if (categories != null)
