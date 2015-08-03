@@ -20,7 +20,7 @@ namespace Foreman
 				speed += module.SpeedBonus * assembler.Speed;
 			}
 
-			return Math.Round(1 / timeDivisor * speed, ProductionNode.RoundingDP);
+			return 60 / (Math.Ceiling(timeDivisor / speed * 60));
 		}
 
 		public MachinePermutation(ProductionEntity machine, ICollection<Module> modules)
