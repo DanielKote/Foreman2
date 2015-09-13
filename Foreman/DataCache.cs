@@ -85,11 +85,8 @@ namespace Foreman
 			{
 				FindAllMods(enabledMods);
 
-				foreach (Mod mod in Mods.Where(m => m.Enabled))
-				{
-					AddLuaPackagePath(lua, mod.dir); //Prototype folder matches package hierarchy so this is enough.
-				}
 				AddLuaPackagePath(lua, Path.Combine(DataPath, "core", "lualib")); //Core lua functions
+				String basePackagePath = lua["package.path"] as String;
 
 				String dataloaderFile = Path.Combine(DataPath, "core", "lualib", "dataloader.lua");
 				try
@@ -104,39 +101,36 @@ namespace Foreman
 				}
 
 				lua.DoString(@"
-	function module(modname,...)
-	end
+					function module(modname,...)
+					end
 	
-	require ""util""
-	util = {}
-	util.table = {}
-	util.table.deepcopy = table.deepcopy
-	util.multiplystripes = multiplystripes");
-
-				Regex requiresRegex = new Regex("require *\\(?(\"|')(?<modulename>[^\\.\"']+)(\"|')\\)?");
-
+					require ""util""
+					util = {}
+					util.table = {}
+					util.table.deepcopy = table.deepcopy
+					util.multiplystripes = multiplystripes");
+								
 				foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
 				{
 					foreach (Mod mod in Mods.Where(m => m.Enabled))
 					{
+						//Mods use relative paths, but if more than one mod is in package.path at once this can be ambiguous
+						lua["package.path"] = basePackagePath;
+						AddLuaPackagePath(lua, mod.dir);
+		
+						//Because many mods use the same path to refer to different files, we need to clear the 'loaded' table so Lua doesn't think they're already loaded
+						lua.DoString(@"
+							for k, v in pairs(package.loaded) do
+								package.loaded[k] = false
+							end");
+
 						String dataFile = Path.Combine(mod.dir, filename);
 						if (File.Exists(dataFile))
 						{
+	
+
 							try
 							{
-								String fileContents = File.ReadAllText(dataFile);
-
-								var matches = requiresRegex.Matches(fileContents);	//This whole section is a dirty hack to force lua to run modules that it thinks have already been loaded (e.g. "config.lua" in DyTech)
-								foreach (Match match in matches)
-								{
-									String moduleName = match.Groups["modulename"].Value;
-									String moduleFileName = Path.Combine(mod.dir, match.Groups["modulename"].Value + ".lua");
-									if (File.Exists(moduleFileName))
-									{
-										lua.DoFile(moduleFileName);
-									}
-								}
-
 								lua.DoFile(dataFile);
 							}
 							catch (Exception e)
