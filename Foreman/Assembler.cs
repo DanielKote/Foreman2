@@ -23,6 +23,18 @@ namespace Foreman
 			return 60 / (Math.Ceiling(timeDivisor / speed * 60));
 		}
 
+		public double GetMinerRate(Resource r)
+		{
+			float speed = assembler.Speed;
+
+			foreach (Module module in modules.OfType<Module>())
+			{
+				speed += module.SpeedBonus * assembler.Speed;
+			}
+
+			return ((assembler as Miner).MiningPower - r.Hardness) * speed / r.Time;
+		}
+
 		public MachinePermutation(ProductionEntity machine, ICollection<Module> modules)
 		{
 			assembler = machine;

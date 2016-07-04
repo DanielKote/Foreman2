@@ -437,15 +437,15 @@ namespace Foreman
 				allowedPermutations.AddRange(miner.GetAllPermutations());
 			}
 
-			List<MachinePermutation> sortedPermutations = allowedPermutations.OrderBy(p => p.GetRate(resource.Time)).ToList();
+			List<MachinePermutation> sortedPermutations = allowedPermutations.OrderBy(p => p.GetMinerRate(resource)).ToList();
 
 			if (sortedPermutations.Any())
 			{
 				float requiredRate = GetRequiredOutput(SuppliedItem);
-				MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(a => a.GetRate(resource.Time) < requiredRate);
+				MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(a => a.GetMinerRate(resource) < requiredRate);
 				if (permutationToAdd != null)
 				{
-					int numberToAdd = Convert.ToInt32(Math.Ceiling(requiredRate / permutationToAdd.GetRate(resource.Time)));
+					int numberToAdd = Convert.ToInt32(Math.Ceiling(requiredRate / permutationToAdd.GetMinerRate(resource)));
 					results.Add(permutationToAdd, numberToAdd);
 				}
 			}
