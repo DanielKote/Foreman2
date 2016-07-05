@@ -154,7 +154,10 @@ namespace Foreman
 				recipeOptionList.Add(new ItemChooserControl(Item, "Create infinite supply node", Item.FriendlyName));
 				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)))
 				{
-					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
+					if (recipe.Category != "incinerator")
+					{
+						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
+					}
 				}
 
 				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);

@@ -640,7 +640,7 @@ namespace Foreman
 					optionList.Add(itemOutputOption);
 					foreach (Recipe recipe in DataCache.Recipes.Values)
 					{
-						if (recipe.Results.ContainsKey(item))
+						if (recipe.Results.ContainsKey(item) && recipe.Category != "incinerator")
 						{
 							optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
 						}
