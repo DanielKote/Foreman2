@@ -210,6 +210,14 @@ namespace Foreman
 				}
 
 				UnknownIcon = LoadImage("UnknownIcon.png");
+				if (UnknownIcon == null)
+				{
+					UnknownIcon = new Bitmap(32, 32);
+					using (Graphics g = Graphics.FromImage(UnknownIcon))
+					{
+						g.FillRectangle(Brushes.White, 0, 0, 32, 32);
+					}
+				}
 
 				LoadAllLanguages();
 				LoadLocaleFiles();
@@ -665,7 +673,7 @@ namespace Foreman
 		
 		private static Bitmap LoadImage(String fileName)
 		{
-			string fullPath;
+			string fullPath = "";
 			if (File.Exists(fileName))
 			{
 				fullPath = fileName;
@@ -678,7 +686,11 @@ namespace Foreman
             {
                 string[] splitPath = fileName.Split('/');
 				splitPath[0] = splitPath[0].Trim('_');
-				fullPath = Mods.FirstOrDefault(m => m.Name == splitPath[0]).dir;
+
+				if (Mods.Any(m => m.Name == splitPath[0]))
+				{
+					fullPath = Mods.First(m => m.Name == splitPath[0]).dir;
+				}
 
 				if (!String.IsNullOrEmpty(fullPath))
 				{
