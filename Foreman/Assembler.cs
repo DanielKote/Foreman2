@@ -11,28 +11,14 @@ namespace Foreman
 		public ProductionEntity assembler;
 		public List<Module> modules;
 
-		public double GetRate(float timeDivisor)
+		public double GetAssemblerRate(float recipeTime)
 		{
-			float speed = assembler.Speed;
-
-			foreach (Module module in modules.OfType<Module>())
-			{
-				speed += module.SpeedBonus * assembler.Speed;
-			}
-
-			return 60 / (Math.Ceiling(timeDivisor / speed * 60));
+			return (assembler as Assembler).GetRate(recipeTime, modules);
 		}
 
 		public double GetMinerRate(Resource r)
 		{
-			float speed = assembler.Speed;
-
-			foreach (Module module in modules.OfType<Module>())
-			{
-				speed += module.SpeedBonus * assembler.Speed;
-			}
-
-			return ((assembler as Miner).MiningPower - r.Hardness) * speed / r.Time;
+			return (assembler as Miner).GetRate(r, modules);
 		}
 
 		public MachinePermutation(ProductionEntity machine, ICollection<Module> modules)
@@ -68,12 +54,7 @@ namespace Foreman
 				friendlyName = value;
 			}
 		}
-
-		public float GetRate(float timeDivisor)
-		{
-			return 1 / timeDivisor * Speed;
-		}
-
+		
 		public IEnumerable<MachinePermutation> GetAllPermutations()
 		{
 			yield return new MachinePermutation(this, new List<Module>());
@@ -113,6 +94,23 @@ namespace Foreman
 		public override string ToString()
 		{
 			return String.Format("Assembler: {0}", Name);
+		}
+
+		public float GetRate(float recipeTime, IEnumerable<Module> speedModules = null)
+		{
+			double finalSpeed = this.Speed;
+			if (speedModules != null)
+			{
+				foreach (Module module in speedModules)
+				{
+					finalSpeed += module.SpeedBonus * this.Speed;
+				}
+			}
+
+			double craftingTime = recipeTime / finalSpeed;
+			craftingTime = (float)(Math.Ceiling(craftingTime * 60d) / 60d); //Machines have to wait for a new tick before starting a new item, so round up to the nearest tick
+
+			return (float)(1d / craftingTime);
 		}
 	}
 

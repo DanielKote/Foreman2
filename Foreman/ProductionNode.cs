@@ -261,7 +261,7 @@ namespace Foreman
 				allowedPermutations.AddRange(assembler.GetAllPermutations());
 			}
 
-			var sortedPermutations = allowedPermutations.OrderBy(a => a.GetRate(BaseRecipe.Time)).ToList();
+			var sortedPermutations = allowedPermutations.OrderBy(a => a.GetAssemblerRate(BaseRecipe.Time)).ToList();
 
 			if (sortedPermutations.Any())
 			{
@@ -271,25 +271,25 @@ namespace Foreman
 				{
 					double remainingRate = requiredRate - totalRateSoFar;
 
-					MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(p => p.GetRate(BaseRecipe.Time) <= remainingRate);
+					MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(p => p.GetAssemblerRate(BaseRecipe.Time) <= remainingRate);
 
 					if (permutationToAdd != null)
 					{
 						int numberToAdd;
 						if (Graph.OneAssemblerPerRecipe)
 						{
-							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetRate(BaseRecipe.Time)));
+							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time)));
 						}
 						else
 						{
-							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / permutationToAdd.GetRate(BaseRecipe.Time)));
+							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time)));
 						}
 						results.Add(permutationToAdd, numberToAdd);
 					}
 					else
 					{
-						permutationToAdd = sortedPermutations.FirstOrDefault(a => a.GetRate(BaseRecipe.Time) > remainingRate);
-						int amount = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetRate(BaseRecipe.Time)));
+						permutationToAdd = sortedPermutations.FirstOrDefault(a => a.GetAssemblerRate(BaseRecipe.Time) > remainingRate);
+						int amount = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time)));
 						if (results.ContainsKey(permutationToAdd))
 						{
 							results[permutationToAdd] += amount;
@@ -302,7 +302,7 @@ namespace Foreman
 					totalRateSoFar = 0;
 					foreach (var a in results)
 					{
-						totalRateSoFar += a.Key.GetRate(BaseRecipe.Time) * a.Value;
+						totalRateSoFar += a.Key.GetAssemblerRate(BaseRecipe.Time) * a.Value;
 					}
 					totalRateSoFar = Math.Round(totalRateSoFar, RoundingDP);
 				}
