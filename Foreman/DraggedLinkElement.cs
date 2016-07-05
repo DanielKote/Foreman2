@@ -115,7 +115,7 @@ namespace Foreman
 			{
 				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
 				recipeOptionList.Add(new ItemChooserControl(Item, "Create output node", Item.FriendlyName));
-				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item)))
+				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item) && r.Category != "incinerator" && r.Category != "incineration"))
 				{
 					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
 				}
@@ -152,9 +152,9 @@ namespace Foreman
 			{
 				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
 				recipeOptionList.Add(new ItemChooserControl(Item, "Create infinite supply node", Item.FriendlyName));
-				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item)))
+				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item) && r.Category != "incinerator" && r.Category != "incineration"))
 				{
-					if (recipe.Category != "incinerator")
+					if (recipe.Category != "incinerator" && recipe.Category != "incineration")
 					{
 						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
 					}
