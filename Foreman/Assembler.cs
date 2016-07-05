@@ -101,7 +101,7 @@ namespace Foreman
 			double finalSpeed = this.Speed;
 			if (speedModules != null)
 			{
-				foreach (Module module in speedModules)
+				foreach (Module module in speedModules.Where(m => m != null))
 				{
 					finalSpeed += module.SpeedBonus * this.Speed;
 				}

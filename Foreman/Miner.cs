@@ -35,7 +35,7 @@ namespace Foreman
 		public float GetRate(Resource resource, IEnumerable<Module> modules)
 		{
 			double finalSpeed = this.Speed;
-			foreach (Module module in modules)
+			foreach (Module module in modules.Where(m => m != null))
 			{
 				finalSpeed += module.SpeedBonus * this.Speed;
 			}
