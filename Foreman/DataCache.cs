@@ -1070,16 +1070,12 @@ namespace Foreman
 					{
 						amount = ReadLuaFloat(resultTable, "amount");
 					}
-					else if (resultTable["probability"] != null)
-					{
-						float probability = ReadLuaFloat(resultTable, "probability");
-						amount = amount * probability; //Just the average yield. Maybe in the future it should show more information about the probability
-					}
 					else if (resultTable["amount_min"] != null)
 					{
+						float probability = ReadLuaFloat(resultTable, "probability", true, 1f);
 						float amount_min = ReadLuaFloat(resultTable, "amount_min");
 						float amount_max = ReadLuaFloat(resultTable, "amount_max");
-						amount = (amount_min + amount_max) / 2f;
+						amount = ((amount_min + amount_max) / 2f) * probability;		//Just the average yield. Maybe in the future it should show more information about the probability
 					}
 					else
 					{
@@ -1093,8 +1089,7 @@ namespace Foreman
 					else
 					{
 						results.Add(result, amount);
-					}
-					
+					}					
 				}
 			}
 			return results;
