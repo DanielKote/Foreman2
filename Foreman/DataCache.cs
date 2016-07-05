@@ -656,7 +656,7 @@ namespace Foreman
 										String[] split = line.Split('=');
 										if (split.Count() == 2)
 										{
-											LocaleFiles[currentIniSection][split[0]] = split[1];
+											LocaleFiles[currentIniSection][split[0].Trim()] = split[1].Trim();
 										}
 									}
 								}
