@@ -30,11 +30,4 @@ Make sure Visual C++ 2012 x86 is installed.
 
 This is because Foreman uses a very naive method for completing the graph. It doesn't try to optimise its choices at all, instead choosing the first recipe it finds for an item. This means that charts with oil processing in them aren't very useful at the moment.
 
-Sorry about that.
-
-## Motivate me! ##
-
-Entirely optional, of course.
-
-Paypal account: factorioforeman@gmail.com  
-Bitcoin address: 1HACXKCkfRYNVQbTRsnpcqhs1YVwAXccnB
+Sorry about that

@@ -670,9 +670,13 @@ namespace Foreman
 			{
 				fullPath = fileName;
 			}
-			else
-			{
-				string[] splitPath = fileName.Split('/');
+            else if (File.Exists(Application.StartupPath + "\\" + fileName))
+            {
+                fullPath = Application.StartupPath + "\\" + fileName;
+            }
+            else
+            {
+                string[] splitPath = fileName.Split('/');
 				splitPath[0] = splitPath[0].Trim('_');
 				fullPath = Mods.FirstOrDefault(m => m.Name == splitPath[0]).dir;
 
