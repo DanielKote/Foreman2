@@ -1058,6 +1058,11 @@ namespace Foreman
 					{
 						amount = ReadLuaFloat(resultTable, "amount");
 					}
+					else if (resultTable["probability"] != null)
+					{
+						float probability = ReadLuaFloat(resultTable, "probability");
+						amount = amount * probability; //Just the average yield. Maybe in the future it should show more information about the probability
+					}
 					else if (resultTable["amount_min"] != null)
 					{
 						float amount_min = ReadLuaFloat(resultTable, "amount_min");
@@ -1068,18 +1073,7 @@ namespace Foreman
 					{
 						amount = Convert.ToSingle(resultTable[2]);
 					}
-
-					if (resultTable["probability"] != null)
-					{
-						float probability = ReadLuaFloat(resultTable, "probability");
-						amount = amount * probability; //Just the average yield. Maybe in the future it should show more information about the probability
-					}
-
-					if (amount == 0f)
-					{
-						amount = 1f;
-					}
-
+					
 					if (results.ContainsKey(result))
 					{
 						results[result] += amount;
