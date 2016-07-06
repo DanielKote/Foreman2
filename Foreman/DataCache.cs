@@ -601,7 +601,10 @@ namespace Foreman
 					}
 					token++;
 
-					newDependency.Version = Version.Parse(split[token]);
+					if (!Version.TryParse(split[token], out newDependency.Version))
+					{
+						newDependency.Version = new Version(0, 0, 0, 0);
+					}
 					token++;
 				}
 
