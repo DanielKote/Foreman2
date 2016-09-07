@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace Foreman
 {
@@ -127,12 +128,124 @@ namespace Foreman
 	{
 		public Recipe BaseRecipe { get; private set; }
 		public Assembler Assembler { get; set; }
-		public Module Module { get; set; }
+
+		public abstract class ModuleFilterBase : ISerializable
+		{
+			public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
+			public abstract IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers);
+			public abstract String Name { get; }
+
+			public static ModuleFilterBase Load(JToken token)
+			{
+				ModuleFilterBase filter = ModuleBestFilter;
+
+				if (token["ModuleFilterType"] != null)
+				{
+					switch ((String)token["ModuleFilterType"])
+					{
+						case "Best":
+							filter = ModuleBestFilter;
+							break;
+						case "None":
+							filter = ModuleNoneFilter;
+							break;
+						case "Specific":
+							if (token["Module"] != null)
+							{
+								var moduleKey = (String)token["Module"];
+								if (DataCache.Modules.ContainsKey(moduleKey))
+								{
+									filter = new ModuleSpecificFilter(DataCache.Modules[moduleKey]);
+								}
+							}
+							break;
+					}
+				}
+
+				return filter;
+			}
+		}
+
+		public class ModuleSpecificFilter : ModuleFilterBase
+		{
+			public Module Module { get; set; }
+
+			public ModuleSpecificFilter(Module module)
+			{
+				this.Module = module;
+			}
+			
+			public override String Name { get { return Module.Name; } }
+
+			public override void GetObjectData(SerializationInfo info, StreamingContext context)
+			{
+				info.AddValue("ModuleFilterType", "Specific");
+				info.AddValue("Module", Module.Name);
+			}
+
+			public override IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers)
+			{
+				List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
+				foreach (Assembler assembler in allowedAssemblers)
+				{
+					allowedPermutations.Add(new MachinePermutation(assembler, Enumerable.Repeat(this.Module, assembler.ModuleSlots).ToList()));
+				}
+
+				return allowedPermutations;
+			}
+		}
+
+		private class ModuleBestFilterImpl : ModuleFilterBase
+		{
+			public override void GetObjectData(SerializationInfo info, StreamingContext context)
+			{
+				info.AddValue("ModuleFilterType", "Best");
+			}
+
+			public override String Name { get { return "Best"; } }
+
+			public override IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers)
+			{
+				List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
+				foreach (Assembler assembler in allowedAssemblers)
+				{
+					allowedPermutations.AddRange(assembler.GetAllPermutations());
+				}
+
+				return allowedPermutations;
+			}
+		}
+
+		private class ModuleNoneFilterImpl : ModuleFilterBase
+		{
+			public override void GetObjectData(SerializationInfo info, StreamingContext context)
+			{
+				info.AddValue("ModuleFilterType", "None");
+			}
+
+			public override String Name { get { return "None"; } }
+
+			public override IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers)
+			{
+				List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
+				foreach (Assembler assembler in allowedAssemblers)
+				{
+					allowedPermutations.Add(new MachinePermutation(assembler, new List<Module>()));
+				}
+
+				return allowedPermutations;
+			}
+		}
+		public ModuleFilterBase ModuleFilter { get; set; }
+
+		public static ModuleFilterBase ModuleBestFilter { get { return new ModuleBestFilterImpl(); } }
+		public static ModuleFilterBase ModuleNoneFilter { get { return new ModuleNoneFilterImpl(); } }
 
 		protected RecipeNode(Recipe baseRecipe, ProductionGraph graph)
 			: base(graph)
 		{
 			BaseRecipe = baseRecipe;
+			ModuleFilter = ModuleBestFilter;
 		}
 
 		public override IEnumerable<Item> Inputs
@@ -253,7 +366,7 @@ namespace Foreman
 
 			List<Assembler> allowedAssemblers;
 
-			if (this.Assembler != null)
+			if (Assembler != null)
 			{
 				allowedAssemblers = new List<Assembler>();
 				allowedAssemblers.Add(this.Assembler);
@@ -266,22 +379,7 @@ namespace Foreman
 					.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count).ToList();
 			}
 
-			List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
-
-			if (this.Module != null)
-			{
-				foreach (Assembler assembler in allowedAssemblers)
-				{
-					allowedPermutations.Add(new MachinePermutation(assembler, Enumerable.Repeat(this.Module, assembler.ModuleSlots).ToList()));
-				}
-			}
-			else
-			{
-				foreach (Assembler assembler in allowedAssemblers)
-				{
-					allowedPermutations.AddRange(assembler.GetAllPermutations());
-				}
-			}
+			List<MachinePermutation> allowedPermutations = ModuleFilter.GetAllPermutations(allowedAssemblers).ToList();
 
 			var sortedPermutations = allowedPermutations.OrderBy(a => a.GetAssemblerRate(BaseRecipe.Time)).ToList();
 
@@ -353,10 +451,7 @@ namespace Foreman
 			{
 				info.AddValue("Assembler", Assembler.Name);
 			}
-			if (Module != null)
-			{
-				info.AddValue("Module", Module.Name);
-			}
+			ModuleFilter.GetObjectData(info, context);
 		}
 	}
 

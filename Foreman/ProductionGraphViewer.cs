@@ -789,15 +789,7 @@ namespace Foreman
 								}
 							}
 
-							if (node["Module"] != null)
-							{
-								var moduleKey = (String)node["module"];
-								if (DataCache.Modules.ContainsKey(moduleKey))
-								{
-									(newNode as RecipeNode).Module = DataCache.Modules[moduleKey];
-								}
-							}
-
+							(newNode as RecipeNode).ModuleFilter = RecipeNode.ModuleFilterBase.Load(node);
 							break;
 						}
 				}

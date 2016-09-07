@@ -78,15 +78,7 @@ namespace Foreman
 				this.assemblerButton.Text = assembler.FriendlyName;
 			}
 
-			var module = (BaseNode as RecipeNode).Module;
-			if (module == null)
-			{
-				this.modulesButton.Text = "Best";
-			}
-			else
-			{
-				this.modulesButton.Text = module.FriendlyName;
-			}
+			this.modulesButton.Text = (BaseNode as RecipeNode).ModuleFilter.Name;
 		}
 
 		private void fixedOption_CheckedChanged(object sender, EventArgs e)
@@ -178,6 +170,9 @@ namespace Foreman
 			var bestOption = new ItemChooserControl(null, "Best", "Best");
 			optionList.Add(bestOption);
 
+			var noneOption = new ItemChooserControl(null, "None", "None");
+			optionList.Add(noneOption);
+
 			var recipeNode = (BaseNode as RecipeNode);
 			var recipe = recipeNode.BaseRecipe;
 
@@ -199,12 +194,16 @@ namespace Foreman
 				{
 					if (c == bestOption)
 					{
-						(BaseNode as RecipeNode).Module = null;
+						(BaseNode as RecipeNode).ModuleFilter = RecipeNode.ModuleBestFilter;
+					}
+					else if (c == noneOption)
+					{
+						(BaseNode as RecipeNode).ModuleFilter = RecipeNode.ModuleNoneFilter;
 					}
 					else
 					{
 						var module = DataCache.Modules.Single(a => a.Key == c.DisplayText).Value;
-						(BaseNode as RecipeNode).Module = module;
+						(BaseNode as RecipeNode).ModuleFilter = new RecipeNode.ModuleSpecificFilter(module);
 					}
 					updateAssemblerButtons();
 					GraphViewer.Graph.UpdateNodeValues();
