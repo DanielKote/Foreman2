@@ -23,7 +23,7 @@ namespace Foreman
 
 		private void RecipeChooserSupplyNodeOption_Load(object sender, EventArgs e)
 		{
-			iconPictureBox.Image = DisplayedItem.Icon;
+			iconPictureBox.Image = DisplayedItem != null ? DisplayedItem.Icon : null;
 			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
 
 			RegisterMouseEvents(this);

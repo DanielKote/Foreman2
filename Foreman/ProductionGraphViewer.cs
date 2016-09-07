@@ -779,6 +779,25 @@ namespace Foreman
 								DataCache.Recipes.Add(recipeName, missingRecipe);
 								newNode = RecipeNode.Create(missingRecipe, Graph);
 							}
+
+							if (node["Assembler"] != null)
+							{
+								var assemblerKey = (String)node["Assembler"];
+								if (DataCache.Assemblers.ContainsKey(assemblerKey))
+								{
+									(newNode as RecipeNode).Assembler = DataCache.Assemblers[assemblerKey];
+								}
+							}
+
+							if (node["Module"] != null)
+							{
+								var moduleKey = (String)node["module"];
+								if (DataCache.Modules.ContainsKey(moduleKey))
+								{
+									(newNode as RecipeNode).Module = DataCache.Modules[moduleKey];
+								}
+							}
+
 							break;
 						}
 				}

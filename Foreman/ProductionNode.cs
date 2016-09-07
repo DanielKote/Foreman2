@@ -126,6 +126,8 @@ namespace Foreman
 	public class RecipeNode : ProductionNode
 	{
 		public Recipe BaseRecipe { get; private set; }
+		public Assembler Assembler { get; set; }
+		public Module Module { get; set; }
 
 		protected RecipeNode(Recipe baseRecipe, ProductionGraph graph)
 			: base(graph)
@@ -249,16 +251,36 @@ namespace Foreman
 			}
 			requiredRate = Math.Round(requiredRate, RoundingDP);
 
-			List<Assembler> allowedAssemblers = DataCache.Assemblers.Values
-				.Where(a => a.Enabled)
-				.Where(a => a.Categories.Contains(BaseRecipe.Category))
-				.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count).ToList();
+			List<Assembler> allowedAssemblers;
+
+			if (this.Assembler != null)
+			{
+				allowedAssemblers = new List<Assembler>();
+				allowedAssemblers.Add(this.Assembler);
+			}
+			else
+			{
+				allowedAssemblers = DataCache.Assemblers.Values
+					.Where(a => a.Enabled)
+					.Where(a => a.Categories.Contains(BaseRecipe.Category))
+					.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count).ToList();
+			}
 
 			List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
 
-			foreach (Assembler assembler in allowedAssemblers)
+			if (this.Module != null)
 			{
-				allowedPermutations.AddRange(assembler.GetAllPermutations());
+				foreach (Assembler assembler in allowedAssemblers)
+				{
+					allowedPermutations.Add(new MachinePermutation(assembler, Enumerable.Repeat(this.Module, assembler.ModuleSlots).ToList()));
+				}
+			}
+			else
+			{
+				foreach (Assembler assembler in allowedAssemblers)
+				{
+					allowedPermutations.AddRange(assembler.GetAllPermutations());
+				}
 			}
 
 			var sortedPermutations = allowedPermutations.OrderBy(a => a.GetAssemblerRate(BaseRecipe.Time)).ToList();
@@ -327,6 +349,14 @@ namespace Foreman
 			info.AddValue("RecipeName", BaseRecipe.Name);
 			info.AddValue("RateType", rateType);
 			info.AddValue("ActualRate", actualRate);
+			if (Assembler != null)
+			{
+				info.AddValue("Assembler", Assembler.Name);
+			}
+			if (Module != null)
+			{
+				info.AddValue("Module", Module.Name);
+			}
 		}
 	}
 
