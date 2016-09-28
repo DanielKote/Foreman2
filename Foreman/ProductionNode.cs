@@ -396,7 +396,7 @@ namespace Foreman
 					if (permutationToAdd != null)
 					{
 						int numberToAdd;
-						if (Graph.OneAssemblerPerRecipe)
+						if (Graph.OneAssemblerPerRecipe || Assembler != null)
 						{
 							numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time)));
 						}
