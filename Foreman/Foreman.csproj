@@ -123,7 +123,9 @@
     </Compile>
     <Compile Include="Recipe.cs" />
     <Compile Include="ProductionGraph.cs" />
-    <Compile Include="ProductionGraphViewer.cs" />
+    <Compile Include="ProductionGraphViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
