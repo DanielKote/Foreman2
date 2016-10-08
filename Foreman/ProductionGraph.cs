@@ -147,12 +147,7 @@ namespace Foreman
 			{
 				node.desiredRate = node.actualRate;
 			}
-
-			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Auto))
-			{
-				node.actualRate = node.desiredRate = 0f;
-			}
-
+			
 			foreach (NodeLink link in GetAllNodeLinks())
 			{
 				link.Throughput = 0f;
