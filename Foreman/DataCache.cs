@@ -676,6 +676,11 @@ namespace Foreman
 		
 		private static Bitmap LoadImage(String fileName)
 		{
+			if (fileName == null)
+			{
+				return null;
+			}
+
 			string fullPath = "";
 			if (File.Exists(fileName))
 			{
