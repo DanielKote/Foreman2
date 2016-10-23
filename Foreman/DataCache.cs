@@ -66,8 +66,9 @@ namespace Foreman
 		public static Dictionary<String, Resource> Resources = new Dictionary<string, Resource>();
 		public static Dictionary<String, Module> Modules = new Dictionary<string, Module>();
 		public static Dictionary<String, Inserter> Inserters = new Dictionary<string, Inserter>();
-
-		private const float defaultRecipeTime = 0.5f;
+        public static Dictionary<String, Technology> Technologies = new Dictionary<string, Technology>();
+        
+        private const float defaultRecipeTime = 0.5f;
 		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
 		public static Bitmap UnknownIcon;
 		public static Dictionary<String, Dictionary<String, String>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
@@ -209,7 +210,16 @@ namespace Foreman
 					}
 				}
 
-				UnknownIcon = LoadImage("UnknownIcon.png");
+                LuaTable technologyTable = lua.GetTable("data.raw")["technology"] as LuaTable;
+                if (technologyTable != null)
+                {
+                    foreach (String technologyName in technologyTable.Keys)
+                    {
+                        InterpretTechnology(technologyName, technologyTable[technologyName] as LuaTable);
+                    }
+                }
+
+                UnknownIcon = LoadImage("UnknownIcon.png");
 				if (UnknownIcon == null)
 				{
 					UnknownIcon = new Bitmap(32, 32);
@@ -1044,7 +1054,49 @@ namespace Foreman
 			}
 		}
 
-		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
+        private static void InterpretTechnology(String name, LuaTable values)
+        {
+            try
+            {
+                Technology newTechnology = new Technology(name);
+
+                String iconFile = ReadLuaString(values, "icon", true);
+                if (iconFile != null)
+                {
+                    Bitmap icon = LoadImage(iconFile);
+                    newTechnology.Icon = icon;
+                }
+
+                LuaTable unlocks = ReadLuaLuaTable(values, "effects");
+                foreach (LuaTable unlock in unlocks.Values)
+                {
+                    if (ReadLuaString(unlock, "type") == "unlock-recipe")
+                    {
+                        String recipeName = ReadLuaString(unlock, "recipe");
+                        Recipe recipe = DataCache.Recipes[recipeName];
+
+                        newTechnology.unlocks.Add(recipe);
+                    }
+                }
+
+                foreach (String s in Properties.Settings.Default.EnabledTechnologies)
+                {
+                    if (s.Split('|')[0] == name)
+                    {
+                        newTechnology.Enabled = (s.Split('|')[1] == "True");
+                    }
+                }
+
+                Technologies.Add(name, newTechnology);
+
+            }
+            catch (MissingPrototypeValueException e)
+            {
+                ErrorLogging.LogLine(String.Format("Error reading value '{0}' from technology prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
+            }
+        }
+
+        private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
 		{
 			Dictionary<Item, float> results = new Dictionary<Item, float>();
 			if (values["result"] != null)
