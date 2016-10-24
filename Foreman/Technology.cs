@@ -11,6 +11,7 @@ namespace Foreman
         public String Name { get; private set; }
         public Bitmap Icon { get; set; }
         public List<Recipe> unlocks { get; set; }
+        public List<Technology> Prerequisites { get; set; }   //TODO: Interpret these in DataCache.InterpretTechnologies
         public Boolean Enabled { get; set; }
 
         public String FriendlyName

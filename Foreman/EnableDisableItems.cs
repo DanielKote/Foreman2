@@ -107,5 +107,18 @@ namespace Foreman
 			}
 			ModsChanged = true;
 		}
-	}
+
+        private void TechnologySelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            Technology tech = (Technology)TechnologySelectionBox.Items[e.Index];
+            tech.Enabled = e.NewValue == CheckState.Checked;
+            if (!tech.Enabled)
+            {
+                for (int i = 0; i < TechnologySelectionBox.Items.Count; i++)
+                {
+                    // TODO: Finish after interpretation of prereqs is implemented.
+                }
+            }
+        }
+    }
 }
