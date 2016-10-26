@@ -258,9 +258,9 @@ namespace Foreman
 				}
 				NodeLink.Create(existingNode, node, item);
 			}
-			else if (item.Recipes.Any(r => !CyclicRecipes.Contains(r)))	//Create new recipe node and link from it
+			else if (item.Recipes.Any(r => r.Enabled && !CyclicRecipes.Contains(r)))	//Create new recipe node and link from it
 			{
-				RecipeNode newNode = RecipeNode.Create(item.Recipes.First(r => !CyclicRecipes.Contains(r)), this);
+				RecipeNode newNode = RecipeNode.Create(item.Recipes.First(r => !CyclicRecipes.Contains(r) && r.Enabled), this);
 				NodeLink.Create(newNode, node, item);
 			}
 			else //Create new supply node and link from it
