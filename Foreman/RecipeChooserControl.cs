@@ -63,16 +63,10 @@ namespace Foreman
         {
             if (e.Button == MouseButtons.Right)
             {
-                
-                Console.WriteLine(sender.ToString());
                 DisplayedRecipe.Enabled = !DisplayedRecipe.Enabled;
-
                 fakeDisable(DisplayedRecipe.Enabled);
             }
         }
-
-
-        
 
         // when Enabled is false, change appearance to that of a disabled control, without actually disabling.
         private void fakeDisable(bool enabled)

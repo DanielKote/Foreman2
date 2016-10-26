@@ -59,6 +59,9 @@ namespace Foreman
         //Asad Butt, Mon Oct 24 2016, 0fnt, "Convert an image to grayscale", Feb 15 '10 at 12:37, http://stackoverflow.com/a/2265990
         public static Bitmap MakeMonochrome(Bitmap src)
         {
+            if (src == null) { return null; }
+
+
             Bitmap dst = new Bitmap(src.Width, src.Height);
             Graphics g = Graphics.FromImage(dst);
 
