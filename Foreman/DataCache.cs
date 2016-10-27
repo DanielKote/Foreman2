@@ -219,6 +219,8 @@ namespace Foreman
 					}
 				}
 
+                UpdateCategories();
+
 				LoadAllLanguages();
 				LoadLocaleFiles();
 			}
@@ -854,12 +856,7 @@ namespace Foreman
 
 				Assemblers.Add(newAssembler.Name, newAssembler);
 
-                foreach (var category in newAssembler.Categories)
-                {
-                    UpdateCategory(category);
-                }
-
-			}
+            }
 			catch (MissingPrototypeValueException e)
 			{
 				ErrorLogging.LogLine(String.Format("Error reading value '{0}' from assembler prototype '{1}'. Returned error message: '{2}'", e.Key, name, e.Message));
@@ -1154,6 +1151,14 @@ namespace Foreman
             foreach (var recipe in DataCache.Recipes.Values.Where(r => r.Category == category))
             {
                 recipe.Enabled = enabled;
+            }
+        }
+
+        public static void UpdateCategories()
+        {
+            foreach (var category in Assemblers.Values.SelectMany(a => a.Categories).Distinct())
+            {
+                UpdateCategory(category);
             }
         }
     }

@@ -69,29 +69,9 @@ namespace Foreman
             Assembler assembler = (Assembler) AssemblerSelectionBox.Items[e.Index];
 			assembler.Enabled = e.NewValue == CheckState.Checked;
 
-            if (assembler.Enabled)
+            foreach (var category in assembler.Categories)
             {
-                // This assembler just turned on.
-                foreach (var recipe in DataCache.Recipes.Values.Where(r => assembler.Categories.Contains(r.Category)))
-                {
-                    // Enable every recipe this assembler can process.
-                    recipe.Enabled = true; 
-                }
-            }
-            else
-            {
-                // This assembler just turned off, disable any recipes in catagories that are now entirely disabled.
-                foreach (var category in assembler.Categories)
-                {
-                    //If any assembler that supports this category is enabled, we don't disable the associated recipes.
-                    if (!DataCache.Assemblers.Values.Any(a => a.Categories.Contains(category) && a.Enabled))
-                    {
-                        foreach (var recipe in DataCache.Recipes.Values.Where(r => r.Category == category))
-                        {
-                            recipe.Enabled = false;
-                        }
-                    }
-                }
+                DataCache.UpdateCategory(category);
             }
 
         }
@@ -134,5 +114,6 @@ namespace Foreman
 			}
 			ModsChanged = true;
 		}
+
 	}
 }

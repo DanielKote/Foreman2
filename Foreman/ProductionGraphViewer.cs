@@ -832,6 +832,7 @@ namespace Foreman
 				module.Enabled = EnabledModules.Contains(module.Name);
 			}
 
+            DataCache.UpdateCategories();
 			Graph.UpdateNodeValues();
 			AddRemoveElements();
 
