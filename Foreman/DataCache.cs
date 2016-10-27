@@ -853,6 +853,12 @@ namespace Foreman
 				}
 
 				Assemblers.Add(newAssembler.Name, newAssembler);
+
+                foreach (var category in newAssembler.Categories)
+                {
+                    UpdateCategory(category);
+                }
+
 			}
 			catch (MissingPrototypeValueException e)
 			{
@@ -1141,5 +1147,14 @@ namespace Foreman
 
 			return ingredients;
 		}
-	}
+
+        public static void UpdateCategory(String category)
+        {
+            var enabled = DataCache.Assemblers.Values.Any(assembler => assembler.Categories.Contains(category) && assembler.Enabled);
+            foreach (var recipe in DataCache.Recipes.Values.Where(r => r.Category == category))
+            {
+                recipe.Enabled = enabled;
+            }
+        }
+    }
 }
