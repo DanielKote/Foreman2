@@ -224,14 +224,17 @@ namespace Foreman
 
 		private void AutomaticCompleteButton_Click(object sender, EventArgs e)
 		{
-			//GraphViewer.Graph.LinkUpAllInputs();
+			GraphViewer.Graph.LinkUpAllInputs();
 			//GraphViewer.Graph.LinkUpAllOutputs();
-			//GraphViewer.Graph.UpdateNodeValues();
+
+			GraphViewer.Graph.UpdateNodeValues();
 			//GraphViewer.Graph.LinkUpAllOutputs();
-			GraphViewer.Graph.FindOptimalGraphToSatisfyFixedNodes();
-			GraphViewer.Graph.UpdateLinkThroughputs();
+
+			//GraphViewer.Graph.FindOptimalGraphToSatisfyFixedNodes();
+			//GraphViewer.Graph.UpdateLinkThroughputs();
 			GraphViewer.AddRemoveElements();
-			//GraphViewer.PositionNodes();
+
+			GraphViewer.PositionNodes();
 		}
 
 		private void ClearButton_Click(object sender, EventArgs e)

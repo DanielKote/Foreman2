@@ -103,33 +103,8 @@ namespace Foreman
 					relevantNodes[i].actualRate = Convert.ToSingle(solution[i]);
 				}
 			}
-		}
 
-		public static void AddAllPossibleRecipeNodesForInputs(this ProductionGraph graph)
-		{
-			foreach (ProductionNode node in graph.Nodes.ToList())
-			{
-				foreach (Item input in node.Inputs)
-				{
-					foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(input)))
-					{
-						if (!graph.Nodes.Any(n => n is RecipeNode && (n as RecipeNode).BaseRecipe == recipe))
-						{
-							var newNode = RecipeNode.Create(recipe, graph);
-							NodeLink.Create(newNode, node, input);
-						}
-					}
-				}
-			}
-
-			graph.LinkUpAllInputs();
-			graph.LinkUpAllInputs();
-			graph.LinkUpAllInputs();
-			graph.LinkUpAllInputs();
-			graph.LinkUpAllInputs();
-			graph.LinkUpAllInputs();
-			graph.LinkUpAllInputs();
-			graph.LinkUpAllInputs();
+			graph.UpdateLinkThroughputs();
 		}
 	}
 }

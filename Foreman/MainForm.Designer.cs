@@ -55,10 +55,10 @@
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.ReloadButton = new System.Windows.Forms.Button();
-			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.LanguageDropDown = new System.Windows.Forms.ComboBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -213,16 +213,16 @@
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(201, 3);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(185, 93);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(188, 93);
 			this.flowLayoutPanel1.TabIndex = 9;
 			// 
 			// AutomaticCompleteButton
 			// 
 			this.AutomaticCompleteButton.Location = new System.Drawing.Point(3, 3);
 			this.AutomaticCompleteButton.Name = "AutomaticCompleteButton";
-			this.AutomaticCompleteButton.Size = new System.Drawing.Size(179, 25);
+			this.AutomaticCompleteButton.Size = new System.Drawing.Size(182, 25);
 			this.AutomaticCompleteButton.TabIndex = 5;
-			this.AutomaticCompleteButton.Text = "Automatically complete flowchart";
+			this.AutomaticCompleteButton.Text = "Automatically create missing nodes";
 			this.AutomaticCompleteButton.UseVisualStyleBackColor = true;
 			this.AutomaticCompleteButton.Click += new System.EventHandler(this.AutomaticCompleteButton_Click);
 			// 
@@ -230,7 +230,7 @@
 			// 
 			this.ClearButton.Location = new System.Drawing.Point(3, 34);
 			this.ClearButton.Name = "ClearButton";
-			this.ClearButton.Size = new System.Drawing.Size(179, 25);
+			this.ClearButton.Size = new System.Drawing.Size(182, 25);
 			this.ClearButton.TabIndex = 6;
 			this.ClearButton.Text = "Clear flowchart";
 			this.ClearButton.UseVisualStyleBackColor = true;
@@ -240,7 +240,7 @@
 			// 
 			this.EnableDisableButton.Location = new System.Drawing.Point(3, 65);
 			this.EnableDisableButton.Name = "EnableDisableButton";
-			this.EnableDisableButton.Size = new System.Drawing.Size(179, 25);
+			this.EnableDisableButton.Size = new System.Drawing.Size(182, 25);
 			this.EnableDisableButton.TabIndex = 7;
 			this.EnableDisableButton.Text = "Enable/disable objects";
 			this.EnableDisableButton.UseVisualStyleBackColor = true;
@@ -254,7 +254,7 @@
 			this.flowLayoutPanel3.Controls.Add(this.loadGraphButton);
 			this.flowLayoutPanel3.Controls.Add(this.ExportImageButton);
 			this.flowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel3.Location = new System.Drawing.Point(392, 3);
+			this.flowLayoutPanel3.Location = new System.Drawing.Point(395, 3);
 			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
 			this.flowLayoutPanel3.Size = new System.Drawing.Size(124, 93);
 			this.flowLayoutPanel3.TabIndex = 14;
@@ -296,7 +296,7 @@
 			this.groupBox2.Controls.Add(this.SingleAssemblerPerRecipeCheckBox);
 			this.groupBox2.Controls.Add(this.AssemblerDisplayCheckBox);
 			this.groupBox2.Controls.Add(this.MinerDisplayCheckBox);
-			this.groupBox2.Location = new System.Drawing.Point(522, 3);
+			this.groupBox2.Location = new System.Drawing.Point(525, 3);
 			this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
@@ -348,7 +348,7 @@
 			this.flowLayoutPanel2.Controls.Add(this.ModDirectoryButton);
 			this.flowLayoutPanel2.Controls.Add(this.ReloadButton);
 			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(710, 3);
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(713, 3);
 			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
 			this.flowLayoutPanel2.Size = new System.Drawing.Size(125, 90);
 			this.flowLayoutPanel2.TabIndex = 13;
@@ -383,22 +383,12 @@
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
-			// 
 			// groupBox3
 			// 
 			this.groupBox3.AutoSize = true;
 			this.groupBox3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.groupBox3.Controls.Add(this.LanguageDropDown);
-			this.groupBox3.Location = new System.Drawing.Point(841, 3);
+			this.groupBox3.Location = new System.Drawing.Point(844, 3);
 			this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
@@ -432,6 +422,16 @@
 			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
 			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
 			this.GraphViewer.TabIndex = 12;
+			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
 			// 
 			// MainForm
 			// 
