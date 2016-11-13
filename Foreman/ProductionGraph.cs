@@ -143,7 +143,7 @@ namespace Foreman
 					List<NodeLink> outLinksForThisItem = new List<NodeLink>();
 					foreach (NodeLink link in node.OutputLinks)
 					{
-						link.Throughput += Math.Min(link.Demand, node.GetUnusedOutput(item));
+						link.Throughput += Math.Min(link.Consumer.GetUnsatisfiedDemand(link.Item), node.GetUnusedOutput(item));
 					}
 				}
 			}
@@ -155,7 +155,7 @@ namespace Foreman
 					List<NodeLink> inLinksForThisItem = new List<NodeLink>();
 					foreach (NodeLink link in node.InputLinks)
 					{
-						link.Throughput += Math.Min(link.Demand, link.Supplier.GetUnusedOutput(item));
+						link.Throughput += Math.Min(link.Consumer.GetUnsatisfiedDemand(link.Item), link.Supplier.GetUnusedOutput(item));
 					}
 				}
 			}
