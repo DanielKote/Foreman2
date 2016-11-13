@@ -56,7 +56,14 @@ namespace Foreman
 					}
 				}
 
-				solver.AddConstraint(new Constraint(itemRequirements[item], ConstraintType.GreaterThan, equationCoefficients));
+				if (itemRequirements[item] < 0)
+				{
+					solver.AddConstraint(new Constraint(-itemRequirements[item], ConstraintType.LessThan, equationCoefficients.Select(c => -c).ToArray()));
+				}
+				else
+				{
+					solver.AddConstraint(new Constraint(itemRequirements[item], ConstraintType.GreaterThan, equationCoefficients));
+				}
 			}
 			
 			decimal[] objectiveFunctionCoefficients = new decimal[nodeCount];
@@ -91,7 +98,7 @@ namespace Foreman
 				{
 					relevantNodes[i].desiredRate = Convert.ToSingle(solution[i]);
 				}
-				if (!(relevantNodes[i] is SupplyNode && relevantNodes[i].rateType == RateType.Manual))
+				if (!(relevantNodes[i] is ConsumerNode) && relevantNodes[i].rateType == RateType.Auto)
 				{
 					relevantNodes[i].actualRate = Convert.ToSingle(solution[i]);
 				}

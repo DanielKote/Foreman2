@@ -254,7 +254,7 @@ namespace Foreman
 		{
 			var results = new Dictionary<MachinePermutation, int>();
 
-			double requiredRate = GetRateDemandedByOutputs();
+			double requiredRate = actualRate;
 			if (requiredRate == double.PositiveInfinity)
 			{
 				return results;
