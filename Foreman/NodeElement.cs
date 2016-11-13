@@ -474,6 +474,7 @@ namespace Foreman
 							}
 						}
 					}
+					tti.Text += String.Format("\n\nCurrent Rate: {0}/s", DisplayedNode.actualRate);
 					Parent.AddTooltip(tti);
 				}
 

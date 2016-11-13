@@ -9,76 +9,71 @@ namespace Foreman
 	{
 		public static void FindOptimalGraphToSatisfyFixedNodes(this ProductionGraph graph)
 		{
-			//graph.AddAllPossibleRecipeNodesForInputs();
+			List<ProductionNode> relevantNodes = graph.Nodes.Where(n => n is RecipeNode || n is SupplyNode).ToList();
+			int nodeCount = relevantNodes.Count();
+			Dictionary<Item, Decimal> itemRequirements = new Dictionary<Item, decimal>();
 
-			List<RecipeNode> recipeNodes = graph.Nodes.OfType<RecipeNode>().ToList();
-			int nodeCount = recipeNodes.Count();
-			HashSet<Item> presentItems = new HashSet<Item>();
+			foreach (var node in graph.Nodes)
+			{
+				foreach (Item item in node.Inputs.Union(node.Outputs))
+				{
+					itemRequirements[item] = 0M;
+				}
+			}
 
-			foreach (var node in graph.Nodes)//.Where(n => n.rateType == RateType.Manual))
+			foreach (var node in graph.Nodes.Where(n => n.rateType == RateType.Manual))
 			{
 				foreach (Item item in node.Inputs.Concat(node.Outputs))
 				{
-					presentItems.Add(item);
+					itemRequirements[item] += (decimal)node.GetTotalDemand(item);
 				}
 			}
-
-			int itemCount = presentItems.Count();
-			List<Item> itemList = presentItems.ToList();
 
 			LinearProgrammingSolver solver = new LinearProgrammingSolver();
-			foreach (Item item in itemList)
+			foreach (Item item in itemRequirements.Keys)
 			{
-				decimal itemTotalOutput = 0M;
 				decimal[] equationCoefficients = new decimal[nodeCount];
-				for (int i = 0; i < recipeNodes.Count(); i++)
+				for (int i = 0; i < relevantNodes.Count(); i++)
 				{
-					RecipeNode node = recipeNodes[i];
-					if (node.Inputs.Contains(item))
+					ProductionNode node = relevantNodes[i];
+					if (node is SupplyNode && node.Outputs.Contains(item))
 					{
-						equationCoefficients[i] -= (decimal)node.BaseRecipe.Ingredients[item];
+						equationCoefficients[i] = 1;
 					}
-					if (node.Outputs.Contains(item))
+					else if (node is RecipeNode)
 					{
-						equationCoefficients[i] += (decimal)node.BaseRecipe.Results[item];
+						if (node.Inputs.Contains(item))
+						{
+							equationCoefficients[i] -= (decimal)((RecipeNode)node).BaseRecipe.Ingredients[item];
+						}
+						if (node.Outputs.Contains(item))
+						{
+							equationCoefficients[i] += (decimal)((RecipeNode)node).BaseRecipe.Results[item];
+						}
 					}
 				}
 
-				foreach (SupplyNode node in graph.Nodes.OfType<SupplyNode>().Where(n => n.Outputs.Contains(item) && n.rateType == RateType.Manual))
-				{
-					itemTotalOutput -= (decimal)node.desiredRate;
-				}
-
-				foreach (ConsumerNode node in graph.Nodes.OfType<ConsumerNode>().Where(n => n.Inputs.Contains(item) && n.rateType == RateType.Manual))
-				{
-					itemTotalOutput += (decimal)node.desiredRate;
-				}
-
-				solver.AddConstraint(new Constraint(itemTotalOutput, ConstraintType.GreaterThan, equationCoefficients));
+				solver.AddConstraint(new Constraint(itemRequirements[item], ConstraintType.GreaterThan, equationCoefficients));
 			}
 
-			HashSet<Item> baseItems = new HashSet<Item>() { DataCache.Items["iron-ore"], DataCache.Items["copper-ore"], DataCache.Items["crude-oil"] };
+			//HashSet<Item> baseItems = new HashSet<Item>() { DataCache.Items["iron-ore"], DataCache.Items["copper-ore"], DataCache.Items["crude-oil"] };
 			decimal[] objectiveFunctionCoefficients = new decimal[nodeCount];
-
 			{
 				int i = 0;
-				foreach (RecipeNode node in graph.Nodes.Where(n => n is RecipeNode))
+				foreach (ProductionNode node in relevantNodes)
 				{
-					foreach (Item item in node.Inputs)
+					if (node is SupplyNode)
 					{
-						if (baseItems.Contains(item))
+						if (((SupplyNode)node).Outputs.Contains(DataCache.Items["water"]))
 						{
-							objectiveFunctionCoefficients[i] += (decimal)node.BaseRecipe.Ingredients[item];
+							objectiveFunctionCoefficients[i] = 0M;
 						}
-					}
-					foreach (Item item in node.Outputs)
-					{
-						if (baseItems.Contains(item))
+						else
 						{
-							objectiveFunctionCoefficients[i] -= (decimal)node.BaseRecipe.Results[item];
+							objectiveFunctionCoefficients[i] = 1M;
 						}
+						
 					}
-
 					i++;
 				}
 			}
@@ -86,9 +81,10 @@ namespace Foreman
 			solver.SetObjectiveFunction(objectiveFunctionCoefficients, ObjectiveFunctionType.Minimise);
 
 			var solution = solver.solve();
-			for (int i = 0; i < recipeNodes.Count(); i++)
+			for (int i = 0; i < relevantNodes.Count(); i++)
 			{
-				recipeNodes[i].actualRate = Convert.ToSingle(solution[i]);
+				relevantNodes[i].desiredRate = Convert.ToSingle(solution[i]);
+				relevantNodes[i].actualRate = Convert.ToSingle(solution[i]);
 			}
 		}
 

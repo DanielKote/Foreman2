@@ -55,7 +55,8 @@ namespace Foreman
 			}
 
 			//Now it's standard!
-			while (rows.Last().HasNegatives)
+			int infiniteStopper = 1000;
+			while (rows.Last().HasNegatives && infiniteStopper-- > 0)
 			{
 				int pivotColumn = rows.Last().IndexOfMostNegative;
 				int pivotRow = choosePivotRow(pivotColumn);
@@ -115,17 +116,17 @@ namespace Foreman
 					{
 						ratios[i] = rows[i].RHS / rows[i][pivotColumn];
 					}
-					catch (DivideByZeroException e)
+					catch (DivideByZeroException)
 					{
 						ratios[i] = Decimal.MaxValue;
 					}
 				}
 			}
 
-			int indexOfLowestRatio = 0;
+			int indexOfLowestRatio = -1;
 			for (int i = 0; i < ratios.Count(); i++)
 			{
-				if (ratios[i] >= 0 && ratios[i] < ratios[indexOfLowestRatio])
+				if (ratios[i] >= 0 && (indexOfLowestRatio == -1 || ratios[i] < ratios[indexOfLowestRatio]))
 				{
 					indexOfLowestRatio = i;
 				}
@@ -164,7 +165,7 @@ namespace Foreman
 		private LinearEquation ConvertConstraintToEquation(Constraint constraint, int index)
 		{
 			decimal multiplier = 1M;
-			if (constraint.Type == ConstraintType.GreaterThan)
+			if (constraint.Type == ConstraintType.GreaterThan)	//Equations are assumed to be less-than by the solver
 			{
 				multiplier = -1M;
 			}
@@ -174,7 +175,7 @@ namespace Foreman
 			{
 				equationCoefficients[i] = constraint.Coefficients[i] * multiplier;
 			}
-			equationCoefficients[constraint.Coefficients.Count() + index] = 1;
+			equationCoefficients[constraint.Coefficients.Count() + index] = 1M;	//Add slack variable
 
 			result.Coefficients = equationCoefficients;
 			return result;
@@ -215,6 +216,33 @@ namespace Foreman
 			this.RHS = rhs;
 			this.Type = type;
 			this.Coefficients = coefficients;
+		}
+
+		public override string ToString()
+		{
+			string output = "";
+			int aChar = 97;
+
+			for (int i = 0; i < Coefficients.Count(); i++)
+			{
+				if (Coefficients[i] != 0)
+				{
+					output += Coefficients[i].ToString("+#;-#") + (char)(aChar + i) + " ";
+				}
+			}
+
+			if (Type == ConstraintType.GreaterThan)
+			{
+				output += ">= ";
+			}
+			else
+			{
+				output += "<= ";
+			}
+
+			output += RHS.ToString();
+
+			return output;
 		}
 	}
 
@@ -323,7 +351,7 @@ namespace Foreman
 			string output = "";
 			foreach (decimal value in Coefficients)
 			{
-				output += decimal.Round(value, 4) + " ";
+				output += String.Format("{0,-8:0}", decimal.Round(value, 4)) + " ";
 			}
 			output += " | " + decimal.Round(RHS, 4);
 

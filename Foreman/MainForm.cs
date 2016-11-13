@@ -229,8 +229,9 @@ namespace Foreman
 			//GraphViewer.Graph.UpdateNodeValues();
 			//GraphViewer.Graph.LinkUpAllOutputs();
 			GraphViewer.Graph.FindOptimalGraphToSatisfyFixedNodes();
+			GraphViewer.Graph.UpdateLinkThroughputs();
 			GraphViewer.AddRemoveElements();
-			GraphViewer.PositionNodes();
+			//GraphViewer.PositionNodes();
 		}
 
 		private void ClearButton_Click(object sender, EventArgs e)

@@ -141,6 +141,38 @@ namespace Foreman
 			}
 		}
 
+		public void UpdateLinkThroughputs()
+		{
+			foreach (NodeLink link in GetAllNodeLinks())
+			{
+				link.Throughput = 0;
+			}
+
+			foreach (ProductionNode node in Nodes)
+			{
+				foreach (Item item in node.Outputs)
+				{
+					List<NodeLink> outLinksForThisItem = new List<NodeLink>();
+					foreach (NodeLink link in node.OutputLinks)
+					{
+						link.Throughput += Math.Min(link.Demand, node.GetUnusedOutput(item));
+					}
+				}
+			}
+
+			foreach (ProductionNode node in Nodes)
+			{
+				foreach (Item item in node.Inputs)
+				{
+					List<NodeLink> inLinksForThisItem = new List<NodeLink>();
+					foreach (NodeLink link in node.InputLinks)
+					{
+						link.Throughput += Math.Min(link.Demand, link.Supplier.GetUnusedOutput(item));
+					}
+				}
+			}
+		}
+
 		public void UpdateNodeValues()
 		{
 			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Manual))
