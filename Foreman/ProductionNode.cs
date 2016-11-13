@@ -23,6 +23,7 @@ namespace Foreman
 		public abstract float GetUnsatisfiedDemand(Item item);
 		public abstract float GetTotalOutput(Item item);
 		public abstract float GetTotalDemand(Item item);
+		public abstract float GetDesiredOutput(Item item);
 		public abstract float GetRateLimitedByInputs();
 		public abstract float GetRateDemandedByOutputs();
 		public RateType rateType = RateType.Auto;
@@ -225,6 +226,17 @@ namespace Foreman
 			return (float)Math.Round(BaseRecipe.Results[item] * actualRate, RoundingDP);
 		}
 
+		public override float GetDesiredOutput(Item item)
+		{
+			if (BaseRecipe.IsMissingRecipe
+				|| !BaseRecipe.Results.ContainsKey(item))
+			{
+				return 0f;
+			}
+
+			return (float)Math.Round(BaseRecipe.Results[item] * desiredRate, RoundingDP);
+		}
+
 		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
 		private float ValidateRecipeRate(float amount)
 		{
@@ -399,6 +411,11 @@ namespace Foreman
 		{
 			return 0f;
 		}
+		
+		public override float GetDesiredOutput(Item item)
+		{
+			return desiredRate;
+		}
 
 		public override float GetTotalOutput(Item item)
 		{
@@ -522,6 +539,11 @@ namespace Foreman
 		}
 
 		public override float GetTotalOutput(Item item)
+		{
+			return 0;
+		}
+
+		public override float GetDesiredOutput(Item item)
 		{
 			return 0;
 		}

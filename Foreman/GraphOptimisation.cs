@@ -9,7 +9,7 @@ namespace Foreman
 	{
 		public static void FindOptimalGraphToSatisfyFixedNodes(this ProductionGraph graph)
 		{
-			List<ProductionNode> relevantNodes = graph.Nodes.Where(n => n is RecipeNode || n is SupplyNode).ToList();
+			List<ProductionNode> relevantNodes = graph.Nodes;
 			int nodeCount = relevantNodes.Count();
 			Dictionary<Item, Decimal> itemRequirements = new Dictionary<Item, decimal>();
 
@@ -25,7 +25,7 @@ namespace Foreman
 			{
 				foreach (Item item in node.Inputs.Concat(node.Outputs))
 				{
-					itemRequirements[item] += (decimal)node.GetTotalDemand(item);
+					itemRequirements[item] += (decimal)node.GetTotalDemand(item) - (decimal)node.GetDesiredOutput(item);
 				}
 			}
 
@@ -39,6 +39,9 @@ namespace Foreman
 					if (node is SupplyNode && node.Outputs.Contains(item))
 					{
 						equationCoefficients[i] = 1;
+					} else if (node is ConsumerNode && node.Inputs.Contains(item))
+					{
+						equationCoefficients[i] = -1;
 					}
 					else if (node is RecipeNode)
 					{
@@ -55,8 +58,7 @@ namespace Foreman
 
 				solver.AddConstraint(new Constraint(itemRequirements[item], ConstraintType.GreaterThan, equationCoefficients));
 			}
-
-			//HashSet<Item> baseItems = new HashSet<Item>() { DataCache.Items["iron-ore"], DataCache.Items["copper-ore"], DataCache.Items["crude-oil"] };
+			
 			decimal[] objectiveFunctionCoefficients = new decimal[nodeCount];
 			{
 				int i = 0;
@@ -71,8 +73,10 @@ namespace Foreman
 						else
 						{
 							objectiveFunctionCoefficients[i] = 1M;
-						}
-						
+						}						
+					} else if (node is ConsumerNode)
+					{
+						objectiveFunctionCoefficients[i] = -1M;
 					}
 					i++;
 				}
@@ -83,8 +87,14 @@ namespace Foreman
 			var solution = solver.solve();
 			for (int i = 0; i < relevantNodes.Count(); i++)
 			{
-				relevantNodes[i].desiredRate = Convert.ToSingle(solution[i]);
-				relevantNodes[i].actualRate = Convert.ToSingle(solution[i]);
+				if (relevantNodes[i].rateType == RateType.Auto)
+				{
+					relevantNodes[i].desiredRate = Convert.ToSingle(solution[i]);
+				}
+				if (!(relevantNodes[i] is SupplyNode && relevantNodes[i].rateType == RateType.Manual))
+				{
+					relevantNodes[i].actualRate = Convert.ToSingle(solution[i]);
+				}
 			}
 		}
 
