@@ -296,7 +296,14 @@ namespace Foreman
 						{
 							numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time)));
 						}
-						results.Add(permutationToAdd, numberToAdd);
+						if (!results.ContainsKey(permutationToAdd))
+						{
+							results.Add(permutationToAdd, numberToAdd);
+						}
+						else
+						{
+							results[permutationToAdd] += numberToAdd;
+						}
 					}
 					else
 					{
