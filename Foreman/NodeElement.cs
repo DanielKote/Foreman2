@@ -478,7 +478,16 @@ namespace Foreman
 							}
 						}
 					}
-					tti.Text += String.Format("\n\nCurrent Rate: {0}/s", DisplayedNode.actualRate);
+
+					if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
+					{
+						tti.Text += String.Format("\n\nCurrent iterations: {0}", DisplayedNode.actualRate);
+					} else
+					{
+						tti.Text += String.Format("\n\nCurrent Rate: {0}/{1}",
+							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? DisplayedNode.actualRate / 60 : DisplayedNode.actualRate,
+							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? "m" : "s");
+					}
 					Parent.AddTooltip(tti);
 				}
 
