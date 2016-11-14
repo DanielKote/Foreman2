@@ -11,9 +11,7 @@ namespace Foreman
 	public class ProductionGraph
 	{
 		public List<ProductionNode> Nodes = new List<ProductionNode>();
-		private int[,] pathMatrixCache = null;
 		private int[,] adjacencyMatrixCache = null;
-		public HashSet<Recipe> CyclicRecipes = new HashSet<Recipe>();
 		private AmountType selectedAmountType = AmountType.FixedAmount;
 		public RateUnit SelectedUnit = RateUnit.PerSecond;
 		public bool OneAssemblerPerRecipe = false;
@@ -41,11 +39,10 @@ namespace Foreman
 			}
 		}
 
-		public ProductionGraph() {}
+		public ProductionGraph() { }
 
 		public void InvalidateCaches()
 		{
-			pathMatrixCache = null;
 			adjacencyMatrixCache = null;
 		}
 
@@ -71,7 +68,7 @@ namespace Foreman
 				return (int[,])adjacencyMatrixCache.Clone();
 			}
 		}
-		
+
 		public IEnumerable<ProductionNode> GetSuppliers(Item item)
 		{
 			foreach (ProductionNode node in Nodes)
@@ -96,26 +93,17 @@ namespace Foreman
 
 		public void LinkUpAllInputs()
 		{
-			bool graphChanged;
+			HashSet<ProductionNode> nodesToVisit = new HashSet<ProductionNode>(Nodes);
 
-			do
+			while (nodesToVisit.Any())
 			{
-				graphChanged = false;
-
-				foreach (ProductionNode node in Nodes.ToList())
-				{
-					foreach (Item item in node.Inputs)
-					{
-						if (!node.InputLinks.Any(l => l.Item == item))
-						{
-							if (CreateAppropriateLink(node, item))
-							{
-								graphChanged = true;
-							}
-						}
-					}
-				}
-			} while (graphChanged);
+				ProductionNode currentNode = nodesToVisit.First();
+				nodesToVisit.Remove(nodesToVisit.First());
+				
+				nodesToVisit.UnionWith(CreateOrLinkAllPossibleRecipeNodes(currentNode));
+				nodesToVisit.UnionWith(CreateOrLinkAllPossibleSupplyNodes(currentNode));
+				CreateAllPossibleInputLinks();
+			}
 		}
 
 		public void LinkUpAllOutputs()
@@ -141,6 +129,38 @@ namespace Foreman
 			}
 		}
 
+		public void UpdateLinkThroughputs()
+		{
+			foreach (NodeLink link in GetAllNodeLinks())
+			{
+				link.Throughput = 0;
+			}
+
+			foreach (ProductionNode node in Nodes)
+			{
+				foreach (Item item in node.Outputs)
+				{
+					List<NodeLink> outLinksForThisItem = new List<NodeLink>();
+					foreach (NodeLink link in node.OutputLinks)
+					{
+						link.Throughput += Math.Min(link.Consumer.GetUnsatisfiedDemand(link.Item), node.GetUnusedOutput(item));
+					}
+				}
+			}
+
+			foreach (ProductionNode node in Nodes)
+			{
+				foreach (Item item in node.Inputs)
+				{
+					List<NodeLink> inLinksForThisItem = new List<NodeLink>();
+					foreach (NodeLink link in node.InputLinks)
+					{
+						link.Throughput += Math.Min(link.Consumer.GetUnsatisfiedDemand(link.Item), link.Supplier.GetUnusedOutput(item));
+					}
+				}
+			}
+		}
+
 		public void UpdateNodeValues()
 		{
 			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Manual))
@@ -148,147 +168,91 @@ namespace Foreman
 				node.desiredRate = node.actualRate;
 			}
 
-			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Auto))
+			this.FindOptimalGraphToSatisfyFixedNodes();
+			UpdateLinkThroughputs();
+		}
+
+		public void CreateAllPossibleInputLinks()
+		{
+			foreach (ProductionNode node in Nodes)
 			{
-				node.actualRate = node.desiredRate = 0f;
-			}
-
-			foreach (NodeLink link in GetAllNodeLinks())
-			{
-				link.Throughput = 0f;
-			}
-
-			// Go down the list and increase each auto node's production rate to satisfy every manual node
-			foreach (ProductionNode startingNode in Nodes.Where(n => n.rateType == RateType.Manual))
-			{
-				Stack<NodeLink> routeHome = new Stack<NodeLink>();	//The links we need to take to get back to the starting node
-				HashSet<ProductionNode> nodesInStack = new HashSet<ProductionNode>{startingNode};
-				int[] linkIndices = new int[Nodes.Count];	//Record which link we took at each tier of the depth-first traversal. Increment it when we go back up from that tier and reset it to 0 when we go down a tier.
-
-				ProductionNode currentNode = startingNode;
-
-				do
-				{
-					if (linkIndices[routeHome.Count()] < currentNode.InputLinks.Count())
-					{
-						NodeLink nextLink = currentNode.InputLinks[linkIndices[routeHome.Count()]];
-						linkIndices[routeHome.Count()]++;
-						if (nextLink.Supplier.rateType == RateType.Auto && !nodesInStack.Contains(nextLink.Supplier))
-						{
-							routeHome.Push(nextLink);
-							nextLink.Throughput += currentNode.GetUnsatisfiedDemand(nextLink.Item);
-
-							currentNode = nextLink.Supplier;
-							currentNode.actualRate = currentNode.GetRateDemandedByOutputs();
-							currentNode.desiredRate = currentNode.actualRate;
-							nodesInStack.Add(currentNode);
-						}
-						else
-						{
-							nextLink.Throughput += Math.Min(nextLink.Supplier.GetUnusedOutput(nextLink.Item), currentNode.GetUnsatisfiedDemand(nextLink.Item));
-						}
-					}
-					else
-					{
-						if (routeHome.Any())
-						{
-							linkIndices[routeHome.Count()] = 0;
-							nodesInStack.Remove(currentNode);
-							currentNode = routeHome.Pop().Consumer;
-						}
-					}
-
-				} while (!(currentNode == startingNode && linkIndices[0] >= startingNode.InputLinks.Count()));
-			}
-
-			//Go up the list and make each node go as fast as it can, given the amounts being input to it
-			var sortedNodes = GetTopologicalSort();
-			foreach (var node in sortedNodes)
-			{
-				if (node.rateType == RateType.Auto)
-				{
-					node.actualRate = node.GetRateLimitedByInputs();
-				}
-				foreach (Item item in node.Outputs)
-				{
-					float remainingOutput = node.GetTotalOutput(item);
-					foreach (NodeLink link in node.OutputLinks.Where(l => l.Item == item))
-					{
-						link.Throughput = Math.Min(link.Throughput, remainingOutput);
-						remainingOutput -= link.Throughput;
-					}
-				}
-			}
-
-			//Find any remaining auto nodes with rate = 0 and make them use as many items as they can
-			//These nodes are probably nodes at the top of the flowchart with nothing above them demanding items
-			foreach (var node in sortedNodes.Where(n => n.rateType == RateType.Auto && n.desiredRate == 0))
-			{
-				foreach (NodeLink link in node.InputLinks)
-				{
-					link.Throughput = link.Supplier.GetTotalOutput(link.Item) - link.Supplier.GetUsedOutput(link.Item);
-				}
-				node.actualRate = node.GetRateLimitedByInputs();
-				if (node.actualRate > 0)
-				{
-					node.desiredRate = node.actualRate;
-				}
-				else
-				{
-					//This node can't run with the available items, so free them up for another node to potentially use (and so the node doesn't display the wrong throughput for each item)
-					node.InputLinks.ForEach(l => l.Throughput = 0);
-				}
+				CreateAllLinksForNode(node);
 			}
 		}
 
 		//Returns true if a new link was created
-		public bool CreateAppropriateLink(ProductionNode node, Item item)
+		public void CreateAllLinksForNode(ProductionNode node)
 		{
-			if (node is RecipeNode && CyclicRecipes.Contains((node as RecipeNode).BaseRecipe))
+			foreach (Item item in node.Inputs)
 			{
-				return false;
-			}
-			
-			if (Nodes.Any(n => n.Outputs.Contains(item)))	//Add link from existing node
-			{
-				ProductionNode existingNode = Nodes.Find(n => n.Outputs.Contains(item));
-				if (existingNode == node)
+				foreach (ProductionNode existingNode in Nodes.Where(n => n.Outputs.Contains(item)))
 				{
-					return false;
+					if (existingNode != node)
+					{
+						NodeLink.Create(existingNode, node, item);
+					}
 				}
-				NodeLink.Create(existingNode, node, item);
 			}
-			else if (item.Recipes.Any(r => !CyclicRecipes.Contains(r)))	//Create new recipe node and link from it
+		}
+
+		//Returns any nodes that are created
+		public IEnumerable<ProductionNode> CreateOrLinkAllPossibleRecipeNodes(ProductionNode node)
+		{
+			List<ProductionNode> createdNodes = new List<ProductionNode>();
+
+			foreach (Item item in node.Inputs)
 			{
-				RecipeNode newNode = RecipeNode.Create(item.Recipes.First(r => !CyclicRecipes.Contains(r)), this);
-				NodeLink.Create(newNode, node, item);
-			}
-			else //Create new supply node and link from it
-			{
-				SupplyNode newNode = SupplyNode.Create(item, this);
-				NodeLink.Create(newNode, node, item, node.GetUnsatisfiedDemand(item));
+				var recipePool = item.Recipes.Where(r => !r.IsCyclic);   //Ignore recipes that can ultimately supply themselves, like filling/emptying barrels or certain modded recipes
+
+				foreach (Recipe recipe in recipePool)
+				{
+					var existingNodes = Nodes.OfType<RecipeNode>().Where(n => n.BaseRecipe == recipe);
+
+					if (!existingNodes.Any())
+					{
+						RecipeNode newNode = RecipeNode.Create(recipe, this);
+						NodeLink.Create(newNode, node, item);
+						createdNodes.Add(newNode);
+					}
+					else
+					{
+						foreach (RecipeNode existingNode in existingNodes)
+						{
+							NodeLink.Create(existingNode, node, item);
+						}
+					}
+				}
 			}
 
-			ReplaceCycles();
-			return true;
+			return createdNodes;
 		}
-		
-		//Replace recipe cycles with a simple supplier node so that they don't cause infinite loops. This is a workaround.
-		public void ReplaceCycles()
+
+		//Returns any nodes that are created
+		public IEnumerable<ProductionNode> CreateOrLinkAllPossibleSupplyNodes(ProductionNode node)
 		{
-			foreach (var StrongComponent in GetStronglyConnectedComponents().Where(scc => scc.Count() > 1))
+			List<ProductionNode> createdNodes = new List<ProductionNode>();
+
+			var unlinkedItems = node.Inputs.Where(i => !node.InputLinks.Any(nl => nl.Item == i));
+
+			foreach (Item item in unlinkedItems)
 			{
-				foreach (ProductionNode node in StrongComponent)
+				var existingNodes = Nodes.OfType<SupplyNode>().Where(n => n.SuppliedItem == item);
+
+				if (!existingNodes.Any())
 				{
-					foreach (NodeLink link in node.InputLinks.ToList().Union(node.OutputLinks.ToList()))
+					SupplyNode newNode = SupplyNode.Create(item, this);
+					NodeLink.Create(newNode, node, item);
+					createdNodes.Add(newNode);
+				}
+				else
+				{
+					foreach (SupplyNode existingNode in existingNodes)
 					{
-						link.Destroy();
+						NodeLink.Create(existingNode, node, item);
 					}
-					CyclicRecipes.Add((node as RecipeNode).BaseRecipe);
-					Nodes.Remove(node);
 				}
 			}
-			InvalidateCaches();
+			return createdNodes;
 		}
 
 		public IEnumerable<ProductionNode> GetInputlessNodes()
@@ -302,6 +266,7 @@ namespace Foreman
 			}
 		}
 
+		//https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
 		private class TarjanNode
 		{
 			public readonly ProductionNode SourceNode;
@@ -315,7 +280,10 @@ namespace Foreman
 			}
 		}
 
-		public IEnumerable<IEnumerable<ProductionNode>> GetStronglyConnectedComponents()
+		//A strongly connected component is a set of nodes in a directed graph that each has a route to every other node in the set.
+		//In this case it means there is a potential manufacturing loop e.g. emptying/refilling oil barrels
+		//Each individual node counts as a SCC by itself, but we're only interested in groups so there is a parameter to ignore them
+		public IEnumerable<IEnumerable<ProductionNode>> GetStronglyConnectedComponents(bool ignoreSingles)
 		{
 			List<List<ProductionNode>> strongList = new List<List<ProductionNode>>();
 			Stack<TarjanNode> S = new Stack<TarjanNode>();
@@ -346,7 +314,14 @@ namespace Foreman
 				}
 			}
 
-			return strongList;
+			if (ignoreSingles)
+			{
+				return strongList.Where(scc => scc.Count > 1);
+			}
+			else
+			{
+				return strongList;
+			}
 		}
 
 		private void StrongConnect(List<List<ProductionNode>> strongList, Stack<TarjanNode> S, int indexCounter, TarjanNode v)

@@ -93,6 +93,7 @@
     <Compile Include="ErrorLogging.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
+    <Compile Include="GraphOptimisation.cs" />
     <Compile Include="ImageExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +102,7 @@
     </Compile>
     <Compile Include="Inserter.cs" />
     <Compile Include="ItemTab.cs" />
+    <Compile Include="LinearProgrammingSolver.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

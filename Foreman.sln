@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foreman", "Foreman\Foreman.csproj", "{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}"
 EndProject
 Global
@@ -26,6 +28,7 @@ Global
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|Any CPU.Build.0 = Release|x86
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|Mixed Platforms.Build.0 = Release|x86
+		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|Mixed Platforms.Deploy.0 = Release|x86
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|Win32.ActiveCfg = Release|x86
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|x86.ActiveCfg = Release|x86
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|x86.Build.0 = Release|x86
