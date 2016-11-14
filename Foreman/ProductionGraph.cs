@@ -168,7 +168,15 @@ namespace Foreman
 				node.desiredRate = node.actualRate;
 			}
 
-			this.FindOptimalGraphToSatisfyFixedNodes();
+			try
+			{
+				this.FindOptimalGraphToSatisfyFixedNodes();
+			}
+			catch (OverflowException)
+			{
+				//If the numbers here are so big they're causing an overflow, there's not much I can do about it. It's already pretty clear in the UI that the values are unusable.
+				//At least this way it doesn't crash...
+			}
 			UpdateLinkThroughputs();
 		}
 
