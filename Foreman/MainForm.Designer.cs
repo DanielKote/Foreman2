@@ -41,8 +41,8 @@
 			this.fixedAmountButton = new System.Windows.Forms.RadioButton();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.AutomaticCompleteButton = new System.Windows.Forms.Button();
+			this.ArrangeNodesButton = new System.Windows.Forms.Button();
 			this.ClearButton = new System.Windows.Forms.Button();
-			this.EnableDisableButton = new System.Windows.Forms.Button();
 			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
 			this.saveGraphButton = new System.Windows.Forms.Button();
 			this.loadGraphButton = new System.Windows.Forms.Button();
@@ -55,11 +55,11 @@
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.ReloadButton = new System.Windows.Forms.Button();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.EnableDisableButton = new System.Windows.Forms.Button();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.LanguageDropDown = new System.Windows.Forms.ComboBox();
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
-			this.panel1 = new System.Windows.Forms.Panel();
-			this.ArrangeNodesButton = new System.Windows.Forms.Button();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
@@ -68,8 +68,8 @@
 			this.flowLayoutPanel3.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.flowLayoutPanel2.SuspendLayout();
-			this.groupBox3.SuspendLayout();
 			this.panel1.SuspendLayout();
+			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -229,6 +229,16 @@
 			this.AutomaticCompleteButton.UseVisualStyleBackColor = true;
 			this.AutomaticCompleteButton.Click += new System.EventHandler(this.AutomaticCompleteButton_Click);
 			// 
+			// ArrangeNodesButton
+			// 
+			this.ArrangeNodesButton.Location = new System.Drawing.Point(3, 34);
+			this.ArrangeNodesButton.Name = "ArrangeNodesButton";
+			this.ArrangeNodesButton.Size = new System.Drawing.Size(182, 25);
+			this.ArrangeNodesButton.TabIndex = 7;
+			this.ArrangeNodesButton.Text = "Reposition nodes";
+			this.ArrangeNodesButton.UseVisualStyleBackColor = true;
+			this.ArrangeNodesButton.Click += new System.EventHandler(this.ArrangeNodesButton_Click);
+			// 
 			// ClearButton
 			// 
 			this.ClearButton.Location = new System.Drawing.Point(3, 65);
@@ -238,16 +248,6 @@
 			this.ClearButton.Text = "Clear flowchart";
 			this.ClearButton.UseVisualStyleBackColor = true;
 			this.ClearButton.Click += new System.EventHandler(this.ClearButton_Click);
-			// 
-			// EnableDisableButton
-			// 
-			this.EnableDisableButton.Location = new System.Drawing.Point(3, 63);
-			this.EnableDisableButton.Name = "EnableDisableButton";
-			this.EnableDisableButton.Size = new System.Drawing.Size(159, 25);
-			this.EnableDisableButton.TabIndex = 7;
-			this.EnableDisableButton.Text = "Enable/disable loaded objects";
-			this.EnableDisableButton.UseVisualStyleBackColor = true;
-			this.EnableDisableButton.Click += new System.EventHandler(this.EnableDisableButton_Click);
 			// 
 			// flowLayoutPanel3
 			// 
@@ -386,6 +386,25 @@
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
+			// panel1
+			// 
+			this.panel1.Controls.Add(this.EnableDisableButton);
+			this.panel1.Controls.Add(this.groupBox3);
+			this.panel1.Location = new System.Drawing.Point(844, 3);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(167, 90);
+			this.panel1.TabIndex = 16;
+			// 
+			// EnableDisableButton
+			// 
+			this.EnableDisableButton.Location = new System.Drawing.Point(3, 63);
+			this.EnableDisableButton.Name = "EnableDisableButton";
+			this.EnableDisableButton.Size = new System.Drawing.Size(159, 25);
+			this.EnableDisableButton.TabIndex = 7;
+			this.EnableDisableButton.Text = "Enable/disable loaded objects";
+			this.EnableDisableButton.UseVisualStyleBackColor = true;
+			this.EnableDisableButton.Click += new System.EventHandler(this.EnableDisableButton_Click);
+			// 
 			// groupBox3
 			// 
 			this.groupBox3.AutoSize = true;
@@ -423,25 +442,6 @@
 			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
 			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
 			// 
-			// panel1
-			// 
-			this.panel1.Controls.Add(this.EnableDisableButton);
-			this.panel1.Controls.Add(this.groupBox3);
-			this.panel1.Location = new System.Drawing.Point(844, 3);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(167, 90);
-			this.panel1.TabIndex = 16;
-			// 
-			// ArrangeNodesButton
-			// 
-			this.ArrangeNodesButton.Location = new System.Drawing.Point(3, 34);
-			this.ArrangeNodesButton.Name = "ArrangeNodesButton";
-			this.ArrangeNodesButton.Size = new System.Drawing.Size(182, 25);
-			this.ArrangeNodesButton.TabIndex = 7;
-			this.ArrangeNodesButton.Text = "Reposition nodes";
-			this.ArrangeNodesButton.UseVisualStyleBackColor = true;
-			this.ArrangeNodesButton.Click += new System.EventHandler(this.ArrangeNodesButton_Click);
-			// 
 			// GraphViewer
 			// 
 			this.GraphViewer.AllowDrop = true;
@@ -477,9 +477,9 @@
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
 			this.flowLayoutPanel2.ResumeLayout(false);
-			this.groupBox3.ResumeLayout(false);
 			this.panel1.ResumeLayout(false);
 			this.panel1.PerformLayout();
+			this.groupBox3.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
