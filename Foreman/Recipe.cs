@@ -42,7 +42,7 @@ namespace Foreman
 		{
 			get
 			{
-				if (DataCache.LocaleFiles["recipe-name"].ContainsKey(Name))
+				if (DataCache.LocaleFiles.ContainsKey("recipe-name") && DataCache.LocaleFiles["recipe-name"].ContainsKey(Name))
 				{
 					return DataCache.LocaleFiles["recipe-name"][Name];
 				}

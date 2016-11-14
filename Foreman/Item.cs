@@ -19,7 +19,7 @@ namespace Foreman
 			{
 				foreach (String category in localeCategories)
 				{
-					if (DataCache.LocaleFiles[category].ContainsKey(Name))
+					if (DataCache.LocaleFiles.ContainsKey(category) && DataCache.LocaleFiles[category].ContainsKey(Name))
 					{
 						return DataCache.LocaleFiles[category][Name];
 					}
