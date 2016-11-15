@@ -45,6 +45,7 @@ namespace Foreman
 			parent.Controls.Add(this);
 			this.Location = new Point(parent.Width / 2 - Width / 2, parent.Height / 2 - Height / 2);
 			this.Anchor = AnchorStyles.None;
+			this.BringToFront();
 			parent.PerformLayout();
 
 			FilterTextBox.Focus();
