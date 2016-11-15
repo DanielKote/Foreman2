@@ -56,6 +56,7 @@ namespace Foreman
 				}
 			}
 		}
+        public Boolean Enabled { get; set; }
 
 		public Recipe(String name, float time, Dictionary<Item, float> ingredients, Dictionary<Item, float> results)
 		{
@@ -63,6 +64,7 @@ namespace Foreman
 			this.Time = time;
 			this.Ingredients = ingredients;
 			this.Results = results;
+            this.Enabled = true; //Nothing will have been loaded yet to disable recipes.
 		}
 
 		public override int GetHashCode()

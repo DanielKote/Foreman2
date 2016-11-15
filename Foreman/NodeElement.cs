@@ -306,6 +306,13 @@ namespace Foreman
 
 		public override void Paint(Graphics graphics)
 		{
+            if (DisplayedNode is RecipeNode)
+            {
+                if (!((RecipeNode) DisplayedNode).BaseRecipe.Enabled)
+                {
+                    GraphicsStuff.FillRoundRect(-5, -5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
+                }
+            }
 			GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, backgroundBrush);
 			graphics.DrawString(text, size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
 			
