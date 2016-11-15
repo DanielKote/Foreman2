@@ -332,6 +332,46 @@ namespace Foreman
 			}
 		}
 
+		public IEnumerable<IEnumerable<ProductionNode>> GetConnectedComponents()
+		{
+			HashSet<ProductionNode> unvisitedNodes = new HashSet<ProductionNode>(Nodes);
+
+			List<HashSet<ProductionNode>> connectedComponents = new List<HashSet<ProductionNode>>();
+
+			while (unvisitedNodes.Any())
+			{
+				connectedComponents.Add(new HashSet<ProductionNode>());
+				HashSet<ProductionNode> toVisitNext = new HashSet<ProductionNode>();
+				toVisitNext.Add(unvisitedNodes.First());
+
+				while (toVisitNext.Any())
+				{
+					ProductionNode currentNode = toVisitNext.First();
+
+					foreach (NodeLink link in currentNode.InputLinks)
+					{
+						if (unvisitedNodes.Contains(link.Supplier))
+						{
+							toVisitNext.Add(link.Supplier);
+						}
+					}
+					foreach (NodeLink link in currentNode.OutputLinks)
+					{
+						if (unvisitedNodes.Contains(link.Consumer))
+						{
+							toVisitNext.Add(link.Consumer);
+						}
+					}
+
+					connectedComponents.Last().Add(currentNode);
+					toVisitNext.Remove(currentNode);
+					unvisitedNodes.Remove(currentNode);
+				}
+			}
+
+			return connectedComponents;
+		}
+
 		private void StrongConnect(List<List<ProductionNode>> strongList, Stack<TarjanNode> S, int indexCounter, TarjanNode v)
 		{
 			v.Index = indexCounter;
