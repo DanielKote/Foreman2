@@ -223,6 +223,8 @@ namespace Foreman
 				LoadLocaleFiles();
 			}
 
+			MarkCyclicRecipes();
+
 			ReportErrors();
 		}
 
@@ -676,6 +678,9 @@ namespace Foreman
 		
 		private static Bitmap LoadImage(String fileName)
 		{
+			if (String.IsNullOrEmpty(fileName))
+			{ return null; }
+
 			string fullPath = "";
 			if (File.Exists(fileName))
 			{
@@ -748,6 +753,10 @@ namespace Foreman
 
 		private static void InterpretLuaItem(String name, LuaTable values)
 		{
+			if (String.IsNullOrEmpty(name))
+			{
+				return;
+			}
 			Item newItem = new Item(name);
 			newItem.Icon = LoadImage(ReadLuaString(values, "icon", true));
 
@@ -1135,6 +1144,23 @@ namespace Foreman
 			}
 
 			return ingredients;
+		}
+
+		private static void MarkCyclicRecipes()
+		{
+			ProductionGraph testGraph = new ProductionGraph();
+			foreach (Recipe recipe in Recipes.Values)
+			{
+				var node = RecipeNode.Create(recipe, testGraph);
+			}
+			testGraph.CreateAllPossibleInputLinks();
+			foreach (var scc in testGraph.GetStronglyConnectedComponents(true))
+			{
+				foreach (var node in scc)
+				{
+					((RecipeNode)node).BaseRecipe.IsCyclic = true;
+				}
+			}
 		}
 	}
 }

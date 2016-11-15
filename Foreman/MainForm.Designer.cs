@@ -41,8 +41,8 @@
 			this.fixedAmountButton = new System.Windows.Forms.RadioButton();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.AutomaticCompleteButton = new System.Windows.Forms.Button();
+			this.ArrangeNodesButton = new System.Windows.Forms.Button();
 			this.ClearButton = new System.Windows.Forms.Button();
-			this.EnableDisableButton = new System.Windows.Forms.Button();
 			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
 			this.saveGraphButton = new System.Windows.Forms.Button();
 			this.loadGraphButton = new System.Windows.Forms.Button();
@@ -55,9 +55,11 @@
 			this.FactorioDirectoryButton = new System.Windows.Forms.Button();
 			this.ModDirectoryButton = new System.Windows.Forms.Button();
 			this.ReloadButton = new System.Windows.Forms.Button();
-			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.EnableDisableButton = new System.Windows.Forms.Button();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.LanguageDropDown = new System.Windows.Forms.ComboBox();
+			this.FilterTextBox = new System.Windows.Forms.TextBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
@@ -66,6 +68,7 @@
 			this.flowLayoutPanel3.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.flowLayoutPanel2.SuspendLayout();
+			this.panel1.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -143,7 +146,7 @@
 			this.MainToolbar.Controls.Add(this.flowLayoutPanel3);
 			this.MainToolbar.Controls.Add(this.groupBox2);
 			this.MainToolbar.Controls.Add(this.flowLayoutPanel2);
-			this.MainToolbar.Controls.Add(this.groupBox3);
+			this.MainToolbar.Controls.Add(this.panel1);
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(3, 3);
 			this.MainToolbar.Name = "MainToolbar";
@@ -208,43 +211,43 @@
 			this.flowLayoutPanel1.AutoSize = true;
 			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.flowLayoutPanel1.Controls.Add(this.AutomaticCompleteButton);
+			this.flowLayoutPanel1.Controls.Add(this.ArrangeNodesButton);
 			this.flowLayoutPanel1.Controls.Add(this.ClearButton);
-			this.flowLayoutPanel1.Controls.Add(this.EnableDisableButton);
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(201, 3);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(185, 93);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(188, 93);
 			this.flowLayoutPanel1.TabIndex = 9;
 			// 
 			// AutomaticCompleteButton
 			// 
 			this.AutomaticCompleteButton.Location = new System.Drawing.Point(3, 3);
 			this.AutomaticCompleteButton.Name = "AutomaticCompleteButton";
-			this.AutomaticCompleteButton.Size = new System.Drawing.Size(179, 25);
+			this.AutomaticCompleteButton.Size = new System.Drawing.Size(182, 25);
 			this.AutomaticCompleteButton.TabIndex = 5;
-			this.AutomaticCompleteButton.Text = "Automatically complete flowchart";
+			this.AutomaticCompleteButton.Text = "Automatically create missing nodes";
 			this.AutomaticCompleteButton.UseVisualStyleBackColor = true;
 			this.AutomaticCompleteButton.Click += new System.EventHandler(this.AutomaticCompleteButton_Click);
 			// 
+			// ArrangeNodesButton
+			// 
+			this.ArrangeNodesButton.Location = new System.Drawing.Point(3, 34);
+			this.ArrangeNodesButton.Name = "ArrangeNodesButton";
+			this.ArrangeNodesButton.Size = new System.Drawing.Size(182, 25);
+			this.ArrangeNodesButton.TabIndex = 7;
+			this.ArrangeNodesButton.Text = "Reposition nodes";
+			this.ArrangeNodesButton.UseVisualStyleBackColor = true;
+			this.ArrangeNodesButton.Click += new System.EventHandler(this.ArrangeNodesButton_Click);
+			// 
 			// ClearButton
 			// 
-			this.ClearButton.Location = new System.Drawing.Point(3, 34);
+			this.ClearButton.Location = new System.Drawing.Point(3, 65);
 			this.ClearButton.Name = "ClearButton";
-			this.ClearButton.Size = new System.Drawing.Size(179, 25);
+			this.ClearButton.Size = new System.Drawing.Size(182, 25);
 			this.ClearButton.TabIndex = 6;
 			this.ClearButton.Text = "Clear flowchart";
 			this.ClearButton.UseVisualStyleBackColor = true;
 			this.ClearButton.Click += new System.EventHandler(this.ClearButton_Click);
-			// 
-			// EnableDisableButton
-			// 
-			this.EnableDisableButton.Location = new System.Drawing.Point(3, 65);
-			this.EnableDisableButton.Name = "EnableDisableButton";
-			this.EnableDisableButton.Size = new System.Drawing.Size(179, 25);
-			this.EnableDisableButton.TabIndex = 7;
-			this.EnableDisableButton.Text = "Enable/disable objects";
-			this.EnableDisableButton.UseVisualStyleBackColor = true;
-			this.EnableDisableButton.Click += new System.EventHandler(this.EnableDisableButton_Click);
 			// 
 			// flowLayoutPanel3
 			// 
@@ -254,7 +257,7 @@
 			this.flowLayoutPanel3.Controls.Add(this.loadGraphButton);
 			this.flowLayoutPanel3.Controls.Add(this.ExportImageButton);
 			this.flowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel3.Location = new System.Drawing.Point(392, 3);
+			this.flowLayoutPanel3.Location = new System.Drawing.Point(395, 3);
 			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
 			this.flowLayoutPanel3.Size = new System.Drawing.Size(124, 93);
 			this.flowLayoutPanel3.TabIndex = 14;
@@ -296,7 +299,7 @@
 			this.groupBox2.Controls.Add(this.SingleAssemblerPerRecipeCheckBox);
 			this.groupBox2.Controls.Add(this.AssemblerDisplayCheckBox);
 			this.groupBox2.Controls.Add(this.MinerDisplayCheckBox);
-			this.groupBox2.Location = new System.Drawing.Point(522, 3);
+			this.groupBox2.Location = new System.Drawing.Point(525, 3);
 			this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
@@ -348,7 +351,7 @@
 			this.flowLayoutPanel2.Controls.Add(this.ModDirectoryButton);
 			this.flowLayoutPanel2.Controls.Add(this.ReloadButton);
 			this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(710, 3);
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(713, 3);
 			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
 			this.flowLayoutPanel2.Size = new System.Drawing.Size(125, 90);
 			this.flowLayoutPanel2.TabIndex = 13;
@@ -383,26 +386,35 @@
 			this.ReloadButton.UseVisualStyleBackColor = true;
 			this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
 			// 
-			// FilterTextBox
+			// panel1
 			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
+			this.panel1.Controls.Add(this.EnableDisableButton);
+			this.panel1.Controls.Add(this.groupBox3);
+			this.panel1.Location = new System.Drawing.Point(844, 3);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(167, 90);
+			this.panel1.TabIndex = 16;
+			// 
+			// EnableDisableButton
+			// 
+			this.EnableDisableButton.Location = new System.Drawing.Point(3, 63);
+			this.EnableDisableButton.Name = "EnableDisableButton";
+			this.EnableDisableButton.Size = new System.Drawing.Size(159, 25);
+			this.EnableDisableButton.TabIndex = 7;
+			this.EnableDisableButton.Text = "Enable/disable loaded objects";
+			this.EnableDisableButton.UseVisualStyleBackColor = true;
+			this.EnableDisableButton.Click += new System.EventHandler(this.EnableDisableButton_Click);
 			// 
 			// groupBox3
 			// 
 			this.groupBox3.AutoSize = true;
 			this.groupBox3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.groupBox3.Controls.Add(this.LanguageDropDown);
-			this.groupBox3.Location = new System.Drawing.Point(841, 3);
+			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.groupBox3.Size = new System.Drawing.Size(133, 57);
+			this.groupBox3.Size = new System.Drawing.Size(159, 57);
 			this.groupBox3.TabIndex = 15;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Language";
@@ -415,10 +427,20 @@
 			this.LanguageDropDown.Location = new System.Drawing.Point(6, 20);
 			this.LanguageDropDown.MaxDropDownItems = 20;
 			this.LanguageDropDown.Name = "LanguageDropDown";
-			this.LanguageDropDown.Size = new System.Drawing.Size(121, 21);
+			this.LanguageDropDown.Size = new System.Drawing.Size(147, 21);
 			this.LanguageDropDown.TabIndex = 1;
 			this.LanguageDropDown.ValueMember = "Name";
 			this.LanguageDropDown.SelectedIndexChanged += new System.EventHandler(this.LanguageDropDown_SelectedIndexChanged);
+			// 
+			// FilterTextBox
+			// 
+			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
+			this.FilterTextBox.Name = "FilterTextBox";
+			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
+			this.FilterTextBox.TabIndex = 13;
+			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
 			// 
 			// GraphViewer
 			// 
@@ -455,6 +477,8 @@
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
 			this.flowLayoutPanel2.ResumeLayout(false);
+			this.panel1.ResumeLayout(false);
+			this.panel1.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.ResumeLayout(false);
 
@@ -492,6 +516,8 @@
 		private System.Windows.Forms.TextBox FilterTextBox;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.ComboBox LanguageDropDown;
+		private System.Windows.Forms.Button ArrangeNodesButton;
+		private System.Windows.Forms.Panel panel1;
 	}
 }
 

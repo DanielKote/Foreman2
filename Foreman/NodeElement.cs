@@ -272,6 +272,10 @@ namespace Foreman
 				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(l => l.Item == tab.Item))
 				{
 					NodeElement node = Parent.GetElementForNode(link.Consumer);
+					if (node == null)
+					{
+						continue;
+					}
 					Point diff = Point.Subtract(new Point(node.Location.X + node.Width / 2, -node.Location.Y + -node.Height / 2), new Size(Location.X + Width / 2, -Location.Y + -Height / 2));
 					diff.Y = Math.Max(0, diff.Y);
 					total += Convert.ToInt32(Math.Atan2(diff.X, diff.Y) * 1000);
@@ -473,6 +477,16 @@ namespace Foreman
 								tti.Text += String.Format("\n------{0}", Module.FriendlyName);
 							}
 						}
+					}
+
+					if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
+					{
+						tti.Text += String.Format("\n\nCurrent iterations: {0}", DisplayedNode.actualRate);
+					} else
+					{
+						tti.Text += String.Format("\n\nCurrent Rate: {0}/{1}",
+							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? DisplayedNode.actualRate / 60 : DisplayedNode.actualRate,
+							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? "m" : "s");
 					}
 					Parent.AddTooltip(tti);
 				}
