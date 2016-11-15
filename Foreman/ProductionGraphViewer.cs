@@ -124,9 +124,16 @@ namespace Foreman
 
 		public void UpdateNodes()
 		{
-			foreach (NodeElement node in Elements.OfType<NodeElement>().ToList())
+			try
 			{
-				node.Update();
+
+				foreach (NodeElement node in Elements.OfType<NodeElement>().ToList())
+				{
+					node.Update();
+				}
+			} catch (OverflowException)
+			{
+				//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
 			}
 			Invalidate();
 		}
