@@ -629,5 +629,23 @@ namespace Foreman
 			}
 			DoDragDrop(draggedRecipes, DragDropEffects.All);
 		}
+
+		private void RecipeListView_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (RecipeListView.SelectedItems.Count == 0)
+			{
+				AddRecipeButton.Enabled = false;
+			}
+			else if (RecipeListView.SelectedItems.Count == 1)
+			{
+				AddRecipeButton.Enabled = true;
+				AddRecipeButton.Text = "Add Recipe";
+			}
+			else if (RecipeListView.SelectedItems.Count > 1)
+			{
+				AddRecipeButton.Enabled = true;
+				AddRecipeButton.Text = "Add Recipes";
+			}
+		}
 	}
 }

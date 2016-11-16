@@ -540,7 +540,7 @@
 			this.AddRecipeButton.Name = "AddRecipeButton";
 			this.AddRecipeButton.Size = new System.Drawing.Size(196, 25);
 			this.AddRecipeButton.TabIndex = 18;
-			this.AddRecipeButton.Text = "Add recipe";
+			this.AddRecipeButton.Text = "Add Recipe";
 			this.AddRecipeButton.UseVisualStyleBackColor = true;
 			this.AddRecipeButton.Click += new System.EventHandler(this.AddRecipeButton_Click);
 			// 
@@ -564,6 +564,7 @@
 			this.RecipeListView.View = System.Windows.Forms.View.Details;
 			this.RecipeListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.RecipeListView_ItemChecked);
 			this.RecipeListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.RecipeListView_ItemDrag);
+			this.RecipeListView.SelectedIndexChanged += new System.EventHandler(this.RecipeListView_SelectedIndexChanged);
 			// 
 			// columnHeader1
 			// 
