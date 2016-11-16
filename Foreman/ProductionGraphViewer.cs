@@ -645,7 +645,7 @@ namespace Foreman
 
 					var optionList = new List<ChooserControl>();
 					optionList.Add(itemOutputOption);
-					foreach (Recipe recipe in DataCache.Recipes.Values)
+					foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
 					{
 						if (recipe.Results.ContainsKey(item) && recipe.Category != "incinerator" && recipe.Category != "incineration")
 						{
@@ -653,7 +653,7 @@ namespace Foreman
 						}
 					}
 					optionList.Add(itemSupplyOption);
-					foreach (Recipe recipe in DataCache.Recipes.Values)
+					foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
 					{
 						if (recipe.Ingredients.ContainsKey(item))
 						{
