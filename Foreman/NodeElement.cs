@@ -352,7 +352,7 @@ namespace Foreman
 			if (linkType == LinkType.Input)
 			{
 				finalString = String.Format(line1Format, actualAmount, unit);
-				if (DisplayedNode.GetTotalDemand(item) > DisplayedNode.GetTotalInput(item)
+				if (Math.Round(DisplayedNode.GetTotalDemand(item), 2) > Math.Round(DisplayedNode.GetTotalInput(item), 2)
 					&& DisplayedNode.GetTotalDemand(item) != float.PositiveInfinity)
 				{
 					finalString += String.Format(line2Format, desiredAmount, unit);
@@ -374,7 +374,7 @@ namespace Foreman
 
 			if (linkType == LinkType.Input)
 			{
-				if (DisplayedNode.GetTotalDemand(item) <= DisplayedNode.GetTotalInput(item)
+				if (Math.Round(DisplayedNode.GetTotalDemand(item), 2) <= Math.Round(DisplayedNode.GetTotalInput(item), 2)
 					&& DisplayedNode.GetTotalDemand(item) != float.PositiveInfinity)
 				{
 					return enough;
@@ -386,7 +386,7 @@ namespace Foreman
 			}
 			else
 			{
-				if (DisplayedNode.GetTotalOutput(item) > DisplayedNode.GetRequiredOutput(item))
+				if (Math.Round(DisplayedNode.GetTotalOutput(item), 2) > Math.Round(DisplayedNode.GetRequiredOutput(item), 2))
 				{
 					return tooMuch;
 				}
