@@ -9,6 +9,7 @@ namespace Foreman
 	public class GhostNodeElement : GraphElement
 	{
 		public HashSet<Item> Items = new HashSet<Item>();
+		public HashSet<Recipe> Recipes = new HashSet<Recipe>();
 
 		private const int iconSize = 32;
 		private List<Point> OffsetOrder = new List<Point>
@@ -34,7 +35,22 @@ namespace Foreman
 		{
 			int i = 0;
 
-			foreach (Item item in Items)
+			List<Bitmap> icons = new List<Bitmap>();
+			if (Items.Any())
+			{
+				foreach (Item item in Items)
+				{
+					icons.Add(item.Icon);
+				}
+			} else
+			{
+				foreach (Recipe recipe in Recipes)
+				{
+					icons.Add(recipe.Icon);
+				}
+			}
+
+			foreach (Bitmap icon in icons)
 			{
 				if (i >= OffsetOrder.Count())
 				{
@@ -42,7 +58,7 @@ namespace Foreman
 				}
 				Point position = Point.Subtract(OffsetOrder[i], new Size(iconSize / 2, iconSize / 2));
 				int scale = Convert.ToInt32(iconSize / Parent.ViewScale);
-				graphics.DrawImage(item.Icon ?? DataCache.UnknownIcon, position.X, position.Y, scale, scale);
+				graphics.DrawImage(icon, position.X, position.Y, scale, scale);
 				i++;
 			}
 

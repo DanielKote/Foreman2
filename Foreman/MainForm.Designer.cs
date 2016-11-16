@@ -30,10 +30,6 @@
 		{
 			this.components = new System.ComponentModel.Container();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.AddItemButton = new System.Windows.Forms.Button();
-			this.ItemListView = new System.Windows.Forms.ListView();
-			this.h_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemImageList = new System.Windows.Forms.ImageList(this.components);
 			this.MainToolbar = new System.Windows.Forms.FlowLayoutPanel();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.rateOptionsDropDown = new System.Windows.Forms.ComboBox();
@@ -59,7 +55,21 @@
 			this.EnableDisableButton = new System.Windows.Forms.Button();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.LanguageDropDown = new System.Windows.Forms.ComboBox();
-			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.ListTabControl = new System.Windows.Forms.TabControl();
+			this.ItemTabPage = new System.Windows.Forms.TabPage();
+			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+			this.ItemFilterTextBox = new System.Windows.Forms.TextBox();
+			this.AddItemButton = new System.Windows.Forms.Button();
+			this.ItemListView = new System.Windows.Forms.ListView();
+			this.h_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ItemImageList = new System.Windows.Forms.ImageList(this.components);
+			this.RecipeTabPage = new System.Windows.Forms.TabPage();
+			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+			this.RecipeFilterTextBox = new System.Windows.Forms.TextBox();
+			this.AddRecipeButton = new System.Windows.Forms.Button();
+			this.RecipeListView = new System.Windows.Forms.ListView();
+			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.RecipeImageList = new System.Windows.Forms.ImageList(this.components);
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
@@ -70,72 +80,29 @@
 			this.flowLayoutPanel2.SuspendLayout();
 			this.panel1.SuspendLayout();
 			this.groupBox3.SuspendLayout();
+			this.ListTabControl.SuspendLayout();
+			this.ItemTabPage.SuspendLayout();
+			this.tableLayoutPanel2.SuspendLayout();
+			this.RecipeTabPage.SuspendLayout();
+			this.tableLayoutPanel3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
 			// 
 			this.tableLayoutPanel1.ColumnCount = 2;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 210F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Controls.Add(this.AddItemButton, 0, 3);
-			this.tableLayoutPanel1.Controls.Add(this.ItemListView, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.MainToolbar, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.GraphViewer, 1, 1);
-			this.tableLayoutPanel1.Controls.Add(this.FilterTextBox, 0, 1);
+			this.tableLayoutPanel1.Controls.Add(this.ListTabControl, 0, 1);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 4;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel1.RowCount = 2;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(1306, 800);
 			this.tableLayoutPanel1.TabIndex = 1;
-			// 
-			// AddItemButton
-			// 
-			this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AddItemButton.Location = new System.Drawing.Point(3, 773);
-			this.AddItemButton.Name = "AddItemButton";
-			this.AddItemButton.Size = new System.Drawing.Size(220, 24);
-			this.AddItemButton.TabIndex = 2;
-			this.AddItemButton.Text = "Add Item";
-			this.AddItemButton.UseVisualStyleBackColor = true;
-			this.AddItemButton.Click += new System.EventHandler(this.AddItemButton_Click);
-			// 
-			// ItemListView
-			// 
-			this.ItemListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.h_Name});
-			this.ItemListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ItemListView.FullRowSelect = true;
-			this.ItemListView.GridLines = true;
-			this.ItemListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-			this.ItemListView.HideSelection = false;
-			this.ItemListView.LabelWrap = false;
-			this.ItemListView.Location = new System.Drawing.Point(3, 134);
-			this.ItemListView.Name = "ItemListView";
-			this.ItemListView.Size = new System.Drawing.Size(220, 633);
-			this.ItemListView.SmallImageList = this.ItemImageList;
-			this.ItemListView.TabIndex = 11;
-			this.ItemListView.UseCompatibleStateImageBehavior = false;
-			this.ItemListView.View = System.Windows.Forms.View.Details;
-			this.ItemListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.ItemListView_ItemDrag);
-			this.ItemListView.SelectedIndexChanged += new System.EventHandler(this.ItemListView_SelectedIndexChanged);
-			this.ItemListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ItemListView_KeyDown);
-			this.ItemListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ItemListView_MouseDoubleClick);
-			// 
-			// h_Name
-			// 
-			this.h_Name.Text = "Name";
-			this.h_Name.Width = 216;
-			// 
-			// ItemImageList
-			// 
-			this.ItemImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-			this.ItemImageList.ImageSize = new System.Drawing.Size(32, 32);
-			this.ItemImageList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// MainToolbar
 			// 
@@ -432,15 +399,182 @@
 			this.LanguageDropDown.ValueMember = "Name";
 			this.LanguageDropDown.SelectedIndexChanged += new System.EventHandler(this.LanguageDropDown_SelectedIndexChanged);
 			// 
-			// FilterTextBox
+			// ListTabControl
 			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 108);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(220, 20);
-			this.FilterTextBox.TabIndex = 13;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
+			this.ListTabControl.Controls.Add(this.ItemTabPage);
+			this.ListTabControl.Controls.Add(this.RecipeTabPage);
+			this.ListTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ListTabControl.Location = new System.Drawing.Point(0, 105);
+			this.ListTabControl.Margin = new System.Windows.Forms.Padding(0);
+			this.ListTabControl.Name = "ListTabControl";
+			this.ListTabControl.Padding = new System.Drawing.Point(0, 0);
+			this.ListTabControl.SelectedIndex = 0;
+			this.ListTabControl.Size = new System.Drawing.Size(210, 695);
+			this.ListTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+			this.ListTabControl.TabIndex = 17;
+			// 
+			// ItemTabPage
+			// 
+			this.ItemTabPage.Controls.Add(this.tableLayoutPanel2);
+			this.ItemTabPage.Location = new System.Drawing.Point(4, 22);
+			this.ItemTabPage.Margin = new System.Windows.Forms.Padding(0);
+			this.ItemTabPage.Name = "ItemTabPage";
+			this.ItemTabPage.Size = new System.Drawing.Size(202, 669);
+			this.ItemTabPage.TabIndex = 0;
+			this.ItemTabPage.Text = "Items";
+			this.ItemTabPage.UseVisualStyleBackColor = true;
+			// 
+			// tableLayoutPanel2
+			// 
+			this.tableLayoutPanel2.ColumnCount = 1;
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel2.Controls.Add(this.ItemFilterTextBox, 0, 0);
+			this.tableLayoutPanel2.Controls.Add(this.AddItemButton, 0, 2);
+			this.tableLayoutPanel2.Controls.Add(this.ItemListView, 0, 1);
+			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+			this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
+			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+			this.tableLayoutPanel2.RowCount = 3;
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(202, 669);
+			this.tableLayoutPanel2.TabIndex = 0;
+			// 
+			// ItemFilterTextBox
+			// 
+			this.ItemFilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ItemFilterTextBox.Location = new System.Drawing.Point(3, 3);
+			this.ItemFilterTextBox.Name = "ItemFilterTextBox";
+			this.ItemFilterTextBox.Size = new System.Drawing.Size(196, 20);
+			this.ItemFilterTextBox.TabIndex = 19;
+			this.ItemFilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
+			this.ItemFilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
+			// 
+			// AddItemButton
+			// 
+			this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AddItemButton.Location = new System.Drawing.Point(3, 641);
+			this.AddItemButton.Name = "AddItemButton";
+			this.AddItemButton.Size = new System.Drawing.Size(196, 25);
+			this.AddItemButton.TabIndex = 18;
+			this.AddItemButton.Text = "Add Item";
+			this.AddItemButton.UseVisualStyleBackColor = true;
+			this.AddItemButton.Click += new System.EventHandler(this.AddItemButton_Click);
+			// 
+			// ItemListView
+			// 
+			this.ItemListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.h_Name});
+			this.ItemListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ItemListView.FullRowSelect = true;
+			this.ItemListView.GridLines = true;
+			this.ItemListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.ItemListView.HideSelection = false;
+			this.ItemListView.LabelWrap = false;
+			this.ItemListView.Location = new System.Drawing.Point(3, 29);
+			this.ItemListView.Name = "ItemListView";
+			this.ItemListView.Size = new System.Drawing.Size(196, 606);
+			this.ItemListView.SmallImageList = this.ItemImageList;
+			this.ItemListView.TabIndex = 15;
+			this.ItemListView.UseCompatibleStateImageBehavior = false;
+			this.ItemListView.View = System.Windows.Forms.View.Details;
+			this.ItemListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.ItemListView_ItemDrag);
+			this.ItemListView.SelectedIndexChanged += new System.EventHandler(this.ItemListView_SelectedIndexChanged);
+			this.ItemListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ItemListView_MouseDoubleClick);
+			// 
+			// h_Name
+			// 
+			this.h_Name.Text = "Name";
+			this.h_Name.Width = 175;
+			// 
+			// ItemImageList
+			// 
+			this.ItemImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+			this.ItemImageList.ImageSize = new System.Drawing.Size(32, 32);
+			this.ItemImageList.TransparentColor = System.Drawing.Color.Transparent;
+			// 
+			// RecipeTabPage
+			// 
+			this.RecipeTabPage.Controls.Add(this.tableLayoutPanel3);
+			this.RecipeTabPage.Location = new System.Drawing.Point(4, 22);
+			this.RecipeTabPage.Name = "RecipeTabPage";
+			this.RecipeTabPage.Size = new System.Drawing.Size(202, 669);
+			this.RecipeTabPage.TabIndex = 1;
+			this.RecipeTabPage.Text = "Recipes";
+			this.RecipeTabPage.UseVisualStyleBackColor = true;
+			// 
+			// tableLayoutPanel3
+			// 
+			this.tableLayoutPanel3.ColumnCount = 1;
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel3.Controls.Add(this.RecipeFilterTextBox, 0, 0);
+			this.tableLayoutPanel3.Controls.Add(this.AddRecipeButton, 0, 2);
+			this.tableLayoutPanel3.Controls.Add(this.RecipeListView, 0, 1);
+			this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 0);
+			this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
+			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+			this.tableLayoutPanel3.RowCount = 3;
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(202, 669);
+			this.tableLayoutPanel3.TabIndex = 1;
+			// 
+			// RecipeFilterTextBox
+			// 
+			this.RecipeFilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.RecipeFilterTextBox.Location = new System.Drawing.Point(3, 3);
+			this.RecipeFilterTextBox.Name = "RecipeFilterTextBox";
+			this.RecipeFilterTextBox.Size = new System.Drawing.Size(196, 20);
+			this.RecipeFilterTextBox.TabIndex = 19;
+			this.RecipeFilterTextBox.TextChanged += new System.EventHandler(this.RecipeFilterTextBox_TextChanged);
+			this.RecipeFilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RecipeFilterTextBox_KeyDown);
+			// 
+			// AddRecipeButton
+			// 
+			this.AddRecipeButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AddRecipeButton.Location = new System.Drawing.Point(3, 641);
+			this.AddRecipeButton.Name = "AddRecipeButton";
+			this.AddRecipeButton.Size = new System.Drawing.Size(196, 25);
+			this.AddRecipeButton.TabIndex = 18;
+			this.AddRecipeButton.Text = "Add recipe";
+			this.AddRecipeButton.UseVisualStyleBackColor = true;
+			this.AddRecipeButton.Click += new System.EventHandler(this.AddRecipeButton_Click);
+			// 
+			// RecipeListView
+			// 
+			this.RecipeListView.CheckBoxes = true;
+			this.RecipeListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1});
+			this.RecipeListView.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RecipeListView.FullRowSelect = true;
+			this.RecipeListView.GridLines = true;
+			this.RecipeListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.RecipeListView.HideSelection = false;
+			this.RecipeListView.LabelWrap = false;
+			this.RecipeListView.Location = new System.Drawing.Point(3, 29);
+			this.RecipeListView.Name = "RecipeListView";
+			this.RecipeListView.Size = new System.Drawing.Size(196, 606);
+			this.RecipeListView.SmallImageList = this.RecipeImageList;
+			this.RecipeListView.TabIndex = 15;
+			this.RecipeListView.UseCompatibleStateImageBehavior = false;
+			this.RecipeListView.View = System.Windows.Forms.View.Details;
+			this.RecipeListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.RecipeListView_ItemChecked);
+			this.RecipeListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.RecipeListView_ItemDrag);
+			// 
+			// columnHeader1
+			// 
+			this.columnHeader1.Text = "Name";
+			this.columnHeader1.Width = 175;
+			// 
+			// RecipeImageList
+			// 
+			this.RecipeImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+			this.RecipeImageList.ImageSize = new System.Drawing.Size(32, 32);
+			this.RecipeImageList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// GraphViewer
 			// 
@@ -449,10 +583,9 @@
 			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.GraphViewer.DraggedElement = null;
-			this.GraphViewer.Location = new System.Drawing.Point(229, 108);
+			this.GraphViewer.Location = new System.Drawing.Point(213, 108);
 			this.GraphViewer.Name = "GraphViewer";
-			this.tableLayoutPanel1.SetRowSpan(this.GraphViewer, 3);
-			this.GraphViewer.Size = new System.Drawing.Size(1074, 689);
+			this.GraphViewer.Size = new System.Drawing.Size(1090, 689);
 			this.GraphViewer.TabIndex = 12;
 			// 
 			// MainForm
@@ -480,6 +613,13 @@
 			this.panel1.ResumeLayout(false);
 			this.panel1.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
+			this.ListTabControl.ResumeLayout(false);
+			this.ItemTabPage.ResumeLayout(false);
+			this.tableLayoutPanel2.ResumeLayout(false);
+			this.tableLayoutPanel2.PerformLayout();
+			this.RecipeTabPage.ResumeLayout(false);
+			this.tableLayoutPanel3.ResumeLayout(false);
+			this.tableLayoutPanel3.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -487,10 +627,7 @@
 		#endregion
 
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.Button AddItemButton;
-		private System.Windows.Forms.ListView ItemListView;
 		private System.Windows.Forms.ImageList ItemImageList;
-		private System.Windows.Forms.ColumnHeader h_Name;
 		private System.Windows.Forms.FlowLayoutPanel MainToolbar;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.ComboBox rateOptionsDropDown;
@@ -513,11 +650,24 @@
 		private System.Windows.Forms.Button loadGraphButton;
 		private System.Windows.Forms.Button EnableDisableButton;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
-		private System.Windows.Forms.TextBox FilterTextBox;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.ComboBox LanguageDropDown;
 		private System.Windows.Forms.Button ArrangeNodesButton;
 		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.TabControl ListTabControl;
+		private System.Windows.Forms.TabPage ItemTabPage;
+		private System.Windows.Forms.ListView ItemListView;
+		private System.Windows.Forms.ColumnHeader h_Name;
+		private System.Windows.Forms.TabPage RecipeTabPage;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+		private System.Windows.Forms.TextBox ItemFilterTextBox;
+		private System.Windows.Forms.Button AddItemButton;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+		private System.Windows.Forms.TextBox RecipeFilterTextBox;
+		private System.Windows.Forms.Button AddRecipeButton;
+		private System.Windows.Forms.ListView RecipeListView;
+		private System.Windows.Forms.ColumnHeader columnHeader1;
+		private System.Windows.Forms.ImageList RecipeImageList;
 	}
 }
 

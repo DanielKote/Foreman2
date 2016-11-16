@@ -14,6 +14,7 @@ namespace Foreman
 	public partial class MainForm : Form
 	{
 		private List<ListViewItem> unfilteredItemList;
+		private List<ListViewItem> unfilteredRecipeList;
 
 		public MainForm()
 		{
@@ -82,12 +83,11 @@ namespace Foreman
 			if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
 			DataCache.LoadAllData(null);
-			LoadItemList();
-
-			rateOptionsDropDown.SelectedIndex = 0;
-
+			
 			LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
 			LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
+
+			UpdateControlValues();
 		}
 
 		public void LoadItemList()
@@ -102,9 +102,9 @@ namespace Foreman
 			foreach (var item in DataCache.Items)
 			{
 				ListViewItem lvItem = new ListViewItem();
-				if (DataCache.Items[item.Key].Icon != null)
+				if (item.Value.Icon != null)
 				{
-					ItemImageList.Images.Add(DataCache.Items[item.Key].Icon);
+					ItemImageList.Images.Add(item.Value.Icon);
 					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
 				}
 				else
@@ -119,6 +119,36 @@ namespace Foreman
 
 			ItemListView.Sorting = SortOrder.Ascending;
 			ItemListView.Sort();
+		}
+
+		public void LoadRecipeList()
+		{
+			RecipeListView.Items.Clear();
+			unfilteredRecipeList = new List<ListViewItem>();
+			if (DataCache.UnknownIcon != null)
+			{
+				RecipeImageList.Images.Add(DataCache.UnknownIcon);
+			}
+			foreach (var recipe in DataCache.Recipes)
+			{
+				ListViewItem lvItem = new ListViewItem();
+				if (recipe.Value.Icon != null)
+				{
+					RecipeImageList.Images.Add(recipe.Value.Icon);
+					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
+				} else
+				{
+					lvItem.ImageIndex = 0;
+				}
+				lvItem.Text = recipe.Value.FriendlyName;
+				lvItem.Tag = recipe.Value;
+				lvItem.Checked = recipe.Value.Enabled;
+				unfilteredRecipeList.Add(lvItem);
+				RecipeListView.Items.Add(lvItem);
+			}
+
+			RecipeListView.Sorting = SortOrder.Ascending;
+			RecipeListView.Sort();
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)
@@ -310,7 +340,7 @@ namespace Foreman
 		private void FilterTextBox_TextChanged(object sender, EventArgs e)
 		{
 			ItemListView.Items.Clear();
-			ItemListView.Items.AddRange(unfilteredItemList.Where(i => i.Text.ToLower().Contains(FilterTextBox.Text.ToLower())).ToArray());
+			ItemListView.Items.AddRange(unfilteredItemList.Where(i => i.Text.ToLower().Contains(ItemFilterTextBox.Text.ToLower())).ToArray());
 		}
 
 		private void FactorioDirectoryButton_Click(object sender, EventArgs e)
@@ -327,7 +357,6 @@ namespace Foreman
 					DataCache.LoadAllData(null);
 					GraphViewer.LoadFromJson(savedGraph);
 					UpdateControlValues();
-					LoadItemList();
 				}
 			}
 		}
@@ -346,7 +375,6 @@ namespace Foreman
 					DataCache.LoadAllData(null);
 					GraphViewer.LoadFromJson(savedGraph);
 					UpdateControlValues();
-					LoadItemList();
 				}
 			}
 		}
@@ -355,7 +383,6 @@ namespace Foreman
 		{
 			GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
 			UpdateControlValues();
-			LoadItemList();
 		}
 
 		private void saveGraphButton_Click(object sender, EventArgs e)
@@ -423,7 +450,6 @@ namespace Foreman
 			{
 				GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
 				UpdateControlValues();
-				LoadItemList();
 			}
 		}
 
@@ -520,11 +546,87 @@ namespace Foreman
 			AssemblerDisplayCheckBox.Checked = GraphViewer.ShowAssemblers;
 			SingleAssemblerPerRecipeCheckBox.Checked = GraphViewer.Graph.OneAssemblerPerRecipe;
 			MinerDisplayCheckBox.Checked = GraphViewer.ShowMiners;
+
+			LoadItemList();
+			LoadRecipeList();
 		}
 
 		private void ArrangeNodesButton_Click(object sender, EventArgs e)
 		{
 			GraphViewer.PositionNodes();
+		}
+
+		private void RecipeFilterTextBox_TextChanged(object sender, EventArgs e)
+		{
+			RecipeListView.Items.Clear();
+			RecipeListView.Items.AddRange(unfilteredRecipeList.Where(r => r.Text.ToLower().Contains(RecipeFilterTextBox.Text.ToLower())).ToArray());
+		}
+
+		private void RecipeFilterTextBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (RecipeListView.Items.Count == 0)
+			{
+				return;
+			}
+			int currentSelection;
+			if (RecipeListView.SelectedIndices.Count == 0)
+			{
+				currentSelection = -1;
+			}
+			else
+			{
+				currentSelection = RecipeListView.SelectedIndices[0];
+			}
+			if (e.KeyCode == Keys.Down)
+			{
+				int newSelection = currentSelection + 1;
+				if (newSelection >= RecipeListView.Items.Count) newSelection = RecipeListView.Items.Count - 1;
+				if (newSelection <= 0) newSelection = 0;
+				RecipeListView.SelectedIndices.Clear();
+				RecipeListView.SelectedIndices.Add(newSelection);
+				e.Handled = true;
+			}
+			else if (e.KeyCode == Keys.Up)
+			{
+				int newSelection = currentSelection - 1;
+				if (newSelection == -1) newSelection = 0;
+				RecipeListView.SelectedIndices.Clear();
+				RecipeListView.SelectedIndices.Add(newSelection);
+				e.Handled = true;
+			}
+			else if (e.KeyCode == Keys.Enter)
+			{
+				AddRecipeButton.PerformClick();
+			}
+		}
+
+		private void RecipeListView_ItemChecked(object sender, ItemCheckedEventArgs e)
+		{
+			((Recipe)e.Item.Tag).Enabled = e.Item.Checked;
+		}
+
+		private void AddRecipeButton_Click(object sender, EventArgs e)
+		{
+			foreach (ListViewItem lvItem in RecipeListView.SelectedItems)
+			{				
+				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
+
+				NodeElement newElement = new NodeElement(RecipeNode.Create((Recipe)lvItem.Tag, GraphViewer.Graph), GraphViewer);
+				newElement.Update();
+				newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+			}
+
+			GraphViewer.Graph.UpdateNodeValues();
+		}
+		
+		private void RecipeListView_ItemDrag(object sender, ItemDragEventArgs e)
+		{
+			HashSet<Recipe> draggedRecipes = new HashSet<Recipe>();
+			foreach (ListViewItem recipe in RecipeListView.SelectedItems)
+			{
+				draggedRecipes.Add((Recipe)recipe.Tag);
+			}
+			DoDragDrop(draggedRecipes, DragDropEffects.All);
 		}
 	}
 }

@@ -610,7 +610,7 @@ namespace Foreman
 
 		void HandleDragEntering(object sender, DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
+			if (e.Data.GetDataPresent(typeof(HashSet<Item>)) || e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
 			{
 				e.Effect = DragDropEffects.All;
 			}
@@ -627,6 +627,15 @@ namespace Foreman
 				}
 
 				GhostDragElement.Location = DesktopToGraph(e.X, e.Y);
+			} else if (e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
+			{
+				if (GhostDragElement == null)
+				{
+					GhostDragElement = new GhostNodeElement(this);
+					GhostDragElement.Recipes = e.Data.GetData(typeof(HashSet<Recipe>)) as HashSet<Recipe>;
+				}
+
+				GhostDragElement.Location = DesktopToGraph(e.X, e.Y);
 			}
 
 			Invalidate();
@@ -634,59 +643,73 @@ namespace Foreman
 
 		void HandleItemDropping(object sender, DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(typeof(HashSet<Item>)) && GhostDragElement != null)
+			if (GhostDragElement != null)
 			{
-				foreach (Item item in GhostDragElement.Items)
+				if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
 				{
-					NodeElement newElement = null;
-
-					var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
-					var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
-
-					var optionList = new List<ChooserControl>();
-					optionList.Add(itemOutputOption);
-					foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
+					foreach (Item item in GhostDragElement.Items)
 					{
-						if (recipe.Results.ContainsKey(item) && recipe.Category != "incinerator" && recipe.Category != "incineration")
+						NodeElement newElement = null;
+
+						var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
+						var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
+
+						var optionList = new List<ChooserControl>();
+						optionList.Add(itemOutputOption);
+						foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
 						{
-							optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+							if (recipe.Results.ContainsKey(item) && recipe.Category != "incinerator" && recipe.Category != "incineration")
+							{
+								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+							}
 						}
-					}
-					optionList.Add(itemSupplyOption);
-					foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
-					{
-						if (recipe.Ingredients.ContainsKey(item))
+						optionList.Add(itemSupplyOption);
+						foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
 						{
-							optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-                        }
-					}
-
-					var chooserPanel = new ChooserPanel(optionList, this);
-
-					Point location = GhostDragElement.Location;
-
-					chooserPanel.Show(c =>
-					{
-						if (c != null)
-						{
-							if (c == itemSupplyOption)
+							if (recipe.Ingredients.ContainsKey(item))
 							{
-								newElement = new NodeElement(SupplyNode.Create(item, this.Graph), this);
+								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
 							}
-							else if (c is RecipeChooserControl)
-							{
-								newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, this.Graph), this);
-							}
-							else if (c == itemOutputOption)
-							{
-								newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
-							}
-
-							Graph.UpdateNodeValues();
-							newElement.Update();
-							newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						}
-					});
+
+						var chooserPanel = new ChooserPanel(optionList, this);
+
+						Point location = GhostDragElement.Location;
+
+						chooserPanel.Show(c =>
+						{
+							if (c != null)
+							{
+								if (c == itemSupplyOption)
+								{
+									newElement = new NodeElement(SupplyNode.Create(item, this.Graph), this);
+								}
+								else if (c is RecipeChooserControl)
+								{
+									newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, this.Graph), this);
+								}
+								else if (c == itemOutputOption)
+								{
+									newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
+								}
+
+								Graph.UpdateNodeValues();
+								newElement.Update();
+								newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+							}
+						});
+					}
+
+				}
+				else if (e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
+				{
+					foreach (Recipe recipe in GhostDragElement.Recipes)
+					{
+						NodeElement newElement = new NodeElement(RecipeNode.Create(recipe, Graph), this);
+						Graph.UpdateNodeValues();
+						newElement.Update();
+						newElement.Location = Point.Add(GhostDragElement.Location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+					}
 				}
 
 				GhostDragElement.Dispose();
@@ -712,6 +735,7 @@ namespace Foreman
 			info.AddValue("EnabledMiners", DataCache.Miners.Values.Where(m => m.Enabled).Select<Miner, String>(m => m.Name));
 			info.AddValue("EnabledModules", DataCache.Modules.Values.Where(m => m.Enabled).Select<Module, String>(m => m.Name));
 			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Enabled).Select<Mod, String>(m => m.Name));
+			info.AddValue("EnabledRecipes", DataCache.Recipes.Values.Where(r => r.Enabled).Select<Recipe, String>(r => r.Name));
 			List<Point> elementLocations = new List<Point>();
 			foreach (ProductionNode node in Graph.Nodes)
 			{
@@ -832,22 +856,28 @@ namespace Foreman
 				NodeLink.Create(supplier, consumer, item);
 			}
 
-			List<String> EnabledAssemblers = json["EnabledAssemblers"].Select(t => (String)t).ToList();
+			IEnumerable<String> EnabledAssemblers = json["EnabledAssemblers"].Select(t => (String)t);
 			foreach (Assembler assembler in DataCache.Assemblers.Values)
 			{
 				assembler.Enabled = EnabledAssemblers.Contains(assembler.Name);
 			}
 
-			List<String> EnabledMiners = json["EnabledMiners"].Select(t => (String)t).ToList();
+			IEnumerable<String> EnabledMiners = json["EnabledMiners"].Select(t => (String)t);
 			foreach (Miner miner in DataCache.Miners.Values)
 			{
 				miner.Enabled = EnabledMiners.Contains(miner.Name);
 			}
 
-			List<String> EnabledModules = json["EnabledModules"].Select(t => (String)t).ToList();
+			IEnumerable<String> EnabledModules = json["EnabledModules"].Select(t => (String)t);
 			foreach (Module module in DataCache.Modules.Values)
 			{
 				module.Enabled = EnabledModules.Contains(module.Name);
+			}
+
+			IEnumerable<String> EnabledRecipes = json["EnabledRecipes"].Select(t => (String)t);
+			foreach (Recipe recipe in DataCache.Recipes.Values)
+			{
+				recipe.Enabled = EnabledRecipes.Contains(recipe.Name);
 			}
 
 			Graph.UpdateNodeValues();
