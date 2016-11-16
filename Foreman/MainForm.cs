@@ -135,7 +135,7 @@ namespace Foreman
 				if (recipe.Value.Icon != null)
 				{
 					RecipeImageList.Images.Add(recipe.Value.Icon);
-					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
+					lvItem.ImageIndex = RecipeImageList.Images.Count - 1;
 				} else
 				{
 					lvItem.ImageIndex = 0;
@@ -523,8 +523,7 @@ namespace Foreman
 			DataCache.LoadLocaleFiles(newLocale);
 
 			GraphViewer.UpdateNodes();
-			GraphViewer.Invalidate();
-			LoadItemList();
+			UpdateControlValues();
 
 			Properties.Settings.Default["Language"] = newLocale;
 			Properties.Settings.Default.Save();
@@ -549,6 +548,8 @@ namespace Foreman
 
 			LoadItemList();
 			LoadRecipeList();
+
+			GraphViewer.Invalidate();
 		}
 
 		private void ArrangeNodesButton_Click(object sender, EventArgs e)
