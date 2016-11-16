@@ -874,10 +874,14 @@ namespace Foreman
 				module.Enabled = EnabledModules.Contains(module.Name);
 			}
 
-			IEnumerable<String> EnabledRecipes = json["EnabledRecipes"].Select(t => (String)t);
-			foreach (Recipe recipe in DataCache.Recipes.Values)
+			JToken enabledRecipesToken;
+			if (json.TryGetValue("EnabledRecipes", out enabledRecipesToken))
 			{
-				recipe.Enabled = EnabledRecipes.Contains(recipe.Name);
+				IEnumerable<String> EnabledRecipes = enabledRecipesToken.Select(t => (String)t);
+				foreach (Recipe recipe in DataCache.Recipes.Values)
+				{
+					recipe.Enabled = EnabledRecipes.Contains(recipe.Name);
+				}
 			}
 
 			Graph.UpdateNodeValues();
