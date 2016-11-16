@@ -4,9 +4,9 @@ This is a simple program for generating flowcharts for production lines in the g
 
 Requires .Net 4.0 or higher and Visual C++ 2012 x86 to run.
 
-Here's an example of the kind of thing you can make with it:
+For example, here's a (fairly messy) flowchart showing the optimal resources and assemblers required to make one rocket per minute:
 
-![Foreman Production Flowchart.png](https://bitbucket.org/repo/ary6LR/images/734263546-Foreman%20Production%20Flowchart.png)
+![1 Rocket per minute.png](https://bitbucket.org/repo/ary6LR/images/1686665211-1%20Rocket%20per%20minute.png)
 
 ## Usage ##
 
