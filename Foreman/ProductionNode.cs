@@ -27,6 +27,8 @@ namespace Foreman
 		public abstract float GetDesiredOutput(Item item);
 		public abstract float GetRateLimitedByInputs();
 		public abstract float GetRateDemandedByOutputs();
+		public abstract IDictionary<Item, float> GetOutputAmounts();
+		public abstract IDictionary<Item, float> GetInputAmounts();
 		public RateType rateType = RateType.Auto;
 		public float actualRate = 0f;
 		public float desiredRate = 0f;
@@ -71,6 +73,21 @@ namespace Foreman
 			return GetTotalOutput(item) - GetUsedOutput(item);
 		}
 
+		public float GetUnusedRate()
+		{
+			float mostUsedItem = float.MaxValue;
+			foreach (Item item in Outputs)
+			{
+				float unusedRateForItem = GetUnusedOutput(item) / GetOutputAmounts()[item];
+				if (unusedRateForItem < mostUsedItem)
+				{
+					mostUsedItem = unusedRateForItem;
+				}
+			}
+
+			return mostUsedItem;
+		}
+		
 		public float GetRequiredOutput(Item item)
 		{
 			float amount = 0;
@@ -352,6 +369,16 @@ namespace Foreman
 			return (float)Math.Round(BaseRecipe.Results[item] * desiredRate, RoundingDP);
 		}
 
+		public override IDictionary<Item, float> GetInputAmounts()
+		{
+			return BaseRecipe.Ingredients;
+		}
+
+		public override IDictionary<Item, float> GetOutputAmounts()
+		{
+			return BaseRecipe.Results;
+		}
+
 		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
 		private float ValidateRecipeRate(float amount)
 		{
@@ -566,6 +593,18 @@ namespace Foreman
 			get { return SuppliedItem.FriendlyName; }
 		}
 
+		public override IDictionary<Item, float> GetInputAmounts()
+		{
+			Dictionary<Item, float> inputAmounts = new Dictionary<Item, float>();
+			inputAmounts.Add(SuppliedItem, 1);
+			return inputAmounts;
+		}
+
+		public override IDictionary<Item, float> GetOutputAmounts()
+		{
+			return new Dictionary<Item, float>();
+		}
+
 		public Dictionary<MachinePermutation, int> GetMinimumMiners()
 		{
 			Dictionary<MachinePermutation, int> results = new Dictionary<MachinePermutation, int>();
@@ -678,6 +717,18 @@ namespace Foreman
 		public override float GetDesiredOutput(Item item)
 		{
 			return 0;
+		}
+
+		public override IDictionary<Item, float> GetOutputAmounts()
+		{
+			Dictionary<Item, float> inputAmounts = new Dictionary<Item, float>();
+			inputAmounts.Add(ConsumedItem, 1);
+			return inputAmounts;
+		}
+
+		public override IDictionary<Item, float> GetInputAmounts()
+		{
+			return new Dictionary<Item, float>();
 		}
 
 		public static ConsumerNode Create(Item item, ProductionGraph graph)
