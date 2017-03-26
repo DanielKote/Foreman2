@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Threading;
 
 namespace Foreman
 {
@@ -82,14 +84,13 @@ namespace Foreman
 			if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
 			if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
-			DataCache.LoadAllData(null);
-			
+            this.backgroundLoader.RunWorkerAsync();
+
 			LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
 			LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
 
 			UpdateControlValues();
 		}
-
 		public void LoadItemList()
 		{
 			//Listview
@@ -647,5 +648,22 @@ namespace Foreman
 				AddRecipeButton.Text = "Add Recipes";
 			}
 		}
-	}
+
+        private void backgroundLoader_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+			DataCache.LoadAllData(null, worker);
+        }
+
+        private void backgroundLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+			UpdateControlValues();
+            progressBar.Visible = false;
+        }
+
+        private void backgroundLoader_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            progressBar.Value = e.ProgressPercentage;
+        }
+    }
 }

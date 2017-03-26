@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace Foreman
 {
@@ -77,14 +78,19 @@ namespace Foreman
 
 		public static Dictionary<String, byte[]> zipHashes = new Dictionary<string, byte[]>();
 
-		public static void LoadAllData(List<String> enabledMods)
+		public static void LoadAllData(List<String> enabledMods, BackgroundWorker worker = null)
 		{
 			Clear();
+            if (worker == null) {
+                // TODO: Update all callers so this default can be removed. For now, use a null object.
+                worker = new BackgroundWorker();
+                worker.WorkerReportsProgress = true;
+            }
 
+            worker.ReportProgress(0);
 			using (Lua lua = new Lua())
 			{
-				FindAllMods(enabledMods);
-
+				FindAllMods(enabledMods, worker);
 				AddLuaPackagePath(lua, Path.Combine(DataPath, "core", "lualib")); //Core lua functions
 				String basePackagePath = lua["package.path"] as String;
 
@@ -140,7 +146,6 @@ namespace Foreman
 						}
 					}
 				}
-
 				//------------------------------------------------------------------------------------------
 				// Lua files have all been executed, now it's time to extract their data from the lua engine
 				//------------------------------------------------------------------------------------------
@@ -218,12 +223,12 @@ namespace Foreman
 						g.FillRectangle(Brushes.White, 0, 0, 32, 32);
 					}
 				}
-
 				LoadAllLanguages();
 				LoadLocaleFiles();
 			}
 
 			MarkCyclicRecipes();
+            worker.ReportProgress(100);
 
 			ReportErrors();
 		}
@@ -405,26 +410,78 @@ namespace Foreman
 			}
 		}
 
-		private static void FindAllMods(List<String> enabledMods) //Vanilla game counts as a mod too.
+        public class ModOnDisk
+        {
+            public readonly string Location;
+            public readonly ModType Type;
+
+            public enum ModType { DIRECTORY, ZIP };
+
+            public ModOnDisk(string location, ModType type)
+            {
+                this.Location = location;
+                this.Type = type;
+            }
+
+            public static IEnumerable<ModOnDisk> EnumerateDirectories(string path)
+            {
+                if (Directory.Exists(path))
+                {
+                    return Directory.EnumerateDirectories(path).Select(x => new ModOnDisk(x, ModType.DIRECTORY));
+                } else
+                {
+                    return Empty();
+                }
+            }
+
+            public static IEnumerable<ModOnDisk> EnumerateZips(string path)
+            {
+                if (Directory.Exists(path))
+                {
+                    return Directory.EnumerateFiles(path, "*.zip").Select(x => new ModOnDisk(x, ModType.ZIP));
+                } else
+                {
+                    return Empty();
+                }
+            }
+
+            public static IEnumerable<ModOnDisk> Empty()
+            {
+                return Enumerable.Empty<ModOnDisk>();
+            }
+        }
+
+        private static void reportingProgress<T>(BackgroundWorker worker, IEnumerable<T> xs, Action<T> f) {
+            float total = xs.Count();
+            float i = 0;
+            foreach (T x in xs)
+            {
+                f.Invoke(x);
+                i += 1;
+                worker.ReportProgress((int)(i / total * 100));
+            }
+        }
+
+		private static void FindAllMods(List<String> enabledMods, BackgroundWorker worker) //Vanilla game counts as a mod too.
 		{
-			if (Directory.Exists(DataPath))
-			{
-				foreach (String dir in Directory.EnumerateDirectories(DataPath))
-				{
-					ReadModInfoFile(dir);
-				}
-			}
-			if (Directory.Exists(Properties.Settings.Default.FactorioModPath))
-			{
-				foreach (String dir in Directory.EnumerateDirectories(Properties.Settings.Default.FactorioModPath))
-				{
-					ReadModInfoFile(dir);
-				}
-				foreach (String zipFile in Directory.EnumerateFiles(Properties.Settings.Default.FactorioModPath, "*.zip"))
-				{
-					ReadModInfoZip(zipFile);					
-				}
-			}
+            String modPath = Properties.Settings.Default.FactorioModPath;
+            IEnumerable<ModOnDisk> mods = ModOnDisk.Empty();
+
+            mods = mods.Concat(ModOnDisk.EnumerateDirectories(DataPath));
+            mods = mods.Concat(ModOnDisk.EnumerateDirectories(modPath));
+            mods = mods.Concat(ModOnDisk.EnumerateZips(modPath));
+
+            reportingProgress(worker, mods, mod =>
+            {
+                switch (mod.Type) {
+                    case ModOnDisk.ModType.DIRECTORY:
+                        ReadModInfoFile(mod.Location);
+                        break;
+                    case ModOnDisk.ModType.ZIP:
+                        ReadModInfoZip(mod.Location);
+                        break;
+                }
+            });
 
 			Dictionary<String, bool> enabledModsFromFile = new Dictionary<string,bool>();
 
