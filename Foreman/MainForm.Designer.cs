@@ -71,8 +71,6 @@
             this.RecipeListView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RecipeImageList = new System.Windows.Forms.ImageList(this.components);
-            this.backgroundLoader = new System.ComponentModel.BackgroundWorker();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.tableLayoutPanel1.SuspendLayout();
             this.MainToolbar.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -116,7 +114,6 @@
             this.MainToolbar.Controls.Add(this.groupBox2);
             this.MainToolbar.Controls.Add(this.flowLayoutPanel2);
             this.MainToolbar.Controls.Add(this.panel1);
-            this.MainToolbar.Controls.Add(this.progressBar);
             this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainToolbar.Location = new System.Drawing.Point(3, 3);
             this.MainToolbar.Name = "MainToolbar";
@@ -592,21 +589,6 @@
             this.RecipeImageList.ImageSize = new System.Drawing.Size(32, 32);
             this.RecipeImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
-            // backgroundLoader
-            // 
-            this.backgroundLoader.WorkerReportsProgress = true;
-            this.backgroundLoader.WorkerSupportsCancellation = true;
-            this.backgroundLoader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundLoader_DoWork);
-            this.backgroundLoader.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundLoader_ProgressChanged);
-            this.backgroundLoader.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundLoader_RunWorkerCompleted);
-            // 
-            // progressBar
-            // 
-            this.progressBar.Location = new System.Drawing.Point(1017, 3);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(100, 23);
-            this.progressBar.TabIndex = 17;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -687,8 +669,6 @@
 		private System.Windows.Forms.ListView RecipeListView;
 		private System.Windows.Forms.ColumnHeader columnHeader1;
 		private System.Windows.Forms.ImageList RecipeImageList;
-        private System.ComponentModel.BackgroundWorker backgroundLoader;
-        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 

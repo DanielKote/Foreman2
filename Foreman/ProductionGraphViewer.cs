@@ -756,7 +756,12 @@ namespace Foreman
 				mod.Enabled = EnabledMods.Contains(mod.Name);
 			}
 			List<String> enabledMods = DataCache.Mods.Where(m => m.Enabled).Select(m => m.Name).ToList();
-			DataCache.LoadAllData(enabledMods);
+
+
+            using (ProgressForm form = new ProgressForm(enabledMods))
+            {
+                form.ShowDialog();
+            }
 
 			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
 			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];

@@ -25,73 +25,82 @@ namespace Foreman
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
-		{
-			//I changed the name of the variable, so this copies the value over for people who are upgrading their Foreman version
-			if (Properties.Settings.Default.FactorioPath == "" && Properties.Settings.Default.FactorioDataPath != "")
-			{
-				Properties.Settings.Default["FactorioPath"] = Path.GetDirectoryName(Properties.Settings.Default.FactorioDataPath);
-				Properties.Settings.Default["FactorioDataPath"] = "";
-			}
+        {
+            //I changed the name of the variable, so this copies the value over for people who are upgrading their Foreman version
+            if (Properties.Settings.Default.FactorioPath == "" && Properties.Settings.Default.FactorioDataPath != "")
+            {
+                Properties.Settings.Default["FactorioPath"] = Path.GetDirectoryName(Properties.Settings.Default.FactorioDataPath);
+                Properties.Settings.Default["FactorioDataPath"] = "";
+            }
 
-			if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
-			{
-				foreach (String defaultPath in new String[]{
-												  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
-												  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
-												  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
-				{
-					if (Directory.Exists(defaultPath))
-					{
-						Properties.Settings.Default["FactorioPath"] = defaultPath;
-						Properties.Settings.Default.Save();
-						break;
-					}
-				}
-			}
+            if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
+            {
+                foreach (String defaultPath in new String[]{
+                                                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
+                                                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
+                                                  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
+                {
+                    if (Directory.Exists(defaultPath))
+                    {
+                        Properties.Settings.Default["FactorioPath"] = defaultPath;
+                        Properties.Settings.Default.Save();
+                        break;
+                    }
+                }
+            }
 
-			if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
-			{
-				using (DirectoryChooserForm form = new DirectoryChooserForm(""))
-				{
-					if (form.ShowDialog() == DialogResult.OK)
-					{
-						Properties.Settings.Default["FactorioPath"] = form.SelectedPath; ;
-						Properties.Settings.Default.Save();
-					}
-					else
-					{
-						Close();
-						Dispose();
-						return;
-					}
-				}
-			}
+            if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
+            {
+                using (DirectoryChooserForm form = new DirectoryChooserForm(""))
+                {
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        Properties.Settings.Default["FactorioPath"] = form.SelectedPath; ;
+                        Properties.Settings.Default.Save();
+                    }
+                    else
+                    {
+                        Close();
+                        Dispose();
+                        return;
+                    }
+                }
+            }
 
-			if (!Directory.Exists(Properties.Settings.Default.FactorioModPath))
-			{
-				if (Directory.Exists(Path.Combine(Properties.Settings.Default.FactorioPath, "mods")))
-				{
-					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
-				}
-				else if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods")))
-				{
-					Properties.Settings.Default["FactorioModPath"] = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods");
-				}
-			}
+            if (!Directory.Exists(Properties.Settings.Default.FactorioModPath))
+            {
+                if (Directory.Exists(Path.Combine(Properties.Settings.Default.FactorioPath, "mods")))
+                {
+                    Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
+                }
+                else if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods")))
+                {
+                    Properties.Settings.Default["FactorioModPath"] = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods");
+                }
+            }
 
-			if (Properties.Settings.Default.EnabledMods == null) Properties.Settings.Default.EnabledMods = new StringCollection();
-			if (Properties.Settings.Default.EnabledAssemblers == null) Properties.Settings.Default.EnabledAssemblers = new StringCollection();
-			if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
-			if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
+            if (Properties.Settings.Default.EnabledMods == null) Properties.Settings.Default.EnabledMods = new StringCollection();
+            if (Properties.Settings.Default.EnabledAssemblers == null) Properties.Settings.Default.EnabledAssemblers = new StringCollection();
+            if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
+            if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
-            this.backgroundLoader.RunWorkerAsync();
+            ReloadFactorioData();
 
-			LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
-			LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
+            LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
+            LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
 
-			UpdateControlValues();
-		}
-		public void LoadItemList()
+            UpdateControlValues();
+        }
+
+        private static void ReloadFactorioData()
+        {
+            using (ProgressForm form = new ProgressForm())
+            {
+                form.ShowDialog();
+            }
+        }
+
+        public void LoadItemList()
 		{
 			//Listview
 			ItemListView.Items.Clear();
@@ -355,7 +364,7 @@ namespace Foreman
 					Properties.Settings.Default.Save();
 
 					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
-					DataCache.LoadAllData(null);
+                    ReloadFactorioData();
 					GraphViewer.LoadFromJson(savedGraph);
 					UpdateControlValues();
 				}
@@ -373,7 +382,7 @@ namespace Foreman
 					Properties.Settings.Default.Save();
 
 					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
-					DataCache.LoadAllData(null);
+                    ReloadFactorioData();
 					GraphViewer.LoadFromJson(savedGraph);
 					UpdateControlValues();
 				}
@@ -648,22 +657,5 @@ namespace Foreman
 				AddRecipeButton.Text = "Add Recipes";
 			}
 		}
-
-        private void backgroundLoader_DoWork(object sender, DoWorkEventArgs e)
-        {
-            BackgroundWorker worker = sender as BackgroundWorker;
-			DataCache.LoadAllData(null, worker);
-        }
-
-        private void backgroundLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-			UpdateControlValues();
-            progressBar.Visible = false;
-        }
-
-        private void backgroundLoader_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            progressBar.Value = e.ProgressPercentage;
-        }
     }
 }

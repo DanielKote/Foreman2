@@ -78,14 +78,9 @@ namespace Foreman
 
 		public static Dictionary<String, byte[]> zipHashes = new Dictionary<string, byte[]>();
 
-		public static void LoadAllData(List<String> enabledMods, BackgroundWorker worker = null)
+		public static void LoadAllData(List<String> enabledMods, BackgroundWorker worker)
 		{
 			Clear();
-            if (worker == null) {
-                // TODO: Update all callers so this default can be removed. For now, use a null object.
-                worker = new BackgroundWorker();
-                worker.WorkerReportsProgress = true;
-            }
 
             worker.ReportProgress(0);
 			using (Lua lua = new Lua())
@@ -456,6 +451,10 @@ namespace Foreman
             float i = 0;
             foreach (T x in xs)
             {
+                if (worker.CancellationPending)
+                {
+                    break;
+                }
                 f.Invoke(x);
                 i += 1;
                 worker.ReportProgress((int)(i / total * 100));
@@ -482,6 +481,11 @@ namespace Foreman
                         break;
                 }
             });
+
+            if (worker.CancellationPending)
+            {
+                return;
+            }
 
 			Dictionary<String, bool> enabledModsFromFile = new Dictionary<string,bool>();
 
