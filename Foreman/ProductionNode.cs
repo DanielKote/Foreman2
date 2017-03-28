@@ -140,7 +140,12 @@ namespace Foreman
 		}
 
 		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
-	}
+
+        internal double GetProductivityBonus()
+        {
+            return 1.5;
+        }
+    }
 
 	public class RecipeNode : ProductionNode
 	{

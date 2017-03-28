@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foreman", "Foreman\Foreman.csproj", "{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForemanTest", "ForemanTest\ForemanTest.csproj", "{7B688C0A-979D-4BB9-9E7A-84E63208A697}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,22 @@ Global
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|Win32.ActiveCfg = Release|x86
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|x86.ActiveCfg = Release|x86
 		{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}.Release|x86.Build.0 = Release|x86
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|Win32.Build.0 = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Debug|x86.Build.0 = Debug|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|Win32.ActiveCfg = Release|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|Win32.Build.0 = Release|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B688C0A-979D-4BB9-9E7A-84E63208A697}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

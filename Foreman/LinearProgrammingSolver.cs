@@ -90,11 +90,16 @@ namespace Foreman
 
 		private void doPivotTransformations(int pivotRow, int pivotColumn)
 		{
+            if (pivotRow < 0)
+                return;
+
 			for (int i = 0; i < rows.Count(); i++)
 			{
-				if (i != pivotRow)
-				{
-					rows[i].AddCoefficients(rows[pivotRow], rows[i][pivotColumn] / -rows[pivotRow][pivotColumn]);
+                if (i != pivotRow)
+                {
+                    if (rows[pivotRow][pivotColumn] != 0) {
+                        rows[i].AddCoefficients(rows[pivotRow], rows[i][pivotColumn] / -rows[pivotRow][pivotColumn]);
+                    }
 				}
 			}
 			rows[pivotRow].MultiplyCoefficients(1M / rows[pivotRow][pivotColumn]);

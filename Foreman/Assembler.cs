@@ -126,6 +126,7 @@ namespace Foreman
 		}
 		public bool Enabled { get; set; }
 		public float SpeedBonus { get; set; }
+        public float ProductivityBonus { get; private set; }
 		public string Name { get; private set; }
 		private String friendlyName;
 		public String FriendlyName
@@ -147,9 +148,10 @@ namespace Foreman
 			}
 		}
 
-		public Module(String name, float speedBonus)
+        public Module(String name, float speedBonus, float productivityBonus)
 		{
 			SpeedBonus = speedBonus;
+			ProductivityBonus = productivityBonus;
 			Name = name;
 			Enabled = true;
 		}
