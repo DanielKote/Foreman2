@@ -110,7 +110,6 @@
     </Compile>
     <Compile Include="Inserter.cs" />
     <Compile Include="ItemTab.cs" />
-    <Compile Include="LinearProgrammingSolver.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -123,6 +122,7 @@
     <Compile Include="Miner.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="ProductionNode.cs" />
+    <Compile Include="ProductionSolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressForm.cs">
       <SubType>Form</SubType>

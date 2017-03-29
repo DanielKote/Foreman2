@@ -140,5 +140,60 @@ namespace ForemanTest
 
             Assert.AreEqual(15, data.SupplyRate("Plate"));
         }
+
+        [TestMethod]
+        public void TestFixedSupply()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Plate").Target(10),
+                builder.Consumer("Plate")
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            Assert.AreEqual(10, data.ConsumedRate("Plate"));
+        }
+
+        [TestMethod]
+        public void TestFixedRecipe()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Ore"),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(10),
+                builder.Consumer("Plate")
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            Assert.AreEqual(10, data.SupplyRate("Ore"));
+            Assert.AreEqual(10, data.ConsumedRate("Plate"));
+        }
+
+        [TestMethod]
+        public void TestPartialGraph()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            foreach (var node in data.Graph.Nodes)
+            {
+                Assert.AreEqual(0, node.desiredRate);
+            }
+        }
     }
 }

@@ -123,6 +123,9 @@ namespace ForemanTest
                 {
                     this.Built.desiredRate = target;
                     this.Built.rateType = RateType.Manual;
+                } else
+                {
+                    this.Built.rateType = RateType.Auto;
                 }
             }
         }
@@ -131,6 +134,8 @@ namespace ForemanTest
         {
             private Dictionary<string, float> inputs;
             private Dictionary<string, float> outputs;
+
+            public float target { get; private set; }
 
             internal RecipeBuilder()
             {
@@ -145,6 +150,15 @@ namespace ForemanTest
 
                 Recipe recipe = new Recipe(recipeName, duration, itemizeKeys(inputs), itemizeKeys(outputs));
                 Built = RecipeNode.Create(recipe, graph);
+
+                if (target > 0)
+                {
+                    this.Built.desiredRate = target;
+                    this.Built.rateType = RateType.Manual;
+                } else
+                {
+                    this.Built.rateType = RateType.Auto;
+                }
             }
 
             internal RecipeBuilder Input(string itemName, float amount)
@@ -156,6 +170,12 @@ namespace ForemanTest
             internal RecipeBuilder Output(string itemName, float amount)
             {
                 outputs.Add(itemName, amount);
+                return this;
+            }
+
+            internal RecipeBuilder Target(float target)
+            {
+                this.target = target;
                 return this;
             }
 
@@ -189,7 +209,17 @@ namespace ForemanTest
                 return Graph.GetSuppliers(new Item(itemName));
             }
 
+            public float ConsumedRate(string itemName)
+            {
+                var desiredRate = Consumers(itemName).Select(x => x.desiredRate).Sum();
+
+                return desiredRate;
+            }
+
+            private IEnumerable<ProductionNode> Consumers(string itemName)
+            {
+                return Graph.GetConsumers(new Item(itemName));
+            }
         }
     }
-
 }
