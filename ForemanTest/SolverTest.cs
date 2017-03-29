@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Foreman;
 
 namespace ForemanTest
@@ -20,11 +21,47 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(10, data.Supply("Plate").desiredRate);
+            Assert.AreEqual(10, data.SupplyRate("Plate"));
         }
 
         [TestMethod]
-        public void TestBasicSolveWithRecipe()
+        public void TestBasicRecipe()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Ore"),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1),
+                builder.Consumer("Plate").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            Assert.AreEqual(10, data.SupplyRate("Ore"));
+        }
+
+        [TestMethod]
+        public void TestRecipeThatReducesItems()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Plate"),
+                builder.Recipe().Input("Plate", 5).Output("Steel", 1),
+                builder.Consumer("Steel").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            Assert.AreEqual(50, data.SupplyRate("Plate"));
+        }
+
+        [TestMethod]
+        public void TestRecipeThatMultipliesItems()
         {
             var builder = GraphBuilder.Create();
 
@@ -38,7 +75,70 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(5, data.Supply("Plate").desiredRate);
+            Assert.AreEqual(5, data.SupplyRate("Plate"));
+        }
+
+        [TestMethod]
+        public void TestRecipeWithUnevenInputOutputRatio()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Plate"),
+                builder.Recipe().Input("Plate", 2).Output("Wire", 3),
+                builder.Consumer("Wire").Target(12)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            Assert.AreEqual(8, data.SupplyRate("Plate"));
+        }
+
+        [TestMethod]
+        public void TestMultipleInput()
+        {
+            var builder = GraphBuilder.Create();
+            var consumer = builder.Consumer("Plate").Target(10);
+
+            builder.Link(
+                builder.Supply("Plate"),
+                consumer
+            );
+            builder.Link(
+                builder.Supply("Plate"),
+                consumer
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            var production = data.SupplyRate("Plate");
+            Assert.IsTrue(production == 10, "Suppliers misproduced: " + production);
+        }
+
+        [TestMethod]
+        public void TestMultipleOutput()
+        {
+            var builder = GraphBuilder.Create();
+            var supplier = builder.Supply("Plate");
+
+            builder.Link(
+                supplier,
+                builder.Consumer("Plate").Target(10)
+            );
+            builder.Link(
+                supplier,
+                builder.Consumer("Plate").Target(5)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            Assert.AreEqual(15, data.SupplyRate("Plate"));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Foreman;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -173,10 +174,21 @@ namespace ForemanTest
                 this.Graph = graph;
             }
 
-            public ProductionNode Supply(string itemName)
+            public float SupplyRate(string itemName)
             {
-                return Graph.GetSuppliers(new Item(itemName)).First();
+                var desiredRate = Suppliers(itemName).Select(x => x.desiredRate).Sum();
+                var actualRate  = Suppliers(itemName).Select(x => x.actualRate).Sum();
+
+                Assert.AreEqual(desiredRate, actualRate, "desiredRate and actualRate don't match!");
+
+                return desiredRate;
             }
+
+            private IEnumerable<ProductionNode> Suppliers(string itemName)
+            {
+                return Graph.GetSuppliers(new Item(itemName));
+            }
+
         }
     }
 

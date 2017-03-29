@@ -6,124 +6,193 @@ using Google.OrTools.LinearSolver;
 
 namespace Foreman
 {
-	public static class GraphOptimisations
-	{
-		public static void FindOptimalGraphToSatisfyFixedNodes(this ProductionGraph graph)
-		{
-			foreach (ProductionNode node in graph.Nodes.Where(n => n.rateType == RateType.Auto))
-			{
-				if (node.rateType == RateType.Auto)
-				{
-					node.actualRate = node.desiredRate = 0;
-				}
-			}
-			
-			foreach (var nodeGroup in graph.GetConnectedComponents())
-			{
-				OptimiseNodeGroup(nodeGroup);				
-				OptimiseNodeGroupGLOP(nodeGroup);
-                Console.Out.Flush();
-			}
+    public static class GraphOptimisations
+    {
+        public static void FindOptimalGraphToSatisfyFixedNodes(this ProductionGraph graph)
+        {
+            foreach (ProductionNode node in graph.Nodes.Where(n => n.rateType == RateType.Auto))
+            {
+                if (node.rateType == RateType.Auto)
+                {
+                    node.actualRate = node.desiredRate = 0;
+                }
+            }
 
-			graph.UpdateLinkThroughputs();
-		}
+            foreach (var nodeGroup in graph.GetConnectedComponents())
+            {
+                //OptimiseNodeGroup(nodeGroup);				
+                OptimiseNodeGroupGLOP(nodeGroup);
+            }
+
+            graph.UpdateLinkThroughputs();
+        }
 
         public class OurSolver
         {
             private Objective objective;
 
             public Solver solver { get; private set; }
-            public HashSet<string> allVariables;
+            public Dictionary<object, Variable> allVariables;
+            private int counter;
+            private List<Google.OrTools.LinearSolver.Constraint> allConstraints;
+
             enum EndpointType { INPUT, OUTPUT }
 
             public OurSolver()
             {
                 this.solver = Solver.CreateSolver("Foreman", "GLOP_LINEAR_PROGRAMMING");
                 this.objective = solver.Objective();
+                this.allVariables = new Dictionary<object, Variable>();
+                this.allConstraints = new List<Google.OrTools.LinearSolver.Constraint>();
                 objective.SetMinimization();
             }
 
-            internal void AddInputGoal(ProductionNode node, Item item, IEnumerable<ProductionNode> suppliers, float desiredRate)
+            internal void AddTarget(ProductionNode node, float desiredRate)
             {
-                {
-                    Google.OrTools.LinearSolver.Constraint constraint = solver.MakeConstraint(desiredRate, double.PositiveInfinity);
-                    Variable variable = varFor(node, item, EndpointType.INPUT);
-                    constraint.SetCoefficient(variable, 1.0);
-                }
-
-                {
-                    // Don't overproduce!
-                    //Google.OrTools.LinearSolver.Constraint productionConstraint = solver.MakeConstraint(0, double.PositiveInfinity);
-                    //Google.OrTools.LinearSolver.Constraint productionConstraint = solver.MakeConstraint(double.NegativeInfinity, 0);
-                    Google.OrTools.LinearSolver.Constraint productionConstraint = solver.MakeConstraint(0, 0);
-
-                    Variable nodeVar = varFor(node, item, EndpointType.INPUT);
-                    productionConstraint.SetCoefficient(nodeVar, 1);
-                    foreach (var supplier in suppliers)
-                    {
-                        productionConstraint.SetCoefficient(varFor(supplier, item, EndpointType.OUTPUT), -1.0);
-                    }
-                }
-
-            }
-
-            private Variable varFor(ProductionNode node, Item item, EndpointType type)
-            {
-                string n = nameFor(node, item, type);
-                
-                Variable existing = solver.LookupVariableOrNull(n);
-                if (existing == null)
-                {
-                    existing = solver.MakeNumVar(0.0, double.PositiveInfinity, n);
-                }
-                return existing;
-            }
-
-            private string nameFor(ProductionNode node, Item item, EndpointType type)
-            {
-                return node.GetHashCode() + ":" + type.ToString() + ":" + item.ToString();
-            }
-
-            internal void AddRecipeConstraint(ProductionNode node, Item input, float inputAmount, Item output, float outputAmount)
-            {
-                Google.OrTools.LinearSolver.Constraint constraint = solver.MakeConstraint(double.NegativeInfinity, 0);
-
-                Variable inputVar = varFor(node, input, EndpointType.INPUT);
-                Variable outputVar = varFor(node, output, EndpointType.OUTPUT);
-
-                // TODO: Comment this
-                constraint.SetCoefficient(inputVar, -outputAmount);
-                constraint.SetCoefficient(outputVar, inputAmount);
-            }
-
-            internal void AddProductionConstraint(ProductionNode node, Item item, IEnumerable<ProductionNode> consumers)
-            {
-                Google.OrTools.LinearSolver.Constraint constraint = solver.MakeConstraint(0, double.PositiveInfinity);
-
-                Variable nodeVar = varFor(node, item, EndpointType.OUTPUT);
+                Variable nodeVar = variableFor(node);
+                var constraint = MakeConstraint(desiredRate, double.PositiveInfinity);
                 constraint.SetCoefficient(nodeVar, 1);
-                foreach (var consumer in consumers)
+            }
+
+            internal int Solve()
+            {
+                return solver.Solve();
+            }
+
+            internal double GetDesiredRate(ProductionNode node)
+            {
+                return variableFor(node).SolutionValue();
+            }
+
+            internal void AddOutputRatio(ProductionNode node, Item item, IEnumerable<NodeLink> itemOutputs, float outputRate)
+            {
+                // Ensure that the sum of all outputs for this type of item is in relation to the rate of the recipe
+                // So for copper wire, the some of every output variable must 2 * rate
+                var constraint = MakeConstraint(0, 0);
+                var desiredRateVariable = variableFor(node);
+
+                constraint.SetCoefficient(desiredRateVariable, outputRate);
+                foreach (var inputLink in itemOutputs)
                 {
-                    constraint.SetCoefficient(varFor(consumer, item, EndpointType.INPUT), -1.0);
+                    var inputVariable = variableFor(inputLink, EndpointType.INPUT);
+                    constraint.SetCoefficient(inputVariable, -1);
                 }
             }
 
-            internal void AddObjective(ProductionNode node, Item item)
+            internal void AddInputRatio(ProductionNode node, Item item, IEnumerable<NodeLink> itemInputs, float inputRate)
             {
-                objective.SetCoefficient(varFor(node, item, EndpointType.OUTPUT), 1);
+                // Ensure that the sum of all inputs for this type of item is in relation to the rate of the recipe
+                // So for the steel input to a solar panel, the sum of every input variable to this node must equal 5 * rate.
+                var constraint = MakeConstraint(0, 0);
+                var desiredRateVariable = variableFor(node);
+
+                constraint.SetCoefficient(desiredRateVariable, inputRate);
+                foreach (var inputLink in itemInputs)
+                {
+                    var inputVariable = variableFor(inputLink, EndpointType.OUTPUT);
+                    constraint.SetCoefficient(inputVariable, -1);
+                }
+            }
+            internal void AddRecipeInputAllowBackup(ProductionNode node, Item item, IEnumerable<NodeLink> itemInputs, float inputRate)
+            {
+                // Ensure that for all inputs for this type of item, they don't consume more than is being produced.
+                // Consuming less is fine, this represents a backup.
+                foreach (var inputLink in itemInputs)
+                {
+                    var constraint = MakeConstraint(0, double.PositiveInfinity);
+                    var supplierVariable = variableFor(inputLink, EndpointType.INPUT);
+                    var consumerVariable = variableFor(inputLink, EndpointType.OUTPUT);
+                    constraint.SetCoefficient(supplierVariable, 1);
+                    constraint.SetCoefficient(consumerVariable, -1);
+                }
+            }
+            internal void AddRecipeInputConsumeAll(ProductionNode node, Item item, IEnumerable<NodeLink> itemInputs, float inputRate)
+            {
+                // Ensure that for all inputs for this type of item, all must be consumed.
+                foreach (var inputLink in itemInputs)
+                {
+                    var constraint = MakeConstraint(0, 0);
+                    var supplierVariable = variableFor(inputLink, EndpointType.INPUT);
+                    var consumerVariable = variableFor(inputLink, EndpointType.OUTPUT);
+                    constraint.SetCoefficient(supplierVariable, 1);
+                    constraint.SetCoefficient(consumerVariable, -1);
+                }
             }
 
-            internal void Solve()
+            private Google.OrTools.LinearSolver.Constraint MakeConstraint(double low, double high)
             {
-                solver.Solve();
+                var constraint = solver.MakeConstraint(low, high);
+                allConstraints.Add(constraint);
+                return constraint;
             }
 
-            internal void GetSolution(ProductionNode node, Item item, bool input)
+            private Variable variableFor(NodeLink inputLink, EndpointType type)
             {
-                Variable v = varFor(node, item, input ? EndpointType.INPUT : EndpointType.OUTPUT);
-                
-                System.Diagnostics.Debug.WriteLine(v.Name() + ": " + v.SolutionValue());
+                return variableFor(Tuple.Create(inputLink, type), "link:" + type + ":" + inputLink.Consumer.DisplayName + ":" + inputLink.Item);
             }
+
+            private Variable variableFor(ProductionNode node)
+            {
+                if (node is SupplyNode)
+                {
+                    return variableFor(node, "supplier:" + node.DisplayName);
+                }
+                else if (node is ConsumerNode)
+                {
+                    return variableFor(node, "consumer:" + node.DisplayName);
+
+                }
+                else
+                {
+                    return variableFor(node, "node:" + node.DisplayName);
+                }
+            }
+
+            private Variable variableFor(object key, String name)
+            {
+                if (allVariables.ContainsKey(key))
+                {
+                    return allVariables[key];
+                }
+                var newVar = solver.MakeNumVar(0.0, double.PositiveInfinity, name + ":" + GetSequence());
+                allVariables[key] = newVar;
+                return newVar;
+            }
+
+            private int GetSequence()
+            {
+                return this.counter += 1;
+            }
+
+            internal void Minimize(ProductionNode node)
+            {
+                objective.SetCoefficient(variableFor(node), 1);
+            }
+
+            public string GetDescription()
+            {
+                var desc = new StringBuilder();
+                foreach (var constraint in this.allConstraints)
+                {
+                    var line = new List<string>();
+                    foreach (var variable in this.allVariables)
+                    {
+                        var coefficient = constraint.GetCoefficient(variable.Value);
+                        if (coefficient != 0.0)
+                        {
+                            line.Add(coefficient + " * " + variable.Value.Name());
+                        }
+                    }
+                    desc.Append(string.Join(" + ", line));
+                    desc.Append(" -> (");
+                    desc.Append(constraint.Lb());
+                    desc.Append(", ");
+                    desc.Append(constraint.Ub());
+                    desc.AppendLine(")");
+                }
+                return desc.ToString();
+            }
+
         }
 
         public static void OptimiseNodeGroupGLOP(IEnumerable<ProductionNode> nodeGroup)
@@ -132,78 +201,54 @@ namespace Foreman
 
             foreach (var node in nodeGroup)
             {
-                if (node is ConsumerNode)
+                if (node is RecipeNode)
                 {
-                    ConsumerNode consumerNode = (ConsumerNode)node;
-                    // TODO: This only works for ConsumerNodes
-                    if (node.rateType == RateType.Manual)
-                    {
-                        foreach (Item item in node.Inputs) //.Concat(node.Outputs))
-                        {
-                            IEnumerable<ProductionNode> suppliers = node.InputLinks
-                                .Where(x => x.Item == item)
-                                .Select(x => x.Supplier);
+                    RecipeNode rNode = (RecipeNode)node;
 
-                            solver.AddInputGoal(node, item, suppliers, node.desiredRate);
-                        }
-                    } else
+                    foreach (var itemInputs in rNode.InputLinks.GroupBy(x => x.Item))
                     {
-                        // Handle waste
-                    }
-                } else
-                {
-                    // Set up internal node constraints
-                    if (node is RecipeNode)
-                    {
-                        RecipeNode rNode = (RecipeNode)node;
-                        foreach (var input in node.Inputs)
-                        {
-                            foreach (var output in node.Outputs)
-                            {
+                        var item = itemInputs.Key;
 
-                                Recipe recipe = rNode.BaseRecipe;
-                                solver.AddRecipeConstraint(rNode, input, recipe.Ingredients[input], output, recipe.Results[output]);
-                            }
-                        }
-                        // TODO: Link output ratios
+                        solver.AddInputRatio(rNode, item, itemInputs, rNode.BaseRecipe.Ingredients[item]);
+                        solver.AddRecipeInputAllowBackup(rNode, item, itemInputs, rNode.BaseRecipe.Ingredients[item]);
                     }
 
-                    // Set up constraints for nodes this one supplies
-                    foreach (var item in node.Outputs)
+                    foreach (var itemOutputs in rNode.OutputLinks.GroupBy(x => x.Item))
                     {
-                        IEnumerable<ProductionNode> supplied = node.OutputLinks
-                            .Where(x => x.Item == item)
-                            .Select(x => x.Consumer);
+                        var item = itemOutputs.Key;
 
-                        solver.AddProductionConstraint(node, item, supplied);
+                        solver.AddOutputRatio(rNode, item, itemOutputs, rNode.BaseRecipe.Results[item]);
+                    }
+                } else if (node is SupplyNode)
+                {
+                    SupplyNode sNode = (SupplyNode)node;
 
-                        // TODO: Or recipes with no inputs?
-                        if (node is SupplyNode)
-                        {
-                            solver.AddObjective(node, item);
-                        }
+                    solver.AddOutputRatio(sNode, sNode.SuppliedItem, sNode.OutputLinks, 1);
+                } else if (node is ConsumerNode)
+                {
+                    ConsumerNode cNode = (ConsumerNode)node;
+
+                    solver.AddInputRatio(cNode, cNode.ConsumedItem, cNode.InputLinks, 1);
+                    solver.AddRecipeInputConsumeAll(cNode, cNode.ConsumedItem, cNode.InputLinks, 1);
+                    if (cNode.rateType == RateType.Manual)
+                    {
+                        solver.AddTarget(cNode, cNode.desiredRate);
                     }
                 }
+                solver.Minimize(node);
             }
-
-            System.Diagnostics.Debug.WriteLine("Solving it");
-            solver.Solve();
 
             foreach (var node in nodeGroup)
             {
-                foreach (var item in node.Inputs)
+                if (node.rateType == RateType.Auto)
                 {
-                    solver.GetSolution(node, item, true);
-                    // TODO: Probably only need first input/output
-                }
-                foreach (var item in node.Outputs)
-                {
-                    solver.GetSolution(node, item, false);
-                    // TODO: Probably only need first input/output
+                    node.desiredRate = (float)solver.GetDesiredRate(node);
+                    if (!(node is ConsumerNode))
+                    {
+                        node.actualRate = (float)solver.GetDesiredRate(node);
+                    }
                 }
             }
-            System.Diagnostics.Debug.WriteLine("Done");
-
         }
 
 		public static void OptimiseNodeGroup3(IEnumerable<ProductionNode> nodeGroup)
