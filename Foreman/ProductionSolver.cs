@@ -60,6 +60,10 @@ namespace Foreman
                     objective.SetCoefficient(variableFor(node), 1);
                 }
             }
+
+            if (nodes.Count == 0)
+                return null;
+
             objective.SetMinimization();
 
             if (solver.Solve() != Solver.OPTIMAL)

@@ -11,7 +11,7 @@ namespace Foreman
 	public enum RateType { Auto, Manual };
 	
 	[Serializable]
-	public abstract class ProductionNode : ISerializable
+	public abstract partial class ProductionNode : ISerializable
 	{
 		public static readonly int RoundingDP = 4;
 		public ProductionGraph Graph { get; protected set; }
@@ -30,7 +30,8 @@ namespace Foreman
 		public abstract IDictionary<Item, float> GetOutputAmounts();
 		public abstract IDictionary<Item, float> GetInputAmounts();
 		public RateType rateType = RateType.Auto;
-		public float actualRate = 0f;
+
+        public float actualRate = 0f;
 		public float desiredRate = 0f;
 
 		protected ProductionNode(ProductionGraph graph)
@@ -147,7 +148,7 @@ namespace Foreman
         }
     }
 
-	public class RecipeNode : ProductionNode
+	public partial class RecipeNode : ProductionNode
 	{
 		public Recipe BaseRecipe { get; private set; }
 		public Assembler Assembler { get; set; }
@@ -504,9 +505,9 @@ namespace Foreman
 			}
 			ModuleFilter.GetObjectData(info, context);
 		}
-	}
+    }
 
-	public class SupplyNode : ProductionNode
+	public partial class SupplyNode : ProductionNode
 	{
 		public Item SuppliedItem { get; private set; }
 
@@ -655,7 +656,7 @@ namespace Foreman
 		}
 	}
 
-	public class ConsumerNode : ProductionNode
+	public partial class ConsumerNode : ProductionNode
 	{
 		public Item ConsumedItem { get; private set; }
 
