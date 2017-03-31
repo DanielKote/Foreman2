@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Foreman;
+using System;
 
 namespace ForemanTest
 {
@@ -21,7 +22,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(10, data.SupplyRate("Plate"));
+            AssertFloatsAreEqual(10, data.SupplyRate("Plate"));
         }
 
         [TestMethod]
@@ -39,7 +40,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(10, data.SupplyRate("Ore"));
+            AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
         }
 
         [TestMethod]
@@ -57,7 +58,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(50, data.SupplyRate("Plate"));
+            AssertFloatsAreEqual(50, data.SupplyRate("Plate"));
         }
 
         [TestMethod]
@@ -75,7 +76,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(5, data.SupplyRate("Plate"));
+            AssertFloatsAreEqual(5, data.SupplyRate("Plate"));
         }
 
         [TestMethod]
@@ -93,7 +94,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(8, data.SupplyRate("Plate"));
+            AssertFloatsAreEqual(8, data.SupplyRate("Plate"));
         }
 
         [TestMethod]
@@ -138,7 +139,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(15, data.SupplyRate("Plate"));
+            AssertFloatsAreEqual(15, data.SupplyRate("Plate"));
         }
 
         [TestMethod]
@@ -155,7 +156,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(10, data.ConsumedRate("Plate"));
+            AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
         }
 
         [TestMethod]
@@ -173,8 +174,8 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            Assert.AreEqual(10, data.SupplyRate("Ore"));
-            Assert.AreEqual(10, data.ConsumedRate("Plate"));
+            AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
+            AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
         }
 
         [TestMethod]
@@ -192,8 +193,89 @@ namespace ForemanTest
 
             foreach (var node in data.Graph.Nodes)
             {
-                Assert.AreEqual(0, node.desiredRate);
+                AssertFloatsAreEqual(0, node.desiredRate);
             }
+        }
+
+        [TestMethod]
+        public void TestDisjointGraph()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Plate"),
+                builder.Consumer("Plate").Target(10)
+            );
+
+            builder.Link(
+                builder.Supply("Ore"),
+                builder.Consumer("Ore").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(10, data.SupplyRate("Plate"));
+            AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
+        }
+
+        [TestMethod]
+        public void TestRecipeLinkedToSelf()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Ore"),
+                builder.Recipe().Input("Ore", 1).Input("Tool", 1).Output("Plate", 1).Output("Tool", 1),
+                builder.Consumer("Plate").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
+        }
+
+        [TestMethod]
+        public void TestCycle()
+        {
+            var builder = GraphBuilder.Create();
+
+            var fixer = builder.Recipe("fixer").Input("Broken", 5).Output("Fixed", 5);
+            var breaker = builder.Recipe("breaker").Input("Fixed", 1).Output("Broken", 1).Target(10);
+            builder.Link(fixer, breaker);
+            builder.Link(breaker, fixer);
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(2, data.RecipeRate("fixer"));
+        }
+
+        [TestMethod]
+        public void TestNoInputRecipe()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Recipe().Output("Water", 100),
+                builder.Recipe().Input("Water", 1).Output("Ice", 1),
+                builder.Consumer("Ice").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(0.1, data.SupplyRate("Water"));
+        }
+
+        private void AssertFloatsAreEqual(double expected, double actual)
+        {
+            Assert.AreEqual(expected, actual, 0.0001);
         }
     }
 }

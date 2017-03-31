@@ -45,9 +45,9 @@ namespace ForemanTest
             return node;
         }
 
-        internal RecipeBuilder Recipe()
+        internal RecipeBuilder Recipe(string name = null)
         {
-            var node = new RecipeBuilder();
+            var node = new RecipeBuilder(name);
             this.nodes.Add(node);
             return node;
         }
@@ -134,21 +134,24 @@ namespace ForemanTest
         {
             private Dictionary<string, float> inputs;
             private Dictionary<string, float> outputs;
+            private string name;
 
             public float target { get; private set; }
 
-            internal RecipeBuilder()
+            internal RecipeBuilder(string name)
             {
                 this.inputs = new Dictionary<string, float>();
                 this.outputs = new Dictionary<string, float>();
+                this.name = name;
             }
 
             internal override void Build(ProductionGraph graph)
             {
                 var duration = 1;
-                var recipeName = "recipe-" + GetSequence();
+                if (name == null)
+                    name = "recipe-" + GetSequence();
 
-                Recipe recipe = new Recipe(recipeName, duration, itemizeKeys(inputs), itemizeKeys(outputs));
+                Recipe recipe = new Recipe(name, duration, itemizeKeys(inputs), itemizeKeys(outputs));
                 Built = RecipeNode.Create(recipe, graph);
 
                 if (target > 0)
@@ -219,6 +222,14 @@ namespace ForemanTest
             private IEnumerable<ProductionNode> Consumers(string itemName)
             {
                 return Graph.GetConsumers(new Item(itemName));
+            }
+
+            public float RecipeRate(string name)
+            {
+                return Graph.Nodes
+                   .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
+                   .Select(x => x.desiredRate)
+                   .Sum();
             }
         }
     }
