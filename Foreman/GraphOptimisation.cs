@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Foreman
@@ -30,22 +31,19 @@ namespace Foreman
                 node.AddConstraints(solver);
             }
 
-            System.Diagnostics.Debug.WriteLine("");
-            System.Diagnostics.Debug.WriteLine(solver.GetDescription());
 
             var solution = solver.Solve();
+
+            Debug.WriteLine(solver.ToString());
 
             // TODO: Handle BIG NUMBERS
             // TODO: Return link throughput in solution
             // TODO: Return error in solution!?
             if (solution == null)
-                throw new Exception("Solver failed but that shouldn't happen.\n" + solver.GetDescription());
-
+                throw new Exception("Solver failed but that shouldn't happen.\n" + solver.ToString());
 
             foreach (var node in nodeGroup)
             {
-                System.Diagnostics.Debug.WriteLine(node.ToString() + " = " + solution.ActualRate(node));
-
                 node.SetSolvedRate(solution.ActualRate(node));
                 foreach (var link in node.OutputLinks.Union(node.InputLinks))
                 {

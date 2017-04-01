@@ -41,7 +41,7 @@ namespace Foreman
 
         private Objective objective;
 
-        private Solver solver;
+        private GoogleSolver solver;
 
         // There is no way to generate a unique string/name for nodes, so instead store a map so they
         // can be uniquely associated.
@@ -49,7 +49,6 @@ namespace Foreman
 
         // We only keep track of constraints as we create them for debugging purposes. OrTools
         // doesn't provide a method for listing all constraints on a solver, which is unfortunate.
-        private List<Constraint> allConstraints;
 
         // Keep track of nodes as they are added to ensure the solution contains all of them, even if
         // there are no links.
@@ -62,10 +61,9 @@ namespace Foreman
 
         public ProductionSolver()
         {
-            this.solver = Solver.CreateSolver("Foreman", "GLOP_LINEAR_PROGRAMMING");
+            this.solver = GoogleSolver.Create();
             this.objective = solver.Objective();
             this.allVariables = new Dictionary<object, Variable>();
-            this.allConstraints = new List<Constraint>();
             this.nodes = new List<ProductionNode>();
         }
 
@@ -101,13 +99,6 @@ namespace Foreman
             if (solver.Solve() != Solver.OPTIMAL)
                 return null;
 
-            foreach (var pair in this.allVariables)
-            {
-                var variable = pair.Value;
-
-                System.Diagnostics.Debug.WriteLine("{0} = {1}", variable.Name(), variable.SolutionValue());
-            }
-
             var nodeSolutions = nodes
                 .ToDictionary(x => x, x => solutionFor(Tuple.Create(x, RateType.ACTUAL)));
 
@@ -128,12 +119,30 @@ namespace Foreman
         {
             var nodeVar = variableFor(node, RateType.ACTUAL);
             var errorVar = variableFor(node, RateType.ERROR);
-            var absErrorVar = variableFor(node, RateType.ABS_ERROR);
 
             var constraint = MakeConstraint(desiredRate, desiredRate);
             constraint.SetCoefficient(nodeVar, 1);
             constraint.SetCoefficient(errorVar, 1);
 
+            minimizeError(node, errorVar);
+        }
+
+        private void minimizeError(ProductionNode node, Variable errorVar)
+        {
+            var absErrorVar = variableFor(node, RateType.ABS_ERROR);
+
+            // These constraints translate the minimization of the absolute variable:
+            //
+            //     min(|e|)
+            //
+            // To a form that is expressible directly to the solver, by introducing a shadow variable z:
+            //
+            //     z - e >= 0
+            //     z + e >= 0
+            //     min(z)
+            //
+            // This is counter-intuitive at first! Key insight: only one constraint will be relevant,
+            // depending on whether e is positive or negative.
             var abs1 = MakeConstraint(0, double.PositiveInfinity);
             abs1.SetCoefficient(absErrorVar, 1);
             abs1.SetCoefficient(errorVar, 1);
@@ -216,14 +225,17 @@ namespace Foreman
 
         private Constraint MakeConstraint(double low, double high)
         {
-            var constraint = solver.MakeConstraint(low, high);
-            allConstraints.Add(constraint);
-            return constraint;
+            return solver.MakeConstraint(low, high);
         }
 
         private Variable variableFor(NodeLink inputLink, EndpointType type)
         {
-            return variableFor(Tuple.Create(inputLink, type), "link:" + type + ":" + inputLink.Consumer.DisplayName + ":" + inputLink.Item);
+            return variableFor(Tuple.Create(inputLink, type), makeName("link", type, inputLink.Consumer.DisplayName, inputLink.Item.FriendlyName));
+        }
+
+        private string makeName(params object[] components)
+        {
+            return string.Join(":", components).ToLower().Replace(" ", "-");
         }
 
         private Variable variableFor(ProductionNode node, RateType type = RateType.ACTUAL)
@@ -231,16 +243,16 @@ namespace Foreman
             var tuple = Tuple.Create(node, type);
             if (node is SupplyNode)
             {
-                return variableFor(tuple, "supplier:" + type + ":" + node.DisplayName);
+                return variableFor(tuple, makeName("supplier", type, node.DisplayName));
             }
             else if (node is ConsumerNode)
             {
-                return variableFor(tuple, "consumer:" + type + ":" + node.DisplayName);
+                return variableFor(tuple, makeName("consumer", type, node.DisplayName));
 
             }
             else
             {
-                return variableFor(tuple, "node:" + type + ":" + node.DisplayName);
+                return variableFor(tuple, makeName("node", type, node.DisplayName));
             }
         }
 
@@ -272,29 +284,9 @@ namespace Foreman
         }
 
         // A human-readable description of the constraints. Useful for debugging.
-        public string GetDescription()
+        public override string ToString()
         {
-            var desc = new StringBuilder();
-            foreach (var constraint in this.allConstraints)
-            {
-                var line = new List<string>();
-                foreach (var variable in this.allVariables)
-                {
-                    var coefficient = constraint.GetCoefficient(variable.Value);
-                    if (coefficient != 0.0)
-                    {
-                        line.Add(coefficient + " * " + variable.Value.Name());
-                    }
-                }
-                desc.Append(string.Join(" + ", line));
-                desc.Append(" -> (");
-                desc.Append(constraint.Lb());
-                desc.Append(", ");
-                desc.Append(constraint.Ub());
-                desc.AppendLine(")");
-            }
-            return desc.ToString();
+            return solver.ToString();
         }
-
     }
 }
