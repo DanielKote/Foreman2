@@ -12,14 +12,7 @@ namespace Foreman
 		public ProductionNode Supplier;
 		public ProductionNode Consumer;
 		public Item Item;
-		public float Demand
-		{
-			get
-			{
-				return Consumer.GetTotalDemand(Item);
-			}
-		}
-		public float Throughput;
+        public double Throughput;
 
 		private NodeLink(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
 		{

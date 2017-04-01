@@ -112,7 +112,9 @@ namespace Foreman
 			{
 				foreach (Item item in node.Outputs)
 				{
-					if (node.GetExcessOutput(item) > 0 || !node.OutputLinks.Any(l => l.Item == item))
+                    // TODO: Write unit tests, figure out what to do about the GetExcessOutput check here
+					// if (node.GetExcessOutput(item) > 0 || !node.OutputLinks.Any(l => l.Item == item))
+					if (!node.OutputLinks.Any(l => l.Item == item))
 					{
 						if (Nodes.Any(n => n.Inputs.Contains(item) && (n.rateType == RateType.Auto) && !(n.InputLinks.Any(l => l.Supplier == node))))
 						{
@@ -131,6 +133,7 @@ namespace Foreman
 
 		public void UpdateLinkThroughputs()
 		{
+            /*
 			foreach (NodeLink link in GetAllNodeLinks())
 			{
 				link.Throughput = 0;
@@ -140,7 +143,6 @@ namespace Foreman
 			{
 				foreach (Item item in node.Outputs)
 				{
-					List<NodeLink> outLinksForThisItem = new List<NodeLink>();
 					foreach (NodeLink link in node.OutputLinks)
 					{
 						link.Throughput += Math.Min(link.Consumer.GetUnsatisfiedDemand(link.Item), node.GetUnusedOutput(item));
@@ -159,15 +161,11 @@ namespace Foreman
 					}
 				}
 			}
+            */
 		}
 
 		public void UpdateNodeValues()
 		{
-			foreach (ProductionNode node in Nodes.Where(n => n.rateType == RateType.Manual))
-			{
-				node.desiredRate = node.actualRate;
-			}
-
 			try
 			{
 				this.FindOptimalGraphToSatisfyFixedNodes();

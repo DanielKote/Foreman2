@@ -191,10 +191,23 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            foreach (var node in data.Graph.Nodes)
-            {
-                AssertFloatsAreEqual(0, node.desiredRate);
-            }
+            AssertFloatsAreEqual(0, data.Graph.Nodes[0].actualRate);
+        }
+
+        [TestMethod]
+        public void TestSingleFixedRecipe()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(10, data.Graph.Nodes[0].actualRate);
         }
 
         [TestMethod]
@@ -271,6 +284,114 @@ namespace ForemanTest
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
             AssertFloatsAreEqual(0.1, data.SupplyRate("Water"));
+        }
+
+        [TestMethod]
+        public void TestRecipeWithEfficiencyBonus()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Ore"),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Efficiency(0.25),
+                builder.Consumer("Plate").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(8, data.SupplyRate("Ore"));
+        }
+
+        [TestMethod]
+        public void TestRecipeCanBeOverSupplied()
+        {
+            var builder = GraphBuilder.Create();
+            var recipe = builder.Recipe("furnace").Input("Ore", 1).Output("Plate", 1);
+            var dualOreSupplier = builder.Supply("Ore").Target(10);
+
+            builder.Link(
+                builder.Supply("Ore").Target(20),
+                recipe,
+                builder.Consumer("Plate").Target(10)
+            );
+            builder.Link(
+                dualOreSupplier,
+                recipe
+            );
+            builder.Link(
+                dualOreSupplier,
+                builder.Consumer("Ore").Target(5)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
+            AssertFloatsAreEqual(25, data.RecipeInputRate("furnace", "Ore"));
+        }
+
+        [TestMethod]
+        public void TestMinimizeOverSupply()
+        {
+            var builder = GraphBuilder.Create();
+            var recipe = builder.Recipe("furnace").Input("Ore", 1).Output("Plate", 1);
+            var dualOreSupplier = builder.Supply("Ore").Target(25);
+
+            builder.Link(
+                dualOreSupplier,
+                recipe,
+                builder.Consumer("Plate").Target(10)
+            );
+
+            builder.Link(
+                dualOreSupplier,
+                builder.Consumer("Ore")
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(25, data.ConsumedRate("Ore"));
+        }
+
+        [TestMethod]
+        public void TestOverProduction()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Ore"),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(15),
+                builder.Consumer("Plate").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(data.SupplyRate("Ore"), data.ConsumedRate("Plate"));
+        }
+
+        [TestMethod]
+        public void TestUnderProduction()
+        {
+            var builder = GraphBuilder.Create();
+
+            builder.Link(
+                builder.Supply("Ore"),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(5),
+                builder.Consumer("Plate").Target(10)
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(data.SupplyRate("Ore"), data.ConsumedRate("Plate"));
         }
 
         private void AssertFloatsAreEqual(double expected, double actual)

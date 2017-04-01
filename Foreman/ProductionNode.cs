@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace Foreman
 {
@@ -18,88 +19,29 @@ namespace Foreman
 		public abstract String DisplayName { get; }
 		public abstract IEnumerable<Item> Inputs { get; }
 		public abstract IEnumerable<Item> Outputs { get; }
-		public List<NodeLink> InputLinks = new List<NodeLink>();
+        public double EfficiencyBonus { get; set; }
+
+        public List<NodeLink> InputLinks = new List<NodeLink>();
 		public List<NodeLink> OutputLinks = new List<NodeLink>();
-		public abstract float GetExcessOutput(Item item);
-		public abstract float GetUnsatisfiedDemand(Item item);
-		public abstract float GetTotalOutput(Item item);
-		public abstract float GetTotalDemand(Item item);
-		public abstract float GetDesiredOutput(Item item);
-		public abstract float GetRateLimitedByInputs();
-		public abstract float GetRateDemandedByOutputs();
-		public abstract IDictionary<Item, float> GetOutputAmounts();
-		public abstract IDictionary<Item, float> GetInputAmounts();
 		public RateType rateType = RateType.Auto;
 
+        // The rate the solver calculated is appropriate for this node.
         public float actualRate = 0f;
+
+        // If the rateType is manual, this field contains the rate the user desires.
 		public float desiredRate = 0f;
+
+        // The calculated rate at which the given item is consumed by this node. This may not match
+        // the desired amount!
+        public abstract float GetConsumeRate(Item item);
+
+        // The calculated rate at which the given item is consumed by this node. This may not match
+        // the desired amount!
+        public abstract float GetSupplyRate(Item item);
 
 		protected ProductionNode(ProductionGraph graph)
 		{
 			Graph = graph;
-		}
-
-		public bool TakesFrom(ProductionNode node)
-		{
-			return node.OutputLinks.Any(l => l.Consumer == this);
-		}
-
-		public bool GivesTo(ProductionNode node)
-		{
-			return node.InputLinks.Any(l => l.Supplier == this);
-		}
-
-		public float GetTotalInput(Item item)
-		{
-			float total = 0f;
-			foreach (NodeLink link in InputLinks.Where(l => l.Item == item))
-			{
-				total += link.Throughput;
-			}
-			return (float)Math.Round(total, RoundingDP);
-		}
-
-		public float GetUsedOutput(Item item)
-		{
-			float total = 0f;
-			foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
-			{
-				total += link.Throughput;
-			}
-			return (float)Math.Round(total, RoundingDP);
-		}
-		
-		public float GetUnusedOutput(Item item)
-		{
-			return GetTotalOutput(item) - GetUsedOutput(item);
-		}
-
-		public float GetUnusedRate()
-		{
-			float mostUsedItem = float.MaxValue;
-			foreach (Item item in Outputs)
-			{
-				float unusedRateForItem = GetUnusedOutput(item) / GetOutputAmounts()[item];
-				if (unusedRateForItem < mostUsedItem)
-				{
-					mostUsedItem = unusedRateForItem;
-				}
-			}
-
-			return mostUsedItem;
-		}
-		
-		public float GetRequiredOutput(Item item)
-		{
-			float amount = 0;
-			foreach (NodeLink link in OutputLinks)
-			{
-				if (link.Item == item)
-				{
-					amount += link.Demand;
-				}
-			}
-			return (float)Math.Round(amount, RoundingDP);
 		}
 
 		public bool CanUltimatelyTakeFrom(ProductionNode node)
@@ -145,6 +87,22 @@ namespace Foreman
         internal double GetProductivityBonus()
         {
             return 1.5;
+        }
+
+        public float GetSuppliedRate(Item item)
+        {
+            return (float)InputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
+        }
+
+        internal bool OverSupplied(Item item)
+        {
+            return (Math.Round(GetConsumeRate(item), 2) < Math.Round(GetSuppliedRate(item), 2));
+        }
+
+        internal bool ManualRateNotMet()
+        {
+            // TODO: Hard-coded epsilon is gross :(
+            return rateType == RateType.Manual && Math.Abs(actualRate - desiredRate) > 0.0001;
         }
     }
 
@@ -302,91 +260,8 @@ namespace Foreman
 			return node;
 		}
 
-		public override float GetRateLimitedByInputs()
-		{
-			if (BaseRecipe.IsMissingRecipe) return 0f;
-
-			float total = float.PositiveInfinity;
-			foreach (Item inputItem in Inputs)
-			{
-				total = Math.Min(total, GetTotalInput(inputItem) / BaseRecipe.Ingredients[inputItem]);
-			}
-			return ValidateRecipeRate(total);
-		}
-
-		public override float GetRateDemandedByOutputs()
-		{
-			if (BaseRecipe.IsMissingRecipe) return 0f;
-
-			float total = 0f;
-			foreach (Item outputItem in BaseRecipe.Results.Keys)
-			{
-				total = Math.Max(total, GetRequiredOutput(outputItem) / BaseRecipe.Results[outputItem]);
-			}
-			return ValidateRecipeRate(total);
-		}
-
-		public override float GetUnsatisfiedDemand(Item item)
-		{
-			if (BaseRecipe.IsMissingRecipe) return 0f;
-			
-			float itemRate = (desiredRate * BaseRecipe.Ingredients[item]) - GetTotalInput(item);
-			return (float)Math.Round(itemRate, RoundingDP);
-		}
-
-		public override float GetExcessOutput(Item item)
-		{
-			if (BaseRecipe.IsMissingRecipe) return 0f;
-
-			float itemRate = (actualRate * BaseRecipe.Results[item]) - GetUsedOutput(item);
-			return (float)Math.Round(itemRate, RoundingDP);
-		}
-
-		public override float GetTotalDemand(Item item)
-		{
-			if (BaseRecipe.IsMissingRecipe
-				|| !BaseRecipe.Ingredients.ContainsKey(item))
-			{
-				return 0f;
-			}
-						
-			return (float)Math.Round(desiredRate * BaseRecipe.Ingredients[item], RoundingDP);
-		}
-
-		public override float GetTotalOutput(Item item)
-		{
-			if (BaseRecipe.IsMissingRecipe
-				|| !BaseRecipe.Results.ContainsKey(item))
-			{
-				return 0f;
-			}
-
-			return (float)Math.Round(BaseRecipe.Results[item] * actualRate, RoundingDP);
-		}
-
-		public override float GetDesiredOutput(Item item)
-		{
-			if (BaseRecipe.IsMissingRecipe
-				|| !BaseRecipe.Results.ContainsKey(item))
-			{
-				return 0f;
-			}
-
-			return (float)Math.Round(BaseRecipe.Results[item] * desiredRate, RoundingDP);
-		}
-
-		public override IDictionary<Item, float> GetInputAmounts()
-		{
-			return BaseRecipe.Ingredients;
-		}
-
-		public override IDictionary<Item, float> GetOutputAmounts()
-		{
-			return BaseRecipe.Results;
-		}
-
-		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
-		private float ValidateRecipeRate(float amount)
+        //If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
+        private float ValidateRecipeRate(float amount)
 		{
 			if (Graph.SelectedAmountType == AmountType.FixedAmount)
 			{
@@ -499,12 +374,43 @@ namespace Foreman
 			info.AddValue("RecipeName", BaseRecipe.Name);
 			info.AddValue("RateType", rateType);
 			info.AddValue("ActualRate", actualRate);
+            if (rateType == RateType.Manual)
+            {
+                info.AddValue("DesiredRate", desiredRate);
+            }
 			if (Assembler != null)
 			{
 				info.AddValue("Assembler", Assembler.Name);
 			}
 			ModuleFilter.GetObjectData(info, context);
 		}
+
+        public override float GetConsumeRate(Item item)
+        {
+			if (BaseRecipe.IsMissingRecipe
+				|| !BaseRecipe.Ingredients.ContainsKey(item))
+			{
+				return 0f;
+			}
+
+			return (float)Math.Round(BaseRecipe.Ingredients[item] * actualRate, RoundingDP);
+        }
+
+        public override float GetSupplyRate(Item item)
+        {
+			if (BaseRecipe.IsMissingRecipe
+				|| !BaseRecipe.Results.ContainsKey(item))
+			{
+				return 0f;
+			}
+
+			return (float)Math.Round(BaseRecipe.Results[item] * actualRate * EfficiencyMultiplier(), RoundingDP);
+        }
+
+        public float EfficiencyMultiplier()
+        {
+            return (float)(1.0 + EfficiencyBonus);
+        }
     }
 
 	public partial class SupplyNode : ProductionNode
@@ -535,80 +441,9 @@ namespace Foreman
 			return node;
 		}
 
-		public override float GetRateLimitedByInputs()
-		{
-			return actualRate;
-		}
-
-		public override float GetRateDemandedByOutputs()
-		{
-			float total = 0f;
-			foreach (NodeLink link in OutputLinks)
-			{
-				total += link.Demand;
-			}
-			return total;
-		}
-
-		public override float GetUnsatisfiedDemand(Item item)
-		{
-			return 0f;
-		}
-
-		public override float GetExcessOutput(Item item)
-		{
-			if (rateType == RateType.Auto)
-			{
-				return 0f;
-			}
-			else
-			{
-				float excessSupply = actualRate;
-				foreach (NodeLink link in OutputLinks.Where(l => l.Item == item))
-				{
-					excessSupply -= link.Throughput;
-				}
-				return (float)Math.Round(excessSupply, RoundingDP);
-			}
-		}
-
-		public override float GetTotalDemand(Item item)
-		{
-			return 0f;
-		}
-		
-		public override float GetDesiredOutput(Item item)
-		{
-			return desiredRate;
-		}
-
-		public override float GetTotalOutput(Item item)
-		{
-			if (SuppliedItem != item)
-			{
-				return 0f;
-			}
-			else
-			{
-				return (float)Math.Round(actualRate, RoundingDP);
-			}
-		}
-
 		public override string DisplayName
 		{
 			get { return SuppliedItem.FriendlyName; }
-		}
-
-		public override IDictionary<Item, float> GetInputAmounts()
-		{
-			Dictionary<Item, float> inputAmounts = new Dictionary<Item, float>();
-			inputAmounts.Add(SuppliedItem, 1);
-			return inputAmounts;
-		}
-
-		public override IDictionary<Item, float> GetOutputAmounts()
-		{
-			return new Dictionary<Item, float>();
 		}
 
 		public Dictionary<MachinePermutation, int> GetMinimumMiners()
@@ -635,7 +470,7 @@ namespace Foreman
 
 			if (sortedPermutations.Any())
 			{
-				float requiredRate = GetRequiredOutput(SuppliedItem);
+				float requiredRate = GetSupplyRate(SuppliedItem);
 				MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(a => a.GetMinerRate(resource) < requiredRate);
 				if (permutationToAdd != null)
 				{
@@ -653,7 +488,25 @@ namespace Foreman
 			info.AddValue("ItemName", SuppliedItem.Name);
 			info.AddValue("RateType", rateType);
 			info.AddValue("ActualRate", actualRate);
+            if (rateType == RateType.Manual)
+            {
+                info.AddValue("DesiredRate", desiredRate);
+            }
 		}
+
+        public override float GetConsumeRate(Item item)
+        {
+            Trace.Fail(String.Format("{0} supplier does not consume {1}, nothing should be asking for the rate!", SuppliedItem.FriendlyName, item.FriendlyName));
+            return 0;
+        }
+
+        public override float GetSupplyRate(Item item)
+        {
+            if (SuppliedItem != item)
+                Trace.Fail(String.Format("{0} supplier does not supply {1}, nothing should be asking for the rate!", SuppliedItem.FriendlyName, item.FriendlyName));
+
+			return (float)Math.Round(actualRate, RoundingDP);
+        }
 	}
 
 	public partial class ConsumerNode : ProductionNode
@@ -683,60 +536,6 @@ namespace Foreman
 			actualRate = 1f;
 		}
 
-		public override float GetRateLimitedByInputs()
-		{
-			return GetTotalInput(ConsumedItem);
-		}
-
-		public override float GetRateDemandedByOutputs()
-		{
-			return 0f;
-		}
-
-		public override float GetUnsatisfiedDemand(Item item)
-		{
-			return (float)Math.Round(desiredRate - GetTotalInput(item), RoundingDP);
-		}
-
-		public override float GetExcessOutput(Item item)
-		{
-			return 0;
-		}
-
-		public override float GetTotalDemand(Item item)
-		{
-			if (ConsumedItem != item)
-			{
-				return 0f;
-			}
-			else
-			{
-				return (float)Math.Round(desiredRate, RoundingDP);
-			}
-		}
-
-		public override float GetTotalOutput(Item item)
-		{
-			return 0;
-		}
-
-		public override float GetDesiredOutput(Item item)
-		{
-			return 0;
-		}
-
-		public override IDictionary<Item, float> GetOutputAmounts()
-		{
-			Dictionary<Item, float> inputAmounts = new Dictionary<Item, float>();
-			inputAmounts.Add(ConsumedItem, 1);
-			return inputAmounts;
-		}
-
-		public override IDictionary<Item, float> GetInputAmounts()
-		{
-			return new Dictionary<Item, float>();
-		}
-
 		public static ConsumerNode Create(Item item, ProductionGraph graph)
 		{
 			ConsumerNode node = new ConsumerNode(item, graph);
@@ -751,6 +550,25 @@ namespace Foreman
 			info.AddValue("ItemName", ConsumedItem.Name);
 			info.AddValue("RateType", rateType);
 			info.AddValue("ActualRate", actualRate);
+            if (rateType == RateType.Manual)
+            {
+                info.AddValue("DesiredRate", desiredRate);
+            }
 		}
+
+        public override float GetConsumeRate(Item item)
+        {
+            if (ConsumedItem != item)
+                Trace.Fail(String.Format("{0} consumer does not consume {1}, nothing should be asking for the rate!", ConsumedItem.FriendlyName, item.FriendlyName));
+
+			return (float)Math.Round(actualRate, RoundingDP);
+        }
+
+        public override float GetSupplyRate(Item item)
+        {
+            Trace.Fail(String.Format("{0} consumer does not supply {1}, nothing should be asking for the rate!", ConsumedItem.FriendlyName, item.FriendlyName));
+
+            return 0;
+        }
 	}
 }

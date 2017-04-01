@@ -30,14 +30,27 @@ namespace Foreman
                 node.AddConstraints(solver);
             }
 
+            System.Diagnostics.Debug.WriteLine("");
+            System.Diagnostics.Debug.WriteLine(solver.GetDescription());
+
             var solution = solver.Solve();
 
+            // TODO: Handle BIG NUMBERS
+            // TODO: Return link throughput in solution
+            // TODO: Return error in solution!?
             if (solution == null)
-                return;
+                throw new Exception("Solver failed but that shouldn't happen.\n" + solver.GetDescription());
+
 
             foreach (var node in nodeGroup)
             {
-                node.SetSolvedRate(solution[node]);
+                System.Diagnostics.Debug.WriteLine(node.ToString() + " = " + solution.ActualRate(node));
+
+                node.SetSolvedRate(solution.ActualRate(node));
+                foreach (var link in node.OutputLinks.Union(node.InputLinks))
+                {
+                    link.Throughput = solution.Throughput(link);
+                }
             }
         }
     }
@@ -48,6 +61,7 @@ namespace Foreman
     {
         internal virtual void AddConstraints(ProductionSolver solver)
         {
+            solver.AddNode(this);
             if (rateType == RateType.Manual)
             {
                 solver.AddTarget(this, desiredRate);
@@ -56,16 +70,12 @@ namespace Foreman
 
         internal void ResetSolvedRate()
         {
-            actualRate = desiredRate = 0;
+            actualRate = 0;
         }
 
         internal virtual void SetSolvedRate(double rate)
         {
-            if (rateType == RateType.Auto)
-            {
-                desiredRate = (float)rate;
-                actualRate = (float)rate;
-            }
+            actualRate = (float)rate;
         }
     }
 
@@ -92,16 +102,6 @@ namespace Foreman
             // fixed), and also to properly consume multiple inputs.
             solver.AddInputRatio(this, ConsumedItem, InputLinks, 1);
             solver.AddInputConsumeAll(this, ConsumedItem, InputLinks, 1);
-        }
-
-        internal override void SetSolvedRate(double rate)
-        {
-            if (rateType == RateType.Auto)
-            {
-                // TODO: Why do consumers not set actualRate? Seems weird.
-                // If removed, ResetSolvedRate could be replaced by SetSolvedRate(0.0)
-                desiredRate = (float)rate;
-            }
         }
     }
 

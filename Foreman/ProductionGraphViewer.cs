@@ -840,7 +840,17 @@ namespace Foreman
 				if (newNode != null)
 				{
 					newNode.rateType = (RateType)(int)node["RateType"];
-					newNode.actualRate = (float)node["ActualRate"];
+                    if (newNode.rateType == RateType.Manual)
+                    {
+                        if (node["DesiredRate"] != null)
+                        {
+                            newNode.desiredRate = (float)node["DesiredRate"];
+                        } else
+                        {
+                            // Legacy data format stored desired rate in actual
+                            newNode.desiredRate = (float)node["ActualRate"];
+                        }
+                    }
 				}
 			}
 

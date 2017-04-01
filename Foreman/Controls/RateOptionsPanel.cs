@@ -32,7 +32,7 @@ namespace Foreman
 				fixedTextBox.Enabled = true;
 			}
 
-			float amountToShow = baseNode.actualRate;
+			float amountToShow = baseNode.desiredRate;
 			if (GraphViewer.Graph.SelectedAmountType == AmountType.Rate)
 			{
 				fixedTextBox.Width = 65;
@@ -54,6 +54,8 @@ namespace Foreman
 				fixedTextBox.Width = 85;
 			}
 			fixedTextBox.Text = Convert.ToString(amountToShow);
+
+            this.efficiencyBonusTextBox.Text = Convert.ToString(baseNode.EfficiencyBonus);
 
 			if (GraphViewer.ShowAssemblers && baseNode is RecipeNode)
 			{
@@ -105,7 +107,7 @@ namespace Foreman
 				{
 					newAmount /= 60;
 				}
-				BaseNode.actualRate = newAmount;
+				BaseNode.desiredRate = newAmount;
 				GraphViewer.Graph.UpdateNodeValues();
 				GraphViewer.UpdateNodes();
 			}
@@ -211,5 +213,17 @@ namespace Foreman
 				}
 			});
 		}
-	}
+
+        private void efficiencyBonusTextBox_TextChanged(object sender, EventArgs e)
+        {
+			double newAmount;
+            var input = (TextBox)sender;
+			if (double.TryParse(input.Text, out newAmount))
+			{
+				BaseNode.EfficiencyBonus = newAmount;
+				GraphViewer.Graph.UpdateNodeValues();
+				GraphViewer.UpdateNodes();
+			}
+        }
+    }
 }

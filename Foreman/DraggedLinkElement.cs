@@ -104,11 +104,11 @@ namespace Foreman
 			{
 				if (StartConnectionType == LinkType.Input)
 				{
-					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, ConsumerElement.DisplayedNode.GetUnsatisfiedDemand(Item));
+					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item);
 				}
 				else
 				{
-					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item, SupplierElement.DisplayedNode.GetExcessOutput(Item));
+					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item);
 				}
 			}
 			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)

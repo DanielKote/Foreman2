@@ -135,6 +135,7 @@ namespace ForemanTest
             private Dictionary<string, float> inputs;
             private Dictionary<string, float> outputs;
             private string name;
+            private double efficiency;
 
             public float target { get; private set; }
 
@@ -153,6 +154,7 @@ namespace ForemanTest
 
                 Recipe recipe = new Recipe(name, duration, itemizeKeys(inputs), itemizeKeys(outputs));
                 Built = RecipeNode.Create(recipe, graph);
+                this.Built.EfficiencyBonus = efficiency;
 
                 if (target > 0)
                 {
@@ -182,6 +184,12 @@ namespace ForemanTest
                 return this;
             }
 
+            internal RecipeBuilder Efficiency(double bonus)
+            {
+                this.efficiency = bonus;
+                return this;
+            }
+
             private Dictionary<Item, float> itemizeKeys(Dictionary<string, float> d)
             {
                 return d.ToDictionary(kp => new Item(kp.Key), kp => kp.Value);
@@ -199,12 +207,7 @@ namespace ForemanTest
 
             public float SupplyRate(string itemName)
             {
-                var desiredRate = Suppliers(itemName).Select(x => x.desiredRate).Sum();
-                var actualRate  = Suppliers(itemName).Select(x => x.actualRate).Sum();
-
-                Assert.AreEqual(desiredRate, actualRate, "desiredRate and actualRate don't match!");
-
-                return desiredRate;
+                return Suppliers(itemName).Select(x => x.actualRate).Sum();
             }
 
             private IEnumerable<ProductionNode> Suppliers(string itemName)
@@ -214,9 +217,7 @@ namespace ForemanTest
 
             public float ConsumedRate(string itemName)
             {
-                var desiredRate = Consumers(itemName).Select(x => x.desiredRate).Sum();
-
-                return desiredRate;
+                return Consumers(itemName).Select(x => x.actualRate).Sum();
             }
 
             private IEnumerable<ProductionNode> Consumers(string itemName)
@@ -228,8 +229,17 @@ namespace ForemanTest
             {
                 return Graph.Nodes
                    .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
-                   .Select(x => x.desiredRate)
+                   .Select(x => x.actualRate)
                    .Sum();
+            }
+
+            internal double RecipeInputRate(string name, string itemName)
+            {
+                return Graph.Nodes
+                   .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
+                   .Select(x => (RecipeNode)x)
+                   .First()
+                   .GetSuppliedRate(new Item(itemName));
             }
         }
     }

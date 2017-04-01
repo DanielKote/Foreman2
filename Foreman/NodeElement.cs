@@ -306,13 +306,11 @@ namespace Foreman
 
 		public override void Paint(Graphics graphics)
 		{
-            if (DisplayedNode is RecipeNode)
+            if ((DisplayedNode is RecipeNode && !((RecipeNode) DisplayedNode).BaseRecipe.Enabled) || DisplayedNode.ManualRateNotMet())
             {
-                if (!((RecipeNode) DisplayedNode).BaseRecipe.Enabled)
-                {
-                    GraphicsStuff.FillRoundRect(-5, -5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
-                }
+                GraphicsStuff.FillRoundRect(-5, -5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
             }
+
 			GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, backgroundBrush);
 			graphics.DrawString(text, size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
 			
@@ -327,16 +325,17 @@ namespace Foreman
 
 			String unit = "";
 
-			float actualAmount = 0; 
-			float desiredAmount = 0;
+			var actualAmount = 0.0; 
+            var suppliedAmount = 0.0;
+
 			if (linkType == LinkType.Input)
 			{
-				actualAmount = DisplayedNode.GetTotalInput(item);
-				desiredAmount = DisplayedNode.GetTotalDemand(item);
+				actualAmount = DisplayedNode.GetConsumeRate(item);
+				suppliedAmount = DisplayedNode.GetSuppliedRate(item);
 			}
 			else
 			{
-				actualAmount = DisplayedNode.GetTotalOutput(item);
+				actualAmount = DisplayedNode.GetSupplyRate(item);
 			}
 			if (Parent.Graph.SelectedAmountType == AmountType.Rate && Parent.Graph.SelectedUnit == RateUnit.PerSecond)
 			{
@@ -346,16 +345,15 @@ namespace Foreman
 			{
 				unit = "/m";
 				actualAmount *= 60;
-				desiredAmount *= 60;
+				suppliedAmount *= 60;
 			}
 
 			if (linkType == LinkType.Input)
 			{
 				finalString = String.Format(line1Format, actualAmount, unit);
-				if (Math.Round(DisplayedNode.GetTotalDemand(item), 2) > Math.Round(DisplayedNode.GetTotalInput(item), 2)
-					&& DisplayedNode.GetTotalDemand(item) != float.PositiveInfinity)
+                if (DisplayedNode.OverSupplied(item))
 				{
-					finalString += String.Format(line2Format, desiredAmount, unit);
+					finalString += String.Format(line2Format, suppliedAmount, unit);
 				}
 			}
 			else
@@ -368,33 +366,18 @@ namespace Foreman
 
 		private Color chooseIconColour(Item item, LinkType linkType)
 		{
-			Color notEnough = Color.FromArgb(255, 255, 193, 193);
 			Color enough = Color.White;
 			Color tooMuch = Color.FromArgb(255, 214, 226, 230);
 
 			if (linkType == LinkType.Input)
 			{
-				if (Math.Round(DisplayedNode.GetTotalDemand(item), 2) <= Math.Round(DisplayedNode.GetTotalInput(item), 2)
-					&& DisplayedNode.GetTotalDemand(item) != float.PositiveInfinity)
-				{
-					return enough;
-				}
-				else
-				{
-					return notEnough;
-				}
-			}
-			else
-			{
-				if (Math.Round(DisplayedNode.GetTotalOutput(item), 2) > Math.Round(DisplayedNode.GetRequiredOutput(item), 2))
+				if (DisplayedNode.OverSupplied(item))
 				{
 					return tooMuch;
 				}
-				else
-				{
-					return enough;
-				}
 			}
+
+            return enough;
 		}
 
 		public override void MouseUp(Point location, MouseButtons button)
