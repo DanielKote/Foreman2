@@ -396,7 +396,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestPreferReuseOfGeneratedMaterialsThanFromSuppliers()
+        public void TestPreferUseOfOverSupplyThanFromSuppliers()
         {
             var builder = GraphBuilder.Create();
 
