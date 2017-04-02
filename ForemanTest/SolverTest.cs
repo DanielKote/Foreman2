@@ -283,7 +283,7 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            AssertFloatsAreEqual(0.1, data.SupplyRate("Water"));
+            AssertFloatsAreEqual(10, data.ConsumedRate("Ice"));
         }
 
         [TestMethod]
@@ -355,7 +355,8 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            AssertFloatsAreEqual(25, data.ConsumedRate("Ore"));
+            AssertFloatsAreEqual(15, data.ConsumedRate("Ore"));
+            AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
         }
 
         [TestMethod]
@@ -392,6 +393,42 @@ namespace ForemanTest
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
             AssertFloatsAreEqual(data.SupplyRate("Ore"), data.ConsumedRate("Plate"));
+        }
+
+        [TestMethod]
+        public void TestPreferReuseOfGeneratedMaterialsThanFromSuppliers()
+        {
+            var builder = GraphBuilder.Create();
+
+            var recipe = builder.Recipe().Output("Plate", 1).Output("Waste", 1);
+            var acid = builder.Recipe().Output("Acid", 1).Input("Waste", 5);
+            var target = builder.Recipe().Output("Battery", 1).Input("Plate", 1).Input("Acid", 1);
+
+            builder.Link(
+                recipe,
+                target,
+                builder.Consumer("Battery").Target(10)
+            );
+
+            builder.Link(
+                builder.Supply("Acid"),
+                target
+            );
+
+            builder.Link(
+                recipe,
+                acid,
+                target
+            );
+
+            var data = builder.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+
+            AssertFloatsAreEqual(10, data.ConsumedRate("Battery"));
+
+            // 10 plate generates 2 acid, so 8 should come from supply
+            AssertFloatsAreEqual(8, data.SupplyRate("Acid"));
         }
 
         private void AssertFloatsAreEqual(double expected, double actual)

@@ -207,7 +207,7 @@ namespace ForemanTest
 
             public float SupplyRate(string itemName)
             {
-                return Suppliers(itemName).Select(x => x.actualRate).Sum();
+                return Suppliers(itemName).Where(x => x is SupplyNode).Select(x => x.actualRate).Sum();
             }
 
             private IEnumerable<ProductionNode> Suppliers(string itemName)
@@ -217,7 +217,7 @@ namespace ForemanTest
 
             public float ConsumedRate(string itemName)
             {
-                return Consumers(itemName).Select(x => x.actualRate).Sum();
+                return Consumers(itemName).Where(x => x is ConsumerNode).Select(x => x.actualRate).Sum();
             }
 
             private IEnumerable<ProductionNode> Consumers(string itemName)

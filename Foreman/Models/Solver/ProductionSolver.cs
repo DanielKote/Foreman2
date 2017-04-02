@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Google.OrTools.LinearSolver;
 using System.Diagnostics;
 
@@ -57,7 +56,7 @@ namespace Foreman
         // Used to ensure uniqueness of variables names
         private int counter;
 
-        enum EndpointType { SUPPLY, CONSUME }
+        enum EndpointType { SUPPLY, CONSUME, ERROR }
 
         public ProductionSolver()
         {
@@ -78,7 +77,8 @@ namespace Foreman
                 // Maximize rate of consumer nodes. This is only relevant for consumer nodes without
                 // a target, and means that they will "soak up" any excess overproduction.
                 objective.SetCoefficient(x, -1.0);
-            } else
+            }
+            else
             {
                 // All other node rates should be minimized.
                 objective.SetCoefficient(x, 1.0);
@@ -113,13 +113,17 @@ namespace Foreman
 
         public enum RateType { ACTUAL, ERROR, ABS_ERROR }
 
-        // Constrain the rate for the given node to be at least the desired rate. It's possible that
-        // it will be more than this, in the case of overproduction.
+        // Ensure that the solution has a rate matching desired for this node. Typically there will
+        // one of these on the ultimate output node, though multiple are supported, on any node. If
+        // there is a conflict, a 'best effort' solution will be returned, where some nodes actual
+        // rates will not match the desired asked for here.
         public void AddTarget(ProductionNode node, float desiredRate)
         {
             var nodeVar = variableFor(node, RateType.ACTUAL);
             var errorVar = variableFor(node, RateType.ERROR);
 
+            // The sum of the rate for this node, plus an error variable, must be equal to
+            // desiredRate. In normal scenarios, the error variable will be zero.
             var constraint = MakeConstraint(desiredRate, desiredRate);
             constraint.SetCoefficient(nodeVar, 1);
             constraint.SetCoefficient(errorVar, 1);
@@ -149,26 +153,51 @@ namespace Foreman
         // Consuming less than is being produced is fine. This represents a backup.
         public void AddInputAllowBackup(ProductionNode node, Item item, IEnumerable<NodeLink> links, float inputRate)
         {
-            AddInput(node, item, links, inputRate, double.PositiveInfinity);
+            Debug.Assert(links.All(x => x.Consumer == node));
+
+            // Each item input/output to a recipe has one varible per link. These variables should be
+            // related to one another using one of the other Ratio methods.
+            foreach (var link in links)
+            {
+                var supplierVariable = variableFor(link, EndpointType.SUPPLY);
+                var consumerVariable = variableFor(link, EndpointType.CONSUME);
+                var errorVariable = variableFor(link, EndpointType.ERROR);
+
+                {
+                    // The consuming end of the link must be no greater than the supplying end.
+                    var constraint = MakeConstraint(0, double.PositiveInfinity);
+                    constraint.SetCoefficient(supplierVariable, 1);
+                    constraint.SetCoefficient(consumerVariable, -1);
+                }
+
+                // Minimize over-supply. Necessary for unbalanced diamond recipe chains (such as
+                // Yuoki smelting - this doesn't occur in Vanilla) where the deficit is made up by an
+                // infinite supplier, in order to not just grab everything from that supplier and let
+                // produced materials backup.
+                {
+                    var constraint = MakeConstraint(0, 0);
+                    constraint.SetCoefficient(errorVariable, 1);
+                    constraint.SetCoefficient(supplierVariable, -1);
+                    constraint.SetCoefficient(consumerVariable, 1);
+                    objective.SetCoefficient(errorVariable, 1.0);
+                }
+            }
         }
 
         // Constrain input to a node for a particular item so that the node consumes everything that is being produced.
         public void AddInputConsumeAll(ProductionNode node, Item item, IEnumerable<NodeLink> links, float inputRate)
         {
-            AddInput(node, item, links, inputRate, 0.0);
-        }
-
-        // Each item input/output to a recipe has one varible per link. These variables should be
-        // related to one another using one of the other Ratio methods.
-        private void AddInput(ProductionNode node, Item item, IEnumerable<NodeLink> links, float inputRate, double upperBound)
-        {
             Debug.Assert(links.All(x => x.Consumer == node));
 
+            // Each item input/output to a recipe has one varible per link. These variables should be
+            // related to one another using one of the other Ratio methods.
             foreach (var link in links)
             {
-                var constraint = MakeConstraint(0, upperBound);
                 var supplierVariable = variableFor(link, EndpointType.SUPPLY);
                 var consumerVariable = variableFor(link, EndpointType.CONSUME);
+
+                // Since all supply is being consumed, the flow at each end of the link should be equal.
+                var constraint = MakeConstraint(0, 0);
                 constraint.SetCoefficient(supplierVariable, 1);
                 constraint.SetCoefficient(consumerVariable, -1);
             }
