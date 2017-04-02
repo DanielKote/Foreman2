@@ -1082,8 +1082,18 @@ namespace Foreman
 					return;
 				}
                 */
+                var limitations = ReadLuaLuaTable(values, "limitation", true);
+                List<String> allowedIn = null;
+                if (limitations != null)
+                {
+                    allowedIn = new List<string>();
+                    foreach (var recipe in limitations.Values)
+                    {
+                        allowedIn.Add((string)recipe);
+                    }
+                }
 
-				Module newModule = new Module(name, speedBonus, productivityBonus);
+				Module newModule = new Module(name, speedBonus, productivityBonus, allowedIn);
 
 				foreach (String s in Properties.Settings.Default.EnabledModules)
 				{

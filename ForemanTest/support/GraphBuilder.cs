@@ -154,7 +154,7 @@ namespace ForemanTest
 
                 Recipe recipe = new Recipe(name, duration, itemizeKeys(inputs), itemizeKeys(outputs));
                 Built = RecipeNode.Create(recipe, graph);
-                this.Built.EfficiencyBonus = efficiency;
+                this.Built.ProductivityBonus = efficiency;
 
                 if (target > 0)
                 {

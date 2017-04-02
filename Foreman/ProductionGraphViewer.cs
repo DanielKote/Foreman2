@@ -851,6 +851,10 @@ namespace Foreman
                             newNode.desiredRate = (float)node["ActualRate"];
                         }
                     }
+                    if (node["SpeedBonus"] != null)
+                        newNode.SpeedBonus = Math.Round((float)node["SpeedBonus"], 4);
+                    if (node["ProductivityBonus"] != null)
+                        newNode.ProductivityBonus = Math.Round((float)node["ProductivityBonus"], 4);
 				}
 			}
 

@@ -54,7 +54,7 @@ namespace Foreman
 
     // Using partial classes here to group all the constraints related code into this file so it's
     // easy to understand as a whole.
-    public partial class ProductionNode
+    public abstract partial class ProductionNode
     {
         internal virtual void AddConstraints(ProductionSolver solver)
         {

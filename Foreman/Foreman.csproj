@@ -149,8 +149,8 @@
     <Compile Include="LinkElement.cs" />
     <Compile Include="Miner.cs" />
     <Compile Include="Mod.cs" />
-    <Compile Include="Models\Solver\ProductionNode.cs" />
-    <Compile Include="ProductionSolver.cs" />
+    <Compile Include="Models\ProductionNode.cs" />
+    <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\ProgressForm.cs">
       <SubType>Form</SubType>

@@ -55,7 +55,8 @@ namespace Foreman
 			}
 			fixedTextBox.Text = Convert.ToString(amountToShow);
 
-            this.efficiencyBonusTextBox.Text = Convert.ToString(baseNode.EfficiencyBonus);
+            this.productivityBonusTextBox.Text = Convert.ToString(baseNode.ProductivityBonus);
+            this.speedBonusTextBox.Text = Convert.ToString(baseNode.SpeedBonus);
 
 			if (GraphViewer.ShowAssemblers && baseNode is RecipeNode)
 			{
@@ -175,11 +176,16 @@ namespace Foreman
 			var noneOption = new ItemChooserControl(null, "None", "None");
 			optionList.Add(noneOption);
 
+			var productivityOption = new ItemChooserControl(null, "Most Productive", "Most Productive");
+			optionList.Add(productivityOption);
+
 			var recipeNode = (BaseNode as RecipeNode);
 			var recipe = recipeNode.BaseRecipe;
 
 			var allowedModules = DataCache.Modules.Values
-				.Where(a => a.Enabled);
+				.Where(a => a.Enabled)
+                .Where(a => a.AllowedIn(recipe));
+
 			foreach (var module in allowedModules.OrderBy(a => a.FriendlyName))
 			{
 				var item = DataCache.Items.Values.SingleOrDefault(i => i.Name == module.Name);
@@ -202,6 +208,10 @@ namespace Foreman
 					{
 						(BaseNode as RecipeNode).ModuleFilter = RecipeNode.ModuleNoneFilter;
 					}
+					else if (c == productivityOption)
+					{
+						(BaseNode as RecipeNode).ModuleFilter = RecipeNode.ModuleProductivityFilter;
+					}
 					else
 					{
 						var module = DataCache.Modules.Single(a => a.Key == c.DisplayText).Value;
@@ -214,16 +224,29 @@ namespace Foreman
 			});
 		}
 
-        private void efficiencyBonusTextBox_TextChanged(object sender, EventArgs e)
+        private void productivityBonusTextBox_TextChanged(object sender, EventArgs e)
         {
 			double newAmount;
             var input = (TextBox)sender;
 			if (double.TryParse(input.Text, out newAmount))
 			{
-				BaseNode.EfficiencyBonus = newAmount;
+				BaseNode.ProductivityBonus = newAmount;
 				GraphViewer.Graph.UpdateNodeValues();
 				GraphViewer.UpdateNodes();
 			}
+        }
+
+        private void speedBonusTextBox_TextChanged(object sender, EventArgs e)
+        {
+			double newAmount;
+            var input = (TextBox)sender;
+			if (double.TryParse(input.Text, out newAmount))
+			{
+				BaseNode.SpeedBonus = newAmount;
+				GraphViewer.Graph.UpdateNodeValues();
+				GraphViewer.UpdateNodes();
+			}
+
         }
     }
 }

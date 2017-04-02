@@ -34,13 +34,15 @@
             this.unitLabel = new System.Windows.Forms.Label();
             this.ratePanel = new System.Windows.Forms.Panel();
             this.assemblerPanel = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.productivityBonusTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.modulesButton = new System.Windows.Forms.Button();
             this.assemblerButton = new System.Windows.Forms.Button();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.efficiencyBonusTextBox = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.speedBonusTextBox = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.ratePanel.SuspendLayout();
             this.assemblerPanel.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -103,21 +105,41 @@
             // assemblerPanel
             // 
             this.assemblerPanel.AutoSize = true;
+            this.assemblerPanel.Controls.Add(this.label4);
+            this.assemblerPanel.Controls.Add(this.speedBonusTextBox);
             this.assemblerPanel.Controls.Add(this.label3);
-            this.assemblerPanel.Controls.Add(this.efficiencyBonusTextBox);
+            this.assemblerPanel.Controls.Add(this.productivityBonusTextBox);
             this.assemblerPanel.Controls.Add(this.label2);
             this.assemblerPanel.Controls.Add(this.label1);
             this.assemblerPanel.Controls.Add(this.modulesButton);
             this.assemblerPanel.Controls.Add(this.assemblerButton);
             this.assemblerPanel.Location = new System.Drawing.Point(104, 3);
             this.assemblerPanel.Name = "assemblerPanel";
-            this.assemblerPanel.Size = new System.Drawing.Size(213, 74);
+            this.assemblerPanel.Size = new System.Drawing.Size(213, 97);
             this.assemblerPanel.TabIndex = 5;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(5, 77);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(98, 13);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Productivity Bonus:";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // productivityBonusTextBox
+            // 
+            this.productivityBonusTextBox.Location = new System.Drawing.Point(110, 74);
+            this.productivityBonusTextBox.Name = "productivityBonusTextBox";
+            this.productivityBonusTextBox.Size = new System.Drawing.Size(100, 20);
+            this.productivityBonusTextBox.TabIndex = 4;
+            this.productivityBonusTextBox.TextChanged += new System.EventHandler(this.productivityBonusTextBox_TextChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(55, 31);
+            this.label2.Location = new System.Drawing.Point(53, 31);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(50, 13);
             this.label2.TabIndex = 3;
@@ -164,26 +186,26 @@
             this.flowLayoutPanel1.Controls.Add(this.assemblerPanel);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(320, 82);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(320, 103);
             this.flowLayoutPanel1.TabIndex = 8;
             // 
-            // efficiencyBonusTextBox
+            // speedBonusTextBox
             // 
-            this.efficiencyBonusTextBox.Location = new System.Drawing.Point(110, 51);
-            this.efficiencyBonusTextBox.Name = "efficiencyBonusTextBox";
-            this.efficiencyBonusTextBox.Size = new System.Drawing.Size(100, 20);
-            this.efficiencyBonusTextBox.TabIndex = 4;
-            this.efficiencyBonusTextBox.TextChanged += new System.EventHandler(this.efficiencyBonusTextBox_TextChanged);
+            this.speedBonusTextBox.Location = new System.Drawing.Point(110, 51);
+            this.speedBonusTextBox.Name = "speedBonusTextBox";
+            this.speedBonusTextBox.Size = new System.Drawing.Size(100, 20);
+            this.speedBonusTextBox.TabIndex = 6;
+            this.speedBonusTextBox.TextChanged += new System.EventHandler(this.speedBonusTextBox_TextChanged);
             // 
-            // label3
+            // label4
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(16, 54);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(89, 13);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Efficiency Bonus:";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(29, 54);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(74, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Speed Bonus:";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // RateOptionsPanel
             // 
@@ -193,7 +215,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.flowLayoutPanel1);
             this.Name = "RateOptionsPanel";
-            this.Size = new System.Drawing.Size(326, 88);
+            this.Size = new System.Drawing.Size(326, 109);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
             this.ratePanel.ResumeLayout(false);
             this.ratePanel.PerformLayout();
@@ -220,6 +242,8 @@
 		private System.Windows.Forms.Button assemblerButton;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox efficiencyBonusTextBox;
+        private System.Windows.Forms.TextBox productivityBonusTextBox;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox speedBonusTextBox;
     }
 }

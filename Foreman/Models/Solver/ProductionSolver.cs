@@ -132,7 +132,7 @@ namespace Foreman
         {
             Debug.Assert(links.All(x => x.Supplier == node));
 
-            AddRatio(node, item, links, rate * (1.0 + node.EfficiencyBonus), EndpointType.SUPPLY);
+            AddRatio(node, item, links, rate * node.ProductivityMultiplier(), EndpointType.SUPPLY);
         }
 
         // Constrain a ratio on the input side of a node

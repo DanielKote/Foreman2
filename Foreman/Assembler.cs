@@ -11,10 +11,17 @@ namespace Foreman
 		public ProductionEntity assembler;
 		public List<Module> modules;
 
-		public double GetAssemblerRate(float recipeTime)
+		public double GetAssemblerRate(float recipeTime, float beaconBonus)
 		{
-			return (assembler as Assembler).GetRate(recipeTime, modules);
+			return (assembler as Assembler).GetRate(recipeTime, beaconBonus, modules);
 		}
+
+        internal double GetAssemblerProductivity()
+        {
+            return modules
+                .Where(x => x != null)
+                .Sum(x => x.ProductivityBonus);
+        }
 
 		public double GetMinerRate(Resource r)
 		{
@@ -26,7 +33,7 @@ namespace Foreman
 			assembler = machine;
 			this.modules = modules.ToList();
 		}
-	}
+    }
 
 	public abstract class ProductionEntity
 	{
@@ -55,7 +62,7 @@ namespace Foreman
 			}
 		}
 		
-		public IEnumerable<MachinePermutation> GetAllPermutations()
+		public IEnumerable<MachinePermutation> GetAllPermutations(Recipe recipe)
 		{
 			yield return new MachinePermutation(this, new List<Module>());
 
@@ -66,7 +73,11 @@ namespace Foreman
 				yield break;
 			}
 
-			foreach (Module module in DataCache.Modules.Values.Where(m => m.Enabled))
+            var allowedModules = DataCache.Modules.Values
+                .Where(m => m.Enabled)
+                .Where(m => m.AllowedIn(recipe));
+
+			foreach (Module module in allowedModules)
 			{
 				for (int i = 0; i < ModuleSlots; i++)
 				{
@@ -96,7 +107,7 @@ namespace Foreman
 			return String.Format("Assembler: {0}", Name);
 		}
 
-		public float GetRate(float recipeTime, IEnumerable<Module> speedModules = null)
+		public float GetRate(float recipeTime, float beaconBonus, IEnumerable<Module> speedModules = null)
 		{
 			double finalSpeed = this.Speed;
 			if (speedModules != null)
@@ -106,6 +117,7 @@ namespace Foreman
 					finalSpeed += module.SpeedBonus * this.Speed;
 				}
 			}
+            finalSpeed += beaconBonus * this.Speed;
 
 			double craftingTime = recipeTime / finalSpeed;
 			craftingTime = (float)(Math.Ceiling(craftingTime * 60d) / 60d); //Machines have to wait for a new tick before starting a new item, so round up to the nearest tick
@@ -129,7 +141,9 @@ namespace Foreman
         public float ProductivityBonus { get; private set; }
 		public string Name { get; private set; }
 		private String friendlyName;
-		public String FriendlyName
+        private List<string> allowedIn;
+
+        public String FriendlyName
 		{
 			get
 			{
@@ -148,12 +162,21 @@ namespace Foreman
 			}
 		}
 
-        public Module(String name, float speedBonus, float productivityBonus)
+        public Module(String name, float speedBonus, float productivityBonus, List<String> allowedIn)
 		{
 			SpeedBonus = speedBonus;
 			ProductivityBonus = productivityBonus;
 			Name = name;
 			Enabled = true;
+            this.allowedIn = allowedIn;
 		}
+
+        public bool AllowedIn(Recipe recipe)
+        {
+            if (allowedIn == null || recipe == null) // TODO: Remove recipe == null case, it's just there as scaffolding.
+                return true;
+
+            return allowedIn.Contains(recipe.Name);
+        }
 	}
 }
