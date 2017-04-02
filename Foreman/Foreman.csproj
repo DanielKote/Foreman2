@@ -127,10 +127,10 @@
     <Compile Include="GhostNodeElement.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="ErrorLogging.cs" />
-    <Compile Include="GoogleSolver.cs" />
+    <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
-    <Compile Include="GraphOptimisation.cs" />
+    <Compile Include="Models\Solver\GraphOptimisation.cs" />
     <Compile Include="Forms\ImageExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -146,11 +146,10 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Item.cs" />
-    <Compile Include="MatrixStuff.cs" />
     <Compile Include="LinkElement.cs" />
     <Compile Include="Miner.cs" />
     <Compile Include="Mod.cs" />
-    <Compile Include="ProductionNode.cs" />
+    <Compile Include="Models\Solver\ProductionNode.cs" />
     <Compile Include="ProductionSolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\ProgressForm.cs">
@@ -167,23 +166,23 @@
       <DependentUpon>RateOptionsPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Recipe.cs" />
-    <Compile Include="ProductionGraph.cs" />
+    <Compile Include="Models\Solver\ProductionGraph.cs" />
     <Compile Include="ProductionGraphViewer.cs" />
     <Compile Include="ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="NodeElement.cs" />
     <Compile Include="NodeLink.cs" />
-    <Compile Include="RecipeChooserControl.cs">
+    <Compile Include="Controls\RecipeChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="RecipeChooserControl.Designer.cs">
+    <Compile Include="Controls\RecipeChooserControl.Designer.cs">
       <DependentUpon>RecipeChooserControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemChooserControl.cs">
+    <Compile Include="Controls\ItemChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ItemChooserControl.Designer.cs">
+    <Compile Include="Controls\ItemChooserControl.Designer.cs">
       <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ZipStorer.cs" />
@@ -224,10 +223,10 @@
     <EmbeddedResource Include="Controls\RateOptionsPanel.resx">
       <DependentUpon>RateOptionsPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="RecipeChooserControl.resx">
+    <EmbeddedResource Include="Controls\RecipeChooserControl.resx">
       <DependentUpon>RecipeChooserControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="RecipeChooserSupplyNodeOption.resx">
+    <EmbeddedResource Include="Controls\RecipeChooserSupplyNodeOption.resx">
       <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />

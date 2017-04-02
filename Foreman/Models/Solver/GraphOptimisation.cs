@@ -37,7 +37,6 @@ namespace Foreman
             Debug.WriteLine(solver.ToString());
 
             // TODO: Handle BIG NUMBERS
-            // TODO: Return link throughput in solution
             // TODO: Return error in solution!?
             if (solution == null)
                 throw new Exception("Solver failed but that shouldn't happen.\n" + solver.ToString());
