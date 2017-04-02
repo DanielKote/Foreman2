@@ -46,12 +46,12 @@ namespace Foreman
                 {
                     return DataCache.LocaleFiles["recipe-name"][Name];
                 }
+                else if (Results.Count == 1)
+                {
+                    return Results.Keys.First().FriendlyName;
+                }
                 else
                 {
-                    // For recipes created from tests (so not in cache), we want to use the name.
-                    // Previously, this would return the friendly name of the first output in the
-                    // recipe, but that seems weird to use if we have a name on hand, particularly
-                    // since it's probably a debugging case (mods not loaded, for example).
                     return Name;
                 }
 			}
