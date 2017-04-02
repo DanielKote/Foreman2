@@ -127,33 +127,6 @@ namespace Foreman
             minimizeError(node, errorVar);
         }
 
-        private void minimizeError(ProductionNode node, Variable errorVar)
-        {
-            var absErrorVar = variableFor(node, RateType.ABS_ERROR);
-
-            // These constraints translate the minimization of the absolute variable:
-            //
-            //     min(|e|)
-            //
-            // To a form that is expressible directly to the solver, by introducing a shadow variable z:
-            //
-            //     z - e >= 0
-            //     z + e >= 0
-            //     min(z)
-            //
-            // This is counter-intuitive at first! Key insight: only one constraint will be relevant,
-            // depending on whether e is positive or negative.
-            var abs1 = MakeConstraint(0, double.PositiveInfinity);
-            abs1.SetCoefficient(absErrorVar, 1);
-            abs1.SetCoefficient(errorVar, 1);
-
-            var abs2 = MakeConstraint(0, double.PositiveInfinity);
-            abs2.SetCoefficient(absErrorVar, 1);
-            abs2.SetCoefficient(errorVar, -1);
-
-            objective.SetCoefficient(absErrorVar, 1000000);
-        }
-
         // Constrain a ratio on the output side of a node
         public void AddOutputRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, double rate)
         {
@@ -213,14 +186,41 @@ namespace Foreman
             // Ensure that the sum of all inputs for this type of item is in relation to the rate of the recipe
             // So for the steel input to a solar panel, the sum of every input variable to this node must equal 5 * rate.
             var constraint = MakeConstraint(0, 0);
-            var desiredRateVariable = variableFor(node);
+            var rateVariable = variableFor(node);
 
-            constraint.SetCoefficient(desiredRateVariable, rate);
+            constraint.SetCoefficient(rateVariable, rate);
             foreach (var link in links)
             {
                 var variable = variableFor(link, type);
                 constraint.SetCoefficient(variable, -1);
             }
+        }
+
+        private void minimizeError(ProductionNode node, Variable errorVar)
+        {
+            var absErrorVar = variableFor(node, RateType.ABS_ERROR);
+
+            // These constraints translate the minimization of the absolute variable:
+            //
+            //     min(|e|)
+            //
+            // To a form that is expressible directly to the solver, by introducing a shadow variable z:
+            //
+            //     z - e >= 0
+            //     z + e >= 0
+            //     min(z)
+            //
+            // This is counter-intuitive at first! Key insight: only one constraint will be relevant,
+            // depending on whether e is positive or negative.
+            var abs1 = MakeConstraint(0, double.PositiveInfinity);
+            abs1.SetCoefficient(absErrorVar, 1);
+            abs1.SetCoefficient(errorVar, 1);
+
+            var abs2 = MakeConstraint(0, double.PositiveInfinity);
+            abs2.SetCoefficient(absErrorVar, 1);
+            abs2.SetCoefficient(errorVar, -1);
+
+            objective.SetCoefficient(absErrorVar, 1000000);
         }
 
         private Constraint MakeConstraint(double low, double high)
