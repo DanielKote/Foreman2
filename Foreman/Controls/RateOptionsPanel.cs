@@ -81,7 +81,7 @@ namespace Foreman
 				this.assemblerButton.Text = assembler.FriendlyName;
 			}
 
-			this.modulesButton.Text = (BaseNode as RecipeNode).ModuleFilter.Name;
+			this.modulesButton.Text = (BaseNode as RecipeNode).NodeModules.Name;
 		}
 
 		private void fixedOption_CheckedChanged(object sender, EventArgs e)
@@ -170,8 +170,8 @@ namespace Foreman
 		private void modulesButton_Click(object sender, EventArgs e)
 		{
 			var optionList = new List<ChooserControl>();
-			var bestOption = new ItemChooserControl(null, "Best", "Best");
-			optionList.Add(bestOption);
+			var fastestOption = new ItemChooserControl(null, "Best", "Best");
+			optionList.Add(fastestOption);
 
 			var noneOption = new ItemChooserControl(null, "None", "None");
 			optionList.Add(noneOption);
@@ -200,22 +200,22 @@ namespace Foreman
 			{
 				if (c != null)
 				{
-					if (c == bestOption)
+					if (c == fastestOption)
 					{
-						(BaseNode as RecipeNode).ModuleFilter = RecipeNode.ModuleBestFilter;
+						(BaseNode as RecipeNode).NodeModules = ModuleSelector.Fastest;
 					}
 					else if (c == noneOption)
 					{
-						(BaseNode as RecipeNode).ModuleFilter = RecipeNode.ModuleNoneFilter;
+						(BaseNode as RecipeNode).NodeModules = ModuleSelector.None;
 					}
 					else if (c == productivityOption)
 					{
-						(BaseNode as RecipeNode).ModuleFilter = RecipeNode.ModuleProductivityFilter;
+						(BaseNode as RecipeNode).NodeModules = ModuleSelector.Productive;
 					}
 					else
 					{
 						var module = DataCache.Modules.Single(a => a.Key == c.DisplayText).Value;
-						(BaseNode as RecipeNode).ModuleFilter = new RecipeNode.ModuleSpecificFilter(module);
+						(BaseNode as RecipeNode).NodeModules = ModuleSelector.Specific(module);
 					}
 					updateAssemblerButtons();
 					GraphViewer.Graph.UpdateNodeValues();

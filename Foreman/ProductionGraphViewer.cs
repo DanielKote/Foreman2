@@ -728,7 +728,6 @@ namespace Foreman
 		{
 			info.AddValue("AmountType", Graph.SelectedAmountType);
 			info.AddValue("Unit", Graph.SelectedUnit);
-			info.AddValue("OneAssemblerPerRecipe", Graph.OneAssemblerPerRecipe);
 			info.AddValue("Nodes", Graph.Nodes);
 			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
 			info.AddValue("EnabledAssemblers", DataCache.Assemblers.Values.Where(a => a.Enabled).Select<Assembler, String>(a => a.Name));
@@ -765,7 +764,6 @@ namespace Foreman
 
 			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
 			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
-			Graph.OneAssemblerPerRecipe = (Boolean)json["OneAssemblerPerRecipe"];
 
 			List<JToken> nodes = json["Nodes"].ToList<JToken>();
 			foreach (var node in nodes)
@@ -832,7 +830,7 @@ namespace Foreman
 								}
 							}
 
-							(newNode as RecipeNode).ModuleFilter = RecipeNode.ModuleFilterBase.Load(node);
+							(newNode as RecipeNode).NodeModules = ModuleSelector.Load(node);
 							break;
 						}
 				}

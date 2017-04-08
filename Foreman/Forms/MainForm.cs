@@ -243,12 +243,6 @@ namespace Foreman
 				this.GraphViewer.Graph.SelectedAmountType = AmountType.FixedAmount;
 			}
 
-			MinerDisplayCheckBox.Checked
-				= MinerDisplayCheckBox.Enabled
-				= AssemblerDisplayCheckBox.Enabled
-				= AssemblerDisplayCheckBox.Checked
-				= !(sender as RadioButton).Checked;
-
 			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.UpdateNodes();
 			GraphViewer.Invalidate();
@@ -290,13 +284,6 @@ namespace Foreman
 		{
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
 			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
-			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.UpdateNodes();
-		}
-
-		private void SingleAssemblerPerRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			GraphViewer.Graph.OneAssemblerPerRecipe = (sender as CheckBox).Checked;
 			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.UpdateNodes();
 		}
@@ -552,8 +539,7 @@ namespace Foreman
 				rateOptionsDropDown.SelectedIndex = 1;
 			}
 
-			AssemblerDisplayCheckBox.Checked = GraphViewer.ShowAssemblers;
-			SingleAssemblerPerRecipeCheckBox.Checked = GraphViewer.Graph.OneAssemblerPerRecipe;
+            AssemblerDisplayCheckBox.Checked = GraphViewer.ShowAssemblers;
 			MinerDisplayCheckBox.Checked = GraphViewer.ShowMiners;
 
 			LoadItemList();

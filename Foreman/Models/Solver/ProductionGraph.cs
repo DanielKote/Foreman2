@@ -14,7 +14,6 @@ namespace Foreman
 		private int[,] adjacencyMatrixCache = null;
 		private AmountType selectedAmountType = AmountType.FixedAmount;
 		public RateUnit SelectedUnit = RateUnit.PerSecond;
-		public bool OneAssemblerPerRecipe = false;
 
 		public AmountType SelectedAmountType
 		{

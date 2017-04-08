@@ -107,7 +107,14 @@ namespace Foreman
 				displayedNumber = value;
 				using (Graphics graphics = Parent.CreateGraphics())
 				{
-					stringWidth = graphics.MeasureString(DisplayedNumber.ToString(), Font).Width;
+                    if (DisplayedNumber > 0)
+                    {
+                        stringWidth = graphics.MeasureString(DisplayedNumber.ToString(), Font).Width;
+                    }
+                    else
+                    {
+                        stringWidth = 0;
+                    }
 					UpdateSize();
 				}
 			}
@@ -136,7 +143,10 @@ namespace Foreman
 			Point iconPoint = new Point((int)((Width + iconSize + stringWidth) / 2 - iconSize), (int)((Height - iconSize) / 2));
 
 			graphics.DrawImage(DisplayedMachine.assembler.Icon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
-			graphics.DrawString(DisplayedNumber.ToString(), Font, Brushes.Black, new Point((int)((Width - iconSize - stringWidth) / 2 + stringWidth / 2), Height / 2), centreFormat);
+            if (DisplayedNumber > 0)
+            {
+                graphics.DrawString(DisplayedNumber.ToString(), Font, Brushes.Black, new Point((int)((Width - iconSize - stringWidth) / 2 + stringWidth / 2), Height / 2), centreFormat);
+            }
 
 			if (DisplayedMachine.modules.Any())
 			{

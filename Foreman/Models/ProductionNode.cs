@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 
 namespace Foreman
 {
-	public enum NodeType { Recipe, Supply, Consumer };
+    public enum NodeType { Recipe, Supply, Consumer };
 	public enum RateType { Auto, Manual };
 	
 	[Serializable]
@@ -112,162 +111,45 @@ namespace Foreman
         }
     }
 
-	public class RecipeNode : ProductionNode
+	public partial class RecipeNode : ProductionNode
 	{
 		public Recipe BaseRecipe { get; private set; }
+        // If null, best available assembler should be used, using speed (not number of module slots)
+        // as a proxy since "best" can have varying definitions.
 		public Assembler Assembler { get; set; }
 
-		public abstract class ModuleFilterBase : ISerializable
-		{
-			public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
-			public abstract IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers, Recipe recipe);
-			public abstract String Name { get; }
+        public ModuleSelector NodeModules { get; set; }
 
-			public static ModuleFilterBase Load(JToken token)
+        internal Dictionary<MachinePermutation, int> GetAssemblers()
+        {
+            var assembler = Assembler;
+
+            if (assembler == null)
 			{
-				ModuleFilterBase filter = ModuleBestFilter;
-
-				if (token["ModuleFilterType"] != null)
-				{
-					switch ((String)token["ModuleFilterType"])
-					{
-						case "Best":
-							filter = ModuleBestFilter;
-							break;
-						case "None":
-							filter = ModuleNoneFilter;
-							break;
-						case "Specific":
-							if (token["Module"] != null)
-							{
-								var moduleKey = (String)token["Module"];
-								if (DataCache.Modules.ContainsKey(moduleKey))
-								{
-									filter = new ModuleSpecificFilter(DataCache.Modules[moduleKey]);
-								}
-							}
-							break;
-					}
-				}
-
-				return filter;
-			}
-		}
-
-		public class ModuleSpecificFilter : ModuleFilterBase
-		{
-			public Module Module { get; set; }
-
-			public ModuleSpecificFilter(Module module)
-			{
-				this.Module = module;
-			}
-			
-			public override String Name { get { return Module.Name; } }
-
-			public override void GetObjectData(SerializationInfo info, StreamingContext context)
-			{
-				info.AddValue("ModuleFilterType", "Specific");
-				info.AddValue("Module", Module.Name);
+                assembler = DataCache.Assemblers.Values
+                    .Where(a => a.Enabled)
+                    .Where(a => a.Categories.Contains(BaseRecipe.Category))
+                    .Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count)
+                    .OrderBy(a => -a.Speed)
+                    .FirstOrDefault();
 			}
 
-			public override IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers, Recipe recipe)
-			{
-                Trace.Assert(this.Module.AllowedIn(recipe), "This module not allowed for this recipe. Shouldn't be able to get here.");
+            var ret = new Dictionary<MachinePermutation, int>();
 
-				List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
-				foreach (Assembler assembler in allowedAssemblers)
-				{
-					allowedPermutations.Add(new MachinePermutation(assembler, Enumerable.Repeat(this.Module, assembler.ModuleSlots).ToList()));
-				}
+            if (assembler != null) {
+                var modules = NodeModules.For(BaseRecipe, assembler.ModuleSlots);
+                var required = (int)Math.Ceiling(actualRate / assembler.GetRate(BaseRecipe.Time, (float)SpeedBonus, modules));
+                ret.Add(new MachinePermutation(assembler, modules.ToList()), required);
+            }
 
-				return allowedPermutations.OrderBy(a =>
-                {
-                    if (Module.ProductivityBonus > Module.SpeedBonus)
-                    {
-                        return a.GetAssemblerProductivity();
-                    } else
-                    {
-                        return a.GetAssemblerRate(recipe.Time, 0);
-                    }
-                });
-			}
-		}
-
-		private class ModuleBestFilterImpl : ModuleFilterBase
-		{
-			public override void GetObjectData(SerializationInfo info, StreamingContext context)
-			{
-				info.AddValue("ModuleFilterType", "Best");
-			}
-
-			public override String Name { get { return "Best"; } }
-
-			public override IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers, Recipe recipe)
-			{
-				List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
-				foreach (Assembler assembler in allowedAssemblers)
-				{
-					allowedPermutations.AddRange(assembler.GetAllPermutations(recipe));
-				}
-
-				return allowedPermutations.OrderBy(a => a.GetAssemblerRate(recipe.Time, 0));
-			}
-		}
-
-        // TODO: Probably can share with BestFilterImptl
-		private class ModuleProductivityFilterImpl : ModuleFilterBase
-		{
-			public override void GetObjectData(SerializationInfo info, StreamingContext context)
-			{
-				info.AddValue("ModuleFilterType", "Most Productive");
-			}
-
-			public override String Name { get { return "Most Productive"; } }
-
-			public override IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers, Recipe recipe)
-			{
-				List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
-				foreach (Assembler assembler in allowedAssemblers)
-				{
-					allowedPermutations.AddRange(assembler.GetAllPermutations(recipe));
-				}
-
-                return allowedPermutations.OrderBy(a => a.GetAssemblerProductivity());
-			}
-		}
-
-		private class ModuleNoneFilterImpl : ModuleFilterBase
-		{
-			public override void GetObjectData(SerializationInfo info, StreamingContext context)
-			{
-				info.AddValue("ModuleFilterType", "None");
-			}
-
-			public override String Name { get { return "None"; } }
-
-			public override IEnumerable<MachinePermutation> GetAllPermutations(IEnumerable<Assembler> allowedAssemblers, Recipe recipe)
-			{
-				List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
-				foreach (Assembler assembler in allowedAssemblers)
-				{
-					allowedPermutations.Add(new MachinePermutation(assembler, new List<Module>()));
-				}
-
-				return allowedPermutations;
-			}
-		}
-		public ModuleFilterBase ModuleFilter { get; set; }
-
-		public static ModuleFilterBase ModuleBestFilter { get { return new ModuleBestFilterImpl(); } }
-		public static ModuleFilterBase ModuleNoneFilter { get { return new ModuleNoneFilterImpl(); } }
-		public static ModuleFilterBase ModuleProductivityFilter { get { return new ModuleProductivityFilterImpl(); } }
+            return ret;
+        }
 
 		protected RecipeNode(Recipe baseRecipe, ProductionGraph graph)
 			: base(graph)
 		{
 			BaseRecipe = baseRecipe;
-			ModuleFilter = ModuleBestFilter;
+			NodeModules = ModuleSelector.Fastest;
 		}
 
 		public override IEnumerable<Item> Inputs
@@ -313,93 +195,6 @@ namespace Foreman
 			}
 		}
 
-		public Dictionary<MachinePermutation, int> GetMinimumAssemblers()
-		{
-			var results = new Dictionary<MachinePermutation, int>();
-
-			double requiredRate = actualRate;
-			if (requiredRate == double.PositiveInfinity)
-			{
-				return results;
-			}
-			requiredRate = Math.Round(requiredRate, RoundingDP);
-
-			List<Assembler> allowedAssemblers;
-
-			if (Assembler != null)
-			{
-				allowedAssemblers = new List<Assembler>();
-				allowedAssemblers.Add(this.Assembler);
-			}
-			else
-			{
-				allowedAssemblers = DataCache.Assemblers.Values
-					.Where(a => a.Enabled)
-					.Where(a => a.Categories.Contains(BaseRecipe.Category))
-					.Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count).ToList();
-			}
-
-            List<MachinePermutation> allowedPermutations = ModuleFilter.GetAllPermutations(allowedAssemblers, BaseRecipe).ToList();
-
-            var sortedPermutations = allowedPermutations.ToList();
-
-            if (sortedPermutations.Any())
-            {
-                double totalRateSoFar = 0;
-                var beaconBonus = (float)SpeedBonus;
-
-                while (totalRateSoFar < requiredRate)
-                {
-                    double remainingRate = requiredRate - totalRateSoFar;
-
-                    MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(p => p.GetAssemblerRate(BaseRecipe.Time, beaconBonus) <= remainingRate);
-
-                    if (permutationToAdd != null)
-                    {
-                        int numberToAdd;
-                        Debug.WriteLine(permutationToAdd.GetAssemblerRate(BaseRecipe.Time, beaconBonus));
-                        if (Graph.OneAssemblerPerRecipe || Assembler != null)
-                        {
-                            numberToAdd = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time, beaconBonus)));
-                        }
-                        else
-                        {
-                            numberToAdd = Convert.ToInt32(Math.Floor(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time, beaconBonus)));
-                        }
-                        if (!results.ContainsKey(permutationToAdd))
-                        {
-                            results.Add(permutationToAdd, numberToAdd);
-                        }
-                        else
-                        {
-                            results[permutationToAdd] += numberToAdd;
-                        }
-                    }
-                    else
-                    {
-                        permutationToAdd = sortedPermutations.FirstOrDefault(a => a.GetAssemblerRate(BaseRecipe.Time, beaconBonus) > remainingRate);
-                        int amount = Convert.ToInt32(Math.Ceiling(remainingRate / permutationToAdd.GetAssemblerRate(BaseRecipe.Time, beaconBonus)));
-                        if (results.ContainsKey(permutationToAdd))
-                        {
-                            results[permutationToAdd] += amount;
-                        }
-                        else
-                        {
-                            results.Add(permutationToAdd, amount);
-                        }
-                    }
-                    totalRateSoFar = 0;
-                    foreach (var a in results)
-                    {
-                        totalRateSoFar += a.Key.GetAssemblerRate(BaseRecipe.Time, beaconBonus) * a.Value;
-                    }
-                    totalRateSoFar = Math.Round(totalRateSoFar, RoundingDP);
-                }
-            }
-
-			return results;
-		}
-
 		public override string DisplayName
 		{
 			get { return BaseRecipe.FriendlyName; }
@@ -426,7 +221,7 @@ namespace Foreman
 			{
 				info.AddValue("Assembler", Assembler.Name);
 			}
-			ModuleFilter.GetObjectData(info, context);
+			NodeModules.GetObjectData(info, context);
 		}
 
         public override float GetConsumeRate(Item item)
@@ -463,16 +258,7 @@ namespace Foreman
 
         public override float ProductivityMultiplier()
         {
-            var assemblers = this.GetMinimumAssemblers();
-            var assemblerBonus = 0.0;
-            /*
-            if (assemblers.Count == 1)
-            {
-                var permutation = assemblers.First().Key;
-                assemblerBonus = permutation.GetAssemblerProductivity();
-            }
-            */
-
+            var assemblerBonus = GetAssemblers().Keys.Sum(x => x.GetAssemblerProductivity());
             return (float)(1.0 + ProductivityBonus + assemblerBonus);
         }
     }

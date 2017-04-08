@@ -196,7 +196,12 @@ namespace Foreman
 					Height = 120;
 					if (DisplayedNode is RecipeNode)
 					{
-						assemblerBox.AssemblerList = (DisplayedNode as RecipeNode).GetMinimumAssemblers();
+                        var assemblers = (DisplayedNode as RecipeNode).GetAssemblers();
+                        if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
+                        {
+                            assemblers = assemblers.ToDictionary(p => p.Key, p => 0);
+                        }
+						assemblerBox.AssemblerList = assemblers;
 					}
 					else if (DisplayedNode is SupplyNode)
 					{

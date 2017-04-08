@@ -32,7 +32,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -70,11 +70,11 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Google.OrTools">
-      <HintPath>..\lib\Google.OrTools.dll</HintPath>
+    <Reference Include="Google.OrTools, Version=5.1.4075.23203, Culture=neutral, PublicKeyToken=e5e5a4177ad79658, processorArchitecture=AMD64">
+      <HintPath>..\packages\Google.OrTools.5.1.4077\lib\net40\Google.OrTools.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Protobuf">
-      <HintPath>..\lib\Google.Protobuf.dll</HintPath>
+    <Reference Include="Google.Protobuf, Version=3.0.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.0.0\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="KeraLua">
       <HintPath>..\lib\KeraLua.dll</HintPath>
@@ -127,6 +127,7 @@
     <Compile Include="GhostNodeElement.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="ErrorLogging.cs" />
+    <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
@@ -231,6 +232,7 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
