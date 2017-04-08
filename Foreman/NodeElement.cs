@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Foreman
 {
@@ -20,6 +21,7 @@ namespace Foreman
 		public Point MousePosition = Point.Empty;
 
 		private Color recipeColour = Color.FromArgb(190, 217, 212);
+		private Color passthroughColour = Color.FromArgb(190, 217, 212);
 		private Color supplyColour = Color.FromArgb(249, 237, 195);
 		private Color consumerColour = Color.FromArgb(231, 214, 224);
 		private Color missingColour = Color.FromArgb(0xff, 0x7f, 0x6b);
@@ -54,29 +56,41 @@ namespace Foreman
 
 			DisplayedNode = node;
 
-			if (DisplayedNode is ConsumerNode)
-			{
-				backgroundColour = supplyColour;
-				if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
-				{
-					backgroundColour = missingColour;
-				}
-			}
-			else if (DisplayedNode is SupplyNode)
-			{
-				backgroundColour = consumerColour;
-				if (((SupplyNode)DisplayedNode).SuppliedItem.IsMissingItem)
-				{
-					backgroundColour = missingColour;
-				}
-			}
-			else if (DisplayedNode is RecipeNode)
-			{
-				backgroundColour = recipeColour;
-				if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissingRecipe)
-				{
-					backgroundColour = missingColour;
-				}
+            if (DisplayedNode is ConsumerNode)
+            {
+                backgroundColour = supplyColour;
+                if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
+                {
+                    backgroundColour = missingColour;
+                }
+            }
+            else if (DisplayedNode is SupplyNode)
+            {
+                backgroundColour = consumerColour;
+                if (((SupplyNode)DisplayedNode).SuppliedItem.IsMissingItem)
+                {
+                    backgroundColour = missingColour;
+                }
+            }
+            else if (DisplayedNode is RecipeNode)
+            {
+                backgroundColour = recipeColour;
+                if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissingRecipe)
+                {
+                    backgroundColour = missingColour;
+                }
+            }
+            else if (DisplayedNode is PassthroughNode)
+            {
+                backgroundColour = passthroughColour;
+                if (((PassthroughNode)DisplayedNode).PassedItem.IsMissingItem)
+                {
+                    backgroundColour = missingColour;
+                }
+            }
+            else
+            {
+                Trace.Fail("No branch for node: " + DisplayedNode.ToString());
 			}
 			backgroundBrush = new SolidBrush(backgroundColour);
 

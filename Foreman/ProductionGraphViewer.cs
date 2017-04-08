@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace Foreman
 {
@@ -653,8 +654,10 @@ namespace Foreman
 
 						var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
 						var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
+						var itemPassthroughOption = new ItemChooserControl(item, "Create pass-through node", item.FriendlyName);
 
 						var optionList = new List<ChooserControl>();
+						optionList.Add(itemPassthroughOption);
 						optionList.Add(itemOutputOption);
 						foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
 						{
@@ -688,10 +691,17 @@ namespace Foreman
 								{
 									newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, this.Graph), this);
 								}
+                                else if (c == itemPassthroughOption)
+                                {
+                                    newElement = new NodeElement(PassthroughNode.Create(item, this.Graph), this);
+                                }
 								else if (c == itemOutputOption)
 								{
 									newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
-								}
+								} else
+                                {
+                                    Trace.Fail("No handler for selected item");
+                                }
 
 								Graph.UpdateNodeValues();
 								newElement.Update();
@@ -805,6 +815,23 @@ namespace Foreman
 							}
 							break;
 						}
+					case "PassThrough":
+						{
+							String itemName = (String)node["ItemName"];
+							if (DataCache.Items.ContainsKey(itemName))
+							{
+								Item item = DataCache.Items[itemName];
+								newNode = PassthroughNode.Create(item, Graph);
+							}
+							else
+							{
+								Item missingItem = new Item(itemName);
+								missingItem.IsMissingItem = true;
+								DataCache.Items.Add(itemName, missingItem);
+								newNode = PassthroughNode.Create(missingItem, Graph);
+							}
+							break;
+						}
 					case "Recipe":
 						{
 							String recipeName = (String)node["RecipeName"];
@@ -833,6 +860,11 @@ namespace Foreman
 							(newNode as RecipeNode).NodeModules = ModuleSelector.Load(node);
 							break;
 						}
+                    default:
+                        {
+                            Trace.Fail("Unknown node type: " + node["NodeType"]);
+                            break;
+                        }
 				}
 
 				if (newNode != null)
