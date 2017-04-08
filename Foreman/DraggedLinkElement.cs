@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Foreman
 {
@@ -114,7 +115,13 @@ namespace Foreman
 			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
 			{
 				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
-				recipeOptionList.Add(new ItemChooserControl(Item, "Create output node", Item.FriendlyName));
+
+                var itemOutputOption = new ItemChooserControl(Item, "Create output node", Item.FriendlyName);
+                var itemPassthroughOption = new ItemChooserControl(Item, "Create pass-through node", Item.FriendlyName);
+
+				recipeOptionList.Add(itemOutputOption);
+				recipeOptionList.Add(itemPassthroughOption);
+
 				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item) && r.Enabled && r.Category != "incinerator" && r.Category != "incineration"))
 				{
 					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
@@ -131,12 +138,22 @@ namespace Foreman
 							Recipe selectedRecipe = (c as RecipeChooserControl).DisplayedRecipe;
 							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
 						}
-						else if (c is ItemChooserControl)
+						else if (c == itemOutputOption)
 						{
 							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
 							newElement = new NodeElement(ConsumerNode.Create(selectedItem, Parent.Graph), Parent);
 							(newElement.DisplayedNode as ConsumerNode).rateType = RateType.Auto;
 						}
+						else if (c == itemPassthroughOption)
+						{
+							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
+							newElement = new NodeElement(PassthroughNode.Create(selectedItem, Parent.Graph), Parent);
+							(newElement.DisplayedNode as PassthroughNode).rateType = RateType.Auto;
+						} else
+                        {
+                            Trace.Fail("Unhandled option: " + c.ToString());
+                        }
+
 						newElement.Update();
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
@@ -151,7 +168,13 @@ namespace Foreman
 			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
 			{
 				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
-				recipeOptionList.Add(new ItemChooserControl(Item, "Create infinite supply node", Item.FriendlyName));
+
+                var itemSupplyOption = new ItemChooserControl(Item, "Create infinite supply node", Item.FriendlyName);
+                var itemPassthroughOption = new ItemChooserControl(Item, "Create pass-through node", Item.FriendlyName);
+
+				recipeOptionList.Add(itemSupplyOption);
+				recipeOptionList.Add(itemPassthroughOption);
+
 				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item) && r.Enabled && r.Category != "incinerator" && r.Category != "incineration"))
 				{
 					if (recipe.Category != "incinerator" && recipe.Category != "incineration")
@@ -172,11 +195,20 @@ namespace Foreman
 							Recipe selectedRecipe = (c as RecipeChooserControl).DisplayedRecipe;
 							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
 						}
-						else if (c is ItemChooserControl)
+						else if (c == itemSupplyOption)
 						{
 							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
 							newElement = new NodeElement(SupplyNode.Create(selectedItem, Parent.Graph), Parent);
 						}
+						else if (c == itemPassthroughOption)
+						{
+							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
+							newElement = new NodeElement(PassthroughNode.Create(selectedItem, Parent.Graph), Parent);
+							(newElement.DisplayedNode as PassthroughNode).rateType = RateType.Auto;
+						} else
+                        {
+                            Trace.Fail("Unhandled option: " + c.ToString());
+                        }
 						newElement.Update();
 						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
 						new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
