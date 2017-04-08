@@ -72,17 +72,8 @@ namespace Foreman
 
             this.nodes.Add(node);
 
-            if (node is ConsumerNode)
-            {
-                // Maximize rate of consumer nodes. This is only relevant for consumer nodes without
-                // a target, and means that they will "soak up" any excess overproduction.
-                objective.SetCoefficient(x, -1.0);
-            }
-            else
-            {
-                // All other node rates should be minimized.
-                objective.SetCoefficient(x, 1.0);
-            }
+            // The rate of all nodes should be minimized
+            objective.SetCoefficient(x, 1.0);
         }
 
         // Returns null if no optimal solution can be found. Technically GLOP can return non-optimal
@@ -136,22 +127,22 @@ namespace Foreman
         {
             Debug.Assert(links.All(x => x.Supplier == node));
 
-            AddRatio(node, item, links, rate * node.ProductivityMultiplier(), EndpointType.SUPPLY);
+            addRatio(node, item, links, rate * node.ProductivityMultiplier(), EndpointType.SUPPLY);
         }
 
         // Constrain a ratio on the input side of a node
-        public void AddInputRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, float rate)
+        public void AddInputRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, double rate)
         {
             Debug.Assert(links.All(x => x.Consumer == node));
 
-            AddRatio(node, item, links, rate, EndpointType.CONSUME);
+            addRatio(node, item, links, rate, EndpointType.CONSUME);
         }
 
         // Constrain input to a node for a particular item so that the node does not consume more
         // than is being produced by the supplier.
         // 
         // Consuming less than is being produced is fine. This represents a backup.
-        public void AddInputAllowBackup(ProductionNode node, Item item, IEnumerable<NodeLink> links, float inputRate)
+        public void AddInputLink(ProductionNode node, Item item, IEnumerable<NodeLink> links, double inputRate)
         {
             Debug.Assert(links.All(x => x.Consumer == node));
 
@@ -179,27 +170,11 @@ namespace Foreman
                     constraint.SetCoefficient(errorVariable, 1);
                     constraint.SetCoefficient(supplierVariable, -1);
                     constraint.SetCoefficient(consumerVariable, 1);
-                    objective.SetCoefficient(errorVariable, 1.0);
+
+                    // The cost of over-supply needs to be greater than benefit of minimizing rate,
+                    // other-wise pure consumption nodes won't consume anything.
+                    objective.SetCoefficient(errorVariable, 1.1);
                 }
-            }
-        }
-
-        // Constrain input to a node for a particular item so that the node consumes everything that is being produced.
-        public void AddInputConsumeAll(ProductionNode node, Item item, IEnumerable<NodeLink> links, float inputRate)
-        {
-            Debug.Assert(links.All(x => x.Consumer == node));
-
-            // Each item input/output to a recipe has one varible per link. These variables should be
-            // related to one another using one of the other Ratio methods.
-            foreach (var link in links)
-            {
-                var supplierVariable = variableFor(link, EndpointType.SUPPLY);
-                var consumerVariable = variableFor(link, EndpointType.CONSUME);
-
-                // Since all supply is being consumed, the flow at each end of the link should be equal.
-                var constraint = MakeConstraint(0, 0);
-                constraint.SetCoefficient(supplierVariable, 1);
-                constraint.SetCoefficient(consumerVariable, -1);
             }
         }
 
@@ -210,7 +185,7 @@ namespace Foreman
         // For example, if a copper wire recipe (1 plate makes 2 wires) is connected to two different
         // consumers, then the sum of the wire rate flowing over those two links must be equal to 2
         // time the rate of the recipe.
-        private void AddRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, double rate, EndpointType type)
+        private void addRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, double rate, EndpointType type)
         {
             // Ensure that the sum of all inputs for this type of item is in relation to the rate of the recipe
             // So for the steel input to a solar panel, the sum of every input variable to this node must equal 5 * rate.
@@ -269,20 +244,7 @@ namespace Foreman
 
         private Variable variableFor(ProductionNode node, RateType type = RateType.ACTUAL)
         {
-            var tuple = Tuple.Create(node, type);
-            if (node is SupplyNode)
-            {
-                return variableFor(tuple, makeName("supplier", type, node.DisplayName));
-            }
-            else if (node is ConsumerNode)
-            {
-                return variableFor(tuple, makeName("consumer", type, node.DisplayName));
-
-            }
-            else
-            {
-                return variableFor(tuple, makeName("node", type, node.DisplayName));
-            }
+            return variableFor(Tuple.Create(node, type), makeName("node", type, node.DisplayName));
         }
 
         private Variable variableFor(object key, String name)

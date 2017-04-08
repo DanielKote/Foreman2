@@ -374,7 +374,10 @@ namespace ForemanTest
 
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
-            AssertFloatsAreEqual(data.SupplyRate("Ore"), data.ConsumedRate("Plate"));
+            AssertFloatsAreEqual(15, data.SupplyRate("Ore"));
+
+            // Links are allowed to back up, so it's ok to match the target here.
+            AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
         }
 
         [TestMethod]

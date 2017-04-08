@@ -31,7 +31,6 @@ namespace Foreman
                 node.AddConstraints(solver);
             }
 
-
             var solution = solver.Solve();
 
             Debug.WriteLine(solver.ToString());
@@ -56,15 +55,6 @@ namespace Foreman
     // easy to understand as a whole.
     public abstract partial class ProductionNode
     {
-        internal virtual void AddConstraints(ProductionSolver solver)
-        {
-            solver.AddNode(this);
-            if (rateType == RateType.Manual)
-            {
-                solver.AddTarget(this, desiredRate);
-            }
-        }
-
         internal void ResetSolvedRate()
         {
             actualRate = 0;
@@ -74,55 +64,35 @@ namespace Foreman
         {
             actualRate = (float)rate;
         }
-    }
 
-    public partial class SupplyNode : ProductionNode
-    {
-        internal override void AddConstraints(ProductionSolver solver)
+        internal void AddConstraints(ProductionSolver solver)
         {
-            base.AddConstraints(solver);
+            solver.AddNode(this);
 
-            // Supply nodes are effectively recipe nodes with no inputs that produce one item
-            // per recipe rate.
-            solver.AddOutputRatio(this, SuppliedItem, OutputLinks, 1);
-        }
-    }
-
-    public partial class ConsumerNode : ProductionNode
-    {
-        internal override void AddConstraints(ProductionSolver solver)
-        {
-            base.AddConstraints(solver);
-
-            // Unlike recipe nodes, consumer nodes need to consume all of their input. This
-            // is needed for both accurate automatically calculated output rates (when not
-            // fixed), and also to properly consume multiple inputs.
-            solver.AddInputRatio(this, ConsumedItem, InputLinks, 1);
-            solver.AddInputConsumeAll(this, ConsumedItem, InputLinks, 1);
-        }
-    }
-
-    public partial class RecipeNode : ProductionNode
-    {
-        internal override void AddConstraints(ProductionSolver solver)
-        {
-            base.AddConstraints(solver);
+            if (rateType == RateType.Manual)
+            {
+                solver.AddTarget(this, desiredRate);
+            }
 
             foreach (var itemInputs in InputLinks.GroupBy(x => x.Item))
             {
                 var item = itemInputs.Key;
 
-                // Inputs to a recipe node are allowed to back up
-                solver.AddInputRatio(this, item, itemInputs, BaseRecipe.Ingredients[item]);
-                solver.AddInputAllowBackup(this, item, itemInputs, BaseRecipe.Ingredients[item]);
+                solver.AddInputRatio(this, item, itemInputs, inputRateFor(item));
+                solver.AddInputLink(this, item, itemInputs, inputRateFor(item));
             }
 
             foreach (var itemOutputs in OutputLinks.GroupBy(x => x.Item))
             {
                 var item = itemOutputs.Key;
 
-                solver.AddOutputRatio(this, item, itemOutputs, BaseRecipe.Results[item]);
+                solver.AddOutputRatio(this, item, itemOutputs, outputRateFor(item));
+                // Output links do not need to constrained, since they are already covered by adding
+                // the input link above.
             }
         }
+
+        internal abstract double outputRateFor(Item item);
+        internal abstract double inputRateFor(Item item);
     }
 }

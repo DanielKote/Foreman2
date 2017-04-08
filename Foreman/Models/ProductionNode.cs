@@ -112,7 +112,7 @@ namespace Foreman
         }
     }
 
-	public partial class RecipeNode : ProductionNode
+	public class RecipeNode : ProductionNode
 	{
 		public Recipe BaseRecipe { get; private set; }
 		public Assembler Assembler { get; set; }
@@ -451,6 +451,16 @@ namespace Foreman
 			return (float)Math.Round(BaseRecipe.Results[item] * actualRate * ProductivityMultiplier(), RoundingDP);
         }
 
+        internal override double outputRateFor(Item item)
+        {
+            return BaseRecipe.Results[item];
+        }
+
+        internal override double inputRateFor(Item item)
+        {
+            return BaseRecipe.Ingredients[item];
+        }
+
         public override float ProductivityMultiplier()
         {
             var assemblers = this.GetMinimumAssemblers();
@@ -467,7 +477,7 @@ namespace Foreman
         }
     }
 
-	public partial class SupplyNode : ProductionNode
+	public class SupplyNode : ProductionNode
 	{
 		public Item SuppliedItem { get; private set; }
 
@@ -562,9 +572,19 @@ namespace Foreman
 
 			return (float)Math.Round(actualRate, RoundingDP);
         }
-	}
 
-	public partial class ConsumerNode : ProductionNode
+        internal override double outputRateFor(Item item)
+        {
+            return 1;
+        }
+
+        internal override double inputRateFor(Item item)
+        {
+            throw new ArgumentException("Supply node should not have any inputs!");
+        }
+    }
+
+	public class ConsumerNode : ProductionNode
 	{
 		public Item ConsumedItem { get; private set; }
 
@@ -625,5 +645,15 @@ namespace Foreman
 
             return 0;
         }
-	}
+
+        internal override double outputRateFor(Item item)
+        {
+            throw new ArgumentException("Consumer should not have outputs!");
+        }
+
+        internal override double inputRateFor(Item item)
+        {
+            return 1;
+        }
+    }
 }
