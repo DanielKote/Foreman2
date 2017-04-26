@@ -715,7 +715,12 @@ namespace Foreman
                         return;
                 }
 
-                var time = ReadLuaFloat(values, "energy_required", true, 0.5f);
+                float time;
+
+                time = values["normal"] != null
+                    ? ReadLuaFloat(ReadLuaLuaTable(values, "normal"), "energy_required", true, 0.5f)
+                    : ReadLuaFloat(values, "energy_required", true, 0.5f);
+
                 var ingredients = extractIngredientsFromLuaRecipe(values);
                 var results = extractResultsFromLuaRecipe(values);
 

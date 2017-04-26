@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using Foreman.Properties;
 
 namespace Foreman
 {
@@ -32,7 +33,25 @@ namespace Foreman
 			Enabled = true;
 		}
 
-		public float GetRate(Resource resource, IEnumerable<Module> modules)
+	    private int _moduleSlots;
+        public new int ModuleSlots
+        {
+            get
+            {
+                if (!Settings.Default.MinersUseModules)
+                    return 0;
+                else
+                    return _moduleSlots;
+            }
+
+            set
+            {
+                if (Settings.Default.MinersUseModules)
+                    _moduleSlots = value;
+            }
+        }
+
+        public float GetRate(Resource resource, IEnumerable<Module> modules)
 		{
 			double finalSpeed = this.Speed;
 			foreach (Module module in modules.Where(m => m != null))
