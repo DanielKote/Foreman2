@@ -92,7 +92,26 @@ namespace Foreman
 					util = {}
 					util.table = {}
 					util.table.deepcopy = table.deepcopy
-					util.multiplystripes = multiplystripes");
+					util.multiplystripes = multiplystripes
+                    util.by_pixel = by_pixel
+                    util.format_number = format_number
+                    util.increment = increment
+
+                    function log(...)
+                    end
+
+                    defines = {}
+                    defines.difficulty_settings = {}
+                    defines.difficulty_settings.recipe_difficulty = {}
+                    defines.difficulty_settings.technology_difficulty = {}
+                    defines.difficulty_settings.recipe_difficulty.normal = 1
+                    defines.difficulty_settings.technology_difficulty.normal = 1
+                    defines.direction = {}
+                    defines.direction.north = 1
+                    defines.direction.east = 2
+                    defines.direction.south = 3
+                    defines.direction.west = 4
+");
 
                 foreach (var filename in new[] {"data.lua", "data-updates.lua", "data-final-fixes.lua"})
                     foreach (var mod in Mods.Where(m => m.Enabled))
@@ -921,9 +940,25 @@ namespace Foreman
                     resultCount = 1f;
                 results.Add(FindOrCreateUnknownItem(resultName), resultCount);
             }
+            else if (ReadLuaLuaTable(values, "results", true) == null)
+            {
+                var table = ReadLuaLuaTable(values, "normal");
+                if (table["result"] == null) return results;
+                var resultName = ReadLuaString(table, "result");
+                var resultCount = ReadLuaFloat(table, "result_count", true);
+                if (resultCount == 0f)
+                {
+                    resultCount = 1f;
+                }
+                results.Add(FindOrCreateUnknownItem(resultName), resultCount);
+            }
             else
             {
-                var resultEnumerator = ReadLuaLuaTable(values, "results").GetEnumerator();
+                //If we can't read results, read normal/results.
+                LuaTable luaTable = ReadLuaLuaTable(values, "results", true) ??
+                                    ReadLuaLuaTable(ReadLuaLuaTable(values, "normal"), "results");
+
+                var resultEnumerator = luaTable.GetEnumerator();
                 while (resultEnumerator.MoveNext())
                 {
                     var resultTable = resultEnumerator.Value as LuaTable;
@@ -963,7 +998,12 @@ namespace Foreman
         private static Dictionary<Item, float> extractIngredientsFromLuaRecipe(LuaTable values)
         {
             var ingredients = new Dictionary<Item, float>();
-            var ingredientEnumerator = ReadLuaLuaTable(values, "ingredients").GetEnumerator();
+
+            //if ingredients can't be read, read normal.ingredients instead
+            LuaTable ingredientsTable = ReadLuaLuaTable(values, "ingredients", true) ??
+                ReadLuaLuaTable(ReadLuaLuaTable(values, "normal"), "ingredients");
+
+            var ingredientEnumerator = ingredientsTable.GetEnumerator();
             while (ingredientEnumerator.MoveNext())
             {
                 var ingredientTable = ingredientEnumerator.Value as LuaTable;
