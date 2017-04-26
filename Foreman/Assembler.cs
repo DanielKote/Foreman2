@@ -93,7 +93,7 @@ namespace Foreman
 
 		public override string ToString()
 		{
-			return String.Format("Assembler: {0}", Name);
+			return $"Assembler: {Name}";
 		}
 
 		public float GetRate(float recipeTime, IEnumerable<Module> speedModules = null)

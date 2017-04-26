@@ -76,7 +76,7 @@ namespace Foreman
 
 		public override string ToString()
 		{
-			return String.Format("Item: {0}", Name);
+			return $"Item: {Name}";
 		}
 	}
 }

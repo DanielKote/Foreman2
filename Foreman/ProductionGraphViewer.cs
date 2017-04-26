@@ -660,7 +660,7 @@ namespace Foreman
 						{
 							if (recipe.Results.ContainsKey(item) && recipe.Category != "incinerator" && recipe.Category != "incineration")
 							{
-								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+								optionList.Add(new RecipeChooserControl(recipe, $"Create '{recipe.FriendlyName}' recipe node", recipe.FriendlyName));
 							}
 						}
 						optionList.Add(itemSupplyOption);
@@ -668,7 +668,7 @@ namespace Foreman
 						{
 							if (recipe.Ingredients.ContainsKey(item))
 							{
-								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+								optionList.Add(new RecipeChooserControl(recipe, $"Create '{recipe.FriendlyName}' recipe node", recipe.FriendlyName));
 							}
 						}
 

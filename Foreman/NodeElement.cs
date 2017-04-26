@@ -138,7 +138,7 @@ namespace Foreman
 				{
 					if (node.SuppliedItem.IsMissingItem)
 					{
-						text = String.Format("Item not loaded! ({0})", node.DisplayName);
+						text = $"Item not loaded! ({node.DisplayName})";
 					}
 					else
 					{
@@ -155,7 +155,7 @@ namespace Foreman
 				ConsumerNode node = (ConsumerNode)DisplayedNode;
 				if (node.ConsumedItem.IsMissingItem)
 				{
-					text = String.Format("Item not loaded! ({0})", node.DisplayName);
+					text = $"Item not loaded! ({node.DisplayName})";
 				}
 				else
 				{
@@ -169,7 +169,7 @@ namespace Foreman
 				{
 					if (node.BaseRecipe.IsMissingRecipe)
 					{
-						text = String.Format("Recipe not loaded! ({0})", node.DisplayName);
+						text = $"Recipe not loaded! ({node.DisplayName})";
 					}
 					else
 					{
@@ -461,39 +461,38 @@ namespace Foreman
 				{
 					tti.Direction = Direction.Left;
 					tti.ScreenLocation = Parent.GraphToScreen(Point.Add(Location, new Size(Width, Height / 2)));
-					tti.Text = String.Format("Recipe: {0}", (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName);
-					tti.Text += String.Format("\n--Base Time: {0}s", (DisplayedNode as RecipeNode).BaseRecipe.Time);
+					tti.Text = $"Recipe: {(DisplayedNode as RecipeNode).BaseRecipe.FriendlyName}";
+					tti.Text += $"\n--Base Time: {(DisplayedNode as RecipeNode).BaseRecipe.Time}s";
 					tti.Text += String.Format("\n--Base Ingredients:");
 					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.Ingredients)
 					{
-						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
+						tti.Text += $"\n----{kvp.Key.FriendlyName} ({kvp.Value.ToString()})";
 					}
 					tti.Text += String.Format("\n--Base Results:");
 					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.Results)
 					{
-						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
+						tti.Text += $"\n----{kvp.Key.FriendlyName} ({kvp.Value.ToString()})";
 					}
 					if (Parent.ShowAssemblers)
 					{
 						tti.Text += String.Format("\n\nAssemblers:");
 						foreach (var kvp in assemblerBox.AssemblerList)
 						{
-							tti.Text += String.Format("\n----{0} ({1})", kvp.Key.assembler.FriendlyName, kvp.Value.ToString());
+							tti.Text += $"\n----{kvp.Key.assembler.FriendlyName} ({kvp.Value.ToString()})";
 							foreach (var Module in kvp.Key.modules.Where(m => m != null))
 							{
-								tti.Text += String.Format("\n------{0}", Module.FriendlyName);
+								tti.Text += $"\n------{Module.FriendlyName}";
 							}
 						}
 					}
 
 					if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
 					{
-						tti.Text += String.Format("\n\nCurrent iterations: {0}", DisplayedNode.actualRate);
+						tti.Text += $"\n\nCurrent iterations: {DisplayedNode.actualRate}";
 					} else
 					{
-						tti.Text += String.Format("\n\nCurrent Rate: {0}/{1}",
-							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? DisplayedNode.actualRate / 60 : DisplayedNode.actualRate,
-							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? "m" : "s");
+						tti.Text +=
+						    $"\n\nCurrent Rate: {(Parent.Graph.SelectedUnit == RateUnit.PerMinute ? DisplayedNode.actualRate/60 : DisplayedNode.actualRate)}/{(Parent.Graph.SelectedUnit == RateUnit.PerMinute ? "m" : "s")}";
 					}
 					Parent.AddTooltip(tti);
 				}

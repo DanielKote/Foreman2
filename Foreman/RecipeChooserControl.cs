@@ -44,11 +44,11 @@ namespace Foreman
 			nameLabel.Text = String.Format(DisplayText, DisplayedRecipe.FriendlyName);
 			foreach (Item ingredient in DisplayedRecipe.Ingredients.Keys)
 			{
-				inputListBox.Items.Add(String.Format("{0} ({1})", ingredient.FriendlyName, DisplayedRecipe.Ingredients[ingredient]));
+				inputListBox.Items.Add($"{ingredient.FriendlyName} ({DisplayedRecipe.Ingredients[ingredient]})");
 			}
 			foreach (Item result in DisplayedRecipe.Results.Keys)
 			{
-				outputListBox.Items.Add(String.Format("{0} ({1})", result.FriendlyName, DisplayedRecipe.Results[result]));
+				outputListBox.Items.Add($"{result.FriendlyName} ({DisplayedRecipe.Results[result]})");
 			}
             iconPictureBox.Image = DisplayedRecipe.Icon;
 			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;

@@ -484,7 +484,7 @@ namespace Foreman
 
 		public override string ToString()
 		{
-			return String.Format("Recipe Tree Node: {0}", BaseRecipe.Name);
+			return $"Recipe Tree Node: {BaseRecipe.Name}";
 		}
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)

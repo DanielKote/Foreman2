@@ -351,7 +351,7 @@ namespace Foreman
 			string output = "";
 			foreach (decimal value in Coefficients)
 			{
-				output += String.Format("{0,-8:0}", decimal.Round(value, 4)) + " ";
+				output += $"{decimal.Round(value, 4),-8:0}" + " ";
 			}
 			output += " | " + decimal.Round(RHS, 4);
 

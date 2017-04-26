@@ -167,7 +167,7 @@ namespace Foreman
 				{
 					if (recipe.Results.ContainsKey(item))
 					{
-						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+						optionList.Add(new RecipeChooserControl(recipe, $"Create '{recipe.FriendlyName}' recipe node", recipe.FriendlyName));
 					}
 				}
 				optionList.Add(itemSupplyOption);
@@ -176,7 +176,7 @@ namespace Foreman
 				{
 					if (recipe.Ingredients.ContainsKey(item))
 					{
-						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+						optionList.Add(new RecipeChooserControl(recipe, $"Create '{recipe.FriendlyName}' recipe node", recipe.FriendlyName));
 					}
 				}
 
@@ -408,7 +408,7 @@ namespace Foreman
 			catch (Exception exception)
 			{
 				MessageBox.Show("Could not save this file. See log for more details");
-				ErrorLogging.LogLine(String.Format("Error saving file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine($"Error saving file '{dialog.FileName}'. Error: '{exception.Message}'");
 			}
 			finally
 			{
@@ -433,7 +433,7 @@ namespace Foreman
 			catch (Exception exception)
 			{
 				MessageBox.Show("Could not load this file. See log for more details");
-				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine($"Error loading file '{dialog.FileName}'. Error: '{exception.Message}'");
 			}
 
 			UpdateControlValues();
