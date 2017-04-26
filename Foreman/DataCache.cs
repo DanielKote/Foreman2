@@ -681,6 +681,13 @@ namespace Foreman
                 return;
             var newItem = new Item(name) {Icon = LoadImage(ReadLuaString(values, "icon", true))};
 
+            var localNames = ReadLuaLuaTable(values, "localised_name", true);
+            if (localNames != null)
+            {
+                if ((localNames[1] as string)?.Contains(".filled-barrel") == true)
+                    return;
+            }
+
             if (!Items.ContainsKey(name))
                 Items.Add(name, newItem);
         }
@@ -700,6 +707,14 @@ namespace Foreman
         {
             try
             {
+                var localNames = ReadLuaLuaTable(values, "localised_name", true);
+                if (localNames != null)
+                {
+                    var localName = localNames[1] as string;
+                    if (localName?.Contains(".fill-barrel") == true || localName?.Contains(".empty-filled-barrel") == true)
+                        return;
+                }
+
                 var time = ReadLuaFloat(values, "energy_required", true, 0.5f);
                 var ingredients = extractIngredientsFromLuaRecipe(values);
                 var results = extractResultsFromLuaRecipe(values);
