@@ -85,6 +85,7 @@ namespace Foreman
 		public bool ShowAssemblers = false;
 		public bool ShowMiners = false;
 		public bool ShowInserters = true;
+	    public bool MinersUseModules = true;
 		StringFormat stringFormat = new StringFormat();
 		public GhostNodeElement GhostDragElement = null;
 		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();

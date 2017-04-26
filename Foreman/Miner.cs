@@ -31,25 +31,8 @@ namespace Foreman
 			Name = name;
 			ResourceCategories = new List<string>();
 			Enabled = true;
+		    UseModules = Settings.Default.MinersUseModules;
 		}
-
-	    private int _moduleSlots;
-        public new int ModuleSlots
-        {
-            get
-            {
-                if (!Settings.Default.MinersUseModules)
-                    return 0;
-                else
-                    return _moduleSlots;
-            }
-
-            set
-            {
-                if (Settings.Default.MinersUseModules)
-                    _moduleSlots = value;
-            }
-        }
 
         public float GetRate(Resource resource, IEnumerable<Module> modules)
 		{

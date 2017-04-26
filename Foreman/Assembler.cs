@@ -29,12 +29,22 @@ namespace Foreman
 	}
 
 	public abstract class ProductionEntity
-	{
+    { 
 		public String Name { get; protected set; }
 		public bool Enabled { get; set; }
 		public Bitmap Icon { get; set; }
-		public int ModuleSlots { get; set; }
-		public float Speed { get; set; }
+
+        public bool UseModules { get; set; }
+
+        private int _moduleSlots;
+
+	    public int ModuleSlots
+	    {
+	        get { return UseModules ? _moduleSlots : 0; }
+	        set { _moduleSlots = value; }
+	    }
+
+	    public float Speed { get; set; }
 		private String friendlyName;
 		public String FriendlyName
 		{
@@ -89,6 +99,7 @@ namespace Foreman
 			Name = name;
 			Categories = new List<string>();
 			AllowedEffects = new List<string>();
+		    UseModules = true;
 		}
 
 		public override string ToString()

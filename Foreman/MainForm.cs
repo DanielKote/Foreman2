@@ -82,7 +82,9 @@ namespace Foreman
 			if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
 			if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
-			DataCache.LoadAllData(null);
+		    if (Properties.Settings.Default.MinersUseModules) MinersUseModulesCheckBox.Checked = true;
+
+            DataCache.LoadAllData(null);
 			
 			LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
 			LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
@@ -647,5 +649,17 @@ namespace Foreman
 				AddRecipeButton.Text = "Add Recipes";
 			}
 		}
-	}
+
+        private void MinersUseModulesCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            GraphViewer.MinersUseModules = ((CheckBox)sender).Checked;
+            Properties.Settings.Default.MinersUseModules = ((CheckBox)sender).Checked;
+            Properties.Settings.Default.Save();
+
+            JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
+            DataCache.LoadAllData(null);
+            GraphViewer.LoadFromJson(savedGraph);
+            UpdateControlValues();
+        }
+    }
 }
