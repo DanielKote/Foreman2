@@ -103,14 +103,14 @@ namespace Foreman
 				}
 
                 lua.DoString(@"
-					function module(modname,...)
-					end
+                    function module(modname,...)
+                    end
 	
-					require ""util""
-					util = {}
-					util.table = {}
-					util.table.deepcopy = table.deepcopy
-					util.multiplystripes = multiplystripes
+                    require ""util""
+                    util = {}
+                    util.table = {}
+                    util.table.deepcopy = table.deepcopy
+                    util.multiplystripes = multiplystripes
                     util.by_pixel = by_pixel
                     util.format_number = format_number
                     util.increment = increment
@@ -1087,7 +1087,7 @@ namespace Foreman
             else if (ReadLuaLuaTable(values, "results", true) == null)
 			{
 			    var table = ReadLuaLuaTable(values, Difficulty);
-                if (table["results"] == null) return results;
+                if (table["result"] == null) return results;
                 String resultName = ReadLuaString(table, "result");
                 float resultCount = ReadLuaFloat(table, "result_count", true);
                 if (resultCount == 0f)
