@@ -58,6 +58,8 @@ namespace Foreman
 
 		public static List<Mod> Mods = new List<Mod>();
 		public static List<Language> Languages = new List<Language>();
+
+	    public static string Difficulty = "normal";
 		
 		public static Dictionary<String, Item> Items = new Dictionary<String, Item>();
 		public static Dictionary<String, Recipe> Recipes = new Dictionary<String, Recipe>();
@@ -100,7 +102,7 @@ namespace Foreman
 					return;
 				}
 
-				lua.DoString(@"
+                lua.DoString(@"
 					function module(modname,...)
 					end
 	
@@ -108,9 +110,28 @@ namespace Foreman
 					util = {}
 					util.table = {}
 					util.table.deepcopy = table.deepcopy
-					util.multiplystripes = multiplystripes");
-								
-				foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
+					util.multiplystripes = multiplystripes
+                    util.by_pixel = by_pixel
+                    util.format_number = format_number
+                    util.increment = increment
+
+                    function log(...)
+                    end
+
+                    defines = {}
+                    defines.difficulty_settings = {}
+                    defines.difficulty_settings.recipe_difficulty = {}
+                    defines.difficulty_settings.technology_difficulty = {}
+                    defines.difficulty_settings.recipe_difficulty.normal = 1
+                    defines.difficulty_settings.technology_difficulty.normal = 1
+                    defines.direction = {}
+                    defines.direction.north = 1
+                    defines.direction.east = 2
+                    defines.direction.south = 3
+                    defines.direction.west = 4
+");
+
+                foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
 				{
 					foreach (Mod mod in Mods.Where(m => m.Enabled))
 					{
@@ -785,7 +806,9 @@ namespace Foreman
 		{
 			try
 			{
-				float time = ReadLuaFloat(values, "energy_required", true, 0.5f);
+			    float time = values[Difficulty] != null
+			        ? ReadLuaFloat(ReadLuaLuaTable(values, Difficulty), "energy_required", true, 0.5f)
+			        : ReadLuaFloat(values, "energy_required", true, 0.5f);
 				Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
 				Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
 
@@ -1061,9 +1084,25 @@ namespace Foreman
 				}
 				results.Add(FindOrCreateUnknownItem(resultName), resultCount);
 			}
+            else if (ReadLuaLuaTable(values, "results", true) == null)
+			{
+			    var table = ReadLuaLuaTable(values, Difficulty);
+                if (table["results"] == null) return results;
+                String resultName = ReadLuaString(table, "result");
+                float resultCount = ReadLuaFloat(table, "result_count", true);
+                if (resultCount == 0f)
+                {
+                    resultCount = 1f;
+                }
+                results.Add(FindOrCreateUnknownItem(resultName), resultCount);
+            }
 			else
 			{
-				var resultEnumerator = ReadLuaLuaTable(values, "results").GetEnumerator();
+                // If we can't read results, try difficulty/results
+			    LuaTable luaTable = ReadLuaLuaTable(values, "results", true) ??
+			                        ReadLuaLuaTable(ReadLuaLuaTable(values, Difficulty), "results");
+
+				var resultEnumerator = luaTable.GetEnumerator();
 				while (resultEnumerator.MoveNext())
 				{
 					LuaTable resultTable = resultEnumerator.Value as LuaTable;
@@ -1110,7 +1149,11 @@ namespace Foreman
 		private static Dictionary<Item, float> extractIngredientsFromLuaRecipe(LuaTable values)
 		{
 			Dictionary<Item, float> ingredients = new Dictionary<Item, float>();
-			var ingredientEnumerator = ReadLuaLuaTable(values, "ingredients").GetEnumerator();
+
+		    LuaTable ingredientsTable = ReadLuaLuaTable(values, "ingredients", true) ??
+		                                ReadLuaLuaTable(ReadLuaLuaTable(values, Difficulty), "ingredients");
+
+			var ingredientEnumerator = ingredientsTable.GetEnumerator();
 			while (ingredientEnumerator.MoveNext())
 			{
 				LuaTable ingredientTable = ingredientEnumerator.Value as LuaTable;
