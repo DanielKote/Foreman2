@@ -806,10 +806,16 @@ namespace Foreman
 		{
 			try
 			{
-			    float time = values[Difficulty] != null
-			        ? ReadLuaFloat(ReadLuaLuaTable(values, Difficulty), "energy_required", true, 0.5f)
-			        : ReadLuaFloat(values, "energy_required", true, 0.5f);
-				Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
+			    var timeSource = values[Difficulty] == null ? values : ReadLuaLuaTable(values, Difficulty, true);
+			    if (timeSource == null)
+			    {
+			        ErrorLogging.LogLine($"Error reading recipe '{name}', unable to locate data table.");
+			        return;
+			    }
+
+			    float time = ReadLuaFloat(timeSource, "energy_required", true, 0.5f);
+
+                Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
 				Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
 
                 if (name == null)
@@ -1074,74 +1080,80 @@ namespace Foreman
 		private static Dictionary<Item, float> extractResultsFromLuaRecipe(LuaTable values)
 		{
 			Dictionary<Item, float> results = new Dictionary<Item, float>();
-			if (values["result"] != null)
+
+		    LuaTable source = null;
+
+		    if (values[Difficulty] == null)
+		        source = values;
+		    else
+		    {
+		        var difficultyTable = ReadLuaLuaTable(values, Difficulty, true);
+		        if (difficultyTable?["result"] != null || difficultyTable?["results"] != null)
+		            source = difficultyTable;
+		    }
+
+			if (source?["result"] != null)
 			{
-				String resultName = ReadLuaString(values, "result");
-				float resultCount = ReadLuaFloat(values, "result_count", true);
+				String resultName = ReadLuaString(source, "result");
+				float resultCount = ReadLuaFloat(source, "result_count", true);
 				if (resultCount == 0f)
 				{
 					resultCount = 1f;
 				}
 				results.Add(FindOrCreateUnknownItem(resultName), resultCount);
 			}
-            else if (ReadLuaLuaTable(values, "results", true) == null)
-			{
-			    var table = ReadLuaLuaTable(values, Difficulty);
-                if (table["result"] == null) return results;
-                String resultName = ReadLuaString(table, "result");
-                float resultCount = ReadLuaFloat(table, "result_count", true);
-                if (resultCount == 0f)
-                {
-                    resultCount = 1f;
-                }
-                results.Add(FindOrCreateUnknownItem(resultName), resultCount);
-            }
 			else
 			{
                 // If we can't read results, try difficulty/results
-			    LuaTable luaTable = ReadLuaLuaTable(values, "results", true) ??
-			                        ReadLuaLuaTable(ReadLuaLuaTable(values, Difficulty), "results");
+			    LuaTable resultsTable = ReadLuaLuaTable(source, "results", true);
 
-				var resultEnumerator = luaTable.GetEnumerator();
-				while (resultEnumerator.MoveNext())
-				{
-					LuaTable resultTable = resultEnumerator.Value as LuaTable;
-					Item result;
-					if (resultTable["name"] != null)
-					{
-						result = FindOrCreateUnknownItem(ReadLuaString(resultTable, "name"));
-					}
-					else
-					{
-						result = FindOrCreateUnknownItem((string)resultTable[1]);
-					}
+			    if (resultsTable != null)
+			    {
+                    var resultEnumerator = resultsTable.GetEnumerator();
+                    while (resultEnumerator.MoveNext())
+                    {
+                        LuaTable resultTable = resultEnumerator.Value as LuaTable;
+                        Item result;
+                        if (resultTable["name"] != null)
+                        {
+                            result = FindOrCreateUnknownItem(ReadLuaString(resultTable, "name"));
+                        }
+                        else
+                        {
+                            result = FindOrCreateUnknownItem((string)resultTable[1]);
+                        }
 
-					float amount = 0f;
-					if (resultTable["amount"] != null)
-					{
-						amount = ReadLuaFloat(resultTable, "amount");
-					}
-					else if (resultTable["amount_min"] != null)
-					{
-						float probability = ReadLuaFloat(resultTable, "probability", true, 1f);
-						float amount_min = ReadLuaFloat(resultTable, "amount_min");
-						float amount_max = ReadLuaFloat(resultTable, "amount_max");
-						amount = ((amount_min + amount_max) / 2f) * probability;		//Just the average yield. Maybe in the future it should show more information about the probability
-					}
-					else
-					{
-						amount = Convert.ToSingle(resultTable[2]);
-					}
-					
-					if (results.ContainsKey(result))
-					{
-						results[result] += amount;
-					}
-					else
-					{
-						results.Add(result, amount);
-					}					
-				}
+                        float amount = 0f;
+                        if (resultTable["amount"] != null)
+                        {
+                            amount = ReadLuaFloat(resultTable, "amount");
+                        }
+                        else if (resultTable["amount_min"] != null)
+                        {
+                            float probability = ReadLuaFloat(resultTable, "probability", true, 1f);
+                            float amount_min = ReadLuaFloat(resultTable, "amount_min");
+                            float amount_max = ReadLuaFloat(resultTable, "amount_max");
+                            amount = ((amount_min + amount_max) / 2f) * probability;        //Just the average yield. Maybe in the future it should show more information about the probability
+                        }
+                        else
+                        {
+                            amount = Convert.ToSingle(resultTable[2]);
+                        }
+
+                        if (results.ContainsKey(result))
+                        {
+                            results[result] += amount;
+                        }
+                        else
+                        {
+                            results.Add(result, amount);
+                        }
+                    }
+                }
+			    else
+			    {
+			        ErrorLogging.LogLine($"Error reading results from {values}.");
+			    }
 			}
 			return results;
 		}
