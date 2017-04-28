@@ -779,7 +779,21 @@ namespace Foreman
 				return;
 			}
 			Item newItem = new Item(name);
-			newItem.Icon = LoadImage(ReadLuaString(values, "icon", true));
+            var filename = ReadLuaString(values, "icon", true);
+            if (filename == null)
+            {
+                var icons = ReadLuaLuaTable(values, "icons", true);
+                if (icons != null)
+                {
+                    // TODO: Figure out how to either composite multiple icons
+                    var first = (LuaTable)icons[1];
+                    if (first != null)
+                    {
+                        filename = ReadLuaString(first, "icon", true);
+                    }
+                }
+            }
+			newItem.Icon = LoadImage(filename);
 
 			if (!Items.ContainsKey(name))
 			{
