@@ -1137,6 +1137,9 @@ namespace Foreman
                         if (resultTable["amount"] != null)
                         {
                             amount = ReadLuaFloat(resultTable, "amount");
+                            //Just the average yield. Maybe in the future it should show more information about the probability
+                            var probability = ReadLuaFloat(resultTable, "probability", true, 1.0f);
+                            amount *= probability;
                         }
                         else if (resultTable["amount_min"] != null)
                         {
