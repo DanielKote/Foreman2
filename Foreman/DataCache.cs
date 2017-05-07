@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
+using System.Threading;
 
 namespace Foreman
 {
@@ -78,14 +79,14 @@ namespace Foreman
 
 		public static Dictionary<String, byte[]> zipHashes = new Dictionary<string, byte[]>();
 
-		public static void LoadAllData(List<String> enabledMods, BackgroundWorker worker)
+		public static void LoadAllData(List<String> enabledMods, CancellableProgress progress)
 		{
 			Clear();
 
-            worker.ReportProgress(0);
+            progress.Report(0);
 			using (Lua lua = new Lua())
 			{
-				FindAllMods(enabledMods, worker);
+				FindAllMods(enabledMods, progress);
 				AddLuaPackagePath(lua, Path.Combine(DataPath, "core", "lualib")); //Core lua functions
 				String basePackagePath = lua["package.path"] as String;
 
@@ -223,7 +224,7 @@ namespace Foreman
 			}
 
 			MarkCyclicRecipes();
-            worker.ReportProgress(100);
+            progress.Report(100);
 
 			ReportErrors();
 		}
@@ -446,22 +447,22 @@ namespace Foreman
             }
         }
 
-        private static void reportingProgress<T>(BackgroundWorker worker, IEnumerable<T> xs, Action<T> f) {
+        private static void reportingProgress<T>(CancellableProgress progress, IEnumerable<T> xs, Action<T> f) {
             float total = xs.Count();
             float i = 0;
             foreach (T x in xs)
             {
-                if (worker.CancellationPending)
+                if (progress.IsCancellationRequested)
                 {
                     break;
                 }
                 f.Invoke(x);
                 i += 1;
-                worker.ReportProgress((int)(i / total * 100));
+                progress.Report((int)(i / total * 100));
             }
         }
 
-		private static void FindAllMods(List<String> enabledMods, BackgroundWorker worker) //Vanilla game counts as a mod too.
+		private static void FindAllMods(List<String> enabledMods, CancellableProgress progress) //Vanilla game counts as a mod too.
 		{
             String modPath = Properties.Settings.Default.FactorioModPath;
             IEnumerable<ModOnDisk> mods = ModOnDisk.Empty();
@@ -470,7 +471,7 @@ namespace Foreman
             mods = mods.Concat(ModOnDisk.EnumerateDirectories(modPath));
             mods = mods.Concat(ModOnDisk.EnumerateZips(modPath));
 
-            reportingProgress(worker, mods, mod =>
+            reportingProgress(progress, mods, mod =>
             {
                 switch (mod.Type) {
                     case ModOnDisk.ModType.DIRECTORY:
@@ -482,7 +483,7 @@ namespace Foreman
                 }
             });
 
-            if (worker.CancellationPending)
+            if (progress.IsCancellationRequested)
             {
                 return;
             }

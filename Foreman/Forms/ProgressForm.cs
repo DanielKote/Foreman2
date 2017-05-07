@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman
@@ -12,35 +14,35 @@ namespace Foreman
     public partial class ProgressForm : Form
     {
         private List<string> enabledMods;
-        private bool workerCompleted;
+        private CancellationTokenSource cts; 
 
         public ProgressForm()
         {
+            this.cts = new CancellationTokenSource();
             InitializeComponent();
         }
 
-        public ProgressForm(List<string> enabledMods)
+        public ProgressForm(List<string> enabledMods) : base()
         {
             this.enabledMods = enabledMods;
-            InitializeComponent();
         }
 
-        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        private async void ProgressForm_Load(object sender, EventArgs e)
         {
-            BackgroundWorker worker = sender as BackgroundWorker;
-			DataCache.LoadAllData(this.enabledMods, worker);
-            if (worker.CancellationPending)
+            var progressHandler = new Progress<int>(value =>
             {
-                e.Cancel = true;
-            }
-        }
+                progressBar.Value = value;
+            });
+            var progress = progressHandler as IProgress<int>;
+            var token = cts.Token;
 
-        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            Console.WriteLine(e.Cancelled);
-            if (e.Cancelled)
+            await Task.Run(() =>
             {
-                Console.WriteLine("Cancelled");
+                DataCache.LoadAllData(this.enabledMods, new CancellableProgress(progress, token));
+            });
+
+            if (token.IsCancellationRequested)
+            {
                 DataCache.Clear();
                 DialogResult = DialogResult.Cancel;
             }
@@ -48,29 +50,14 @@ namespace Foreman
             {
                 DialogResult = DialogResult.OK;
             }
-            this.workerCompleted = true;
 			Close();
-        }
-
-        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            progressBar.Value = e.ProgressPercentage;
-        }
-
-        private void ProgressForm_Load(object sender, EventArgs e)
-        {
-            backgroundWorker.RunWorkerAsync();
         }
 
         // This event currently won't occur, since we hid the window controls for the dialog.
         // Other parts of the system (at least, save/load) don't handle cancellation well and can raise errors.
         private void ProgressForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!this.workerCompleted)
-            {
-                backgroundWorker.CancelAsync();
-                e.Cancel = true;
-            }
+            cts.Cancel();
         }
     }
 }
