@@ -72,7 +72,13 @@ namespace Foreman
 
             this.nodes.Add(node);
 
-            // The rate of all nodes should be minimized
+            // The rate of all nodes should be minimized.
+            //
+            // TODO: There is a tension between minimizing supply and minimizing time to produce that
+            // I suspect is not explicitly handled well here. That will likely result in "unexpected"
+            // results depending on which the user is wanting. Need to figure out concrete examples
+            // of where this would happen. With sufficiently large error co-efficients it's probably
+            // fine for most real world recipes?
             objective.SetCoefficient(x, 1.0);
         }
 
@@ -164,7 +170,10 @@ namespace Foreman
                 // Minimize over-supply. Necessary for unbalanced diamond recipe chains (such as
                 // Yuoki smelting - this doesn't occur in Vanilla) where the deficit is made up by an
                 // infinite supplier, in order to not just grab everything from that supplier and let
-                // produced materials backup.
+                // produced materials backup. Also, this is needed so that resources don't "pool" in
+                // pass-through nodes.
+                //
+                // TODO: A more correct solution for pass-through would be to forbid over-supply on them.
                 {
                     var constraint = MakeConstraint(0, 0);
                     constraint.SetCoefficient(errorVariable, 1);
@@ -173,7 +182,7 @@ namespace Foreman
 
                     // The cost of over-supply needs to be greater than benefit of minimizing rate,
                     // other-wise pure consumption nodes won't consume anything.
-                    objective.SetCoefficient(errorVariable, 1.1);
+                    objective.SetCoefficient(errorVariable, 100);
                 }
             }
         }

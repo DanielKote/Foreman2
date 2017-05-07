@@ -52,6 +52,13 @@ namespace ForemanTest
             return node;
         }
 
+        internal SingletonNodeBuilder Passthrough(string item)
+        {
+            var node = new SingletonNodeBuilder(PassthroughNode.Create).Item(item);
+            this.nodes.Add(node);
+            return node;
+        }
+
         // Link the provided nodes by automatically matching up inputs to outputs.
         // The same builder can be passed to multiple different invocations, to enable building of complex graphs.
         internal void Link(params ProductionNodeBuilder[] nodeBuilders)

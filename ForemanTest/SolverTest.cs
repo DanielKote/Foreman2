@@ -330,7 +330,7 @@ namespace ForemanTest
             GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
 
             AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
-            AssertFloatsAreEqual(25, data.RecipeInputRate("furnace", "Ore"));
+            AssertFloatsAreEqual(20, data.RecipeInputRate("furnace", "Ore"));
         }
 
         [TestMethod]
@@ -432,6 +432,96 @@ namespace ForemanTest
 
             // 10 plate generates 2 acid, so 8 should come from supply
             AssertFloatsAreEqual(8, data.SupplyRate("Acid"));
+        }
+
+        [TestMethod]
+        public void TestPassThroughDoesNotAlterSolve()
+        {
+            // This regression was reported in
+            // https://bitbucket.org/Nicksaurus/foreman/pull-requests/17/do-not-merge-progress-modal-new-solver/diff#comment-36282209.
+            // In particular, resources were "pooling" in the passthrough node and extra refinery
+            // cycles were being used, rather than using the cracking (which is what happens without
+            // the passthrough node - the cases should be equivalent). There is likely a more minimal
+            // test case, though I couldn't figure one out.
+            var builderA = GraphBuilder.Create();
+            var builderB = GraphBuilder.Create();
+
+            GraphBuilder[] builders = { builderA, builderB };
+            bool[] addPassthroughs = { false, true };
+
+            foreach (var tuple in builders.Zip(addPassthroughs, (a, b) => Tuple.Create(a, b)))
+            {
+                var builder = tuple.Item1;
+                var usePassthrough = tuple.Item2;
+
+                var waterSupply = builder.Supply("Water");
+                var oilSupply = builder.Supply("Oil");
+
+                var refining = builder.Recipe()
+                    .Input("Water", 5).Input("Oil", 10)
+                    .Output("Heavy", 1).Output("Light", 4.5f).Output("Gas", 5.5f);
+
+                var heavyCracking = builder.Recipe("Cracking")
+                    .Input("Heavy", 4).Input("Water", 3)
+                    .Output("Light", 3);
+
+                var lightCracking = builder.Recipe()
+                    .Input("Light", 3).Input("Water", 3)
+                    .Output("Gas", 2);
+
+
+                var target = builder.Consumer("Gas").Target(12);
+
+                if (usePassthrough)
+                {
+                    builder.Link(
+                        oilSupply,
+                        refining,
+                        builder.Passthrough("Heavy"),
+                        heavyCracking,
+                        lightCracking,
+                        target
+                    );
+                } else
+                {
+                    builder.Link(
+                        oilSupply,
+                        refining,
+                        heavyCracking,
+                        lightCracking,
+                        target
+                    );
+                }
+
+                GraphBuilder.RecipeBuilder[] recipes = { refining, heavyCracking, lightCracking };
+                foreach (var x in recipes) {
+                    builder.Link(
+                        waterSupply,
+                        x
+                    );
+                }
+
+                builder.Link(
+                    refining,
+                    lightCracking
+                );
+
+                builder.Link(
+                    refining,
+                    target
+                );
+            }
+
+            var dataA = builderA.Build();
+            var dataB = builderB.Build();
+
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(dataA.Graph);
+            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(dataB.Graph);
+
+            AssertFloatsAreEqual(12, dataA.ConsumedRate("Gas"));
+            AssertFloatsAreEqual(12, dataB.ConsumedRate("Gas"));
+            AssertFloatsAreEqual(dataA.RecipeInputRate("Cracking", "Heavy"), dataB.RecipeInputRate("Cracking", "Heavy"));
+            AssertFloatsAreEqual(dataA.SupplyRate("Oil"), dataB.SupplyRate("Oil"));
         }
 
         private void AssertFloatsAreEqual(double expected, double actual)
