@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using Foreman.Properties;
 
 namespace Foreman
 {
@@ -102,6 +103,8 @@ namespace Foreman
 					return;
 				}
 
+			    
+
                 lua.DoString(@"
                     function module(modname,...)
                     end
@@ -130,6 +133,9 @@ namespace Foreman
                     defines.direction.south = 3
                     defines.direction.west = 4
 ");
+
+                var modSettingsLua = ReadModSettings();
+			    lua.DoString(modSettingsLua);
 
                 foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
 				{
@@ -249,7 +255,38 @@ namespace Foreman
 			ReportErrors();
 		}
 
-		private static void LoadAllLanguages()
+	    private static string ReadModSettings()
+	    {
+	        var settingsFile = Path.Combine(Properties.Settings.Default.FactorioPath, "mod-settings.json");
+
+	        if (!File.Exists(settingsFile))
+	            return String.Empty;
+
+            JObject settings = JObject.Parse(File.ReadAllText(settingsFile));
+            var sb = new StringBuilder();
+
+	        var startup = settings.First.First.Children();
+
+	        sb.AppendLine("settings = {}");
+	        sb.AppendLine("settings.startup = {}");
+
+	        const string braces = @"{}";
+
+	        foreach (var x in startup)
+	        {
+	            if (!(x is JProperty)) continue;
+	            var p = (JProperty) x;
+	            var format = $"settings.startup[\"{p.Name}\"]";
+	            sb.AppendLine($"{format} = {braces}");
+	            var valprop = (JProperty) p.Value.First;
+	            var value = $"{format}.value = {valprop.Value.ToString().ToLower()}";
+	            sb.AppendLine(value);
+	        }
+
+	        return sb.ToString();
+	    }
+
+	    private static void LoadAllLanguages()
 		{
 			var dirList = Directory.EnumerateDirectories(Path.Combine(Mods.First(m => m.Name == "core").dir, "locale"));
 
