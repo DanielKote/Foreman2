@@ -259,6 +259,9 @@ namespace Foreman
 	    {
 	        var settingsFile = Path.Combine(Properties.Settings.Default.FactorioPath, "mod-settings.json");
 
+            if (!File.Exists(settingsFile))
+                settingsFile = Path.Combine("%appdata%", "Factorio", "mod-settings.json");
+
 	        if (!File.Exists(settingsFile))
 	            return String.Empty;
 
