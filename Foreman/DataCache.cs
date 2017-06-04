@@ -257,21 +257,22 @@ namespace Foreman
 
 	    private static string ReadModSettings()
 	    {
-	        var settingsFile = Path.Combine(Properties.Settings.Default.FactorioPath, "mod-settings.json");
+            var sb = new StringBuilder();
+            sb.AppendLine("settings = {}");
+            sb.AppendLine("settings.startup = {}");
 
-            if (!File.Exists(settingsFile))
-                settingsFile = Path.Combine("%appdata%", "Factorio", "mod-settings.json");
+            var settingsFile = Path.Combine(Properties.Settings.Default.FactorioModPath, "mod-settings.json");
 
 	        if (!File.Exists(settingsFile))
-	            return String.Empty;
+	        {
+                ErrorLogging.LogLine($"Unable to find mod-settings.json: {settingsFile}");
+	            return sb.ToString();
+	        }
 
-            JObject settings = JObject.Parse(File.ReadAllText(settingsFile));
-            var sb = new StringBuilder();
+	        JObject settings = JObject.Parse(File.ReadAllText(settingsFile));
+            
 
-	        var startup = settings.First.First.Children();
-
-	        sb.AppendLine("settings = {}");
-	        sb.AppendLine("settings.startup = {}");
+            var startup = settings.First.First.Children();
 
 	        const string braces = @"{}";
 
