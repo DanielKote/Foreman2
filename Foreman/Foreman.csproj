@@ -88,6 +88,7 @@
     <Compile Include="EnableDisableItems.Designer.cs">
       <DependentUpon>EnableDisableItems.cs</DependentUpon>
     </Compile>
+    <Compile Include="FactorioPropertyTree.cs" />
     <Compile Include="GhostNodeElement.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="ErrorLogging.cs" />
