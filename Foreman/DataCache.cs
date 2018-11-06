@@ -295,8 +295,23 @@ namespace Foreman
                 var format = $"settings.startup[\"{x.Key}\"]";
                 sb.AppendLine($"{format} = {braces}");
                 var valPropTree = ((Dictionary<string, FactorioPropertyTree>)x.Value.Content)["value"].Content;
-                var value = $"{format}.value = {valPropTree.ToString().ToLower()}";
-                sb.AppendLine(value);
+                var type = valPropTree.GetType();
+                var value = "";
+                if (type.Name == "String")
+                {
+                    value = '"' + valPropTree.ToString() + '"';
+                }
+                else if (type.Name == "Boolean" || type.Name == "Double" || type.Name == "Float" || type.Name == "Integer")
+                {
+                    value = valPropTree.ToString();
+                }
+                else
+                {
+                    throw new Exception($"Unknown type {type.Name} found while parsing settings for key {x.Key}");
+                }
+                
+                var assignment = $"{format}.value = {value}";
+                sb.AppendLine(assignment);
             }
 
             return sb.ToString();
