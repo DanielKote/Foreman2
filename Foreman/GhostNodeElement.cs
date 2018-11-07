@@ -58,7 +58,7 @@ namespace Foreman
 				}
 				Point position = Point.Subtract(OffsetOrder[i], new Size(iconSize / 2, iconSize / 2));
 				int scale = Convert.ToInt32(iconSize / Parent.ViewScale);
-				graphics.DrawImage(icon, position.X, position.Y, scale, scale);
+				graphics.DrawImage(icon ?? DataCache.UnknownIcon, position.X, position.Y, scale, scale);
 				i++;
 			}
 

@@ -84,7 +84,29 @@ namespace Foreman
             if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
             if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
+	    switch (Properties.Settings.Default.FactorioDifficulty)
+		    {
+                case "normal":
+                    DataCache.Difficulty = "normal";
+                    NormalDifficultyRadioButton.Checked = true;
+                    break;
+                case "expensive":
+                    DataCache.Difficulty = "expensive";
+                    ExpensiveDifficultyRadioButton.Checked = true;
+                    break;
+                default:
+                    Properties.Settings.Default.FactorioDifficulty = "normal";
+                    Properties.Settings.Default.Save();
+                    DataCache.Difficulty = "normal";
+                    NormalDifficultyRadioButton.Checked = true;
+		            break;
+		    }
+
             ReloadFactorioData();
+
+            // Register after loading settings to prevent an unnessecary data reload.
+            NormalDifficultyRadioButton.CheckedChanged += DifficultyChanged;
+            ExpensiveDifficultyRadioButton.CheckedChanged += DifficultyChanged;
 
             LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
             LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
@@ -643,5 +665,26 @@ namespace Foreman
 				AddRecipeButton.Text = "Add Recipes";
 			}
 		}
+
+        private void DifficultyChanged(object sender, EventArgs e)
+        {
+            var currentDifficulty = DataCache.Difficulty;
+
+            if (NormalDifficultyRadioButton.Checked)
+                DataCache.Difficulty = "normal";
+            else if (ExpensiveDifficultyRadioButton.Checked)
+                DataCache.Difficulty = "expensive";
+
+            if (currentDifficulty == DataCache.Difficulty)
+                return;
+
+            Properties.Settings.Default.FactorioDifficulty = DataCache.Difficulty;
+            Properties.Settings.Default.Save();
+
+            JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
+            ReloadFactorioData();
+            GraphViewer.LoadFromJson(savedGraph);
+            UpdateControlValues();
+        }
     }
 }
