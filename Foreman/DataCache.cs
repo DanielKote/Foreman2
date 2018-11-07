@@ -851,10 +851,15 @@ namespace Foreman
             if (fileName == null)
             {
                 var icons = ReadLuaLuaTable(values, "icons", true);
-                // TODO: Figure out how to either composite multiple icons
-                var first = (LuaTable)icons?[1];
-                if (first != null)
-                    fileName = ReadLuaString(first, "icon", true);
+                if (icons != null)
+                {
+                    // TODO: Figure out how to either composite multiple icons
+                    var first = (LuaTable)icons?[1];
+                    if (first != null)
+                    {
+                        fileName = ReadLuaString(first, "icon", true);
+                    }
+                }
             }
 
             newItem.Icon = LoadImage(fileName);
