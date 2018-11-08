@@ -470,8 +470,8 @@ namespace Foreman
         {
             try
             {
-                string luaCommand = String.Format("package.path = package.path .. ';{0}{1}?.lua'", dir, Path.DirectorySeparatorChar);
-                luaCommand = luaCommand.Replace("\\", "\\\\");
+                string escapedDir = (dir + Path.DirectorySeparatorChar).Replace(@"\", @"\\").Replace("'", @"\'");
+                string luaCommand = String.Format("package.path = package.path .. ';{0}?.lua'", escapedDir);
                 lua.DoString(luaCommand);
             }
             catch (Exception e)
