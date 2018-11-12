@@ -35,17 +35,47 @@ namespace Foreman
 
             if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
             {
+                List<FoundInstallation> installations = new List<FoundInstallation>();
+                String steamFolder = Path.Combine("Steam", "steamapps", "common");
                 foreach (String defaultPath in new String[]{
-                                                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
-                                                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
-                                                  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
+                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), steamFolder, "Factorio"),
+                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), steamFolder, "Factorio"),
+                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
+                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
+                  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
                 {
                     if (Directory.Exists(defaultPath))
                     {
-                        Properties.Settings.Default["FactorioPath"] = defaultPath;
-                        Properties.Settings.Default.Save();
-                        break;
+                        FoundInstallation inst = FoundInstallation.GetInstallationFromPath(defaultPath);
+                        if (inst != null)
+                            installations.Add(inst);
                     }
+                }
+
+                if (installations.Count > 0)
+                {
+                    if (installations.Count > 1)
+                    {
+                        using (InstallationChooserForm form = new InstallationChooserForm(installations))
+                        {
+                            if (form.ShowDialog() == DialogResult.OK && form.SelectedPath != null)
+                            {
+                                Properties.Settings.Default["FactorioPath"] = form.SelectedPath;
+                            }
+                            else
+                            {
+                                Close();
+                                Dispose();
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Properties.Settings.Default["FactorioPath"] = installations[0].path;
+                    }
+
+                    Properties.Settings.Default.Save();
                 }
             }
 

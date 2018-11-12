@@ -86,7 +86,7 @@ namespace Foreman
         {
             Clear();
 
-	    progress.Report(0);
+	        progress.Report(0);
             using (Lua lua = new Lua())
             {
                 FindAllMods(enabledMods);
