@@ -89,7 +89,7 @@ namespace Foreman
 	        progress.Report(0);
             using (Lua lua = new Lua())
             {
-                FindAllMods(enabledMods);
+                FindAllMods(enabledMods, progress);
 
                 AddLuaPackagePath(lua, Path.Combine(DataPath, "core", "lualib")); //Core lua functions
                 String basePackagePath = lua["package.path"] as String;
@@ -157,8 +157,6 @@ namespace Foreman
                         String dataFile = Path.Combine(mod.dir, filename);
                         if (File.Exists(dataFile))
                         {
-
-
                             try
                             {
                                 lua.DoFile(dataFile);
@@ -521,7 +519,7 @@ namespace Foreman
             }
         }
 
-        private static void reportingProgress<T>(CancellableProgress progress, IEnumerable<T> xs, Action<T> f) {
+        private static void reportingProgress<T>(CancellableProgress progress, int percentCoverage, IEnumerable<T> xs, Action<T> f) {
             float total = xs.Count();
             float i = 0;
             foreach (T x in xs)
@@ -532,7 +530,7 @@ namespace Foreman
                 }
                 f.Invoke(x);
                 i += 1;
-                progress.Report((int)(i / total * 100));
+                progress.Report((int)(i / total * percentCoverage));
             }
         }
 
@@ -545,7 +543,7 @@ namespace Foreman
             mods = mods.Concat(ModOnDisk.EnumerateDirectories(modPath));
             mods = mods.Concat(ModOnDisk.EnumerateZips(modPath));
 
-            reportingProgress(progress, mods, mod =>
+            reportingProgress(progress, 50, mods, mod =>
             {
                 switch (mod.Type) {
                     case ModOnDisk.ModType.DIRECTORY:
@@ -560,46 +558,6 @@ namespace Foreman
             if (progress.IsCancellationRequested)
             {
                 return;
-            }
-        }
-
-        private static IEnumerable<String> getAllLuaFiles()
-        {
-            if (Directory.Exists(ModPath))
-            {
-                foreach (String file in Directory.GetFiles(DataPath, "*.lua", SearchOption.AllDirectories))
-                {
-                    yield return file;
-                }
-            }
-            if (Directory.Exists(ModPath))
-            {
-                foreach (String file in Directory.GetFiles(ModPath, "*.lua", SearchOption.AllDirectories))
-                {
-                    yield return file;
-                }
-            }
-        }
-
-        private static void FindAllMods(List<String> enabledMods) //Vanilla game counts as a mod too.
-        {
-            if (Directory.Exists(DataPath))
-            {
-                foreach (String dir in Directory.EnumerateDirectories(DataPath))
-                {
-                    ReadModInfoFile(dir);
-                }
-            }
-            if (Directory.Exists(Properties.Settings.Default.FactorioModPath))
-            {
-                foreach (String dir in Directory.EnumerateDirectories(Properties.Settings.Default.FactorioModPath))
-                {
-                    ReadModInfoFile(dir);
-                }
-                foreach (String zipFile in Directory.EnumerateFiles(Properties.Settings.Default.FactorioModPath, "*.zip"))
-                {
-                    ReadModInfoZip(zipFile);
-                }
             }
 
             Dictionary<String, bool> enabledModsFromFile = new Dictionary<string, bool>();
@@ -652,6 +610,26 @@ namespace Foreman
             DependencyGraph modGraph = new DependencyGraph(Mods);
             modGraph.DisableUnsatisfiedMods();
             Mods = modGraph.SortMods();
+
+            progress.Report(75);
+        }
+
+        private static IEnumerable<String> getAllLuaFiles()
+        {
+            if (Directory.Exists(ModPath))
+            {
+                foreach (String file in Directory.GetFiles(DataPath, "*.lua", SearchOption.AllDirectories))
+                {
+                    yield return file;
+                }
+            }
+            if (Directory.Exists(ModPath))
+            {
+                foreach (String file in Directory.GetFiles(ModPath, "*.lua", SearchOption.AllDirectories))
+                {
+                    yield return file;
+                }
+            }
         }
 
         private static void ReadModInfoFile(String dir)
