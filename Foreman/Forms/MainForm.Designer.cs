@@ -283,7 +283,7 @@
             // AssemblerDisplayCheckBox
             // 
             this.AssemblerDisplayCheckBox.AutoSize = true;
-            this.AssemblerDisplayCheckBox.Enabled = false;
+            this.AssemblerDisplayCheckBox.Enabled = true;
             this.AssemblerDisplayCheckBox.Location = new System.Drawing.Point(7, 20);
             this.AssemblerDisplayCheckBox.Name = "AssemblerDisplayCheckBox";
             this.AssemblerDisplayCheckBox.Size = new System.Drawing.Size(116, 17);
