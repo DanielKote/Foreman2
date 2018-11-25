@@ -22,7 +22,7 @@ namespace Foreman
             InitializeComponent();
         }
 
-        public ProgressForm(List<string> enabledMods) : base()
+        public ProgressForm(List<string> enabledMods) : this()
         {
             this.enabledMods = enabledMods;
         }

@@ -966,6 +966,9 @@ namespace Foreman
                 Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
                 Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
 
+                if (results == null)
+                    return;
+
                 if (name == null)
                     name = results.ElementAt(0).Key.Name;
                 Recipe newRecipe = new Recipe(name, time == 0.0f ? defaultRecipeTime : time, ingredients, results);
@@ -1191,11 +1194,11 @@ namespace Foreman
                     return;
                 }
 
-		LuaTable productivity = ReadLuaLuaTable(effectTable, "productivity", true);
-		if (productivity != null)
-		{
-			productivityBonus = ReadLuaFloat(productivity, "bonus", true, -1f);
-		}
+                LuaTable productivity = ReadLuaLuaTable(effectTable, "productivity", true);
+                if (productivity != null)
+                {
+                    productivityBonus = ReadLuaFloat(productivity, "bonus", true, -1f);
+                }
 
                 var limitations = ReadLuaLuaTable(values, "limitation", true);
                 List<String> allowedIn = null;
@@ -1256,6 +1259,12 @@ namespace Foreman
                 var difficultyTable = ReadLuaLuaTable(values, Difficulty, true);
                 if (difficultyTable?["result"] != null || difficultyTable?["results"] != null)
                     source = difficultyTable;
+            }
+
+            if (source == null)
+            {
+                ErrorLogging.LogLine($"Error reading results from {values}.");
+                return null;
             }
 
             if (source?["result"] != null)
