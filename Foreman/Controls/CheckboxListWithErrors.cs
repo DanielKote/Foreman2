@@ -16,6 +16,7 @@ namespace Foreman
         public CheckboxListWithErrors()
         {
             this.tooltip = new ToolTip();
+            this.tooltip.InitialDelay = 200;
         }
 
         public void setError(int index, string error)
@@ -45,21 +46,28 @@ namespace Foreman
             base.OnDrawItem(tweakedEventArgs);
         }
 
-        protected override void OnMouseHover(EventArgs e)
+        protected override void OnMouseMove(MouseEventArgs e)
         {
-            int newIndex = this.IndexFromPoint(this.PointToClient(MousePosition));
+            int newIndex = this.IndexFromPoint(e.Location);
             if (tooltipIndex != newIndex)
-                ShowToolTip(newIndex);
+            {
+                UpdateToolTip(newIndex);
+            }
 
-            base.OnMouseHover(e);
+            base.OnMouseMove(e);
         }
 
-        private void ShowToolTip(int newIndex)
+        private void UpdateToolTip(int newIndex)
         {
             tooltipIndex = newIndex;
             if (tooltipIndex > -1 && errors.ContainsKey(tooltipIndex))
             {
+                tooltip.Active = true;
                 tooltip.SetToolTip(this, errors[tooltipIndex]);
+            }
+            else
+            {
+                tooltip.Active = false;
             }
         }
     }
