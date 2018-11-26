@@ -115,6 +115,9 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="AssemblerBox.cs" />
     <Compile Include="CancellableProgress.cs" />
+    <Compile Include="Controls\CheckboxListWithErrors.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -209,6 +212,9 @@
       <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ZipStorer.cs" />
+    <EmbeddedResource Include="Controls\CheckboxListWithErrors.resx">
+      <DependentUpon>CheckboxListWithErrors.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ChooserControl.resx">
       <DependentUpon>ChooserControl.cs</DependentUpon>
     </EmbeddedResource>
