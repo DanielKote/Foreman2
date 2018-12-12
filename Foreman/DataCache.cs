@@ -106,9 +106,26 @@ namespace Foreman
                     return;
                 }
 
-
-
+                // Added a custom require function to support relative paths (angels refining was using this and a few others)
                 lua.DoString(@"
+                    local oldrequire = require
+
+                    function relative_require(modname)
+                      local regular_loader = package.searchers[2]
+                      local loader = function(inner)
+                        if string.match(modname, '(.*)%.') then
+                          return regular_loader(string.match(modname, '(.*)%.') .. '.' .. inner)
+                        end
+                      end
+
+                      table.insert(package.searchers, 1, loader)
+                      local retval = oldrequire(modname)
+                      table.remove(package.searchers, 1)
+
+                      return retval
+                    end
+                    _G.require = relative_require
+
                     function module(modname,...)
                     end
 	
