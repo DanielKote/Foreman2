@@ -710,7 +710,17 @@ namespace Foreman
 
         private static void ReadModInfoZip(String zipFile)
         {
-            UnzipMod(zipFile);
+            // Ran into a mod with a file that had a modified timestamp that causes the UnZip to fail. Not much we can do besides skip that mod.
+            // TODO: Should report
+            try
+            {
+                UnzipMod(zipFile);
+            }
+            catch (Exception e)
+            {
+                ErrorLogging.LogLine(String.Format("The mod with zip file '{0}' could not be extracted. Error: {1}", zipFile, e.Message));
+                return;
+            }
 
             String file = Directory.EnumerateFiles(Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile)), "info.json", SearchOption.AllDirectories).FirstOrDefault();
             if (String.IsNullOrWhiteSpace(file))
