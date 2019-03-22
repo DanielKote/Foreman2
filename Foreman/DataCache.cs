@@ -302,6 +302,11 @@ namespace Foreman
                 patch = reader.ReadUInt16();
                 dev = reader.ReadUInt16();
 
+                if (minor == 17)
+                {
+                    var noop = reader.ReadByte();
+                }
+
                 propTree = FactorioPropertyTree.Read(reader);
             }
 
