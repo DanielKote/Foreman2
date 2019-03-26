@@ -610,7 +610,8 @@ namespace Foreman
                 foreach (String s in Properties.Settings.Default.EnabledMods)
                 {
                     var split = s.Split('|');
-                    splitModStrings.Add(split[0], split[1]);
+                    if (!splitModStrings.ContainsKey(split[0]))
+                        splitModStrings.Add(split[0], split[1]);
                 }
                 foreach (Mod mod in Mods)
                 {
@@ -685,38 +686,30 @@ namespace Foreman
                 }
             }
 
-            if (zipHashes.ContainsKey(fullPath))
-            {
-                if (!zipHashes[fullPath].SequenceEqual(hash))
-                {
-                    needsExtraction = true;
-                    zipHashes[fullPath] = hash;
-                }
-            }
-            else
-            {
+            if (!zipHashes.ContainsKey(fullPath) || !zipHashes[fullPath].SequenceEqual(hash))
                 needsExtraction = true;
-                zipHashes.Add(fullPath, hash);
-            }
-
-            String outputDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(modZipFile));
 
             if (needsExtraction)
             {
                 using (ZipStorer zip = ZipStorer.Open(modZipFile, FileAccess.Read))
                 {
+                    String outputDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(modZipFile));
                     foreach (var fileEntry in zip.ReadCentralDir())
                     {
                         zip.ExtractFile(fileEntry, Path.Combine(outputDir, fileEntry.FilenameInZip));
                     }
                 }
+
+                if (zipHashes.ContainsKey(fullPath))
+                    zipHashes[fullPath] = hash;
+                else
+                    zipHashes.Add(fullPath, hash);
             }
         }
 
         private static void ReadModInfoZip(String zipFile)
         {
             // Ran into a mod with a file that had a modified timestamp that causes the UnZip to fail. Not much we can do besides skip that mod.
-            // TODO: Should report
             try
             {
                 UnzipMod(zipFile);
@@ -738,6 +731,12 @@ namespace Foreman
         private static void ReadModInfo(String json, String dir)
         {
             Mod newMod = JsonConvert.DeserializeObject<Mod>(json);
+            if (Mods.Any(m => m.Name == newMod.Name))
+            {
+                ErrorLogging.LogLine(String.Format("Duplicate installed mod found '{0}' ignoring duplicate.", newMod.Name));
+                return;
+            }
+            
             newMod.dir = dir;
 
             if (!Version.TryParse(newMod.version, out newMod.parsedVersion))

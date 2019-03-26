@@ -51,7 +51,7 @@ namespace Foreman
                 }
             }
 
-            ModSelectionBox.Items.AddRange(DataCache.Mods.ToArray());
+            ModSelectionBox.Items.AddRange(DataCache.Mods.OrderBy<Mod, string>(m => m.Name).ToArray());
             ModSelectionBox.DisplayMember = "name";
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
             {

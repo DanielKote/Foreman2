@@ -49,7 +49,7 @@
             this.MaximizeBox = false;
             this.Name = "ProgressForm";
             this.Text = "Loading Factorio Data...";
-            this.TopMost = true;
+            this.TopMost = false;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ProgressForm_FormClosing);
             this.Load += new System.EventHandler(this.ProgressForm_Load);
             this.ResumeLayout(false);
