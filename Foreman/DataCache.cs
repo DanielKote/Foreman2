@@ -803,8 +803,6 @@ namespace Foreman
         {
             LuaTable itemTable = lua.GetTable("data.raw")[typeName] as LuaTable;
 
-            var table = lua.GetTable("data.raw")["solar-panel"] as LuaTable;
-
             if (itemTable != null)
             {
                 var enumerator = itemTable.GetEnumerator();
@@ -1033,7 +1031,8 @@ namespace Foreman
                 Assembler newAssembler = new Assembler(name);
 
                 newAssembler.Icon = LoadImage(ReadLuaString(values, "icon", true));
-                newAssembler.MaxIngredients = ReadLuaInt(values, "ingredient_count");
+                // 0.17 compat, ingredient_count no longer required
+                newAssembler.MaxIngredients = ReadLuaInt(values, "ingredient_count", true, 10);
                 newAssembler.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
                 if (newAssembler.ModuleSlots == 0)
                 {
@@ -1131,7 +1130,8 @@ namespace Foreman
                 Miner newMiner = new Miner(name);
 
                 newMiner.Icon = LoadImage(ReadLuaString(values, "icon", true));
-                newMiner.MiningPower = ReadLuaFloat(values, "mining_power");
+                // 0.17 compat, mining_power no longer required
+                newMiner.MiningPower = ReadLuaFloat(values, "mining_power", true, 1);
                 newMiner.Speed = ReadLuaFloat(values, "mining_speed");
                 newMiner.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
                 if (newMiner.ModuleSlots == 0)
@@ -1178,8 +1178,8 @@ namespace Foreman
                 }
                 Resource newResource = new Resource(name);
                 newResource.Category = ReadLuaString(values, "category", true, "basic-solid");
-                LuaTable minableTable = ReadLuaLuaTable(values, "minable", true);
-                newResource.Hardness = ReadLuaFloat(minableTable, "hardness");
+                LuaTable minableTable = ReadLuaLuaTable(values, "minable", true);   
+                newResource.Hardness = ReadLuaFloat(minableTable, "hardness", true, 0.5f);
                 newResource.Time = ReadLuaFloat(minableTable, "mining_time");
 
                 if (minableTable["result"] != null)
