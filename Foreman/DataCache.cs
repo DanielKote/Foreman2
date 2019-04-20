@@ -941,22 +941,7 @@ namespace Foreman
                 return;
             }
             Item newItem = new Item(name);
-            var fileName = ReadLuaString(values, "icon", true);
-            if (fileName == null)
-            {
-                var icons = ReadLuaLuaTable(values, "icons", true);
-                if (icons != null)
-                {
-                    // TODO: Figure out how to either composite multiple icons
-                    var first = (LuaTable)icons?[1];
-                    if (first != null)
-                    {
-                        fileName = ReadLuaString(first, "icon", true);
-                    }
-                }
-            }
-
-            newItem.Icon = LoadImage(fileName);
+            newItem.Icon = GetIcon(values);
 
             if (!Items.ContainsKey(name))
             {
@@ -977,6 +962,30 @@ namespace Foreman
                 newItem = Items[itemName];
             }
             return newItem;
+        }
+
+        private static Bitmap GetIcon(LuaTable values, bool fallbackToUnknown = false)
+        {
+            string fileName = ReadLuaString(values, "icon", true);
+            if (fileName == null)
+            {
+                var icons = ReadLuaLuaTable(values, "icons", true);
+                if (icons != null)
+                {
+                    // TODO: Figure out how to composite multiple icons
+                    LuaTable first = (LuaTable)icons?[1];
+                    if (first != null)
+                    {
+                        fileName = ReadLuaString(first, "icon", true);
+                    }
+                }
+            }
+
+
+            if (fileName == null)
+                return (fallbackToUnknown ? UnknownIcon : null);
+            else
+                return LoadImage(fileName);
         }
 
         private static void InterpretLuaRecipe(String name, LuaTable values)
@@ -1003,13 +1012,7 @@ namespace Foreman
                 Recipe newRecipe = new Recipe(name, time == 0.0f ? defaultRecipeTime : time, ingredients, results);
 
                 newRecipe.Category = ReadLuaString(values, "category", true, "crafting");
-
-                String iconFile = ReadLuaString(values, "icon", true);
-                if (iconFile != null)
-                {
-                    Bitmap icon = LoadImage(iconFile);
-                    newRecipe.Icon = icon;
-                }
+                newRecipe.Icon = GetIcon(values);
 
                 foreach (Item result in results.Keys)
                 {
@@ -1029,8 +1032,8 @@ namespace Foreman
             try
             {
                 Assembler newAssembler = new Assembler(name);
+                newAssembler.Icon = GetIcon(values, true);
 
-                newAssembler.Icon = LoadImage(ReadLuaString(values, "icon", true));
                 // 0.17 compat, ingredient_count no longer required
                 newAssembler.MaxIngredients = ReadLuaInt(values, "ingredient_count", true, 10);
                 newAssembler.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
@@ -1080,7 +1083,7 @@ namespace Foreman
             {
                 Assembler newFurnace = new Assembler(name);
 
-                newFurnace.Icon = LoadImage(ReadLuaString(values, "icon", true));
+                newFurnace.Icon = GetIcon(values, true);
                 newFurnace.MaxIngredients = 1;
                 newFurnace.ModuleSlots = ReadLuaInt(values, "module_slots", true, 0);
                 if (newFurnace.ModuleSlots == 0)
@@ -1129,7 +1132,7 @@ namespace Foreman
             {
                 Miner newMiner = new Miner(name);
 
-                newMiner.Icon = LoadImage(ReadLuaString(values, "icon", true));
+                newMiner.Icon = GetIcon(values, true);
                 // 0.17 compat, mining_power no longer required
                 newMiner.MiningPower = ReadLuaFloat(values, "mining_power", true, 1);
                 newMiner.Speed = ReadLuaFloat(values, "mining_speed");
@@ -1267,7 +1270,7 @@ namespace Foreman
                 float rotationSpeed = ReadLuaFloat(values, "rotation_speed");
                 Inserter newInserter = new Inserter(name);
                 newInserter.RotationSpeed = rotationSpeed;
-                newInserter.Icon = LoadImage(ReadLuaString(values, "icon", true));
+                newInserter.Icon = GetIcon(values, true);
 
                 Inserters.Add(name, newInserter);
             }
