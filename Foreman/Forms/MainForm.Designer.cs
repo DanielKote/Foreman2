@@ -44,6 +44,7 @@
             this.loadGraphButton = new System.Windows.Forms.Button();
             this.ExportImageButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+
             this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
             this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
@@ -70,6 +71,9 @@
             this.RecipeListView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RecipeImageList = new System.Windows.Forms.ImageList(this.components);
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.NormalDifficultyRadioButton = new System.Windows.Forms.RadioButton();
+            this.ExpensiveDifficultyRadioButton = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.MainToolbar.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -84,6 +88,7 @@
             this.tableLayoutPanel2.SuspendLayout();
             this.RecipeTabPage.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -113,6 +118,8 @@
             this.MainToolbar.Controls.Add(this.groupBox2);
             this.MainToolbar.Controls.Add(this.flowLayoutPanel2);
             this.MainToolbar.Controls.Add(this.panel1);
+            this.MainToolbar.Controls.Add(this.groupBox4);
+
             this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainToolbar.Location = new System.Drawing.Point(3, 3);
             this.MainToolbar.Name = "MainToolbar";
@@ -276,6 +283,7 @@
             // AssemblerDisplayCheckBox
             // 
             this.AssemblerDisplayCheckBox.AutoSize = true;
+            this.AssemblerDisplayCheckBox.Enabled = true;
             this.AssemblerDisplayCheckBox.Location = new System.Drawing.Point(7, 20);
             this.AssemblerDisplayCheckBox.Name = "AssemblerDisplayCheckBox";
             this.AssemblerDisplayCheckBox.Size = new System.Drawing.Size(116, 17);
@@ -574,6 +582,43 @@
             this.RecipeImageList.ImageSize = new System.Drawing.Size(32, 32);
             this.RecipeImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
+            // groupBox4
+            // 
+            this.groupBox4.AutoSize = true;
+            this.groupBox4.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.groupBox4.Controls.Add(this.ExpensiveDifficultyRadioButton);
+            this.groupBox4.Controls.Add(this.NormalDifficultyRadioButton);
+            this.groupBox4.Location = new System.Drawing.Point(1017, 3);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.groupBox4.Size = new System.Drawing.Size(86, 75);
+            this.groupBox4.TabIndex = 16;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Difficulty";
+            // 
+            // NormalDifficultyRadioButton
+            // 
+            this.NormalDifficultyRadioButton.AutoSize = true;
+            this.NormalDifficultyRadioButton.Location = new System.Drawing.Point(6, 19);
+            this.NormalDifficultyRadioButton.Name = "NormalDifficultyRadioButton";
+            this.NormalDifficultyRadioButton.Size = new System.Drawing.Size(58, 17);
+            this.NormalDifficultyRadioButton.TabIndex = 2;
+            this.NormalDifficultyRadioButton.TabStop = true;
+            this.NormalDifficultyRadioButton.Text = "Normal";
+            this.NormalDifficultyRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // ExpensiveDifficultyRadioButton
+            // 
+            this.ExpensiveDifficultyRadioButton.AutoSize = true;
+            this.ExpensiveDifficultyRadioButton.Location = new System.Drawing.Point(6, 42);
+            this.ExpensiveDifficultyRadioButton.Name = "ExpensiveDifficultyRadioButton";
+            this.ExpensiveDifficultyRadioButton.Size = new System.Drawing.Size(74, 17);
+            this.ExpensiveDifficultyRadioButton.TabIndex = 3;
+            this.ExpensiveDifficultyRadioButton.TabStop = true;
+            this.ExpensiveDifficultyRadioButton.Text = "Expensive";
+            this.ExpensiveDifficultyRadioButton.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -606,6 +651,8 @@
             this.RecipeTabPage.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -653,6 +700,9 @@
 		private System.Windows.Forms.ListView RecipeListView;
 		private System.Windows.Forms.ColumnHeader columnHeader1;
 		private System.Windows.Forms.ImageList RecipeImageList;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.RadioButton ExpensiveDifficultyRadioButton;
+        private System.Windows.Forms.RadioButton NormalDifficultyRadioButton;
     }
 }
 

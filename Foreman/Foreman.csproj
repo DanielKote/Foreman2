@@ -115,6 +115,9 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="AssemblerBox.cs" />
     <Compile Include="CancellableProgress.cs" />
+    <Compile Include="Controls\CheckboxListWithErrors.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -126,6 +129,12 @@
     </Compile>
     <Compile Include="DataCache.cs" />
     <Compile Include="DependencyGraph.cs" />
+    <Compile Include="Forms\InstallationChooserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InstallationChooserForm.Designer.cs">
+      <DependentUpon>InstallationChooserForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\DirectoryChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -138,10 +147,12 @@
     <Compile Include="Forms\EnableDisableItems.Designer.cs">
       <DependentUpon>EnableDisableItems.cs</DependentUpon>
     </Compile>
+    <Compile Include="FactorioPropertyTree.cs" />
     <Compile Include="GhostNodeElement.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="ErrorLogging.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
+    <Compile Include="Models\FoundInstallation.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="GraphicsStuff.cs" />
     <Compile Include="GraphElement.cs" />
@@ -201,14 +212,22 @@
       <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ZipStorer.cs" />
+    <EmbeddedResource Include="Controls\CheckboxListWithErrors.resx">
+      <DependentUpon>CheckboxListWithErrors.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ChooserControl.resx">
       <DependentUpon>ChooserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ChooserPanel.resx">
       <DependentUpon>ChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InstallationChooserForm.resx">
+      <DependentUpon>InstallationChooserForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DirectoryChooserForm.resx">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EnableDisableItems.resx">
       <DependentUpon>EnableDisableItems.cs</DependentUpon>

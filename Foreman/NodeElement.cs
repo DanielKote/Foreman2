@@ -22,10 +22,10 @@ namespace Foreman
 
 		private Color recipeColour = Color.FromArgb(190, 217, 212);
 		private Color passthroughColour = Color.FromArgb(190, 217, 212);
-		private Color supplyColour = Color.FromArgb(249, 237, 195);
-		private Color consumerColour = Color.FromArgb(231, 214, 224);
+		private Color supplyColour = Color.FromArgb(231, 214, 224);
+		private Color outputColour = Color.FromArgb(249, 237, 195);
 		private Color missingColour = Color.FromArgb(0xff, 0x7f, 0x6b);
-		private Color backgroundColour;
+        private Color darkTextColour = Color.FromArgb(69, 69, 69);
 		
 		private const int assemblerSize = 32;
 		private const int assemblerBorderX = 10;
@@ -44,6 +44,7 @@ namespace Foreman
 		public ProductionNode DisplayedNode { get; private set; }
 
 		private Brush backgroundBrush;
+		private Brush textBrush;
 		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 		private StringFormat centreFormat = new StringFormat();
 
@@ -56,9 +57,12 @@ namespace Foreman
 
 			DisplayedNode = node;
 
+            Color backgroundColour = missingColour;
+            Color textColour = darkTextColour;
             if (DisplayedNode is ConsumerNode)
             {
-                backgroundColour = supplyColour;
+                backgroundColour = outputColour;
+                
                 if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
                 {
                     backgroundColour = missingColour;
@@ -66,7 +70,7 @@ namespace Foreman
             }
             else if (DisplayedNode is SupplyNode)
             {
-                backgroundColour = consumerColour;
+                backgroundColour = supplyColour;
                 if (((SupplyNode)DisplayedNode).SuppliedItem.IsMissingItem)
                 {
                     backgroundColour = missingColour;
@@ -93,6 +97,7 @@ namespace Foreman
                 Trace.Fail("No branch for node: " + DisplayedNode.ToString());
 			}
 			backgroundBrush = new SolidBrush(backgroundColour);
+			textBrush = new SolidBrush(textColour);
 
 			foreach (Item item in node.Inputs)
 			{
@@ -331,7 +336,7 @@ namespace Foreman
             }
 
 			GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, backgroundBrush);
-			graphics.DrawString(text, size10Font, Brushes.White, Width / 2, Height / 2, centreFormat);
+			graphics.DrawString(text, size10Font, textBrush, Width / 2, Height / 2, centreFormat);
 			
 			base.Paint(graphics);
 		}

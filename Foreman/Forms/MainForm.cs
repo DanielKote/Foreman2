@@ -35,17 +35,47 @@ namespace Foreman
 
             if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
             {
+                List<FoundInstallation> installations = new List<FoundInstallation>();
+                String steamFolder = Path.Combine("Steam", "steamapps", "common");
                 foreach (String defaultPath in new String[]{
-                                                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
-                                                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
-                                                  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
+                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), steamFolder, "Factorio"),
+                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), steamFolder, "Factorio"),
+                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
+                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
+                  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
                 {
                     if (Directory.Exists(defaultPath))
                     {
-                        Properties.Settings.Default["FactorioPath"] = defaultPath;
-                        Properties.Settings.Default.Save();
-                        break;
+                        FoundInstallation inst = FoundInstallation.GetInstallationFromPath(defaultPath);
+                        if (inst != null)
+                            installations.Add(inst);
                     }
+                }
+
+                if (installations.Count > 0)
+                {
+                    if (installations.Count > 1)
+                    {
+                        using (InstallationChooserForm form = new InstallationChooserForm(installations))
+                        {
+                            if (form.ShowDialog() == DialogResult.OK && form.SelectedPath != null)
+                            {
+                                Properties.Settings.Default["FactorioPath"] = form.SelectedPath;
+                            }
+                            else
+                            {
+                                Close();
+                                Dispose();
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Properties.Settings.Default["FactorioPath"] = installations[0].path;
+                    }
+
+                    Properties.Settings.Default.Save();
                 }
             }
 
@@ -55,7 +85,7 @@ namespace Foreman
                 {
                     if (form.ShowDialog() == DialogResult.OK)
                     {
-                        Properties.Settings.Default["FactorioPath"] = form.SelectedPath; ;
+                        Properties.Settings.Default["FactorioPath"] = form.SelectedPath;
                         Properties.Settings.Default.Save();
                     }
                     else
@@ -84,7 +114,29 @@ namespace Foreman
             if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
             if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
+	    switch (Properties.Settings.Default.FactorioDifficulty)
+		    {
+                case "normal":
+                    DataCache.Difficulty = "normal";
+                    NormalDifficultyRadioButton.Checked = true;
+                    break;
+                case "expensive":
+                    DataCache.Difficulty = "expensive";
+                    ExpensiveDifficultyRadioButton.Checked = true;
+                    break;
+                default:
+                    Properties.Settings.Default.FactorioDifficulty = "normal";
+                    Properties.Settings.Default.Save();
+                    DataCache.Difficulty = "normal";
+                    NormalDifficultyRadioButton.Checked = true;
+		            break;
+		    }
+
             ReloadFactorioData();
+
+            // Register after loading settings to prevent an unnessecary data reload.
+            NormalDifficultyRadioButton.CheckedChanged += DifficultyChanged;
+            ExpensiveDifficultyRadioButton.CheckedChanged += DifficultyChanged;
 
             LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
             LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
@@ -643,5 +695,26 @@ namespace Foreman
 				AddRecipeButton.Text = "Add Recipes";
 			}
 		}
+
+        private void DifficultyChanged(object sender, EventArgs e)
+        {
+            var currentDifficulty = DataCache.Difficulty;
+
+            if (NormalDifficultyRadioButton.Checked)
+                DataCache.Difficulty = "normal";
+            else if (ExpensiveDifficultyRadioButton.Checked)
+                DataCache.Difficulty = "expensive";
+
+            if (currentDifficulty == DataCache.Difficulty)
+                return;
+
+            Properties.Settings.Default.FactorioDifficulty = DataCache.Difficulty;
+            Properties.Settings.Default.Save();
+
+            JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
+            ReloadFactorioData();
+            GraphViewer.LoadFromJson(savedGraph);
+            UpdateControlValues();
+        }
     }
 }
