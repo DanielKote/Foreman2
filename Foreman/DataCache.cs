@@ -1327,9 +1327,14 @@ namespace Foreman
                         {
                             result = FindOrCreateUnknownItem(ReadLuaString(resultTable, "name"));
                         }
-                        else
+                        else if (resultTable[1] != null)
                         {
                             result = FindOrCreateUnknownItem((string)resultTable[1]);
+                        }
+                        else
+                        {
+                            ErrorLogging.LogLine($"Error reading results from {values}.");
+                            return null;
                         }
 
                         float amount = 0f;
