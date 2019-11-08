@@ -667,13 +667,6 @@ namespace Foreman
 							}
 						}
 						optionList.Add(itemSupplyOption);
-						foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
-						{
-							if (recipe.Ingredients.ContainsKey(item))
-							{
-								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-							}
-						}
 
 						var chooserPanel = new ChooserPanel(optionList, this);
 
