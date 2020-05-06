@@ -26,8 +26,12 @@ If you get tired of connecting recipes together yourself, click "Automatically c
 
 Make sure Visual C++ 2012 x86 is installed.
 
-**Automatically completing the graph sometimes chooses very inefficient recipes (e.g. choosing basic oil processing over advanced oil processing when no heavy or light oil is required).**
+**Crash on load**
 
-This is because Foreman uses a very naive method for completing the graph. It doesn't try to optimise its choices at all, instead choosing the first recipe it finds for an item. This means that charts with oil processing in them aren't very useful at the moment.
+We've found most crashes to be related to mods implementing features in their Lua we didn't anticipate or changes to the Lua when a new version of Factorio is released. Feel free to open an issue in this respository so we can investigate and fix.
 
-Sorry about that
+## Contributing ##
+
+At the time of writing the only official "contributor" is myself, Rybadour here on Github and /u/salbris on Reddit. More are welcome! I don't have any official guidance such as a code style guide so feel free to suggest or create one! I doubt I'd turn away any pull requests unless they involve large rewrites of the core functionality that I would be hard-pressed to review. Generally I'd recommend looking at the issues here on Github to see if the feature you'd like to add is already listed and assigned. I'd recommend everyone to consider this repository the source of truth for the project as there are numerous copies on BitBucket. I'll be attempting to consolidate everything here.
+
+If you would like to contribute but are having difficulty understanding the codebase feel free to reach out directly. I've also taken the liberty to create a Discord server for contributors. We could use that to discuss development and questions about the program. Discord: https://discord.gg/bYqVq2
