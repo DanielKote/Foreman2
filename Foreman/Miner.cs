@@ -40,8 +40,8 @@ namespace Foreman
 				finalSpeed += module.SpeedBonus * this.Speed;
 			}
 
-			//According to http://www.factorioforums.com/wiki/index.php?title=Mining_drill
-			double timeForOneItem = resource.Time / ((MiningPower - resource.Hardness) * finalSpeed);
+			//According to https://wiki.factorio.com/Mining
+			double timeForOneItem = resource.Time / finalSpeed;
 
 			timeForOneItem = Math.Ceiling(timeForOneItem * 60d) / 60d;   //Round up to the nearest tick, since mining can't start until the start of a new tick
 
