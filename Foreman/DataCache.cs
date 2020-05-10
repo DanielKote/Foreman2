@@ -502,6 +502,8 @@ namespace Foreman
 
         public class ModOnDisk
         {
+            public readonly string Id;
+            public readonly Version Version;
             public readonly string Location;
             public readonly ModType Type;
 
@@ -509,6 +511,16 @@ namespace Foreman
 
             public ModOnDisk(string location, ModType type)
             {
+                String[] parts = Path.GetFileNameWithoutExtension(location).Split('_');
+                this.Id = parts.Count() > 1 ? String.Join("_", parts.Take(parts.Length - 1)) : parts[0];
+                try
+                {
+                    this.Version = new Version(parts.Last());
+                }
+                catch (Exception e)
+                {
+                    this.Version = new Version(0, 0);
+                }
                 this.Location = location;
                 this.Type = type;
             }
@@ -556,8 +568,8 @@ namespace Foreman
             }
         }
 
-		private static void FindAllMods(List<String> enabledMods, CancellableProgress progress) //Vanilla game counts as a mod too.
-		{
+        private static void FindAllMods(List<String> enabledMods, CancellableProgress progress) //Vanilla game counts as a mod too.
+        {
             String modPath = Properties.Settings.Default.FactorioModPath;
             IEnumerable<ModOnDisk> mods = ModOnDisk.Empty();
 
@@ -565,14 +577,58 @@ namespace Foreman
             mods = mods.Concat(ModOnDisk.EnumerateDirectories(modPath));
             mods = mods.Concat(ModOnDisk.EnumerateZips(modPath));
 
-            reportingProgress(progress, 50, mods, mod =>
+            IEnumerable<ModOnDisk> latestMods = ChangeModsToOnlyLatest(mods);
+
+            if (enabledMods == null)
+            {
+                enabledMods = new List<string>();
+                if (Properties.Settings.Default.EnabledMods.Count > 0)
+                {
+                    foreach (String s in Properties.Settings.Default.EnabledMods)
+                    {
+                        var split = s.Split('|');
+                        if (split[1] == "True")
+                            enabledMods.Add(split[0]);
+                    }
+                }
+                else
+                {
+                    string modListFile = Path.Combine(modPath, "mod-list.json");
+                    if (File.Exists(modListFile))
+                    {
+                        String json = File.ReadAllText(modListFile);
+                        dynamic parsedJson = JsonConvert.DeserializeObject(json);
+                        foreach (var mod in parsedJson.mods)
+                        {
+                            if ((bool)mod.enabled)
+                                enabledMods.Add((string)mod.name);
+                        }
+                    }
+                }
+            }
+
+            reportingProgress(progress, 80, latestMods, mod =>
             {
                 switch (mod.Type) {
                     case ModOnDisk.ModType.DIRECTORY:
                         ReadModInfoFile(mod.Location);
                         break;
-                    case ModOnDisk.ModType.ZIP:
-                        ReadModInfoZip(mod.Location);
+                    case ModOnDisk.ModType.ZIP: 
+                        // Unzipping is very expensive only do if we have to
+                        if (enabledMods.Contains(mod.Id))
+                        {
+                            ReadModInfoZip(mod.Location);
+                        }
+                        else
+                        {
+                            Mod newMod = new Mod();
+                            newMod.Id = mod.Id;
+                            newMod.parsedVersion = mod.Version;
+                            newMod.Name = newMod.Id;
+                            newMod.Enabled = false;
+                            Mods.Add(newMod);
+                        }
+
                         break;
                 }
             });
@@ -582,59 +638,31 @@ namespace Foreman
                 return;
             }
 
-            Dictionary<String, bool> enabledModsFromFile = new Dictionary<string, bool>();
-
-            string modListFile = Path.Combine(Properties.Settings.Default.FactorioModPath, "mod-list.json");
-            if (File.Exists(modListFile))
+            foreach (Mod mod in Mods)
             {
-                String json = File.ReadAllText(modListFile);
-                dynamic parsedJson = JsonConvert.DeserializeObject(json);
-                foreach (var mod in parsedJson.mods)
-                {
-                    String name = mod.name;
-                    Boolean enabled = (bool)mod.enabled;
-                    enabledModsFromFile.Add(name, enabled);
-                }
-            }
-
-            if (enabledMods != null)
-            {
-                foreach (Mod mod in Mods)
-                {
-                    mod.Enabled = enabledMods.Contains(mod.Name);
-                }
-            }
-            else
-            {
-                Dictionary<String, String> splitModStrings = new Dictionary<string, string>();
-                foreach (String s in Properties.Settings.Default.EnabledMods)
-                {
-                    var split = s.Split('|');
-                    if (!splitModStrings.ContainsKey(split[0]))
-                        splitModStrings.Add(split[0], split[1]);
-                }
-                foreach (Mod mod in Mods)
-                {
-                    if (splitModStrings.ContainsKey(mod.Name))
-                    {
-                        mod.Enabled = (splitModStrings[mod.Name] == "True");
-                    }
-                    else if (enabledModsFromFile.ContainsKey(mod.Name))
-                    {
-                        mod.Enabled = enabledModsFromFile[mod.Name];
-                    }
-                    else
-                    {
-                        mod.Enabled = true;
-                    }
-                }
+                mod.Enabled = enabledMods.Contains(mod.Name);
             }
 
             DependencyGraph modGraph = new DependencyGraph(Mods);
             modGraph.DisableUnsatisfiedMods();
             Mods = modGraph.SortMods();
 
-            progress.Report(75);
+            progress.Report(90);
+        }
+
+        private static IEnumerable<ModOnDisk> ChangeModsToOnlyLatest(IEnumerable<ModOnDisk> mods)
+        {
+            List<ModOnDisk> latest = new List<ModOnDisk>();
+            foreach (ModOnDisk mod in mods)
+            {
+                ModOnDisk found = latest.Find(m => m.Id == mod.Id);
+                if (found == null || found.Version < mod.Version)
+                {
+                    latest.Remove(found);
+                    latest.Add(mod);
+                }
+            }
+            return latest;
         }
 
         private static IEnumerable<String> getAllLuaFiles()

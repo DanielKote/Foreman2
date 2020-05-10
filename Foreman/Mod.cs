@@ -7,6 +7,7 @@ namespace Foreman
 {
 	public class Mod
 	{
+        public String Id = "";
 		public String Name = "";
 		public String title = "";
 		public String version = "";
