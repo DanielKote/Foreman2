@@ -107,6 +107,7 @@ namespace Foreman
                 }
 
                 // Added a custom require function to support relative paths (angels refining was using this and a few others)
+                // Defines is defined here: https://lua-api.factorio.com/latest/defines.html 
                 lua.DoString(@"
                     local oldrequire = require
 
@@ -141,23 +142,78 @@ namespace Foreman
                     function log(...)
                     end
 
+                    
                     defines = {}
+                    defines.alert_type = {}
+                    defines.behavior_result = {}
+                    defines.build_check_type = {}
+                    defines.chain_signal_state = {}
+                    defines.chunk_generated_status = {}
+                    defines.circuit_condition_index = {}
+                    defines.circuit_connector_id = {}
+                    defines.command = {}
+                    defines.compound_command = {}
+                    defines.control_behavior = {}
+                    defines.control_behavior.inserter = {}
+                    defines.control_behavior.inserter.circuit_mode_of_operation = {}
+                    defines.control_behavior.inserter.hand_read_mode = {}
+                    defines.control_behavior.logistics_container = {}
+                    defines.control_behavior.logistics_container.circuit_mode_of_operation = {}
+                    defines.control_behavior.lamp = {}
+                    defines.control_behavior.lamp.circuit_mode_of_operation = {}
+                    defines.control_behavior.mining_drill = {}
+                    defines.control_behavior.mining_drill.resource_read_mode = {}
+                    defines.control_behavior.transport_belt = {}
+                    defines.control_behavior.transport_belt.content_read_mode = {}
+                    defines.control_behavior.type = {}
+                    defines.controllers = {}
+                    defines.deconstruction_item = {}
+                    defines.deconstruction_item.entity_filter_mode = {}
+                    defines.deconstruction_item.tile_filter_mode = {}
+                    defines.deconstruction_item.tile_selection_mode = {}
+                    defines.difficulty = {}
                     defines.difficulty_settings = {}
                     defines.difficulty_settings.recipe_difficulty = {}
                     defines.difficulty_settings.technology_difficulty = {}
                     defines.difficulty_settings.recipe_difficulty.normal = 1
                     defines.difficulty_settings.technology_difficulty.normal = 1
+                    defines.distraction = {}
                     defines.direction = {}
                     defines.direction.north = 1
                     defines.direction.east = 2
                     defines.direction.south = 3
                     defines.direction.west = 4
+                    defines.entity_status = {}
+                    defines.events = {}
+                    defines.flow_precision_index = {}
+                    defines.group_state = {}
+                    defines.gui_type = {}
+                    defines.input_action = {}
+                    defines.inventory = {}
+                    defines.logistic_member_index = {}
+                    defines.logistic_mode = {}
+                    defines.mouse_button_type = {}
+                    defines.rail_connection_direction = {}
+                    defines.rail_direction = {}
+                    defines.render_mode	= {}
+                    defines.rich_text_setting = {}
+                    defines.riding = {}
+                    defines.riding.acceleration = {}
+                    defines.riding.direction = {}
+                    defines.shooting = {}
+                    defines.signal_state = {}
+                    defines.train_state	 = {}
+                    defines.transport_line = {}
+                    defines.wire_connection_id = {}
+                    defines.wire_type = {}
 ");
 
                 var modSettingsLua = ReadModSettings();
                 lua.DoString(modSettingsLua);
 
-                foreach (String filename in new String[] { "data.lua", "data-updates.lua", "data-final-fixes.lua" })
+                // Note: All mods "settings" file is processed first then data, then date-updates, etc.
+                // This allows things such as the base mod to generate barrel recipes after other mods have defined liquids
+                foreach (String filename in new String[] { "settings.lua", "data.lua", "data-updates.lua", "data-final-fixes.lua" })
                 {
                     foreach (Mod mod in Mods.Where(m => m.Enabled))
                     {
