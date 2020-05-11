@@ -780,7 +780,6 @@ namespace Foreman
         {
             String fullPath = Path.GetFullPath(modZipFile);
             byte[] hash;
-            Boolean needsExtraction = false;
 
             using (var md5 = MD5.Create())
             {
@@ -791,18 +790,9 @@ namespace Foreman
             }
 
             if (!zipHashes.ContainsKey(fullPath) || !zipHashes[fullPath].SequenceEqual(hash))
-                needsExtraction = true;
-
-            if (needsExtraction)
             {
-                using (ZipStorer zip = ZipStorer.Open(modZipFile, FileAccess.Read))
-                {
-                    String outputDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(modZipFile));
-                    foreach (var fileEntry in zip.ReadCentralDir())
-                    {
-                        zip.ExtractFile(fileEntry, Path.Combine(outputDir, fileEntry.FilenameInZip));
-                    }
-                }
+                String outputDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(modZipFile));
+                System.IO.Compression.ZipFile.ExtractToDirectory(modZipFile, outputDir);
 
                 if (zipHashes.ContainsKey(fullPath))
                     zipHashes[fullPath] = hash;
