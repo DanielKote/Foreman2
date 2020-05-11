@@ -56,8 +56,8 @@ namespace Foreman
             }
         }
 
-        private static String DataPath { get { return Path.Combine(Properties.Settings.Default.FactorioPath, "data"); } }
-        private static String ModPath { get { return Properties.Settings.Default.FactorioModPath; } }
+        private static String DataPath { get { return Path.Combine(Settings.Default.FactorioPath, "data"); } }
+        private static String ModPath { get { return Settings.Default.FactorioModPath; } }
 
         public static List<Mod> Mods = new List<Mod>();
         public static List<Language> Languages = new List<Language>();
@@ -356,7 +356,7 @@ namespace Foreman
             sb.AppendLine("settings = {}");
             sb.AppendLine("settings.startup = {}");
 
-            var settingsFile = Path.Combine(Properties.Settings.Default.FactorioModPath, "mod-settings.dat");
+            var settingsFile = Path.Combine(Settings.Default.FactorioModPath, "mod-settings.dat");
 
             if (!File.Exists(settingsFile))
             {
@@ -546,18 +546,18 @@ namespace Foreman
             if (failedPathDirectories.Any())
             {
                 ErrorLogging.LogLine("There were errors setting the lua path variable for the following directories:");
-                foreach (String dir in DataCache.failedPathDirectories.Keys)
+                foreach (String dir in failedPathDirectories.Keys)
                 {
-                    ErrorLogging.LogLine(String.Format("{0} ({1})", dir, DataCache.failedPathDirectories[dir].Message));
+                    ErrorLogging.LogLine(String.Format("{0} ({1})", dir, failedPathDirectories[dir].Message));
                 }
             }
 
             if (failedFiles.Any())
             {
                 ErrorLogging.LogLine("The following files could not be loaded due to errors:");
-                foreach (String file in DataCache.failedFiles.Keys)
+                foreach (String file in failedFiles.Keys)
                 {
-                    ErrorLogging.LogLine(String.Format("{0} ({1})", file, DataCache.failedFiles[file].Message));
+                    ErrorLogging.LogLine(String.Format("{0} ({1})", file, failedFiles[file].Message));
                 }
             }
         }
@@ -646,7 +646,7 @@ namespace Foreman
 
         private static void FindAllMods(List<String> enabledMods, CancellableProgress progress) //Vanilla game counts as a mod too.
         {
-            String modPath = Properties.Settings.Default.FactorioModPath;
+            String modPath = Settings.Default.FactorioModPath;
             IEnumerable<ModOnDisk> mods = ModOnDisk.Empty();
 
             mods = mods.Concat(ModOnDisk.EnumerateDirectories(DataPath));
@@ -658,9 +658,9 @@ namespace Foreman
             if (enabledMods == null)
             {
                 enabledMods = new List<string>();
-                if (Properties.Settings.Default.EnabledMods.Count > 0)
+                if (Settings.Default.EnabledMods.Count > 0)
                 {
-                    foreach (String s in Properties.Settings.Default.EnabledMods)
+                    foreach (String s in Settings.Default.EnabledMods)
                     {
                         var split = s.Split('|');
                         if (split[1] == "True")
@@ -792,7 +792,8 @@ namespace Foreman
             if (!zipHashes.ContainsKey(fullPath) || !zipHashes[fullPath].SequenceEqual(hash))
             {
                 String outputDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(modZipFile));
-                System.IO.Compression.ZipFile.ExtractToDirectory(modZipFile, outputDir);
+                if (!Directory.Exists(outputDir))
+                    ZipFile.ExtractToDirectory(modZipFile, outputDir);
 
                 if (zipHashes.ContainsKey(fullPath))
                     zipHashes[fullPath] = hash;
@@ -1155,7 +1156,7 @@ namespace Foreman
                     newAssembler.Categories.Add(category);
                 }
 
-                foreach (String s in Properties.Settings.Default.EnabledAssemblers)
+                foreach (String s in Settings.Default.EnabledAssemblers)
                 {
                     if (s.Split('|')[0] == name)
                     {
@@ -1204,7 +1205,7 @@ namespace Foreman
                     newFurnace.Categories.Add(category);
                 }
 
-                foreach (String s in Properties.Settings.Default.EnabledAssemblers)
+                foreach (String s in Settings.Default.EnabledAssemblers)
                 {
                     if (s.Split('|')[0] == name)
                     {
@@ -1249,7 +1250,7 @@ namespace Foreman
                     }
                 }
 
-                foreach (String s in Properties.Settings.Default.EnabledMiners)
+                foreach (String s in Settings.Default.EnabledMiners)
                 {
                     if (s.Split('|')[0] == name)
                     {
@@ -1341,7 +1342,7 @@ namespace Foreman
 
                 Module newModule = new Module(name, speedBonus, productivityBonus, allowedIn);
 
-                foreach (String s in Properties.Settings.Default.EnabledModules)
+                foreach (String s in Settings.Default.EnabledModules)
                 {
                     if (s.Split('|')[0] == name)
                     {
