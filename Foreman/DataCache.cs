@@ -92,6 +92,7 @@ namespace Foreman
                 FindAllMods(enabledMods, progress);
 
                 AddLuaPackagePath(lua, Path.Combine(DataPath, "core", "lualib")); //Core lua functions
+                AddLuaPackagePath(lua, Path.Combine(DataPath, "base")); // Base mod
                 String basePackagePath = lua["package.path"] as String;
 
                 String dataloaderFile = Path.Combine(DataPath, "core", "lualib", "dataloader.lua");
@@ -108,10 +109,14 @@ namespace Foreman
 
                 // Added a custom require function to support relative paths (angels refining was using this and a few others)
                 // Defines is defined here: https://lua-api.factorio.com/latest/defines.html 
+                // Also contains a special case for "__base__" that can resolve to the base mod
                 lua.DoString(@"
                     local oldrequire = require
 
                     function relative_require(modname)
+                      if string.match(modname, '__base__.') then
+                        return oldrequire(string.gsub(modname, '__base__.', ''))
+                      end
                       local regular_loader = package.searchers[2]
                       local loader = function(inner)
                         if string.match(modname, '(.*)%.') then
@@ -138,6 +143,8 @@ namespace Foreman
                     util.by_pixel = by_pixel
                     util.format_number = format_number
                     util.increment = increment
+
+                    _G.unpack = table.unpack;
 
                     function log(...)
                     end
@@ -235,7 +242,7 @@ namespace Foreman
                         //Because many mods use the same path to refer to different files, we need to clear the 'loaded' table so Lua doesn't think they're already loaded
                         lua.DoString(@"
 							for k, v in pairs(package.loaded) do
-								package.loaded[k] = false
+                               package.loaded[k] = false
 							end");
 
                         String dataFile = Path.Combine(mod.dir, filename);
@@ -252,6 +259,8 @@ namespace Foreman
                         }
                     }
                 }
+
+                progress.Report(90);
 
                 //------------------------------------------------------------------------------------------
                 // Lua files have all been executed, now it's time to extract their data from the lua engine
