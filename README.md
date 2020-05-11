@@ -8,6 +8,10 @@ For example, here's a (fairly messy) flowchart showing the optimal resources and
 
 ![1 Rocket per minute.png](https://bitbucket.org/repo/ary6LR/images/1686665211-1%20Rocket%20per%20minute.png)
 
+## Download ##
+
+To download the latest version of Foreman please visit the "Releases" tab here on Github and download the "Release.zip" from the latest release.
+
 ## Usage ##
 
 Run Foreman.exe. It should automatically find your Factorio installation if you used the installer. Otherwise it will ask for its location.
