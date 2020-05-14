@@ -302,6 +302,7 @@
             this.MinerDisplayCheckBox.TabIndex = 0;
             this.MinerDisplayCheckBox.Text = "Display Miners/Pumpjacks";
             this.MinerDisplayCheckBox.UseVisualStyleBackColor = true;
+            this.MinerDisplayCheckBox.CheckedChanged += new System.EventHandler(this.MinerDisplayCheckBox_CheckedChanged);
             // 
             // flowLayoutPanel2
             // 
