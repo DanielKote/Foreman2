@@ -190,6 +190,10 @@ namespace Foreman
                     defines.direction.east = 2
                     defines.direction.south = 3
                     defines.direction.west = 4
+                    defines.direction.northeast = 5
+                    defines.direction.southeast = 6
+                    defines.direction.southwest = 7
+                    defines.direction.northwest = 8
                     defines.entity_status = {}
                     defines.events = {}
                     defines.flow_precision_index = {}
