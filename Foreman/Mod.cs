@@ -77,6 +77,24 @@ namespace Foreman
 		public Version Version;
 		public bool Optional = false;
 		public DependencyType VersionType = DependencyType.EqualTo;
+
+		public override string ToString()
+		{
+            String type = "";
+            switch (VersionType)
+            {
+                case DependencyType.EqualTo:
+                    type = "=";
+                    break;
+                case DependencyType.GreaterThan:
+                    type = ">";
+                    break;
+                case DependencyType.GreaterThanOrEqual:
+                    type = ">=";
+                    break;
+            }
+			return ModName + " " + type + " " + Version;
+		}
 	}
 
 	public enum DependencyType

@@ -114,8 +114,8 @@ namespace Foreman
                     local oldrequire = require
 
                     function relative_require(modname)
-                      if string.match(modname, '__base__.') then
-                        return oldrequire(string.gsub(modname, '__base__.', ''))
+                      if string.match(modname, '__.+__/') then
+                        return oldrequire(string.gsub(modname, '__.+__/', ''))
                       end
                       local regular_loader = package.searchers[2]
                       local loader = function(inner)
@@ -235,8 +235,6 @@ namespace Foreman
                 {
                     foreach (Mod mod in newEnabledMods)
                     {
-                        //Mods use relative paths, but if more than one mod is in package.path at once this can be ambiguous
-                        lua["package.path"] = basePackagePath;
                         AddLuaPackagePath(lua, mod.dir);
 
                         //Because many mods use the same path to refer to different files, we need to clear the 'loaded' table so Lua doesn't think they're already loaded
@@ -260,7 +258,7 @@ namespace Foreman
                     }
                 }
 
-                progress.Report(90);
+                progress.Report(80);
 
                 //------------------------------------------------------------------------------------------
                 // Lua files have all been executed, now it's time to extract their data from the lua engine
@@ -344,6 +342,7 @@ namespace Foreman
                 LoadLocaleFiles();
             }
 
+            progress.Report(90);
             MarkCyclicRecipes();
             progress.Report(100);
 
@@ -567,7 +566,8 @@ namespace Foreman
             try
             {
                 string escapedDir = (dir + Path.DirectorySeparatorChar).Replace(@"\", @"\\").Replace("'", @"\'");
-                string luaCommand = String.Format("package.path = package.path .. ';{0}?.lua'", escapedDir);
+                // Inserting the given path at the front of package.path. Without this mods might import files from other mods.
+                string luaCommand = String.Format("package.path = '{0}?.lua;' .. package.path", escapedDir);
                 lua.DoString(luaCommand);
             }
             catch (Exception e)
@@ -683,7 +683,7 @@ namespace Foreman
                 }
             }
 
-            reportingProgress(progress, 80, latestMods, mod =>
+            reportingProgress(progress, 75, latestMods, mod =>
             {
                 switch (mod.Type) {
                     case ModOnDisk.ModType.DIRECTORY:
@@ -723,7 +723,7 @@ namespace Foreman
             modGraph.DisableUnsatisfiedMods();
             Mods = modGraph.SortMods();
 
-            progress.Report(90);
+            progress.Report(80);
         }
 
         private static IEnumerable<ModOnDisk> ChangeModsToOnlyLatest(IEnumerable<ModOnDisk> mods)
@@ -838,6 +838,7 @@ namespace Foreman
             {
                 newMod.parsedVersion = new Version(0, 0, 0, 0);
             }
+            Console.WriteLine("Parsing Mod " + newMod.Name);
             ParseModDependencies(newMod);
 
             Mods.Add(newMod);
@@ -847,7 +848,7 @@ namespace Foreman
         {
             if (mod.Name == "base")
             {
-                mod.dependencies.Add("core");
+                mod.dependencies.Add("core >= 0.0.0.0");
             }
 
             foreach (String depString in mod.dependencies)
@@ -880,14 +881,23 @@ namespace Foreman
                         case ">=":
                             newDependency.VersionType = DependencyType.GreaterThanOrEqual;
                             break;
+                        default:
+                            ErrorLogging.LogLine(String.Format("Mod '{0}' has malformed dependency '{1}'", mod.Name, depString));
+                            return;
                     }
                     token++;
 
                     if (!Version.TryParse(split[token], out newDependency.Version))
                     {
-                        newDependency.Version = new Version(0, 0, 0, 0);
+                        ErrorLogging.LogLine(String.Format("Mod '{0}' has malformed dependency '{1}'", mod.Name, depString));
+                        return;
                     }
                     token++;
+                }
+                else
+                {
+                    ErrorLogging.LogLine(String.Format("Mod '{0}' has malformed dependency '{1}'", mod.Name, depString));
+                    return;
                 }
 
                 mod.parsedDependencies.Add(newDependency);
