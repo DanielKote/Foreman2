@@ -662,6 +662,8 @@ namespace Foreman
             if (enabledMods == null)
             {
                 enabledMods = new List<string>();
+                enabledMods.Add("base");
+                enabledMods.Add("core");
                 if (Settings.Default.EnabledMods.Count > 0)
                 {
                     foreach (String s in Settings.Default.EnabledMods)
@@ -819,9 +821,11 @@ namespace Foreman
                 return;
             }
 
-            String file = Directory.EnumerateFiles(Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile)), "info.json", SearchOption.AllDirectories).FirstOrDefault();
+            String modUnzippedFolder = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipFile));
+            String file = Directory.EnumerateFiles(modUnzippedFolder, "info.json", SearchOption.AllDirectories).FirstOrDefault();
             if (String.IsNullOrWhiteSpace(file))
             {
+                ErrorLogging.LogLine(String.Format("Could not find info.json at '{0}' for mod zipFile '{1}'", modUnzippedFolder, zipFile));
                 return;
             }
             ReadModInfo(File.ReadAllText(file), Path.GetDirectoryName(file));
