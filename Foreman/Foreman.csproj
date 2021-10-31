@@ -126,8 +126,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assembler.cs" />
-    <Compile Include="AssemblerBox.cs" />
+    <Compile Include="DataTypes\Assembler.cs" />
+    <Compile Include="Forms\DirectoryChooserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DirectoryChooserForm.designer.cs">
+      <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProductionGraphViewer\AssemblerBox.cs" />
     <Compile Include="Controls\CheckboxListWithErrors.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -140,21 +146,15 @@
     <Compile Include="Controls\ChooserPanel.Designer.cs">
       <DependentUpon>ChooserPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataCache.cs" />
-    <Compile Include="DependencyGraph.cs" />
+    <Compile Include="DataCache\DataCache.cs" />
+    <Compile Include="DataCache\DependencyGraph.cs" />
     <Compile Include="Extensions\VersionOperatorExtensions.cs" />
-    <Compile Include="FModDataProcessor.cs" />
+    <Compile Include="DataCache\FModDataProcessor.cs" />
     <Compile Include="Forms\InstallationChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\InstallationChooserForm.Designer.cs">
       <DependentUpon>InstallationChooserForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\DirectoryChooserForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\DirectoryChooserForm.Designer.cs">
-      <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
@@ -162,18 +162,19 @@
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FactorioPropertyTree.cs" />
-    <Compile Include="GhostNodeElement.cs" />
-    <Compile Include="DraggedLinkElement.cs" />
-    <Compile Include="ErrorLogging.cs" />
-    <Compile Include="IconProcessor.cs" />
-    <Compile Include="LBitmap.cs" />
-    <Compile Include="LuaDataProcessor.cs" />
+    <Compile Include="DataCache\FactorioLuaPropertyTree.cs" />
+    <Compile Include="ProductionGraphViewer\FloatingTooltipControl.cs" />
+    <Compile Include="ProductionGraphViewer\GhostNodeElement.cs" />
+    <Compile Include="ProductionGraphViewer\DraggedLinkElement.cs" />
+    <Compile Include="DataCache\ErrorLogging.cs" />
+    <Compile Include="DataCache\IconProcessor.cs" />
+    <Compile Include="DataCache\LBitmap.cs" />
+    <Compile Include="DataCache\LuaDataProcessor.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
-    <Compile Include="Models\FoundInstallation.cs" />
+    <Compile Include="FoundInstallation.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
-    <Compile Include="GraphicsStuff.cs" />
-    <Compile Include="GraphElement.cs" />
+    <Compile Include="ProductionGraphViewer\GraphicsStuff.cs" />
+    <Compile Include="ProductionGraphViewer\GraphElement.cs" />
     <Compile Include="Models\Solver\GraphOptimisation.cs" />
     <Compile Include="Forms\ImageExportForm.cs">
       <SubType>Form</SubType>
@@ -181,17 +182,17 @@
     <Compile Include="Forms\ImageExportForm.Designer.cs">
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemTab.cs" />
+    <Compile Include="ProductionGraphViewer\ItemTab.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Item.cs" />
-    <Compile Include="LinkElement.cs" />
-    <Compile Include="Miner.cs" />
-    <Compile Include="Mod.cs" />
+    <Compile Include="DataTypes\Item.cs" />
+    <Compile Include="ProductionGraphViewer\LinkElement.cs" />
+    <Compile Include="DataTypes\Miner.cs" />
+    <Compile Include="DataTypes\Mod.cs" />
     <Compile Include="Models\ProductionNode.cs" />
     <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="Program.cs" />
@@ -208,14 +209,16 @@
     <Compile Include="Controls\RateOptionsPanel.Designer.cs">
       <DependentUpon>RateOptionsPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Recipe.cs" />
+    <Compile Include="DataTypes\Recipe.cs" />
     <Compile Include="Models\Solver\ProductionGraph.cs" />
-    <Compile Include="ProductionGraphViewer.cs" />
-    <Compile Include="ProductionGraphViewer.Designer.cs">
+    <Compile Include="Controls\ProductionGraphViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="NodeElement.cs" />
-    <Compile Include="NodeLink.cs" />
+    <Compile Include="ProductionGraphViewer\NodeElement.cs" />
+    <Compile Include="Models\NodeLink.cs" />
     <Compile Include="Controls\RecipeChooserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -228,7 +231,7 @@
     <Compile Include="Controls\ItemChooserControl.Designer.cs">
       <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ZipStorer.cs" />
+    <Compile Include="DataCache\ZipStorer.cs" />
     <EmbeddedResource Include="Controls\CheckboxListWithErrors.resx">
       <DependentUpon>CheckboxListWithErrors.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -239,12 +242,11 @@
     <EmbeddedResource Include="Controls\ChooserPanel.resx">
       <DependentUpon>ChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\InstallationChooserForm.resx">
-      <DependentUpon>InstallationChooserForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DirectoryChooserForm.resx">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InstallationChooserForm.resx">
+      <DependentUpon>InstallationChooserForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsForm.resx">
@@ -269,7 +271,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="ProductionGraphViewer.resx">
+    <EmbeddedResource Include="Controls\ProductionGraphViewer.resx">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\RateOptionsPanel.resx">

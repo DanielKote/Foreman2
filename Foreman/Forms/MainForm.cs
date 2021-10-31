@@ -253,7 +253,7 @@ namespace Foreman
 						}
 
 						newElement.Update();
-						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+						newElement.Location = location;
 					}
 				});
 			}
@@ -646,7 +646,7 @@ namespace Foreman
 
 				NodeElement newElement = new NodeElement(RecipeNode.Create((Recipe)lvItem.Tag, GraphViewer.Graph), GraphViewer);
 				newElement.Update();
-				newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
+				newElement.Location = location;
 			}
 
 			GraphViewer.Graph.UpdateNodeValues();

@@ -414,7 +414,7 @@ namespace Foreman
             ushort patch;
             ushort dev;
 
-            FactorioPropertyTree propTree;
+            FactorioLuaPropertyTree propTree;
 
             using (BinaryReader reader = new BinaryReader(File.Open(settingsFile, FileMode.Open)))
             {
@@ -428,10 +428,10 @@ namespace Foreman
                     var noop = reader.ReadByte();
                 }
 
-                propTree = FactorioPropertyTree.Read(reader);
+                propTree = FactorioLuaPropertyTree.Read(reader);
             }
 
-            var startup = (Dictionary<string, FactorioPropertyTree>)((Dictionary<string, FactorioPropertyTree>)propTree.Content)["startup"].Content;
+            var startup = (Dictionary<string, FactorioLuaPropertyTree>)((Dictionary<string, FactorioLuaPropertyTree>)propTree.Content)["startup"].Content;
 
             const string braces = @"{}";
 
@@ -439,7 +439,7 @@ namespace Foreman
             {
                 var format = $"settings.startup[\"{x.Key}\"]";
                 sb.AppendLine($"{format} = {braces}");
-                var valPropTree = ((Dictionary<string, FactorioPropertyTree>)x.Value.Content)["value"].Content;
+                var valPropTree = ((Dictionary<string, FactorioLuaPropertyTree>)x.Value.Content)["value"].Content;
                 var type = valPropTree.GetType();
                 var value = "";
                 if (type.Name == "String")

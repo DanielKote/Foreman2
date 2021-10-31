@@ -422,7 +422,7 @@
             this.ModuleDropDown.FormattingEnabled = true;
             this.ModuleDropDown.Items.AddRange(new object[] {
             "None",
-            "Efficiency",
+            "Speed",
             "Productivity"});
             this.ModuleDropDown.Location = new System.Drawing.Point(9, 75);
             this.ModuleDropDown.Name = "ModuleDropDown";
