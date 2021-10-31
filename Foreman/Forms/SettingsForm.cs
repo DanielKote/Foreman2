@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Foreman
@@ -17,7 +14,7 @@ namespace Foreman
             public Dictionary<Assembler, bool> Assemblers;
             public Dictionary<Miner, bool> Miners;
             public Dictionary<Module, bool> Modules;
-            public Dictionary<Mod, bool> Mods;
+            public Dictionary<string, bool> Mods;
 
             public List<Language> LanguageOptions;
             public Language selectedLanguage;
@@ -27,14 +24,13 @@ namespace Foreman
 
             public DataCache.GenerationType GenerationType;
             public bool NormalDifficulty;
-            public bool UseSaveFileData;
 
             public SettingsFormOptions()
             {
                 Assemblers = new Dictionary<Assembler, bool>();
                 Miners = new Dictionary<Miner, bool>();
                 Modules = new Dictionary<Module, bool>();
-                Mods = new Dictionary<Mod, bool>();
+                Mods = new Dictionary<string, bool>();
                 LanguageOptions = new List<Language>();
             }
 
@@ -47,7 +43,7 @@ namespace Foreman
                     clone.Miners.Add(kvp.Key, kvp.Value);
                 foreach (KeyValuePair<Module, bool> kvp in Modules)
                     clone.Modules.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<Mod, bool> kvp in Mods)
+                foreach (KeyValuePair<string, bool> kvp in Mods)
                     clone.Mods.Add(kvp.Key, kvp.Value);
                 foreach (Language language in LanguageOptions)
                     clone.LanguageOptions.Add(language);
@@ -57,7 +53,6 @@ namespace Foreman
                 clone.UserDataLocation = this.UserDataLocation;
                 clone.GenerationType = this.GenerationType;
                 clone.NormalDifficulty = this.NormalDifficulty;
-                clone.UseSaveFileData = this.UseSaveFileData;
 
                 return clone;
             }
@@ -69,8 +64,7 @@ namespace Foreman
                     (other.InstallLocation == this.InstallLocation) &&
                     (other.UserDataLocation == this.UserDataLocation) &&
                     (other.GenerationType == this.GenerationType) &&
-                    (other.NormalDifficulty == this.NormalDifficulty) &&
-                    (other.UseSaveFileData == this.UseSaveFileData);
+                    (other.NormalDifficulty == this.NormalDifficulty);
 
                 if (!ignoreAssemblersMinersModules)
                 {
@@ -85,7 +79,7 @@ namespace Foreman
                             same = same && other.Modules.Contains(kvp) && (kvp.Value == other.Modules[kvp.Key]);
                 }
                 if (same)
-                    foreach (KeyValuePair<Mod, bool> kvp in Mods)
+                    foreach (KeyValuePair<string, bool> kvp in Mods)
                         same = same && other.Mods.Contains(kvp) && (kvp.Value == other.Mods[kvp.Key]);
 
                 //dont care about language options, only about the actually selected language
@@ -96,7 +90,7 @@ namespace Foreman
         private SettingsFormOptions originalOptions;
         public SettingsFormOptions CurrentOptions;
         public bool ReloadRequested;
-        private bool modListEnabled = true;
+        private bool modListEnabled = false;
 
         public SettingsForm(SettingsFormOptions options)
         {
@@ -157,30 +151,10 @@ namespace Foreman
             ModSelectionBox.DisplayMember = "name";
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
             {
-                Mod mod = (Mod)ModSelectionBox.Items[i];
+                string mod = (string)ModSelectionBox.Items[i];
                 if (CurrentOptions.Mods[mod])
                     ModSelectionBox.SetItemChecked(i, true);
-
-                foreach (ModDependency dep in mod.parsedDependencies)
-                {
-                    if (dep.Optional)
-                        continue;
-
-                    Mod otherMod = this.getModFromName(dep.ModName);
-                    if (otherMod == null)
-                    {
-                        ModSelectionBox.errors[i] = mod.Name + " requires " + dep.ModName + " but is missing";
-                        break;
-                    }
-                    else if (!mod.DependsOn(otherMod, false))
-                    {
-                        ModSelectionBox.errors[i] = $"{mod.Name} requires {dep.ModName} {dep.VersionOperator.Token()} {dep.Version} but is {otherMod.version}";
-                        break;
-                    }
-                }
             }
-
-            UseSaveFileDataCheckBox.Checked = CurrentOptions.UseSaveFileData;
 
             //do this last to set the options on the mods before disabling / enabling changes
             if (CurrentOptions.GenerationType == DataCache.GenerationType.ForemanMod)
@@ -194,18 +168,9 @@ namespace Foreman
                 UseFactorioBaseRadioButton.Checked = true;
                 setModListEnabled(true);
             }
-        }
 
-        private Mod getModFromName(string name)
-        {
-            for (int i = 0; i < ModSelectionBox.Items.Count; i++)
-            {
-                Mod mod = (Mod)ModSelectionBox.Items[i];
-                if (mod.Name == name)
-                    return mod;
-            }
-
-            return null;
+            //attach the item check event last so it doesnt trigger during the initial setup of checkmarks
+            ModSelectionBox.ItemCheck += new ItemCheckEventHandler(ModSelectionBox_ItemCheck);
         }
 
         private void setModListEnabled(bool enabled)
@@ -292,21 +257,21 @@ namespace Foreman
         //MODS------------------------------------------------------------------------------------------
         private void ModSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (modListEnabled)
+            if (modListEnabled) //this also means that FactorioModsProcessor has the mod set
             {
-                Mod mod = (Mod)ModSelectionBox.Items[e.Index];
-                CurrentOptions.Mods[mod] = (e.NewValue == CheckState.Checked);
+                Mod mod = FactorioModsProcessor.Mods.First(m => m.Name == (string)ModSelectionBox.Items[e.Index]);
+                CurrentOptions.Mods[mod.Name] = (e.NewValue == CheckState.Checked);
 
                 //have to go through the dependecies when changing mod state. mod incompatibilities, versions, full dependencies are checked at load (similar to factorio)
-                if (CurrentOptions.Mods[mod])
+                if (CurrentOptions.Mods[mod.Name])
                 {
                     for (int i = 0; i < ModSelectionBox.Items.Count; i++)
                     {
-                        Mod otherMod = (Mod)ModSelectionBox.Items[i];
+                        Mod otherMod = FactorioModsProcessor.Mods.First(m => m.Name == (string)ModSelectionBox.Items[i]);
                         if (mod.DependsOn(otherMod, true))
                         {
                             ModSelectionBox.SetItemChecked(i, true);
-                            CurrentOptions.Mods[otherMod] = true;
+                            CurrentOptions.Mods[otherMod.Name] = true;
                         }
                     }
                 }
@@ -314,11 +279,11 @@ namespace Foreman
                 {
                     for (int i = 0; i < ModSelectionBox.Items.Count; i++)
                     {
-                        Mod otherMod = (Mod)ModSelectionBox.Items[i];
+                        Mod otherMod = FactorioModsProcessor.Mods.First(m => m.Name == (string)ModSelectionBox.Items[i]);
                         if (mod.DependsOn(otherMod, true))
                         {
                             ModSelectionBox.SetItemChecked(i, false);
-                            CurrentOptions.Mods[otherMod] = false;
+                            CurrentOptions.Mods[otherMod.Name] = false;
                         }
                     }
                 }
@@ -333,7 +298,7 @@ namespace Foreman
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
             {
                 ModSelectionBox.SetItemChecked(i, true);
-                CurrentOptions.Mods[(Mod)ModSelectionBox.Items[i]] = true;
+                CurrentOptions.Mods[(string)ModSelectionBox.Items[i]] = true;
             }
         }
 
@@ -342,7 +307,7 @@ namespace Foreman
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
             {
                 ModSelectionBox.SetItemChecked(i, false);
-                CurrentOptions.Mods[(Mod)ModSelectionBox.Items[i]] = false;
+                CurrentOptions.Mods[(string)ModSelectionBox.Items[i]] = false;
             }
         }
 
@@ -388,8 +353,8 @@ namespace Foreman
             else if (e.Cancel == false)
             {
                 CurrentOptions.UserDataLocation = CurrentOptions.InstallLocation; //we are actually closing, so set up the userdatalocation to what it is for processing
-                foreach (Mod mod in CurrentOptions.Mods.Keys.ToArray())
-                    if (mod.Name == "core" || mod.Name == "base")
+                foreach (string mod in CurrentOptions.Mods.Keys.ToArray())
+                    if (mod == "core" || mod == "base")
                         CurrentOptions.Mods[mod] = true;
             }
 
@@ -407,11 +372,6 @@ namespace Foreman
         private void LanguageDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
             CurrentOptions.selectedLanguage = (LanguageDropDown.SelectedItem as Language);
-        }
-
-        private void UseSaveFileDataCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            CurrentOptions.UseSaveFileData = UseSaveFileDataCheckBox.Checked;
         }
 
         //FOLDER LOCATIONS------------------------------------------------------------------------------------------

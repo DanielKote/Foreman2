@@ -56,7 +56,7 @@
             this.ConfirmButton = new System.Windows.Forms.Button();
             this.CancelSettingsButton = new System.Windows.Forms.Button();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
-            this.UseSaveFileDataCheckBox = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.UseForemanModRadioButton = new System.Windows.Forms.RadioButton();
             this.UseFactorioBaseRadioButton = new System.Windows.Forms.RadioButton();
             this.UseFactorioBaseOptionsGroup = new System.Windows.Forms.GroupBox();
@@ -125,7 +125,6 @@
             this.ModSelectionBox.Name = "ModSelectionBox";
             this.ModSelectionBox.Size = new System.Drawing.Size(240, 514);
             this.ModSelectionBox.TabIndex = 10;
-            this.ModSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModSelectionBox_ItemCheck);
             // 
             // groupBox7
             // 
@@ -388,34 +387,33 @@
             // 
             // groupBox10
             // 
-            this.groupBox10.Controls.Add(this.UseSaveFileDataCheckBox);
+            this.groupBox10.Controls.Add(this.label1);
             this.groupBox10.Controls.Add(this.UseForemanModRadioButton);
             this.groupBox10.Controls.Add(this.UseFactorioBaseRadioButton);
             this.groupBox10.Controls.Add(this.UseFactorioBaseOptionsGroup);
             this.groupBox10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.groupBox10.Location = new System.Drawing.Point(12, 204);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(453, 321);
+            this.groupBox10.Size = new System.Drawing.Size(453, 297);
             this.groupBox10.TabIndex = 19;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "Factorio Options:";
             // 
-            // UseSaveFileDataCheckBox
+            // label1
             // 
-            this.UseSaveFileDataCheckBox.AutoSize = true;
-            this.UseSaveFileDataCheckBox.Location = new System.Drawing.Point(10, 25);
-            this.UseSaveFileDataCheckBox.Name = "UseSaveFileDataCheckBox";
-            this.UseSaveFileDataCheckBox.Size = new System.Drawing.Size(252, 24);
-            this.UseSaveFileDataCheckBox.TabIndex = 20;
-            this.UseSaveFileDataCheckBox.Text = "Use Save-file data if available";
-            this.UseSaveFileDataCheckBox.UseVisualStyleBackColor = true;
-            this.UseSaveFileDataCheckBox.CheckedChanged += new System.EventHandler(this.UseSaveFileDataCheckBox_CheckedChanged);
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.label1.Location = new System.Drawing.Point(45, 20);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(384, 17);
+            this.label1.TabIndex = 21;
+            this.label1.Text = "(If loading from save file, factorio installation isnt necessary)";
             // 
             // UseForemanModRadioButton
             // 
             this.UseForemanModRadioButton.AutoSize = true;
             this.UseForemanModRadioButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.UseForemanModRadioButton.Location = new System.Drawing.Point(17, 79);
+            this.UseForemanModRadioButton.Location = new System.Drawing.Point(17, 55);
             this.UseForemanModRadioButton.Name = "UseForemanModRadioButton";
             this.UseForemanModRadioButton.Size = new System.Drawing.Size(426, 21);
             this.UseForemanModRadioButton.TabIndex = 19;
@@ -427,12 +425,12 @@
             // 
             this.UseFactorioBaseRadioButton.AutoSize = true;
             this.UseFactorioBaseRadioButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.UseFactorioBaseRadioButton.Location = new System.Drawing.Point(17, 112);
+            this.UseFactorioBaseRadioButton.Location = new System.Drawing.Point(17, 88);
             this.UseFactorioBaseRadioButton.Name = "UseFactorioBaseRadioButton";
-            this.UseFactorioBaseRadioButton.Size = new System.Drawing.Size(286, 21);
+            this.UseFactorioBaseRadioButton.Size = new System.Drawing.Size(401, 21);
             this.UseFactorioBaseRadioButton.TabIndex = 19;
             this.UseFactorioBaseRadioButton.TabStop = true;
-            this.UseFactorioBaseRadioButton.Text = "Auto generate objects from factorio base";
+            this.UseFactorioBaseRadioButton.Text = "Attempt generation via LUA (Not Recommended - Can Fail)";
             this.UseFactorioBaseRadioButton.UseVisualStyleBackColor = true;
             this.UseFactorioBaseRadioButton.CheckedChanged += new System.EventHandler(this.UseFactorioBaseRadioButton_CheckedChanged);
             // 
@@ -440,7 +438,7 @@
             // 
             this.UseFactorioBaseOptionsGroup.Controls.Add(this.groupBox14);
             this.UseFactorioBaseOptionsGroup.Controls.Add(this.groupBox13);
-            this.UseFactorioBaseOptionsGroup.Location = new System.Drawing.Point(10, 116);
+            this.UseFactorioBaseOptionsGroup.Location = new System.Drawing.Point(10, 92);
             this.UseFactorioBaseOptionsGroup.Name = "UseFactorioBaseOptionsGroup";
             this.UseFactorioBaseOptionsGroup.Size = new System.Drawing.Size(434, 192);
             this.UseFactorioBaseOptionsGroup.TabIndex = 2;
@@ -592,6 +590,6 @@
         private System.Windows.Forms.Button AssemblerSelectionAllButton;
         private System.Windows.Forms.Button ReloadButton;
         private System.Windows.Forms.CheckBox IgnoreUserDataLocationCheckBox;
-        private System.Windows.Forms.CheckBox UseSaveFileDataCheckBox;
+        private System.Windows.Forms.Label label1;
     }
 }

@@ -77,10 +77,10 @@ namespace Foreman
                 if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
                     backgroundColour = missingColour;
             }
-            else if (DisplayedNode is SupplyNode)
+            else if (DisplayedNode is SupplierNode)
             {
                 backgroundColour = supplyColour;
-                if (((SupplyNode)DisplayedNode).SuppliedItem.IsMissingItem)
+                if (((SupplierNode)DisplayedNode).SuppliedItem.IsMissingItem)
                     backgroundColour = missingColour;
             }
             else if (DisplayedNode is RecipeNode)
@@ -120,7 +120,7 @@ namespace Foreman
 				outputTabs.Add(newTab);
 			}
 
-			if (DisplayedNode is RecipeNode || DisplayedNode is SupplyNode)
+			if (DisplayedNode is RecipeNode || DisplayedNode is SupplierNode)
 			{
 				assemblerBox = new AssemblerBox(Parent);
 				SubElements.Add(assemblerBox); 
@@ -154,9 +154,9 @@ namespace Foreman
 		{
 			UpdateTabOrder();
 
-			if (DisplayedNode is SupplyNode)
+			if (DisplayedNode is SupplierNode)
 			{
-				SupplyNode node = (SupplyNode)DisplayedNode;
+				SupplierNode node = (SupplierNode)DisplayedNode;
 				if (!Parent.ShowMiners)
 				{
 					if (node.SuppliedItem.IsMissingItem)
@@ -206,17 +206,17 @@ namespace Foreman
 			if (assemblerBox != null) //recipe box (update width&height if displaying assembler/miner, or just increase min width if not displaying assembler/miner) + update assembler list
 			{
 				if ((DisplayedNode is RecipeNode && Parent.ShowAssemblers)
-					|| (DisplayedNode is SupplyNode && Parent.ShowMiners))
+					|| (DisplayedNode is SupplierNode && Parent.ShowMiners))
 				{
-					if (DisplayedNode is RecipeNode)
+					if (DisplayedNode is RecipeNode  rNode)
 					{
-                        var assemblers = (DisplayedNode as RecipeNode).GetAssemblers();
+                        var assemblers = rNode.GetAssemblers();
                         if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
                             assemblers = assemblers.ToDictionary(p => p.Key, p => 0);
 						assemblerBox.AssemblerList = assemblers;
 					}
-					else if (DisplayedNode is SupplyNode)
-						assemblerBox.AssemblerList = (DisplayedNode as SupplyNode).GetMinimumMiners();
+					else if (DisplayedNode is SupplierNode sNode)
+						assemblerBox.AssemblerList = sNode.GetMinimumMiners();
 
 					assemblerBox.Update();
 					int assemblerBoxWidth = assemblerBox.Width + 20;
@@ -364,10 +364,10 @@ namespace Foreman
 				GraphicsStuff.FillRoundRect(trans.X - (Width/2), trans.Y - (Height / 2), Width, Height, 8, graphics, bgBrush);
 				graphics.DrawString(text, myFont, textBrush, trans.X, trans.Y, centreFormat);
 
-				if (DisplayedNode is RecipeNode)
+				if (DisplayedNode is RecipeNode rNode)
 				{
 					int prodCount = 0;
-					var assemblers = (DisplayedNode as RecipeNode).GetAssemblers();
+					var assemblers = rNode.GetAssemblers();
 					foreach (MachinePermutation assembler in assemblers.Keys)
 						foreach (Module module in assembler.modules)
 							if (module.ProductivityBonus > 0)
@@ -478,9 +478,23 @@ namespace Foreman
 				}
 				if (!inItemTab)
 				{
-					Parent.OpenNodeMenu(this);
-				}
-			}
+                    rightClickMenu.MenuItems.Clear();
+                    rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+                        new EventHandler((o, e) =>
+                        {
+                            Parent.DeleteNode(this);
+                        })));
+                    if (Parent.SelectedNodes.Count > 2 && Parent.SelectedNodes.Contains(this))
+                    {
+                        rightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
+                        new EventHandler((o, e) =>
+                        {
+                            Parent.TryDeleteSelectedNodes();
+                        })));
+                    }
+                    rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+                }
+            }
 		}
 
 		public void beginEditingNodeRate()
@@ -504,23 +518,46 @@ namespace Foreman
 				if (mousedTab != null)
 				{
 					TooltipInfo tti = new TooltipInfo();
-					tti.Text = mousedTab.Item.FriendlyName;
+
 					if (mousedTab.Type == LinkType.Input)
 					{
-						tti.Text += "\nDrag to create a new connection";
+                        if (DisplayedNode is RecipeNode rNode)
+                            tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(mousedTab.Item);
+                        else if(!mousedTab.Item.IsTemperatureDependent)
+                            tti.Text = mousedTab.Item.FriendlyName;
+						else
+                        {
+							fRange tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Output); //input type tab means output of connection link
+							if (tempRange.Ignore && DisplayedNode is PassthroughNode)
+								tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Input); //if there was no temp range on this side of this throughput node, try to just copy the other side
+							tti.Text = Item.GetTemperatureRangeFriendlyName(mousedTab.Item, tempRange);
+                        }
+
+					    tti.Text += "\nDrag to create a new connection";
 						tti.Direction = Direction.Up;
 						tti.ScreenLocation = Parent.GraphToScreen(GetInputLineConnectionPoint(mousedTab.Item));
 					}
-					else
+					else //if(mousedTab.Type == LinkType.Output)
 					{
-						tti.Text = mousedTab.Item.FriendlyName;
+                        if (DisplayedNode is RecipeNode rNode)
+                            tti.Text = rNode.BaseRecipe.GetProductFriendlyName(mousedTab.Item);
+						else if (!mousedTab.Item.IsTemperatureDependent)
+							tti.Text = mousedTab.Item.FriendlyName;
+						else
+						{
+							fRange tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Input); //output type tab means input of connection link
+							if (tempRange.Ignore && DisplayedNode is PassthroughNode)
+								tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Output); //if there was no temp range on this side of this throughput node, try to just copy the other side
+							tti.Text = Item.GetTemperatureRangeFriendlyName(mousedTab.Item, tempRange);
+						}
+
 						tti.Text += "\nDrag to create a new connection";
-						tti.Direction = Direction.Down;
+                        tti.Direction = Direction.Down;
 						tti.ScreenLocation = Parent.GraphToScreen(GetOutputLineConnectionPoint(mousedTab.Item));
 					}
 					toolTips.Add(tti);
 				}
-				else if (DisplayedNode is RecipeNode)
+				else if (DisplayedNode is RecipeNode rNode)
 				{
 					TooltipInfo tti = new TooltipInfo();
 					tti.Direction = Direction.Left;
@@ -528,15 +565,15 @@ namespace Foreman
 					tti.Text = String.Format("WH: {0},{1}\n", Width, Height);
 					tti.Text += String.Format("XY: {0},{1}\n", X, Y);
 
-					tti.Text += String.Format("Recipe: {0}", (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName);
-					tti.Text += String.Format("\n--Base Time: {0}s", (DisplayedNode as RecipeNode).BaseRecipe.Time);
+					tti.Text += String.Format("Recipe: {0}", rNode.BaseRecipe.FriendlyName);
+					tti.Text += String.Format("\n--Base Time: {0}s", rNode.BaseRecipe.Time);
 					tti.Text += String.Format("\n--Base Ingredients:");
-					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.IngredientsSet)
+					foreach (var kvp in rNode.BaseRecipe.IngredientSet)
 					{
 						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
 					}
-					tti.Text += String.Format("\n--Base Results:");
-					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.ResultsSet)
+					tti.Text += String.Format("\n--Base Products:");
+					foreach (var kvp in rNode.BaseRecipe.ProductSet)
 					{
 						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
 					}

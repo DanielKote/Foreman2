@@ -132,6 +132,7 @@
     <Compile Include="Controls\IRChooserPanel.Designer.cs">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataCache\FactorioModsProcessor.cs" />
     <Compile Include="DataTypes\Assembler.cs" />
     <Compile Include="DataTypes\DataObjectBase.cs" />
     <Compile Include="DataTypes\Group.cs" />
@@ -142,6 +143,11 @@
     <Compile Include="Forms\DirectoryChooserForm.designer.cs">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\ConsumerNode.cs" />
+    <Compile Include="Models\ErrorNode.cs" />
+    <Compile Include="Models\PassthroughNode.cs" />
+    <Compile Include="Models\RecipeNode.cs" />
+    <Compile Include="Models\SupplierNode.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="ProductionGraphView\AssemblerBox.cs" />
     <Compile Include="Controls\CheckboxListWithErrors.cs">

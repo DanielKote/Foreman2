@@ -228,23 +228,29 @@ namespace Foreman
 			NodeElement mousedElement = Parent.GetElementsAtPoint(location).OfType<NodeElement>().FirstOrDefault();
 			if (mousedElement != null)
 			{
-				if (StartConnectionType == LinkType.Input)
-				{
-					if (mousedElement.DisplayedNode.Outputs.Contains(Item))
-						SupplierElement = mousedElement;
-				}
-				else
-				{
-					if (mousedElement.DisplayedNode.Inputs.Contains(Item))
-						ConsumerElement = mousedElement;
-				}
-			}
-			else
+                if (StartConnectionType == LinkType.Input && mousedElement.DisplayedNode.Outputs.Contains(Item))
+                    SupplierElement = mousedElement;
+                else if (StartConnectionType == LinkType.Output && mousedElement.DisplayedNode.Inputs.Contains(Item))
+                    ConsumerElement = mousedElement;
+
+				//if we have found a possible connection above (both supplier & consumer are no longer null), but the item is temperature dependent AND the temperature check fails, break connection
+                if (SupplierElement != null &&
+					ConsumerElement != null &&
+					Item.IsTemperatureDependent &&
+					!LinkElement.IsValidTemperatureConnection(Item, SupplierElement, ConsumerElement))
+                {
+                    if (StartConnectionType == LinkType.Input)
+                        SupplierElement = null;
+                    else  //if(StartConnectionType == LinkType.Output)
+                        ConsumerElement = null;
+                }
+            }
+			else //no node under mouse, break any previously established connections (ex:when mouse drag leaves a possible connection)
 			{
 				if (StartConnectionType == LinkType.Input)
 					SupplierElement = null;
-				else
-					ConsumerElement = null;
+                else  //if(StartConnectionType == LinkType.Output)
+                    ConsumerElement = null;
 			}
 		}
 	}

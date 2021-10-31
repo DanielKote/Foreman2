@@ -43,7 +43,8 @@ namespace Foreman
 		public Rectangle SelectionZone;
 		public Point SelectionZoneOriginPoint;
 
-		private HashSet<NodeElement> SelectedNodes; //main list of selected nodes
+        public IReadOnlyCollection<NodeElement> SelectedNodes { get { return selectedNodes; } }
+		private HashSet<NodeElement> selectedNodes; //main list of selected nodes
 		private HashSet<NodeElement> CurrentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
 
 		private Pen gridPen = new Pen(Color.FromArgb(220, 220, 220), 1);
@@ -105,7 +106,7 @@ namespace Foreman
 			Resize += new EventHandler(ProductionGraphViewer_Resized);
 			ViewOffset = new Point(Width / -2, Height / -2);
 
-			SelectedNodes = new HashSet<NodeElement>();
+			selectedNodes = new HashSet<NodeElement>();
 			CurrentSelectionNodes = new HashSet<NodeElement>();
 
 			UpdateGraphBounds();
@@ -125,13 +126,22 @@ namespace Foreman
 
 		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType , NodeElement originElement = null)
 		{
-			if (nNodeType != NewNodeType.Disconnected && originElement == null) //just in case check (should
-				Trace.Fail("Origin element not provided for a new (linked) node");
+			if (nNodeType != NewNodeType.Disconnected && (originElement == null || baseItem == null)) //just in case check (should
+				Trace.Fail("Origin element or base item not provided for a new (linked) node");
 
 			if (ShowGrid)
 				newLocation = new Point(AlignToGrid(newLocation.X), AlignToGrid(newLocation.Y));
 
-			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
+			fRange tempRange = new fRange(0,0, true);
+			if (baseItem != null && baseItem.IsTemperatureDependent)
+			{
+				if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
+					tempRange = LinkElement.GetTemperatureRange(baseItem, originElement, LinkType.Output);
+				else if (nNodeType == NewNodeType.Supplier) //need to check all nodes up to recipes for range of temperatures being consumed (guaranteed to be in a SINGLE [] range)
+					tempRange = LinkElement.GetTemperatureRange(baseItem, originElement, LinkType.Input);
+			}
+
+			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
 			recipeChooser.Show(newProductionNode =>
 			{
 				if(newProductionNode != null)
@@ -178,9 +188,9 @@ namespace Foreman
 
 		public void AddRemoveElements()
 		{
-			Elements.RemoveWhere(e => e is LinkElement && !Graph.GetAllNodeLinks().Contains((e as LinkElement).DisplayedLink));
-			Elements.RemoveWhere(e => e is NodeElement && !Graph.Nodes.Contains((e as NodeElement).DisplayedNode));
-			SelectedNodes.RemoveWhere(e => !Graph.Nodes.Contains(e.DisplayedNode));
+			Elements.RemoveWhere(e => e is LinkElement le && !Graph.GetAllNodeLinks().Contains(le.DisplayedLink));
+			Elements.RemoveWhere(e => e is NodeElement le && !Graph.Nodes.Contains(le.DisplayedNode));
+			selectedNodes.RemoveWhere(e => !Graph.Nodes.Contains(e.DisplayedNode));
 
 			foreach (ProductionNode node in Graph.Nodes)
 			{
@@ -206,7 +216,7 @@ namespace Foreman
         {
 			if (tab.Type == LinkType.Input)
 			{
-				var removedLinks = Elements.Where(le => le is LinkElement && (le as LinkElement).ConsumerTab == tab).ToList();
+				var removedLinks = Elements.Where(e => e is LinkElement le && le.ConsumerTab == tab).ToList();
 				foreach (LinkElement removedLink in removedLinks)
 				{
 					removedLink.DisplayedLink.Destroy();
@@ -215,7 +225,7 @@ namespace Foreman
 			}
 			else
 			{
-				var removedLinks = Elements.Where(le => le is LinkElement && (le as LinkElement).SupplierTab == tab).ToList();
+				var removedLinks = Elements.Where(e => e is LinkElement le && le.SupplierTab == tab).ToList();
 				foreach (LinkElement removedLink in removedLinks)
 				{
 					removedLink.DisplayedLink.Destroy();
@@ -246,7 +256,7 @@ namespace Foreman
 			{
 				foreach (NodeLink link in node.DisplayedNode.InputLinks.ToList().Union(node.DisplayedNode.OutputLinks.ToList()))
 				{
-					Elements.RemoveWhere(le => le is LinkElement && (le as LinkElement).DisplayedLink == link);
+					Elements.RemoveWhere(e => e is LinkElement le && le.DisplayedLink == link);
 				}
 				Elements.Remove(node);
 				node.DisplayedNode.Destroy();
@@ -259,13 +269,13 @@ namespace Foreman
 		public void TryDeleteSelectedNodes()
 		{
 			bool proceed = true;
-			if (SelectedNodes.Count > 10)
-				proceed = (MessageBox.Show("You are deleting " + SelectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
+			if (selectedNodes.Count > 10)
+				proceed = (MessageBox.Show("You are deleting " + selectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
 			if (proceed)
 			{
-				foreach (NodeElement node in SelectedNodes)
+				foreach (NodeElement node in selectedNodes)
 					DeleteNode(node);
-				SelectedNodes.Clear();
+				selectedNodes.Clear();
 			}
 		}
 
@@ -273,14 +283,14 @@ namespace Foreman
 		{
 			if ((Control.ModifierKeys & Keys.Alt) != 0) //remove zone
 			{
-				foreach (NodeElement selectedNode in SelectedNodes)
+				foreach (NodeElement selectedNode in selectedNodes)
 					selectedNode.Selected = true;
 				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
 					newlySelectedNode.Selected = false;
 			}
 			else if ((Control.ModifierKeys & Keys.Control) != 0)  //add zone
 			{
-				foreach (NodeElement selectedNode in SelectedNodes)
+				foreach (NodeElement selectedNode in selectedNodes)
 					selectedNode.Selected = true;
 				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
 					newlySelectedNode.Selected = true;
@@ -294,31 +304,12 @@ namespace Foreman
 
 		public void AlignSelected()
 		{
-			foreach (NodeElement ne in SelectedNodes)
+			foreach (NodeElement ne in selectedNodes)
 			{
 				ne.X = AlignToGrid(ne.X);
 				ne.Y = AlignToGrid(ne.Y);
 			}
 			Invalidate();
-		}
-
-		public void OpenNodeMenu(NodeElement node)
-		{
-			rightClickMenu.MenuItems.Clear();
-			rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-				new EventHandler((o, e) =>
-				{
-					DeleteNode(node);
-				})));
-			if (SelectedNodes.Count > 2 && SelectedNodes.Contains(node))
-			{
-				rightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
-				new EventHandler((o, e) =>
-				{
-					TryDeleteSelectedNodes();
-				})));
-			}
-			rightClickMenu.Show(Parent, Point.Add(Control.MousePosition, new Size(0, -20)));
 		}
 
 		//----------------------------------------------Paint functions
@@ -582,9 +573,9 @@ namespace Foreman
 					SelectionZone = new Rectangle();
 					if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0) //clear all selected nodes if we arent using modifier keys
 					{
-						foreach (NodeElement ne in SelectedNodes)
+						foreach (NodeElement ne in selectedNodes)
 							ne.Selected = false;
-						SelectedNodes.Clear();
+						selectedNodes.Clear();
 					}
 				}
             }
@@ -618,15 +609,15 @@ namespace Foreman
 						if ((Control.ModifierKeys & Keys.Alt) != 0) //removal zone processing
 						{
 							foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-								SelectedNodes.Remove(newlySelectedNode);
+								selectedNodes.Remove(newlySelectedNode);
 						}
 						else
 						{
 							if ((Control.ModifierKeys & Keys.Control) == 0) //if we arent using control, then we are just selecting
-								SelectedNodes.Clear();
+								selectedNodes.Clear();
 
 							foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-								SelectedNodes.Add(newlySelectedNode);
+								selectedNodes.Add(newlySelectedNode);
 						}
 						CurrentSelectionNodes.Clear();
 					}
@@ -635,7 +626,7 @@ namespace Foreman
 					{
 						if ((Control.ModifierKeys & Keys.Alt) != 0) //remove
 						{
-							SelectedNodes.Remove(clickedNode);
+							selectedNodes.Remove(clickedNode);
 							clickedNode.Selected = false;
 							MouseDownElement = null;
 							Invalidate();
@@ -643,9 +634,9 @@ namespace Foreman
 						else if ((Control.ModifierKeys & Keys.Control) != 0) //add if unselected, remove if selected
 						{
 							if (clickedNode.Selected)
-								SelectedNodes.Remove(clickedNode);
+								selectedNodes.Remove(clickedNode);
 							else
-								SelectedNodes.Add(clickedNode);
+								selectedNodes.Add(clickedNode);
 
 							clickedNode.Selected = !clickedNode.Selected;
 							MouseDownElement = null;
@@ -687,14 +678,14 @@ namespace Foreman
 					break;
 
 				case DragOperation.Item:
-					if (SelectedNodes.Contains(MouseDownElement)) //dragging a group
+					if (selectedNodes.Contains(MouseDownElement)) //dragging a group
 					{
 						Point startPoint = MouseDownElement.Location;
 						MouseDownElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-MouseDownElement.X, -MouseDownElement.Y)));
 						Point endPoint = MouseDownElement.Location;
 						if (startPoint != endPoint)
 						{
-							foreach(NodeElement node in SelectedNodes)
+							foreach(NodeElement node in selectedNodes)
                             {
 								if (node != MouseDownElement)
 								{
@@ -807,25 +798,25 @@ namespace Foreman
 				Console.WriteLine((int)(keyData & Keys.Left));
 				Console.WriteLine((int)(Keys.Left));
 
-				foreach (NodeElement node in SelectedNodes)
+				foreach (NodeElement node in selectedNodes)
 					node.X -= moveUnit;
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Right)
 			{
-				foreach (NodeElement node in SelectedNodes)
+				foreach (NodeElement node in selectedNodes)
 					node.X += moveUnit;
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Up)
 			{
-				foreach (NodeElement node in SelectedNodes)
+				foreach (NodeElement node in selectedNodes)
 					node.Y -= moveUnit;
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Down)
 			{
-				foreach (NodeElement node in SelectedNodes)
+				foreach (NodeElement node in selectedNodes)
 					node.Y += moveUnit;
 				processed = true;
 			}
@@ -950,14 +941,14 @@ namespace Foreman
 			info.AddValue("EnabledAssemblers", DataCache.Assemblers.Values.Where(a => a.Enabled).Select<Assembler, String>(a => a.Name));
 			info.AddValue("EnabledMiners", DataCache.Miners.Values.Where(m => m.Enabled).Select<Miner, String>(m => m.Name));
 			info.AddValue("EnabledModules", DataCache.Modules.Values.Where(m => m.Enabled).Select<Module, String>(m => m.Name));
-			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Enabled).Select<Mod, String>(m => m.Name));
+			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Value).Select(n => n.Key));
 			info.AddValue("HiddenRecipes", DataCache.Recipes.Values.Where(r => r.Hidden).Select<Recipe, String>(r => r.Name));
 			info.AddValue("Nodes", Graph.Nodes);
 			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
 			info.AddValue("ElementLocations", Graph.Nodes.Select(n => GetElementForNode(n).Location).ToList());
 		}
 
-		public void LoadFromJson(JObject json, bool resetEnabledStates = false)
+		public void LoadFromJson(JObject json, bool reloadIconCache)
 		{
 			//clear graph
 			Graph.Nodes.Clear();
@@ -983,7 +974,7 @@ namespace Foreman
 				Properties.Settings.Default.EnabledModules.Add(module);
 
 			//update DataCache with the updated mod info (or just update it in general to have a clean slate)
-			using (DataReloadForm form = new DataReloadForm())
+			using (DataReloadForm form = new DataReloadForm(reloadIconCache))
 				form.ShowDialog();
 
 			foreach (string recipe in json["HiddenRecipes"].Select(t => (string)t).ToList())
@@ -1020,18 +1011,18 @@ namespace Foreman
 					//recipe check #1 : does its name exist in database
 					string recipeName = (string)iRecipe["Name"];
 					bool recipeExists = DataCache.Recipes.ContainsKey(recipeName);
-					//recipe check #2 : do the ingredients & results from the loaded data exist within the actual recipe?
+					//recipe check #2 : do the ingredients & products from the loaded data exist within the actual recipe?
 					//check for null to handle old saves
 					List<string> ingredients = iRecipe["Ingredients"].Select(t => (string)t).ToList();
-					List<string> results = iRecipe["Results"].Select(t => (string)t).ToList();
+					List<string> products = iRecipe["Products"].Select(t => (string)t).ToList();
 					if (recipeExists)
 					{
 						Recipe recipe = DataCache.Recipes[recipeName];
 						//check #2 (from above)
 						foreach (string ingredient in ingredients)
-							recipeExists &= DataCache.Items.ContainsKey(ingredient) && recipe.IngredientsSet.ContainsKey(DataCache.Items[ingredient]);
-						foreach (string result in results)
-							recipeExists &= DataCache.Items.ContainsKey(result) && recipe.ResultsSet.ContainsKey(DataCache.Items[result]);
+							recipeExists &= DataCache.Items.ContainsKey(ingredient) && recipe.IngredientSet.ContainsKey(DataCache.Items[ingredient]);
+						foreach (string result in products)
+							recipeExists &= DataCache.Items.ContainsKey(result) && recipe.ProductSet.ContainsKey(DataCache.Items[result]);
 					}
 					if (!recipeExists)
 					{
@@ -1047,12 +1038,12 @@ namespace Foreman
 								else
 									missingRecipe.AddIngredient(DataCache.MissingItems[ingredient], 1);
 							}
-							foreach (string result in results)
+							foreach (string product in products)
 							{
-								if (DataCache.Items.ContainsKey(result))
-									missingRecipe.AddResult(DataCache.Items[result], 1);
+								if (DataCache.Items.ContainsKey(product))
+									missingRecipe.AddProduct(DataCache.Items[product], 1);
 								else
-									missingRecipe.AddResult(DataCache.MissingItems[result], 1);
+									missingRecipe.AddProduct(DataCache.MissingItems[product], 1);
 							}
 
 							DataCache.MissingRecipes.Add(recipeName, missingRecipe);
@@ -1082,9 +1073,9 @@ namespace Foreman
 						{
 							string itemName = (string)node["ItemName"];
 							if (DataCache.Items.ContainsKey(itemName))
-								newNode = SupplyNode.Create(DataCache.Items[itemName], Graph);
+								newNode = SupplierNode.Create(DataCache.Items[itemName], Graph);
 							else if (DataCache.MissingItems.ContainsKey(itemName))
-								newNode = SupplyNode.Create(DataCache.MissingItems[itemName], Graph);
+								newNode = SupplierNode.Create(DataCache.MissingItems[itemName], Graph);
 							break;
 						}
 					case "PassThrough":
@@ -1099,7 +1090,7 @@ namespace Foreman
 					case "Recipe":
 						{
 							string recipeName = (string)node["RecipeName"];
-							if (DataCache.MissingRecipes.ContainsKey(recipeName)) //missing list checked first in case of same recipe name (but different ingredients/results)
+							if (DataCache.MissingRecipes.ContainsKey(recipeName)) //missing list checked first in case of same recipe name (but different ingredients/products)
 								newNode = RecipeNode.Create(DataCache.MissingRecipes[recipeName], Graph);
 							else if (DataCache.Recipes.ContainsKey(recipeName))
 								newNode = RecipeNode.Create(DataCache.Recipes[recipeName], Graph);

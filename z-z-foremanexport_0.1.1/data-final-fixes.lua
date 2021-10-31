@@ -12,11 +12,12 @@ end
 
 --process the entire icons/icon/iconsize property set, and add the corresponding dummy item
 outputSet = {}
-function ProcessIcon(obj)
+function ProcessIcon(obj, defaultSize)
 
 	output =         '<><>'..obj.name..'<><>'
 	if obj.icon or obj.icons then --if both are missing, then icon_info is set to null
 		output = output..'			"icon_info":\n			{\n'
+		output = output..'				"icon_dsize": '..defaultSize..',\n'
 		output = output..ProcessIconData(obj, 4)..',\n'
 		output = output..'				"icons":\n				[\n'
 
@@ -138,81 +139,81 @@ LOG('---------------------TECHNOLOGY:-------------------')
 table.insert(outputSet,'<!><!>T')
 for name, obj in pairs(data.raw.technology) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 256)
 end
 LOG('---------------------RECIPIES:-------------------')
 table.insert(outputSet,'<!><!>R')
 for name, obj in pairs(data.raw.recipe) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 LOG('---------------------ITEMS:-------------------')
 table.insert(outputSet,'<!><!>I')
 for name, obj in pairs(data.raw.item) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw.capsule) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw.module) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw.ammo) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw.gun) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw.armor) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw.tool) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['repair-tool']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['rail-planner']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['item-with-entity-data']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['item-with-inventory']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['item-with-label']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['item-with-tags']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['spider-vehicle']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['spidertron-remote']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 LOG('---------------------FLUIDS:-------------------')
 table.insert(outputSet,'<!><!>F')
 for name, obj in pairs(data.raw.fluid) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 --[[
 --modules go into items
@@ -220,35 +221,35 @@ LOG('---------------------MODULES:-------------------')
 table.insert(outputSet,'<!><!>M')
 for name, obj in pairs(data.raw.module) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 --]]
 LOG('---------------------ASSEMBLY MACHINES:-------------------')
 table.insert(outputSet,'<!><!>A')
 for name, obj in pairs(data.raw['assembling-machine']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['rocket-silo']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 for name, obj in pairs(data.raw['furnace']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 LOG('---------------------MINERS:-------------------')
 table.insert(outputSet,'<!><!>D')
 for name, obj in pairs(data.raw['mining-drill']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 32)
 end
 
 LOG('---------------------ITEM GROUPS:-------------------')
 table.insert(outputSet,'<!><!>G')
 for name, obj in pairs(data.raw['item-group']) do
 	LOG(name)
-	ProcessIcon(obj)
+	ProcessIcon(obj, 64)
 end
 
 

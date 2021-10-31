@@ -15,6 +15,7 @@ local AvailableAMachines = {}
 local AvailableMiners = {}
 local AvailableResources = {}
 
+--these are the name -> icon index dictionaries. an object with a given name will ask the correct dictionary for the icon index, which will then give him the actual icon information from the IconCollection dictionary
 local IconsTech = {}
 local IconsRecipes = {}
 local IconsItems = {}
@@ -23,6 +24,9 @@ local IconsFluids = {}
 local IconsAMachines = {}
 local IconsMiners = {}
 local IconsGroups = {}
+
+local IconIndex = 0
+local IconCollection = {} --this is where the icon data is actually stored
 
 --translations for localization names & descriptions.
 local Translations = {}
@@ -34,6 +38,7 @@ local FailedIcons = {}
 
 local function FlushFileBuffer()
 	game.write_file('ForemanFactorioSetup.txt', FileBuffer, true)
+	game.remove_path('ForemanFactorioIconData.dat') --this deletes any existing icon cache when the setup file updates.
 	FileBuffer = ''
 end
 
@@ -374,8 +379,11 @@ local function ReadIconData()
 					processString = string.sub(processString, dataEndIndex + 6)
 					progressMade = true
 					
-					currentDictionary[name] = data
-					LOG(name)
+					currentDictionary[name] = IconIndex
+					IconCollection[IconIndex] = data
+					LOG(IconIndex..": "..name)
+					IconIndex = IconIndex + 1
+
 				end
 				
 			end		
@@ -540,10 +548,10 @@ local function ExportResearch()
 		ExportLine('],',  3)
 		
 		if IconsTech[name] then
-			ExportRaw(IconsTech[name]..'\n')
+			ExportParameter('icon_id', IconsTech[name], true, '', 3)
 		else
 			table.insert(FailedIcons, 'Tech: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 
 		counter = counter - 1 
@@ -644,26 +652,26 @@ local function ExportRecipes()
 		
 		if IconsRecipes[name] then
 			--need to check for null icons (very likely here since recipes with 1 result will usually not have an icon and just use the one from the result)
-			if string.find(IconsRecipes[name], '"icon_info": null') then
+			if string.find(IconCollection[IconsRecipes[name]], '"icon_info": null') then
 				if recipe.products[1] then
 					if IconsItems[recipe.products[1].name] then
-						ExportRaw(IconsItems[recipe.products[1].name]..'\n')
+						ExportParameter('icon_id', IconsItems[recipe.products[1].name], true, '', 3)
 					elseif IconsFluids[recipe.products[1].name] then
-						ExportRaw(IconsFluids[recipe.products[1].name]..'\n')
+						ExportParameter('icon_id', IconsFluids[recipe.products[1].name], true, '', 3)
 					else
 						table.insert(FailedIcons, 'Recipe: '..name)
-						ExportParameter('icon_info', 'null', true, '', 3)
+						ExportParameter('icon_id', '-1', true, '', 3)
 					end
 				else
 					table.insert(FailedIcons, 'Recipe: '..name)
-					ExportParameter('icon_info', 'null', true, '', 3)
+					ExportParameter('icon_id', '-1', true, '', 3)
 				end				
 			else
-				ExportRaw(IconsRecipes[name]..'\n')
+				ExportParameter('icon_id', IconsRecipes[name], true, '', 3)
 			end
 		else
 			table.insert(FailedIcons, 'Recipe: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 
 		counter = counter - 1 
@@ -713,10 +721,10 @@ local function ExportItems()
 		end
 		
 		if IconsItems[name] then
-			ExportRaw(IconsItems[name]..'\n')
+			ExportParameter('icon_id', IconsItems[name], true, '', 3)
 		else
 			table.insert(FailedIcons, 'Item: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 		
 		counter = counter - 1 
@@ -765,10 +773,10 @@ local function ExportFluids()
 		end
 
 		if IconsFluids[name] then
-			ExportRaw(IconsFluids[name]..'\n')
+			ExportParameter('icon_id', IconsFluids[name], true, '', 3)
 		else
 			table.insert(FailedIcons, 'Fluid: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 		
 		counter = counter - 1 
@@ -831,10 +839,10 @@ local function ExportModules()
 		ExportLine('],', 3)
 		
 		if IconsItems[name] then
-			ExportRaw(IconsItems[name]..'\n')
+			ExportParameter('icon_id', IconsItems[name], true, '', 3)
 		else
 			table.insert(FailedIcons, 'Module: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 
 		counter = counter - 1 
@@ -908,10 +916,10 @@ local function ExportCraftingMachines()
 		ExportLine('],', 3)
 		
 		if IconsAMachines[name] then
-			ExportRaw(IconsAMachines[name]..'\n')
+			ExportParameter('icon_id', IconsAMachines[name], true, '', 3)
 		else
 			table.insert(FailedIcons, 'AssemblyMachine: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 		
 		counter = counter - 1 
@@ -970,10 +978,10 @@ local function ExportMiners()
 		ExportLine('],', 3)
 		
 		if IconsMiners[name] then
-			ExportRaw(IconsMiners[name]..'\n')
+			ExportParameter('icon_id', IconsMiners[name], true, '', 3)
 		else
 			table.insert(FailedIcons, 'Miner: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 		
 		counter = counter - 1 
@@ -1101,10 +1109,10 @@ local function ExportGroups()
 		ExportLine('],', 3)
 		
 		if IconsGroups[name] then
-			ExportRaw(IconsGroups[name]..'\n')
+			ExportParameter('icon_id', IconsGroups[name], true, '', 3)
 		else
 			table.insert(FailedIcons, 'Group: '..name)
-			ExportParameter('icon_info', 'null', true, '', 3)
+			ExportParameter('icon_id', '-1', true, '', 3)
 		end
 
 
@@ -1139,8 +1147,30 @@ local function ExportSubGroups()
 			ExportLine('}', 2)
 		end
 	end
-	ExportLine(']', 1)
+	ExportLine('],', 1)
 end	
+
+local function ExportIcons()
+	ExportLine('"icons": [', 1)
+	counter = 0
+	for _,_ in pairs(IconCollection) do
+		counter = counter + 1
+	end
+	for index, data in pairs(IconCollection) do
+		ExportLine('{', 2)
+		ExportParameter('icon_id', index, true, ',', 3)
+		ExportRaw(data..'\n')
+		
+		counter = counter - 1 
+		if counter > 0 then
+			ExportLine('},', 2)
+		else
+			ExportLine('}', 2)
+		end
+	end
+	ExportLine(']', 1)
+end		
+	
 
 script.on_event(defines.events.on_player_joined_game,
 	function(e)
@@ -1181,6 +1211,7 @@ script.on_event(defines.events.on_string_translated,
 			ExportResources()
 			ExportGroups()
 			ExportSubGroups()
+			ExportIcons()
 			ExportLine('}', 0)
 			FlushFileBuffer()
 			

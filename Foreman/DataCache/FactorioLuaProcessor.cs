@@ -37,7 +37,7 @@ namespace Foreman
         private Dictionary<string, Exception> FailedFiles;
         private Dictionary<string, Exception> FailedPaths;
 
-        private List<Mod> Mods = DataCache.Mods;
+        private List<Mod> Mods = FactorioModsProcessor.Mods;
         private static string DataPath { get { return Path.Combine(Settings.Default.FactorioPath, "data"); } }
         private static string ModPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "mods"); } }
         private string Difficulty { get { return Settings.Default.FactorioNormalDifficulty ? "normal" : "expensive"; } }
@@ -49,6 +49,14 @@ namespace Foreman
 
         public FactorioLuaProcessor()
         {
+
+            Items = new Dictionary<string, Item>();
+            Recipes = new Dictionary<string, Recipe>();
+            Assemblers = new Dictionary<string, Assembler>();
+            Miners = new Dictionary<string, Miner>();
+            Resources = new Dictionary<string, Resource>();
+            Modules = new Dictionary<string, Module>();
+
             FailedFiles = new Dictionary<string, Exception>();
             FailedPaths = new Dictionary<string, Exception>();
         }
@@ -470,24 +478,24 @@ namespace Foreman
                 float time = GetLuaValueOrDefault<float>(recipeData, "energy_required", true, 0.5f);
 
                 Dictionary<Item, float> ingredients = extractIngredientsFromLuaRecipe(values);
-                Dictionary<Item, float> results = extractResultsFromLuaRecipe(values);
-
+                Dictionary<Item, float> products = extractResultsFromLuaRecipe(values);
+                /*
                 if (false)
                 {
                     Console.Write("RECIPE < " + name + "> (" + time + "s): ");
                     foreach (Item item in ingredients.Keys)
                         Console.Write(item.Name + " x" + ingredients[item] + ", ");
                     Console.Write("   --->   ");
-                    foreach (Item item in results.Keys)
-                        Console.Write(item.Name + " x" + results[item] + ", ");
+                    foreach (Item item in products.Keys)
+                        Console.Write(item.Name + " x" + products[item] + ", ");
                     Console.WriteLine("");
-                }
+                }*/
 
-                if (results == null)
+                if (products == null)
                     return;
 
                 if (name == null)
-                    name = results.ElementAt(0).Key.Name;
+                    name = products.ElementAt(0).Key.Name;
 
                 // check if recipe even appears ingame (e.g. gets researched)
                 if (!IsRecipeAvailable(name, recipeData, techTable))
@@ -499,8 +507,8 @@ namespace Foreman
                 newRecipe.Time = (time == 0.0f) ? defaultRecipeTime : time;
                 foreach (KeyValuePair<Item, float> kvp in ingredients)
                     newRecipe.AddIngredient(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<Item, float> kvp in results)
-                    newRecipe.AddResult(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<Item, float> kvp in products)
+                    newRecipe.AddProduct(kvp.Key, kvp.Value);
 
                 newRecipe.Category = GetLuaValueOrDefault<string>(values, "category", true, "crafting");
                 // Skip barreling recipes from Bobs/Angels

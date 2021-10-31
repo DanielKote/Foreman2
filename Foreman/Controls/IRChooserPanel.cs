@@ -29,6 +29,7 @@ namespace Foreman
         protected ProductionGraphViewer PGViewer;
 
         protected abstract ToolTip IRButtonToolTip { get; }
+        private IGToolTip GroupButtonToolTip;
 
         protected abstract List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList();
         protected abstract void IRButton_MouseUp(object sender, MouseEventArgs e);
@@ -39,6 +40,8 @@ namespace Foreman
             this.DoubleBuffered = true;
             InitializeComponent();
             IRFlowPanel.Height = IRPanelRows * 35 + 12;
+
+            GroupButtonToolTip = new IGToolTip();
 
             IRPanelScrollBar.Minimum = 0;
             IRPanelScrollBar.Maximum = 0;
@@ -52,7 +55,7 @@ namespace Foreman
             ShowHiddenCheckBox.Checked = Properties.Settings.Default.ShowHidden;
             IgnoreAssemblerCheckBox.Checked = Properties.Settings.Default.IgnoreAssemblerStatus;
 
-            InitializeIRButtons();
+            InitializeButtons();
 
             PGViewer = parent;
             parent.Controls.Add(this);
@@ -68,7 +71,7 @@ namespace Foreman
             FilterTextBox.Focus();
         }
 
-        private void InitializeIRButtons()
+        private void InitializeButtons()
         {
             //initialize the group buttons
             SortedGroups = DataCache.Groups.Values.ToList();
@@ -87,6 +90,12 @@ namespace Foreman
                 button.Size = new Size(64, 64);
                 button.Image = new Bitmap(group.Icon, 50, 50);
                 button.Tag = group;
+
+                GroupButtonToolTip.SetToolTip(button, string.IsNullOrEmpty(group.FriendlyName) ? "-" : group.FriendlyName);
+
+                button.MouseHover += new EventHandler(GroupButton_MouseHover);
+                button.MouseLeave += new EventHandler(GroupButton_MouseLeave);
+
                 GroupButtons.Add(button);
                 GroupButtonLinks.Add(group, button);
             }
@@ -218,7 +227,7 @@ namespace Foreman
             else
             {
                 foreach (NFButton groupButton in GroupButtons)
-                    groupButton.BackColor = (groupButton.Tag as Group == sGroup) ? SelectedGroupButtonBGColor : Color.DimGray;
+                    groupButton.BackColor = ((Group)(groupButton.Tag) == sGroup) ? SelectedGroupButtonBGColor : Color.DimGray;
                 if (SelectedGroup != sGroup)
                 {
                     StartingGroup = sGroup;
@@ -233,7 +242,17 @@ namespace Foreman
 
         private void GroupButton_Click(object sender, EventArgs e)
         {
-            SetSelectedGroup((sender as NFButton).Tag as Group);
+            SetSelectedGroup((Group)((NFButton)sender).Tag);
+        }
+
+        private void GroupButton_MouseHover(object sender, EventArgs e)
+        {
+            Control control = (Control)sender;
+            GroupButtonToolTip.Show(GroupButtonToolTip.GetToolTip(control), control, new Point(control.Width, 10));
+        }
+        private void GroupButton_MouseLeave(object sender, EventArgs e)
+        {
+            GroupButtonToolTip.Hide((Control)sender);
         }
 
         private void IRChooserPanel_Leave(object sender, EventArgs e)
@@ -276,12 +295,12 @@ namespace Foreman
 
         internal virtual void IRButton_MouseHover(object sender, EventArgs e)
         {
-            Control control = sender as Control;
+            Control control = (Control)sender;
             IRButtonToolTip.Show(IRButtonToolTip.GetToolTip(control), control, new Point(control.Width, 10));
         }
         private void IRButton_MouseLeave(object sender, EventArgs e)
         {
-            IRButtonToolTip.Hide(sender as Control);
+            IRButtonToolTip.Hide((Control)sender);
         }
     }
 
@@ -290,7 +309,7 @@ namespace Foreman
         public Action<Item> CallbackMethod; //returns the selected item
         public void Show(Action<Item> callback) { CallbackMethod = callback; }
 
-        private ToolTip iToolTip = new ItemToolTip();
+        private ToolTip iToolTip = new IGToolTip();
         protected override ToolTip IRButtonToolTip { get { return iToolTip; } }
 
         public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint) : base(parent, originPoint)
@@ -367,7 +386,7 @@ namespace Foreman
                 Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
                 Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
                 Properties.Settings.Default.Save();
-                CallbackMethod((sender as NFButton).Tag as Item);
+                CallbackMethod((Item)((Button)sender).Tag);
                 Dispose();
             }
         }
@@ -378,11 +397,12 @@ namespace Foreman
         public Action<ProductionNode> CallbackMethod; //returns the created production node (or null if not created)
         public void Show(Action<ProductionNode> callback) { CallbackMethod = callback; }
         protected Item KeyItem;
+        protected fRange KeyItemTempRange;
 
         private ToolTip rToolTip = new RecipeToolTip();
         protected override ToolTip IRButtonToolTip { get { return rToolTip; } }
 
-        public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, Item item, bool includeSuppliers, bool includeConsumers) : base(parent, originPoint)
+        public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, Item item, fRange tempRange, bool includeSuppliers, bool includeConsumers) : base(parent, originPoint)
         {
             AsIngredientCheckBox.Checked = includeConsumers;
             AsProductCheckBox.Checked = includeSuppliers;
@@ -395,6 +415,8 @@ namespace Foreman
             AsProductCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 
             KeyItem = item;
+            KeyItemTempRange = (includeSuppliers && includeConsumers) ? new fRange(0, 0, true) : tempRange; //cant use temp range if adding both s&c (its a disconnected node anyway)
+
             if (KeyItem == null)
             {
                 OtherNodeOptionsTableLayoutPanel.Visible = false;
@@ -448,14 +470,21 @@ namespace Foreman
                     foreach (Recipe recipe in sgroup.Recipes.Where(n => 
                         n.LFriendlyName.Contains(filterString) && (
                             ignoreItem || 
-                            (includeConsumers && n.IngredientsSet.ContainsKey(KeyItem)) ||
-                            (includeSuppliers && n.ResultsSet.ContainsKey(KeyItem)) ) ))
+                            (includeConsumers && n.IngredientSet.ContainsKey(KeyItem)) ||
+                            (includeSuppliers && n.ProductSet.ContainsKey(KeyItem)) ) ))
                     {
                         if ((!recipe.Hidden || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus))
                         {
-                            Color bgColor = (!recipe.Hidden ? (recipe.HasEnabledAssemblers ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
-                            recipeCounter++;
-                            recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
+                            //further check for temperature
+                            if (KeyItemTempRange.Ignore ||
+                                (includeConsumers && recipe.IngredientTemperatureMap[KeyItem].Contains(KeyItemTempRange)) ||
+                                (includeSuppliers && KeyItemTempRange.Contains(recipe.ProductTemperatureMap[KeyItem])))
+                            {
+
+                                Color bgColor = (!recipe.Hidden ? (recipe.HasEnabledAssemblers ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
+                                recipeCounter++;
+                                recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
+                            }
                         }
                     }
                     sgList.Add(recipeList);
@@ -493,7 +522,7 @@ namespace Foreman
         {
             if (e.Button == MouseButtons.Left) //select recipe
             {
-                Recipe selectedRecipe = (sender as NFButton).Tag as Recipe;
+                Recipe selectedRecipe = (Recipe)((Button)sender).Tag;
                 Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
                 Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
                 Properties.Settings.Default.Save();
@@ -510,7 +539,7 @@ namespace Foreman
 
         private void AddSupplyButton_Click(object sender, EventArgs e)
         {
-            SupplyNode newNode = SupplyNode.Create(KeyItem, PGViewer.Graph);
+            SupplierNode newNode = SupplierNode.Create(KeyItem, PGViewer.Graph);
             newNode.rateType = RateType.Auto;
             Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
@@ -543,9 +572,9 @@ namespace Foreman
 
         internal override void IRButton_MouseHover(object sender, EventArgs e)
         {
-            Control control = sender as Control;
+            Control control = (Control)sender;
 
-            int yoffset = -control.Location.Y + 16 + Math.Max(-100, Math.Min(0, 348 - RecipeToolTip.GetRecipeToolTipHeight((control as Button).Tag as Recipe)));
+            int yoffset = -control.Location.Y + 16 + Math.Max(-100, Math.Min(0, 348 - RecipeToolTip.GetRecipeToolTipHeight((Recipe)((Button)sender).Tag)));
             IRButtonToolTip.Show(IRButtonToolTip.GetToolTip(control), control, new Point(control.Width, yoffset));
         }
     }
@@ -556,11 +585,11 @@ namespace Foreman
         protected override bool ShowFocusCues { get { return false; } }
     }
 
-    public class ItemToolTip : ToolTip
+    public class IGToolTip : ToolTip
     {
         private static readonly Color BackgroundColor = Color.FromArgb(65, 65, 65);
 
-        public ItemToolTip()
+        public IGToolTip()
         {
             this.AutoPopDelay = 100000;
             this.InitialDelay = 100000;
@@ -569,10 +598,10 @@ namespace Foreman
             this.OwnerDraw = true;
             this.BackColor = BackgroundColor;
             this.ForeColor = Color.White;
-            this.Draw += new DrawToolTipEventHandler(ItemToolTip_Draw);
+            this.Draw += new DrawToolTipEventHandler(IGTooltip_Draw);
         }
 
-        private void ItemToolTip_Draw(object sender, DrawToolTipEventArgs e)
+        private void IGTooltip_Draw(object sender, DrawToolTipEventArgs e)
         {
             e.DrawBackground();
             e.Graphics.DrawRectangle(new Pen(new SolidBrush(Color.Black), 2), e.Bounds);
@@ -609,7 +638,7 @@ namespace Foreman
 
         private void OnPopup(object sender, PopupEventArgs e)
         {
-            Recipe recipe = (e.AssociatedControl as Button).Tag as Recipe;
+            Recipe recipe = (Recipe)((Button)e.AssociatedControl).Tag;
             e.ToolTipSize = new Size(250, GetRecipeToolTipHeight(recipe));
           
         }
@@ -618,7 +647,7 @@ namespace Foreman
         {
             using (Graphics g = e.Graphics)
             {
-                Recipe recipe = (e.AssociatedControl as Button).Tag as Recipe;
+                Recipe recipe = (Recipe)((Button)e.AssociatedControl).Tag;
 
                 g.FillRectangle(BackgroundBrush, e.Bounds);
 
@@ -635,31 +664,34 @@ namespace Foreman
                 yOffset += 2;
                 g.DrawString("Ingredients:", SectionFont, TextBrush, 4, 0 + yOffset);
                 yOffset += 20;
-                foreach (Item ingredient in recipe.IngredientsList)
+                foreach (Item ingredient in recipe.IngredientList)
                 {
+                    string name = recipe.GetIngredientFriendlyName(ingredient);
                     g.DrawImage(ingredient.Icon, 14, 4 + yOffset, 32, 32);
-                    Font itemFont = (g.MeasureString(ingredient.FriendlyName, RecipeFont).Width > e.Bounds.Width - 50) ? SmallItemFont : ItemFont;
-                    g.DrawString(ingredient.FriendlyName, itemFont, TextBrush, new Point(52, 2 + yOffset));
-                    g.DrawString(recipe.IngredientsSet[ingredient].ToString("0.##") + "x", QuantityFont, TextBrush, new Point(52, 20 + yOffset));
+                    Font itemFont = (g.MeasureString(name, RecipeFont).Width > e.Bounds.Width - 50) ? SmallItemFont : ItemFont;
+                    g.DrawString(name, itemFont, TextBrush, new Point(52, 2 + yOffset));
+                    g.DrawString(recipe.IngredientSet[ingredient].ToString("0.##") + "x", QuantityFont, TextBrush, new Point(52, 20 + yOffset));
                     yOffset += 40;
                 }
 
-                //Results list:
+                //Products list:
                 g.FillRectangle(DarkBackgroundBrush, new Rectangle(0, yOffset, e.Bounds.Width, 20));
                 yOffset += 2;
                 g.DrawString("Products:", SectionFont, TextBrush, 4, 0 + yOffset);
                 yOffset += 20;
-                foreach (Item result in recipe.ResultsList)
+                foreach (Item product in recipe.ProductList)
                 {
-                    g.DrawImage(result.Icon, 14, 4 + yOffset, 32, 32);
-                    Font itemFont = (g.MeasureString(result.FriendlyName, RecipeFont).Width > e.Bounds.Width - 50) ? SmallItemFont : ItemFont;
-                    g.DrawString(result.FriendlyName, itemFont, TextBrush, new Point(52, 2 + yOffset));
-                    g.DrawString(recipe.ResultsSet[result].ToString("0.##") + "x", QuantityFont, TextBrush, new Point(52, 20 + yOffset));
+                    string name = recipe.GetProductFriendlyName(product);
+
+                    g.DrawImage(product.Icon, 14, 4 + yOffset, 32, 32);
+                    Font itemFont = (g.MeasureString(name, RecipeFont).Width > e.Bounds.Width - 50) ? SmallItemFont : ItemFont;
+                    g.DrawString(name, itemFont, TextBrush, new Point(52, 2 + yOffset));
+                    g.DrawString(recipe.ProductSet[product].ToString("0.##") + "x", QuantityFont, TextBrush, new Point(52, 20 + yOffset));
                     yOffset += 40;
                 }
 
                 //time
-                g.FillRectangle(DarkBackgroundBrush, new Rectangle(0, yOffset, e.Bounds.Width, 20));
+                g.FillRectangle(DarkBackgroundBrush, new Rectangle(0, yOffset, e.Bounds.Width, 22));
                 yOffset += 2;
                 g.DrawString("Crafting Time: " + recipe.Time.ToString("0.##") + " s", SectionFont, TextBrush, 4, 0 + yOffset);
 
@@ -669,7 +701,7 @@ namespace Foreman
 
         public static int GetRecipeToolTipHeight(Recipe recipe)
         {
-            return 108 + recipe.IngredientsList.Count * 40 + recipe.ResultsList.Count * 40;
+            return 110 + recipe.IngredientList.Count * 40 + recipe.ProductList.Count * 40;
         }
     }
 }

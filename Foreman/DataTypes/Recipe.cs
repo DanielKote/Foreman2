@@ -9,34 +9,54 @@ namespace Foreman
 	{
 		public string Name;
 		public List<string> Ingredients;
-		public List<string> Results;
+		public List<string> Products;
 
 		public RecipeShort(Recipe recipe)
 		{
 			Name = recipe.Name;
-			Ingredients = recipe.IngredientsSet.Keys.Select(item => item.Name).ToList();
-			Results = recipe.ResultsSet.Keys.Select(item => item.Name).ToList();
+			Ingredients = recipe.IngredientSet.Keys.Select(item => item.Name).ToList();
+			Products = recipe.ProductSet.Keys.Select(item => item.Name).ToList();
 		}
 	}
 
-	public class Recipe : DataObjectBase
-	{
-		public static string[] recipeLocaleCategories = { "recipe-name" };
+    public struct fRange
+    {
+		//NOTE: there is no check for min to be guaranteed to be less than max, and this is BY DESIGN
+		//this means that if your range is for example from 10 to 8, (and it isnt ignored), ANY call to Contains methods will return false
+		//ex: 2 recipes, one requiring fluid 0->10 degrees, other requiring fluid 20->30 degrees. A proper summation of ranges will result in a vaild range of 20->10 degrees to satisfy both recipes, aka: NO TEMP WILL SATISFY!
+		public float Min;
+		public float Max;
+		public bool Ignore;
 
-		public Subgroup MySubgroup { get; protected set; }
+		public fRange(float min, float max, bool ignore = false) { Min = min; Max = max; Ignore = ignore; }
+        public bool Contains(float value) { return Ignore || (value >= Min && value <= Max); }
+		public bool Contains(fRange range) { return Ignore || (this.Min <= range.Min && this.Max >= range.Max); }
+		public bool IsContainedIn(fRange range) { return Ignore || (range.Min <= this.Min && range.Max >= this.Max); } //Ignore counts only for this! not for the provided range
+    }
 
-		public float Time { get; set; }
-		public string Category { get; set; }
+    public class Recipe : DataObjectBase
+    {
+        public static string[] recipeLocaleCategories = { "recipe-name" };
 
-		public IReadOnlyDictionary<Item, float> ResultsSet { get { return resultsSet; } }
-		public IReadOnlyDictionary<Item, float> IngredientsSet { get { return ingredientsSet; } }
-		public IReadOnlyList<Item> ResultsList { get { return resultsList; } }
-		public IReadOnlyList<Item> IngredientsList { get { return ingredientsList; } }
+        public Subgroup MySubgroup { get; protected set; }
 
-		private Dictionary<Item, float> resultsSet;
-		private List<Item> resultsList;
-		private Dictionary<Item, float> ingredientsSet;
-		private List<Item> ingredientsList;
+        public float Time { get; set; }
+        public string Category { get; set; }
+
+        public IReadOnlyDictionary<Item, float> ProductSet { get { return productSet; } }
+		public IReadOnlyList<Item> ProductList { get { return productList; } }
+        public IReadOnlyDictionary<Item, float> ProductTemperatureMap { get { return productTemperatureMap; } }
+
+        public IReadOnlyDictionary<Item, float> IngredientSet { get { return ingredientSet; } }
+		public IReadOnlyList<Item> IngredientList { get { return ingredientList; } }
+        public IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get { return ingredientTemperatureMap; } }
+
+		private Dictionary<Item, float> productSet;
+        private Dictionary<Item, float> productTemperatureMap;
+		private List<Item> productList;
+		private Dictionary<Item, float> ingredientSet;
+        private Dictionary<Item, fRange> ingredientTemperatureMap;
+		private List<Item> ingredientList;
 
 		public bool IsAvailableAtStart { get; set; }
 		public bool IsCyclic { get; set; }
@@ -52,8 +72,8 @@ namespace Foreman
 			{
 				if (base.Icon == null)
 				{
-					if (ResultsSet.Count == 1)
-						base.Icon = ResultsSet.Keys.First().Icon;
+					if (ProductSet.Count == 1)
+						base.Icon = ProductSet.Keys.First().Icon;
 					else
 						base.Icon = DataCache.UnknownIcon;
 				}
@@ -70,10 +90,12 @@ namespace Foreman
 			MySubgroup.Recipes.Add(this);
 
 			this.Time = 0.5f;
-			this.ingredientsSet = new Dictionary<Item, float>();
-			this.resultsSet = new Dictionary<Item, float>();
-			this.ingredientsList = new List<Item>();
-			this.resultsList = new List<Item>();
+			this.ingredientSet = new Dictionary<Item, float>();
+			this.ingredientList = new List<Item>();
+            this.ingredientTemperatureMap = new Dictionary<Item, fRange>();
+			this.productSet = new Dictionary<Item, float>();
+			this.productList = new List<Item>();
+            this.productTemperatureMap = new Dictionary<Item, float>();
 			this.HasEnabledAssemblers = false;
 
 			this.Hidden = false;
@@ -81,46 +103,79 @@ namespace Foreman
 			this.IsCyclic = false;
 		}
 
-		public void AddIngredient(Item item, float quantity)
+		public string GetIngredientFriendlyName(Item item)
+		{
+			if (!ingredientSet.ContainsKey(item))
+				return item.FriendlyName;
+			if (!item.IsTemperatureDependent)
+				return item.FriendlyName;
+			return Item.GetTemperatureRangeFriendlyName(item, IngredientTemperatureMap[item]);
+        }
+
+        public string GetProductFriendlyName(Item item)
         {
-			if (ingredientsSet.ContainsKey(item))
-				ingredientsSet[item] += quantity;
+            if (!productSet.ContainsKey(item))
+                return item.FriendlyName;
+
+            string name = item.FriendlyName;
+            if (item.IsTemperatureDependent)
+				name += " (" + ProductTemperatureMap[item].ToString("0") + "°)";
+
+            return name;
+        }
+
+        public bool TestIngredientConnection(Recipe provider, Item ingredient) //checks if the temperature that the ingredient is coming out at fits within the range of temperatures required for this recipe
+        {
+            if (!ingredientSet.ContainsKey(ingredient) || !provider.productSet.ContainsKey(ingredient))
+                return false;
+
+            return ingredientTemperatureMap[ingredient].Contains(provider.productTemperatureMap[ingredient]);
+        }
+
+        public void AddIngredient(Item item, float quantity, float minTemp = float.NegativeInfinity, float maxTemp = float.PositiveInfinity)
+        {
+			if (ingredientSet.ContainsKey(item))
+				ingredientSet[item] += quantity;
 			else
             {
-				ingredientsSet.Add(item, quantity);
-				ingredientsList.Add(item);
+				ingredientSet.Add(item, quantity);
+				ingredientList.Add(item);
+                ingredientTemperatureMap.Add(item, new fRange(minTemp, maxTemp));
 				item.InternalAddConsumptionRecipe(this);
             }
         }
 
 		public bool DeleteIngredient(Item item)
         {
-			if (!ingredientsSet.ContainsKey(item))
+			if (!ingredientSet.ContainsKey(item))
 				return false;
-			ingredientsSet.Remove(item);
-			ingredientsList.Remove(item);
+			ingredientSet.Remove(item);
+			ingredientList.Remove(item);
+            ingredientTemperatureMap.Remove(item);
 			item.InternalRemoveConsumptionRecipe(this);
 			return true;
         }
 
-		public void AddResult(Item item, float quantity)
+        public void AddProduct(Item item, float quantity, float temperature = 0)
 		{
-			if (resultsSet.ContainsKey(item))
-				resultsSet[item] += quantity;
+			if (productSet.ContainsKey(item))
+				productSet[item] += quantity;
 			else
 			{
-				resultsSet.Add(item, quantity);
-				resultsList.Add(item);
+				productSet.Add(item, quantity);
+				productList.Add(item);
+                productTemperatureMap.Add(item, temperature);
 				item.InternalAddProductionRecipe(this);
 			}
 		}
 
-		public bool DeleteResult(Item item)
+		public bool DeleteProduct(Item item)
 		{
-			if (!resultsSet.ContainsKey(item))
+			if (!productSet.ContainsKey(item))
 				return false;
-			resultsSet.Remove(item);
-			resultsList.Remove(item);
+			productSet.Remove(item);
+			productList.Remove(item);
+            productTemperatureMap.Remove(item);
 			item.InternalRemoveProductionRecipe(this);
 			return true;
 		}

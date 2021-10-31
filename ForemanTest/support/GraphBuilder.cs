@@ -35,7 +35,7 @@ namespace ForemanTest
 
         internal SingletonNodeBuilder Supply(string item)
         {
-            var node = new SingletonNodeBuilder(SupplyNode.Create).Item(item);
+            var node = new SingletonNodeBuilder(SupplierNode.Create).Item(item);
             this.nodes.Add(node);
             return node;
         }
@@ -167,7 +167,7 @@ namespace ForemanTest
                 foreach (KeyValuePair<string, float> kvp in inputs)
                     recipe.AddIngredient(DataCache.Items[kvp.Key], kvp.Value);
                 foreach (KeyValuePair<string, float> kvp in outputs)
-                    recipe.AddResult(DataCache.Items[kvp.Key], kvp.Value);
+                    recipe.AddProduct(DataCache.Items[kvp.Key], kvp.Value);
 
                 Built = RecipeNode.Create(recipe, graph);
                 this.Built.ProductivityBonus = efficiency;
@@ -223,7 +223,7 @@ namespace ForemanTest
 
             public float SupplyRate(string itemName)
             {
-                return Suppliers(itemName).Where(x => x is SupplyNode).Select(x => x.actualRate).Sum();
+                return Suppliers(itemName).Where(x => x is SupplierNode).Select(x => x.actualRate).Sum();
             }
 
             private IEnumerable<ProductionNode> Suppliers(string itemName)

@@ -113,7 +113,7 @@ namespace Foreman
 			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 			DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
 
-			using (DataReloadForm form = new DataReloadForm())
+			using (DataReloadForm form = new DataReloadForm(false))
 				form.ShowDialog(); //LOAD FACTORIO DATA
 
 			Properties.Settings.Default.EnabledAssemblers.Clear();
@@ -191,15 +191,15 @@ namespace Foreman
 				return;
 			}
 
-			//try
-			//{
-				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
-			//}
-			//catch (Exception exception)
-			//{
-			//	MessageBox.Show("Could not load this file. See log for more details");
-			//	ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
-			//}
+			try
+			{
+				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false);
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show("Could not load this file. See log for more details");
+				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+			}
 
 			UpdateControlValues();
 			GraphViewer.Invalidate();
@@ -231,21 +231,20 @@ namespace Foreman
 					oldOptions.Miners.Add(miner, miner.Enabled);
 				foreach (Module module in DataCache.Modules.Values)
 					oldOptions.Modules.Add(module, module.Enabled);
-				foreach (Mod mod in DataCache.Mods)
+				foreach (KeyValuePair<string, bool> modKVP in DataCache.Mods.ToArray())
 				{
-					if(mod.Name == "core" || mod.Name == "base")
-						mod.Enabled = true;
-					oldOptions.Mods.Add(mod, mod.Enabled);
+					if(modKVP.Key == "core" || modKVP.Key == "base")
+						DataCache.Mods[modKVP.Key] = true;
+					oldOptions.Mods.Add(modKVP.Key, modKVP.Value);
 				}
-				foreach (Language language in DataCache.Languages)
+				foreach (Language language in FactorioModsProcessor.Languages)
 					oldOptions.LanguageOptions.Add(language);
 
-				oldOptions.selectedLanguage = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
+				oldOptions.selectedLanguage = FactorioModsProcessor.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
 				oldOptions.InstallLocation = Properties.Settings.Default.FactorioPath;
 				oldOptions.UserDataLocation = Properties.Settings.Default.FactorioUserDataPath;
 				oldOptions.GenerationType = (DataCache.GenerationType)(Properties.Settings.Default.GenerationType);
 				oldOptions.NormalDifficulty = (Properties.Settings.Default.FactorioNormalDifficulty);
-				oldOptions.UseSaveFileData = (Properties.Settings.Default.UseSaveFileData);
 
 				using (SettingsForm form = new SettingsForm(oldOptions))
 				{
@@ -285,8 +284,8 @@ namespace Foreman
 					//reload the full data cache if we had some major changes to the options
 					if (!oldOptions.Equals(form.CurrentOptions, true) || reload) //some changes have been made OR reload was requested
 					{
-						DataCache.LocaleFiles.Clear();
-						DataCache.LoadLocaleFiles((form.CurrentOptions.selectedLanguage == null)? "en" : form.CurrentOptions.selectedLanguage.Name);
+						FactorioModsProcessor.LocaleFiles.Clear();
+						FactorioModsProcessor.LoadLocaleFiles((form.CurrentOptions.selectedLanguage == null)? "en" : form.CurrentOptions.selectedLanguage.Name);
 						if(form.CurrentOptions.selectedLanguage != null)
 							Properties.Settings.Default.Language = form.CurrentOptions.selectedLanguage.Name;
 
@@ -294,17 +293,19 @@ namespace Foreman
 						Properties.Settings.Default.FactorioUserDataPath = form.CurrentOptions.UserDataLocation;
 						Properties.Settings.Default.GenerationType = (int)(form.CurrentOptions.GenerationType);
 						Properties.Settings.Default.FactorioNormalDifficulty = form.CurrentOptions.NormalDifficulty;
-						Properties.Settings.Default.UseSaveFileData = form.CurrentOptions.UseSaveFileData;
 
 						Properties.Settings.Default.EnabledMods.Clear();
-						foreach (KeyValuePair<Mod, bool> kvp in form.CurrentOptions.Mods)
+						foreach (KeyValuePair<string, bool> kvp in form.CurrentOptions.Mods)
 						{
-							kvp.Key.Enabled = kvp.Value;
-							if (kvp.Value)
-								Properties.Settings.Default.EnabledMods.Add(kvp.Key.Name);
+							DataCache.Mods[kvp.Key] = kvp.Value;
+							Mod mod = FactorioModsProcessor.Mods.FirstOrDefault(n => n.Name == kvp.Key);
+							if (mod != null)
+								mod.Enabled = kvp.Value;
+
+							Properties.Settings.Default.EnabledMods.Add(kvp.Key);
 						}
 
-						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), reload);
 					}
 
 					Properties.Settings.Default.Save();

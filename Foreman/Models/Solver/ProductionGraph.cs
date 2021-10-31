@@ -246,17 +246,17 @@ namespace Foreman
 
 			foreach (Item item in unlinkedItems)
 			{
-				var existingNodes = Nodes.OfType<SupplyNode>().Where(n => n.SuppliedItem == item);
+				var existingNodes = Nodes.OfType<SupplierNode>().Where(n => n.SuppliedItem == item);
 
 				if (!existingNodes.Any())
 				{
-					SupplyNode newNode = SupplyNode.Create(item, this);
+					SupplierNode newNode = SupplierNode.Create(item, this);
 					NodeLink.Create(newNode, node, item);
 					createdNodes.Add(newNode);
 				}
 				else
 				{
-					foreach (SupplyNode existingNode in existingNodes)
+					foreach (SupplierNode existingNode in existingNodes)
 					{
 						NodeLink.Create(existingNode, node, item);
 					}

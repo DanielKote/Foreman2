@@ -31,12 +31,12 @@ namespace Foreman
 							if (category == "recipe-name")
 								Console.WriteLine("!");
 							string[] SplitName = Name.Split('\n'); //internally we use '\n' to add futher to the original name (as in the case with different temperature fluids)
-							if (DataCache.LocaleFiles.ContainsKey(category) && DataCache.LocaleFiles[category].ContainsKey(SplitName[0]))
+							if (FactorioModsProcessor.LocaleFiles.ContainsKey(category) && FactorioModsProcessor.LocaleFiles[category].ContainsKey(SplitName[0]))
 							{
-								if (DataCache.LocaleFiles[category][SplitName[0]].Contains("__"))
-									calcName = Regex.Replace(DataCache.LocaleFiles[category][SplitName[0]], "__.+?__", "").Replace("_", "").Replace("-", " ");
+								if (FactorioModsProcessor.LocaleFiles[category][SplitName[0]].Contains("__"))
+									calcName = Regex.Replace(FactorioModsProcessor.LocaleFiles[category][SplitName[0]], "__.+?__", "").Replace("_", "").Replace("-", " ");
 								else
-									calcName = DataCache.LocaleFiles[category][SplitName[0]];
+									calcName = FactorioModsProcessor.LocaleFiles[category][SplitName[0]];
 								if (SplitName.Length > 1)
 									calcName += " (" + SplitName + "*)";
 							}
@@ -83,7 +83,7 @@ namespace Foreman
         private Bitmap icon;
         public Bitmap Icon
 		{
-			get { return icon; } 
+			get { if (icon == null) Icon = null; return icon; } 
 			set
 			{
 				if (value != null)

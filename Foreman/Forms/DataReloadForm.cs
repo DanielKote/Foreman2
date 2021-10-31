@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman
@@ -16,13 +10,15 @@ namespace Foreman
         private CancellationTokenSource cts;
         private int currentPercent;
         private string currentText;
+        private bool ReloadIconCache;
 
-        public DataReloadForm()
+        public DataReloadForm(bool reloadIconCache)
         {
             this.cts = new CancellationTokenSource();
             InitializeComponent();
             currentPercent = 0;
             currentText = "";
+            ReloadIconCache = reloadIconCache;
         }
 
         private async void ProgressForm_Load(object sender, EventArgs e)
@@ -47,7 +43,7 @@ namespace Foreman
             var progress = progressHandler as IProgress<KeyValuePair<int, string>>;
             var token = cts.Token;
 
-            await DataCache.LoadAllData(progress, token);
+            await DataCache.LoadAllData(progress, token, ReloadIconCache);
 
             if (token.IsCancellationRequested)
             {

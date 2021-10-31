@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace Foreman
 {
+    [Serializable]
     public struct IconColorPair
     {
         public Bitmap Icon;
@@ -20,6 +21,12 @@ namespace Foreman
             this.Icon = icon;
             this.Color = color;
         }
+    }
+    [Serializable]
+    public class IconBitmapCollection
+    {
+        public Dictionary<int, IconColorPair> Icons;
+        public IconBitmapCollection() { Icons = new Dictionary<int, IconColorPair>(); }
     }
 
     public struct IconInfo
@@ -56,7 +63,6 @@ namespace Foreman
         internal static readonly int IconCanvasSize = 64;
 
         private static Bitmap unknownIcon;
-        private static Bitmap unknownBWIcon;
         public static Bitmap GetUnknownIcon()
         {
             if (unknownIcon == null)
@@ -108,6 +114,8 @@ namespace Foreman
                 iconDrawSize = (int)(iconDrawSize * IconCanvasScale);
 
                 Bitmap iconImage = LoadImage(ii.iconPath, iconDrawSize);
+                if (iconImage == null)
+                    return new IconColorPair(GetUnknownIcon(), Color.Black);
 
                 //apply tint (if necessary)
                 //NOTE: tint is applied as pre-multiplied alpha, so: A(result) = A(original); RGB(result) = RGB(tint) + RGB(original) * (255 - A(tint))
@@ -166,7 +174,7 @@ namespace Foreman
             return new IconColorPair(icon, averageColor);
         }
 
-        private static Bitmap LoadImage(String fileName, int resultSize = 32)
+        private static Bitmap LoadImage(string fileName, int resultSize = 32)
         {
             if (String.IsNullOrEmpty(fileName))
             { return null; }
@@ -185,9 +193,9 @@ namespace Foreman
                 string[] splitPath = fileName.Split('/');
                 splitPath[0] = splitPath[0].Trim('_');
 
-                if (DataCache.Mods.Any(m => m.Name == splitPath[0]))
+                if (FactorioModsProcessor.Mods.Any(m => m.Name == splitPath[0]))
                 {
-                    fullPath = DataCache.Mods.First(m => m.Name == splitPath[0]).dir;
+                    fullPath = FactorioModsProcessor.Mods.First(m => m.Name == splitPath[0]).dir;
                 }
 
                 if (!String.IsNullOrEmpty(fullPath))
@@ -198,6 +206,9 @@ namespace Foreman
                     }
                 }
             }
+
+            if (!File.Exists(fullPath))
+                return null;
 
             try
             {

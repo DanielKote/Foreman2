@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Drawing;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.IO.Compression;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using Foreman.Properties;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,141 +12,121 @@ using System.Diagnostics;
 
 namespace Foreman
 {
-    public class Language
-    {
-        public String Name;
-        private String localName;
-        public String LocalName
-        {
-            get
-            {
-                if (!String.IsNullOrWhiteSpace(localName))
-                {
-                    return localName;
-                }
-                else
-                {
-                    return Name;
-                }
-            }
-            set
-            {
-                localName = value;
-            }
-        }
-    }
-
     public static class DataCache
     {
         public enum GenerationType { ForemanMod, FactorioLUA }
 
-        public static List<Mod> Mods = new List<Mod>();
-        public static List<Language> Languages = new List<Language>();
-        public static Dictionary<string, Dictionary<string, string>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
+        public static Dictionary<string, bool> Mods = new Dictionary<string, bool>();
+        public static IReadOnlyDictionary<string, Technology> Technologies { get { return technologies; } }
+        public static IReadOnlyDictionary<string, Group> Groups { get { return groups; } }
+        public static IReadOnlyDictionary<string, Subgroup> Subgroups { get { return subgroups; } }
+        public static IReadOnlyDictionary<string, Item> Items { get { return items; } }
+        public static IReadOnlyDictionary<string, Recipe> Recipes { get { return recipes; } }
+        public static IReadOnlyDictionary<string, Assembler> Assemblers { get { return assemblers; } }
+        public static IReadOnlyDictionary<string, Miner> Miners { get { return miners; } }
+        public static IReadOnlyDictionary<string, Resource> Resources { get { return resources; } }
+        public static IReadOnlyDictionary<string, Module> Modules { get { return modules; } }
 
-        public static Dictionary<string, Technology> Technologies = new Dictionary<string, Technology>();
-        public static Dictionary<string, Group> Groups = new Dictionary<string, Group>();
-        public static Dictionary<string, Subgroup> Subgroups = new Dictionary<string, Subgroup>();
-        public static Dictionary<string, Item> Items = new Dictionary<string, Item>();
-        public static Dictionary<string, Recipe> Recipes = new Dictionary<string, Recipe>();
-        public static Dictionary<string, Assembler> Assemblers = new Dictionary<string, Assembler>();
-        public static Dictionary<string, Miner> Miners = new Dictionary<string, Miner>();
-        public static Dictionary<string, Resource> Resources = new Dictionary<string, Resource>();
-        public static Dictionary<string, Module> Modules = new Dictionary<string, Module>();
-
-        public static Dictionary<string, Recipe> MissingRecipes = new Dictionary<string, Recipe>(); //both are used when loading a graph file with unknown / missing items / recipes.
+        public static Dictionary<string, Recipe> MissingRecipes = new Dictionary<string, Recipe>();
         public static Dictionary<string, Item> MissingItems = new Dictionary<string, Item>();
         public static Subgroup MissingSubgroup = new Subgroup("", new Group("","",""), "");
 
-        public static Dictionary<string, Exception> failedFiles = new Dictionary<string, Exception>();
-        public static Dictionary<string, Exception> failedPathDirectories = new Dictionary<string, Exception>();
- 
         public static Bitmap UnknownIcon { get { return IconProcessor.GetUnknownIcon(); } }
-
-        private static Dictionary<string, byte[]> zipHashes = new Dictionary<string, byte[]>();
-        private static GenerationType GetGenerationType() { return (GenerationType)(Settings.Default.GenerationType); }
-
-        private static string DataPath { get { return Path.Combine(Settings.Default.FactorioPath, "data"); } }
-        private static string ModPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "mods"); } }
-        private static string ScriptOutPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "script-output"); } }
-        private static string ExtractionPath { get { return ModPath; } }
-
-        private static readonly List<Tuple<string, DependencyType>> DependencyTypeTokens = new List<Tuple<string, DependencyType>>
-        {
-            Tuple.Create("(?)", DependencyType.OptionalHidden),
-            Tuple.Create("?", DependencyType.Optional),
-            Tuple.Create("!", DependencyType.Incompatible)
-        };
-        private static readonly List<Tuple<string, VersionOperator>> VersionOperatorTokens = new List<Tuple<string, VersionOperator>>
-        {
-            // Order is important to match the 'largest' token first
-            Tuple.Create(VersionOperator.GreaterThanOrEqual.Token(), VersionOperator.GreaterThanOrEqual),
-            Tuple.Create(VersionOperator.LessThanOrEqual.Token(), VersionOperator.LessThanOrEqual),
-            Tuple.Create(VersionOperator.GreaterThan.Token(), VersionOperator.GreaterThan),
-            Tuple.Create(VersionOperator.LessThan.Token(), VersionOperator.LessThan),
-            Tuple.Create(VersionOperator.EqualTo.Token(), VersionOperator.EqualTo)
-        };
 
         public static event EventHandler DataLoaded;
 
-        internal static async Task LoadAllData(IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
+        private static Dictionary<string, Technology> technologies;
+        private static Dictionary<string, Group> groups;
+        private static Dictionary<string, Subgroup> subgroups;
+        private static Dictionary<string, Item> items;
+        private static Dictionary<string, Recipe> recipes;
+        private static Dictionary<string, Assembler> assemblers;
+        private static Dictionary<string, Miner> miners;
+        private static Dictionary<string, Resource> resources;
+        private static Dictionary<string, Module> modules;
+
+        private static Dictionary<string, Exception> failedFiles = new Dictionary<string, Exception>();
+        private static Dictionary<string, Exception> failedPathDirectories = new Dictionary<string, Exception>();
+ 
+        private static GenerationType GetGenerationType() { return (GenerationType)(Settings.Default.GenerationType); }
+        private static string ScriptOutPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "script-output"); } }
+
+        internal static async Task LoadAllData(IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, bool reloadIconCache)
         {
             await Task.Run(() =>
             {
                 Clear();
 
-                progress.Report(new KeyValuePair<int, string>(0,""));
-
-                FindAllMods(progress, ctoken, 0, 15); //gets mod enable status from Properties.Settings.Default
-                LoadAllLanguages();
-                LoadLocaleFiles(Properties.Settings.Default.Language);
-
                 JObject jsonData;
-                int jsonStartingPercent = 15;
+                JsonDataProcessor processor = new JsonDataProcessor();
                 switch (GetGenerationType())
                 {
                     case GenerationType.FactorioLUA:
+                        /*
+                        progress.Report(new KeyValuePair<int, string>(0, ""));
+                        FactorioModsProcessor.LoadMods(progress, ctoken, 0, 15);
+                        foreach (Mod mod in FactorioModsProcessor.Mods)
+                            Mods.Add(mod.Name, mod.Enabled);
 
+                        if (File.Exists(iconDataFile))
+                            processor.LoadIconCache(iconDataFile);
+
+                        jsonData = JObject.Parse(File.ReadAllText(setupFile));
+                        processor.LoadData(jsonData, progress, ctoken, 15, 95);
+                        processor.SaveIconCache(Path.Combine(ScriptOutPath, "ForemanFactorioIconData.dat"));
+                        break;
+                        */
                     case GenerationType.ForemanMod:
                     default:
                         //read in the data from the foreman mod (in the script output folder)
                         string setupFile = Path.Combine(ScriptOutPath, "ForemanFactorioSetup.txt");
+                        string iconDataFile = Path.Combine(ScriptOutPath, "ForemanFactorioIconData.dat");
                         if (!File.Exists(setupFile))
                         {
                             MessageBox.Show("The setup file could not be found!\n\nEnsure you have the \"z-z-foremanexport\" mod installed, enabled, and started a new game with it. It should freeze the game for a bit (1sec for vanilla installation, 30sec+ for Angel/Bob with extras) before displaying \"Foreman export complete.\" ");
                             return;
                         }
+
+                        bool modLoadRequired = true;
+                        if (File.Exists(iconDataFile) && !reloadIconCache)
+                            modLoadRequired = !processor.LoadIconCache(iconDataFile);
+
+                        //failed to load cache (corrupt or doesnt exist), have to load mods / mod info
+                        if (modLoadRequired)
+                        {
+                            progress.Report(new KeyValuePair<int, string>(0, ""));
+                            FactorioModsProcessor.LoadMods(progress, ctoken, 0, 15);
+                            foreach (Mod mod in FactorioModsProcessor.Mods)
+                                Mods.Add(mod.Name, mod.Enabled);
+                        }
+
                         jsonData = JObject.Parse(File.ReadAllText(setupFile));
+                        processor.LoadData(jsonData, progress, ctoken, 15, 95);
+                        processor.SaveIconCache(Path.Combine(ScriptOutPath, "ForemanFactorioIconData.dat"));
                         break;
                 }
-                JsonDataProcessor processor = new JsonDataProcessor();
-                processor.LoadData(jsonData, progress, ctoken, jsonStartingPercent, 95);
 
-                foreach (KeyValuePair<string, Technology> kvp in processor.GetTechnologies())
-                    Technologies.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Group> kvp in processor.GetGroups())
-                    Groups.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Subgroup> kvp in processor.GetSubgroups())
-                    Subgroups.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Item> kvp in processor.GetItems())
-                    Items.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Recipe> kvp in processor.GetRecipes())
-                    Recipes.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Assembler> kvp in processor.GetAssemblers())
-                    Assemblers.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Miner> kvp in processor.GetMiners())
-                    Miners.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Resource> kvp in processor.GetResources())
-                    Resources.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Module> kvp in processor.GetModules())
-                    Modules.Add(kvp.Key, kvp.Value);
+                technologies = processor.Technologies;
+                groups = processor.Groups;
+                subgroups = processor.Subgroups;
+                items = processor.Items;
+                recipes = processor.Recipes;
+                assemblers = processor.Assemblers;
+                miners = processor.Miners;
+                resources = processor.Resources;
+                modules = processor.Modules;
 
-                foreach (KeyValuePair<string, Exception> kvp in processor.GetFileExceptions())
+                foreach (KeyValuePair<string, Exception> kvp in processor.FailedFiles)
                     failedFiles.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Exception> kvp in processor.GetPathExceptions())
+                foreach (KeyValuePair<string, Exception> kvp in processor.FailedPaths)
                     failedPathDirectories.Add(kvp.Key, kvp.Value);
-
-                //IncorporateMiners(); //miners are inserted as part of recipes & assembly machines
+                foreach(string mod in processor.IncludedMods)
+                {
+                    if (Mods.ContainsKey(mod))
+                        Mods[mod] = true;
+                    else
+                        Mods.Add(mod, true);
+                }
 
                 progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes"));
                 MarkCyclicRecipes();
@@ -168,179 +144,21 @@ namespace Foreman
         public static void Clear()
         {
             Mods.Clear();
-            Technologies.Clear();
-            Groups.Clear();
-            Subgroups.Clear();
-            Items.Clear();
-            Recipes.Clear();
-            Assemblers.Clear();
-            Miners.Clear();
-            Resources.Clear();
-            Modules.Clear();
-            LocaleFiles.Clear();
-            Languages.Clear();
+            technologies?.Clear();
+            groups?.Clear();
+            subgroups?.Clear();
+            items?.Clear();
+            recipes?.Clear();
+            assemblers?.Clear();
+            miners?.Clear();
+            resources?.Clear();
+            modules?.Clear();
 
             MissingItems.Clear();
             MissingRecipes.Clear();
 
-            failedFiles.Clear();
-            failedPathDirectories.Clear();
-        }
-
-        public static void UpdateRecipesAssemblerStatus()
-        {
-            //very quick update on recipes to check for valid assemblers (if they have none, then they are so marked)
-            foreach (Recipe recipe in Recipes.Values)
-            {
-                bool usable = false;
-                foreach (Assembler assembler in Assemblers.Values)
-                    usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category);
-                recipe.HasEnabledAssemblers = usable;
-                if (!usable)
-                    Console.WriteLine(recipe);
-            }
-        }
-
-        private static void FindAllMods(IProgress<KeyValuePair<int,string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent) //Vanilla game counts as a mod too.
-        {
-            progress.Report(new KeyValuePair<int, string>(startingPercent, "Preparing Mods"));
-
-            String modPath = ModPath;
-            IEnumerable<ModOnDisk> mods = ModOnDisk.Empty();
-
-            mods = mods.Concat(ModOnDisk.EnumerateDirectories(DataPath));
-            mods = mods.Concat(ModOnDisk.EnumerateDirectories(modPath));
-            mods = mods.Concat(ModOnDisk.EnumerateZips(modPath));
-
-            IEnumerable<ModOnDisk> latestMods = ChangeModsToOnlyLatest(mods);
-
-            List<string> enabledMods = new List<string>();
-            enabledMods.Add("base");
-            enabledMods.Add("core");
-            if (Settings.Default.EnabledMods.Count > 0)
-            {
-                foreach (String s in Settings.Default.EnabledMods)
-                    enabledMods.Add(s);
-            }
-            else
-            {
-                string modListFile = Path.Combine(modPath, "mod-list.json");
-                if (File.Exists(modListFile))
-                {
-                    String json = File.ReadAllText(modListFile);
-                    dynamic parsedJson = JsonConvert.DeserializeObject(json);
-                    foreach (var mod in parsedJson.mods)
-                    {
-                        if ((bool)mod.enabled)
-                            enabledMods.Add((string)mod.name);
-                    }
-                }
-            }
-
-            int totalCount = latestMods.Count();
-            int counter = 0;
-            foreach (ModOnDisk mod in latestMods)
-            {
-                switch (mod.Type)
-                {
-                    case ModOnDisk.ModType.DIRECTORY:
-                        ReadModInfoFile(mod.Location);
-                        break;
-                    case ModOnDisk.ModType.ZIP:
-                        // Unzipping is very expensive only do if we have to
-                        if (enabledMods.Contains(mod.Id))
-                            ReadModInfoZip(mod.Location);
-                        else
-                        {
-                            Mod newMod = new Mod();
-                            newMod.Id = mod.Id;
-                            newMod.parsedVersion = mod.Version;
-                            newMod.Name = newMod.Id;
-                            newMod.Enabled = false;
-                            Mods.Add(newMod);
-                        }
-                        break;
-                }
-                if (ctoken.IsCancellationRequested)
-                    return;
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
-            }
-
-            foreach (Mod mod in Mods)
-                mod.Enabled = enabledMods.Contains(mod.Name);
-
-            DependencyGraph modGraph = new DependencyGraph(Mods);
-            modGraph.DisableUnsatisfiedMods();
-            Mods = modGraph.SortMods();
-
-            progress.Report(new KeyValuePair<int, string>(endingPercent,""));
-        }
-
-        private static void LoadAllLanguages()
-        {
-            var dirList = Directory.EnumerateDirectories(Path.Combine(Mods.First(m => m.Name == "core").dir, "locale"));
-
-            foreach (String dir in dirList)
-            {
-                Language newLanguage = new Language();
-                newLanguage.Name = Path.GetFileName(dir);
-                try
-                {
-                    String infoJson = File.ReadAllText(Path.Combine(dir, "info.json"));
-                    newLanguage.LocalName = (String)JObject.Parse(infoJson)["language-name"];
-                }
-                catch { }
-                Languages.Add(newLanguage);
-            }
-        }
-
-        public static void LoadLocaleFiles(String locale)
-        {
-            foreach (Mod mod in Mods.Where(m => m.Enabled))
-            {
-                String localeDir = Path.Combine(mod.dir, "locale", locale);
-                if (!Directory.Exists(localeDir))
-                    localeDir = Path.Combine(mod.dir, "locale", "en"); //try for a default english if the one we want doesnt exist
-
-                if (Directory.Exists(localeDir))
-                {
-                    foreach (String file in Directory.GetFiles(localeDir, "*.cfg"))
-                    {
-                        try
-                        {
-                            using (StreamReader fStream = new StreamReader(file))
-                            {
-                                string currentIniSection = "none";
-
-                                while (!fStream.EndOfStream)
-                                {
-                                    String line = fStream.ReadLine();
-                                    if (line.StartsWith("[") && line.EndsWith("]"))
-                                    {
-                                        currentIniSection = line.Trim('[', ']');
-                                    }
-                                    else
-                                    {
-                                        if (!LocaleFiles.ContainsKey(currentIniSection))
-                                        {
-                                            LocaleFiles.Add(currentIniSection, new Dictionary<string, string>());
-                                        }
-                                        String[] split = line.Split('=');
-                                        if (split.Count() == 2)
-                                        {
-                                            LocaleFiles[currentIniSection][split[0].Trim()] = split[1].Trim();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            failedFiles[file] = e;
-                        }
-                    }
-                }
-            }
+            failedFiles?.Clear();
+            failedPathDirectories?.Clear();
         }
 
         private static void ReportErrors()
@@ -364,210 +182,18 @@ namespace Foreman
             }
         }
 
-        public class ModOnDisk
+
+        public static void UpdateRecipesAssemblerStatus()
         {
-            public readonly string Id;
-            public readonly Version Version;
-            public readonly string Location;
-            public readonly ModType Type;
-
-            public enum ModType { DIRECTORY, ZIP };
-
-            public ModOnDisk(string location, ModType type)
+            //very quick update on recipes to check for valid assemblers (if they have none, then they are so marked)
+            foreach (Recipe recipe in Recipes.Values)
             {
-                String[] parts = Path.GetFileNameWithoutExtension(location).Split('_');
-                this.Id = parts.Count() > 1 ? String.Join("_", parts.Take(parts.Length - 1)) : parts[0];
-                try
-                {
-                    this.Version = new Version(parts.Last());
-                }
-                catch (Exception e)
-                {
-                    this.Version = new Version(0, 0);
-                    ErrorLogging.LogLine(e.Message);
-                }
-                this.Location = location;
-                this.Type = type;
-            }
-
-            public static IEnumerable<ModOnDisk> EnumerateDirectories(string path)
-            {
-                if (Directory.Exists(path))
-                {
-                    return Directory.EnumerateDirectories(path).Select(x => new ModOnDisk(x, ModType.DIRECTORY));
-                }
-                else
-                {
-                    return Empty();
-                }
-            }
-
-            public static IEnumerable<ModOnDisk> EnumerateZips(string path)
-            {
-                if (Directory.Exists(path))
-                {
-                    return Directory.EnumerateFiles(path, "*.zip").Select(x => new ModOnDisk(x, ModType.ZIP));
-                }
-                else
-                {
-                    return Empty();
-                }
-            }
-
-            public static IEnumerable<ModOnDisk> Empty()
-            {
-                return Enumerable.Empty<ModOnDisk>();
-            }
-        }
-
-
-        private static IEnumerable<ModOnDisk> ChangeModsToOnlyLatest(IEnumerable<ModOnDisk> mods)
-        {
-            List<ModOnDisk> latest = new List<ModOnDisk>();
-            foreach (ModOnDisk mod in mods)
-            {
-                ModOnDisk found = latest.Find(m => m.Id == mod.Id);
-                if (found == null || found.Version < mod.Version)
-                {
-                    latest.Remove(found);
-                    latest.Add(mod);
-                }
-            }
-            return latest;
-        }
-
-        private static void ReadModInfoFile(String dir)
-        {
-            try
-            {
-                if (!File.Exists(Path.Combine(dir, "info.json")))
-                {
-                    return;
-                }
-                String json = File.ReadAllText(Path.Combine(dir, "info.json"));
-                ReadModInfo(json, dir);
-            }
-            catch (Exception)
-            {
-                ErrorLogging.LogLine(String.Format("The mod at '{0}' has an invalid info.json file", dir));
-            }
-        }
-
-        private static void UnzipMod(String modZipFile)
-        {
-            String fullPath = Path.GetFullPath(modZipFile);
-            byte[] hash;
-
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(fullPath))
-                {
-                    hash = md5.ComputeHash(stream);
-                }
-            }
-
-            if (!zipHashes.ContainsKey(fullPath) || !zipHashes[fullPath].SequenceEqual(hash))
-            {
-                String outputDir = Path.Combine(ExtractionPath, Path.GetFileNameWithoutExtension(modZipFile));
-                if (!Directory.Exists(outputDir))
-                {
-                    ZipFile.ExtractToDirectory(modZipFile, outputDir);
-                }
-
-                if (zipHashes.ContainsKey(fullPath))
-                    zipHashes[fullPath] = hash;
-                else
-                    zipHashes.Add(fullPath, hash);
-            }
-        }
-
-        private static void ReadModInfoZip(String zipFile)
-        {
-            // Ran into a mod with a file that had a modified timestamp that causes the UnZip to fail. Not much we can do besides skip that mod.
-            try
-            {
-                UnzipMod(zipFile);
-            }
-            catch (Exception e)
-            {
-                ErrorLogging.LogLine(String.Format("The mod with zip file '{0}' could not be extracted. Error: {1}", zipFile, e.Message));
-                return;
-            }
-
-            String modUnzippedFolder = Path.Combine(ExtractionPath, Path.GetFileNameWithoutExtension(zipFile));
-            String file = Directory.EnumerateFiles(modUnzippedFolder, "info.json", SearchOption.AllDirectories).FirstOrDefault();
-            if (String.IsNullOrWhiteSpace(file))
-            {
-                ErrorLogging.LogLine(String.Format("Could not find info.json at '{0}' for mod zipFile '{1}'", modUnzippedFolder, zipFile));
-                return;
-            }
-            ReadModInfo(File.ReadAllText(file), Path.GetDirectoryName(file));
-        }
-
-        private static void ReadModInfo(String json, String dir)
-        {
-            Mod newMod = JsonConvert.DeserializeObject<Mod>(json);
-            if (Mods.Any(m => m.Name == newMod.Name))
-            {
-                ErrorLogging.LogLine(String.Format("Duplicate installed mod found '{0}' ignoring duplicate.", newMod.Name));
-                return;
-            }
-
-            newMod.dir = dir;
-
-            if (!Version.TryParse(newMod.version, out newMod.parsedVersion))
-            {
-                newMod.parsedVersion = new Version(0, 0, 0, 0);
-            }
-            Console.WriteLine("Parsing Mod " + newMod.Name);
-            ParseModDependencies(newMod);
-
-            Mods.Add(newMod);
-        }
-
-        private static void ParseModDependencies(Mod mod)
-        {
-            if (mod.Name == "base")
-            {
-                mod.dependencies.Add("core >= 0.0.0.0");
-            }
-
-            foreach (string depString in mod.dependencies)
-            {
-                ModDependency newDependency = new ModDependency();
-
-                string trimmedDepString = depString.Trim();
-                var dependencyTypeToken = DependencyTypeTokens.FirstOrDefault(t => trimmedDepString.StartsWith(t.Item1));
-                newDependency.Type = dependencyTypeToken?.Item2 ?? DependencyType.Required;
-
-                string modNameWithVersion = dependencyTypeToken != null ?
-                    trimmedDepString.Substring(dependencyTypeToken.Item1.Length).TrimStart() : trimmedDepString;
-                var indexOfVersionOperatorToken = VersionOperatorTokens
-                    .Select(t => new { Token = t.Item1, Index = modNameWithVersion.IndexOf(t.Item1), Operator = t.Item2 })
-                    .FirstOrDefault(v => v.Index > 0);
-
-                if (indexOfVersionOperatorToken != null)
-                {
-                    newDependency.ModName = modNameWithVersion
-                        .Substring(0, indexOfVersionOperatorToken.Index)
-                        .TrimEnd();
-                    newDependency.VersionOperator = indexOfVersionOperatorToken.Operator;
-
-                    string versionString = modNameWithVersion
-                        .Substring(indexOfVersionOperatorToken.Index + indexOfVersionOperatorToken.Token.Length)
-                        .TrimStart();
-                    if (!Version.TryParse(versionString, out newDependency.Version))
-                    {
-                        ErrorLogging.LogLine(String.Format("Mod '{0}' has malformed dependency '{1}'", mod.Name, depString));
-                        return;
-                    }
-                }
-                else
-                {
-                    newDependency.ModName = modNameWithVersion;
-                }
-
-                mod.parsedDependencies.Add(newDependency);
+                bool usable = false;
+                foreach (Assembler assembler in Assemblers.Values)
+                    usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category);
+                recipe.HasEnabledAssemblers = usable;
+                if (!usable)
+                    Console.WriteLine(recipe);
             }
         }
 

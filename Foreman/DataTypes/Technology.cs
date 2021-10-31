@@ -20,7 +20,12 @@ namespace Foreman
 		public bool Enabled { get { return enabled; } set { enabled = value && !Locked; } }
 		public bool Locked { get { return locked; } set { locked = value; if (value) enabled = false; } } //cant be enabled if locked
 
-		public Bitmap Icon { get; set; }
+		private Bitmap icon;
+		public Bitmap Icon
+		{ 
+			get { if (icon == null) Icon = null; return icon; } 
+			set { icon = (value == null) ? DataCache.UnknownIcon : value; } 
+		}
 
 		private Technology()
 		{

@@ -2,48 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Foreman.Properties;
 using System.Threading;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Foreman
 {
     class JsonDataProcessor
     {
-        private Dictionary<string, Technology> Technologies;
-        private Dictionary<string, Group> Groups;
-        private Dictionary<string, Subgroup> Subgroups;
-        private Dictionary<string, Item> Items;
-        private Dictionary<string, List<string>> FluidDuplicants;
-        private Dictionary<string, Recipe> Recipes;
-        private Dictionary<string, List<string>> RecipeDuplicants;
-        private Dictionary<string, Assembler> Assemblers;
-        private Dictionary<string, Miner> Miners;
-        private Dictionary<string, Resource> Resources;
-        private Dictionary<string, Module> Modules;
+        public List<string> IncludedMods;
+        public Dictionary<string, Technology> Technologies;
+        public Dictionary<string, Group> Groups;
+        public Dictionary<string, Subgroup> Subgroups;
+        public Dictionary<string, Item> Items;
+        public Dictionary<string, Recipe> Recipes;
+        public Dictionary<string, Assembler> Assemblers;
+        public Dictionary<string, Miner> Miners;
+        public Dictionary<string, Resource> Resources;
+        public Dictionary<string, Module> Modules;
 
-        private Dictionary<string, Exception> FailedFiles;
-        private Dictionary<string, Exception> FailedPaths;
+        public Dictionary<string, Exception> FailedFiles;
+        public Dictionary<string, Exception> FailedPaths;
 
         private Dictionary<string, Group> SubgroupToGroupLinks; //used internally to link up subgroup to the correct group
         private const float defaultRecipeTime = 0.5f;
 
-        public IReadOnlyDictionary<string, Technology> GetTechnologies() { return Technologies; }
-        public IReadOnlyDictionary<string, Group> GetGroups() { return Groups; }
-        public IReadOnlyDictionary<string, Subgroup> GetSubgroups() { return Subgroups; }
-        public IReadOnlyDictionary<string, Item> GetItems() { return Items; }
-        public IReadOnlyDictionary<string, Recipe> GetRecipes() { return Recipes; }
-        public IReadOnlyDictionary<string, Assembler> GetAssemblers() { return Assemblers; }
-        public IReadOnlyDictionary<string, Miner> GetMiners() { return Miners; }
-        public IReadOnlyDictionary<string, Resource> GetResources() { return Resources; }
-        public IReadOnlyDictionary<string, Module> GetModules() { return Modules; }
-
-        public IReadOnlyDictionary<string, Exception> GetFileExceptions() { return FailedFiles; }
-        public IReadOnlyDictionary<string, Exception> GetPathExceptions() { return FailedPaths; }
+        private Dictionary<int, IconColorPair> IconCache; //icons are generated first and loaded into this cache
 
         public JsonDataProcessor()
         {
+            IncludedMods = new List<string>();
+
             Technologies = new Dictionary<string, Technology>();
 
             Groups = new Dictionary<string, Group>();
@@ -51,11 +42,7 @@ namespace Foreman
             SubgroupToGroupLinks = new Dictionary<string, Group>();
 
             Items = new Dictionary<string, Item>();
-            FluidDuplicants = new Dictionary<string, List<string>>(); //used to store references to the names in items for any extra fluids (ex: coolant *300, coolant *200, coolant *100)
-
             Recipes = new Dictionary<string, Recipe>();
-            RecipeDuplicants = new Dictionary<string, List<string>>(); //same as above - duplicate recipes due to fluid temps
-
             Assemblers = new Dictionary<string, Assembler>();
             Miners = new Dictionary<string, Miner>();
             Resources = new Dictionary<string, Resource>();
@@ -63,90 +50,56 @@ namespace Foreman
 
             FailedFiles = new Dictionary<string, Exception>();
             FailedPaths = new Dictionary<string, Exception>();
+
+            IconCache = new Dictionary<int, IconColorPair>();
         }
 
         public void LoadData(JObject jsonData, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
         {
-            progress.Report(new KeyValuePair<int, string>(startingPercent, "Preparing Icons")); //lets be honest - thats what most of the time is used for here
-
-            //process mods
-            List<String> EnabledMods = jsonData["mods"].Select(t => (String)t).ToList();
-            foreach (Mod mod in DataCache.Mods)
+            //process mods (just add the names of enabled mods to the list - this is just the set of mods enabled during this particular snapshot of factorio data to json)
+            Settings.Default.EnabledMods.Clear();
+            foreach (string mod in jsonData["mods"].Select(t => (string)t))
             {
-                mod.Enabled = EnabledMods.Contains(mod.Name);
+                Settings.Default.EnabledMods.Add(mod);
+                IncludedMods.Add(mod);
             }
-            List<String> enabledMods = DataCache.Mods.Where(m => m.Enabled).Select(m => m.Name).ToList();
 
-            int totalCount =
-                jsonData["technologies"].Count() +
-                jsonData["groups"].Count() + 
-                //jsonData["subgroups"].Count() + //they dont have any icons, so are extremely fast (and thus can be ignored for the progress bar)
-                jsonData["items"].Count() +
-                jsonData["fluids"].Count() +
-                jsonData["recipes"].Count() +
-                jsonData["crafting_machines"].Count() +
-                jsonData["miners"].Count() +
-                jsonData["resources"].Count() +
-                jsonData["modules"].Count();
-            int counter = 0;
+            //if icon cache is empty, we need to process icons. if it isnt, then we assume it has been loaded (and if it hasnt / is wrong, well - thats what 'reload' is there for)
+            if (IconCache.Count == 0)
+            {
+                progress.Report(new KeyValuePair<int, string>(startingPercent, "Preparing Icons")); //lets be honest - thats what most of the time is used for here
+                int totalCount = jsonData["icons"].Count();
+                int counter = 0;
+                foreach (var objJToken in jsonData["icons"].ToList())
+                {
+                    progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
+                    ProcessIcon(objJToken);
+                }
+            }
 
+            progress.Report(new KeyValuePair<int, string>(endingPercent, "Creating Data...")); //yea, I gave it all of 0% to complete this entire part. its under 0.1s even for A&B...
             foreach (var objJToken in jsonData["technologies"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessTechnology(objJToken);
-            }
             foreach (var objJToken in jsonData["groups"].ToList())
-            {
                 ProcessGroup(objJToken);
-            }
             foreach (var objJToken in jsonData["subgroups"].ToList())
-            {
                 ProcessSubgroup(objJToken);
-            }
             foreach (var objJToken in jsonData["items"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount,""));
                 ProcessItem(objJToken);
-            }
             foreach (var objJToken in jsonData["fluids"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessFluid(objJToken);
-            }
             foreach (var objJToken in jsonData["recipes"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessRecipe(objJToken);
-            }
-            foreach (var objJToken in jsonData["recipes"].ToList())
-                ProcessRecipeProducts(objJToken);                   //this is done to add extra 'items' representing the temperature ranges of the liquids
-            foreach (var objJToken in jsonData["recipes"].ToList())
-                ProcessRecipeIngredients(objJToken);                //with the extra 'items' from above, we can now process ingredients with linking to the liquid of appropriate temp
             foreach (var objJToken in jsonData["technologies"].ToList())
                 ProcessTechnologyPassTwo(objJToken);                //adds in the recipes (now that we have added all of them) that are unlocked along with the prerequisite tech (now that all tech has been added)
-
             foreach (var objJToken in jsonData["crafting_machines"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessAssembler(objJToken);
-            }
             foreach (var objJToken in jsonData["miners"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessMiner(objJToken);
-            }
             foreach (var objJToken in jsonData["resources"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessResource(objJToken);
-            }
             foreach (var objJToken in jsonData["modules"].ToList())
-            {
-                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessModule(objJToken);
-            }
-
-            ProcessDuplicates(); //checks if the 'default' item should be removed (ex: nothing creates it and everything that consumes it also consumes a variation of it)
 
             //sort
             foreach (Group g in Groups.Values)
@@ -165,37 +118,48 @@ namespace Foreman
                 if (Modules.ContainsKey(s))
                     Modules[s].Enabled = true;
 
-            progress.Report(new KeyValuePair<int, string>(endingPercent, "Removing unreachable items"));
             RemoveUnusableItems();
+
             progress.Report(new KeyValuePair<int, string>(endingPercent, ""));
         }
 
-        private IconColorPair ProcessIcon(JToken iconInfoJToken, int defaultIconSize)
+        private void ProcessIcon(JToken objJToken)
         {
-            string mainIconPath = (string)iconInfoJToken["icon"];
-            int baseIconSize = (int)iconInfoJToken["icon_size"];
+            int iconIndex = (int)objJToken["icon_id"];
+            IconColorPair iconData = new IconColorPair(null, Color.Black);
 
-            IconInfo iicon = new IconInfo(mainIconPath, baseIconSize);
-
-            List<IconInfo> iicons = new List<IconInfo>();
-            List<JToken> iconJTokens = iconInfoJToken["icons"].ToList();
-            foreach (var iconJToken in iconJTokens)
+            if (objJToken["icon_info"].Type != JTokenType.Null)
             {
-                IconInfo picon = new IconInfo((string)iconJToken["icon"], (int)iconJToken["icon_size"]);
-                picon.iconScale = (double)iconJToken["scale"];
+                JToken iconInfoJToken = objJToken["icon_info"];
 
-                picon.iconOffset = new Point((int)iconJToken["shift"][0], (int)iconJToken["shift"][1]);
-                picon.SetIconTint((double)iconJToken["tint"][3], (double)iconJToken["tint"][0], (double)iconJToken["tint"][1], (double)iconJToken["tint"][2]);
-                iicons.Add(picon);
+                string mainIconPath = (string)iconInfoJToken["icon"];
+                int baseIconSize = (int)iconInfoJToken["icon_size"];
+                int defaultIconSize = (int)iconInfoJToken["icon_dsize"];
+
+                IconInfo iicon = new IconInfo(mainIconPath, baseIconSize);
+
+                List<IconInfo> iicons = new List<IconInfo>();
+                List<JToken> iconJTokens = iconInfoJToken["icons"].ToList();
+                foreach (var iconJToken in iconJTokens)
+                {
+                    IconInfo picon = new IconInfo((string)iconJToken["icon"], (int)iconJToken["icon_size"]);
+                    picon.iconScale = (double)iconJToken["scale"];
+
+                    picon.iconOffset = new Point((int)iconJToken["shift"][0], (int)iconJToken["shift"][1]);
+                    picon.SetIconTint((double)iconJToken["tint"][3], (double)iconJToken["tint"][0], (double)iconJToken["tint"][1], (double)iconJToken["tint"][2]);
+                    iicons.Add(picon);
+                }
+                iconData = IconProcessor.GetIconAndColor(iicon, iicons, defaultIconSize);
             }
-            return IconProcessor.GetIconAndColor(iicon, iicons, defaultIconSize);
+            IconCache.Add(iconIndex, iconData);
         }
 
         private void ProcessTechnology(JToken objJToken)
         {
             Technology technology = new Technology((string)objJToken["name"]);
             technology.LName = (string)objJToken["localised_name"];
-            technology.Icon = ProcessIcon(objJToken["icon_info"], 256).Icon;
+            if (IconCache.ContainsKey((int)objJToken["icon_id"]))
+                technology.Icon = IconCache[(int)objJToken["icon_id"]].Icon;
             Technologies.Add(technology.Name, technology);
         }
 
@@ -219,8 +183,8 @@ namespace Foreman
         private void ProcessGroup(JToken objJToken)
         {
             Group group = new Group((string)objJToken["name"], (string)objJToken["localised_name"], (string)objJToken["order"]);
-            group.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 64));
-
+            if (IconCache.ContainsKey((int)objJToken["icon_id"]))
+                group.SetIconAndColor(IconCache[(int)objJToken["icon_id"]]);
             foreach (var subgroupJToken in objJToken["subgroups"])
                 SubgroupToGroupLinks.Add((string)subgroupJToken, group);
             Groups.Add(group.Name, group);
@@ -235,7 +199,8 @@ namespace Foreman
         private void ProcessItem(JToken objJToken)
         {
             Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], false, Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
-            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
+            if (IconCache.ContainsKey((int)objJToken["icon_id"]))
+                item.SetIconAndColor(IconCache[(int)objJToken["icon_id"]]);
             Items.Add(item.Name, item);
         }
 
@@ -243,7 +208,8 @@ namespace Foreman
         {
             Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], true, Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
             item.Temperature = (double)objJToken["default_temperature"];
-            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
+            if (IconCache.ContainsKey((int)objJToken["icon_id"]))
+                item.SetIconAndColor(IconCache[(int)objJToken["icon_id"]]);
             Items.Add(item.Name, item);
         }
 
@@ -253,120 +219,37 @@ namespace Foreman
             recipe.Time = (float)objJToken["energy"] > 0 ? (float)objJToken["energy"] : defaultRecipeTime;
             recipe.Category = (string)objJToken["category"];
             recipe.IsAvailableAtStart = (bool)objJToken["enabled"];
-            recipe.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
-            Recipes.Add(recipe.Name, recipe);
-        }
-        private void ProcessRecipeProducts(JToken objJToken)
-        {
-            Recipe recipe = Recipes[(string)objJToken["name"]];
+            if (IconCache.ContainsKey((int)objJToken["icon_id"]))
+                recipe.SetIconAndColor(IconCache[(int)objJToken["icon_id"]]);
 
             foreach (var productJToken in objJToken["products"].ToList())
             {
-                if ((float)productJToken["amount"] == 0)
-                    continue;
-
                 string name = (string)productJToken["name"];
-
                 float amount = (float)productJToken["amount"];
-                if (amount != 0)
+                float temperature = 0; // ((string)productJToken["type"] == "fluid" && productJToken["temperature"].Type != JTokenType.Null) ? (float)productJToken["temperature"] : 0;
+                if((string)productJToken["type"] == "fluid" && productJToken["temperature"].Type != JTokenType.Null)
                 {
-                    if ((string)productJToken["type"] == "item" || productJToken["temperature"].Type == JTokenType.Null || Items[name].Temperature == (double)productJToken["temperature"])
-                    {
-                        recipe.AddResult(Items[name], amount);
-                    }
-                    else //this is a fluid with a specified temperature different from the default fluid temperature
-                    {
-                        double temp = (double)productJToken["temperature"];
-                        string fluidName = name + String.Format("\n{0:N2}", temp);
-                        if (Items.ContainsKey(fluidName))
-                        {
-                            //the new fluid has already been 'created' by a previous recipe
-                            recipe.AddResult(Items[fluidName], amount);
-                        }
-                        else
-                        {
-                            //we have to add the new fluid
-                            if (!FluidDuplicants.ContainsKey(name))
-                                FluidDuplicants[name] = new List<string>();
-                            FluidDuplicants[name].Add(fluidName);
-
-                            Item defaultFluid = Items[name];
-                            Item newFluid = new Item(fluidName, defaultFluid.LName + " (" + temp + "°)", true, defaultFluid.MySubgroup, defaultFluid.Order + temp);
-                            newFluid.Temperature = temp;
-                            newFluid.Icon = defaultFluid.Icon;
-
-                            Items.Add(newFluid.Name, newFluid);
-                            recipe.AddResult(newFluid, amount);
-                        }
-                    }
+                    temperature = (float)productJToken["temperature"];
+                    if (Items[name].Temperature != temperature)
+                        Items[name].IsTemperatureDependent = true;
                 }
+
+                if (amount != 0)
+                    recipe.AddProduct(Items[name], amount, temperature);
             }
-        }
-        private void ProcessRecipeIngredients(JToken objJToken)
-        {
-            List<Recipe> recipes = new List<Recipe>(); //any situation where multiple fluids fit as an ingredient will require addition of new recipes
-            recipes.Add(Recipes[(string)objJToken["name"]]);
+
             foreach (var ingredientJToken in objJToken["ingredients"].ToList())
             {
-
                 string name = (string)ingredientJToken["name"];
-                double minTemp = (ingredientJToken["minimum_temperature"] == null || ingredientJToken["minimum_temperature"].Type == JTokenType.Null) ? double.MinValue : (double)ingredientJToken["minimum_temperature"];
-                double maxTemp = (ingredientJToken["maximum_temperature"] == null || ingredientJToken["maximum_temperature"].Type == JTokenType.Null) ? double.MaxValue : (double)ingredientJToken["maximum_temperature"];
                 float amount = (float)ingredientJToken["amount"];
 
+                float minTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["minimum_temperature"].Type != JTokenType.Null) ? (float)ingredientJToken["minimum_temperature"] : float.NegativeInfinity;
+                float maxTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"].Type != JTokenType.Null) ? (float)ingredientJToken["maximum_temperature"] : float.PositiveInfinity;
                 if (amount != 0)
-                {
-                    Item defaultIngredient = Items[name];
-                    List<Item> validIngredients = new List<Item>();
-                    if ((string)ingredientJToken["type"] == "item" || defaultIngredient.Temperature >= minTemp && defaultIngredient.Temperature <= maxTemp)
-                        validIngredients.Add(defaultIngredient);
-                    if (FluidDuplicants.ContainsKey(name)) //have to check for any duplicants and possibly create alternate recipes
-                    {
-                        foreach (string altName in FluidDuplicants[name])
-                        {
-                            Item altIngredient = Items[altName];
-                            if (altIngredient.Temperature >= minTemp && altIngredient.Temperature <= maxTemp)
-                                validIngredients.Add(altIngredient);
-                        }
-                    }
-
-                    //increase the number of recipes if necessary (each one beyond the first valid ingredient)
-                    int baseRecipeCount = recipes.Count();
-                    for (int i = 1; i < validIngredients.Count; i++)
-                    {
-                        if (!RecipeDuplicants.ContainsKey(recipes[0].Name))
-                            RecipeDuplicants[recipes[0].Name] = new List<string>();
-
-                        for (int j = 0; j < baseRecipeCount; j++)
-                        {
-                            Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1), recipes[j].LName, recipes[0].MySubgroup, recipes[0].Order + (i * baseRecipeCount + j + 1));
-                            newRecipe.Category = recipes[j].Category;
-                            newRecipe.Hidden = recipes[j].Hidden;
-                            newRecipe.Time = recipes[j].Time;
-                            newRecipe.Icon = recipes[j].Icon;
-
-                            foreach (KeyValuePair<Item, float> kvp in recipes[j].IngredientsSet)
-                                newRecipe.AddIngredient(kvp.Key, kvp.Value);
-                            foreach (KeyValuePair<Item, float> kvp in recipes[j].ResultsSet)
-                                newRecipe.AddResult(kvp.Key, kvp.Value);
-
-                            recipes.Add(newRecipe);
-                            Recipes.Add(newRecipe.Name, newRecipe);
-                            RecipeDuplicants[recipes[0].Name].Add(newRecipe.Name);
-                        }
-                    }
-
-                    //process each ingredient
-                    for (int i = 0; i < validIngredients.Count; i++)
-                    {
-                        for (int j = 0; j < baseRecipeCount; j++)
-                        {
-                            Recipe crecipe = recipes[i * baseRecipeCount + j];
-                            crecipe.AddIngredient(validIngredients[i], amount);
-                        }
-                    }
-                }
+                    recipe.AddIngredient(Items[name], amount, minTemp, maxTemp);
             }
+
+            Recipes.Add(recipe.Name, recipe);
         }
 
         private void ProcessAssembler(JToken objJToken)
@@ -375,7 +258,8 @@ namespace Foreman
             assembler.LName = (string)objJToken["localised_name"];
             assembler.Speed = (float)objJToken["crafting_speed"];
             assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
-            assembler.Icon = ProcessIcon(objJToken["icon_info"], 32).Icon;
+            if (IconCache.ContainsKey((int)objJToken["icon_id"]))
+                assembler.Icon = IconCache[(int)objJToken["icon_id"]].Icon;
 
             foreach (var categoryJToken in objJToken["crafting_categories"])
                 assembler.Categories.Add((string)categoryJToken);
@@ -391,7 +275,8 @@ namespace Foreman
             miner.LName = (string)objJToken["localised_name"];
             miner.MiningPower = (float)objJToken["mining_speed"];
             miner.ModuleSlots = (int)objJToken["module_inventory_size"];
-            miner.Icon = ProcessIcon(objJToken["icon_info"], 32).Icon;
+            if (IconCache.ContainsKey((int)objJToken["icon_id"]))
+                miner.Icon = IconCache[(int)objJToken["icon_id"]].Icon;
 
             foreach (var categoryJToken in objJToken["resource_categories"])
                 miner.ResourceCategories.Add((string)categoryJToken);
@@ -428,59 +313,8 @@ namespace Foreman
                 foreach (Recipe recipe in Recipes.Values)
                     limitations.Add(recipe.Name);
             }
-            else //only the specified recipes work. Have to check for duplicate recipes (due to fluid temps)
-            {
-                List<string> newLimitations = new List<string>();
-                foreach(string rname in limitations)
-                    if (RecipeDuplicants.ContainsKey(rname))
-                        newLimitations.AddRange(RecipeDuplicants[rname]);
-            }
 
             Modules.Add(module.Name, module);
-        }
-
-        private void ProcessDuplicates()
-        {
-            foreach(KeyValuePair<string, List<string>> kvp in FluidDuplicants)
-            {
-                Item defaultFluid = Items[kvp.Key];
-                defaultFluid.LName += " (" + defaultFluid.Temperature + "°)";
-                List<Item> altFluids = new List<Item>();
-                foreach (string altNames in kvp.Value)
-                    altFluids.Add(Items[altNames]);
-
-                bool defaultIsProduced = false;
-                foreach(Recipe recipe in Recipes.Values)
-                    foreach (Item fluid in recipe.ResultsSet.Keys)
-                        defaultIsProduced |= (fluid == defaultFluid);
-
-                if(!defaultIsProduced) //nothing produces it, have to check if every consumer has an alternative
-                {
-                    List<Recipe> defaultUseRecipes = new List<Recipe>();
-                    foreach (Recipe recipe in Recipes.Values)
-                        foreach (Item item in recipe.IngredientsSet.Keys)
-                            if (item == defaultFluid)
-                                defaultUseRecipes.Add(recipe);
-
-                    bool defaultIsUnnecessary = true;
-                    foreach (Recipe recipe in defaultUseRecipes)
-                    {
-                        bool canUseAltFluid = false;
-                        if (RecipeDuplicants.ContainsKey(recipe.Name))
-                        {
-                            foreach(string altRecipeName in RecipeDuplicants[recipe.Name])
-                                foreach (Item altFluid in altFluids)
-                                    canUseAltFluid |= Recipes[altRecipeName].IngredientsSet.ContainsKey(altFluid);
-                        }
-                        if (!canUseAltFluid)
-                            defaultIsUnnecessary = false;
-                    }
-
-                    if(defaultIsUnnecessary)
-                        foreach (Recipe recipe in defaultUseRecipes)
-                            Recipes.Remove(recipe.Name);
-                }
-            }
         }
 
         //This is used to clean up the items & recipes to those that can actually appear given the settings.
@@ -488,19 +322,35 @@ namespace Foreman
         //to further clean up items
         //NOTE: if the FactorioLuaProcessor is used (as opposed to the foreman mod export), then this does the entire job of control.lua in
         //checking researchable tech, removing un-unlockable recipes, removing any items that dont appear in the clean recipe list, etc.
-        private HashSet<Technology> temp_unlockableTechSet; //used within IsUnlockable to not have to go through the entire tree for every single item (once an item is set to be 'unlockable' here, it will not require a recursive search again)
         private void RemoveUnusableItems()
         {
+            HashSet<Technology> temp_unlockableTechSet = new HashSet<Technology>();
+            bool IsUnlockable(Technology tech) //sets the locked parameter based on unlockability of it & its prerequisites. returns true if unlocked
+            {
+                if (tech.Locked)
+                    return false;
+                else if (temp_unlockableTechSet.Contains(tech))
+                    return true;
+                else if (tech.Prerequisites.Count == 0)
+                    return true;
+                else
+                {
+                    bool available = true;
+                    foreach (Technology preTech in tech.Prerequisites)
+                        available = available && IsUnlockable(preTech);
+                    tech.Locked = !available;
+
+                    if (available)
+                        temp_unlockableTechSet.Add(tech);
+                    return available;
+                }
+            }
+
             //step 1: calculate unlockable technologies (either already researched or recursive search to confirm all prerequisites are unlockable / researched)
-            temp_unlockableTechSet = new HashSet<Technology>();
             List<string> unavailableTech = new List<string>();
             foreach (Technology tech in Technologies.Values)
-            {
                 if (!IsUnlockable(tech))
                     unavailableTech.Add(tech.Name);
-            }
-            temp_unlockableTechSet.Clear();
-            temp_unlockableTechSet = null;
 
             //step 1.5: remove blocked tech
             foreach (string techName in unavailableTech)
@@ -510,8 +360,7 @@ namespace Foreman
             HashSet<Recipe> unusableRecipes = new HashSet<Recipe>(Recipes.Values);
             foreach (Technology tech in Technologies.Values)
                 foreach (Recipe recipe in tech.Recipes)
-                    if(!recipe.Name.Contains("\n"))// "\n" in name represents that this is a duplicate recipe made specifically for fluid temperatures. Ignore
-                        unusableRecipes.Remove(recipe);
+                    unusableRecipes.Remove(recipe);
             foreach (Recipe recipe in Recipes.Values)
                 if (recipe.IsAvailableAtStart)
                     unusableRecipes.Remove(recipe);
@@ -529,27 +378,14 @@ namespace Foreman
             {
                 recipe.MySubgroup.Recipes.Remove(recipe);
                 Recipes.Remove(recipe.Name);
-                if (RecipeDuplicants.ContainsKey(recipe.Name))
-                {
-                    foreach (string altRecipe in RecipeDuplicants[recipe.Name])
-                    {
-                        Recipes[altRecipe].MySubgroup.Recipes.Remove(Recipes[altRecipe]);
-                        Recipes.Remove(altRecipe);
-                    }
-                }
+                foreach (Item ingredient in recipe.IngredientList.ToList())
+                    recipe.DeleteIngredient(ingredient);
+                foreach (Item product in recipe.ProductList.ToList())
+                    recipe.DeleteProduct(product);
             }
 
-            //step 3: calculate unlockable items (ingredient/product of unlockable recipes -> dont care about anything that isnt part of a recipe)
-            HashSet<Item> unusableItems = new HashSet<Item>(Items.Values);
-            foreach (Recipe recipe in Recipes.Values)
-            {
-                foreach (Item item in recipe.IngredientsSet.Keys)
-                    unusableItems.Remove(item);
-                foreach (Item item in recipe.ResultsSet.Keys)
-                    unusableItems.Remove(item);
-            }
-            //step 3.5: remove blocked items
-            foreach (Item item in unusableItems)
+            //step 3: remove any items that arent a part of a recipe (either ingredient or product) -> we dont care about any item that is alone
+            foreach (Item item in Items.Values.Where(i => i.ConsumptionRecipes.Count == 0 && i.ProductionRecipes.Count == 0).ToList())
             {
                 item.MySubgroup.Items.Remove(item);
                 Items.Remove(item.Name);
@@ -574,25 +410,61 @@ namespace Foreman
                 if (!Groups.ContainsKey(subgroup.MyGroup.Name))
                     Groups.Add(subgroup.MyGroup.Name, subgroup.MyGroup);
         }
-
-        private bool IsUnlockable(Technology tech) //sets the locked parameter based on unlockability of it & its prerequisites. returns true if unlocked
+        /*
+        private void SaveIconData()
         {
-            if (tech.Locked)
-                return false;
-            else if (temp_unlockableTechSet.Contains(tech))
-                return true;
-            else if (tech.Prerequisites.Count == 0)
-                return true;
-            else
-            {
-                bool available = true;
-                foreach (Technology preTech in tech.Prerequisites)
-                    available = available && IsUnlockable(preTech);
-                tech.Locked = !available;
+            IconBitmapCollection iCollection = new IconBitmapCollection();
 
-                if (available)
-                    temp_unlockableTechSet.Add(tech);
-                return available;
+            foreach(Technology tech in Technologies.Values)
+            {
+                iCollection.IconCollection.Add*
+            }
+        }*/
+
+
+        public void LoadIconCache(JObject jsonData, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
+        {
+
+        }
+
+        public void SaveIconCache(string path)
+        {
+            IconBitmapCollection iCollection = new IconBitmapCollection();
+
+            foreach (KeyValuePair<int, IconColorPair> iconKVP in IconCache)
+                iCollection.Icons.Add(iconKVP.Key, iconKVP.Value);
+
+            if (File.Exists(path))
+                File.Delete(path);
+            using (Stream stream = File.Open(path, FileMode.Create, FileAccess.Write))
+            {
+                var binaryFormatter = new BinaryFormatter();
+                binaryFormatter.Serialize(stream, iCollection);
+            }
+        }
+
+        public bool LoadIconCache(string path)
+        { 
+            IconCache.Clear();
+            try
+            {
+                using (Stream stream = File.Open(path, FileMode.Open))
+                {
+                    var binaryFormatter = new BinaryFormatter();
+                    IconBitmapCollection iCollection = (IconBitmapCollection)binaryFormatter.Deserialize(stream);
+
+                    foreach (KeyValuePair<int, IconColorPair> iconKVP in iCollection.Icons)
+                        IconCache.Add(iconKVP.Key, iconKVP.Value);
+                }
+                return true;
+            }
+            catch //there was an error reading the cache. Just ignore it and continue (we will have to load the icons from the files directly)
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+
+                IconCache.Clear();
+                return false;
             }
         }
     }

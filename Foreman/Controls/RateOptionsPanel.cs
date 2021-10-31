@@ -189,7 +189,7 @@ namespace Foreman
         {
 			if (BaseNode is RecipeNode rNode) //should be obvious
 			{
-				Assembler updatedAssembler = AssemblerSelectionBox.SelectedItem as Assembler;
+                Assembler updatedAssembler = (Assembler)AssemblerSelectionBox.SelectedItem;
 				if (updatedAssembler == BestAssembler)
 					updatedAssembler = null;
 				if(rNode.Assembler != updatedAssembler)
@@ -213,7 +213,7 @@ namespace Foreman
 				else if (ModuleSelectionBox.SelectedItem == ProdModule)
 					updatedMSelector = ModuleSelector.Productive;
 				else
-					updatedMSelector = ModuleSelector.Specific(ModuleSelectionBox.SelectedItem as Module);
+					updatedMSelector = ModuleSelector.Specific((Module)ModuleSelectionBox.SelectedItem);
 
 				if(rNode.NodeModules != updatedMSelector)
                 {

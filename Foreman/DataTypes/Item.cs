@@ -16,6 +16,7 @@ namespace Foreman
 
 		public bool IsMissingItem { get { return DataCache.MissingItems.ContainsKey(Name); } }
 		public bool IsFluid { get; private set; }
+        public bool IsTemperatureDependent { get; set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
 
 		public double Temperature { get; set; } //for liquids
 
@@ -39,13 +40,15 @@ namespace Foreman
 			consumptionRecipes = new HashSet<Recipe>();
 
 			IsFluid = isfluid;
+            Temperature = 0;
+            IsTemperatureDependent = false;
 		}
 
 		internal void InternalAddConsumptionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds an ingredient
         {
 			consumptionRecipes.Add(recipe);
         }
-		internal void InternalAddProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds a result
+		internal void InternalAddProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds a product
         {
 			productionRecipes.Add(recipe);
         }
@@ -53,11 +56,34 @@ namespace Foreman
 		{
 			consumptionRecipes.Remove(recipe);
 		}
-		internal void InternalRemoveProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it removes a result
+		internal void InternalRemoveProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it removes a product
 		{
 			productionRecipes.Remove(recipe);
 		}
 
 		public override string ToString() { return String.Format("Item: {0}", Name); }
+
+		public static string GetTemperatureRangeFriendlyName(Item item, fRange tempRange)
+        {
+			if (tempRange.Ignore)
+				return item.FriendlyName;
+
+			string name = item.FriendlyName;
+			bool includeMin = tempRange.Min >= float.MinValue; //== float.NegativeInfinity;
+			bool includeMax = tempRange.Max <= float.MaxValue; //== float.PositiveInfinity;
+
+			if (tempRange.Min == tempRange.Max)
+				name += " (" + tempRange.Min.ToString("0") + "°)";
+			else if (includeMin && includeMax)
+				name += " (" + tempRange.Min.ToString("0") + "°-" + tempRange.Max.ToString("0") + "°)";
+			else if (includeMin)
+				name += " (min " + tempRange.Min.ToString("0") + "°)";
+			else if (includeMax)
+				name += " (max " + tempRange.Max.ToString("0") + "°)";
+			else
+				name += "(any°)";
+
+			return name;
+		}
 	}
 }
