@@ -214,7 +214,7 @@ namespace Foreman
 			{
 				var recipePool = item.ProductionRecipes.Where(r => !r.IsCyclic);   //Ignore recipes that can ultimately supply themselves, like filling/emptying barrels or certain modded recipes
 
-				foreach (Recipe recipe in recipePool.Where(r => r.Enabled))
+				foreach (Recipe recipe in recipePool.Where(r => r.Enabled && r.HasEnabledAssemblers))
 				{
 					var existingNodes = Nodes.OfType<RecipeNode>().Where(n => n.BaseRecipe == recipe);
 

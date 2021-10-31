@@ -127,13 +127,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataTypes\Assembler.cs" />
+    <Compile Include="DataTypes\Technology.cs" />
     <Compile Include="Forms\DirectoryChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\DirectoryChooserForm.designer.cs">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionGraphViewer\AssemblerBox.cs" />
+    <Compile Include="ProductionGraphView\AssemblerBox.cs" />
     <Compile Include="Controls\CheckboxListWithErrors.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -149,7 +150,7 @@
     <Compile Include="DataCache\DataCache.cs" />
     <Compile Include="DataCache\DependencyGraph.cs" />
     <Compile Include="Extensions\VersionOperatorExtensions.cs" />
-    <Compile Include="DataCache\FModDataProcessor.cs" />
+    <Compile Include="DataCache\JsonDataProcessor.cs" />
     <Compile Include="Forms\InstallationChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -163,18 +164,18 @@
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DataCache\FactorioLuaPropertyTree.cs" />
-    <Compile Include="ProductionGraphViewer\FloatingTooltipControl.cs" />
-    <Compile Include="ProductionGraphViewer\GhostNodeElement.cs" />
-    <Compile Include="ProductionGraphViewer\DraggedLinkElement.cs" />
+    <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
+    <Compile Include="ProductionGraphView\GhostNodeElement.cs" />
+    <Compile Include="ProductionGraphView\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
     <Compile Include="DataCache\IconProcessor.cs" />
     <Compile Include="DataCache\LBitmap.cs" />
-    <Compile Include="DataCache\LuaDataProcessor.cs" />
+    <Compile Include="DataCache\FactorioLuaProcessor.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="FoundInstallation.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
-    <Compile Include="ProductionGraphViewer\GraphicsStuff.cs" />
-    <Compile Include="ProductionGraphViewer\GraphElement.cs" />
+    <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
+    <Compile Include="ProductionGraphView\GraphElement.cs" />
     <Compile Include="Models\Solver\GraphOptimisation.cs" />
     <Compile Include="Forms\ImageExportForm.cs">
       <SubType>Form</SubType>
@@ -182,7 +183,7 @@
     <Compile Include="Forms\ImageExportForm.Designer.cs">
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionGraphViewer\ItemTab.cs" />
+    <Compile Include="ProductionGraphView\ItemTab.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -190,7 +191,7 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DataTypes\Item.cs" />
-    <Compile Include="ProductionGraphViewer\LinkElement.cs" />
+    <Compile Include="ProductionGraphView\LinkElement.cs" />
     <Compile Include="DataTypes\Miner.cs" />
     <Compile Include="DataTypes\Mod.cs" />
     <Compile Include="Models\ProductionNode.cs" />
@@ -217,7 +218,7 @@
     <Compile Include="Controls\ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionGraphViewer\NodeElement.cs" />
+    <Compile Include="ProductionGraphView\NodeElement.cs" />
     <Compile Include="Models\NodeLink.cs" />
     <Compile Include="Controls\RecipeChooserControl.cs">
       <SubType>UserControl</SubType>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NLua;
 using System.IO;
 using System.Drawing;
 using Newtonsoft.Json;
@@ -12,6 +11,8 @@ using System.Text.RegularExpressions;
 using Foreman.Properties;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Foreman
 {
@@ -46,12 +47,17 @@ namespace Foreman
         public static List<Mod> Mods = new List<Mod>();
         public static List<Language> Languages = new List<Language>();
         public static Dictionary<String, Dictionary<String, String>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
+
+        public static Dictionary<string, Technology> Technologies = new Dictionary<string, Technology>();
         public static Dictionary<string, Item> Items = new Dictionary<String, Item>();
         public static Dictionary<string, Recipe> Recipes = new Dictionary<String, Recipe>();
         public static Dictionary<string, Assembler> Assemblers = new Dictionary<string, Assembler>();
         public static Dictionary<string, Miner> Miners = new Dictionary<string, Miner>();
         public static Dictionary<string, Resource> Resources = new Dictionary<string, Resource>();
         public static Dictionary<string, Module> Modules = new Dictionary<string, Module>();
+
+        public static Dictionary<string, Recipe> MissingRecipes = new Dictionary<string, Recipe>(); //both are used when loading a graph file with unknown / missing items / recipes.
+        public static Dictionary<string, Item> MissingItems = new Dictionary<string, Item>();
 
         public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
         public static Dictionary<String, Exception> failedPathDirectories = new Dictionary<string, Exception>();
@@ -60,11 +66,10 @@ namespace Foreman
 
         private static Dictionary<String, byte[]> zipHashes = new Dictionary<string, byte[]>();
         private static GenerationType GetGenerationType() { return (GenerationType)(Settings.Default.GenerationType); }
-        private static readonly int ProgressPercentModLoading = DataReloadForm.ProcessBreakpoints[1];
-        private static readonly int ProgressPercentCyclic = DataReloadForm.ProcessBreakpoints[3];
 
         private static String DataPath { get { return Path.Combine(Settings.Default.FactorioPath, "data"); } }
         private static String ModPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "mods"); } }
+        private static string ScriptOutPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "script-output"); } }
         private static String ExtractionPath { get { return ModPath; } }
 
         private static readonly List<Tuple<string, DependencyType>> DependencyTypeTokens = new List<Tuple<string, DependencyType>>
@@ -83,80 +88,96 @@ namespace Foreman
             Tuple.Create(VersionOperator.EqualTo.Token(), VersionOperator.EqualTo)
         };
 
-        internal static async Task LoadAllData(List<string> enabledMods, IProgress<int> progress, CancellationToken ctoken)
+        internal static async Task LoadAllData(bool defaultEnabled, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
         {
             await Task.Run(() =>
             {
                 Clear();
 
-                progress.Report(0);
-                using (Lua lua = new Lua())
+                progress.Report(new KeyValuePair<int, string>(0,""));
+
+                FindAllMods(progress, ctoken, 0, 15); //gets mod enable status from Properties.Settings.Default
+                LoadAllLanguages();
+                LoadLocaleFiles(Properties.Settings.Default.Language);
+                UnknownIcon = IconProcessor.GetUnknownIcon();
+
+                JObject jsonData;
+                int jsonStartingPercent = 15;
+                switch (GetGenerationType())
                 {
-                    FindAllMods(progress, ctoken); //gets mod enable status from Properties.Settings.Default
-                    LoadAllLanguages();
-                    LoadLocaleFiles(Properties.Settings.Default.Language);
-                    UnknownIcon = IconProcessor.GetUnknownIcon();
-
-                    DataProcessor processor;
-                    switch (GetGenerationType())
-                    {
-                        case DataCache.GenerationType.FactorioLUA:
-                            processor = new LuaDataProcessor();
-                            break;
-                        case DataCache.GenerationType.ForemanMod:
-                        default:
-                            processor = new FModDataProcessor();
-                            break;
-                    }
-                    processor.LoadData(progress, ctoken);
-
-                    foreach (KeyValuePair<string, Item> kvp in processor.GetItems())
-                        Items.Add(kvp.Key, kvp.Value);
-                    foreach (KeyValuePair<string, Recipe> kvp in processor.GetRecipes())
-                        Recipes.Add(kvp.Key, kvp.Value);
-                    foreach (KeyValuePair<string, Assembler> kvp in processor.GetAssemblers())
-                        Assemblers.Add(kvp.Key, kvp.Value);
-                    foreach (KeyValuePair<string, Miner> kvp in processor.GetMiners())
-                        Miners.Add(kvp.Key, kvp.Value);
-                    foreach (KeyValuePair<string, Resource> kvp in processor.GetResources())
-                        Resources.Add(kvp.Key, kvp.Value);
-                    foreach (KeyValuePair<string, Module> kvp in processor.GetModules())
-                        Modules.Add(kvp.Key, kvp.Value);
-
-                    foreach (KeyValuePair<string, Exception> kvp in processor.GetFileExceptions())
-                        failedFiles.Add(kvp.Key, kvp.Value);
-                    foreach (KeyValuePair<string, Exception> kvp in processor.GetPathExceptions())
-                        failedPathDirectories.Add(kvp.Key, kvp.Value);
-
-                    RemoveUnusableItems(); //gets rid of any item that isnt an ingredient or product of at least one recipe (ex: all those blueprints)
-                    //IncorporateMiners(); //miners are inserted as part of recipes & assembly machines
-
-                    progress.Report(ProgressPercentCyclic);
-                    MarkCyclicRecipes();
-                    ReportErrors();
-                    progress.Report(100);
+                    case DataCache.GenerationType.FactorioLUA:
+                        jsonStartingPercent = 30; //15% goes to processing factorio lua
+                        FactorioLuaProcessor flp = new FactorioLuaProcessor();
+                        jsonData = flp.LoadData(progress, ctoken, 0, jsonStartingPercent);
+                        break;
+                    case DataCache.GenerationType.ForemanMod:
+                    default:
+                        //read in the data from the foreman mod (in the script output folder)
+                        string setupFile = Path.Combine(ScriptOutPath, "ForemanFactorioSetup.txt");
+                        if (!File.Exists(setupFile))
+                        {
+                            MessageBox.Show("The setup file could not be found!\n\nEnsure you have the \"z-z-foremanexport\" mod installed, enabled, and started a new game with it. It should freeze the game for a bit (1sec for vanilla installation, 30sec+ for Angel/Bob with extras) before displaying \"Foreman export complete.\" ");
+                            return;
+                        }
+                        jsonData = JObject.Parse(File.ReadAllText(setupFile));
+                        break;
                 }
+                JsonDataProcessor processor = new JsonDataProcessor();
+                processor.LoadData(jsonData, defaultEnabled, progress, ctoken, jsonStartingPercent, 95);
+
+                foreach (KeyValuePair<string, Technology> kvp in processor.GetTechnologies())
+                    Technologies.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Item> kvp in processor.GetItems())
+                    Items.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Recipe> kvp in processor.GetRecipes())
+                    Recipes.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Assembler> kvp in processor.GetAssemblers())
+                    Assemblers.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Miner> kvp in processor.GetMiners())
+                    Miners.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Resource> kvp in processor.GetResources())
+                    Resources.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Module> kvp in processor.GetModules())
+                    Modules.Add(kvp.Key, kvp.Value);
+
+                foreach (KeyValuePair<string, Exception> kvp in processor.GetFileExceptions())
+                    failedFiles.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Exception> kvp in processor.GetPathExceptions())
+                    failedPathDirectories.Add(kvp.Key, kvp.Value);
+
+                //IncorporateMiners(); //miners are inserted as part of recipes & assembly machines
+
+                progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes"));
+                MarkCyclicRecipes();
+                ReportErrors();
+                progress.Report(new KeyValuePair<int, string>(100, "Done!"));
             });
         }
 
         public static void Clear()
         {
             Mods.Clear();
+            Technologies.Clear();
             Items.Clear();
             Recipes.Clear();
             Assemblers.Clear();
             Miners.Clear();
             Resources.Clear();
             Modules.Clear();
-            Item.ClearColorCache();
             LocaleFiles.Clear();
+            Languages.Clear();
+
+            MissingItems.Clear();
+            MissingRecipes.Clear();
+
             failedFiles.Clear();
             failedPathDirectories.Clear();
-            Languages.Clear();
         }
 
-        private static void FindAllMods(IProgress<int> progress, CancellationToken ctoken) //Vanilla game counts as a mod too.
+        private static void FindAllMods(IProgress<KeyValuePair<int,string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent) //Vanilla game counts as a mod too.
         {
+            progress.Report(new KeyValuePair<int, string>(startingPercent, "Preparing Mods"));
+
             String modPath = ModPath;
             IEnumerable<ModOnDisk> mods = ModOnDisk.Empty();
 
@@ -172,11 +193,7 @@ namespace Foreman
             if (Settings.Default.EnabledMods.Count > 0)
             {
                 foreach (String s in Settings.Default.EnabledMods)
-                {
-                    var split = s.Split('|');
-                    if (split[1] == "True")
-                        enabledMods.Add(split[0]);
-                }
+                    enabledMods.Add(s);
             }
             else
             {
@@ -193,8 +210,8 @@ namespace Foreman
                 }
             }
 
-            float total = latestMods.Count();
-            float current = 0;
+            int totalCount = latestMods.Count();
+            int counter = 0;
             foreach (ModOnDisk mod in latestMods)
             {
                 switch (mod.Type)
@@ -219,7 +236,7 @@ namespace Foreman
                 }
                 if (ctoken.IsCancellationRequested)
                     return;
-                progress.Report((int)(current++ / total * ProgressPercentModLoading));
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
             }
 
             foreach (Mod mod in Mods)
@@ -229,7 +246,7 @@ namespace Foreman
             modGraph.DisableUnsatisfiedMods();
             Mods = modGraph.SortMods();
 
-            progress.Report(15);
+            progress.Report(new KeyValuePair<int, string>(endingPercent,""));
         }
 
         private static void LoadAllLanguages()
@@ -525,24 +542,6 @@ namespace Foreman
 
                 mod.parsedDependencies.Add(newDependency);
             }
-        }
-
-        private static void RemoveUnusableItems()
-        {
-            HashSet<Item> usableItems = new HashSet<Item>();
-            foreach(Recipe recipe in Recipes.Values)
-            {
-                foreach (Item item in recipe.Ingredients.Keys)
-                    usableItems.Add(item);
-                foreach (Item item in recipe.Results.Keys)
-                    usableItems.Add(item);
-            }
-            List<Item> unusableItems = new List<Item>();
-            foreach (Item item in Items.Values)
-                if (!usableItems.Contains(item))
-                    unusableItems.Add(item);
-            foreach (Item item in unusableItems)
-                Items.Remove(item.Name);
         }
 
         private static void MarkCyclicRecipes()

@@ -1,0 +1,686 @@
+{
+  "AmountType": 0,
+  "Unit": 1,
+  "GenerationType": 0,
+  "IncludedItems": [
+    "electronic-circuit",
+    "advanced-circuit",
+    "steel-chest",
+    "logistic-chest-active-provider",
+    "plastic-bar",
+    "copper-cable",
+    "arithmetic-combinator",
+    "explosives",
+    "explosive-cannon-shell",
+    "radar",
+    "artillery-shell",
+    "processing-unit",
+    "artillery-targeting-remote",
+    "steel-plate",
+    "iron-gear-wheel",
+    "concrete",
+    "artillery-turret",
+    "engine-unit",
+    "pipe",
+    "artillery-wagon",
+    "iron-plate",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "copper-plate",
+    "iron-ore",
+    "copper-ore"
+  ],
+  "IncludedRecipes": [
+    {
+      "Name": "logistic-chest-active-provider",
+      "Ingredients": [
+        "electronic-circuit",
+        "advanced-circuit",
+        "steel-chest"
+      ],
+      "Results": [
+        "logistic-chest-active-provider"
+      ]
+    },
+    {
+      "Name": "advanced-circuit",
+      "Ingredients": [
+        "plastic-bar",
+        "copper-cable",
+        "electronic-circuit"
+      ],
+      "Results": [
+        "advanced-circuit"
+      ]
+    },
+    {
+      "Name": "arithmetic-combinator",
+      "Ingredients": [
+        "copper-cable",
+        "electronic-circuit"
+      ],
+      "Results": [
+        "arithmetic-combinator"
+      ]
+    },
+    {
+      "Name": "artillery-shell",
+      "Ingredients": [
+        "explosives",
+        "explosive-cannon-shell",
+        "radar"
+      ],
+      "Results": [
+        "artillery-shell"
+      ]
+    },
+    {
+      "Name": "artillery-targeting-remote",
+      "Ingredients": [
+        "processing-unit",
+        "radar"
+      ],
+      "Results": [
+        "artillery-targeting-remote"
+      ]
+    },
+    {
+      "Name": "artillery-turret",
+      "Ingredients": [
+        "steel-plate",
+        "iron-gear-wheel",
+        "advanced-circuit",
+        "concrete"
+      ],
+      "Results": [
+        "artillery-turret"
+      ]
+    },
+    {
+      "Name": "artillery-wagon",
+      "Ingredients": [
+        "steel-plate",
+        "iron-gear-wheel",
+        "advanced-circuit",
+        "engine-unit",
+        "pipe"
+      ],
+      "Results": [
+        "artillery-wagon"
+      ]
+    },
+    {
+      "Name": "assembling-machine-1",
+      "Ingredients": [
+        "iron-plate",
+        "iron-gear-wheel",
+        "electronic-circuit"
+      ],
+      "Results": [
+        "assembling-machine-1"
+      ]
+    },
+    {
+      "Name": "assembling-machine-2",
+      "Ingredients": [
+        "steel-plate",
+        "iron-gear-wheel",
+        "electronic-circuit",
+        "assembling-machine-1"
+      ],
+      "Results": [
+        "assembling-machine-2"
+      ]
+    },
+    {
+      "Name": "electronic-circuit",
+      "Ingredients": [
+        "iron-plate",
+        "copper-cable"
+      ],
+      "Results": [
+        "electronic-circuit"
+      ]
+    },
+    {
+      "Name": "copper-cable",
+      "Ingredients": [
+        "copper-plate"
+      ],
+      "Results": [
+        "copper-cable"
+      ]
+    },
+    {
+      "Name": "iron-gear-wheel",
+      "Ingredients": [
+        "iron-plate"
+      ],
+      "Results": [
+        "iron-gear-wheel"
+      ]
+    },
+    {
+      "Name": "iron-plate",
+      "Ingredients": [
+        "iron-ore"
+      ],
+      "Results": [
+        "iron-plate"
+      ]
+    },
+    {
+      "Name": "copper-plate",
+      "Ingredients": [
+        "copper-ore"
+      ],
+      "Results": [
+        "copper-plate"
+      ]
+    },
+    {
+      "Name": "steel-plate",
+      "Ingredients": [
+        "iron-plate"
+      ],
+      "Results": [
+        "steel-plate"
+      ]
+    }
+  ],
+  "EnabledAssemblers": [
+    "stone-furnace",
+    "steel-furnace",
+    "electric-furnace",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "oil-refinery",
+    "chemical-plant",
+    "centrifuge",
+    "rocket-silo"
+  ],
+  "EnabledMiners": [
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "pumpjack"
+  ],
+  "EnabledModules": [
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "effectivity-module",
+    "effectivity-module-2",
+    "effectivity-module-3",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3"
+  ],
+  "EnabledMods": [
+    "core",
+    "base",
+    "z-z-foremanexport"
+  ],
+  "EnabledRecipes": [
+    "automation-science-pack",
+    "firearm-magazine",
+    "pistol",
+    "burner-inserter",
+    "copper-cable",
+    "small-electric-pole",
+    "burner-mining-drill",
+    "wooden-chest",
+    "electric-mining-drill",
+    "iron-chest",
+    "light-armor",
+    "pipe",
+    "pipe-to-ground",
+    "stone-brick",
+    "stone-furnace",
+    "transport-belt",
+    "offshore-pump",
+    "inserter",
+    "iron-plate",
+    "iron-stick",
+    "repair-pack",
+    "boiler",
+    "steam-engine",
+    "copper-plate",
+    "iron-gear-wheel",
+    "radar",
+    "electronic-circuit",
+    "lab",
+    "assembling-machine-1",
+    "long-handed-inserter",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "fast-inserter",
+    "filter-inserter",
+    "advanced-circuit",
+    "processing-unit",
+    "red-wire",
+    "green-wire",
+    "arithmetic-combinator",
+    "decider-combinator",
+    "constant-combinator",
+    "power-switch",
+    "programmable-speaker",
+    "explosives",
+    "underground-belt",
+    "splitter",
+    "fast-transport-belt",
+    "fast-underground-belt",
+    "fast-splitter",
+    "express-transport-belt",
+    "express-underground-belt",
+    "express-splitter",
+    "small-lamp",
+    "solar-panel",
+    "gun-turret",
+    "laser-turret",
+    "stone-wall",
+    "gate",
+    "engine-unit",
+    "electric-engine-unit",
+    "lubricant",
+    "battery",
+    "landfill",
+    "chemical-science-pack",
+    "logistic-science-pack",
+    "military-science-pack",
+    "production-science-pack",
+    "satellite",
+    "steel-plate",
+    "steel-chest",
+    "utility-science-pack",
+    "steel-furnace",
+    "electric-furnace",
+    "concrete",
+    "hazard-concrete",
+    "refined-concrete",
+    "refined-hazard-concrete",
+    "accumulator",
+    "medium-electric-pole",
+    "big-electric-pole",
+    "substation",
+    "rail",
+    "locomotive",
+    "cargo-wagon",
+    "fluid-wagon",
+    "train-stop",
+    "rail-signal",
+    "rail-chain-signal",
+    "flying-robot-frame",
+    "roboport",
+    "logistic-chest-passive-provider",
+    "logistic-chest-storage",
+    "construction-robot",
+    "logistic-robot",
+    "logistic-chest-active-provider",
+    "logistic-chest-requester",
+    "logistic-chest-buffer",
+    "personal-roboport-equipment",
+    "personal-roboport-mk2-equipment",
+    "stack-inserter",
+    "stack-filter-inserter",
+    "pumpjack",
+    "oil-refinery",
+    "chemical-plant",
+    "basic-oil-processing",
+    "solid-fuel-from-petroleum-gas",
+    "storage-tank",
+    "pump",
+    "empty-barrel",
+    "advanced-oil-processing",
+    "heavy-oil-cracking",
+    "light-oil-cracking",
+    "solid-fuel-from-heavy-oil",
+    "solid-fuel-from-light-oil",
+    "coal-liquefaction",
+    "sulfuric-acid",
+    "sulfur",
+    "plastic-bar",
+    "artillery-wagon",
+    "artillery-turret",
+    "artillery-shell",
+    "artillery-targeting-remote",
+    "spidertron",
+    "spidertron-remote",
+    "submachine-gun",
+    "shotgun",
+    "shotgun-shell",
+    "atomic-bomb",
+    "piercing-rounds-magazine",
+    "grenade",
+    "uranium-rounds-magazine",
+    "uranium-cannon-shell",
+    "explosive-uranium-cannon-shell",
+    "poison-capsule",
+    "slowdown-capsule",
+    "combat-shotgun",
+    "piercing-shotgun-shell",
+    "cluster-grenade",
+    "car",
+    "flamethrower",
+    "flamethrower-ammo",
+    "flamethrower-turret",
+    "tank",
+    "cannon-shell",
+    "explosive-cannon-shell",
+    "land-mine",
+    "rocket-launcher",
+    "rocket",
+    "explosive-rocket",
+    "defender-capsule",
+    "distractor-capsule",
+    "destroyer-capsule",
+    "kovarex-enrichment-process",
+    "nuclear-fuel",
+    "nuclear-fuel-reprocessing",
+    "nuclear-reactor",
+    "heat-exchanger",
+    "heat-pipe",
+    "steam-turbine",
+    "centrifuge",
+    "uranium-processing",
+    "uranium-fuel-cell",
+    "heavy-armor",
+    "modular-armor",
+    "power-armor",
+    "power-armor-mk2",
+    "energy-shield-equipment",
+    "energy-shield-mk2-equipment",
+    "night-vision-equipment",
+    "belt-immunity-equipment",
+    "exoskeleton-equipment",
+    "battery-equipment",
+    "battery-mk2-equipment",
+    "solar-panel-equipment",
+    "fusion-reactor-equipment",
+    "personal-laser-defense-equipment",
+    "discharge-defense-equipment",
+    "discharge-defense-remote",
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3",
+    "effectivity-module",
+    "effectivity-module-2",
+    "effectivity-module-3",
+    "beacon",
+    "low-density-structure",
+    "rocket-control-unit",
+    "rocket-fuel",
+    "rocket-silo",
+    "rocket-part",
+    "cliff-explosives"
+  ],
+  "Nodes": [
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "logistic-chest-active-provider",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "advanced-circuit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "arithmetic-combinator",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "artillery-shell",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "artillery-targeting-remote",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "artillery-turret",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "artillery-wagon",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "assembling-machine-1",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "assembling-machine-2",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "electronic-circuit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "copper-cable",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-gear-wheel",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "copper-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "steel-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    }
+  ],
+  "NodeLinks": [
+    {
+      "Supplier": 9,
+      "Consumer": 0,
+      "Item": "electronic-circuit"
+    },
+    {
+      "Supplier": 1,
+      "Consumer": 0,
+      "Item": "advanced-circuit"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 1,
+      "Item": "electronic-circuit"
+    },
+    {
+      "Supplier": 10,
+      "Consumer": 1,
+      "Item": "copper-cable"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 2,
+      "Item": "electronic-circuit"
+    },
+    {
+      "Supplier": 10,
+      "Consumer": 2,
+      "Item": "copper-cable"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 5,
+      "Item": "iron-gear-wheel"
+    },
+    {
+      "Supplier": 14,
+      "Consumer": 5,
+      "Item": "steel-plate"
+    },
+    {
+      "Supplier": 1,
+      "Consumer": 5,
+      "Item": "advanced-circuit"
+    },
+    {
+      "Supplier": 14,
+      "Consumer": 6,
+      "Item": "steel-plate"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 6,
+      "Item": "iron-gear-wheel"
+    },
+    {
+      "Supplier": 1,
+      "Consumer": 6,
+      "Item": "advanced-circuit"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 7,
+      "Item": "electronic-circuit"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 7,
+      "Item": "iron-gear-wheel"
+    },
+    {
+      "Supplier": 12,
+      "Consumer": 7,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 8,
+      "Item": "electronic-circuit"
+    },
+    {
+      "Supplier": 14,
+      "Consumer": 8,
+      "Item": "steel-plate"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 8,
+      "Item": "iron-gear-wheel"
+    },
+    {
+      "Supplier": 10,
+      "Consumer": 9,
+      "Item": "copper-cable"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 10,
+      "Item": "copper-plate"
+    },
+    {
+      "Supplier": 12,
+      "Consumer": 11,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 12,
+      "Consumer": 14,
+      "Item": "iron-plate"
+    }
+  ],
+  "ElementLocations": [
+    "-48, -108",
+    "432, 384",
+    "-288, 216",
+    "-48, -312",
+    "204, -36",
+    "252, -264",
+    "0, 144",
+    "-396, -12",
+    "-312, -252",
+    "336, 672",
+    "-144, 948",
+    "-708, 528",
+    "-600, 984",
+    "-504, 1152",
+    "-444, 636"
+  ]
+}

@@ -145,7 +145,7 @@ namespace Foreman
 		public string Name { get; private set; }
 		public string LName;
 		private String friendlyName;
-        private List<string> allowedIn;
+        private HashSet<string> allowedIn;
 
         public String FriendlyName
 		{
@@ -168,7 +168,7 @@ namespace Foreman
 			}
 		}
 
-        public Module(String name, float speedBonus, float productivityBonus, List<string> allowedIn)
+        public Module(String name, float speedBonus, float productivityBonus, HashSet<string> allowedIn)
 		{
 			Name = name;
 			Enabled = true;

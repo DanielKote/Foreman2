@@ -95,6 +95,10 @@ namespace Foreman
                 if (((PassthroughNode)DisplayedNode).PassedItem.IsMissingItem)
                     backgroundColour = missingColour;
             }
+			else if(DisplayedNode is ErrorNode)
+            {
+				backgroundColour = missingColour;
+            }
             else
                 Trace.Fail("No branch for node: " + DisplayedNode.ToString());
 
@@ -354,7 +358,7 @@ namespace Foreman
 					if (tab.Type == LinkType.Input && DisplayedNode.OverSupplied(tab.Item))
 						bgBrush = backgroundOversuppliedBrush;
 
-				if ((DisplayedNode is RecipeNode && !((RecipeNode)DisplayedNode).BaseRecipe.Enabled) || DisplayedNode.ManualRateNotMet())
+				if (DisplayedNode.ManualRateNotMet() || (DisplayedNode is RecipeNode && !(((RecipeNode)DisplayedNode).BaseRecipe.Enabled && ((RecipeNode)DisplayedNode).BaseRecipe.HasEnabledAssemblers)))
 					GraphicsStuff.FillRoundRect(trans.X - (Width / 2) - 5, trans.Y - (Height / 2) - 5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
 
 				GraphicsStuff.FillRoundRect(trans.X - (Width/2), trans.Y - (Height / 2), Width, Height, 8, graphics, bgBrush);

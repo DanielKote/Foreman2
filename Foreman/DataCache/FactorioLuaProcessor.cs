@@ -5,27 +5,14 @@ using System.Text;
 using NLua;
 using System.IO;
 using System.Drawing;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Foreman.Properties;
 using System.Threading;
 
 namespace Foreman
 {
-    interface DataProcessor
-    {
-        Dictionary<string, Item> GetItems();
-        Dictionary<string, Recipe> GetRecipes();
-        Dictionary<string, Assembler> GetAssemblers();
-        Dictionary<string, Miner> GetMiners();
-        Dictionary<string, Resource> GetResources();
-        Dictionary<string, Module> GetModules();
-
-        Dictionary<string, Exception> GetFileExceptions();
-        Dictionary<string, Exception> GetPathExceptions();
-
-        void LoadData(IProgress<int> progress, CancellationToken ctoken);
-    }
-
-    class LuaDataProcessor : DataProcessor
+    class FactorioLuaProcessor
     {
         private class MissingPrototypeValueException : Exception
         {
@@ -57,10 +44,6 @@ namespace Foreman
 
         private const float defaultRecipeTime = 0.5f;
 
-        private static readonly int ProgressPrevious = DataReloadForm.ProcessBreakpoints[1];
-        private static readonly int ProgressPercentModProcessing = DataReloadForm.ProcessBreakpoints[2] - DataReloadForm.ProcessBreakpoints[1];
-        private static readonly int ProgressPercentIconProcessing = DataReloadForm.ProcessBreakpoints[3] - DataReloadForm.ProcessBreakpoints[2];
-
         public Dictionary<string, Item> GetItems() { return Items; }
         public Dictionary<string, Recipe> GetRecipes() { return Recipes; }
         public Dictionary<string, Assembler> GetAssemblers() { return Assemblers; }
@@ -71,7 +54,7 @@ namespace Foreman
         public Dictionary<string, Exception> GetFileExceptions() { return FailedFiles; }
         public Dictionary<string, Exception> GetPathExceptions() { return FailedPaths; }
 
-        public LuaDataProcessor()
+        public FactorioLuaProcessor()
         {
             Items = new Dictionary<string, Item>();
             Recipes = new Dictionary<string, Recipe>();
@@ -83,9 +66,11 @@ namespace Foreman
             FailedPaths = new Dictionary<string, Exception>();
         }
 
-        public void LoadData(IProgress<int> progress, CancellationToken ctoken)
+        public JObject LoadData(IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
         {
-            progress.Report(ProgressPrevious);
+            int modPercent = (int)((endingPercent - startingPercent) * 0.6 + startingPercent);
+
+            progress.Report(new KeyValuePair<int, string>(startingPercent, "Running Factorio LUA code"));
             using (Lua lua = new Lua())
             {
                 AddLuaPackagePath(lua, Path.Combine(DataPath, "core", "lualib")); //Core lua functions
@@ -101,7 +86,7 @@ namespace Foreman
                 {
                     FailedFiles[dataloaderFile] = e;
                     ErrorLogging.LogLine(String.Format("Error loading dataloader.lua. This file is required to load any values from the prototypes. Message: '{0}'", e.Message));
-                    return;
+                    return null;
                 }
 
                 // Added a custom require function to support relative paths (angels refining was using this and a few others)
@@ -252,7 +237,7 @@ namespace Foreman
                 {
                     foreach (Mod mod in newEnabledMods)
                     {
-                        progress.Report(ProgressPrevious + (int)(current++ / total * ProgressPercentModProcessing));
+                        progress.Report(new KeyValuePair<int, string>(startingPercent + (int)((modPercent - startingPercent) * current++ / total), ""));
 
                         Console.WriteLine("Processing: " + filename + " in " + mod);
                         AddLuaPackagePath(lua, mod.dir);
@@ -279,13 +264,14 @@ namespace Foreman
                     }
                 }
 
-                progress.Report(ProgressPrevious + ProgressPercentModProcessing);
+                progress.Report(new KeyValuePair<int, string>(modPercent, "Processing Data.Raw from Factorio LUA"));
 
                 //------------------------------------------------------------------------------------------
                 // Lua files have all been executed, now it's time to extract their data from the lua engine
                 //------------------------------------------------------------------------------------------
                 total = 0;
                 current = 0;
+                JObject factorioData = new JObject();
 
                 List<string> itemTypes = new List<string> {
                     "item",
@@ -328,7 +314,7 @@ namespace Foreman
                         var enumerator = itemTable.GetEnumerator();
                         while (enumerator.MoveNext())
                         {
-                            progress.Report(ProgressPrevious + ProgressPercentModProcessing + (int)(current++ / total * ProgressPercentIconProcessing));
+                            progress.Report(new KeyValuePair<int, string>(modPercent + (int)((endingPercent - modPercent) * current++ / total), ""));
                             InterpretItem(enumerator.Key as String, enumerator.Value as LuaTable);
                         }
                     }
@@ -338,7 +324,7 @@ namespace Foreman
                     var recipeEnumerator = recipeTable.GetEnumerator();
                     while (recipeEnumerator.MoveNext())
                     {
-                        progress.Report(ProgressPrevious + ProgressPercentModProcessing + (int)(current++ / total * ProgressPercentIconProcessing));
+                        progress.Report(new KeyValuePair<int, string>(modPercent + (int)((endingPercent - modPercent) * current++ / total), ""));
                         InterpretRecipe(recipeEnumerator.Key as String, recipeEnumerator.Value as LuaTable, technologyTable);
                     }
                 }
@@ -347,7 +333,7 @@ namespace Foreman
                     var assemblerEnumerator = assemblerTable.GetEnumerator();
                     while (assemblerEnumerator.MoveNext())
                     {
-                        progress.Report(ProgressPrevious + ProgressPercentModProcessing + (int)(current++ / total * ProgressPercentIconProcessing));
+                        progress.Report(new KeyValuePair<int, string>(modPercent + (int)((endingPercent - modPercent) * current++ / total), ""));
                         InterpretAssemblingMachine(assemblerEnumerator.Key as String, assemblerEnumerator.Value as LuaTable);
                     }
                 }
@@ -357,7 +343,7 @@ namespace Foreman
                     var furnaceEnumerator = furnaceTable.GetEnumerator();
                     while (furnaceEnumerator.MoveNext())
                     {
-                        progress.Report(ProgressPrevious + ProgressPercentModProcessing + (int)(current++ / total * ProgressPercentIconProcessing));
+                        progress.Report(new KeyValuePair<int, string>(modPercent + (int)((endingPercent - modPercent) * current++ / total), ""));
                         InterpretFurnace(furnaceEnumerator.Key as String, furnaceEnumerator.Value as LuaTable);
                     }
                 }
@@ -367,7 +353,7 @@ namespace Foreman
                     var minerEnumerator = minerTable.GetEnumerator();
                     while (minerEnumerator.MoveNext())
                     {
-                        progress.Report(ProgressPrevious + ProgressPercentModProcessing + (int)(current++ / total * ProgressPercentIconProcessing));
+                        progress.Report(new KeyValuePair<int, string>(modPercent + (int)((endingPercent - modPercent) * current++ / total), ""));
                         InterpretMiner(minerEnumerator.Key as String, minerEnumerator.Value as LuaTable);
                     }
                 }
@@ -377,7 +363,7 @@ namespace Foreman
                     var resourceEnumerator = resourceTable.GetEnumerator();
                     while (resourceEnumerator.MoveNext())
                     {
-                        progress.Report(ProgressPrevious + ProgressPercentModProcessing + (int)(current++ / total * ProgressPercentIconProcessing));
+                        progress.Report(new KeyValuePair<int, string>(modPercent + (int)((endingPercent - modPercent) * current++ / total), ""));
                         InterpretResource(resourceEnumerator.Key as String, resourceEnumerator.Value as LuaTable);
                     }
                 }
@@ -386,13 +372,13 @@ namespace Foreman
                 {
                     foreach (String moduleName in moduleTable.Keys)
                     {
-                        progress.Report(ProgressPrevious + ProgressPercentModProcessing + (int)(current++ / total * ProgressPercentIconProcessing));
+                        progress.Report(new KeyValuePair<int, string>(modPercent + (int)((endingPercent - modPercent) * current++ / total), ""));
                         InterpretModule(moduleName, moduleTable[moduleName] as LuaTable);
                     }
                 }
+                progress.Report(new KeyValuePair<int, string>(endingPercent, ""));
+                return factorioData;
             }
-
-            progress.Report(ProgressPrevious + ProgressPercentModProcessing + ProgressPercentIconProcessing);
         }
 
         private string ReadModSettings()
@@ -774,9 +760,9 @@ namespace Foreman
 
                 foreach (String s in Settings.Default.EnabledAssemblers)
                 {
-                    if (s.Split('|')[0] == name)
+                    if (s == name)
                     {
-                        newAssembler.Enabled = (s.Split('|')[1] == "True");
+                        newAssembler.Enabled = true;
                     }
                 }
 
@@ -823,9 +809,9 @@ namespace Foreman
 
                 foreach (String s in Settings.Default.EnabledAssemblers)
                 {
-                    if (s.Split('|')[0] == name)
+                    if (s == name)
                     {
-                        newFurnace.Enabled = (s.Split('|')[1] == "True");
+                        newFurnace.Enabled = true;
                     }
                 }
 
@@ -941,10 +927,10 @@ namespace Foreman
                 }
 
                 var limitations = GetLuaValueOrDefault<LuaTable>(values, "limitation", true);
-                List<String> allowedIn = null;
+                HashSet<String> allowedIn = null;
                 if (limitations != null)
                 {
-                    allowedIn = new List<string>();
+                    allowedIn = new HashSet<string>();
                     foreach (var recipe in limitations.Values)
                     {
                         allowedIn.Add((string)recipe);
@@ -955,9 +941,9 @@ namespace Foreman
 
                 foreach (String s in Settings.Default.EnabledModules)
                 {
-                    if (s.Split('|')[0] == name)
+                    if (s == name)
                     {
-                        newModule.Enabled = (s.Split('|')[1] == "True");
+                        newModule.Enabled = true;
                     }
                 }
 

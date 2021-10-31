@@ -118,23 +118,32 @@ namespace Foreman
 			MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
-            ReloadFactorioData();
-            UpdateControlValues();
-        }
-
-        private static void ReloadFactorioData()
-        {
-			using (DataReloadForm form = new DataReloadForm())
-			{
+			using (DataReloadForm form = new DataReloadForm(true))
 				form.ShowDialog();
-			}
+
+
+			Properties.Settings.Default.EnabledAssemblers.Clear();
+			foreach (string assembler in DataCache.Assemblers.Keys)
+				Properties.Settings.Default.EnabledAssemblers.Add(assembler);
+
+			Properties.Settings.Default.EnabledMiners.Clear();
+			foreach (string miner in DataCache.Miners.Keys)
+				Properties.Settings.Default.EnabledMiners.Add(miner);
+
+			Properties.Settings.Default.EnabledModules.Clear();
+			foreach (string module in DataCache.Modules.Keys)
+				Properties.Settings.Default.EnabledModules.Add(module);
+
+			Properties.Settings.Default.Save();
+
+			UpdateControlValues();
         }
 
         public void LoadItemList()
 		{
 			//quick filter for only items used by the currently active recipes:
 			HashSet<Item> availableItems = new HashSet<Item>();
-			foreach(Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled))
+			foreach(Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled && n.HasEnabledAssemblers))
             {
 				foreach (Item item in recipe.Ingredients.Keys)
 					availableItems.Add(item);
@@ -181,20 +190,24 @@ namespace Foreman
 			}
 			foreach (var recipe in DataCache.Recipes)
 			{
-				ListViewItem lvItem = new ListViewItem();
-				if (recipe.Value.Icon != null)
+				if (recipe.Value.HasEnabledAssemblers)
 				{
-					RecipeImageList.Images.Add(recipe.Value.Icon);
-					lvItem.ImageIndex = RecipeImageList.Images.Count - 1;
-				} else
-				{
-					lvItem.ImageIndex = 0;
+					ListViewItem lvItem = new ListViewItem();
+					if (recipe.Value.Icon != null)
+					{
+						RecipeImageList.Images.Add(recipe.Value.Icon);
+						lvItem.ImageIndex = RecipeImageList.Images.Count - 1;
+					}
+					else
+					{
+						lvItem.ImageIndex = 0;
+					}
+					lvItem.Text = recipe.Value.FriendlyName;
+					lvItem.Tag = recipe.Value;
+					lvItem.Checked = recipe.Value.Enabled;
+					unfilteredRecipeList.Add(lvItem);
+					RecipeListView.Items.Add(lvItem);
 				}
-				lvItem.Text = recipe.Value.FriendlyName;
-				lvItem.Tag = recipe.Value;
-				lvItem.Checked = recipe.Value.Enabled;
-				unfilteredRecipeList.Add(lvItem);
-				RecipeListView.Items.Add(lvItem);
 			}
 
 			RecipeListView.Sorting = SortOrder.Ascending;
@@ -216,13 +229,13 @@ namespace Foreman
 				optionList.Add(itemOutputOption);
 
 				foreach (Recipe recipe in item.ProductionRecipes)
-					if (recipe.Enabled)
+					if (recipe.Enabled && recipe.HasEnabledAssemblers)
 						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
 
 				optionList.Add(itemSupplyOption);
 
 				foreach (Recipe recipe in item.ConsumptionRecipes)
-					if (recipe.Enabled)
+					if (recipe.Enabled && recipe.HasEnabledAssemblers)
 						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
 
 
@@ -412,15 +425,15 @@ namespace Foreman
 				return;
 			}
 
-			try
-			{
+			//try
+			//{
 				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
-			}
-			catch (Exception exception)
-			{
-				MessageBox.Show("Could not load this file. See log for more details");
-				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
-			}
+			//}
+			//catch (Exception exception)
+			//{
+			//	MessageBox.Show("Could not load this file. See log for more details");
+			//	ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+			//}
 
 			UpdateControlValues();
 			GraphViewer.Invalidate();
@@ -477,7 +490,7 @@ namespace Foreman
 						{
 							kvp.Key.Enabled = kvp.Value;
 							if (kvp.Value)
-								Properties.Settings.Default.EnabledAssemblers.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+								Properties.Settings.Default.EnabledAssemblers.Add(kvp.Key.Name);
 						}
 
 						Properties.Settings.Default.EnabledMiners.Clear();
@@ -485,7 +498,7 @@ namespace Foreman
 						{
 							kvp.Key.Enabled = kvp.Value;
 							if (kvp.Value)
-								Properties.Settings.Default.EnabledMiners.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+								Properties.Settings.Default.EnabledMiners.Add(kvp.Key.Name);
 						}
 
 						Properties.Settings.Default.EnabledModules.Clear();
@@ -493,7 +506,7 @@ namespace Foreman
 						{
 							kvp.Key.Enabled = kvp.Value;
 							if (kvp.Value)
-								Properties.Settings.Default.EnabledModules.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+								Properties.Settings.Default.EnabledModules.Add(kvp.Key.Name);
 						}
 
 						Properties.Settings.Default.EnabledMods.Clear();
@@ -501,7 +514,7 @@ namespace Foreman
 						{
 							kvp.Key.Enabled = kvp.Value;
 							if (kvp.Value)
-								Properties.Settings.Default.EnabledMods.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+								Properties.Settings.Default.EnabledMods.Add(kvp.Key.Name);
 						}
 
 						Properties.Settings.Default.Save();

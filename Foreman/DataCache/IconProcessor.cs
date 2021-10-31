@@ -141,6 +141,25 @@ namespace Foreman
             return icon;
         }
 
+        public static Color GetAverageColor(Bitmap icon, bool darkenIfWhite = true)
+        {
+            if (icon == null)
+                return Color.Black;
+
+            using (Bitmap pixel = new Bitmap(1, 1))
+            using (Graphics g = Graphics.FromImage(pixel))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(icon, new Rectangle(0, 0, 1, 1)); //Scale the icon down to a 1-pixel image, which does the averaging for us
+                Color result = pixel.GetPixel(0, 0);
+                //Set alpha to 255, also lighten the colours to make them more pastel-y
+                result = Color.FromArgb(255, result.R + (255 - result.R) / 2, result.G + (255 - result.G) / 2, result.B + (255 - result.B) / 2);
+                if(result.GetBrightness() > 0.8) //too white
+                    return Color.FromArgb((int)(result.R * 0.8), (int)(result.G * 0.8), (int)(result.B * 0.8));
+                return result;
+            }
+        }
+
         private static Bitmap LoadImage(String fileName, int resultSize = 32)
         {
             if (String.IsNullOrEmpty(fileName))

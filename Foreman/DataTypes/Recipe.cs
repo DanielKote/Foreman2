@@ -7,6 +7,20 @@ using System.Text.RegularExpressions;
 
 namespace Foreman
 {
+	public class RecipeShort
+	{
+		public string Name;
+		public List<string> Ingredients;
+		public List<string> Results;
+
+		public RecipeShort(Recipe recipe)
+		{
+			Name = recipe.Name;
+			Ingredients = recipe.Ingredients.Keys.Select(item => item.Name).ToList();
+			Results = recipe.Results.Keys.Select(item => item.Name).ToList();
+		}
+	}
+
 	public class Recipe
 	{
 		public String Name { get; private set; }
@@ -15,8 +29,13 @@ namespace Foreman
 		public String Category { get; set; }
 		public Dictionary<Item, float> Results { get; private set; }
 		public Dictionary<Item, float> Ingredients { get; private set; }
+		public bool IsAvailableAtStart { get; set; }
 		public Boolean IsMissingRecipe = false;
 		public Boolean IsCyclic { get; set; }
+
+		public bool Enabled { get; set; }
+		public bool HasEnabledAssemblers { get; set; }
+
 		private Bitmap uniqueIcon = null;
 		public Bitmap Icon
 		{
@@ -63,7 +82,6 @@ namespace Foreman
                 }
 			}
 		}
-        public Boolean Enabled { get; set; }
 
 		public Recipe(String name)
 		{
@@ -72,6 +90,7 @@ namespace Foreman
 			this.Ingredients = new Dictionary<Item, float>();
 			this.Results = new Dictionary<Item, float>();
             this.Enabled = true; //Nothing will have been loaded yet to disable recipes.
+			this.HasEnabledAssemblers = false;
 		}
 
 		public override int GetHashCode()

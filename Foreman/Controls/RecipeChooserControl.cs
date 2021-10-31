@@ -58,7 +58,7 @@ namespace Foreman
             iconPictureBox.Image = DisplayedRecipe.Icon;
 			iconPictureBox.SizeMode = PictureBoxSizeMode.Zoom;
 
-            fakeDisable(DisplayedRecipe.Enabled);
+            fakeDisable(DisplayedRecipe.Enabled && DisplayedRecipe.HasEnabledAssemblers);
 
 			RegisterMouseEvents(this);
 		}
@@ -69,7 +69,7 @@ namespace Foreman
             if (e.Button == MouseButtons.Right)
             {
                 DisplayedRecipe.Enabled = !DisplayedRecipe.Enabled;
-                fakeDisable(DisplayedRecipe.Enabled);
+                fakeDisable(DisplayedRecipe.Enabled && DisplayedRecipe.HasEnabledAssemblers);
             }
         }
 

@@ -19,18 +19,9 @@ namespace Foreman
 		public double Temperature { get; set; } //for liquids
 
 		private Bitmap icon;
-		public Bitmap Icon
-		{
-			get { return icon; }
-			set
-			{
-				UpdateAverageColor(value);
-				ProcessIcon(value);
-			}
-		}
-
+		public Bitmap Icon { get { return icon; } set { icon = value; AverageColor = IconProcessor.GetAverageColor(value); } }
+		private static readonly Color DefaultAverageColor = Color.Black;
 		public Color AverageColor { get; private set; }
-		public bool TooBright { get; private set; }
 
 		public String FriendlyName
 		{
@@ -63,16 +54,12 @@ namespace Foreman
 		}
 		public Boolean IsMissingItem = false;
 
-		private Item()
-		{
-			Name = "";
-		}
-
 		public Item(String name)
 		{
 			Name = name;
 			ProductionRecipes = new HashSet<Recipe>();
 			ConsumptionRecipes = new HashSet<Recipe>();
+			AverageColor = DefaultAverageColor;
 		}
 
 		public override int GetHashCode()
@@ -113,50 +100,9 @@ namespace Foreman
 			return String.Format("Item: {0}", Name);
 		}
 
-		private static Dictionary<Bitmap, Color> colourCache = new Dictionary<Bitmap, Color>();
-		public static void ClearColorCache()
-        {
-			colourCache.Clear();
-        }
-
-		private void UpdateAverageColor(Bitmap icon, bool darkenIfWhite = true)
-		{
-			if (icon == null)
-            {
-				AverageColor = Color.Gray;
-				return;
-            }
-
-			Color result;
-			if (colourCache.ContainsKey(icon))
-			{
-				result = colourCache[icon];
-			}
-			else
-			{
-				using (Bitmap pixel = new Bitmap(1, 1))
-				using (Graphics g = Graphics.FromImage(pixel))
-				{
-					g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-					g.DrawImage(icon, new Rectangle(0, 0, 1, 1)); //Scale the icon down to a 1-pixel image, which does the averaging for us
-					result = pixel.GetPixel(0, 0);
-				}
-				//Set alpha to 255, also lighten the colours to make them more pastel-y
-				result = Color.FromArgb(255, result.R + (255 - result.R) / 2, result.G + (255 - result.G) / 2, result.B + (255 - result.B) / 2);
-				colourCache.Add(icon, result);
-			}
-
-			//darken color if it is too bright
-			TooBright = (result.GetBrightness() > 0.90);
-
-			if (TooBright && darkenIfWhite)
-				AverageColor = Color.FromArgb((int)(result.R * 0.8), (int)(result.G * 0.8), (int)(result.B * 0.8));
-			else
-				AverageColor = result;
-		}
-
 		private const int iconBorder = 1;
 		private static readonly Color iconBorderColor = Color.FromArgb(150, 100, 100, 100);
+		/*
 		private void ProcessIcon(Bitmap inicon)
         {
 			if(inicon == null)
@@ -199,6 +145,6 @@ namespace Foreman
 			}
 			else
 				icon = inicon;
-		}
+		}*/
 	}
 }

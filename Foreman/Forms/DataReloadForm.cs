@@ -13,25 +13,18 @@ namespace Foreman
 {
     public partial class DataReloadForm : Form
     {
-        private List<string> enabledMods;
         private CancellationTokenSource cts;
         private int currentPercent;
-        private static readonly string[] ProcessNames = { "Reading Factorio mod data...", "Processing Factorio mod LUA code...", "Creating icons...", "Checking for cyclic recipes..." };
-        public static readonly int[] ProcessBreakpoints = { 0, 15, 30, 98, 200 };
-        private int currentBPindex;
+        private string currentText;
+        private bool defaultEnabled;
 
-        public DataReloadForm()
+        public DataReloadForm(bool defaultEnabled)
         {
             this.cts = new CancellationTokenSource();
             InitializeComponent();
             currentPercent = 0;
-            currentBPindex = 0;
-            this.Text = "Preparing Foreman: " + ProcessNames[currentBPindex];
-        }
-
-        public DataReloadForm(List<string> enabledMods, DataCache.GenerationType generationType) : this()
-        {
-            this.enabledMods = enabledMods;
+            currentText = "";
+            this.defaultEnabled = defaultEnabled;
         }
 
         private async void ProgressForm_Load(object sender, EventArgs e)
@@ -40,26 +33,23 @@ namespace Foreman
             DateTime startTime = DateTime.Now;
             //ErrorLogging.LogLine("Init program.");
             #endif
-            var progressHandler = new Progress<int>(value =>
+            var progressHandler = new Progress<KeyValuePair<int, string>>(value =>
             {
-                if (value > currentPercent)
+                if (value.Key > currentPercent)
                 {
-                    if(value >= ProcessBreakpoints[currentBPindex+1])
-                    {
-                        currentBPindex++;
-                        if ((DataCache.GenerationType)Properties.Settings.Default.GenerationType == DataCache.GenerationType.ForemanMod && currentBPindex == 1)
-                            currentBPindex = 2; //skip lua title if we are loading directly with mod
-
-                        this.Text = "Preparing Foreman: " + ProcessNames[currentBPindex];
-                    }
-                    currentPercent = value;
-                    progressBar.Value = value;
+                    currentPercent = value.Key;
+                    progressBar.Value = value.Key;
+                }
+                if(!String.IsNullOrEmpty(value.Value) && value.Value != currentText)
+                {
+                    currentText = value.Value;
+                    Text = "Preparing Foreman: " + value.Value;
                 }
             });
-            var progress = progressHandler as IProgress<int>;
+            var progress = progressHandler as IProgress<KeyValuePair<int, string>>;
             var token = cts.Token;
 
-            await DataCache.LoadAllData(enabledMods, progress, token);
+            await DataCache.LoadAllData(defaultEnabled, progress, token);
 
             if (token.IsCancellationRequested)
             {

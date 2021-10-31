@@ -9,7 +9,7 @@ namespace Foreman
 {
     public enum NodeType { Recipe, Supply, Consumer };
 	public enum RateType { Auto, Manual };
-	
+
 	[Serializable]
 	public abstract partial class ProductionNode : ISerializable
 	{
@@ -231,9 +231,10 @@ namespace Foreman
 				info.AddValue("Assembler", Assembler.Name);
 			}
 			NodeModules.GetObjectData(info, context);
+
 		}
 
-        public override float GetConsumeRate(Item item)
+		public override float GetConsumeRate(Item item)
         {
 			if (BaseRecipe.IsMissingRecipe
 				|| !BaseRecipe.Ingredients.ContainsKey(item))
@@ -257,12 +258,12 @@ namespace Foreman
 
         internal override double outputRateFor(Item item)
         {
-            return BaseRecipe.Results[item];
+			return BaseRecipe.Results[item];
         }
 
         internal override double inputRateFor(Item item)
         {
-            return BaseRecipe.Ingredients[item];
+			return BaseRecipe.Ingredients[item];
         }
 
         public override float ProductivityMultiplier()
@@ -272,7 +273,32 @@ namespace Foreman
         }
     }
 
-	public class SupplyNode : ProductionNode
+    public class ErrorNode : ProductionNode
+    {
+        public override string DisplayName { get { return "ERROR NODE"; } }
+        public override IEnumerable<Item> Inputs { get { return new List<Item>(); } }
+        public override IEnumerable<Item> Outputs { get { return new List<Item>(); } }
+		public override float GetConsumeRate(Item item) { Trace.Fail(String.Format("Error node not consume {0}, nothing should be asking for the rate!", item.FriendlyName)); return 0; }
+        public override float GetSupplyRate(Item item) { Trace.Fail(String.Format("Error node not suppy {0}, nothing should be asking for the rate!", item.FriendlyName)); return 0; }
+        internal override double inputRateFor(Item item) { throw new ArgumentException("Supply node should not have any inputs!"); }
+		internal override double outputRateFor(Item item) { throw new ArgumentException("Supply node should not have any outputs!"); }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+			info.AddValue("NodeType", "ERROR");
+		}
+		protected ErrorNode(ProductionGraph graph) : base(graph) { }
+
+		public static ErrorNode Create(ProductionGraph graph)
+		{
+			ErrorNode node = new ErrorNode(graph);
+			node.Graph.Nodes.Add(node);
+			node.Graph.InvalidateCaches();
+			return node;
+		}
+	}
+
+    public class SupplyNode : ProductionNode
 	{
 		public Item SuppliedItem { get; private set; }
 
@@ -354,7 +380,7 @@ namespace Foreman
             }
 		}
 
-        public override float GetConsumeRate(Item item)
+		public override float GetConsumeRate(Item item)
         {
             Trace.Fail(String.Format("{0} supplier does not consume {1}, nothing should be asking for the rate!", SuppliedItem.FriendlyName, item.FriendlyName));
             return 0;

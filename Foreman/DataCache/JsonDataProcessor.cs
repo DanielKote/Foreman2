@@ -1,27 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using NLua;
-using System.IO;
-using System.Windows.Forms;
 using System.Drawing;
-using System.Drawing.Imaging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.IO.Compression;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using Foreman.Properties;
-using System.ComponentModel;
 using System.Threading;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace Foreman
 {
-    class FModDataProcessor : DataProcessor
+    class JsonDataProcessor
     {
+        private Dictionary<string, Technology> Technologies;
         private Dictionary<string, Item> Items;
         private Dictionary<string, List<string>> FluidDuplicants;
         private Dictionary<string, Recipe> Recipes;
@@ -34,53 +24,43 @@ namespace Foreman
         private Dictionary<string, Exception> FailedFiles;
         private Dictionary<string, Exception> FailedPaths;
 
-        private List<Mod> Mods = DataCache.Mods;
-        private static string DataPath { get { return Path.Combine(Settings.Default.FactorioPath, "data"); } }
-        private static string ModPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "mods"); } }
-        private static string ScriptOutPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "script-output"); } }
-
-        private static readonly int ProgressPrevious = DataReloadForm.ProcessBreakpoints[1];
-        private static readonly int ProgressThis = DataReloadForm.ProcessBreakpoints[3] - DataReloadForm.ProcessBreakpoints[1];
-
         private const float defaultRecipeTime = 0.5f;
+        private bool defaultEnabled = false;
 
-        public Dictionary<string, Item> GetItems() { return Items; }
-        public Dictionary<string, Recipe> GetRecipes() { return Recipes; }
-        public Dictionary<string, Assembler> GetAssemblers() { return Assemblers; }
-        public Dictionary<string, Miner> GetMiners() { return Miners; }
-        public Dictionary<string, Resource> GetResources() { return Resources; }
-        public Dictionary<string, Module> GetModules() { return Modules; }
+        public IReadOnlyDictionary<string, Technology> GetTechnologies() { return Technologies; }
+        public IReadOnlyDictionary<string, Item> GetItems() { return Items; }
+        public IReadOnlyDictionary<string, Recipe> GetRecipes() { return Recipes; }
+        public IReadOnlyDictionary<string, Assembler> GetAssemblers() { return Assemblers; }
+        public IReadOnlyDictionary<string, Miner> GetMiners() { return Miners; }
+        public IReadOnlyDictionary<string, Resource> GetResources() { return Resources; }
+        public IReadOnlyDictionary<string, Module> GetModules() { return Modules; }
 
-        public Dictionary<string, Exception> GetFileExceptions() { return FailedFiles; }
-        public Dictionary<string, Exception> GetPathExceptions() { return FailedPaths; }
+        public IReadOnlyDictionary<string, Exception> GetFileExceptions() { return FailedFiles; }
+        public IReadOnlyDictionary<string, Exception> GetPathExceptions() { return FailedPaths; }
 
-        public FModDataProcessor()
+        public JsonDataProcessor()
         {
+            Technologies = new Dictionary<string, Technology>();
+
             Items = new Dictionary<string, Item>();
             FluidDuplicants = new Dictionary<string, List<string>>(); //used to store references to the names in items for any extra fluids (ex: coolant *300, coolant *200, coolant *100)
+
             Recipes = new Dictionary<string, Recipe>();
             RecipeDuplicants = new Dictionary<string, List<string>>(); //same as above - duplicate recipes due to fluid temps
+
             Assemblers = new Dictionary<string, Assembler>();
             Miners = new Dictionary<string, Miner>();
             Resources = new Dictionary<string, Resource>();
             Modules = new Dictionary<string, Module>();
+
             FailedFiles = new Dictionary<string, Exception>();
             FailedPaths = new Dictionary<string, Exception>();
         }
 
-        public void LoadData(IProgress<int> progress, CancellationToken ctoken)
+        public void LoadData(JObject jsonData, bool enableAll, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
         {
-            progress.Report(ProgressPrevious);
-
-            //read in the data from the foreman mod (in the script output folder)
-            string setupFile = Path.Combine(ScriptOutPath, "ForemanFactorioSetup.txt");
-            if (!File.Exists(setupFile))
-            {
-                MessageBox.Show("The setup file could not be found!\n\nEnsure you have the \"z-z-foremanexport\" mod installed, enabled, and started a new game with it. It should freeze the game for a bit (1sec for vanilla installation, 30sec+ for Angel/Bob with extras) before displaying \"Foreman export complete.\" ");
-                progress.Report(100);
-                return;
-            }
-            JObject jsonData = JObject.Parse(File.ReadAllText(setupFile));
+            defaultEnabled = enableAll;
+            progress.Report(new KeyValuePair<int, string>(startingPercent, "Preparing Icons")); //lets be honest - thats what most of the time is used for here
 
             //process mods
             List<String> EnabledMods = jsonData["mods"].Select(t => (String)t).ToList();
@@ -91,6 +71,7 @@ namespace Foreman
             List<String> enabledMods = DataCache.Mods.Where(m => m.Enabled).Select(m => m.Name).ToList();
 
             int totalCount =
+                jsonData["technologies"].Count() +
                 jsonData["items"].Count() +
                 jsonData["fluids"].Count() +
                 jsonData["recipes"].Count() +
@@ -100,67 +81,70 @@ namespace Foreman
                 jsonData["modules"].Count();
             int counter = 0;
 
+            foreach (var objJToken in jsonData["technologies"].ToList())
+            {
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
+                ProcessTechnology(objJToken);
+            }
             foreach (var objJToken in jsonData["items"].ToList())
             {
-                progress.Report(ProgressPrevious + ProgressThis * counter++ / totalCount);
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount,""));
                 ProcessItem(objJToken);
             }
             foreach (var objJToken in jsonData["fluids"].ToList())
             {
-                progress.Report(ProgressPrevious + ProgressThis * counter++ / totalCount);
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessFluid(objJToken);
             }
             foreach (var objJToken in jsonData["recipes"].ToList())
             {
-                progress.Report(ProgressPrevious + ProgressThis * counter++ / totalCount);
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessRecipe(objJToken);
             }
             foreach (var objJToken in jsonData["recipes"].ToList())
                 ProcessRecipeProducts(objJToken);                   //this is done to add extra 'items' representing the temperature ranges of the liquids
             foreach (var objJToken in jsonData["recipes"].ToList())
                 ProcessRecipeIngredients(objJToken);                //with the extra 'items' from above, we can now process ingredients with linking to the liquid of appropriate temp
+            foreach (var objJToken in jsonData["technologies"].ToList())
+                ProcessTechnologyPassTwo(objJToken);                //adds in the recipes (now that we have added all of them) that are unlocked along with the prerequisite tech (now that all tech has been added)
 
             foreach (var objJToken in jsonData["crafting_machines"].ToList())
             {
-                progress.Report(ProgressPrevious + ProgressThis * counter++ / totalCount);
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessAssembler(objJToken);
             }
             foreach (var objJToken in jsonData["miners"].ToList())
             {
-                progress.Report(ProgressPrevious + ProgressThis * counter++ / totalCount);
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessMiner(objJToken);
             }
             foreach (var objJToken in jsonData["resources"].ToList())
             {
-                progress.Report(ProgressPrevious + ProgressThis * counter++ / totalCount);
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessResource(objJToken);
             }
             foreach (var objJToken in jsonData["modules"].ToList())
             {
-                progress.Report(ProgressPrevious + ProgressThis * counter++ / totalCount);
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessModule(objJToken);
             }
 
-            foreach (String s in Settings.Default.EnabledAssemblers)
-            {
-                string[] split = s.Split('|');
-                if (Assemblers.ContainsKey(split[0]))
-                    Assemblers[split[0]].Enabled = (split[1] == "True");
-            }
-            foreach (String s in Settings.Default.EnabledMiners)
-            {
-                string[] split = s.Split('|');
-                if (Miners.ContainsKey(split[0]))
-                    Miners[split[0]].Enabled = (split[1] == "True");
-            }
-            foreach (String s in Settings.Default.EnabledModules)
-            {
-                string[] split = s.Split('|');
-                if (Modules.ContainsKey(split[0]))
-                    Modules[split[0]].Enabled = (split[1] == "True");
-            }
+            ProcessDuplicates(); //checks if the 'default' item should be removed (ex: nothing creates it and everything that consumes it also consumes a variation of it)
 
-            progress.Report(ProgressPrevious + ProgressThis);
+
+            foreach (string s in Settings.Default.EnabledAssemblers)
+                if (Assemblers.ContainsKey(s))
+                    Assemblers[s].Enabled = true;
+            foreach (string s in Settings.Default.EnabledMiners)
+                if (Miners.ContainsKey(s))
+                    Miners[s].Enabled = true;
+            foreach (string s in Settings.Default.EnabledModules)
+                if (Modules.ContainsKey(s))
+                    Modules[s].Enabled = true;
+
+            progress.Report(new KeyValuePair<int, string>(endingPercent, "Removing unreachable items"));
+            RemoveUnusableItems();
+            progress.Report(new KeyValuePair<int, string>(endingPercent, ""));
         }
 
         private Bitmap ProcessIcon(JToken iconInfoJToken)
@@ -182,6 +166,31 @@ namespace Foreman
                 iicons.Add(picon);
             }
             return IconProcessor.GetIcon(iicon, iicons);
+        }
+
+        private void ProcessTechnology(JToken objJToken)
+        {
+            Technology technology = new Technology((string)objJToken["name"]);
+            technology.LName = (string)objJToken["localised_name"];
+            technology.Icon = ProcessIcon(objJToken["icon_info"]);
+            Technologies.Add(technology.Name, technology);
+        }
+
+        private void ProcessTechnologyPassTwo(JToken objJToken)
+        {
+            Technology technology = Technologies[(string)objJToken["name"]];
+
+            foreach (var recipe in objJToken["recipes"])
+                if (Recipes.ContainsKey((string)recipe))
+                    technology.Recipes.Add(Recipes[(string)recipe]);
+
+            foreach (var prerequisite in objJToken["prerequisites"])
+            {
+                if (Technologies.ContainsKey((string)prerequisite))
+                    technology.Prerequisites.Add(Technologies[(string)prerequisite]);
+                else
+                    technology.Locked = true; //if the required prerequisite isnt in the list, then this tech cant be researched
+            }
         }
 
         private void ProcessItem(JToken objJToken)
@@ -207,6 +216,7 @@ namespace Foreman
             recipe.LName = (string)objJToken["localised_name"];
             recipe.Time = (float)objJToken["energy"] > 0 ? (float)objJToken["energy"] : defaultRecipeTime;
             recipe.Category = (string)objJToken["category"];
+            recipe.IsAvailableAtStart = (bool)objJToken["enabled"];
             recipe.Icon = ProcessIcon(objJToken["icon_info"]);
             Recipes.Add(recipe.Name, recipe);
         }
@@ -234,6 +244,7 @@ namespace Foreman
                     string fluidName = name + String.Format("\n{0:N2}", temp);
                     if (Items.ContainsKey(fluidName))
                     {
+                        //the new fluid has already been 'created' by a previous recipe
                         if (recipe.Results.ContainsKey(Items[fluidName]))
                             recipe.Results[Items[fluidName]] += (float)productJToken["amount"];
                         else
@@ -244,6 +255,7 @@ namespace Foreman
                     }
                     else
                     {
+                        //we have to add the new fluid
                         if (!FluidDuplicants.ContainsKey(name))
                             FluidDuplicants[name] = new List<string>();
                         FluidDuplicants[name].Add(fluidName);
@@ -289,8 +301,8 @@ namespace Foreman
                 int baseRecipeCount = recipes.Count();
                 for (int i = 1; i < validIngredients.Count; i++)
                 {
-                    if (!RecipeDuplicants.ContainsKey(name))
-                        RecipeDuplicants[name] = new List<string>();
+                    if (!RecipeDuplicants.ContainsKey(recipes[0].Name))
+                        RecipeDuplicants[recipes[0].Name] = new List<string>();
 
                     for (int j = 0; j < baseRecipeCount; j++)
                     {
@@ -308,7 +320,7 @@ namespace Foreman
 
                         recipes.Add(newRecipe);
                         Recipes.Add(newRecipe.Name, newRecipe);
-                        RecipeDuplicants[name].Add(newRecipe.Name);
+                        RecipeDuplicants[recipes[0].Name].Add(newRecipe.Name);
                     }
                 }
 
@@ -332,19 +344,20 @@ namespace Foreman
 
         private void ProcessAssembler(JToken objJToken)
         {
-            Assembler assember = new Assembler((string)objJToken["name"]);
-            assember.LName = (string)objJToken["localised_name"];
-            assember.Speed = (float)objJToken["crafting_speed"];
-            assember.MaxIngredients = (int)objJToken["ingredient_count"];
-            assember.ModuleSlots = (int)objJToken["module_inventory_size"];
-            assember.Icon = ProcessIcon(objJToken["icon_info"]);
+            Assembler assembler = new Assembler((string)objJToken["name"]);
+            assembler.LName = (string)objJToken["localised_name"];
+            assembler.Speed = (float)objJToken["crafting_speed"];
+            assembler.MaxIngredients = (int)objJToken["ingredient_count"];
+            assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
+            assembler.Icon = ProcessIcon(objJToken["icon_info"]);
 
             foreach (var categoryJToken in objJToken["crafting_categories"])
-                assember.Categories.Add((string)categoryJToken);
+                assembler.Categories.Add((string)categoryJToken);
             foreach (var effectJToken in objJToken["allowed_effects"])
-                assember.AllowedEffects.Add((string)effectJToken);
+                assembler.AllowedEffects.Add((string)effectJToken);
 
-            Assemblers.Add(assember.Name, assember);
+            assembler.Enabled = defaultEnabled;
+            Assemblers.Add(assembler.Name, assembler);
         }
 
         private void ProcessMiner(JToken objJToken)
@@ -358,6 +371,7 @@ namespace Foreman
             foreach (var categoryJToken in objJToken["resource_categories"])
                 miner.ResourceCategories.Add((string)categoryJToken);
 
+            miner.Enabled = defaultEnabled;
             Miners.Add(miner.Name, miner);
         }
 
@@ -374,7 +388,7 @@ namespace Foreman
 
         private void ProcessModule(JToken objJToken)
         {
-            List<string> limitations = new List<string>();
+            HashSet<string> limitations = new HashSet<string>();
             Module module = new Module(
                 (string)objJToken["name"],
                 (float)objJToken["module_effects_speed"],
@@ -384,6 +398,7 @@ namespace Foreman
 
             foreach (var recipe in objJToken["limitations"])
                 limitations.Add((string)recipe);
+
             if (limitations.Count == 0) //means all recipes work
             {
                 foreach (Recipe recipe in Recipes.Values)
@@ -397,7 +412,140 @@ namespace Foreman
                         newLimitations.AddRange(RecipeDuplicants[rname]);
             }
 
+            module.Enabled = defaultEnabled;
             Modules.Add(module.Name, module);
+        }
+
+        private void ProcessDuplicates()
+        {
+            foreach(KeyValuePair<string, List<string>> kvp in FluidDuplicants)
+            {
+                Item defaultFluid = Items[kvp.Key];
+                defaultFluid.LName += " (" + defaultFluid.Temperature + "*)";
+                List<Item> altFluids = new List<Item>();
+                foreach (string altNames in kvp.Value)
+                    altFluids.Add(Items[altNames]);
+
+                bool defaultIsProduced = false;
+                foreach(Recipe recipe in Recipes.Values)
+                    foreach (Item fluid in recipe.Results.Keys)
+                        defaultIsProduced |= (fluid == defaultFluid);
+
+                if(!defaultIsProduced) //nothing produces it, have to check if every consumer has an alternative
+                {
+                    List<Recipe> defaultUseRecipes = new List<Recipe>();
+                    foreach (Recipe recipe in Recipes.Values)
+                        foreach (Item item in recipe.Ingredients.Keys)
+                            if (item == defaultFluid)
+                                defaultUseRecipes.Add(recipe);
+
+                    bool defaultIsUnnecessary = true;
+                    foreach (Recipe recipe in defaultUseRecipes)
+                    {
+                        bool canUseAltFluid = false;
+                        if (RecipeDuplicants.ContainsKey(recipe.Name))
+                        {
+                            foreach(string altRecipeName in RecipeDuplicants[recipe.Name])
+                                foreach (Item altFluid in altFluids)
+                                    canUseAltFluid |= Recipes[altRecipeName].Ingredients.ContainsKey(altFluid);
+                        }
+                        if (!canUseAltFluid)
+                            defaultIsUnnecessary = false;
+                    }
+
+                    if(defaultIsUnnecessary)
+                        foreach (Recipe recipe in defaultUseRecipes)
+                            Recipes.Remove(recipe.Name);
+                }
+            }
+        }
+
+        //This is used to clean up the items & recipes to those that can actually appear given the settings.
+        //A very similar process is done in the 'control.lua' of the foreman mod, but this also processes the enabled assembly machines
+        //to further clean up items
+        //NOTE: if the FactorioLuaProcessor is used (as opposed to the foreman mod export), then this does the entire job of control.lua in
+        //checking researchable tech, removing un-unlockable recipes, removing any items that dont appear in the clean recipe list, etc.
+        private HashSet<Technology> temp_unlockableTechSet; //used within IsUnlockable to not have to go through the entire tree for every single item (once an item is set to be 'unlockable' here, it will not require a recursive search again)
+        private void RemoveUnusableItems()
+        {
+            //step 1: calculate unlockable technologies (either already researched or recursive search to confirm all prerequisites are unlockable / researched)
+            temp_unlockableTechSet = new HashSet<Technology>();
+            List<string> unavailableTech = new List<string>();
+            foreach (Technology tech in Technologies.Values)
+            {
+                if (!IsUnlockable(tech))
+                    unavailableTech.Add(tech.Name);
+            }
+            temp_unlockableTechSet.Clear();
+            temp_unlockableTechSet = null;
+
+            //step 1.5: remove blocked tech
+            foreach (string techName in unavailableTech)
+                Technologies.Remove(techName);
+
+            //step 2: calculate unlockable recipes (those unlocked at start, or unlocked via unlockable tech)
+            HashSet<Recipe> ununlockableRecipes = new HashSet<Recipe>(Recipes.Values);
+            foreach (Technology tech in Technologies.Values)
+                foreach (Recipe recipe in tech.Recipes)
+                    ununlockableRecipes.Remove(recipe);
+            //step 2.5: remove blocked recipe (those not part of a tech or unlocked at start), including any alt-recipes of it (due to fluid temps)
+            foreach (Recipe recipe in ununlockableRecipes)
+            {
+                if (!recipe.IsAvailableAtStart && !recipe.Name.Contains("\n")) // "\n" in name represents that this is a duplicate recipe made specifically for fluid temperatures. Ignore
+                {
+                    Recipes.Remove(recipe.Name);
+                    if (RecipeDuplicants.ContainsKey(recipe.Name))
+                        foreach (string altRecipe in RecipeDuplicants[recipe.Name])
+                            Recipes.Remove(altRecipe);
+                }
+            }
+
+            //step 3: update recipes to check for valid assemblers
+            foreach (Recipe recipe in Recipes.Values)
+            {
+                bool usable = false;
+                foreach (Assembler assembler in Assemblers.Values)
+                    usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category) && recipe.Ingredients.Count <= assembler.MaxIngredients;
+                recipe.HasEnabledAssemblers = usable;
+            }
+
+            //step 4: calculate unlockable items (ingredient/product of unlockable recipes -> dont care about anything that isnt part of a recipe)
+            HashSet<Item> unusableItems = new HashSet<Item>(Items.Values);
+            foreach (Recipe recipe in Recipes.Values)
+            {
+                foreach (Item item in recipe.Ingredients.Keys)
+                    unusableItems.Remove(item);
+                foreach (Item item in recipe.Results.Keys)
+                    unusableItems.Remove(item);
+            }
+            //step 4.5: remove blocked items
+            foreach (Item item in unusableItems)
+                Items.Remove(item.Name);
+
+            //step 5: clean up tech tree (removing any recipes from the unlocks that are no longer present in recipe set)
+            foreach(Technology tech in Technologies.Values)
+                tech.Recipes.IntersectWith(Recipes.Values);
+        }
+
+        private bool IsUnlockable(Technology tech) //sets the locked parameter based on unlockability of it & its prerequisites. returns true if unlocked
+        {
+            if (tech.Locked)
+                return false;
+            else if (temp_unlockableTechSet.Contains(tech))
+                return true;
+            else if (tech.Prerequisites.Count == 0)
+                return true;
+            else
+            {
+                bool available = true;
+                foreach (Technology preTech in tech.Prerequisites)
+                    available = available && IsUnlockable(preTech);
+                tech.Locked = !available;
+
+                if (available)
+                    temp_unlockableTechSet.Add(tech);
+                return available;
+            }
         }
     }
 }
