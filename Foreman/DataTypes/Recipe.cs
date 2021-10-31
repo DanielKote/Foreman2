@@ -23,6 +23,8 @@ namespace Foreman
 	{
 		public static string[] recipeLocaleCategories = { "recipe-name" };
 
+		public Subgroup MySubgroup { get; internal set; }
+
 		public float Time { get; set; }
 		public string Category { get; set; }
 		public Dictionary<Item, float> Results { get; private set; }
@@ -31,7 +33,8 @@ namespace Foreman
 		public bool IsCyclic { get; set; }
 		public bool IsMissingRecipe { get { return DataCache.MissingRecipes.ContainsKey(Name); } }
 
-		public bool Enabled { get; set; }
+		public bool Hidden { get; set; }
+
 		public bool HasEnabledAssemblers { get; set; }
 
 		public new Bitmap Icon
@@ -50,16 +53,19 @@ namespace Foreman
 			set { base.Icon = value; }
 		}
 
-		public Recipe(string name, string lname, Subgroup subgroup, string order) : base(name, lname, subgroup, order)
+		public Recipe(string name, string lname, Subgroup subgroup, string order) : base(name, lname, order)
 		{
 			localeCategories = recipeLocaleCategories;
+
+			MySubgroup = subgroup;
+			MySubgroup.Recipes.Add(this);
 
 			this.Time = 0.5f;
 			this.Ingredients = new Dictionary<Item, float>();
 			this.Results = new Dictionary<Item, float>();
-            this.Enabled = true; //Nothing will have been loaded yet to disable recipes.
 			this.HasEnabledAssemblers = false;
 
+			this.Hidden = false;
 			this.IsAvailableAtStart = false;
 			this.IsCyclic = false;
 		}

@@ -43,7 +43,7 @@ namespace Foreman
             this.AsIngredientCheckBox = new System.Windows.Forms.CheckBox();
             this.ShowHiddenCheckBox = new System.Windows.Forms.CheckBox();
             this.FilterTextBox = new System.Windows.Forms.TextBox();
-            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
+            this.IRPanelScrollBar = new System.Windows.Forms.VScrollBar();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.AddSupplyButton = new System.Windows.Forms.Button();
             this.AddPassthroughButton = new System.Windows.Forms.Button();
@@ -66,7 +66,7 @@ namespace Foreman
             this.tableLayoutPanel1.Controls.Add(this.GroupFlowPanel, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.IRFlowPanel, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.vScrollBar1, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.IRPanelScrollBar, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 3);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
@@ -83,7 +83,7 @@ namespace Foreman
             // 
             this.GroupFlowPanel.AutoSize = true;
             this.GroupFlowPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.GroupFlowPanel.BackColor = System.Drawing.Color.Gray;
+            this.GroupFlowPanel.BackColor = System.Drawing.Color.DimGray;
             this.tableLayoutPanel1.SetColumnSpan(this.GroupFlowPanel, 2);
             this.GroupFlowPanel.Controls.Add(this.BaseGroupButton);
             this.GroupFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -95,6 +95,7 @@ namespace Foreman
             // 
             // BaseGroupButton
             // 
+            this.BaseGroupButton.BackColor = System.Drawing.Color.Gray;
             this.BaseGroupButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.BaseGroupButton.FlatAppearance.BorderSize = 2;
             this.BaseGroupButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -109,7 +110,7 @@ namespace Foreman
             // 
             // IRFlowPanel
             // 
-            this.IRFlowPanel.BackColor = System.Drawing.Color.Gray;
+            this.IRFlowPanel.BackColor = System.Drawing.Color.DimGray;
             this.IRFlowPanel.Controls.Add(this.BaseIRUsedButton);
             this.IRFlowPanel.Controls.Add(this.BaseIREmptyButton);
             this.IRFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -121,13 +122,14 @@ namespace Foreman
             // 
             // BaseIRUsedButton
             // 
+            this.BaseIRUsedButton.BackColor = System.Drawing.Color.Gray;
             this.BaseIRUsedButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.BaseIRUsedButton.FlatAppearance.BorderSize = 2;
             this.BaseIRUsedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BaseIRUsedButton.Location = new System.Drawing.Point(2, 2);
-            this.BaseIRUsedButton.Margin = new System.Windows.Forms.Padding(0);
+            this.BaseIRUsedButton.Location = new System.Drawing.Point(3, 3);
+            this.BaseIRUsedButton.Margin = new System.Windows.Forms.Padding(1);
             this.BaseIRUsedButton.Name = "BaseIRUsedButton";
-            this.BaseIRUsedButton.Size = new System.Drawing.Size(36, 36);
+            this.BaseIRUsedButton.Size = new System.Drawing.Size(34, 34);
             this.BaseIRUsedButton.TabIndex = 0;
             this.BaseIRUsedButton.TabStop = false;
             this.BaseIRUsedButton.UseVisualStyleBackColor = false;
@@ -139,10 +141,11 @@ namespace Foreman
             this.BaseIREmptyButton.Enabled = false;
             this.BaseIREmptyButton.FlatAppearance.BorderSize = 2;
             this.BaseIREmptyButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BaseIREmptyButton.Location = new System.Drawing.Point(46, 10);
-            this.BaseIREmptyButton.Margin = new System.Windows.Forms.Padding(8);
+            this.BaseIREmptyButton.ForeColor = System.Drawing.Color.Gray;
+            this.BaseIREmptyButton.Location = new System.Drawing.Point(50, 14);
+            this.BaseIREmptyButton.Margin = new System.Windows.Forms.Padding(12);
             this.BaseIREmptyButton.Name = "BaseIREmptyButton";
-            this.BaseIREmptyButton.Size = new System.Drawing.Size(20, 20);
+            this.BaseIREmptyButton.Size = new System.Drawing.Size(12, 12);
             this.BaseIREmptyButton.TabIndex = 10;
             this.BaseIREmptyButton.TabStop = false;
             this.BaseIREmptyButton.UseVisualStyleBackColor = false;
@@ -151,7 +154,7 @@ namespace Foreman
             // panel1
             // 
             this.panel1.AutoSize = true;
-            this.panel1.BackColor = System.Drawing.Color.Gray;
+            this.panel1.BackColor = System.Drawing.Color.DimGray;
             this.tableLayoutPanel1.SetColumnSpan(this.panel1, 2);
             this.panel1.Controls.Add(this.ItemIconPanel);
             this.panel1.Controls.Add(this.IgnoreAssemblerCheckBox);
@@ -170,6 +173,7 @@ namespace Foreman
             // 
             // ItemIconPanel
             // 
+            this.ItemIconPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ItemIconPanel.Location = new System.Drawing.Point(7, 34);
             this.ItemIconPanel.Name = "ItemIconPanel";
             this.ItemIconPanel.Size = new System.Drawing.Size(48, 48);
@@ -201,7 +205,7 @@ namespace Foreman
             this.AsProductCheckBox.AutoSize = true;
             this.AsProductCheckBox.Checked = true;
             this.AsProductCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.AsProductCheckBox.Location = new System.Drawing.Point(255, 63);
+            this.AsProductCheckBox.Location = new System.Drawing.Point(236, 63);
             this.AsProductCheckBox.Name = "AsProductCheckBox";
             this.AsProductCheckBox.Size = new System.Drawing.Size(126, 24);
             this.AsProductCheckBox.TabIndex = 4;
@@ -225,7 +229,7 @@ namespace Foreman
             // ShowHiddenCheckBox
             // 
             this.ShowHiddenCheckBox.AutoSize = true;
-            this.ShowHiddenCheckBox.Location = new System.Drawing.Point(255, 4);
+            this.ShowHiddenCheckBox.Location = new System.Drawing.Point(236, 3);
             this.ShowHiddenCheckBox.Name = "ShowHiddenCheckBox";
             this.ShowHiddenCheckBox.Size = new System.Drawing.Size(130, 24);
             this.ShowHiddenCheckBox.TabIndex = 1;
@@ -238,17 +242,19 @@ namespace Foreman
             this.FilterTextBox.ForeColor = System.Drawing.Color.Black;
             this.FilterTextBox.Location = new System.Drawing.Point(61, 2);
             this.FilterTextBox.Name = "FilterTextBox";
-            this.FilterTextBox.Size = new System.Drawing.Size(186, 26);
+            this.FilterTextBox.Size = new System.Drawing.Size(169, 26);
             this.FilterTextBox.TabIndex = 0;
+            this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
             // 
-            // vScrollBar1
+            // IRPanelScrollBar
             // 
-            this.vScrollBar1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.vScrollBar1.Location = new System.Drawing.Point(370, 173);
-            this.vScrollBar1.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(21, 294);
-            this.vScrollBar1.TabIndex = 3;
+            this.IRPanelScrollBar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.IRPanelScrollBar.Location = new System.Drawing.Point(370, 173);
+            this.IRPanelScrollBar.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.IRPanelScrollBar.Name = "IRPanelScrollBar";
+            this.IRPanelScrollBar.Size = new System.Drawing.Size(21, 294);
+            this.IRPanelScrollBar.TabIndex = 3;
+            this.IRPanelScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.IRPanelScrollBar_Scroll);
             // 
             // tableLayoutPanel2
             // 
@@ -327,21 +333,21 @@ namespace Foreman
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.FlowLayoutPanel IRFlowPanel;
-        private System.Windows.Forms.FlowLayoutPanel GroupFlowPanel;
+        internal System.Windows.Forms.FlowLayoutPanel IRFlowPanel;
+        internal System.Windows.Forms.FlowLayoutPanel GroupFlowPanel;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.VScrollBar vScrollBar1;
+        internal System.Windows.Forms.VScrollBar IRPanelScrollBar;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.CheckBox AsProductCheckBox;
-        private System.Windows.Forms.CheckBox AsIngredientCheckBox;
-        private System.Windows.Forms.CheckBox ShowHiddenCheckBox;
-        private System.Windows.Forms.TextBox FilterTextBox;
+        internal System.Windows.Forms.CheckBox AsProductCheckBox;
+        internal System.Windows.Forms.CheckBox AsIngredientCheckBox;
+        internal System.Windows.Forms.CheckBox ShowHiddenCheckBox;
+        internal System.Windows.Forms.TextBox FilterTextBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Button AddSupplyButton;
-        private System.Windows.Forms.Button AddPassthroughButton;
-        private System.Windows.Forms.Button AddConsumerButton;
-        private System.Windows.Forms.CheckBox IgnoreAssemblerCheckBox;
-        private System.Windows.Forms.Panel ItemIconPanel;
+        internal System.Windows.Forms.Button AddSupplyButton;
+        internal System.Windows.Forms.Button AddPassthroughButton;
+        internal System.Windows.Forms.Button AddConsumerButton;
+        internal System.Windows.Forms.CheckBox IgnoreAssemblerCheckBox;
+        internal System.Windows.Forms.Panel ItemIconPanel;
         private System.Windows.Forms.Button BaseGroupButton;
         private System.Windows.Forms.Button BaseIRUsedButton;
         private System.Windows.Forms.Button BaseIREmptyButton;

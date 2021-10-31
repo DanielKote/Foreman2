@@ -631,6 +631,9 @@ namespace Foreman
 
 		void ProductionGraphViewer_MouseWheel(object sender, MouseEventArgs e)
 		{
+			if (!this.Focused)
+				return;
+
 			ClearFloatingControls();
 			Point oldZoomCenter = ScreenToGraph(e.Location);
 
@@ -861,13 +864,24 @@ namespace Foreman
 					Item item = GhostDragElement.Item;
 					Point location = GhostDragElement.Location;
 
-					IRChooserPanel panel = new IRChooserPanel();
-					this.Controls.Add(panel);
-					panel.Location = new Point(100, 100);
-					panel.Anchor = AnchorStyles.None;
-					this.PerformLayout();
-					panel.Show();
+					if (true)
+					{
+						RecipeChooserPanel rpanel = new RecipeChooserPanel(this, item, true, true);
+						rpanel.Show(c =>
+						{
+							Console.WriteLine(c);
+						});
 
+					}
+					else
+					{
+
+						ItemChooserPanel ipanel = new ItemChooserPanel(this);
+						ipanel.Show(c =>
+						{
+							Console.WriteLine(c);
+						});
+					}
 
 					return;
 
@@ -973,7 +987,7 @@ namespace Foreman
 			info.AddValue("EnabledMiners", DataCache.Miners.Values.Where(m => m.Enabled).Select<Miner, String>(m => m.Name));
 			info.AddValue("EnabledModules", DataCache.Modules.Values.Where(m => m.Enabled).Select<Module, String>(m => m.Name));
 			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Enabled).Select<Mod, String>(m => m.Name));
-			info.AddValue("EnabledRecipes", DataCache.Recipes.Values.Where(r => r.Enabled).Select<Recipe, String>(r => r.Name));
+			info.AddValue("EnabledRecipes", DataCache.Recipes.Values.Where(r => !r.Hidden).Select<Recipe, String>(r => r.Name));
 			info.AddValue("Nodes", Graph.Nodes);
 			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
 			info.AddValue("ElementLocations", Graph.Nodes.Select(n => GetElementForNode(n).Location).ToList());

@@ -52,9 +52,11 @@ namespace Foreman
     public static class IconProcessor
     {
         internal static readonly Color NoTint = Color.FromArgb(255, 0, 0, 0);
+        internal static readonly Pen HiddenSlashPen = new Pen(new SolidBrush(Color.DarkRed), 4);
         internal static readonly int IconCanvasSize = 64;
 
         private static Bitmap unknownIcon;
+        private static Bitmap unknownBWIcon;
         public static Bitmap GetUnknownIcon()
         {
             if (unknownIcon == null)
@@ -72,14 +74,14 @@ namespace Foreman
             return unknownIcon;
         }
 
-        public static IconColorPair GetIconAndColor(IconInfo iinfo, List<IconInfo> iinfos)
+        public static IconColorPair GetIconAndColor(IconInfo iinfo, List<IconInfo> iinfos, int defaultCanvasSize)
         {
 #if IgnoreIcons
             return new IconColorPair(GetUnknownIcon(), Color.Black);
 #endif
             if (iinfos == null)
                 iinfos = new List<IconInfo>();
-            int mainIconSize = iinfo.iconSize > 0 ? iinfo.iconSize : 32;
+            int mainIconSize = iinfo.iconSize > 0 ? iinfo.iconSize : defaultCanvasSize;
             double IconCanvasScale = (double)IconCanvasSize / mainIconSize;
             //if (iinfos.Count > 0 && iinfos[0].iconSize > 0 && iinfos[0].iconScale == 0) mainIconSize = iinfos[0].iconSize;
 
@@ -300,6 +302,40 @@ namespace Foreman
             }
 
             return canvas;
+        }
+
+        //Asad Butt, Mon Oct 24 2016, 0fnt, "Convert an image to grayscale", Feb 15 '10 at 12:37, http://stackoverflow.com/a/2265990
+        //not used at the moment, left behind just in case
+        public static Bitmap MakeMonochrome(Bitmap src)
+        {
+            if (src == null) { return null; }
+
+
+            Bitmap dst = new Bitmap(src.Width, src.Height);
+            Graphics g = Graphics.FromImage(dst);
+
+            ColorMatrix colorMatrix = new ColorMatrix(
+                new float[][]
+                {
+                    new float[] {.3f, .3f, .3f, 0, 0},
+                    new float[] {.59f, .59f, .59f, 0, 0},
+                    new float[] {.11f, .11f, .11f, 0, 0},
+                    new float[] {0, 0, 0, 1, 0},
+                    new float[] {0, 0, 0, 0, 1}
+                });
+
+            ImageAttributes attrib = new ImageAttributes();
+
+            attrib.SetColorMatrix(colorMatrix);
+
+            g.DrawImage(src,
+                new Rectangle(0, 0, src.Width, src.Height),
+                0, 0, src.Width, src.Height,
+                GraphicsUnit.Pixel, attrib
+                );
+
+            g.Dispose();
+            return dst;
         }
     }
 }

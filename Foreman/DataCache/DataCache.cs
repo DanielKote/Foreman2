@@ -169,6 +169,8 @@ namespace Foreman
         {
             Mods.Clear();
             Technologies.Clear();
+            Groups.Clear();
+            Subgroups.Clear();
             Items.Clear();
             Recipes.Clear();
             Assemblers.Clear();

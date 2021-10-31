@@ -170,12 +170,12 @@ namespace Foreman
             progress.Report(new KeyValuePair<int, string>(endingPercent, ""));
         }
 
-        private IconColorPair ProcessIcon(JToken iconInfoJToken)
+        private IconColorPair ProcessIcon(JToken iconInfoJToken, int defaultIconSize)
         {
             string mainIconPath = (string)iconInfoJToken["icon"];
-            int defaultIconSize = (int)iconInfoJToken["icon_size"];
+            int baseIconSize = (int)iconInfoJToken["icon_size"];
 
-            IconInfo iicon = new IconInfo(mainIconPath, defaultIconSize);
+            IconInfo iicon = new IconInfo(mainIconPath, baseIconSize);
 
             List<IconInfo> iicons = new List<IconInfo>();
             List<JToken> iconJTokens = iconInfoJToken["icons"].ToList();
@@ -184,18 +184,18 @@ namespace Foreman
                 IconInfo picon = new IconInfo((string)iconJToken["icon"], (int)iconJToken["icon_size"]);
                 picon.iconScale = (double)iconJToken["scale"];
 
-                picon.iconOffset = new Point((int)iconJToken["shift"][0], (int)iconJToken["shift"][0]);
+                picon.iconOffset = new Point((int)iconJToken["shift"][0], (int)iconJToken["shift"][1]);
                 picon.SetIconTint((double)iconJToken["tint"][3], (double)iconJToken["tint"][0], (double)iconJToken["tint"][1], (double)iconJToken["tint"][2]);
                 iicons.Add(picon);
             }
-            return IconProcessor.GetIconAndColor(iicon, iicons);
+            return IconProcessor.GetIconAndColor(iicon, iicons, defaultIconSize);
         }
 
         private void ProcessTechnology(JToken objJToken)
         {
             Technology technology = new Technology((string)objJToken["name"]);
             technology.LName = (string)objJToken["localised_name"];
-            technology.Icon = ProcessIcon(objJToken["icon_info"]).Icon;
+            technology.Icon = ProcessIcon(objJToken["icon_info"], 256).Icon;
             Technologies.Add(technology.Name, technology);
         }
 
@@ -219,7 +219,7 @@ namespace Foreman
         private void ProcessGroup(JToken objJToken)
         {
             Group group = new Group((string)objJToken["name"], (string)objJToken["localised_name"], (string)objJToken["order"]);
-            group.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
+            group.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 64));
 
             foreach (var subgroupJToken in objJToken["subgroups"])
                 SubgroupToGroupLinks.Add((string)subgroupJToken, group);
@@ -235,7 +235,7 @@ namespace Foreman
         private void ProcessItem(JToken objJToken)
         {
             Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
-            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
+            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
             Items.Add(item.Name, item);
         }
 
@@ -243,7 +243,7 @@ namespace Foreman
         {
             Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
             item.Temperature = (double)objJToken["default_temperature"];
-            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
+            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
             Items.Add(item.Name, item);
         }
 
@@ -253,7 +253,7 @@ namespace Foreman
             recipe.Time = (float)objJToken["energy"] > 0 ? (float)objJToken["energy"] : defaultRecipeTime;
             recipe.Category = (string)objJToken["category"];
             recipe.IsAvailableAtStart = (bool)objJToken["enabled"];
-            recipe.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
+            recipe.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
             Recipes.Add(recipe.Name, recipe);
         }
         private void ProcessRecipeProducts(JToken objJToken)
@@ -262,6 +262,9 @@ namespace Foreman
 
             foreach (var productJToken in objJToken["products"].ToList())
             {
+                if ((float)productJToken["amount"] == 0)
+                    continue;
+
                 string name = (string)productJToken["name"];
 
                 if((string)productJToken["type"] == "item" || productJToken["temperature"].Type == JTokenType.Null || Items[name].Temperature == (double)productJToken["temperature"])
@@ -283,7 +286,7 @@ namespace Foreman
                         //the new fluid has already been 'created' by a previous recipe
                         if (recipe.Results.ContainsKey(Items[fluidName]))
                             recipe.Results[Items[fluidName]] += (float)productJToken["amount"];
-                        else
+                        else if ((float)productJToken["amount"] != 0)
                         {
                             recipe.Results.Add(Items[fluidName], (float)productJToken["amount"]);
                             Items[fluidName].ProductionRecipes.Add(recipe);
@@ -314,6 +317,9 @@ namespace Foreman
             recipes.Add(Recipes[(string)objJToken["name"]]);
             foreach (var ingredientJToken in objJToken["ingredients"].ToList())
             {
+                if ((float)ingredientJToken["amount"] == 0)
+                    continue;
+
                 string name = (string)ingredientJToken["name"];
                 double minTemp = (ingredientJToken["minimum_temperature"] == null || ingredientJToken["minimum_temperature"].Type == JTokenType.Null) ? double.MinValue : (double)ingredientJToken["minimum_temperature"];
                 double maxTemp = (ingredientJToken["maximum_temperature"] == null || ingredientJToken["maximum_temperature"].Type == JTokenType.Null) ? double.MaxValue : (double)ingredientJToken["maximum_temperature"];
@@ -343,7 +349,7 @@ namespace Foreman
                     {
                         Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1), recipes[j].LName, recipes[0].MySubgroup, recipes[0].Order+(i * baseRecipeCount + j + 1));
                         newRecipe.Category = recipes[j].Category;
-                        newRecipe.Enabled = recipes[j].Enabled;
+                        newRecipe.Hidden = recipes[j].Hidden;
                         newRecipe.Time = recipes[j].Time;
                         newRecipe.Icon = recipes[j].Icon;
 
@@ -382,7 +388,7 @@ namespace Foreman
             assembler.LName = (string)objJToken["localised_name"];
             assembler.Speed = (float)objJToken["crafting_speed"];
             assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
-            assembler.Icon = ProcessIcon(objJToken["icon_info"]).Icon;
+            assembler.Icon = ProcessIcon(objJToken["icon_info"], 32).Icon;
 
             foreach (var categoryJToken in objJToken["crafting_categories"])
                 assembler.Categories.Add((string)categoryJToken);
@@ -398,7 +404,7 @@ namespace Foreman
             miner.LName = (string)objJToken["localised_name"];
             miner.MiningPower = (float)objJToken["mining_speed"];
             miner.ModuleSlots = (int)objJToken["module_inventory_size"];
-            miner.Icon = ProcessIcon(objJToken["icon_info"]).Icon;
+            miner.Icon = ProcessIcon(objJToken["icon_info"], 32).Icon;
 
             foreach (var categoryJToken in objJToken["resource_categories"])
                 miner.ResourceCategories.Add((string)categoryJToken);
@@ -517,8 +523,11 @@ namespace Foreman
             HashSet<Recipe> unusableRecipes = new HashSet<Recipe>(Recipes.Values);
             foreach (Technology tech in Technologies.Values)
                 foreach (Recipe recipe in tech.Recipes)
-                    if(!recipe.IsAvailableAtStart && !recipe.Name.Contains("\n"))// "\n" in name represents that this is a duplicate recipe made specifically for fluid temperatures. Ignore
+                    if(!recipe.Name.Contains("\n"))// "\n" in name represents that this is a duplicate recipe made specifically for fluid temperatures. Ignore
                         unusableRecipes.Remove(recipe);
+            foreach (Recipe recipe in Recipes.Values)
+                if (recipe.IsAvailableAtStart)
+                    unusableRecipes.Remove(recipe);
             //step 2.1: also remove any recipes that dont have ANY assembler that fits
             foreach (Recipe recipe in Recipes.Values)
             {
@@ -526,15 +535,21 @@ namespace Foreman
                 foreach (Assembler assembler in Assemblers.Values)
                     usable |= assembler.Categories.Contains(recipe.Category);
                 if (!usable)
-                    unusableRecipes.Remove(recipe);
+                    unusableRecipes.Add(recipe);
             }
             //step 2.5: remove blocked recipe (those not part of a tech or unlocked at start), including any alt-recipes of it (due to fluid temps)
             foreach (Recipe recipe in unusableRecipes)
             {
+                recipe.MySubgroup.Recipes.Remove(recipe);
                 Recipes.Remove(recipe.Name);
                 if (RecipeDuplicants.ContainsKey(recipe.Name))
+                {
                     foreach (string altRecipe in RecipeDuplicants[recipe.Name])
+                    {
+                        Recipes[altRecipe].MySubgroup.Recipes.Remove(Recipes[altRecipe]);
                         Recipes.Remove(altRecipe);
+                    }
+                }
             }
 
             //step 3: calculate unlockable items (ingredient/product of unlockable recipes -> dont care about anything that isnt part of a recipe)
@@ -548,7 +563,10 @@ namespace Foreman
             }
             //step 3.5: remove blocked items
             foreach (Item item in unusableItems)
+            {
+                item.MySubgroup.Items.Remove(item);
                 Items.Remove(item.Name);
+            }
 
             //step 4: clean up tech tree (removing any recipes from the unlocks that are no longer present in recipe set)
             foreach(Technology tech in Technologies.Values)
@@ -557,9 +575,11 @@ namespace Foreman
             //step 5: clean up groups and subgroups (basically, clear the entire dictionary and for each recipe & item 'add' their subgroup & group into the dictionary.
             Groups.Clear();
             Subgroups.Clear();
-            foreach(Item item in Items.Values)
-                if(!Subgroups.ContainsKey(item.MySubgroup.Name))
+            foreach (Item item in Items.Values)
+            {
+                if (!Subgroups.ContainsKey(item.MySubgroup.Name))
                     Subgroups.Add(item.MySubgroup.Name, item.MySubgroup);
+            }
             foreach (Recipe recipe in Recipes.Values)
                 if (!Subgroups.ContainsKey(recipe.MySubgroup.Name))
                     Subgroups.Add(recipe.MySubgroup.Name, recipe.MySubgroup);

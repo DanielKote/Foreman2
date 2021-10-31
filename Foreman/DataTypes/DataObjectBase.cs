@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
@@ -11,13 +10,11 @@ namespace Foreman
         public string Name { get; private set; }
         public string LName { get; set; }
 		public string Order { get; private set; }
-		public virtual Subgroup MySubgroup { get; private set; }
-		public virtual Group MyGroup { get { return MySubgroup.MyGroup; } }
 
 		private string friendlyName;
 		private string lfriendlyName; //lower case
-		public string LFriendlyName { get { if (string.IsNullOrEmpty(lfriendlyName)) lfriendlyName = FriendlyName.ToLower(); return lfriendlyName; } }
-		public string FriendlyName
+		public virtual string LFriendlyName { get { if (string.IsNullOrEmpty(lfriendlyName)) lfriendlyName = FriendlyName.ToLower(); return lfriendlyName; } }
+		public virtual string FriendlyName
 		{
 			get
 			{
@@ -51,11 +48,10 @@ namespace Foreman
 			}
 		}
 
-		public DataObjectBase(string name, string lname, Subgroup subGroup, string order)
+		public DataObjectBase(string name, string lname, string order)
         {
 			Name = name;
 			LName = lname;
-			MySubgroup = subGroup;
 
 			Order = order;
 			AverageColor = Color.Black;
@@ -67,6 +63,7 @@ namespace Foreman
 			if(icon != null)
             {
 				this.icon = icon;
+
 				this.AverageColor = averageColor;
             }
 			else

@@ -53,7 +53,7 @@ namespace Foreman
 
 		private void MainForm_Load(object sender, EventArgs e)
         {
-			WindowState = FormWindowState.Maximized;
+			//WindowState = FormWindowState.Maximized;
 
             //I changed the name of the variable (again), so this copies the value over for people who are upgrading their Foreman version
             if (Properties.Settings.Default.FactorioPath == "" && Properties.Settings.Default.FactorioDataPath != "")
@@ -199,7 +199,7 @@ namespace Foreman
 				lvItem.Text = recipe.FriendlyName;
 				lvItem.Tag = recipe;
 				lvItem.Name = recipe.Name; //key
-				lvItem.Checked = recipe.Enabled;
+				lvItem.Checked = !recipe.Hidden;
 				unfilteredRecipeList.Add(lvItem);
 			}
 
@@ -230,7 +230,7 @@ namespace Foreman
 			//very quick filter for only items used by the currently active recipes:
 			DataCache.UpdateRecipesAssemblerStatus();
 			HashSet<Item> availableItems = new HashSet<Item>();
-			foreach (Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled && n.HasEnabledAssemblers))
+			foreach (Recipe recipe in DataCache.Recipes.Values.Where(n => !n.Hidden && n.HasEnabledAssemblers))
 			{
 				foreach (Item item in recipe.Ingredients.Keys)
 					availableItems.Add(item);
@@ -333,13 +333,13 @@ namespace Foreman
 					{
 						lvi = filteredRecipeList[index];
 						lvi.Checked = setCheck;
-						(lvi.Tag as Recipe).Enabled = lvi.Checked;
+						(lvi.Tag as Recipe).Hidden = !lvi.Checked;
 					}
 				}
 				else
 				{
 					lvi.Checked = !lvi.Checked;
-					(lvi.Tag as Recipe).Enabled = lvi.Checked;
+					(lvi.Tag as Recipe).Hidden = !lvi.Checked;
 				}
 				RecipeListView.Invalidate();
 				GraphViewer.Invalidate();
@@ -359,13 +359,13 @@ namespace Foreman
 					{
 						lvi = filteredRecipeList[index];
 						lvi.Checked = setCheck;
-						(lvi.Tag as Recipe).Enabled = lvi.Checked;
+						(lvi.Tag as Recipe).Hidden = !lvi.Checked;
 					}
 				}
 				else
 				{
 					//lvi.Checked = lvi.Checked;
-					(lvi.Tag as Recipe).Enabled = lvi.Checked;
+					(lvi.Tag as Recipe).Hidden = !lvi.Checked;
 				}
 				RecipeListView.Invalidate();
 				GraphViewer.Invalidate();
@@ -399,7 +399,7 @@ namespace Foreman
         {
 			string rliKey = recipe.Name;
 			if (RecipeListView.Items.ContainsKey(rliKey))
-				RecipeListView.Items[rliKey].Checked = recipe.Enabled;
+				RecipeListView.Items[rliKey].Checked = !recipe.Hidden;
 			RecipeListView.Invalidate();
         }
 

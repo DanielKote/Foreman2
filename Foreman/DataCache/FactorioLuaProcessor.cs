@@ -1114,7 +1114,7 @@ namespace Foreman
                     }
                 }
             }
-            return IconProcessor.GetIconAndColor(mIconInfo, iconInfos);
+            return IconProcessor.GetIconAndColor(mIconInfo, iconInfos, 32);
         }
 
     }

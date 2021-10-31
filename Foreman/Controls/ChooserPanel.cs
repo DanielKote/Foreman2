@@ -38,11 +38,11 @@ namespace Foreman
 			//fill in recipes
 			if(includeConsumers)
 				foreach (Recipe r in item.ConsumptionRecipes)
-					if(Properties.Settings.Default.ShowHidden || (r.Enabled && r.HasEnabledAssemblers))
+					if(Properties.Settings.Default.ShowHidden || (!r.Hidden && r.HasEnabledAssemblers))
 						RecipeComboBox.Items.Add(r);
 			if (includeSuppliers)
 				foreach (Recipe r in item.ProductionRecipes)
-					if (Properties.Settings.Default.ShowHidden || (r.Enabled && r.HasEnabledAssemblers))
+					if (Properties.Settings.Default.ShowHidden || (!r.Hidden && r.HasEnabledAssemblers))
 						RecipeComboBox.Items.Add(r);
 
 			RecipeComboBox.Focus();

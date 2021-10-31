@@ -56,7 +56,6 @@
             this.ModuleDropDown = new System.Windows.Forms.ComboBox();
             this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
             this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
-            this.GraphViewer = new Foreman.ProductionGraphViewer();
             this.ListTabControl = new System.Windows.Forms.TabControl();
             this.ItemTabPage = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -90,6 +89,7 @@
             this.MinerSelectionBoxAllButton = new System.Windows.Forms.Button();
             this.MinerSelectionBox = new System.Windows.Forms.CheckedListBox();
             this.MinerSelectionBoxNoneButton = new System.Windows.Forms.Button();
+            this.GraphViewer = new Foreman.ProductionGraphViewer();
             this.tableLayoutPanel1.SuspendLayout();
             this.MainToolbar.SuspendLayout();
             this.flowLayoutPanel3.SuspendLayout();
@@ -127,7 +127,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(982, 553);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(982, 653);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // MainToolbar
@@ -480,20 +480,6 @@
             this.MinerDisplayCheckBox.UseVisualStyleBackColor = true;
             this.MinerDisplayCheckBox.CheckedChanged += new System.EventHandler(this.MinerDisplayCheckBox_CheckedChanged);
             // 
-            // GraphViewer
-            // 
-            this.GraphViewer.AllowDrop = true;
-            this.GraphViewer.BackColor = System.Drawing.Color.White;
-            this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GraphViewer.Location = new System.Drawing.Point(285, 141);
-            this.GraphViewer.Margin = new System.Windows.Forms.Padding(5);
-            this.GraphViewer.MouseDownElement = null;
-            this.GraphViewer.Name = "GraphViewer";
-            this.GraphViewer.Size = new System.Drawing.Size(692, 407);
-            this.GraphViewer.TabIndex = 12;
-            this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
-            // 
             // ListTabControl
             // 
             this.ListTabControl.Controls.Add(this.ItemTabPage);
@@ -506,7 +492,7 @@
             this.ListTabControl.Name = "ListTabControl";
             this.ListTabControl.Padding = new System.Drawing.Point(0, 0);
             this.ListTabControl.SelectedIndex = 0;
-            this.ListTabControl.Size = new System.Drawing.Size(280, 417);
+            this.ListTabControl.Size = new System.Drawing.Size(280, 517);
             this.ListTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.ListTabControl.TabIndex = 17;
             this.ListTabControl.SelectedIndexChanged += new System.EventHandler(this.ListTabControl_SelectedIndexChanged);
@@ -517,7 +503,7 @@
             this.ItemTabPage.Location = new System.Drawing.Point(4, 25);
             this.ItemTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.ItemTabPage.Name = "ItemTabPage";
-            this.ItemTabPage.Size = new System.Drawing.Size(272, 388);
+            this.ItemTabPage.Size = new System.Drawing.Size(272, 488);
             this.ItemTabPage.TabIndex = 0;
             this.ItemTabPage.Text = "Items";
             this.ItemTabPage.UseVisualStyleBackColor = true;
@@ -539,7 +525,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(272, 388);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(272, 488);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // ItemFilterTextBox
@@ -567,7 +553,7 @@
             this.ItemListView.Margin = new System.Windows.Forms.Padding(4);
             this.ItemListView.MultiSelect = false;
             this.ItemListView.Name = "ItemListView";
-            this.ItemListView.Size = new System.Drawing.Size(264, 286);
+            this.ItemListView.Size = new System.Drawing.Size(264, 386);
             this.ItemListView.SmallImageList = this.IconList;
             this.ItemListView.TabIndex = 15;
             this.ItemListView.UseCompatibleStateImageBehavior = false;
@@ -591,7 +577,7 @@
             // AddItemButton
             // 
             this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddItemButton.Location = new System.Drawing.Point(4, 352);
+            this.AddItemButton.Location = new System.Drawing.Point(4, 452);
             this.AddItemButton.Margin = new System.Windows.Forms.Padding(4);
             this.AddItemButton.Name = "AddItemButton";
             this.AddItemButton.Size = new System.Drawing.Size(264, 32);
@@ -604,7 +590,7 @@
             // 
             this.ShowHiddenItemsCheckBox.AutoSize = true;
             this.ShowHiddenItemsCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ShowHiddenItemsCheckBox.Location = new System.Drawing.Point(3, 327);
+            this.ShowHiddenItemsCheckBox.Location = new System.Drawing.Point(3, 427);
             this.ShowHiddenItemsCheckBox.Name = "ShowHiddenItemsCheckBox";
             this.ShowHiddenItemsCheckBox.Size = new System.Drawing.Size(266, 18);
             this.ShowHiddenItemsCheckBox.TabIndex = 20;
@@ -618,7 +604,7 @@
             this.RecipeTabPage.Location = new System.Drawing.Point(4, 25);
             this.RecipeTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.RecipeTabPage.Name = "RecipeTabPage";
-            this.RecipeTabPage.Size = new System.Drawing.Size(272, 388);
+            this.RecipeTabPage.Size = new System.Drawing.Size(272, 588);
             this.RecipeTabPage.TabIndex = 1;
             this.RecipeTabPage.Text = "Recipes";
             this.RecipeTabPage.UseVisualStyleBackColor = true;
@@ -640,7 +626,7 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(272, 388);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(272, 588);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // RecipeFilterTextBox
@@ -668,7 +654,7 @@
             this.RecipeListView.Location = new System.Drawing.Point(4, 34);
             this.RecipeListView.Margin = new System.Windows.Forms.Padding(4);
             this.RecipeListView.Name = "RecipeListView";
-            this.RecipeListView.Size = new System.Drawing.Size(264, 286);
+            this.RecipeListView.Size = new System.Drawing.Size(264, 486);
             this.RecipeListView.SmallImageList = this.IconList;
             this.RecipeListView.TabIndex = 15;
             this.RecipeListView.UseCompatibleStateImageBehavior = false;
@@ -689,7 +675,7 @@
             // AddRecipeButton
             // 
             this.AddRecipeButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddRecipeButton.Location = new System.Drawing.Point(4, 352);
+            this.AddRecipeButton.Location = new System.Drawing.Point(4, 552);
             this.AddRecipeButton.Margin = new System.Windows.Forms.Padding(4);
             this.AddRecipeButton.Name = "AddRecipeButton";
             this.AddRecipeButton.Size = new System.Drawing.Size(264, 32);
@@ -702,7 +688,7 @@
             // 
             this.ShowDisabledRecipesCheckBox.AutoSize = true;
             this.ShowDisabledRecipesCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ShowDisabledRecipesCheckBox.Location = new System.Drawing.Point(3, 327);
+            this.ShowDisabledRecipesCheckBox.Location = new System.Drawing.Point(3, 527);
             this.ShowDisabledRecipesCheckBox.Name = "ShowDisabledRecipesCheckBox";
             this.ShowDisabledRecipesCheckBox.Size = new System.Drawing.Size(266, 18);
             this.ShowDisabledRecipesCheckBox.TabIndex = 20;
@@ -715,7 +701,7 @@
             this.tabPage1.Controls.Add(this.tableLayoutPanel4);
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(272, 388);
+            this.tabPage1.Size = new System.Drawing.Size(272, 588);
             this.tabPage1.TabIndex = 2;
             this.tabPage1.Text = "Other";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -734,16 +720,16 @@
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(272, 388);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(272, 588);
             this.tableLayoutPanel4.TabIndex = 0;
             // 
             // groupBox6
             // 
             this.groupBox6.Controls.Add(this.tableLayoutPanel7);
             this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox6.Location = new System.Drawing.Point(3, 261);
+            this.groupBox6.Location = new System.Drawing.Point(3, 395);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(266, 124);
+            this.groupBox6.Size = new System.Drawing.Size(266, 190);
             this.groupBox6.TabIndex = 2;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Modules";
@@ -762,7 +748,7 @@
             this.tableLayoutPanel7.RowCount = 2;
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel7.Size = new System.Drawing.Size(260, 103);
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(260, 169);
             this.tableLayoutPanel7.TabIndex = 1;
             // 
             // ModuleSelectionBox
@@ -774,7 +760,7 @@
             this.ModuleSelectionBox.Location = new System.Drawing.Point(4, 3);
             this.ModuleSelectionBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.ModuleSelectionBox.Name = "ModuleSelectionBox";
-            this.ModuleSelectionBox.Size = new System.Drawing.Size(252, 67);
+            this.ModuleSelectionBox.Size = new System.Drawing.Size(252, 133);
             this.ModuleSelectionBox.Sorted = true;
             this.ModuleSelectionBox.TabIndex = 4;
             this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
@@ -782,7 +768,7 @@
             // ModuleSelectionBoxNoneButton
             // 
             this.ModuleSelectionBoxNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ModuleSelectionBoxNoneButton.Location = new System.Drawing.Point(133, 76);
+            this.ModuleSelectionBoxNoneButton.Location = new System.Drawing.Point(133, 142);
             this.ModuleSelectionBoxNoneButton.Name = "ModuleSelectionBoxNoneButton";
             this.ModuleSelectionBoxNoneButton.Size = new System.Drawing.Size(124, 24);
             this.ModuleSelectionBoxNoneButton.TabIndex = 1;
@@ -793,7 +779,7 @@
             // ModuleSelectionBoxAllButton
             // 
             this.ModuleSelectionBoxAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ModuleSelectionBoxAllButton.Location = new System.Drawing.Point(3, 76);
+            this.ModuleSelectionBoxAllButton.Location = new System.Drawing.Point(3, 142);
             this.ModuleSelectionBoxAllButton.Name = "ModuleSelectionBoxAllButton";
             this.ModuleSelectionBoxAllButton.Size = new System.Drawing.Size(124, 24);
             this.ModuleSelectionBoxAllButton.TabIndex = 0;
@@ -807,7 +793,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox3.Location = new System.Drawing.Point(3, 3);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(266, 123);
+            this.groupBox3.Size = new System.Drawing.Size(266, 190);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Assemblers / Smelters:";
@@ -826,13 +812,13 @@
             this.tableLayoutPanel5.RowCount = 2;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(260, 102);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(260, 169);
             this.tableLayoutPanel5.TabIndex = 0;
             // 
             // AssemblerSelectionBoxAllButton
             // 
             this.AssemblerSelectionBoxAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerSelectionBoxAllButton.Location = new System.Drawing.Point(3, 75);
+            this.AssemblerSelectionBoxAllButton.Location = new System.Drawing.Point(3, 142);
             this.AssemblerSelectionBoxAllButton.Name = "AssemblerSelectionBoxAllButton";
             this.AssemblerSelectionBoxAllButton.Size = new System.Drawing.Size(124, 24);
             this.AssemblerSelectionBoxAllButton.TabIndex = 0;
@@ -843,7 +829,7 @@
             // AssemblerSelectionBoxNoneButton
             // 
             this.AssemblerSelectionBoxNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerSelectionBoxNoneButton.Location = new System.Drawing.Point(133, 75);
+            this.AssemblerSelectionBoxNoneButton.Location = new System.Drawing.Point(133, 142);
             this.AssemblerSelectionBoxNoneButton.Name = "AssemblerSelectionBoxNoneButton";
             this.AssemblerSelectionBoxNoneButton.Size = new System.Drawing.Size(124, 24);
             this.AssemblerSelectionBoxNoneButton.TabIndex = 1;
@@ -860,7 +846,7 @@
             this.AssemblerSelectionBox.Location = new System.Drawing.Point(4, 3);
             this.AssemblerSelectionBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.AssemblerSelectionBox.Name = "AssemblerSelectionBox";
-            this.AssemblerSelectionBox.Size = new System.Drawing.Size(252, 66);
+            this.AssemblerSelectionBox.Size = new System.Drawing.Size(252, 133);
             this.AssemblerSelectionBox.Sorted = true;
             this.AssemblerSelectionBox.TabIndex = 4;
             this.AssemblerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AssemblerSelectionBox_ItemCheck);
@@ -869,9 +855,9 @@
             // 
             this.groupBox4.Controls.Add(this.tableLayoutPanel6);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox4.Location = new System.Drawing.Point(3, 132);
+            this.groupBox4.Location = new System.Drawing.Point(3, 199);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(266, 123);
+            this.groupBox4.Size = new System.Drawing.Size(266, 190);
             this.groupBox4.TabIndex = 1;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Miners / Pumpjacks";
@@ -890,13 +876,13 @@
             this.tableLayoutPanel6.RowCount = 2;
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(260, 102);
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(260, 169);
             this.tableLayoutPanel6.TabIndex = 1;
             // 
             // MinerSelectionBoxAllButton
             // 
             this.MinerSelectionBoxAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MinerSelectionBoxAllButton.Location = new System.Drawing.Point(3, 75);
+            this.MinerSelectionBoxAllButton.Location = new System.Drawing.Point(3, 142);
             this.MinerSelectionBoxAllButton.Name = "MinerSelectionBoxAllButton";
             this.MinerSelectionBoxAllButton.Size = new System.Drawing.Size(124, 24);
             this.MinerSelectionBoxAllButton.TabIndex = 0;
@@ -913,7 +899,7 @@
             this.MinerSelectionBox.Location = new System.Drawing.Point(4, 3);
             this.MinerSelectionBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MinerSelectionBox.Name = "MinerSelectionBox";
-            this.MinerSelectionBox.Size = new System.Drawing.Size(252, 66);
+            this.MinerSelectionBox.Size = new System.Drawing.Size(252, 133);
             this.MinerSelectionBox.Sorted = true;
             this.MinerSelectionBox.TabIndex = 4;
             this.MinerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.MinerSelectionBox_ItemCheck);
@@ -921,7 +907,7 @@
             // MinerSelectionBoxNoneButton
             // 
             this.MinerSelectionBoxNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MinerSelectionBoxNoneButton.Location = new System.Drawing.Point(133, 75);
+            this.MinerSelectionBoxNoneButton.Location = new System.Drawing.Point(133, 142);
             this.MinerSelectionBoxNoneButton.Name = "MinerSelectionBoxNoneButton";
             this.MinerSelectionBoxNoneButton.Size = new System.Drawing.Size(124, 24);
             this.MinerSelectionBoxNoneButton.TabIndex = 1;
@@ -929,16 +915,30 @@
             this.MinerSelectionBoxNoneButton.UseVisualStyleBackColor = true;
             this.MinerSelectionBoxNoneButton.Click += new System.EventHandler(this.MinerSelectionBoxNoneButton_Click);
             // 
+            // GraphViewer
+            // 
+            this.GraphViewer.AllowDrop = true;
+            this.GraphViewer.BackColor = System.Drawing.Color.White;
+            this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GraphViewer.Location = new System.Drawing.Point(285, 141);
+            this.GraphViewer.Margin = new System.Windows.Forms.Padding(5);
+            this.GraphViewer.MouseDownElement = null;
+            this.GraphViewer.Name = "GraphViewer";
+            this.GraphViewer.Size = new System.Drawing.Size(692, 507);
+            this.GraphViewer.TabIndex = 12;
+            this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(982, 553);
+            this.ClientSize = new System.Drawing.Size(982, 653);
             this.Controls.Add(this.tableLayoutPanel1);
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.MinimumSize = new System.Drawing.Size(1000, 600);
+            this.MinimumSize = new System.Drawing.Size(1000, 700);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Foreman";

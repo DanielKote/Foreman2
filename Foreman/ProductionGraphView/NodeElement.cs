@@ -358,7 +358,7 @@ namespace Foreman
 					if (tab.Type == LinkType.Input && DisplayedNode.OverSupplied(tab.Item))
 						bgBrush = backgroundOversuppliedBrush;
 
-				if (DisplayedNode.ManualRateNotMet() || (DisplayedNode is RecipeNode && !(((RecipeNode)DisplayedNode).BaseRecipe.Enabled && ((RecipeNode)DisplayedNode).BaseRecipe.HasEnabledAssemblers)))
+				if (DisplayedNode.ManualRateNotMet() || (DisplayedNode is RecipeNode && !(!((RecipeNode)DisplayedNode).BaseRecipe.Hidden && ((RecipeNode)DisplayedNode).BaseRecipe.HasEnabledAssemblers)))
 					GraphicsStuff.FillRoundRect(trans.X - (Width / 2) - 5, trans.Y - (Height / 2) - 5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
 
 				GraphicsStuff.FillRoundRect(trans.X - (Width/2), trans.Y - (Height / 2), Width, Height, 8, graphics, bgBrush);
