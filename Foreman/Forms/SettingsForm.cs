@@ -21,6 +21,7 @@ namespace Foreman
 			public bool DynamicLinkWidth;
 			public bool AbbreviateSciPacks;
 			public bool ShowRecipeToolTip;
+			public bool RoundAssemblerCount;
 			public bool LockedRecipeEditPanelPosition;
 
 			public bool ShowErrorArrows;
@@ -105,6 +106,7 @@ namespace Foreman
 			NodeCountForSimpleViewInput.Maximum = Math.Max(NodeCountForSimpleViewInput.Maximum, options.NodeCountForSimpleView);
 			NodeCountForSimpleViewInput.Value = options.NodeCountForSimpleView;
 			ShowNodeRecipeCheckBox.Checked = Options.ShowRecipeToolTip;
+			RoundAssemblerCountCheckBox.Checked = options.RoundAssemblerCount;
 			AbbreviateSciPackCheckBox.Checked = Options.AbbreviateSciPacks;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
 			WarningArrowsCheckBox.Checked = Options.ShowWarningArrows;
@@ -440,6 +442,7 @@ namespace Foreman
 			Options.DynamicLinkWidth = DynamicLWCheckBox.Checked;
 			Options.AbbreviateSciPacks = AbbreviateSciPackCheckBox.Checked;
 			Options.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
+			Options.RoundAssemblerCount = RoundAssemblerCountCheckBox.Checked;
 			Options.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
 			Options.ShowErrorArrows = ErrorArrowsCheckBox.Checked;
 			Options.ShowWarningArrows = WarningArrowsCheckBox.Checked;

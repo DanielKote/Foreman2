@@ -286,5 +286,17 @@ namespace Foreman.Properties {
                 this["AbbreviateSciPacks"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RoundAssemblerCount {
+            get {
+                return ((bool)(this["RoundAssemblerCount"]));
+            }
+            set {
+                this["RoundAssemblerCount"] = value;
+            }
+        }
     }
 }

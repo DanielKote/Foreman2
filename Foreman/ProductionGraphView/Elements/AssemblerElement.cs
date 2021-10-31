@@ -119,6 +119,8 @@ namespace Foreman
 				double assemblerCount = DisplayedNode.ActualAssemblerCount;
 				if (assemblerCount >= 10000)
 					text += assemblerCount.ToString("0.##e0");
+				else if (Properties.Settings.Default.RoundAssemblerCount)
+					text += Math.Ceiling(assemblerCount).ToString("0");
 				else if (assemblerCount >= 0.1)
 					text += assemblerCount.ToString("0.#");
 				else if (assemblerCount != 0)

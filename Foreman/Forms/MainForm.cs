@@ -223,6 +223,7 @@ namespace Foreman
 			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
 			options.ShowErrorArrows = GraphViewer.ArrowRenderer.ShowErrorArrows;
 
+			options.RoundAssemblerCount = Properties.Settings.Default.RoundAssemblerCount;
 			options.AbbreviateSciPacks = Properties.Settings.Default.AbbreviateSciPacks;
 			options.DEV_ShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
 			options.DEV_UseRecipeBWFilters = Properties.Settings.Default.UseRecipeBWfilters;
@@ -278,6 +279,7 @@ namespace Foreman
 					GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
 					Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;
 
+					Properties.Settings.Default.RoundAssemblerCount = options.RoundAssemblerCount;
 					Properties.Settings.Default.AbbreviateSciPacks = options.AbbreviateSciPacks;
 
 					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
