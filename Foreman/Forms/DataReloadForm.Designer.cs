@@ -35,24 +35,28 @@
             // 
             this.progressBar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.progressBar.Location = new System.Drawing.Point(0, 0);
-            this.progressBar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.progressBar.Margin = new System.Windows.Forms.Padding(4);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(482, 28);
+            this.progressBar.Size = new System.Drawing.Size(482, 43);
             this.progressBar.TabIndex = 0;
             // 
-            // DataReloadForm
+            // DataLoadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(482, 28);
+            this.ClientSize = new System.Drawing.Size(482, 43);
             this.ControlBox = false;
             this.Controls.Add(this.progressBar);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
-            this.Name = "DataReloadForm";
+            this.MaximumSize = new System.Drawing.Size(500, 90);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(500, 90);
+            this.Name = "DataLoadForm";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.Text = "Loading Factorio Data...";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ProgressForm_FormClosing);
             this.Load += new System.EventHandler(this.ProgressForm_Load);
             this.ResumeLayout(false);
 

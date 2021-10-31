@@ -16,13 +16,16 @@ namespace Foreman
 	public partial class ImportPresetForm : Form
 	{
 		private char[] ExtraChars = { '(', ')', '-', '_', '.', ' ' };
+		private CancellationTokenSource cts;
 
 		public string NewPresetName { get; private set; }
-
+		public bool ImportStarted { get; private set; }
 
 		public ImportPresetForm()
 		{
 			NewPresetName = "";
+			ImportStarted = false;
+			cts = new CancellationTokenSource();
 			InitializeComponent();
 
 			//check default folders for a factorio installation (to fill in the path as the 'default')
@@ -68,7 +71,7 @@ namespace Foreman
 			FactorioSettingsGroup.Enabled = !enabled;
 			PresetNameGroup.Enabled = !enabled;
 			OKButton.Enabled = !enabled;
-			CancelImportButton.Enabled = !enabled;
+			//CancelImportButton.Enabled = !enabled;
 			ImportProgressBar.Visible = enabled;
 		}
 
@@ -93,6 +96,7 @@ namespace Foreman
 
 		private void CancelButton_Click(object sender, EventArgs e)
 		{
+			cts.Cancel();
 			DialogResult = DialogResult.Cancel;
 			NewPresetName = "";
 			Close();
@@ -160,8 +164,17 @@ namespace Foreman
 				if (!String.IsNullOrEmpty(value.Value) && value.Value != ImportProgressBar.CustomText)
 					ImportProgressBar.CustomText = value.Value;
 			}) as IProgress<KeyValuePair<int, string>>;
+			var token = cts.Token;
 
-			NewPresetName = await ProcessPreset(installPath, userDataPath, progress);
+#if DEBUG
+			Stopwatch stopwatch = new Stopwatch();
+#endif
+			ImportStarted = true;
+			NewPresetName = await ProcessPreset(installPath, userDataPath, progress, token);
+#if DEBUG
+			Console.WriteLine(string.Format("Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0")));
+			ErrorLogging.LogLine(string.Format("Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0")));
+#endif
 
 			if (!string.IsNullOrEmpty(NewPresetName))
 			{
@@ -257,7 +270,7 @@ namespace Foreman
 			return installPath; //something weird must have happened to end up here. Honesty these path conversions are a bit of a mess - not enough examples to be sure its correct (works with all case 'I' have...)
 		}
 
-		private async Task<string> ProcessPreset(string installPath, string userDataPath, IProgress<KeyValuePair<int, string>> progress)
+		private async Task<string> ProcessPreset(string installPath, string userDataPath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token)
         {
 			return await Task.Run(() =>
 			{
@@ -320,6 +333,12 @@ namespace Foreman
 				while (!process.HasExited)
 				{
 					resultString += process.StandardOutput.ReadToEnd();
+					if(token.IsCancellationRequested)
+                    {
+						process.Close();
+						CleanupFailedImport(modsPath);
+						return "";
+                    }
 					Thread.Sleep(100);
 				}
 
@@ -337,6 +356,12 @@ namespace Foreman
 				while (!process.HasExited)
 				{
 					resultString += process.StandardOutput.ReadToEnd();
+					if (token.IsCancellationRequested)
+					{
+						process.Close();
+						CleanupFailedImport(modsPath);
+						return "";
+					}
 					Thread.Sleep(100);
 				}
 
@@ -404,6 +429,12 @@ namespace Foreman
 				File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconJObject.ToString(Formatting.Indented));
 				File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataJObject.ToString(Formatting.Indented));
 #endif
+				if (token.IsCancellationRequested)
+				{
+					process.Close();
+					CleanupFailedImport(modsPath);
+					return "";
+				}
 
 				//now we need to process icons. This is done by the IconProcessor.
 				Dictionary<string, string> modSet = new Dictionary<string, string>();
@@ -412,22 +443,33 @@ namespace Foreman
 
 				using (IconCacheProcessor icProcessor = new IconCacheProcessor())
 				{
-					if (!icProcessor.PrepareModPaths(modSet, modsPath, Path.Combine(installPath, "data")))
+					if (!icProcessor.PrepareModPaths(modSet, modsPath, Path.Combine(installPath, "data"), token))
 					{
-						MessageBox.Show("Mod inconsistency detected. Try to see if launching Factorio gives an error?");
-						ErrorLogging.LogLine("Mod parsing failed - the list of mods provided could not be mapped to the existing mod folders & zip files.");
+						if (!token.IsCancellationRequested)
+						{
+							MessageBox.Show("Mod inconsistency detected. Try to see if launching Factorio gives an error?");
+							ErrorLogging.LogLine("Mod parsing failed - the list of mods provided could not be mapped to the existing mod folders & zip files.");
+						}
 						CleanupFailedImport(modsPath, presetPath);
 						return "";
 					}
 
-					if (!icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, 20, 100))
+					if (!icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, token, 20, 100))
 					{
-						ErrorLogging.LogLine(string.Format("{0}/{1} images were not found while processing icons.", icProcessor.FailedPathCount, icProcessor.TotalPathCount));
-						if (MessageBox.Show(string.Format("{0}/{1} images that were processed for icons were not found and thus some icons are likely wrong/empty. Do you still wish to continue with the preset import?", icProcessor.FailedPathCount, icProcessor.TotalPathCount), "Confirm Preset Import", MessageBoxButtons.YesNo) != DialogResult.Yes)
+						if (!token.IsCancellationRequested)
 						{
+							ErrorLogging.LogLine(string.Format("{0}/{1} images were not found while processing icons.", icProcessor.FailedPathCount, icProcessor.TotalPathCount));
+							if (MessageBox.Show(string.Format("{0}/{1} images that were processed for icons were not found and thus some icons are likely wrong/empty. Do you still wish to continue with the preset import?", icProcessor.FailedPathCount, icProcessor.TotalPathCount), "Confirm Preset Import", MessageBoxButtons.YesNo) != DialogResult.Yes)
+							{
+								CleanupFailedImport(modsPath, presetPath);
+								return "";
+							}
+						}
+						else
+                        {
 							CleanupFailedImport(modsPath, presetPath);
 							return "";
-						}
+                        }
 					}
 				}
 

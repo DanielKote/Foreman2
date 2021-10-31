@@ -68,7 +68,7 @@ namespace Foreman
             bitmapCache = new Dictionary<string, Bitmap>();
         }
 
-        public bool PrepareModPaths(Dictionary<string, string> modSet, string modsPath, string dataPath)
+        public bool PrepareModPaths(Dictionary<string, string> modSet, string modsPath, string dataPath, CancellationToken token)
         {
             folderLinks.Clear();
             archiveFileLinks.Clear();
@@ -79,6 +79,9 @@ namespace Foreman
             //if zip, then the actual files can either be in the root of zip, or in <name> foler, or in <name>_<version> folder
             foreach(KeyValuePair<string, string> mod in modSet)
             {
+                if (token.IsCancellationRequested)
+                    return false;
+
                 if (Directory.Exists(Path.Combine(modsPath, mod.Key + "_" + mod.Value)))
                     folderLinks.Add("__" + mod.Key.ToLower() + "__", Path.Combine(modsPath, mod.Key + "_" + mod.Value));
                 else if (Directory.Exists(Path.Combine(modsPath, mod.Key)))
@@ -111,7 +114,7 @@ namespace Foreman
             return success;
         }
 
-        public bool CreateIconCache(JObject iconJObject, string cachePath, IProgress<KeyValuePair<int, string>> progress, int startingPercent, int endingPercent)
+        public bool CreateIconCache(JObject iconJObject, string cachePath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token, int startingPercent, int endingPercent)
         {
             TotalPathCount = 0;
             FailedPathCount = 0;
@@ -130,26 +133,31 @@ namespace Foreman
             int counter = 0;
             foreach (var iconJToken in iconJObject["technologies"].ToList())
             {
+                if (token.IsCancellationRequested) return false;
                 progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 256);
             }
             foreach (var iconJToken in iconJObject["recipes"].ToList())
             {
+                if (token.IsCancellationRequested) return false;
                 progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 32);
             }
             foreach (var iconJToken in iconJObject["items"].ToList())
             {
+                if (token.IsCancellationRequested) return false;
                 progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 32);
             }
             foreach (var iconJToken in iconJObject["fluids"].ToList())
             {
+                if (token.IsCancellationRequested) return false;
                 progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 32);
             }
             foreach (var iconJToken in iconJObject["groups"].ToList())
             {
+                if (token.IsCancellationRequested) return false;
                 progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 64);
             }

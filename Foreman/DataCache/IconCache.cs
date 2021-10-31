@@ -66,7 +66,7 @@ namespace Foreman
             }
         }
 
-        public static async Task<Dictionary<string, IconColorPair>> LoadIconCache(string path, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
+        public static async Task<Dictionary<string, IconColorPair>> LoadIconCache(string path, IProgress<KeyValuePair<int, string>> progress, int startingPercent, int endingPercent)
         {
             Dictionary<string, IconColorPair> iconCache = new Dictionary<string, IconColorPair>();
             await Task.Run(() =>

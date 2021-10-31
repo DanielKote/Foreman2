@@ -319,13 +319,15 @@ namespace Foreman
             using (ImportPresetForm form = new ImportPresetForm())
             {
                 form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 150;
-                form.Top = this.Top + 100;
+                form.Left = this.Left + 50;
+                form.Top = this.Top + 50;
                 DialogResult result = form.ShowDialog();
+
+                if(form.ImportStarted)
+                    GC.Collect(); //we just processed a new preset (either fully or cancelled) - this required the opening of (potentially) alot of zip files and processing of a ton of bitmaps that are now stuck in garbate. In large mod packs like A&B this could clear out 2GB+ of memory.
 
                 if(result == DialogResult.OK && !string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
                 {
-                    GC.Collect(); //we just added a new preset - this required the opening of (potentially) alot of zip files and processing of a ton of bitmaps that are now stuck in garbate. In large mod packs like A&B this could clear out 2GB+ of memory.
                     Preset newPreset = new Preset(form.NewPresetName, false, false);
                     CurrentOptions.Presets.Add(newPreset);
                     PresetListBox.Items.Add(newPreset);
@@ -341,7 +343,19 @@ namespace Foreman
 
         private void ComparePresetsButton_Click(object sender, EventArgs e)
         {
+            if(CurrentOptions.Presets.Count < 2)
+            {
+                MessageBox.Show("Can not compare presets!\n...you only have 1 preset :/");
+                return;
+            }
 
+            using(PresetComparatorForm form = new PresetComparatorForm())
+            {
+                form.StartPosition = FormStartPosition.Manual;
+                form.Left = this.Left + 50;
+                form.Top = this.Top + 50;
+                form.ShowDialog();
+            }
         }
     }
 }

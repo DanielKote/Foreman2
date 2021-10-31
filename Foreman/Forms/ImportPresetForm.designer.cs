@@ -69,7 +69,7 @@
             this.OKButton.Location = new System.Drawing.Point(12, 241);
             this.OKButton.Margin = new System.Windows.Forms.Padding(4);
             this.OKButton.Name = "OKButton";
-            this.OKButton.Size = new System.Drawing.Size(413, 32);
+            this.OKButton.Size = new System.Drawing.Size(470, 32);
             this.OKButton.TabIndex = 2;
             this.OKButton.Text = "Import";
             this.OKButton.UseVisualStyleBackColor = true;
@@ -195,10 +195,10 @@
             // CancelImportButton
             // 
             this.CancelImportButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelImportButton.Location = new System.Drawing.Point(435, 241);
+            this.CancelImportButton.Location = new System.Drawing.Point(490, 241);
             this.CancelImportButton.Margin = new System.Windows.Forms.Padding(4);
             this.CancelImportButton.Name = "CancelImportButton";
-            this.CancelImportButton.Size = new System.Drawing.Size(177, 32);
+            this.CancelImportButton.Size = new System.Drawing.Size(122, 32);
             this.CancelImportButton.TabIndex = 6;
             this.CancelImportButton.Text = "Cancel";
             this.CancelImportButton.UseVisualStyleBackColor = true;
@@ -240,7 +240,7 @@
             this.ImportProgressBar.CustomText = null;
             this.ImportProgressBar.Location = new System.Drawing.Point(13, 241);
             this.ImportProgressBar.Name = "ImportProgressBar";
-            this.ImportProgressBar.Size = new System.Drawing.Size(599, 32);
+            this.ImportProgressBar.Size = new System.Drawing.Size(470, 32);
             this.ImportProgressBar.TabIndex = 5;
             this.ImportProgressBar.Visible = false;
             // 

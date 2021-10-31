@@ -30,6 +30,9 @@ namespace Foreman
 			{
 				using (DataLoadForm form = new DataLoadForm(validPresets[0]))
 				{
+					form.StartPosition = FormStartPosition.Manual;
+					form.Left = this.Left + 150;
+					form.Top = this.Top + 100;
 					form.ShowDialog(); //LOAD FACTORIO DATA
 					GraphViewer.Graph = new ProductionGraph(form.GetDataCache());
 					//gc collection is unnecessary - first data cache to be created.
@@ -182,8 +185,8 @@ namespace Foreman
 				using (SettingsForm form = new SettingsForm(oldOptions))
 				{
 					form.StartPosition = FormStartPosition.Manual;
-					form.Left = this.Left + 150;
-					form.Top = this.Top + 100;
+					form.Left = this.Left + 50;
+					form.Top = this.Top + 50;
 					form.ShowDialog();
 					reload = (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset); //if we changed the preset, then load up another settings form after processing
 
@@ -214,9 +217,9 @@ namespace Foreman
 		{
 			ImageExportForm form = new ImageExportForm(GraphViewer);
 			form.StartPosition = FormStartPosition.Manual;
-			form.Left = this.Left + 150;
-			form.Top = this.Top + 100;
-			form.Show();
+			form.Left = this.Left + 50;
+			form.Top = this.Top + 50;
+			form.ShowDialog();
 		}
 
 		private void AddRecipeButton_Click(object sender, EventArgs e)

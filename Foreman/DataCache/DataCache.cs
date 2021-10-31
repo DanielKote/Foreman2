@@ -13,8 +13,15 @@ namespace Foreman
 {
     public class PresetErrorPackage : IComparable<PresetErrorPackage>
     {
+        public Preset Preset;
+
+        public List<string> RequiredMods;
+        public List<string> RequiredItems;
+        public List<string> RequiredRecipes;
+
         public List<string> MissingRecipes;
         public List<string> IncorrectRecipes;
+        public List<string> ValidMissingRecipes; //any recipes that were missing previously but have been found to fit in this current preset
         public List<string> MissingItems;
         public List<string> MissingMods;
         public List<string> AddedMods;
@@ -23,10 +30,16 @@ namespace Foreman
         public int ErrorCount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count + MissingMods.Count + AddedMods.Count + WrongVersionMods.Count; } }
         public int MICount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count; } }
 
-        public PresetErrorPackage()
+        public PresetErrorPackage(Preset preset)
         {
+            Preset = preset;
+            RequiredMods = new List<string>();
+            RequiredItems = new List<string>();
+            RequiredRecipes = new List<string>();
+
             MissingRecipes = new List<string>();
             IncorrectRecipes = new List<string>();
+            ValidMissingRecipes = new List<string>();
             MissingItems = new List<string>();
             MissingMods = new List<string>(); // in mod-name|version format
             AddedMods = new List<string>(); //in mod-name|version format
@@ -114,12 +127,12 @@ namespace Foreman
             resourceCategories = new Dictionary<string, List<ResourcePrototype>>();
         }
 
-        public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
+        public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress)
         {
             Clear();
 
             JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
-            Dictionary<string, IconColorPair> iconCache = await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, ctoken, 0, 90);
+            Dictionary<string, IconColorPair> iconCache = await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, 0, 90);
             PresetName = preset.Name;
 
             await Task.Run(() =>
@@ -292,9 +305,11 @@ namespace Foreman
             }
 
             //compare to provided mod/item/recipe sets (recipes have a chance of existing in multitudes - aka: missing recipes)
-            PresetErrorPackage errors = new PresetErrorPackage();
+            PresetErrorPackage errors = new PresetErrorPackage(preset);
             foreach(var mod in modList)
             {
+                errors.RequiredMods.Add(mod.Key + "|" + mod.Value);
+
                 if (!presetMods.ContainsKey(mod.Key))
                     errors.MissingMods.Add(mod.Key + "|" + mod.Value);
                 else if (presetMods[mod.Key] != mod.Value)
@@ -305,18 +320,30 @@ namespace Foreman
                     errors.AddedMods.Add(mod.Key + "|" + mod.Value);
 
             foreach (string itemName in itemList)
+            {
+                errors.RequiredItems.Add(itemName);
+
                 if (!presetItems.Contains(itemName))
                     errors.MissingItems.Add(itemName);
+            }
 
             foreach (RecipeShort recipeS in recipeShorts)
             {
+                errors.RequiredRecipes.Add(recipeS.Name);
                 if (recipeS.isMissing)
-                    continue;
-
-                if (!presetRecipes.ContainsKey(recipeS.Name))
-                    errors.MissingRecipes.Add(recipeS.Name);
-                else if (!recipeS.Equals(presetRecipes[recipeS.Name]))
-                    errors.IncorrectRecipes.Add(recipeS.Name);
+                {
+                    if (presetRecipes.ContainsKey(recipeS.Name) && recipeS.Equals(presetRecipes[recipeS.Name]))
+                        errors.ValidMissingRecipes.Add(recipeS.Name);
+                    else
+                        errors.IncorrectRecipes.Add(recipeS.Name);
+                }
+                else
+                {
+                    if (!presetRecipes.ContainsKey(recipeS.Name))
+                        errors.MissingRecipes.Add(recipeS.Name);
+                    else if (!recipeS.Equals(presetRecipes[recipeS.Name]))
+                        errors.IncorrectRecipes.Add(recipeS.Name);
+                }
             }
 
             return errors;
@@ -709,8 +736,9 @@ namespace Foreman
 
             //step 2: delete any recipes with no unlocks (those that had no unlocks in the beginning - those that were part of the removed tech were also removed)
             //step 2.1: also delete any recipes with no viable assembler
+            //step 2.2: and the recipes with no ingredients and products (... industrial revolution, what are those aetheric glow recipes????)
             foreach (RecipePrototype recipe in recipes.Values.ToList())
-                if (recipe.myUnlockTechnologies.Count == 0 || recipe.validAssemblers.Count == 0)
+                if (recipe.myUnlockTechnologies.Count == 0 || recipe.validAssemblers.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0))
                     DeleteRecipe(recipe);
 
             //step 3: try and delete all items (can only delete if item isnt produced/consumed by any recipe, and isnt part of assemblers, miners, modules (that exist in this cache)

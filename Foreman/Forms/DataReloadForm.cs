@@ -9,7 +9,6 @@ namespace Foreman
 {
     public partial class DataLoadForm : Form
     {
-        private CancellationTokenSource cts;
         private int currentPercent;
         private string currentText;
 
@@ -20,7 +19,6 @@ namespace Foreman
         {
             currentPercent = 0;
             currentText = "";
-            cts = new CancellationTokenSource();
 
             selectedPreset = preset;
 
@@ -46,20 +44,10 @@ namespace Foreman
                     Text = "Preparing Foreman: " + value.Value;
                 }
             }) as IProgress<KeyValuePair<int, string>>;
-            var token = cts.Token;
 
             createdDataCache = new DataCache();
-            await createdDataCache.LoadAllData(selectedPreset, progress, token);
-
-            if (token.IsCancellationRequested)
-            {
-                createdDataCache.Clear();
-                DialogResult = DialogResult.Cancel;
-            }
-            else
-            {
-                DialogResult = DialogResult.OK;
-            }
+            await createdDataCache.LoadAllData(selectedPreset, progress);
+            DialogResult = DialogResult.OK;
 			Close();
 
 #if DEBUG
@@ -72,13 +60,6 @@ namespace Foreman
         public DataCache GetDataCache()
         {
             return createdDataCache;
-        }
-
-        // This event currently won't occur, since we hid the window controls for the dialog.
-        // Other parts of the system (at least, save/load) don't handle cancellation well and can raise errors.
-        private void ProgressForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            cts.Cancel();
         }
     }
 }

@@ -133,6 +133,9 @@
     <Compile Include="Controls\RecipeToolTip.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\SyncListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DataCache\IconCache.cs" />
     <Compile Include="DataTypes\Assembler.cs" />
     <Compile Include="DataTypes\DataObjectBase.cs" />
@@ -144,6 +147,12 @@
     </Compile>
     <Compile Include="Forms\ImportPresetForm.designer.cs">
       <DependentUpon>ImportPresetForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PresetComparatorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PresetComparatorForm.Designer.cs">
+      <DependentUpon>PresetComparatorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\PresetSelectionForm.cs">
       <SubType>Form</SubType>
@@ -220,6 +229,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportPresetForm.resx">
       <DependentUpon>ImportPresetForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PresetComparatorForm.resx">
+      <DependentUpon>PresetComparatorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PresetSelectionForm.resx">
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>

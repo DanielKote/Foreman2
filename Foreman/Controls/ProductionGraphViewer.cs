@@ -946,6 +946,8 @@ namespace Foreman
 			info.AddValue("SavedPresetName", Graph.DCache.PresetName);
 			info.AddValue("AmountType", Graph.SelectedAmountType);
 			info.AddValue("Unit", Graph.SelectedUnit);
+			info.AddValue("ViewOffset", ViewOffset);
+			info.AddValue("ViewScale", ViewScale);
 
 			info.AddValue("IncludedMods", Graph.DCache.IncludedMods.Select(m => m.Key + "|"+m.Value));
 			info.AddValue("IncludedItems", includedItems);
@@ -991,7 +993,7 @@ namespace Foreman
 			// the preset list will then be checked for compatibility based on recipes, and the one with least errors will be used.
 			// any errors will prompt a message box saying that 'incompatibility was found, but proceeding anyways'.
 			List<Preset> allPresets = MainForm.GetValidPresetsList();
-			Dictionary<Preset, PresetErrorPackage> presetErrors = new Dictionary<Preset, PresetErrorPackage>();
+			List<PresetErrorPackage> presetErrors = new List<PresetErrorPackage>();
 			Preset chosenPreset = null;
 			if (useFirstPreset)
 				chosenPreset = allPresets[0];
@@ -1007,7 +1009,7 @@ namespace Foreman
 					else
 					{
 						//errors found. even though the name fits, but the preset seems to be the wrong one. Proceed with searching for best-fit
-						presetErrors.Add(savedWPreset, errors);
+						presetErrors.Add(errors);
 						allPresets.Remove(savedWPreset);
 					}
 				}
@@ -1019,19 +1021,21 @@ namespace Foreman
 					{
 						PresetErrorPackage errors = DataCache.TestPreset(preset, modSet, itemNames, recipeShorts);
 						if (errors != null)
-							presetErrors.Add(preset, errors);
+							presetErrors.Add(errors);
 					}
 
 					//show the menu to select the preferred preset
 					using (PresetSelectionForm form = new PresetSelectionForm(presetErrors))
 					{
 						form.StartPosition = FormStartPosition.Manual;
-						form.Left = ParentForm.Left + 150;
-						form.Top = ParentForm.Top + 100;
+						form.Left = ParentForm.Left + 50;
+						form.Top = ParentForm.Top + 50;
 
 						if (form.ShowDialog() != DialogResult.OK || form.ChosenPreset == null) //null check is not necessary - if we get an ok dialogresult, we know it will be set
 							return;
 						chosenPreset = form.ChosenPreset;
+						Properties.Settings.Default.CurrentPresetName = chosenPreset.Name;
+						Properties.Settings.Default.Save();
 					}
 				}
 				else if(chosenPreset.Name != Properties.Settings.Default.CurrentPresetName) //we had to switch the preset to a new one (without the user having to select a preset from a list)
@@ -1045,6 +1049,9 @@ namespace Foreman
 			//load new preset
 			using (DataLoadForm form = new DataLoadForm(chosenPreset))
 			{
+				form.StartPosition = FormStartPosition.Manual;
+				form.Left = this.Left + 150;
+				form.Top = this.Top + 100;
 				form.ShowDialog(); //LOAD FACTORIO DATA
 				Graph = new ProductionGraph(form.GetDataCache());
 				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size)
@@ -1053,6 +1060,9 @@ namespace Foreman
 			//set up graph options
 			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
 			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
+			string[] viewOffsetString = ((string)json["ViewOffset"]).Split(',');
+			ViewOffset = new Point(int.Parse(viewOffsetString[0]), int.Parse(viewOffsetString[1]));
+			ViewScale = (float)json["ViewScale"];
 
 			if (!enableEverything)
 			{
