@@ -10,11 +10,12 @@ namespace Foreman
 	{
 		public ProductionNode BaseNode { get; private set; }
 		public ProductionGraphViewer GraphViewer { get; private set; }
+		private DataCache DCache { get { return GraphViewer.DCache; } }
 
-		private static Assembler BestAssembler = new Assembler("best\n") { FriendlyName = "Best" };
-		private static Module NoneModule = new Module("none\n", 0, 0, new HashSet<string>()) { FriendlyName = "None" };
-		private static Module BestModule = new Module("best\n", 0, 0, new HashSet<string>()) { FriendlyName = "Max Speed" };
-		private static Module ProdModule = new Module("productive\n", 0, 0, new HashSet<string>()) { FriendlyName = "Max Productivity" };
+		private static Assembler BestAssembler = new Assembler(null, "best\n", "Best");
+		private static Module NoneModule = new Module(null, "none\n", "None", 0, 0);
+		private static Module BestModule = new Module(null, "best\n", "Max Speed", 0, 0);
+		private static Module ProdModule = new Module(null, "productive\n", "Max Productivity", 0, 0);
 
 		public RateOptionsPanel(ProductionNode baseNode, ProductionGraphViewer graphViewer)
 		{
@@ -69,12 +70,8 @@ namespace Foreman
 				Recipe recipe = rNode.BaseRecipe;
 
 				//Set up the assembler selection list
-				var allowedAssemblers = DataCache.Assemblers.Values
-					.Where(a => a.Enabled)
-					.Where(a => a.Categories.Contains(recipe.Category));
-
 				AssemblerSelectionBox.Items.Add(BestAssembler);
-				foreach (Assembler assembler in allowedAssemblers.OrderBy(a => a.FriendlyName))
+				foreach (Assembler assembler in recipe.ValidAssemblers.Where(a => a.Enabled).OrderBy(a => a.FriendlyName))
 					AssemblerSelectionBox.Items.Add(assembler);
 
 				if (rNode.Assembler == null)
@@ -83,17 +80,13 @@ namespace Foreman
 					AssemblerSelectionBox.SelectedItem = rNode.Assembler;
 
 				//Set up the module selection list
-				var allowedModules = DataCache.Modules.Values
-					.Where(a => a.Enabled)
-					.Where(a => a.AllowedIn(recipe));
-
 				ModuleSelectionBox.Items.Add(NoneModule);
 				ModuleSelectionBox.Items.Add(BestModule);
 				ModuleSelectionBox.Items.Add(ProdModule);
-				foreach (Module module in allowedModules.OrderBy(a => a.FriendlyName))
+				foreach (Module module in recipe.ValidModules.Where(m => m.Enabled).OrderBy(a => a.FriendlyName))
 					ModuleSelectionBox.Items.Add(module);
-				if (DataCache.Modules.ContainsKey(rNode.NodeModules.Name))
-					ModuleSelectionBox.SelectedItem = DataCache.Modules[rNode.NodeModules.Name];
+				if (DCache.Modules.ContainsKey(rNode.NodeModules.Name))
+					ModuleSelectionBox.SelectedItem = DCache.Modules[rNode.NodeModules.Name];
 				else if (rNode.NodeModules == ModuleSelector.Fastest)
 					ModuleSelectionBox.SelectedIndex = 1;
 				else if (rNode.NodeModules == ModuleSelector.Productive)
@@ -206,11 +199,11 @@ namespace Foreman
 			if (BaseNode is RecipeNode rNode) //should be obvious
 			{
 				ModuleSelector updatedMSelector;
-				if (ModuleSelectionBox.SelectedItem == NoneModule)
+				if ((Module)ModuleSelectionBox.SelectedItem == NoneModule)
 					updatedMSelector = ModuleSelector.None;
-				else if (ModuleSelectionBox.SelectedItem == BestModule)
+				else if ((Module)ModuleSelectionBox.SelectedItem == BestModule)
 					updatedMSelector = ModuleSelector.Fastest;
-				else if (ModuleSelectionBox.SelectedItem == ProdModule)
+				else if ((Module)ModuleSelectionBox.SelectedItem == ProdModule)
 					updatedMSelector = ModuleSelector.Productive;
 				else
 					updatedMSelector = ModuleSelector.Specific((Module)ModuleSelectionBox.SelectedItem);

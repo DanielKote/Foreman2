@@ -37,7 +37,7 @@ local TranslationCounter = 0
 local FailedIcons = {}
 
 local function FlushFileBuffer()
-	game.write_file('ForemanFactorioSetup.txt', FileBuffer, true)
+	game.write_file('ForemanFactorioSetup.json', FileBuffer, true)
 	game.remove_path('ForemanFactorioIconData.dat') --this deletes any existing icon cache when the setup file updates.
 	FileBuffer = ''
 end
@@ -471,18 +471,28 @@ end
 
 local function ExportModList()
 	ExportLine('"mods": [', 1)
-	ExportLine('"core",', 2)
+	
+	ExportLine('{', 2)
+	ExportParameter('name', 'core', false, ',', 3)
+	ExportParameter('version', '1.1', false, '', 3)
+	ExportLine('},', 2)
+	
 	counter = 0
 	for _, _ in pairs(game.active_mods) do
 		counter = counter + 1
 	end
 	
-	for name, _ in pairs(game.active_mods) do
+	for name, version in pairs(game.active_mods) do
+		ExportLine('{', 2)
+	
+		ExportParameter('name', name, false, ',', 3)
+		ExportParameter('version', version, false, '', 3)
+	
 		counter = counter - 1
 		if counter > 0 then
-			ExportLine('"'..name..'",', 2)
+			ExportLine('},', 2)
 		else
-			ExportLine('"'..name..'"', 2)
+			ExportLine('}', 2)
 		end
 	end
 	ExportLine('],', 1)
@@ -1175,7 +1185,7 @@ end
 script.on_event(defines.events.on_player_joined_game,
 	function(e)
 		--this is called when the game first starts (single player at least)
-		game.write_file('ForemanFactorioSetup.txt', '', false)
+		game.write_file('ForemanFactorioSetup.json', '', false)
 		player = game.players[e.player_index]
 		
 		ProcessPrototypes()

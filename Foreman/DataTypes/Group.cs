@@ -7,7 +7,7 @@ namespace Foreman
     {
         public List<Subgroup> Subgroups { get; private set; }
 
-        public Group(string name, string lname, string order) : base(name, lname, order)
+        public Group(DataCache dCache, string name, string lname, string order) : base(dCache, name, lname, order)
         {
             Subgroups = new List<Subgroup>();
         }
@@ -18,17 +18,21 @@ namespace Foreman
 
     public class Subgroup : DataObjectBase
     {
-        public Group MyGroup { get; protected set; }
+        public Group MyGroup { get; private set; }
 
         public List<Recipe> Recipes { get; private set; }
         public List<Item> Items { get; private set; }
 
-        public Subgroup(string name, Group myGroup, string order) : base(name, name, order)
+        public Subgroup(DataCache dCache, string name, string order) : base(dCache, name, name, order)
+        {
+            Recipes = new List<Recipe>();
+            Items = new List<Item>();
+        }
+
+        internal void SetGroup(Group myGroup)
         {
             MyGroup = myGroup;
             MyGroup.Subgroups.Add(this);
-            Recipes = new List<Recipe>();
-            Items = new List<Item>();
         }
 
         public void SortIRs() { Recipes.Sort(); Items.Sort(); } //sort them by their order string

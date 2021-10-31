@@ -9,7 +9,7 @@ namespace ForemanTest
     // A fluid interface for building up production graphs for testing. See references for usage.
     public class GraphBuilder
     {
-        public static Subgroup TestSubgroup = new Subgroup("", new Group("", "", ""), "");
+        public static Subgroup TestSubgroup = new Subgroup(null, "", "");
 
 
         private static int counter = 0;
@@ -74,7 +74,8 @@ namespace ForemanTest
 
         internal BuiltData Build()
         {
-            var graph = new ProductionGraph();
+            DataCache dCache = new DataCache();
+            var graph = new ProductionGraph(dCache);
 
             foreach (var node in this.nodes)
             {
@@ -127,7 +128,7 @@ namespace ForemanTest
 
             internal override void Build(ProductionGraph graph)
             {
-                Built = this.createFunction(new Item(itemName, "", false, TestSubgroup, ""), graph);
+                Built = this.createFunction(new Item(graph.DCache, itemName, "", false, TestSubgroup, ""), graph);
 
                 if (target > 0)
                 {
@@ -162,12 +163,12 @@ namespace ForemanTest
                 if (name == null)
                     name = "recipe-" + GetSequence();
 
-                Recipe recipe = new Recipe(name, "", TestSubgroup, "");
+                Recipe recipe = new Recipe(graph.DCache, name, "", TestSubgroup, "");
                 recipe.Time = duration;
                 foreach (KeyValuePair<string, float> kvp in inputs)
-                    recipe.AddIngredient(DataCache.Items[kvp.Key], kvp.Value);
+                    recipe.AddIngredient(graph.DCache.Items[kvp.Key], kvp.Value);
                 foreach (KeyValuePair<string, float> kvp in outputs)
-                    recipe.AddProduct(DataCache.Items[kvp.Key], kvp.Value);
+                    recipe.AddProduct(graph.DCache.Items[kvp.Key], kvp.Value);
 
                 Built = RecipeNode.Create(recipe, graph);
                 this.Built.ProductivityBonus = efficiency;
@@ -228,7 +229,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Suppliers(string itemName)
             {
-                return Graph.GetSuppliers(new Item(itemName, "", false, TestSubgroup, ""));
+                return Graph.GetSuppliers(new Item(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }
 
             public float ConsumedRate(string itemName)
@@ -238,7 +239,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Consumers(string itemName)
             {
-                return Graph.GetConsumers(new Item(itemName, "", false, TestSubgroup, ""));
+                return Graph.GetConsumers(new Item(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }
 
             public float RecipeRate(string name)
@@ -255,7 +256,7 @@ namespace ForemanTest
                    .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
                    .Select(x => (RecipeNode)x)
                    .First()
-                   .GetSuppliedRate(new Item(itemName, "", false, TestSubgroup, ""));
+                   .GetSuppliedRate(new Item(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }
         }
     }

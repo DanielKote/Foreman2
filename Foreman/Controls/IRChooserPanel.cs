@@ -36,7 +36,9 @@ namespace Foreman
 
         public IRChooserPanel(ProductionGraphViewer parent, Point originPoint)
         {
+            PGViewer = parent;
             this.DoubleBuffered = true;
+
             InitializeComponent();
             IRFlowPanel.Height = IRPanelRows * 35 + 12;
 
@@ -56,7 +58,6 @@ namespace Foreman
 
             InitializeButtons();
 
-            PGViewer = parent;
             parent.Controls.Add(this);
             this.Location = originPoint;
             this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -73,7 +74,7 @@ namespace Foreman
         private void InitializeButtons()
         {
             //initialize the group buttons
-            SortedGroups = DataCache.Groups.Values.ToList();
+            SortedGroups = PGViewer.DCache.Groups.Values.ToList();
             SortedGroups.Sort();
             foreach(Group group in SortedGroups)
             {

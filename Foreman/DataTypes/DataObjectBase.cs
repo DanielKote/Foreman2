@@ -6,56 +6,20 @@ namespace Foreman
 {
     public abstract class DataObjectBase : IComparable<DataObjectBase>
     {
-		protected string[] localeCategories;
+		protected DataCache myCache { get; private set; }
+
         public string Name { get; private set; }
-        public string LName { get; set; }
 		public string Order { get; private set; }
 
-		private string friendlyName;
-		private string lfriendlyName; //lower case
-		public virtual string LFriendlyName { get { if (string.IsNullOrEmpty(lfriendlyName)) lfriendlyName = FriendlyName.ToLower(); return lfriendlyName; } }
-		public virtual string FriendlyName
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(friendlyName))
-				{
-					if (!String.IsNullOrEmpty(LName))
-						friendlyName = LName;
-					else if (localeCategories != null)
-					{
-						string calcName = "";
+		public virtual string LFriendlyName { get; private set; }
+		public virtual string FriendlyName { get; private set; }
 
-						foreach (string category in localeCategories)
-						{
-							if (category == "recipe-name")
-								Console.WriteLine("!");
-							string[] SplitName = Name.Split('\n'); //internally we use '\n' to add futher to the original name (as in the case with different temperature fluids)
-							if (FactorioModsProcessor.LocaleFiles.ContainsKey(category) && FactorioModsProcessor.LocaleFiles[category].ContainsKey(SplitName[0]))
-							{
-								if (FactorioModsProcessor.LocaleFiles[category][SplitName[0]].Contains("__"))
-									calcName = Regex.Replace(FactorioModsProcessor.LocaleFiles[category][SplitName[0]], "__.+?__", "").Replace("_", "").Replace("-", " ");
-								else
-									calcName = FactorioModsProcessor.LocaleFiles[category][SplitName[0]];
-								if (SplitName.Length > 1)
-									calcName += " (" + SplitName + "*)";
-							}
-						}
-						if (calcName == "")
-							Console.WriteLine(Name);
-						friendlyName = calcName;
-					}
-					else
-						friendlyName = Name;
-				}
-				return friendlyName;
-			}
-		}
-
-		public DataObjectBase(string name, string lname, string order)
+		public DataObjectBase(DataCache dCache, string name, string friendlyName, string order)
         {
+			myCache = dCache;
 			Name = name;
-			LName = lname;
+			FriendlyName = friendlyName;
+			LFriendlyName = friendlyName.ToLower();
 
 			Order = order;
 			AverageColor = Color.Black;
@@ -78,10 +42,10 @@ namespace Foreman
 		}
 
         private static readonly Color DefaultAverageColor = Color.Black;
-        public Color AverageColor { get; private set; }
+        public virtual Color AverageColor { get; private set; }
 
         private Bitmap icon;
-        public Bitmap Icon
+        public virtual Bitmap Icon
 		{
 			get { if (icon == null) Icon = null; return icon; } 
 			set

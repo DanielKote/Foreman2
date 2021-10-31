@@ -1,43 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text.RegularExpressions;
 
 namespace Foreman
 {
-    public class Technology
+    public class Technology : DataObjectBase
     {
-        public String Name { get; private set; }
-        public string LName { get; set; }
-        public HashSet<Technology> Prerequisites { get; private set; }
-        public HashSet<Recipe> Recipes { get; private set; }
+        public IReadOnlyCollection<Technology> Prerequisites { get { return prerequisites; } }
+		public IReadOnlyCollection<Technology> PostTechs { get { return postTechs; } }
+        public IReadOnlyCollection<Recipe> UnlockedRecipes { get { return unlockedRecipes; } }
 
 		private bool enabled = false;
 		private bool locked = false;
 		public bool Enabled { get { return enabled; } set { enabled = value && !Locked; } }
 		public bool Locked { get { return locked; } set { locked = value; if (value) enabled = false; } } //cant be enabled if locked
 
-		private Bitmap icon;
-		public Bitmap Icon
-		{ 
-			get { if (icon == null) Icon = null; return icon; } 
-			set { icon = (value == null) ? DataCache.UnknownIcon : value; } 
+		private HashSet<Technology> prerequisites;
+		private HashSet<Technology> postTechs;
+		private HashSet<Recipe> unlockedRecipes;
+
+		public Technology(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName, "-")
+		{
+			prerequisites = new HashSet<Technology>();
+			postTechs = new HashSet<Technology>();
+			unlockedRecipes = new HashSet<Recipe>();
 		}
 
-		private Technology()
-		{
-			Name = "";
-		}
+		public void AddPrerequisite(Technology tech)
+        {
+			prerequisites.Add(tech);
+			tech.postTechs.Add(this);
+        }
 
-		public Technology(String name)
-		{
-			Name = name;
-			Prerequisites = new HashSet<Technology>();
-			Recipes = new HashSet<Recipe>();
-		}
+		internal void InternalOneWayRemovePrerequisite(Technology tech)
+        {
+			prerequisites.Remove(tech);
+        }
+
+		internal void InternalOneWayRemovePostTech(Technology tech)
+        {
+			postTechs.Remove(tech);
+        }
+
+		internal void InternalOneWayAddRecipe(Recipe recipe) //only called from Recipe
+        {
+			unlockedRecipes.Add(recipe);
+        }
+
+		internal void InternalOneWayRemoveRecipe(Recipe recipe) //only called from Recipe
+        {
+			unlockedRecipes.Remove(recipe);
+        }
 
 		public override int GetHashCode()
 		{

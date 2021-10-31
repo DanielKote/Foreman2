@@ -12,6 +12,8 @@ namespace Foreman
 {
 	public partial class MainForm : Form
 	{
+		internal const string DefaultPreset = "_default (Factorio 1.1 Vanilla)";
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -23,114 +25,22 @@ namespace Foreman
         {
 			//WindowState = FormWindowState.Maximized;
 
-            //I changed the name of the variable (again), so this copies the value over for people who are upgrading their Foreman version
-            if (Properties.Settings.Default.FactorioPath == "" && Properties.Settings.Default.FactorioDataPath != "")
-            {
-                Properties.Settings.Default.FactorioPath = Path.GetDirectoryName(Properties.Settings.Default.FactorioDataPath);
-                Properties.Settings.Default.FactorioDataPath = "";
-            }
+			bool gotPreset = SetSelectedPreset(Properties.Settings.Default.CurrentPresetName);
+			if (gotPreset)
+			{
+				using (DataLoadForm form = new DataLoadForm())
+				{
+					form.ShowDialog(); //LOAD FACTORIO DATA
+					GraphViewer.Graph = new ProductionGraph(form.GetDataCache());
+				}
 
-            if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
-            {
-                List<FoundInstallation> installations = new List<FoundInstallation>();
-                String steamFolder = Path.Combine("Steam", "steamapps", "common");
-                foreach (String defaultPath in new String[]{
-                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), steamFolder, "Factorio"),
-                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), steamFolder, "Factorio"),
-                  Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES(X86)"), "Factorio"),
-                  Path.Combine(Environment.GetEnvironmentVariable("ProgramW6432"), "Factorio"),
-                  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Applications", "factorio.app", "Contents")}) //Not actually tested on a Mac
-                {
-                    if (Directory.Exists(defaultPath))
-                    {
-                        FoundInstallation inst = FoundInstallation.GetInstallationFromPath(defaultPath);
-                        if (inst != null)
-                            installations.Add(inst);
-                    }
-                }
-
-                if (installations.Count > 0)
-                {
-                    if (installations.Count > 1)
-                    {
-                        using (InstallationChooserForm form = new InstallationChooserForm(installations))
-                        {
-                            if (form.ShowDialog() == DialogResult.OK && form.SelectedPath != null)
-                            {
-                                Properties.Settings.Default.FactorioPath = form.SelectedPath;
-                            }
-                            else
-                            {
-                                Close();
-                                Dispose();
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Properties.Settings.Default.FactorioPath = installations[0].path;
-                    }
-
-                    Properties.Settings.Default.Save();
-                }
-            }
-
-            if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
-            {
-                using (DirectoryChooserForm form = new DirectoryChooserForm(""))
-                {
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        Properties.Settings.Default.FactorioPath = form.SelectedPath;
-                        Properties.Settings.Default.Save();
-                    }
-                    else
-                    {
-                        Close();
-                        Dispose();
-                        return;
-                    }
-                }
-            }
-
-            if (!Directory.Exists(Properties.Settings.Default.FactorioUserDataPath))
-            {
-                if (Directory.Exists(Properties.Settings.Default.FactorioPath))
-                    Properties.Settings.Default.FactorioUserDataPath = Properties.Settings.Default.FactorioPath;
-                else if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio")))
-                    Properties.Settings.Default.FactorioUserDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio");
-            }
-
-            if (Properties.Settings.Default.EnabledMods == null) Properties.Settings.Default.EnabledMods = new StringCollection();
-            if (Properties.Settings.Default.EnabledAssemblers == null) Properties.Settings.Default.EnabledAssemblers = new StringCollection();
-            if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
-            if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
-
-			ModuleDropDown.SelectedIndex = Properties.Settings.Default.DefaultModules;
-			MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
-			MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
-			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
-			DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
-
-			using (DataReloadForm form = new DataReloadForm(false))
-				form.ShowDialog(); //LOAD FACTORIO DATA
-
-			Properties.Settings.Default.EnabledAssemblers.Clear();
-			foreach (string assembler in DataCache.Assemblers.Keys)
-				Properties.Settings.Default.EnabledAssemblers.Add(assembler);
-
-			Properties.Settings.Default.EnabledMiners.Clear();
-			foreach (string miner in DataCache.Miners.Keys)
-				Properties.Settings.Default.EnabledMiners.Add(miner);
-
-			Properties.Settings.Default.EnabledModules.Clear();
-			foreach (string module in DataCache.Modules.Keys)
-				Properties.Settings.Default.EnabledModules.Add(module);
-
-			Properties.Settings.Default.Save();
-
-			UpdateControlValues();
+				ModuleDropDown.SelectedIndex = Properties.Settings.Default.DefaultModules;
+				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
+				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
+				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
+				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
+				UpdateControlValues();
+			}
         }
 
 		private void UpdateControlValues()
@@ -153,15 +63,13 @@ namespace Foreman
 		private void SaveGraphButton_Click(object sender, EventArgs e)
 		{
 			SaveFileDialog dialog = new SaveFileDialog();
-			dialog.DefaultExt = ".json";
-			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+			dialog.DefaultExt = ".fjson";
+			dialog.Filter = "Foreman files (*.fjson)|*.fjson|All files|*.*";
 			dialog.AddExtension = true;
 			dialog.OverwritePrompt = true;
-			dialog.FileName = "Flowchart.json";
+			dialog.FileName = "Flowchart.fjson";
 			if (dialog.ShowDialog() != DialogResult.OK)
-			{
 				return;
-			}
 
 			var serialiser = JsonSerializer.Create();
 			serialiser.Formatting = Formatting.Indented;
@@ -184,16 +92,18 @@ namespace Foreman
 		private void LoadGraphButton_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
 			dialog.CheckFileExists = true;
 			if (dialog.ShowDialog() != DialogResult.OK)
-			{
 				return;
-			}
 
 			try
 			{
-				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false);
+				if(Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
+					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
+				else if(Path.GetExtension(dialog.FileName).ToLower() == ".json")
+					GraphViewer.LoadFromOldJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
+				//NOTE: MainCache will update
 			}
 			catch (Exception exception)
 			{
@@ -214,7 +124,7 @@ namespace Foreman
 
         private void MainHelpButton_Click(object sender, EventArgs e)
         {
-
+			//yea, need to add a help window at some point...
         }
 
 		//---------------------------------------------------------Settings/export/additem/addrecipe
@@ -225,26 +135,32 @@ namespace Foreman
 			do
 			{
 				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
-				foreach (Assembler assembler in DataCache.Assemblers.Values)
+				foreach (Assembler assembler in GraphViewer.Graph.DCache.Assemblers.Values)
 					oldOptions.Assemblers.Add(assembler, assembler.Enabled);
-				foreach (Miner miner in DataCache.Miners.Values)
+				foreach (Miner miner in GraphViewer.Graph.DCache.Miners.Values)
 					oldOptions.Miners.Add(miner, miner.Enabled);
-				foreach (Module module in DataCache.Modules.Values)
+				foreach (Module module in GraphViewer.Graph.DCache.Modules.Values)
 					oldOptions.Modules.Add(module, module.Enabled);
-				foreach (KeyValuePair<string, bool> modKVP in DataCache.Mods.ToArray())
-				{
-					if(modKVP.Key == "core" || modKVP.Key == "base")
-						DataCache.Mods[modKVP.Key] = true;
-					oldOptions.Mods.Add(modKVP.Key, modKVP.Value);
-				}
-				foreach (Language language in FactorioModsProcessor.Languages)
-					oldOptions.LanguageOptions.Add(language);
+				foreach (KeyValuePair<string,string> kvp in GraphViewer.Graph.DCache.IncludedMods)
+					oldOptions.Mods.Add(kvp.Key + " - " + kvp.Value);
+				oldOptions.Mods.Sort();
 
-				oldOptions.selectedLanguage = FactorioModsProcessor.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
-				oldOptions.InstallLocation = Properties.Settings.Default.FactorioPath;
-				oldOptions.UserDataLocation = Properties.Settings.Default.FactorioUserDataPath;
-				oldOptions.GenerationType = (DataCache.GenerationType)(Properties.Settings.Default.GenerationType);
-				oldOptions.NormalDifficulty = (Properties.Settings.Default.FactorioNormalDifficulty);
+				foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.json"))
+					if (File.Exists(Path.ChangeExtension(presetFile, "dat")))
+						oldOptions.Presets.Add(Path.GetFileNameWithoutExtension(presetFile));
+
+				oldOptions.SelectedPreset = Properties.Settings.Default.CurrentPresetName;
+				if(!oldOptions.Presets.Contains(oldOptions.SelectedPreset))
+                {
+					if (!oldOptions.Presets.Contains(DefaultPreset))
+					{
+						MessageBox.Show("The default preset (Factorio 1.1 Vanilla) has been removed. Please re-install / re-download Foreman");
+						Close();
+						Dispose();
+						return;
+					}
+					oldOptions.SelectedPreset = DefaultPreset;
+                }					
 
 				using (SettingsForm form = new SettingsForm(oldOptions))
 				{
@@ -252,68 +168,60 @@ namespace Foreman
 					form.Left = this.Left + 250;
 					form.Top = this.Top + 25;
 					form.ShowDialog();
-					reload = form.ReloadRequested;
+					reload = form.ReloadRequired;
 
-					//update the assemblers, miners, modules no matter what
-					Properties.Settings.Default.EnabledAssemblers.Clear();
-					foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
+					if (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset) //different preset -> need to reload datacache
 					{
-						kvp.Key.Enabled = kvp.Value;
-						if (kvp.Value)
-							Properties.Settings.Default.EnabledAssemblers.Add(kvp.Key.Name);
+						SetSelectedPreset(form.CurrentOptions.SelectedPreset);
+						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+						Properties.Settings.Default.Save();
+					}
+					else //update the assemblers, miners, modules if we havent switched preset (if we have, then all are enabled)
+					{
+						foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
+							kvp.Key.Enabled = kvp.Value;
+						foreach (KeyValuePair<Miner, bool> kvp in form.CurrentOptions.Miners)
+							kvp.Key.Enabled = kvp.Value;
+						foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
+							kvp.Key.Enabled = kvp.Value;
 					}
 
-					Properties.Settings.Default.EnabledMiners.Clear();
-					foreach (KeyValuePair<Miner, bool> kvp in form.CurrentOptions.Miners)
-					{
-						kvp.Key.Enabled = kvp.Value;
-						if (kvp.Value)
-							Properties.Settings.Default.EnabledMiners.Add(kvp.Key.Name);
-					}
-
-					Properties.Settings.Default.EnabledModules.Clear();
-					foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
-					{
-						kvp.Key.Enabled = kvp.Value;
-						if (kvp.Value)
-							Properties.Settings.Default.EnabledModules.Add(kvp.Key.Name);
-					}
-
-					DataCache.UpdateRecipesAssemblerStatus();
-
-					//reload the full data cache if we had some major changes to the options
-					if (!oldOptions.Equals(form.CurrentOptions, true) || reload) //some changes have been made OR reload was requested
-					{
-						FactorioModsProcessor.LocaleFiles.Clear();
-						FactorioModsProcessor.LoadLocaleFiles((form.CurrentOptions.selectedLanguage == null)? "en" : form.CurrentOptions.selectedLanguage.Name);
-						if(form.CurrentOptions.selectedLanguage != null)
-							Properties.Settings.Default.Language = form.CurrentOptions.selectedLanguage.Name;
-
-						Properties.Settings.Default.FactorioPath = form.CurrentOptions.InstallLocation;
-						Properties.Settings.Default.FactorioUserDataPath = form.CurrentOptions.UserDataLocation;
-						Properties.Settings.Default.GenerationType = (int)(form.CurrentOptions.GenerationType);
-						Properties.Settings.Default.FactorioNormalDifficulty = form.CurrentOptions.NormalDifficulty;
-
-						Properties.Settings.Default.EnabledMods.Clear();
-						foreach (KeyValuePair<string, bool> kvp in form.CurrentOptions.Mods)
-						{
-							DataCache.Mods[kvp.Key] = kvp.Value;
-							Mod mod = FactorioModsProcessor.Mods.FirstOrDefault(n => n.Name == kvp.Key);
-							if (mod != null)
-								mod.Enabled = kvp.Value;
-
-							Properties.Settings.Default.EnabledMods.Add(kvp.Key);
-						}
-
-						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), reload);
-					}
-
-					Properties.Settings.Default.Save();
 					GraphViewer.UpdateNodes();
 					UpdateControlValues();
-
 				}
 			} while (reload);
+		}
+
+		private bool SetSelectedPreset(string preset) //NOTE: this does NOT! update the cache, it only sets the string in properties.
+        {
+			if (string.IsNullOrEmpty(preset) ||
+				!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", preset + ".json" })) ||
+				!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", preset + ".dat" })))
+			{
+				if (preset != DefaultPreset)
+				{
+					string message;
+					if (string.IsNullOrEmpty(preset))
+						message = "No preset has been specified.\nResetting to default preset (Factorio 1.1 Vanilla)";
+					else
+						message = "Selected preset (" + preset + ") does not exist.\nResetting to default preset (Factorio 1.1 Vanilla)";
+					MessageBox.Show(message);
+				}
+
+				Properties.Settings.Default.CurrentPresetName = DefaultPreset;
+				if (!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", DefaultPreset + ".json" })) ||
+					!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", DefaultPreset + ".dat" })))
+				{
+					MessageBox.Show("The default preset (Factorio 1.1 Vanilla) has been removed. Please re-install / re-download Foreman");
+					Close();
+					Dispose();
+					return false;
+				}
+			}
+			else
+				Properties.Settings.Default.CurrentPresetName = preset;
+			Properties.Settings.Default.Save();
+			return true;
 		}
 
 		private void ExportImageButton_Click(object sender, EventArgs e)

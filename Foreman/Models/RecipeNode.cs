@@ -20,20 +20,20 @@ namespace Foreman
 
 			if (assembler == null)
 			{
-				assembler = DataCache.Assemblers.Values
-					.Where(a => a.Enabled)
-					.Where(a => a.Categories.Contains(BaseRecipe.Category))
-					.OrderBy(a => -a.Speed)
-					.FirstOrDefault();
+				//assembler = PGViewer.DCache.Assemblers.Values
+				//	.Where(a => a.Enabled)
+				//	.Where(a => a.Categories.Contains(BaseRecipe.Category))
+				//	.OrderBy(a => -a.Speed)
+				//	.FirstOrDefault();
 			}
 
 			var ret = new Dictionary<MachinePermutation, int>();
 
 			if (assembler != null)
 			{
-				var modules = NodeModules.For(BaseRecipe, assembler.ModuleSlots);
-				var required = (int)Math.Ceiling(actualRate / assembler.GetRate(BaseRecipe.Time, (float)SpeedBonus, modules));
-				ret.Add(new MachinePermutation(assembler, modules.ToList()), required);
+				//var modules = NodeModules.For(BaseRecipe, assembler.ModuleSlots);
+				//var required = (int)Math.Ceiling(actualRate / assembler.GetRate(BaseRecipe.Time, (float)SpeedBonus, modules));
+				//ret.Add(new MachinePermutation(assembler, modules.ToList()), required);
 			}
 
 			return ret;

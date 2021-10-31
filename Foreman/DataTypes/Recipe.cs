@@ -36,12 +36,9 @@ namespace Foreman
 
     public class Recipe : DataObjectBase
     {
-        public static string[] recipeLocaleCategories = { "recipe-name" };
-
         public Subgroup MySubgroup { get; protected set; }
 
         public float Time { get; set; }
-        public string Category { get; set; }
 
         public IReadOnlyDictionary<Item, float> ProductSet { get { return productSet; } }
 		public IReadOnlyList<Item> ProductList { get { return productList; } }
@@ -51,20 +48,30 @@ namespace Foreman
 		public IReadOnlyList<Item> IngredientList { get { return ingredientList; } }
         public IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get { return ingredientTemperatureMap; } }
 
+		public IReadOnlyCollection<Assembler> ValidAssemblers { get { return validAssemblers; } }
+		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
+
+		public IReadOnlyCollection<Technology> MyUnlockTechnologies { get { return myUnlockTechnologies; } }
+
 		private Dictionary<Item, float> productSet;
         private Dictionary<Item, float> productTemperatureMap;
 		private List<Item> productList;
+
 		private Dictionary<Item, float> ingredientSet;
         private Dictionary<Item, fRange> ingredientTemperatureMap;
 		private List<Item> ingredientList;
 
-		public bool IsAvailableAtStart { get; set; }
+		private HashSet<Assembler> validAssemblers;
+		private HashSet<Module> validModules;
+
+		private HashSet<Technology> myUnlockTechnologies;
+
 		public bool IsCyclic { get; set; }
-		public bool IsMissingRecipe { get { return DataCache.MissingRecipes.ContainsKey(Name); } }
+		public bool IsMissingRecipe { get { return myCache.MissingRecipes.ContainsKey(Name); } }
+		public bool HasEnabledAssemblers { get { return validAssemblers.FirstOrDefault(a => a.Enabled) != null; } }
 
 		public bool Hidden { get; set; }
 
-		public bool HasEnabledAssemblers { get; set; }
 
 		public new Bitmap Icon
 		{
@@ -82,25 +89,26 @@ namespace Foreman
 			set { base.Icon = value; }
 		}
 
-		public Recipe(string name, string lname, Subgroup subgroup, string order) : base(name, lname, order)
+		public Recipe(DataCache dCache, string name, string friendlyName, Subgroup subgroup, string order) : base(dCache, name, friendlyName, order)
 		{
-			localeCategories = recipeLocaleCategories;
-
 			MySubgroup = subgroup;
 			MySubgroup.Recipes.Add(this);
 
-			this.Time = 0.5f;
-			this.ingredientSet = new Dictionary<Item, float>();
-			this.ingredientList = new List<Item>();
-            this.ingredientTemperatureMap = new Dictionary<Item, fRange>();
-			this.productSet = new Dictionary<Item, float>();
-			this.productList = new List<Item>();
-            this.productTemperatureMap = new Dictionary<Item, float>();
-			this.HasEnabledAssemblers = false;
-
+			Time = 0.5f;
 			this.Hidden = false;
-			this.IsAvailableAtStart = false;
 			this.IsCyclic = false;
+
+			ingredientSet = new Dictionary<Item, float>();
+			ingredientList = new List<Item>();
+            ingredientTemperatureMap = new Dictionary<Item, fRange>();
+
+			productSet = new Dictionary<Item, float>();
+			productList = new List<Item>();
+            productTemperatureMap = new Dictionary<Item, float>();
+
+			validAssemblers = new HashSet<Assembler>();
+			validModules = new HashSet<Module>();
+			myUnlockTechnologies = new HashSet<Technology>();
 		}
 
 		public string GetIngredientFriendlyName(Item item)
@@ -141,19 +149,15 @@ namespace Foreman
 				ingredientSet.Add(item, quantity);
 				ingredientList.Add(item);
                 ingredientTemperatureMap.Add(item, new fRange(minTemp, maxTemp));
-				item.InternalAddConsumptionRecipe(this);
+				item.InternalOneWayAddConsumptionRecipe(this);
             }
         }
 
-		public bool DeleteIngredient(Item item)
-        {
-			if (!ingredientSet.ContainsKey(item))
-				return false;
+		internal void InternalOneWayDeleteIngredient(Item item) //only from delete calls
+		{
 			ingredientSet.Remove(item);
 			ingredientList.Remove(item);
             ingredientTemperatureMap.Remove(item);
-			item.InternalRemoveConsumptionRecipe(this);
-			return true;
         }
 
         public void AddProduct(Item item, float quantity, float temperature = 0)
@@ -165,20 +169,49 @@ namespace Foreman
 				productSet.Add(item, quantity);
 				productList.Add(item);
                 productTemperatureMap.Add(item, temperature);
-				item.InternalAddProductionRecipe(this);
+				item.InternalOneWayAddProductionRecipe(this);
 			}
 		}
 
-		public bool DeleteProduct(Item item)
+		internal void InternalOneWayDeleteProduct(Item item) //only from delete calls
 		{
-			if (!productSet.ContainsKey(item))
-				return false;
 			productSet.Remove(item);
 			productList.Remove(item);
             productTemperatureMap.Remove(item);
-			item.InternalRemoveProductionRecipe(this);
-			return true;
 		}
+
+		public void AddValidAssembler(Assembler assembler)
+        {
+			validAssemblers.Add(assembler);
+			assembler.InternalOneWayAddRecipe(this);
+        }
+
+		internal void InternalOneWayRemoveValidAssembler(Assembler assembler) //only from delete calls
+		{
+			validAssemblers.Remove(assembler);
+        }
+
+		public void AddValidModule(Module module)
+        {
+			validModules.Add(module);
+			module.InternalOneWayAddRecipe(this);
+        }
+
+		internal void InternalOneWayRemoveValidModule(Module module) //only from delete calls
+		{
+			validModules.Remove(module);
+        }
+
+		public void AddUnlockTechnology(Technology technology)
+        {
+			myUnlockTechnologies.Add(technology);
+			technology.InternalOneWayAddRecipe(this);
+        }
+
+		internal void InternalOneWayRemoveUnlockTechnology(Technology technology) //only from delete calls
+		{
+			myUnlockTechnologies.Remove(technology);
+        }
 
 		public override string ToString() { return String.Format("Recipe: {0}", Name); }
 	}

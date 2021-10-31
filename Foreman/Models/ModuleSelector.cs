@@ -16,7 +16,7 @@ namespace Foreman
         public static ModuleSelector None { get { return new ModuleSelectorNone(); } }
         public static ModuleSelector Productive { get { return new ModuleSelectorProductivity(); } }
 
-        public static ModuleSelector Load(JToken token)
+        public static ModuleSelector Load(JToken token, DataCache cache)
         {
             ModuleSelector filter = Fastest;
 
@@ -37,9 +37,9 @@ namespace Foreman
                         if (token["Module"] != null)
                         {
                             var moduleKey = (String)token["Module"];
-                            if (DataCache.Modules.ContainsKey(moduleKey))
+                            if (cache.Modules.ContainsKey(moduleKey))
                             {
-                                filter = new ModuleSpecificFilter(DataCache.Modules[moduleKey]);
+                                filter = new ModuleSpecificFilter(cache.Modules[moduleKey]);
                             }
                         }
                         break;
@@ -49,13 +49,13 @@ namespace Foreman
             return filter;
         }
 
-        protected abstract IEnumerable<Module> availableModules();
+        protected abstract IEnumerable<Module> availableModules(DataCache cache);
 
-        public IEnumerable<Module> For(Recipe recipe, int moduleSlots)
+        public IEnumerable<Module> For(DataCache cache, Recipe recipe, int moduleSlots)
         {
-            var modules = availableModules()
+            var modules = availableModules(cache)
                 .Where(m => m.Enabled)
-                .Where(m => m.AllowedIn(recipe))
+                .Where(m => m.ValidRecipes.Contains(recipe))
                 .Take(1);
 
             return Enumerable.Repeat(modules, moduleSlots)
@@ -84,7 +84,7 @@ namespace Foreman
                 info.AddValue("Module", Module.Name);
             }
 
-            protected override IEnumerable<Module> availableModules()
+            protected override IEnumerable<Module> availableModules(DataCache cache)
             {
                 return Enumerable.Repeat(Module, 1);
             }
@@ -99,9 +99,9 @@ namespace Foreman
 
             public override String Name { get { return "Fastest"; } }
 
-            protected override IEnumerable<Module> availableModules()
+            protected override IEnumerable<Module> availableModules(DataCache cache)
             {
-                return DataCache.Modules.Values
+                return cache.Modules.Values
                     .OrderBy(m => -m.SpeedBonus);
             }
         }
@@ -115,9 +115,9 @@ namespace Foreman
 
             public override String Name { get { return "Most Productive"; } }
 
-            protected override IEnumerable<Module> availableModules()
+            protected override IEnumerable<Module> availableModules(DataCache cache)
             {
-                return DataCache.Modules.Values
+                return cache.Modules.Values
                     .OrderBy(m => -m.ProductivityBonus);
             }
         }
@@ -131,7 +131,7 @@ namespace Foreman
 
             public override String Name { get { return "None"; } }
 
-            protected override IEnumerable<Module> availableModules()
+            protected override IEnumerable<Module> availableModules(DataCache cache)
             {
                 return Enumerable.Empty<Module>();
             }

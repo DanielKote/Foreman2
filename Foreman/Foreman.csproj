@@ -101,14 +101,8 @@
     <Reference Include="Google.Protobuf, Version=3.6.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.6.1\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
-    <Reference Include="KeraLua, Version=1.3.2.0, Culture=neutral, PublicKeyToken=04d04586786c6f34, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLua.1.3.2.1\lib\net45\KeraLua.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NLua, Version=1.3.2.0, Culture=neutral, PublicKeyToken=8df2ab518030ea95, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLua.1.3.2.1\lib\net45\NLua.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -132,10 +126,10 @@
     <Compile Include="Controls\IRChooserPanel.Designer.cs">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataCache\FactorioModsProcessor.cs" />
     <Compile Include="DataTypes\Assembler.cs" />
     <Compile Include="DataTypes\DataObjectBase.cs" />
     <Compile Include="DataTypes\Group.cs" />
+    <Compile Include="DataTypes\ProductionEntity.cs" />
     <Compile Include="DataTypes\Technology.cs" />
     <Compile Include="Forms\DirectoryChooserForm.cs">
       <SubType>Form</SubType>
@@ -148,36 +142,22 @@
     <Compile Include="Models\PassthroughNode.cs" />
     <Compile Include="Models\RecipeNode.cs" />
     <Compile Include="Models\SupplierNode.cs" />
-    <Compile Include="NativeMethods.cs" />
     <Compile Include="ProductionGraphView\AssemblerBox.cs" />
     <Compile Include="Controls\CheckboxListWithErrors.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DataCache\DataCache.cs" />
-    <Compile Include="DataCache\DependencyGraph.cs" />
-    <Compile Include="Extensions\VersionOperatorExtensions.cs" />
-    <Compile Include="DataCache\JsonDataProcessor.cs" />
-    <Compile Include="Forms\InstallationChooserForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\InstallationChooserForm.Designer.cs">
-      <DependentUpon>InstallationChooserForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataCache\FactorioLuaPropertyTree.cs" />
     <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
     <Compile Include="ProductionGraphView\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
     <Compile Include="DataCache\IconProcessor.cs" />
-    <Compile Include="DataCache\LBitmap.cs" />
-    <Compile Include="DataCache\FactorioLuaProcessor.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
-    <Compile Include="FoundInstallation.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
     <Compile Include="ProductionGraphView\GraphElement.cs" />
@@ -198,7 +178,6 @@
     <Compile Include="DataTypes\Item.cs" />
     <Compile Include="ProductionGraphView\LinkElement.cs" />
     <Compile Include="DataTypes\Miner.cs" />
-    <Compile Include="DataTypes\Mod.cs" />
     <Compile Include="Models\ProductionNode.cs" />
     <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="Program.cs" />
@@ -236,10 +215,6 @@
     <EmbeddedResource Include="Forms\DirectoryChooserForm.resx">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\InstallationChooserForm.resx">
-      <DependentUpon>InstallationChooserForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -271,6 +246,12 @@
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />
     <None Include="packages.config" />
+    <None Include="Presets\_default %28Factorio 1.1 Vanilla%29.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Presets\_default %28Factorio 1.1 Vanilla%29.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -308,7 +289,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY /y "$(SolutionDir)lib\lua52.dll" "."</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -20,8 +20,10 @@ namespace Foreman
 		private enum DragOperation { None, Item, Selection, Processed }
 		public enum NewNodeType { Disconnected, Supplier, Consumer }
 
+		public DataCache DCache { get { return Graph.DCache; } }
+
 		public HashSet<GraphElement> Elements = new HashSet<GraphElement>();
-		public ProductionGraph Graph = new ProductionGraph();
+		public ProductionGraph Graph; //set it up when we have cache
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
@@ -935,70 +937,99 @@ namespace Foreman
 			//write
 			info.AddValue("AmountType", Graph.SelectedAmountType);
 			info.AddValue("Unit", Graph.SelectedUnit);
-			info.AddValue("GenerationType", Properties.Settings.Default.GenerationType);
 			info.AddValue("IncludedItems", includedItems);
 			info.AddValue("IncludedRecipes", includedRecipeShorts);
-			info.AddValue("EnabledAssemblers", DataCache.Assemblers.Values.Where(a => a.Enabled).Select<Assembler, String>(a => a.Name));
-			info.AddValue("EnabledMiners", DataCache.Miners.Values.Where(m => m.Enabled).Select<Miner, String>(m => m.Name));
-			info.AddValue("EnabledModules", DataCache.Modules.Values.Where(m => m.Enabled).Select<Module, String>(m => m.Name));
-			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Value).Select(n => n.Key));
-			info.AddValue("HiddenRecipes", DataCache.Recipes.Values.Where(r => r.Hidden).Select<Recipe, String>(r => r.Name));
+			info.AddValue("IncludedMods", DCache.IncludedMods.Select(m => m.Key + "|"+m.Value));
+
+			info.AddValue("EnabledAssemblers", DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
+			info.AddValue("EnabledMiners", DCache.Miners.Values.Where(m => m.Enabled).Select(m => m.Name));
+			info.AddValue("EnabledModules", DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
+			info.AddValue("HiddenRecipes", DCache.Recipes.Values.Where(r => r.Hidden).Select(r => r.Name));
+
 			info.AddValue("Nodes", Graph.Nodes);
 			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
 			info.AddValue("ElementLocations", Graph.Nodes.Select(n => GetElementForNode(n).Location).ToList());
 		}
 
-		public void LoadFromJson(JObject json, bool reloadIconCache)
+		public void LoadFromOldJson(JObject json)
+        {
+			//need to convert it to the new format
+			//then:
+			//LoadFromJson(json);
+        }
+
+		public void LoadFromJson(JObject json)
 		{
 			//clear graph
 			Graph.Nodes.Clear();
 			Elements.Clear();
 
-			//load the properties of the save
-			Properties.Settings.Default.GenerationType = (json["GenerationType"] != null) ? (int)json["GenerationType"].ToObject(typeof(int)) : (int)DataCache.GenerationType.ForemanMod; //GenerationType might not exist in older saves. If it doesnt, default to mod (because why not)
+			//reload data cache based on the included mods list (search through presets to find one with same mod set, or if not inform user that we are attempting to load with current preset)
+			List<KeyValuePair<string, string>> modList = new List<KeyValuePair<string, string>>();
+			foreach (string str in json["IncludedMods"].Select(t => (string)t).ToList())
+            {
+				string[] mod = str.Split('|');
+				modList.Add(new KeyValuePair<string, string>(mod[0], mod[1]));
+            }
 
-			Properties.Settings.Default.EnabledMods.Clear();
-			foreach (string mod in json["EnabledMods"].Select(t => (string)t).ToList())
-				Properties.Settings.Default.EnabledMods.Add(mod);
+			using (DataLoadForm form = new DataLoadForm(modList))
+			{
+				form.ShowDialog(); //LOAD FACTORIO DATA
+				Graph = new ProductionGraph(form.GetDataCache());
+			}
 
-			Properties.Settings.Default.EnabledAssemblers.Clear();
-			foreach (string assembler in json["EnabledAssemblers"].Select(t => (string)t).ToList())
-				Properties.Settings.Default.EnabledAssemblers.Add(assembler);
+			//set up graph options
+			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
+			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
 
-			Properties.Settings.Default.EnabledMiners.Clear();
-			foreach (string miner in json["EnabledMiners"].Select(t => (string)t).ToList())
-				Properties.Settings.Default.EnabledMiners.Add(miner);
+			//update enabled statuses
+			foreach (Assembler assembler in DCache.Assemblers.Values)
+				assembler.Enabled = false;
+			foreach (string name in json["EnabledAssemblers"].Select(t => (string)t).ToList())
+				if (DCache.Assemblers.ContainsKey(name))
+					DCache.Assemblers[name].Enabled = true;
 
-			Properties.Settings.Default.EnabledModules.Clear();
-			foreach (string module in json["EnabledModules"].Select(t => (string)t).ToList())
-				Properties.Settings.Default.EnabledModules.Add(module);
+			foreach (Miner miner in DCache.Miners.Values)
+				miner.Enabled = false;
+			foreach (string name in json["EnabledMiners"].Select(t => (string)t).ToList())
+				if (DCache.Miners.ContainsKey(name))
+					DCache.Miners[name].Enabled = true;
 
-			//update DataCache with the updated mod info (or just update it in general to have a clean slate)
-			using (DataReloadForm form = new DataReloadForm(reloadIconCache))
-				form.ShowDialog();
+			foreach (Module module in DCache.Modules.Values)
+				module.Enabled = false;
+			foreach (string name in json["EnabledModules"].Select(t => (string)t).ToList())
+				if (DCache.Modules.ContainsKey(name))
+					DCache.Modules[name].Enabled = true;
 
 			foreach (string recipe in json["HiddenRecipes"].Select(t => (string)t).ToList())
-				if (DataCache.Recipes.ContainsKey(recipe))
-					DataCache.Recipes[recipe].Hidden = true;
+				if (DCache.Recipes.ContainsKey(recipe))
+					DCache.Recipes[recipe].Hidden = true;
 
+			//add all nodes
 			InsertJsonObjects(json, false);
 		}
 
 		public void InsertJsonObjects(JObject json, bool relativePlacement = false)
 		{
-			//set up graph options
-			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
-			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
+			//match rate types
+			float multiplier = 1;
+			if(Graph.SelectedUnit != (RateUnit)(int)json["Unit"])
+            {
+				if (Graph.SelectedUnit == RateUnit.PerMinute) //json unit is per second
+					multiplier = 60;
+				else if (Graph.SelectedUnit == RateUnit.PerSecond) //json unit is per minute
+					multiplier = 1 / 60;
+            }
 
 			//check all items for existance
 			if (json["IncludedItems"] != null)
 			{
 				foreach (string iItem in json["IncludedItems"].Select(t => (string)t).ToList())
 				{
-					if (!DataCache.Items.ContainsKey(iItem))
+					if (!DCache.Items.ContainsKey(iItem))
 					{
-						Item missingItem = new Item(iItem, iItem, false, DataCache.MissingSubgroup, "");
-						DataCache.MissingItems.Add(missingItem.Name, missingItem);
+						Item missingItem = new Item(DCache, iItem, iItem, false, DCache.MissingSubgroup, "");
+						DCache.MissingItems.Add(missingItem.Name, missingItem);
 					}
 				}
 			}
@@ -1010,43 +1041,43 @@ namespace Foreman
 				{
 					//recipe check #1 : does its name exist in database
 					string recipeName = (string)iRecipe["Name"];
-					bool recipeExists = DataCache.Recipes.ContainsKey(recipeName);
+					bool recipeExists = DCache.Recipes.ContainsKey(recipeName);
 					//recipe check #2 : do the ingredients & products from the loaded data exist within the actual recipe?
 					//check for null to handle old saves
 					List<string> ingredients = iRecipe["Ingredients"].Select(t => (string)t).ToList();
 					List<string> products = iRecipe["Products"].Select(t => (string)t).ToList();
 					if (recipeExists)
 					{
-						Recipe recipe = DataCache.Recipes[recipeName];
+						Recipe recipe = DCache.Recipes[recipeName];
 						//check #2 (from above)
 						foreach (string ingredient in ingredients)
-							recipeExists &= DataCache.Items.ContainsKey(ingredient) && recipe.IngredientSet.ContainsKey(DataCache.Items[ingredient]);
+							recipeExists &= DCache.Items.ContainsKey(ingredient) && recipe.IngredientSet.ContainsKey(DCache.Items[ingredient]);
 						foreach (string result in products)
-							recipeExists &= DataCache.Items.ContainsKey(result) && recipe.ProductSet.ContainsKey(DataCache.Items[result]);
+							recipeExists &= DCache.Items.ContainsKey(result) && recipe.ProductSet.ContainsKey(DCache.Items[result]);
 					}
 					if (!recipeExists)
 					{
 						//if we are here, then we failed either check 1 or check 2: this is a missing recipe
 
-						if (!DataCache.MissingRecipes.ContainsKey(recipeName))
+						if (!DCache.MissingRecipes.ContainsKey(recipeName))
 						{
-							Recipe missingRecipe = new Recipe(recipeName, recipeName, DataCache.MissingSubgroup, "");
+							Recipe missingRecipe = new Recipe(DCache, recipeName, recipeName, DCache.MissingSubgroup, "");
 							foreach (string ingredient in ingredients)
 							{
-								if (DataCache.Items.ContainsKey(ingredient))
-									missingRecipe.AddIngredient(DataCache.Items[ingredient], 1);
+								if (DCache.Items.ContainsKey(ingredient))
+									missingRecipe.AddIngredient(DCache.Items[ingredient], 1);
 								else
-									missingRecipe.AddIngredient(DataCache.MissingItems[ingredient], 1);
+									missingRecipe.AddIngredient(DCache.MissingItems[ingredient], 1);
 							}
 							foreach (string product in products)
 							{
-								if (DataCache.Items.ContainsKey(product))
-									missingRecipe.AddProduct(DataCache.Items[product], 1);
+								if (DCache.Items.ContainsKey(product))
+									missingRecipe.AddProduct(DCache.Items[product], 1);
 								else
-									missingRecipe.AddProduct(DataCache.MissingItems[product], 1);
+									missingRecipe.AddProduct(DCache.MissingItems[product], 1);
 							}
 
-							DataCache.MissingRecipes.Add(recipeName, missingRecipe);
+							DCache.MissingRecipes.Add(recipeName, missingRecipe);
 						}
 					}
 				}
@@ -1063,47 +1094,47 @@ namespace Foreman
 					case "Consumer":
 						{
 							string itemName = (string)node["ItemName"];
-							if (DataCache.Items.ContainsKey(itemName))
-								newNode = ConsumerNode.Create(DataCache.Items[itemName], Graph);
-							else if (DataCache.MissingItems.ContainsKey(itemName))
-								newNode = ConsumerNode.Create(DataCache.MissingItems[itemName], Graph);
+							if (DCache.Items.ContainsKey(itemName))
+								newNode = ConsumerNode.Create(DCache.Items[itemName], Graph);
+							else if (DCache.MissingItems.ContainsKey(itemName))
+								newNode = ConsumerNode.Create(DCache.MissingItems[itemName], Graph);
 							break;
 						}
 					case "Supply":
 						{
 							string itemName = (string)node["ItemName"];
-							if (DataCache.Items.ContainsKey(itemName))
-								newNode = SupplierNode.Create(DataCache.Items[itemName], Graph);
-							else if (DataCache.MissingItems.ContainsKey(itemName))
-								newNode = SupplierNode.Create(DataCache.MissingItems[itemName], Graph);
+							if (DCache.Items.ContainsKey(itemName))
+								newNode = SupplierNode.Create(DCache.Items[itemName], Graph);
+							else if (DCache.MissingItems.ContainsKey(itemName))
+								newNode = SupplierNode.Create(DCache.MissingItems[itemName], Graph);
 							break;
 						}
 					case "PassThrough":
 						{
 							string itemName = (string)node["ItemName"];
-							if (DataCache.Items.ContainsKey(itemName))
-								newNode = PassthroughNode.Create(DataCache.Items[itemName], Graph);
-							else if (DataCache.MissingItems.ContainsKey(itemName))
-								newNode = PassthroughNode.Create(DataCache.MissingItems[itemName], Graph);
+							if (DCache.Items.ContainsKey(itemName))
+								newNode = PassthroughNode.Create(DCache.Items[itemName], Graph);
+							else if (DCache.MissingItems.ContainsKey(itemName))
+								newNode = PassthroughNode.Create(DCache.MissingItems[itemName], Graph);
 							break;
 						}
 					case "Recipe":
 						{
 							string recipeName = (string)node["RecipeName"];
-							if (DataCache.MissingRecipes.ContainsKey(recipeName)) //missing list checked first in case of same recipe name (but different ingredients/products)
-								newNode = RecipeNode.Create(DataCache.MissingRecipes[recipeName], Graph);
-							else if (DataCache.Recipes.ContainsKey(recipeName))
-								newNode = RecipeNode.Create(DataCache.Recipes[recipeName], Graph);
+							if (DCache.MissingRecipes.ContainsKey(recipeName)) //missing list checked first in case of same recipe name (but different ingredients/products)
+								newNode = RecipeNode.Create(DCache.MissingRecipes[recipeName], Graph);
+							else if (DCache.Recipes.ContainsKey(recipeName))
+								newNode = RecipeNode.Create(DCache.Recipes[recipeName], Graph);
 
 							if (newNode != null)
 							{
 								if (node["Assembler"] != null)
 								{
 									var assemblerKey = (string)node["Assembler"];
-									if (DataCache.Assemblers.ContainsKey(assemblerKey))
-										(newNode as RecipeNode).Assembler = DataCache.Assemblers[assemblerKey];
+									if (DCache.Assemblers.ContainsKey(assemblerKey))
+										(newNode as RecipeNode).Assembler = DCache.Assemblers[assemblerKey];
 								}
-								(newNode as RecipeNode).NodeModules = ModuleSelector.Load(node);
+								(newNode as RecipeNode).NodeModules = ModuleSelector.Load(node, DCache);
 							}
 							break;
 						}
@@ -1118,17 +1149,7 @@ namespace Foreman
 				{
 					newNode.rateType = (RateType)(int)node["RateType"];
 					if (newNode.rateType == RateType.Manual)
-					{
-						if (node["DesiredRate"] != null)
-						{
-							newNode.desiredRate = (float)node["DesiredRate"];
-						}
-						else
-						{
-							// Legacy data format stored desired rate in actual
-							newNode.desiredRate = (float)node["ActualRate"];
-						}
-					}
+						newNode.desiredRate = (float)node["DesiredRate"] * multiplier;
 					if (node["SpeedBonus"] != null)
 						newNode.SpeedBonus = Math.Round((float)node["SpeedBonus"], 4);
 					if (node["ProductivityBonus"] != null)
@@ -1136,6 +1157,7 @@ namespace Foreman
 				}
 				else
                 {
+					Trace.Fail("ErrorNode created: ");
 					newNode = ErrorNode.Create(Graph);
                 }
 			}
@@ -1151,10 +1173,10 @@ namespace Foreman
 				{
 					string itemName = (string)nodelink["Item"];
 					Item item;
-					if (DataCache.Items.ContainsKey(itemName))
-						item = DataCache.Items[itemName];
-					else if (DataCache.MissingItems.ContainsKey(itemName))
-						item = DataCache.MissingItems[itemName];
+					if (DCache.Items.ContainsKey(itemName))
+						item = DCache.Items[itemName];
+					else if (DCache.MissingItems.ContainsKey(itemName))
+						item = DCache.MissingItems[itemName];
 					else
 						continue;
 					NodeLink.Create(supplier, consumer, item);

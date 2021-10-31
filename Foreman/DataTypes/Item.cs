@@ -6,15 +6,17 @@ namespace Foreman
 {
 	public class Item : DataObjectBase
 	{
-		public static string[] itemLocaleCategories = { "item-name", "fluid-name", "entity-name", "equipment-name" };
         public Subgroup MySubgroup { get; protected set; }
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }
 		public IReadOnlyCollection<Recipe> ConsumptionRecipes { get { return consumptionRecipes; } }
+		public IReadOnlyCollection<Resource> MiningResources { get { return miningResources; } }
+
 		private HashSet<Recipe> productionRecipes;
 		private HashSet<Recipe> consumptionRecipes;
+		private HashSet<Resource> miningResources;
 
-		public bool IsMissingItem { get { return DataCache.MissingItems.ContainsKey(Name); } }
+		public bool IsMissingItem { get { return myCache.MissingItems.ContainsKey(Name); } }
 		public bool IsFluid { get; private set; }
         public bool IsTemperatureDependent { get; set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
 
@@ -31,35 +33,45 @@ namespace Foreman
 			set { base.Icon = value; }
         }
 
-		public Item(string name, string lname, bool isfluid, Subgroup subgroup, string order) : base(name, lname, order)
+		public Item(DataCache dCache, string name, string friendlyName, bool isfluid, Subgroup subgroup, string order) : base(dCache, name, friendlyName, order)
 		{
 			MySubgroup = subgroup;
 			MySubgroup.Items.Add(this);
-			localeCategories = itemLocaleCategories;
 			productionRecipes = new HashSet<Recipe>();
 			consumptionRecipes = new HashSet<Recipe>();
+			miningResources = new HashSet<Resource>();
 
 			IsFluid = isfluid;
             Temperature = 0;
             IsTemperatureDependent = false;
 		}
 
-		internal void InternalAddConsumptionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds an ingredient
+		internal void InternalOneWayAddConsumptionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds an ingredient
         {
 			consumptionRecipes.Add(recipe);
         }
-		internal void InternalAddProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds a product
+		internal void InternalOneWayAddProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds a product
         {
 			productionRecipes.Add(recipe);
         }
-		internal void InternalRemoveConsumptionRecipe(Recipe recipe) //should only be called from the Recipe class when it removes an ingredient
+		internal void InternalOneWayRemoveConsumptionRecipe(Recipe recipe) //only from delete calls
 		{
 			consumptionRecipes.Remove(recipe);
 		}
-		internal void InternalRemoveProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it removes a product
+		internal void InternalOneWayRemoveProductionRecipe(Recipe recipe) //only from delete calls
 		{
 			productionRecipes.Remove(recipe);
 		}
+
+		internal void InternalOneWayAddMiningResource(Resource resource) //should only be called from Resource class
+        {
+			miningResources.Add(resource);
+        }
+
+		internal void InternalOneWayRemoveMiningResource(Resource resource) //only from delete calls
+        {
+			miningResources.Remove(resource);
+        }
 
 		public override string ToString() { return String.Format("Item: {0}", Name); }
 

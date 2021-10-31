@@ -42,18 +42,12 @@ namespace Foreman
 		{
 			Dictionary<MachinePermutation, int> results = new Dictionary<MachinePermutation, int>();
 
-			Resource resource = DataCache.Resources.Values.FirstOrDefault(r => r.result == SuppliedItem.Name);
-			if (resource == null)
-			{
+			if (SuppliedItem.MiningResources.Count == 0)
 				return results;
-			}
 
-			List<Miner> allowedMiners = DataCache.Miners.Values
-				.Where(m => m.Enabled)
-				.Where(m => m.ResourceCategories.Contains(resource.Category)).ToList();
-
+			Resource resource = SuppliedItem.MiningResources.First();
 			List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
-			foreach (Miner miner in allowedMiners)
+			foreach (Miner miner in resource.ValidMiners.Where(m =>m.Enabled))
 			{
 				// TODO: Find correct recipe to pass in here. Needed to disallow productivity modules.
 				allowedPermutations.AddRange(miner.GetAllPermutations(null));

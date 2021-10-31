@@ -1,6 +1,6 @@
 ﻿namespace Foreman
 {
-    partial class DataReloadForm
+    partial class DataLoadForm
     {
         /// <summary>
         /// Required designer variable.

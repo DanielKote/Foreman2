@@ -17,6 +17,8 @@ namespace Foreman
 		private AmountType selectedAmountType = AmountType.FixedAmount;
 		public RateUnit SelectedUnit = RateUnit.PerSecond;
 
+		public DataCache DCache { get; private set; }
+
 		public AmountType SelectedAmountType
 		{
 			get
@@ -40,7 +42,7 @@ namespace Foreman
 			}
 		}
 
-		public ProductionGraph() { }
+		public ProductionGraph(DataCache dCache) { DCache = dCache; }
 
 		public void InvalidateCaches()
 		{

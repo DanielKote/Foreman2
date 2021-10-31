@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Foreman
 {
@@ -54,30 +57,157 @@ namespace Foreman
         }
     }
 
-    public static class IconProcessor
+    public class IconProcessor
     {
         internal static readonly Color NoTint = Color.FromArgb(255, 255, 255, 255);
-        internal static readonly Pen HiddenSlashPen = new Pen(new SolidBrush(Color.DarkRed), 4);
 
         private static Bitmap unknownIcon;
         public static Bitmap GetUnknownIcon()
         {
             if (unknownIcon == null)
             {
-                unknownIcon = LoadImage("UnknownIcon.png");
-                if (unknownIcon == null)
+                try
                 {
-                    unknownIcon = new Bitmap(32, 32);
-                    using (Graphics g = Graphics.FromImage(unknownIcon))
+                    using (Bitmap image = new Bitmap("UnknownIcon.png")) //If you don't do this, the file is locked for the lifetime of the bitmap
                     {
-                        g.FillRectangle(Brushes.White, 0, 0, 32, 32);
+                        Bitmap bmp = new Bitmap(image);
+                        return bmp;
                     }
                 }
+                catch (Exception) { return new Bitmap(32, 32); }
             }
             return unknownIcon;
         }
 
-        public static IconColorPair GetIconAndColor(IconInfo iinfo, List<IconInfo> iinfos, int defaultCanvasSize)
+        private Dictionary<int, IconColorPair> iconCache;
+        public IReadOnlyDictionary<int, IconColorPair> IconCache { get { return iconCache; } }
+        private Dictionary<string, string> ModPathLinks;
+        private List<string> FailedImagePaths;
+
+        private IconProcessor()
+        {
+            iconCache = new Dictionary<int, IconColorPair>();
+            ModPathLinks = new Dictionary<string, string>();
+            FailedImagePaths = new List<string>();
+        }
+
+        public IconProcessor MakeIconProcessor(JObject jsonData, string modFolderLocation) //will return a null if mods are missing from the directory
+        {
+            IconProcessor processor = new IconProcessor();
+            if (PrepareModPaths(jsonData, modFolderLocation))
+                return processor;
+            else
+                return null;
+
+        }
+
+        public async Task FillIconCache(JObject jsonData, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
+        {
+            await Task.Run(() =>
+            {
+                iconCache.Clear();
+                FailedImagePaths.Clear();
+
+                int totalCount = jsonData["icons"].Count();
+                int counter = 0;
+                foreach (var iconJToken in jsonData["icons"].ToList())
+                {
+                    progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
+                    iconCache.Add((int)iconJToken["icon_id"], ProcessIcon(iconJToken));
+                }
+            });
+        }
+
+        public static void SaveIconCache(string path, Dictionary<int, IconColorPair> iconCache)
+        {
+            IconBitmapCollection iCollection = new IconBitmapCollection();
+
+            foreach (KeyValuePair<int, IconColorPair> iconKVP in iconCache)
+                iCollection.Icons.Add(iconKVP.Key, iconKVP.Value);
+
+            if (File.Exists(path))
+                File.Delete(path);
+            using (Stream stream = File.Open(path, FileMode.Create, FileAccess.Write))
+            {
+                var binaryFormatter = new BinaryFormatter();
+                binaryFormatter.Serialize(stream, iCollection);
+            }
+        }
+
+        public static async Task<Dictionary<int, IconColorPair>> LoadIconCache(string path, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
+        {
+            Dictionary<int, IconColorPair> iconCache = new Dictionary<int, IconColorPair>();
+            await Task.Run(() =>
+            {
+                try
+                {
+                    using (Stream stream = File.Open(path, FileMode.Open))
+                    {
+                        var binaryFormatter = new BinaryFormatter();
+                        IconBitmapCollection iCollection = (IconBitmapCollection)binaryFormatter.Deserialize(stream);
+
+                        int totalCount = iCollection.Icons.Count();
+                        int counter = 0;
+                        foreach (KeyValuePair<int, IconColorPair> iconKVP in iCollection.Icons)
+                        {
+                            progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, "Loading Icons..."));
+                            iconCache.Add(iconKVP.Key, iconKVP.Value);
+                        }
+                    }
+                }
+                catch //there was an error reading the cache. Just ignore it and continue (we will have to load the icons from the files directly)
+                {
+                    if (File.Exists(path))
+                        File.Delete(path);
+                    iconCache.Clear();
+                }
+            });
+            return iconCache;
+        }
+
+        private bool PrepareModPaths(JObject jsonData, string modFolder)
+        {
+            ModPathLinks.Clear();
+            List<string> modList = new List<string>(jsonData["mods"].Select(t => (string)t));
+            // now we have to go through the entire mod folder, confirm that all the required mods are there,
+            // unzip any that are zipped to a.. temp? location, and fill up the mod path links dictionary
+
+            return true; //no mods missing
+        }
+
+        private IconColorPair ProcessIcon(JToken objJToken)
+        {
+            int iconIndex = (int)objJToken["icon_id"];
+            IconColorPair iconData = new IconColorPair(null, Color.Black);
+
+            if (objJToken["icon_info"].Type != JTokenType.Null)
+            {
+                JToken iconInfoJToken = objJToken["icon_info"];
+
+                string mainIconPath = (string)iconInfoJToken["icon"];
+                int baseIconSize = (int)iconInfoJToken["icon_size"];
+                int defaultIconSize = (int)iconInfoJToken["icon_dsize"];
+
+                IconInfo iicon = new IconInfo(mainIconPath, baseIconSize);
+
+                List<IconInfo> iicons = new List<IconInfo>();
+                List<JToken> iconJTokens = iconInfoJToken["icons"].ToList();
+                foreach (var iconJToken in iconJTokens)
+                {
+                    IconInfo picon = new IconInfo((string)iconJToken["icon"], (int)iconJToken["icon_size"]);
+                    picon.iconScale = (double)iconJToken["scale"];
+
+                    picon.iconOffset = new Point((int)iconJToken["shift"][0], (int)iconJToken["shift"][1]);
+                    picon.SetIconTint((double)iconJToken["tint"][3], (double)iconJToken["tint"][0], (double)iconJToken["tint"][1], (double)iconJToken["tint"][2]);
+                    iicons.Add(picon);
+                }
+                iconData = GetIconAndColor(iicon, iicons, defaultIconSize);
+            }
+            return iconData;
+        }
+
+
+        public IconColorPair GetIconAndColor(IconInfo iinfo, List<IconInfo> iinfos, int defaultCanvasSize)
         {
             if (iinfos == null)
                 iinfos = new List<IconInfo>();
@@ -118,7 +248,7 @@ namespace Foreman
                 int iconDrawSize = (int)(iconSize * (ii.iconScale > 0 ? ii.iconScale : (double)defaultCanvasSize / iconSize));
                 iconDrawSize = (int)(iconDrawSize * IconCanvasScale);
 
-                Bitmap iconImage = LoadImage(ii.iconPath, iconDrawSize);
+                Bitmap iconImage = LoadImageFromMod(ii.iconPath, iconDrawSize);
                 if (iconImage == null)
                     continue;
 
@@ -179,7 +309,7 @@ namespace Foreman
             return new IconColorPair(result, averageColor);
         }
 
-        private static Bitmap LoadImage(string fileName, int resultSize = 32) //NOTE: must make sure we use pre-multiplied alpha
+        private Bitmap LoadImageFromMod(string fileName, int resultSize = 32) //NOTE: must make sure we use pre-multiplied alpha
         {
             if (String.IsNullOrEmpty(fileName))
             { return null; }
@@ -189,31 +319,21 @@ namespace Foreman
             {
                 fullPath = fileName;
             }
-            else if (File.Exists(Application.StartupPath + "\\" + fileName))
-            {
-                fullPath = Application.StartupPath + "\\" + fileName;
-            }
             else
             {
                 string[] splitPath = fileName.Split('/');
                 splitPath[0] = splitPath[0].Trim('_');
 
-                if (FactorioModsProcessor.Mods.Any(m => m.Name == splitPath[0]))
-                {
-                    fullPath = FactorioModsProcessor.Mods.First(m => m.Name == splitPath[0]).dir;
-                }
-
-                if (!String.IsNullOrEmpty(fullPath))
-                {
-                    for (int i = 1; i < splitPath.Count(); i++) //Skip the first split section because it's the mod name, not a directory
-                    {
-                        fullPath = Path.Combine(fullPath, splitPath[i]);
-                    }
-                }
+                if (ModPathLinks.ContainsKey(splitPath[0]))
+                    splitPath[0] = ModPathLinks[splitPath[0]];
+                fullPath = Path.Combine(splitPath);
             }
 
             if (!File.Exists(fullPath))
+            {
+                FailedImagePaths.Add(fileName);
                 return null;
+            }
 
             try
             {
@@ -229,10 +349,7 @@ namespace Foreman
                     return bmp;
                 }
             }
-            catch (Exception)
-            {
-                return null;
-            }
+            catch (Exception) { return null; }
         }
 
         public static Color GetAverageColor(Bitmap icon)

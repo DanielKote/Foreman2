@@ -1,187 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Drawing;
 
 namespace Foreman
 {
-	public class MachinePermutation
-	{
-		public ProductionEntity assembler;
-		public List<Module> modules;
-
-		public double GetAssemblerRate(float recipeTime, float beaconBonus)
-		{
-			return (assembler as Assembler).GetRate(recipeTime, beaconBonus, modules);
-		}
-
-        internal double GetAssemblerProductivity()
-        {
-            return modules
-                .Where(x => x != null)
-                .Sum(x => x.ProductivityBonus);
-        }
-
-		public double GetMinerRate(Resource r)
-		{
-			return (assembler as Miner).GetRate(r, modules);
-		}
-
-		public MachinePermutation(ProductionEntity machine, ICollection<Module> modules)
-		{
-			assembler = machine;
-			this.modules = modules.ToList();
-		}
-    }
-
-	public abstract class ProductionEntity
-	{
-		public String Name { get; protected set; }
-		public string LName;
-		public bool Enabled { get; set; }
-		public Bitmap Icon { get; set; }
-		public int ModuleSlots { get; set; }
-		public float Speed { get; set; }
-		private String friendlyName;
-		public String FriendlyName
-		{
-			get
-			{
-				if (!String.IsNullOrEmpty(LName))
-					return LName;
-				if (!String.IsNullOrWhiteSpace(friendlyName))
-				{
-					return friendlyName;
-				}
-				else
-				{
-					return Name;
-				}
-			}
-			set
-			{
-				friendlyName = value;
-			}
-		}
-		
-		public IEnumerable<MachinePermutation> GetAllPermutations(Recipe recipe)
-		{
-			yield return new MachinePermutation(this, new List<Module>());
-
-			Module[] currentModules = new Module[ModuleSlots];
-
-			if (ModuleSlots <= 0)
-			{
-				yield break;
-			}
-
-            var allowedModules = DataCache.Modules.Values
-                .Where(m => m.Enabled)
-                .Where(m => m.AllowedIn(recipe));
-
-			foreach (Module module in allowedModules)
-			{
-				for (int i = 0; i < ModuleSlots; i++)
-				{
-					currentModules[i] = module;
-					yield return new MachinePermutation(this, currentModules);
-				}
-			}
-		}
-	}
-
 	public class Assembler : ProductionEntity
 	{
-		public List<String> Categories { get; private set; }
-		public List<string> AllowedEffects { get; private set; }
+		public IReadOnlyCollection<Recipe> ValidRecipes { get { return validRecipes; } }
+		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
+		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
-		public Assembler(String name)
+		private HashSet<Recipe> validRecipes;
+		private HashSet<Module> validModules;
+
+		public Assembler(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName)
 		{
 			Enabled = true;
-			Name = name;
-			Categories = new List<string>();
-			AllowedEffects = new List<string>();
+			validRecipes = new HashSet<Recipe>();
+			validModules = new HashSet<Module>();
 		}
+
+		public void AddValidModule(Module module)
+        {
+			validModules.Add(module);
+			module.InternalOneWayAddAssembler(this);
+        }
+
+		internal void InternalOneWayRemoveValidModule(Module module) //only from delete calls
+        {
+			validModules.Remove(module);
+        }
+
+		internal void InternalOneWayAddRecipe(Recipe recipe) //should only be called from Recipe (when it adds an assembler)
+        {
+			validRecipes.Add(recipe);
+        }
+
+		internal void InternalOneWayRemoveRecipe(Recipe recipe) //only from delete calls
+        {
+			validRecipes.Remove(recipe);
+        }
 
 		public override string ToString()
 		{
 			return String.Format("Assembler: {0}", Name);
 		}
 
-		public float GetRate(float recipeTime, float beaconBonus, IEnumerable<Module> speedModules = null)
+		public float GetRate(Recipe recipe, float beaconBonus, IEnumerable<Module> modules = null)
 		{
 			double finalSpeed = this.Speed;
-			if (speedModules != null)
-			{
-				foreach (Module module in speedModules.Where(m => m != null))
-				{
+			if (modules != null)
+				foreach (Module module in modules.Where(m => m != null))
 					finalSpeed += module.SpeedBonus * this.Speed;
-				}
-			}
             finalSpeed += beaconBonus * this.Speed;
 
-			double craftingTime = recipeTime / finalSpeed;
+			double craftingTime = recipe.Time / finalSpeed;
 			craftingTime = (float)(Math.Ceiling(craftingTime * 60d) / 60d); //Machines have to wait for a new tick before starting a new item, so round up to the nearest tick
 
 			return (float)(1d / craftingTime);
 		}
 	}
 
-	public class Module
+	public class Module : DataObjectBase
 	{
-		public Bitmap Icon
-		{
-			get
-			{
-				//For each module there should be a corresponding item with the icon already loaded.
-				return DataCache.Items[Name].Icon;
-			}
-		}
-		public bool Enabled { get; set; }
+		public override Bitmap Icon { get { return myCache.Items[Name].Icon; } }
+        public override Color AverageColor { get { return myCache.Items[Name].AverageColor; } }
+        public override string FriendlyName { get { return myCache.Items[Name].FriendlyName; } }
+        public override string LFriendlyName { get { return myCache.Items[Name].LFriendlyName; } }
+
+		public IReadOnlyCollection<Recipe> ValidRecipes { get { return validRecipes; } }
+		public IReadOnlyCollection<Assembler> ValidAssemblers { get { return validAssemblers; } }
+		public Item AssociatedItem { get { return myCache.Items[Name]; } }
+
+        public bool Enabled { get; set; }
 		public float SpeedBonus { get; private set; }
         public float ProductivityBonus { get; private set; }
-		public string Name { get; private set; }
-		public string LName;
-		private String friendlyName;
-        private HashSet<string> allowedIn;
 
-        public String FriendlyName
-		{
-			get
-			{
-				if (!String.IsNullOrEmpty(LName))
-					return LName;
-				if (!String.IsNullOrWhiteSpace(friendlyName))
-				{
-					return friendlyName;
-				}
-				else
-				{
-					return Name;
-				}
-			}
-			set
-			{
-				friendlyName = value;
-			}
-		}
+		private HashSet<Recipe> validRecipes;
+		private HashSet<Assembler> validAssemblers;
 
-        public Module(String name, float speedBonus, float productivityBonus, HashSet<string> allowedIn)
+		public Module(DataCache dCache, string name, string friendlyName, float speedBonus, float productivityBonus) : base(dCache, name, friendlyName, "-")
 		{
-			Name = name;
 			Enabled = true;
-			this.SpeedBonus = speedBonus;
-			this.ProductivityBonus = productivityBonus;
-			this.allowedIn = allowedIn;
+			SpeedBonus = speedBonus;
+			ProductivityBonus = productivityBonus;
+			validRecipes = new HashSet<Recipe>();
+			validAssemblers = new HashSet<Assembler>();
 		}
 
-        public bool AllowedIn(Recipe recipe)
+		internal void InternalOneWayAddRecipe(Recipe recipe) //should only be called from Recipe (when it adds a valid module)
         {
-            if (allowedIn == null || recipe == null) // TODO: Remove recipe == null case, it's just there as scaffolding.
-                return true;
+			validRecipes.Add(recipe);
+        }
 
-            return allowedIn.Contains(recipe.Name);
+		internal void InternalOneWayRemoveRecipe(Recipe recipe) //only from delete calls
+		{
+			validRecipes.Remove(recipe);
+        }
+
+		internal void InternalOneWayAddAssembler(Assembler assembler) //should only be called from Assembler (when it adds a valid module)
+        {
+			validAssemblers.Add(assembler);
+        }
+
+		internal void InternalOneWayRemoveAssembler(Assembler assembler) //only from delete calls
+		{
+			validAssemblers.Remove(assembler);
         }
 	}
 }

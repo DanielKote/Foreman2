@@ -26,92 +26,12 @@ namespace Foreman.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FactorioPath {
+        public string CurrentPresetName {
             get {
-                return ((string)(this["FactorioPath"]));
+                return ((string)(this["CurrentPresetName"]));
             }
             set {
-                this["FactorioPath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FactorioUserDataPath {
-            get {
-                return ((string)(this["FactorioUserDataPath"]));
-            }
-            set {
-                this["FactorioUserDataPath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("en")]
-        public string Language {
-            get {
-                return ((string)(this["Language"]));
-            }
-            set {
-                this["Language"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection EnabledMods {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledMods"]));
-            }
-            set {
-                this["EnabledMods"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection EnabledAssemblers {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledAssemblers"]));
-            }
-            set {
-                this["EnabledAssemblers"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection EnabledMiners {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledMiners"]));
-            }
-            set {
-                this["EnabledMiners"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection EnabledModules {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["EnabledModules"]));
-            }
-            set {
-                this["EnabledModules"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool FactorioNormalDifficulty {
-            get {
-                return ((bool)(this["FactorioNormalDifficulty"]));
-            }
-            set {
-                this["FactorioNormalDifficulty"] = value;
+                this["CurrentPresetName"] = value;
             }
         }
         
@@ -160,30 +80,6 @@ namespace Foreman.Properties {
             }
             set {
                 this["AltGridlines"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FactorioDataPath {
-            get {
-                return ((string)(this["FactorioDataPath"]));
-            }
-            set {
-                this["FactorioDataPath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int GenerationType {
-            get {
-                return ((int)(this["GenerationType"]));
-            }
-            set {
-                this["GenerationType"] = value;
             }
         }
         
