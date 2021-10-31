@@ -11,44 +11,14 @@ namespace Foreman
 {
 	public partial class ChooserPanel : UserControl
 	{
+		public Action<ProductionNode> CallbackMethod; //returns the created production node (or null if not created)
+		private Item Item;
+		ProductionGraphViewer PGViewer;
 
-		public const int RecipeIconSize = 64;
-		public const int ModuleIconSize = 32;
-		public const int AssemblerIconSize = 32;
-
-		public Action<ChooserControl> CallbackMethod;
-
-		private List<ChooserControl> controls;
-
-		private ChooserControl selectedControl = null;
-		public ChooserControl SelectedControl
-		{
-			get
-			{
-				return selectedControl;
-			}
-			set
-			{
-				if (selectedControl != null)
-				{
-					selectedControl.BackColor = Color.White;
-				}
-				selectedControl = value;
-				if (value != null)
-				{
-					selectedControl.BackColor = Color.FromArgb(0xFF, 0xAE, 0xC6, 0xCF);
-				}
-			}
-		}
-
-		public ChooserPanel(IEnumerable<ChooserControl> controls, ProductionGraphViewer parent, int IconSize)
+		public ChooserPanel(Item item, bool includeSuppliers, bool includeConsumers, ProductionGraphViewer parent)
 			: base()
 		{
 			InitializeComponent();
-
-			this.controls = controls.ToList();
-			foreach (ChooserControl cc in controls)
-				cc.UpdateIconSize(IconSize);
 
 			parent.Controls.Add(this);
 			this.Location = new Point(parent.Width / 2 - Width / 2, parent.Height / 2 - Height / 2);
@@ -56,133 +26,66 @@ namespace Foreman
 			this.BringToFront();
 			parent.PerformLayout();
 
-			//tableLayoutPanel1.Focus();
-			flowLayoutPanel1.Focus();
-			//this.Focus();
+			this.Item = item;
+			this.PGViewer = parent;
+
+			//enable buttons
+			if (!includeSuppliers)
+				SourceButton.Enabled = false;
+			if (!includeConsumers)
+				ResultButton.Enabled = false;
+
+			//fill in recipes
+			if(includeConsumers)
+				foreach (Recipe r in item.ConsumptionRecipes)
+					if(Properties.Settings.Default.ShowHidden || (r.Enabled && r.HasEnabledAssemblers))
+						RecipeComboBox.Items.Add(r);
+			if (includeSuppliers)
+				foreach (Recipe r in item.ProductionRecipes)
+					if (Properties.Settings.Default.ShowHidden || (r.Enabled && r.HasEnabledAssemblers))
+						RecipeComboBox.Items.Add(r);
+
+			RecipeComboBox.Focus();
 		}
 
-		private void ChooserPanel_Load(object sender, EventArgs e)
-		{
-			foreach (ChooserControl control in controls)
-			{
-				flowLayoutPanel1.Controls.Add(control);
-				control.ParentPanel = this;
-				control.Dock = DockStyle.Top;
-				control.Width = this.Width;
-				RegisterKeyEvents(control);
-			}
-
-			Parent.PerformLayout();
-
-			UpdateControlWidth();
-		}
-
-		private void UpdateControlWidth()
-		{
-			if (flowLayoutPanel1.Controls[flowLayoutPanel1.Controls.Count - 1].Bottom > 600)
-			{
-				flowLayoutPanel1.Padding = new Padding(Padding.Left, Padding.Top, SystemInformation.VerticalScrollBarWidth, Padding.Bottom);
-			}
-			else
-			{
-				flowLayoutPanel1.Padding = new Padding(Padding.Left, Padding.Top, Padding.Left, Padding.Bottom);
-			}
-		}
-
-		public void Show(Action<ChooserControl> callback)
+		public void Show(Action<ProductionNode> callback)
 		{
 			CallbackMethod = callback;
 		}
 
-		private void RegisterKeyEvents(Control control)
+		private void ChooserPanel_Load(object sender, EventArgs e)
 		{
-			control.KeyDown += ChooserPanel_KeyDown;
-
-			foreach (Control subControl in control.Controls)
-			{
-				RegisterKeyEvents(subControl);
-			}
+			Parent.PerformLayout();
 		}
 
-		public void ChooserPanel_KeyDown(object sender, KeyEventArgs e)
-		{
-			switch (e.KeyCode)
-			{
-				case Keys.Escape:
-					CallbackMethod(null);
-					Dispose();
-					break;
-				case Keys.Down:
-					SelectedControl = controls[Math.Min(controls.IndexOf(selectedControl) + 1, controls.Count - 1)];
-					break;
-				case Keys.Up:
-					SelectedControl = controls[Math.Max(controls.IndexOf(selectedControl) - 1, 0)];
-					break;
-				case Keys.Enter:
-					CallbackMethod(SelectedControl);
-					Dispose();
-					break;
-					//default:
-					//	FilterTextBox.Focus();
-					//	SendKeys.Send(e.KeyCode.ToString());
-					//	break;
-			}
-			e.Handled = true;
-		}
-
-		private void ChooserPanel_MouseMove(object sender, MouseEventArgs e)
-		{
-			SelectedControl = null;
-		}
-
-		private void ChooserPanel_MouseLeave(object sender, EventArgs e)
-		{
-			SelectedControl = null;
-		}
-
-		private void FilterTextBox_TextChanged(object sender, EventArgs e)
-		{
-			SuspendLayout();
-			foreach (ChooserControl control in flowLayoutPanel1.Controls)
-			{
-				if (control.FilterText.ToLower().Contains(FilterTextBox.Text.ToLower()))
-				{
-					control.Visible = true;
-				}
-				else
-				{
-					control.Visible = false;
-				}
-			}
-			ResumeLayout(false);
-		}
-
-		private bool left = false; //prevent double calls
 		private void ChooserPanel_Leave(object sender, EventArgs e)
 		{
-			if(!left)
-            {
-				bool enabledRecipeListChanged = false;
-				foreach (Control control in controls)
-					enabledRecipeListChanged |= (control is RecipeChooserControl rcControl && rcControl.RecipeOriginallyEnabled != rcControl.DisplayedRecipe.Enabled);
-				if (enabledRecipeListChanged && ParentForm is MainForm mForm)
-				{
-					mForm.UpdateVisibleItemList();
-				}
-
-				left = true;
-            }
-
 			Dispose();
 		}
 
-		private void FilterTextBox_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.KeyCode == Keys.Escape || e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Enter)
-			{
-				ChooserPanel_KeyDown(sender, e);
-				e.Handled = true;
-			}
+        private void SourceButton_Click(object sender, EventArgs e)
+        {
+			CallbackMethod(SupplyNode.Create(Item, PGViewer.Graph));
+			Dispose();
+        }
+
+        private void PassthroughButton_Click(object sender, EventArgs e)
+        {
+			CallbackMethod(PassthroughNode.Create(Item, PGViewer.Graph));
+			Dispose();
 		}
-	}
+
+		private void ResultButton_Click(object sender, EventArgs e)
+        {
+			CallbackMethod(ConsumerNode.Create(Item, PGViewer.Graph));
+			Dispose();
+		}
+
+		private void RecipeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			Recipe sRecipe = RecipeComboBox.SelectedItem as Recipe;
+			CallbackMethod(RecipeNode.Create(sRecipe, PGViewer.Graph));
+			Dispose();
+		}
+    }
 }

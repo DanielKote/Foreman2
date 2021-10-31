@@ -50,7 +50,7 @@ namespace Foreman
 			set { base.Icon = value; }
 		}
 
-		public Recipe(string name, string lname) : base(name, lname)
+		public Recipe(string name, string lname, Subgroup subgroup, string order) : base(name, lname, subgroup, order)
 		{
 			localeCategories = recipeLocaleCategories;
 

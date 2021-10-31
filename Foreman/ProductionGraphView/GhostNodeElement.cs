@@ -8,7 +8,7 @@ namespace Foreman
 {
 	public class GhostNodeElement : GraphElement
 	{
-		public HashSet<Item> Items = new HashSet<Item>();
+		public Item Item;
 		public HashSet<Recipe> Recipes = new HashSet<Recipe>();
 
 		private const int iconSize = 32;
@@ -36,18 +36,14 @@ namespace Foreman
 			int i = 0;
 
 			List<Bitmap> icons = new List<Bitmap>();
-			if (Items.Any())
+			if (Item != null)
 			{
-				foreach (Item item in Items)
-				{
-					icons.Add(item.Icon);
-				}
-			} else
+				icons.Add(Item.Icon);
+			}
+			else
 			{
 				foreach (Recipe recipe in Recipes)
-				{
 					icons.Add(recipe.Icon);
-				}
 			}
 
 			foreach (Bitmap icon in icons)

@@ -202,24 +202,24 @@ namespace Foreman.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ShowDisabledRecipes {
+        public bool ShowHidden {
             get {
-                return ((bool)(this["ShowDisabledRecipes"]));
+                return ((bool)(this["ShowHidden"]));
             }
             set {
-                this["ShowDisabledRecipes"] = value;
+                this["ShowHidden"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ShowHiddenItems {
+        public bool IgnoreAssemblerStatus {
             get {
-                return ((bool)(this["ShowHiddenItems"]));
+                return ((bool)(this["IgnoreAssemblerStatus"]));
             }
             set {
-                this["ShowHiddenItems"] = value;
+                this["IgnoreAssemblerStatus"] = value;
             }
         }
     }

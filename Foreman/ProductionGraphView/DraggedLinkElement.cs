@@ -168,11 +168,11 @@ namespace Foreman
 			{
 				if (StartConnectionType == LinkType.Input)
 				{
-					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item);
+					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
 				}
 				else
 				{
-					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item);
+					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
 				}
 
 				Parent.Graph.UpdateNodeValues();
@@ -181,115 +181,34 @@ namespace Foreman
 				Parent.UpdateGraphBounds();
 				Parent.Invalidate();
 			}
-			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
+			else //at least one null
 			{
-				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
-
-                var itemOutputOption = new ItemChooserControl(Item, "Create output node", Item.FriendlyName);
-                var itemPassthroughOption = new ItemChooserControl(Item, "Create pass-through node", Item.FriendlyName);
-
-				recipeOptionList.Add(itemOutputOption);
-				recipeOptionList.Add(itemPassthroughOption);
-
-				foreach(Recipe recipe in Item.ConsumptionRecipes)
-					if(Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
-
-				var chooserPanel = new ChooserPanel(recipeOptionList, Parent, ChooserPanel.RecipeIconSize);
-				chooserPanel.Show(c =>
+				bool includeSuppliers = StartConnectionType == LinkType.Input && SupplierElement == null;
+				bool includeConsumers = StartConnectionType == LinkType.Output && ConsumerElement == null;
+				if (includeSuppliers || includeConsumers)
 				{
-					if (c != null)
+					var chooserPanel = new ChooserPanel(Item, includeSuppliers, includeConsumers, Parent);
+
+					chooserPanel.Show(c =>
 					{
-						NodeElement newElement = null;
-						if (c is RecipeChooserControl)
+						if (c != null)
 						{
-							Recipe selectedRecipe = (c as RecipeChooserControl).DisplayedRecipe;
-							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
+							NodeElement newElement = new NodeElement(c, Parent);
+							newElement.Location = newObjectLocation;
+							newElement.Update();
+
+							NodeLink newLink = NodeLink.Create(SupplierElement != null? SupplierElement.DisplayedNode : newElement.DisplayedNode, ConsumerElement != null? ConsumerElement.DisplayedNode : newElement.DisplayedNode, this.Item);
+							new LinkElement(Parent, newLink, SupplierElement != null? SupplierElement : newElement, ConsumerElement != null? ConsumerElement : newElement);
+
+							Parent.Graph.UpdateNodeValues();
+							Parent.AddRemoveElements();
+							Parent.UpdateNodes();
+							Parent.UpdateGraphBounds();
+							Parent.Invalidate();
 						}
-						else if (c == itemOutputOption)
-						{
-							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
-							newElement = new NodeElement(ConsumerNode.Create(selectedItem, Parent.Graph), Parent);
-							(newElement.DisplayedNode as ConsumerNode).rateType = RateType.Auto;
-						}
-						else if (c == itemPassthroughOption)
-						{
-							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
-							newElement = new NodeElement(PassthroughNode.Create(selectedItem, Parent.Graph), Parent);
-							(newElement.DisplayedNode as PassthroughNode).rateType = RateType.Auto;
-						} else
-                        {
-                            Trace.Fail("Unhandled option: " + c.ToString());
-                        }
-
-						newElement.Update();
-						newElement.Location = newObjectLocation;
-						NodeLink newLink = NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item);
-						new LinkElement(Parent, newLink, SupplierElement, newElement);
-					}
-
-					Parent.Graph.UpdateNodeValues();
-					Parent.AddRemoveElements();
-					Parent.UpdateNodes();
-					Parent.UpdateGraphBounds();
-					Parent.Invalidate();
-				});
-
+					});
+				}
 			}
-			else if (StartConnectionType == LinkType.Input && SupplierElement == null)
-			{
-				List<ChooserControl> recipeOptionList = new List<ChooserControl>();
-
-                var itemSupplyOption = new ItemChooserControl(Item, "Create infinite supply node", Item.FriendlyName);
-                var itemPassthroughOption = new ItemChooserControl(Item, "Create pass-through node", Item.FriendlyName);
-
-				recipeOptionList.Add(itemSupplyOption);
-				recipeOptionList.Add(itemPassthroughOption);
-
-
-				foreach (Recipe recipe in Item.ProductionRecipes)
-					if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
-
-				var chooserPanel = new ChooserPanel(recipeOptionList, Parent, ChooserPanel.RecipeIconSize);
-				chooserPanel.Show(c =>
-				{
-					if (c != null)
-					{
-						NodeElement newElement = null;
-						if (c is RecipeChooserControl)
-						{
-							Recipe selectedRecipe = (c as RecipeChooserControl).DisplayedRecipe;
-							newElement = new NodeElement(RecipeNode.Create(selectedRecipe, Parent.Graph), Parent);
-						}
-						else if (c == itemSupplyOption)
-						{
-							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
-							newElement = new NodeElement(SupplyNode.Create(selectedItem, Parent.Graph), Parent);
-						}
-						else if (c == itemPassthroughOption)
-						{
-							Item selectedItem = (c as ItemChooserControl).DisplayedItem;
-							newElement = new NodeElement(PassthroughNode.Create(selectedItem, Parent.Graph), Parent);
-							(newElement.DisplayedNode as PassthroughNode).rateType = RateType.Auto;
-						} else
-                        {
-                            Trace.Fail("Unhandled option: " + c.ToString());
-                        }
-						newElement.Update();
-						newElement.Location = newObjectLocation;
-						NodeLink newLink = NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item);
-						new LinkElement(Parent,newLink, newElement, ConsumerElement);
-					}
-
-					Parent.Graph.UpdateNodeValues();
-					Parent.AddRemoveElements();
-					Parent.UpdateNodes();
-					Parent.UpdateGraphBounds();
-					Parent.Invalidate();
-				});
-			}
-
 			Dispose();
 		}
 

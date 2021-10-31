@@ -126,8 +126,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\IRChooserPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\IRChooserPanel.Designer.cs">
+      <DependentUpon>IRChooserPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataTypes\Assembler.cs" />
     <Compile Include="DataTypes\DataObjectBase.cs" />
+    <Compile Include="DataTypes\Group.cs" />
     <Compile Include="DataTypes\Technology.cs" />
     <Compile Include="Forms\DirectoryChooserForm.cs">
       <SubType>Form</SubType>
@@ -139,9 +146,6 @@
     <Compile Include="ProductionGraphView\AssemblerBox.cs" />
     <Compile Include="Controls\CheckboxListWithErrors.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\ChooserControl.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\ChooserPanel.cs">
       <SubType>UserControl</SubType>
@@ -222,28 +226,16 @@
     </Compile>
     <Compile Include="ProductionGraphView\NodeElement.cs" />
     <Compile Include="Models\NodeLink.cs" />
-    <Compile Include="Controls\RecipeChooserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\RecipeChooserControl.Designer.cs">
-      <DependentUpon>RecipeChooserControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ItemChooserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\ItemChooserControl.Designer.cs">
-      <DependentUpon>ItemChooserControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="DataCache\ZipStorer.cs" />
     <EmbeddedResource Include="Controls\CheckboxListWithErrors.resx">
       <DependentUpon>CheckboxListWithErrors.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ChooserControl.resx">
-      <DependentUpon>ChooserControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ChooserPanel.resx">
       <DependentUpon>ChooserPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\IRChooserPanel.resx">
+      <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DirectoryChooserForm.resx">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
@@ -279,12 +271,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\RateOptionsPanel.resx">
       <DependentUpon>RateOptionsPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\RecipeChooserControl.resx">
-      <DependentUpon>RecipeChooserControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\RecipeChooserSupplyNodeOption.resx">
-      <DependentUpon>ItemChooserControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />

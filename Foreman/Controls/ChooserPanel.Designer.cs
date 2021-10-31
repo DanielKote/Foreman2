@@ -28,81 +28,79 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.FilterTextBox = new System.Windows.Forms.TextBox();
-			this.tableLayoutPanel1.SuspendLayout();
-			this.SuspendLayout();
-			// 
-			// tableLayoutPanel1
-			// 
-			this.tableLayoutPanel1.AutoSize = true;
-			this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel1.ColumnCount = 1;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 1);
-			this.tableLayoutPanel1.Controls.Add(this.FilterTextBox, 0, 0);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 2;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(7, 32);
-			this.tableLayoutPanel1.TabIndex = 0;
-			// 
-			// flowLayoutPanel1
-			// 
-			this.flowLayoutPanel1.AutoScroll = true;
-			this.flowLayoutPanel1.AutoSize = true;
-			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 29);
-			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(1, 1);
-			this.flowLayoutPanel1.TabIndex = 0;
-			this.flowLayoutPanel1.WrapContents = false;
-			// 
-			// FilterTextBox
-			// 
-			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FilterTextBox.Location = new System.Drawing.Point(3, 3);
-			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(1, 20);
-			this.FilterTextBox.TabIndex = 1;
-			this.FilterTextBox.TextChanged += new System.EventHandler(this.FilterTextBox_TextChanged);
-			this.FilterTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FilterTextBox_KeyDown);
-			// 
-			// ChooserPanel
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
-			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.BackColor = System.Drawing.Color.WhiteSmoke;
-			this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.Controls.Add(this.tableLayoutPanel1);
-			this.DoubleBuffered = true;
-			this.MaximumSize = new System.Drawing.Size(999999, 600);
-			this.Name = "ChooserPanel";
-			this.Size = new System.Drawing.Size(7, 32);
-			this.Load += new System.EventHandler(this.ChooserPanel_Load);
-			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ChooserPanel_KeyDown);
-			this.Leave += new System.EventHandler(this.ChooserPanel_Leave);
-			this.MouseLeave += new System.EventHandler(this.ChooserPanel_MouseLeave);
-			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ChooserPanel_MouseMove);
-			this.tableLayoutPanel1.ResumeLayout(false);
-			this.tableLayoutPanel1.PerformLayout();
-			this.ResumeLayout(false);
-			this.PerformLayout();
+            this.RecipeComboBox = new System.Windows.Forms.ComboBox();
+            this.SourceButton = new System.Windows.Forms.Button();
+            this.PassthroughButton = new System.Windows.Forms.Button();
+            this.ResultButton = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // RecipeComboBox
+            // 
+            this.RecipeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.RecipeComboBox.FormattingEnabled = true;
+            this.RecipeComboBox.Location = new System.Drawing.Point(3, 41);
+            this.RecipeComboBox.Name = "RecipeComboBox";
+            this.RecipeComboBox.Size = new System.Drawing.Size(287, 24);
+            this.RecipeComboBox.TabIndex = 0;
+            this.RecipeComboBox.SelectedIndexChanged += new System.EventHandler(this.RecipeComboBox_SelectedIndexChanged);
+            // 
+            // SourceButton
+            // 
+            this.SourceButton.Location = new System.Drawing.Point(3, 3);
+            this.SourceButton.Name = "SourceButton";
+            this.SourceButton.Size = new System.Drawing.Size(75, 32);
+            this.SourceButton.TabIndex = 1;
+            this.SourceButton.Text = "Source";
+            this.SourceButton.UseVisualStyleBackColor = true;
+            this.SourceButton.Click += new System.EventHandler(this.SourceButton_Click);
+            // 
+            // PassthroughButton
+            // 
+            this.PassthroughButton.Location = new System.Drawing.Point(84, 3);
+            this.PassthroughButton.Name = "PassthroughButton";
+            this.PassthroughButton.Size = new System.Drawing.Size(125, 32);
+            this.PassthroughButton.TabIndex = 2;
+            this.PassthroughButton.Text = "Passthrough";
+            this.PassthroughButton.UseVisualStyleBackColor = true;
+            this.PassthroughButton.Click += new System.EventHandler(this.PassthroughButton_Click);
+            // 
+            // ResultButton
+            // 
+            this.ResultButton.Location = new System.Drawing.Point(215, 3);
+            this.ResultButton.Name = "ResultButton";
+            this.ResultButton.Size = new System.Drawing.Size(75, 32);
+            this.ResultButton.TabIndex = 3;
+            this.ResultButton.Text = "Result";
+            this.ResultButton.UseVisualStyleBackColor = true;
+            this.ResultButton.Click += new System.EventHandler(this.ResultButton_Click);
+            // 
+            // ChooserPanel
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Controls.Add(this.ResultButton);
+            this.Controls.Add(this.PassthroughButton);
+            this.Controls.Add(this.SourceButton);
+            this.Controls.Add(this.RecipeComboBox);
+            this.DoubleBuffered = true;
+            this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximumSize = new System.Drawing.Size(1333331, 738);
+            this.Name = "ChooserPanel";
+            this.Size = new System.Drawing.Size(293, 70);
+            this.Load += new System.EventHandler(this.ChooserPanel_Load);
+            this.Leave += new System.EventHandler(this.ChooserPanel_Leave);
+            this.ResumeLayout(false);
 
 		}
 
-		#endregion
+        #endregion
 
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-		private System.Windows.Forms.TextBox FilterTextBox;
-	}
+        private System.Windows.Forms.ComboBox RecipeComboBox;
+        private System.Windows.Forms.Button SourceButton;
+        private System.Windows.Forms.Button PassthroughButton;
+        private System.Windows.Forms.Button ResultButton;
+    }
 }

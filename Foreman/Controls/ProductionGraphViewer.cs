@@ -821,7 +821,7 @@ namespace Foreman
 
 		void HandleDragEntering(object sender, DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(typeof(HashSet<Item>)) || e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
+			if (e.Data.GetDataPresent(typeof(Item)) || e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
 			{
 				e.Effect = DragDropEffects.All;
 			}
@@ -829,12 +829,12 @@ namespace Foreman
 
 		void HandleItemDragging(object sender, DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
+			if (e.Data.GetDataPresent(typeof(Item)))
 			{
 				if (GhostDragElement == null)
 				{
 					GhostDragElement = new GhostNodeElement(this);
-					GhostDragElement.Items = e.Data.GetData(typeof(HashSet<Item>)) as HashSet<Item>;
+					GhostDragElement.Item = e.Data.GetData(typeof(Item)) as Item;
 				}
 
 				GhostDragElement.Location = DesktopToGraph(e.X, e.Y);
@@ -856,70 +856,38 @@ namespace Foreman
 		{
 			if (GhostDragElement != null)
 			{
-				if (e.Data.GetDataPresent(typeof(HashSet<Item>)))
+				if (e.Data.GetDataPresent(typeof(Item)))
 				{
-					foreach (Item item in GhostDragElement.Items)
+					Item item = GhostDragElement.Item;
+					Point location = GhostDragElement.Location;
+
+					IRChooserPanel panel = new IRChooserPanel();
+					this.Controls.Add(panel);
+					panel.Location = new Point(100, 100);
+					panel.Anchor = AnchorStyles.None;
+					this.PerformLayout();
+					panel.Show();
+
+
+					return;
+
+					var chooserPanel = new ChooserPanel(item, true, true, this);
+
+					chooserPanel.Show(c =>
 					{
-						NodeElement newElement = null;
-
-						var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
-						var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
-						var itemPassthroughOption = new ItemChooserControl(item, "Create pass-through node", item.FriendlyName);
-
-						var optionList = new List<ChooserControl>();
-						optionList.Add(itemPassthroughOption);
-
-						optionList.Add(itemOutputOption);
-						foreach (Recipe recipe in item.ProductionRecipes)
-							if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-
-						optionList.Add(itemSupplyOption);
-						foreach (Recipe recipe in item.ConsumptionRecipes)
-							if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-
-
-						var chooserPanel = new ChooserPanel(optionList, this, ChooserPanel.RecipeIconSize);
-
-						Point location = GhostDragElement.Location;
-						if (ShowGrid)
+						if (c != null)
 						{
-							location.X = AlignToGrid(location.X);
-							location.Y = AlignToGrid(location.Y);
-						}
-
-						chooserPanel.Show(c =>
-						{
-							if (c != null)
+							NodeElement newElement = new NodeElement(c, this);
+							//Graph.UpdateNodeValues(); // no need - its a disconnected node!
+							newElement.Update();
+							if (ShowGrid)
 							{
-								if (c == itemSupplyOption)
-								{
-									newElement = new NodeElement(SupplyNode.Create(item, this.Graph), this);
-								}
-								else if (c is RecipeChooserControl)
-								{
-									newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, this.Graph), this);
-								}
-                                else if (c == itemPassthroughOption)
-                                {
-                                    newElement = new NodeElement(PassthroughNode.Create(item, this.Graph), this);
-                                }
-								else if (c == itemOutputOption)
-								{
-									newElement = new NodeElement(ConsumerNode.Create(item, this.Graph), this);
-								} else
-                                {
-                                    Trace.Fail("No handler for selected item");
-                                }
-
-								//Graph.UpdateNodeValues(); // no need - its a disconnected node!
-								newElement.Update();
-								newElement.Location = location;
+								location.X = AlignToGrid(location.X);
+								location.Y = AlignToGrid(location.Y);
 							}
-						});
-					}
-
+							newElement.Location = location;
+						}
+					});
 				}
 				else if (e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
 				{
@@ -1056,7 +1024,7 @@ namespace Foreman
 				{
 					if (!DataCache.Items.ContainsKey(iItem))
 					{
-						Item missingItem = new Item(iItem, iItem);
+						Item missingItem = new Item(iItem, iItem, DataCache.MissingSubgroup, "");
 						missingItem.IsMissingItem = true;
 						DataCache.MissingItems.Add(missingItem.Name, missingItem);
 					}
@@ -1090,7 +1058,7 @@ namespace Foreman
 
 						if (!DataCache.MissingRecipes.ContainsKey(recipeName))
 						{
-							Recipe missingRecipe = new Recipe(recipeName, recipeName);
+							Recipe missingRecipe = new Recipe(recipeName, recipeName, DataCache.MissingSubgroup, "");
 							foreach (string ingredient in ingredients)
 							{
 								if (DataCache.Items.ContainsKey(ingredient))

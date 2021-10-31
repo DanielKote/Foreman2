@@ -10,7 +10,7 @@ namespace Foreman
 
 		public HashSet<Recipe> ProductionRecipes { get; private set; }
 		public HashSet<Recipe> ConsumptionRecipes { get; private set; }
-		public Boolean IsMissingItem = false;
+		public bool IsMissingItem = false;
 
 		public double Temperature { get; set; } //for liquids
 
@@ -25,7 +25,7 @@ namespace Foreman
 			set { base.Icon = value; }
         }
 
-		public Item(string name, string lname) : base(name, lname)
+		public Item(string name, string lname, Subgroup subgroup, string order) : base(name, lname, subgroup, order)
 		{
 			localeCategories = itemLocaleCategories;
 			ProductionRecipes = new HashSet<Recipe>();

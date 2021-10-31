@@ -10,6 +10,9 @@ namespace Foreman
 		internal string[] localeCategories;
         public string Name { get; private set; }
         public string LName { get; set; }
+		public string Order { get; private set; }
+		public virtual Subgroup MySubgroup { get; private set; }
+		public virtual Group MyGroup { get { return MySubgroup.MyGroup; } }
 
 		private string friendlyName;
 		private string lfriendlyName; //lower case
@@ -25,14 +28,12 @@ namespace Foreman
 					else if (localeCategories != null)
 					{
 						string calcName = "";
-						string localeString = "";
 
 						foreach (String category in localeCategories)
 						{
 							string[] SplitName = Name.Split('\f');
 							if (DataCache.LocaleFiles.ContainsKey(category) && DataCache.LocaleFiles[category].ContainsKey(SplitName[0]))
 							{
-								localeString = DataCache.LocaleFiles[category][SplitName[0]];
 								if (DataCache.LocaleFiles[category][SplitName[0]].Contains("__"))
 									calcName = Regex.Replace(DataCache.LocaleFiles[category][SplitName[0]], "__.+?__", "").Replace("_", "").Replace("-", " ");
 								else
@@ -50,10 +51,13 @@ namespace Foreman
 			}
 		}
 
-		public DataObjectBase(string name, string lname)
+		public DataObjectBase(string name, string lname, Subgroup subGroup, string order)
         {
 			Name = name;
 			LName = lname;
+			MySubgroup = subGroup;
+
+			Order = order;
 			AverageColor = Color.Black;
         }
 
@@ -116,6 +120,6 @@ namespace Foreman
 		}
 
 		public override int GetHashCode() { return Name.GetHashCode(); }
-		public int CompareTo(DataObjectBase other) { return LFriendlyName.CompareTo(other.LFriendlyName); }
+		public int CompareTo(DataObjectBase other) { return Order.CompareTo(other.Order); }
 	}
 }

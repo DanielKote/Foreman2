@@ -143,8 +143,8 @@ namespace Foreman
 			MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 			MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
-			ShowDisabledRecipesCheckBox.Checked = Properties.Settings.Default.ShowDisabledRecipes;
-			ShowHiddenItemsCheckBox.Checked = Properties.Settings.Default.ShowHiddenItems;
+			ShowDisabledRecipesCheckBox.Checked = Properties.Settings.Default.ShowHidden;
+			ShowHiddenItemsCheckBox.Checked = Properties.Settings.Default.ShowHidden;
 
 			using (DataReloadForm form = new DataReloadForm())
 				form.ShowDialog(); //LOAD FACTORIO DATA
@@ -168,6 +168,7 @@ namespace Foreman
 
 		private void DataCache_DataLoaded(object _, EventArgs e)
 		{
+			//fill in the selection boxes (under 'other' tab)
 			AssemblerSelectionBox.Items.Clear();
 			AssemblerSelectionBox.Items.AddRange(DataCache.Assemblers.Values.ToArray());
 			MinerSelectionBox.Items.Clear();
@@ -176,7 +177,7 @@ namespace Foreman
 			ModuleSelectionBox.Items.AddRange(DataCache.Modules.Values.ToArray());
 			UpdateEDCheckLists();
 
-			//new data loaded through the data cache. need to refresh recipe & item lists
+			//fill in the unfiltered lists (and sort them alpha)
 			unfilteredRecipeList.Clear();
 			unfilteredItemList.Clear();
 			IconList.Images.Clear();
@@ -248,7 +249,7 @@ namespace Foreman
 					lvItem.BackColor = NormalBackground;
 				}
 			}
-			if (Properties.Settings.Default.ShowHiddenItems) //if we are to show hidden items, we will place them under the visible items, seperately sorted by alpha (due to the way we add them here)
+			if (Properties.Settings.Default.ShowHidden) //if we are to show hidden items, we will place them under the visible items, seperately sorted by alpha (due to the way we add them here)
 			{
 				foreach (ListViewItem lvItem in unfilteredItemList)
 				{
@@ -279,7 +280,7 @@ namespace Foreman
 					lvItem.BackColor = NormalBackground;
 				}
 			}
-			if (Properties.Settings.Default.ShowDisabledRecipes) //if we are to show disabled recipes, we will place them under the visible recipes, seperately sorted by alpha (due to the way we add them here)
+			if (Properties.Settings.Default.ShowHidden) //if we are to show disabled recipes, we will place them under the visible recipes, seperately sorted by alpha (due to the way we add them here)
 			{
 				foreach (ListViewItem lvItem in unfilteredRecipeList)
 				{
@@ -453,58 +454,24 @@ namespace Foreman
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
 			Item item = filteredItemList[ItemListView.SelectedIndices[0]].Tag as Item;
-			NodeElement newElement = null;
-
-			var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
-			var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
-
-			var optionList = new List<ChooserControl>();
-
-			optionList.Add(itemOutputOption);
-
-			foreach (Recipe recipe in item.ProductionRecipes)
-				if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-					optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-
-			optionList.Add(itemSupplyOption);
-
-			foreach (Recipe recipe in item.ConsumptionRecipes)
-				if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-					optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-
-
-			var chooserPanel = new ChooserPanel(optionList, GraphViewer, ChooserPanel.RecipeIconSize);
-
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 			if (GraphViewer.ShowGrid)
 			{
 				location.X = GraphViewer.AlignToGrid(location.X);
 				location.Y = GraphViewer.AlignToGrid(location.Y);
 			}
+			var chooserPanel = new ChooserPanel(item, true, true, GraphViewer);
 
 			chooserPanel.Show(c =>
 			{
 				if (c != null)
 				{
-					if (c == itemSupplyOption)
-					{
-						newElement = new NodeElement(SupplyNode.Create(item, GraphViewer.Graph), GraphViewer);
-					}
-					else if (c is RecipeChooserControl)
-					{
-						newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, GraphViewer.Graph), GraphViewer);
-					}
-					else if (c == itemOutputOption)
-					{
-						newElement = new NodeElement(ConsumerNode.Create(item, GraphViewer.Graph), GraphViewer);
-					}
-
+					NodeElement newElement = new NodeElement(c, GraphViewer);
 					newElement.Update();
 					newElement.Location = location;
+					GraphViewer.Graph.UpdateNodeValues();
 				}
 			});
-
-			GraphViewer.Graph.UpdateNodeValues();
 		}
 
 		private void rateButton_CheckedChanged(object sender, EventArgs e)
@@ -585,9 +552,7 @@ namespace Foreman
 
 		private void ItemListView_ItemDrag(object sender, ItemDragEventArgs e)
 		{
-			HashSet<Item> draggedItems = new HashSet<Item>();
-			draggedItems.Add(filteredItemList[ItemListView.SelectedIndices[0]].Tag as Item);
-			DoDragDrop(draggedItems, DragDropEffects.All);
+			DoDragDrop(filteredItemList[ItemListView.SelectedIndices[0]].Tag as Item, DragDropEffects.All);
 		}
 
 		private void saveGraphButton_Click(object sender, EventArgs e)
@@ -1041,14 +1006,18 @@ namespace Foreman
 
 		private void ShowHiddenItemsCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			Properties.Settings.Default.ShowHiddenItems = ShowHiddenItemsCheckBox.Checked;
+			Properties.Settings.Default.ShowHidden = ShowHiddenItemsCheckBox.Checked;
+			if (ShowHiddenItemsCheckBox.Checked != ShowDisabledRecipesCheckBox.Checked)
+				ShowDisabledRecipesCheckBox.Checked = ShowHiddenItemsCheckBox.Checked;
 			Properties.Settings.Default.Save();
 			UpdateVisibleItemList();
 		}
 
 		private void ShowDisabledRecipesCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			Properties.Settings.Default.ShowDisabledRecipes = ShowDisabledRecipesCheckBox.Checked;
+			Properties.Settings.Default.ShowHidden = ShowDisabledRecipesCheckBox.Checked;
+			if (ShowHiddenItemsCheckBox.Checked != ShowDisabledRecipesCheckBox.Checked)
+				ShowHiddenItemsCheckBox.Checked = ShowDisabledRecipesCheckBox.Checked;
 			Properties.Settings.Default.Save();
 			UpdateVisibleRecipeList();
 		}
@@ -1072,6 +1041,5 @@ namespace Foreman
 				return cp;
 			}
 		}
-
     }
 }

@@ -47,10 +47,10 @@
     <Setting Name="UseSaveFileData" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ShowDisabledRecipes" Type="System.Boolean" Scope="User">
+    <Setting Name="ShowHidden" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="ShowHiddenItems" Type="System.Boolean" Scope="User">
+    <Setting Name="IgnoreAssemblerStatus" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

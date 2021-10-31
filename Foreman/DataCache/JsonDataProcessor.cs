@@ -12,6 +12,8 @@ namespace Foreman
     class JsonDataProcessor
     {
         private Dictionary<string, Technology> Technologies;
+        private Dictionary<string, Group> Groups;
+        private Dictionary<string, Subgroup> Subgroups;
         private Dictionary<string, Item> Items;
         private Dictionary<string, List<string>> FluidDuplicants;
         private Dictionary<string, Recipe> Recipes;
@@ -24,9 +26,12 @@ namespace Foreman
         private Dictionary<string, Exception> FailedFiles;
         private Dictionary<string, Exception> FailedPaths;
 
+        private Dictionary<string, Group> SubgroupToGroupLinks; //used internally to link up subgroup to the correct group
         private const float defaultRecipeTime = 0.5f;
 
         public IReadOnlyDictionary<string, Technology> GetTechnologies() { return Technologies; }
+        public IReadOnlyDictionary<string, Group> GetGroups() { return Groups; }
+        public IReadOnlyDictionary<string, Subgroup> GetSubgroups() { return Subgroups; }
         public IReadOnlyDictionary<string, Item> GetItems() { return Items; }
         public IReadOnlyDictionary<string, Recipe> GetRecipes() { return Recipes; }
         public IReadOnlyDictionary<string, Assembler> GetAssemblers() { return Assemblers; }
@@ -40,6 +45,10 @@ namespace Foreman
         public JsonDataProcessor()
         {
             Technologies = new Dictionary<string, Technology>();
+
+            Groups = new Dictionary<string, Group>();
+            Subgroups = new Dictionary<string, Subgroup>();
+            SubgroupToGroupLinks = new Dictionary<string, Group>();
 
             Items = new Dictionary<string, Item>();
             FluidDuplicants = new Dictionary<string, List<string>>(); //used to store references to the names in items for any extra fluids (ex: coolant *300, coolant *200, coolant *100)
@@ -70,6 +79,8 @@ namespace Foreman
 
             int totalCount =
                 jsonData["technologies"].Count() +
+                jsonData["groups"].Count() + 
+                //jsonData["subgroups"].Count() + //they dont have any icons, so are extremely fast (and thus can be ignored for the progress bar)
                 jsonData["items"].Count() +
                 jsonData["fluids"].Count() +
                 jsonData["recipes"].Count() +
@@ -83,6 +94,14 @@ namespace Foreman
             {
                 progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessTechnology(objJToken);
+            }
+            foreach (var objJToken in jsonData["groups"].ToList())
+            {
+                ProcessGroup(objJToken);
+            }
+            foreach (var objJToken in jsonData["subgroups"].ToList())
+            {
+                ProcessSubgroup(objJToken);
             }
             foreach (var objJToken in jsonData["items"].ToList())
             {
@@ -129,6 +148,13 @@ namespace Foreman
 
             ProcessDuplicates(); //checks if the 'default' item should be removed (ex: nothing creates it and everything that consumes it also consumes a variation of it)
 
+            //sort
+            foreach (Group g in Groups.Values)
+                g.SortSubgroups();
+            foreach (Subgroup sg in Subgroups.Values)
+                sg.SortIRs();
+
+            //enable/disable based on settings
             foreach (string s in Settings.Default.EnabledAssemblers)
                 if (Assemblers.ContainsKey(s))
                     Assemblers[s].Enabled = true;
@@ -190,16 +216,32 @@ namespace Foreman
             }
         }
 
+        private void ProcessGroup(JToken objJToken)
+        {
+            Group group = new Group((string)objJToken["name"], (string)objJToken["localised_name"], (string)objJToken["order"]);
+            group.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
+
+            foreach (var subgroupJToken in objJToken["subgroups"])
+                SubgroupToGroupLinks.Add((string)subgroupJToken, group);
+            Groups.Add(group.Name, group);
+        }
+
+        private void ProcessSubgroup(JToken objJToken)
+        {
+            Subgroup subgroup = new Subgroup((string)objJToken["name"], SubgroupToGroupLinks[(string)objJToken["name"]], (string)objJToken["order"]);
+            Subgroups.Add(subgroup.Name, subgroup);
+        }
+
         private void ProcessItem(JToken objJToken)
         {
-            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"]);
+            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
             item.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
             Items.Add(item.Name, item);
         }
 
         private void ProcessFluid(JToken objJToken)
         {
-            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"]);
+            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
             item.Temperature = (double)objJToken["default_temperature"];
             item.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
             Items.Add(item.Name, item);
@@ -207,7 +249,7 @@ namespace Foreman
 
         private void ProcessRecipe(JToken objJToken)
         {
-            Recipe recipe = new Recipe((string)objJToken["name"], (string)objJToken["localised_name"]);
+            Recipe recipe = new Recipe((string)objJToken["name"], (string)objJToken["localised_name"], Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
             recipe.Time = (float)objJToken["energy"] > 0 ? (float)objJToken["energy"] : defaultRecipeTime;
             recipe.Category = (string)objJToken["category"];
             recipe.IsAvailableAtStart = (bool)objJToken["enabled"];
@@ -255,7 +297,7 @@ namespace Foreman
                         FluidDuplicants[name].Add(fluidName);
 
                         Item defaultFluid = Items[name];
-                        Item newFluid = new Item(fluidName, defaultFluid.LName + " (" + temp + "*)");
+                        Item newFluid = new Item(fluidName, defaultFluid.LName + " (" + temp + "*)", defaultFluid.MySubgroup, defaultFluid.Order+temp);
                         newFluid.Temperature = temp;
                         newFluid.Icon = defaultFluid.Icon;
 
@@ -299,7 +341,7 @@ namespace Foreman
 
                     for (int j = 0; j < baseRecipeCount; j++)
                     {
-                        Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1), recipes[j].LName);
+                        Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1), recipes[j].LName, recipes[0].MySubgroup, recipes[0].Order+(i * baseRecipeCount + j + 1));
                         newRecipe.Category = recipes[j].Category;
                         newRecipe.Enabled = recipes[j].Enabled;
                         newRecipe.Time = recipes[j].Time;
@@ -511,6 +553,19 @@ namespace Foreman
             //step 4: clean up tech tree (removing any recipes from the unlocks that are no longer present in recipe set)
             foreach(Technology tech in Technologies.Values)
                 tech.Recipes.IntersectWith(Recipes.Values);
+
+            //step 5: clean up groups and subgroups (basically, clear the entire dictionary and for each recipe & item 'add' their subgroup & group into the dictionary.
+            Groups.Clear();
+            Subgroups.Clear();
+            foreach(Item item in Items.Values)
+                if(!Subgroups.ContainsKey(item.MySubgroup.Name))
+                    Subgroups.Add(item.MySubgroup.Name, item.MySubgroup);
+            foreach (Recipe recipe in Recipes.Values)
+                if (!Subgroups.ContainsKey(recipe.MySubgroup.Name))
+                    Subgroups.Add(recipe.MySubgroup.Name, recipe.MySubgroup);
+            foreach (Subgroup subgroup in Subgroups.Values)
+                if (!Groups.ContainsKey(subgroup.MyGroup.Name))
+                    Groups.Add(subgroup.MyGroup.Name, subgroup.MyGroup);
         }
 
         private bool IsUnlockable(Technology tech) //sets the locked parameter based on unlockability of it & its prerequisites. returns true if unlocked

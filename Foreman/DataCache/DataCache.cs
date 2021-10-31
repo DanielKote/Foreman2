@@ -46,11 +46,13 @@ namespace Foreman
 
         public static List<Mod> Mods = new List<Mod>();
         public static List<Language> Languages = new List<Language>();
-        public static Dictionary<String, Dictionary<String, String>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
+        public static Dictionary<string, Dictionary<string, string>> LocaleFiles = new Dictionary<string, Dictionary<string, string>>();
 
         public static Dictionary<string, Technology> Technologies = new Dictionary<string, Technology>();
-        public static Dictionary<string, Item> Items = new Dictionary<String, Item>();
-        public static Dictionary<string, Recipe> Recipes = new Dictionary<String, Recipe>();
+        public static Dictionary<string, Group> Groups = new Dictionary<string, Group>();
+        public static Dictionary<string, Subgroup> Subgroups = new Dictionary<string, Subgroup>();
+        public static Dictionary<string, Item> Items = new Dictionary<string, Item>();
+        public static Dictionary<string, Recipe> Recipes = new Dictionary<string, Recipe>();
         public static Dictionary<string, Assembler> Assemblers = new Dictionary<string, Assembler>();
         public static Dictionary<string, Miner> Miners = new Dictionary<string, Miner>();
         public static Dictionary<string, Resource> Resources = new Dictionary<string, Resource>();
@@ -58,19 +60,20 @@ namespace Foreman
 
         public static Dictionary<string, Recipe> MissingRecipes = new Dictionary<string, Recipe>(); //both are used when loading a graph file with unknown / missing items / recipes.
         public static Dictionary<string, Item> MissingItems = new Dictionary<string, Item>();
+        public static Subgroup MissingSubgroup = new Subgroup("", new Group("","",""), "");
 
-        public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
-        public static Dictionary<String, Exception> failedPathDirectories = new Dictionary<string, Exception>();
+        public static Dictionary<string, Exception> failedFiles = new Dictionary<string, Exception>();
+        public static Dictionary<string, Exception> failedPathDirectories = new Dictionary<string, Exception>();
  
         public static Bitmap UnknownIcon { get { return IconProcessor.GetUnknownIcon(); } }
 
-        private static Dictionary<String, byte[]> zipHashes = new Dictionary<string, byte[]>();
+        private static Dictionary<string, byte[]> zipHashes = new Dictionary<string, byte[]>();
         private static GenerationType GetGenerationType() { return (GenerationType)(Settings.Default.GenerationType); }
 
-        private static String DataPath { get { return Path.Combine(Settings.Default.FactorioPath, "data"); } }
-        private static String ModPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "mods"); } }
+        private static string DataPath { get { return Path.Combine(Settings.Default.FactorioPath, "data"); } }
+        private static string ModPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "mods"); } }
         private static string ScriptOutPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "script-output"); } }
-        private static String ExtractionPath { get { return ModPath; } }
+        private static string ExtractionPath { get { return ModPath; } }
 
         private static readonly List<Tuple<string, DependencyType>> DependencyTypeTokens = new List<Tuple<string, DependencyType>>
         {
@@ -125,6 +128,10 @@ namespace Foreman
 
                 foreach (KeyValuePair<string, Technology> kvp in processor.GetTechnologies())
                     Technologies.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Group> kvp in processor.GetGroups())
+                    Groups.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<string, Subgroup> kvp in processor.GetSubgroups())
+                    Subgroups.Add(kvp.Key, kvp.Value);
                 foreach (KeyValuePair<string, Item> kvp in processor.GetItems())
                     Items.Add(kvp.Key, kvp.Value);
                 foreach (KeyValuePair<string, Recipe> kvp in processor.GetRecipes())
@@ -148,12 +155,14 @@ namespace Foreman
                 progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes"));
                 MarkCyclicRecipes();
                 progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
+
                 UpdateRecipesAssemblerStatus();
                 ReportErrors();
+
+                DataLoaded?.Invoke(null, EventArgs.Empty);
+                progress.Report(new KeyValuePair<int, string>(100, "Done!"));
             });
 
-            DataLoaded?.Invoke(null, EventArgs.Empty);
-            progress.Report(new KeyValuePair<int, string>(100, "Done!"));
         }
 
         public static void Clear()

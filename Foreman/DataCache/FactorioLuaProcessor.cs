@@ -456,7 +456,7 @@ namespace Foreman
             {
                 return;
             }
-            Item newItem = new Item(name, "");
+            Item newItem = new Item(name, "", null, "");
             newItem.SetIconAndColor(GetIconAndColor(values));
 
             if (!Items.ContainsKey(name))
@@ -508,7 +508,7 @@ namespace Foreman
                     return;
                 }
 
-                Recipe newRecipe = new Recipe(name, "");
+                Recipe newRecipe = new Recipe(name, "", null, "");
                 newRecipe.Time = (time == 0.0f) ? defaultRecipeTime : time;
                 foreach (KeyValuePair<Item, float> kvp in ingredients)
                     newRecipe.Ingredients.Add(kvp.Key, kvp.Value);
@@ -715,7 +715,7 @@ namespace Foreman
             Item newItem;
             if (!Items.ContainsKey(itemName))
             {
-                Items.Add(itemName, newItem = new Item(itemName, ""));
+                Items.Add(itemName, newItem = new Item(itemName, "", null, ""));
             }
             else
             {

@@ -9,6 +9,9 @@ namespace ForemanTest
     // A fluid interface for building up production graphs for testing. See references for usage.
     public class GraphBuilder
     {
+        public static Subgroup TestSubgroup = new Subgroup("", new Group("", "", ""), "");
+
+
         private static int counter = 0;
         protected static int GetSequence()
         {
@@ -124,7 +127,7 @@ namespace ForemanTest
 
             internal override void Build(ProductionGraph graph)
             {
-                Built = this.createFunction(new Item(itemName, ""), graph);
+                Built = this.createFunction(new Item(itemName, "", TestSubgroup, ""), graph);
 
                 if (target > 0)
                 {
@@ -159,7 +162,7 @@ namespace ForemanTest
                 if (name == null)
                     name = "recipe-" + GetSequence();
 
-                Recipe recipe = new Recipe(name, "");
+                Recipe recipe = new Recipe(name, "", TestSubgroup, "");
                 recipe.Time = duration;
                 foreach (KeyValuePair<string, float> kvp in inputs)
                     recipe.Ingredients.Add(DataCache.Items[kvp.Key], kvp.Value);
@@ -225,7 +228,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Suppliers(string itemName)
             {
-                return Graph.GetSuppliers(new Item(itemName, ""));
+                return Graph.GetSuppliers(new Item(itemName, "", TestSubgroup, ""));
             }
 
             public float ConsumedRate(string itemName)
@@ -235,7 +238,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Consumers(string itemName)
             {
-                return Graph.GetConsumers(new Item(itemName, ""));
+                return Graph.GetConsumers(new Item(itemName, "", TestSubgroup, ""));
             }
 
             public float RecipeRate(string name)
@@ -252,7 +255,7 @@ namespace ForemanTest
                    .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
                    .Select(x => (RecipeNode)x)
                    .First()
-                   .GetSuppliedRate(new Item(itemName, ""));
+                   .GetSuppliedRate(new Item(itemName, "", TestSubgroup, ""));
             }
         }
     }
