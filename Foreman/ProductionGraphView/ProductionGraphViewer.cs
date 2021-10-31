@@ -711,12 +711,15 @@ namespace Foreman
 					if (selectedNodes.Contains(MouseDownElement)) //dragging a group
 					{
 						Point startPoint = MouseDownElement.Location;
+						GraphElement element = MouseDownElement;
 						MouseDownElement.Dragged(graph_location);
-						Point endPoint = MouseDownElement.Location;
-						if (startPoint != endPoint)
-							foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
-								node.SetLocation(new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y));
-
+						if (element == MouseDownElement) //check to ensure that the dragged operation hasnt changed the mousedown element -> as is the case with item tab to dragged link
+						{
+							Point endPoint = MouseDownElement.Location;
+							if (startPoint != endPoint)
+								foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
+									node.SetLocation(new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y));
+						}
 					}
 					else //dragging single item
 					{
@@ -991,6 +994,7 @@ namespace Foreman
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			//preset options
+			info.AddValue("Version:", Properties.Settings.Default.ForemanVersion);
 			info.AddValue("SavedPresetName", DCache.PresetName);
 			info.AddValue("IncludedMods", DCache.IncludedMods.Select(m => m.Key + "|" + m.Value));
 

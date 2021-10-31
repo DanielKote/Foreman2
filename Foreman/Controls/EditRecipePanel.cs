@@ -191,7 +191,7 @@ namespace Foreman
 
 			List<Module> moduleOptions = nodeData.BaseRecipe.Modules.Intersect(nodeData.SelectedAssembler.Modules).OrderBy(m => m.LFriendlyName).ToList();
 
-			CleanTable(SelectedAModulesTable, nodeData.SelectedAssembler.ModuleSlots);
+			CleanTable(SelectedAModulesTable, nodeData.AssemblerModules.Count);
 
 			AssemblerModules.Clear();
 			for (int i = 0; i < nodeData.AssemblerModules.Count; i++)
@@ -276,7 +276,7 @@ namespace Foreman
 			List<Module> moduleOptions = nodeData.SelectedBeacon == null ? new List<Module>() : nodeData.BaseRecipe.Modules.Intersect(nodeData.SelectedAssembler.Modules).Intersect(nodeData.SelectedBeacon.Modules).OrderBy(m => m.LFriendlyName).ToList();
 			int moduleSlots = nodeData.SelectedBeacon == null ? 0 : nodeData.SelectedBeacon.ModuleSlots;
 
-			CleanTable(SelectedBModulesTable, moduleSlots);
+			CleanTable(SelectedBModulesTable, nodeData.BeaconModules.Count);
 
 			BeaconModules.Clear();
 			for (int i = 0; i < nodeData.BeaconModules.Count; i++)
@@ -457,6 +457,7 @@ namespace Foreman
 		}
 		private void AModuleButton_Click(object sender, EventArgs e)
 		{
+			ToolTip.Hide((Control)sender);
 			int index = AssemblerModules.IndexOf((Button)sender);
 			nodeController.RemoveAssemblerModule(index);
 			myGraphViewer.Graph.UpdateNodeValues();
@@ -481,6 +482,7 @@ namespace Foreman
 		}
 		private void BModuleButton_Click(object sender, EventArgs e)
 		{
+			ToolTip.Hide((Control)sender);
 			int index = BeaconModules.IndexOf((Button)sender);
 			myGraphViewer.Graph.UpdateNodeValues();
 			nodeController.RemoveBeaconModule(index);

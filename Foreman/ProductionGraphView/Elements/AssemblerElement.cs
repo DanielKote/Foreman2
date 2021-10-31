@@ -9,7 +9,7 @@ namespace Foreman
 {
 	public class AssemblerElement : GraphElement
 	{
-		private const int AssemblerIconSize = 48;
+		private const int AssemblerIconSize = 54;
 		private const int ModuleIconSize = 13;
 		private const int ModuleSpacing = 12;
 
@@ -21,6 +21,7 @@ namespace Foreman
 		private static readonly Pen prodModulePen = new Pen(Brushes.DarkRed, 3);
 		private static readonly Pen effModulePen = new Pen(Brushes.DarkGreen, 3);
 		private static readonly Pen unknownModulePen = new Pen(Brushes.Black, 3);
+		private static readonly Font moduleFont = new Font(FontFamily.GenericSansSerif, 6, FontStyle.Bold);
 
 		private static readonly Font infoFont = new Font(FontFamily.GenericSansSerif, 5);
 		private static readonly Font counterBaseFont = new Font(FontFamily.GenericSansSerif, 14);
@@ -59,44 +60,51 @@ namespace Foreman
 				for (int i = 0; i < moduleLocations.Length && i < DisplayedNode.AssemblerModules.Count; i++)
 					graphics.DrawImage(DisplayedNode.AssemblerModules[i].Icon, trans.X + moduleLocations[i].X + moduleOffset.X, trans.Y + moduleLocations[i].Y + moduleOffset.Y, ModuleIconSize, ModuleIconSize);
 			}
-			else //resot to drawing circles for each module instead -> 5x6 set, so max 30 modules shown
+			else if (DisplayedNode.AssemblerModules.Count <= 4 * 7) //resot to drawing circles for each module instead -> 4x7 set, so max 28 modules shown
 			{
-				for (int x = 0; x < 5; x++)
+				for (int x = 0; x < 4; x++)
 				{
-					for (int y = 0; y < 6; y++)
+					for (int y = 0; y < 7; y++)
 					{
-						if (DisplayedNode.AssemblerModules.Count > (x * 6) + y)
+						if (DisplayedNode.AssemblerModules.Count > (x * 7) + y)
 						{
-							Pen marker = DisplayedNode.AssemblerModules[(x * 6) + y].ProductivityBonus > 0 ? prodModulePen :
-								DisplayedNode.AssemblerModules[(x * 6) + y].ConsumptionBonus < 0 ? effModulePen :
-								DisplayedNode.AssemblerModules[(x * 6) + y].SpeedBonus > 0 ? speedModulePen : unknownModulePen;
-							graphics.DrawEllipse(marker, trans.X + moduleOffset.X + 20 - (x * 7), trans.Y + moduleOffset.Y + (y * 7), 3, 3);
+							Pen marker = DisplayedNode.AssemblerModules[(x * 7) + y].ProductivityBonus > 0 ? prodModulePen :
+								DisplayedNode.AssemblerModules[(x * 7) + y].ConsumptionBonus < 0 ? effModulePen :
+								DisplayedNode.AssemblerModules[(x * 7) + y].SpeedBonus > 0 ? speedModulePen : unknownModulePen;
+							graphics.DrawEllipse(marker, trans.X + moduleOffset.X + ModuleSpacing + ModuleIconSize - 3 - (x * 7), trans.Y + moduleOffset.Y + (y * 7), 3, 3);
 						}
 					}
 				}
 			}
+			else
+			{
+				int prodModules = DisplayedNode.AssemblerModules.Count(m => m.ProductivityBonus > 0);
+				int efficiencyModules = DisplayedNode.AssemblerModules.Count(m => m.ConsumptionBonus < 0 && m.ProductivityBonus <= 0);
+				int speedModules = DisplayedNode.AssemblerModules.Count(m => m.SpeedBonus > 0 && m.ConsumptionBonus >= 0 && m.ProductivityBonus <= 0);
+				int unknownModules = DisplayedNode.AssemblerModules.Count - prodModules - efficiencyModules - speedModules;
+				graphics.DrawString(string.Format("S:{0}", speedModules), moduleFont, Brushes.DarkBlue, trans.X, trans.Y + 10);
+				graphics.DrawString(string.Format("E:{0}", efficiencyModules), moduleFont, Brushes.DarkGreen, trans.X, trans.Y + 20);
+				graphics.DrawString(string.Format("P:{0}", prodModules), moduleFont, Brushes.DarkRed, trans.X, trans.Y + 30);
+				graphics.DrawString(string.Format("U:{0}", unknownModules), moduleFont, Brushes.Black, trans.X, trans.Y + 40);
+			}
 
 			//assembler info + quantity
-			Rectangle textbox;
+			Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 10, (myParent.Width / 2) - this.X - (this.Width / 2) - 6, 30);
 			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Assembler || DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner))
 			{
 				//info text
-				graphics.DrawString("Speed:\nProd:\nPower:", infoFont, textBrush, trans.X + Width, trans.Y);
-				graphics.DrawString(string.Format("{0:P0}\n{1:P0}\n{2:P0}", DisplayedNode.GetSpeedMultiplier(), DisplayedNode.GetProductivityMultiplier(), DisplayedNode.GetConsumptionMultiplier()), infoFont, textBrush, trans.X + Width + 30, trans.Y);
+				graphics.DrawString("Speed:\nProd:\nPower:", infoFont, textBrush, trans.X + Width + 2, trans.Y);
+				graphics.DrawString(string.Format("{0:P0}\n{1:P0}\n{2:P0}", DisplayedNode.GetSpeedMultiplier(), DisplayedNode.GetProductivityMultiplier(), DisplayedNode.GetConsumptionMultiplier()), infoFont, textBrush, trans.X + Width + 26, trans.Y);
 
-				textbox = new Rectangle(trans.X + Width, trans.Y + 26, 60, 30);
+				textbox.Y = trans.Y + 24;
 			}
 			else if(graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && DisplayedNode.SelectedAssembler.EntityType == EntityType.Generator)
 			{
 				//info text
 				graphics.DrawString("Power:", infoFont, textBrush, trans.X + Width, trans.Y + 10);
-				graphics.DrawString(string.Format("{0:P0}", DisplayedNode.GetGeneratorEffectivity()), infoFont, textBrush, trans.X + Width + 30, trans.Y + 10);
+				graphics.DrawString(string.Format("{0:P0}", DisplayedNode.GetGeneratorEffectivity()), infoFont, textBrush, trans.X + Width + 26, trans.Y + 10);
 
-				textbox = new Rectangle(trans.X + Width, trans.Y + 26, 60, 30);
-			}
-			else
-			{
-				textbox = new Rectangle(trans.X + Width, trans.Y + 10, 60, 30);
+				textbox.Y = trans.Y + 24;
 			}
 
 			//quantity
@@ -109,7 +117,7 @@ namespace Foreman
 			else
 			{
 				double assemblerCount = DisplayedNode.ActualAssemblerCount;
-				if (assemblerCount >= 1000)
+				if (assemblerCount >= 10000)
 					text += assemblerCount.ToString("0.##e0");
 				else if (assemblerCount >= 0.1)
 					text += assemblerCount.ToString("0.#");

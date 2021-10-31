@@ -397,8 +397,6 @@ namespace Foreman
 				return output; //missing recipe is an automatic end -> we dont care about any other errors, since the only solution is to delete the node.
 			}
 
-			Console.WriteLine(Convert.ToString((int)ErrorSet, 2));
-
 			if ((ErrorSet & RecipeNode.Errors.AssemblerIsMissing) != 0)
 				output.Add(string.Format("> Assembler \"{0}\" doesnt exist in preset!", MyNode.SelectedAssembler.FriendlyName));
 			if ((ErrorSet & RecipeNode.Errors.BurnerNoFuelSet) != 0)

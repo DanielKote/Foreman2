@@ -41,18 +41,18 @@ namespace Foreman
 		{
 			if (InputTabs.Count == 0 && OutputTabs.Count != 0)
 			{
-				AssemblerElement.Location = new Point(-30, -2);
-				BeaconElement.Location = new Point(-18, 32);
+				AssemblerElement.Location = new Point(-26, -6);
+				BeaconElement.Location = new Point(-30, 36);
 			}
 			else if (OutputTabs.Count == 0 && InputTabs.Count != 0)
 			{
-				AssemblerElement.Location = new Point(-30, -22);
-				BeaconElement.Location = new Point(-18, 12);
+				AssemblerElement.Location = new Point(-26, -26);
+				BeaconElement.Location = new Point(-30, 16);
 			}
 			else
 			{
-				AssemblerElement.Location = new Point(-30, -12);
-				BeaconElement.Location = new Point(-18, 22);
+				AssemblerElement.Location = new Point(-26, -16);
+				BeaconElement.Location = new Point(-30, 26);
 			}
 
 			AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);

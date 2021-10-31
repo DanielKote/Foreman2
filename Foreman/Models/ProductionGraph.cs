@@ -501,6 +501,7 @@ namespace Foreman
 			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
 
 			//serialize
+			info.AddValue("Version:", Properties.Settings.Default.ForemanVersion);
 			info.AddValue("IncludedItems", includedItems);
 			info.AddValue("IncludedRecipes", includedRecipeShorts);
 			info.AddValue("IncludedAssemblers", includedAssemblers);

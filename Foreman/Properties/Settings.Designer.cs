@@ -262,5 +262,17 @@ namespace Foreman.Properties {
                 this["ShowErrorArrows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int ForemanVersion {
+            get {
+                return ((int)(this["ForemanVersion"]));
+            }
+            set {
+                this["ForemanVersion"] = value;
+            }
+        }
     }
 }
