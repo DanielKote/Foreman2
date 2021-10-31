@@ -74,7 +74,7 @@ namespace Foreman
         private void InitializeButtons()
         {
             //initialize the group buttons
-            SortedGroups = PGViewer.DCache.Groups.Values.ToList();
+            SortedGroups = PGViewer.Graph.DCache.Groups.Values.ToList();
             SortedGroups.Sort();
             foreach(Group group in SortedGroups)
             {

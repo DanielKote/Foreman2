@@ -2,22 +2,56 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
+using Newtonsoft.Json.Linq;
 
 namespace Foreman
 {
-	public class RecipeShort
+	public class RecipeShort : IEquatable<RecipeShort>
 	{
 		public string Name;
-		public List<string> Ingredients;
-		public List<string> Products;
+		public Dictionary<string, float> Ingredients;
+		public Dictionary<string, float> Products;
 
 		public RecipeShort(Recipe recipe)
 		{
 			Name = recipe.Name;
-			Ingredients = recipe.IngredientSet.Keys.Select(item => item.Name).ToList();
-			Products = recipe.ProductSet.Keys.Select(item => item.Name).ToList();
+			Ingredients = new Dictionary<string, float>();
+			foreach (var kvp in recipe.IngredientSet)
+				Ingredients.Add(kvp.Key.Name, kvp.Value);
+			Products = new Dictionary<string, float>();
+			foreach (var kvp in recipe.ProductSet)
+				Products.Add(kvp.Key.Name, kvp.Value);
 		}
-	}
+
+		public RecipeShort(string name)
+		{
+			Name = name;
+			Ingredients = new Dictionary<string, float>();
+			Products = new Dictionary<string, float>();
+		}
+
+		public static List<RecipeShort> GetListFromJson(JToken jdata)
+        {
+			List<RecipeShort> resultList = new List<RecipeShort>();
+			foreach(JToken recipe in jdata)
+            {
+				RecipeShort newShort = new RecipeShort((string)recipe["Name"]);
+				foreach (JProperty ingredient in recipe["Ingredients"])
+					newShort.Ingredients.Add((string)ingredient.Name, (float)ingredient.Value);
+				foreach (JProperty ingredient in recipe["Products"])
+					newShort.Products.Add((string)ingredient.Name, (float)ingredient.Value);
+				resultList.Add(newShort);
+			}
+			return resultList;
+        }
+
+        public bool Equals(RecipeShort other)
+        {
+			return this.Name == other.Name &&
+				this.Ingredients.Count == other.Ingredients.Count && this.Ingredients.SequenceEqual(other.Ingredients) &&
+				this.Products.Count == other.Products.Count && this.Products.SequenceEqual(other.Products);
+        }
+    }
 
     public struct fRange
     {

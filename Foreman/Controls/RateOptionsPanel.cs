@@ -10,7 +10,7 @@ namespace Foreman
 	{
 		public ProductionNode BaseNode { get; private set; }
 		public ProductionGraphViewer GraphViewer { get; private set; }
-		private DataCache DCache { get { return GraphViewer.DCache; } }
+		private DataCache DCache { get { return GraphViewer.Graph.DCache; } }
 
 		private static Assembler BestAssembler = new Assembler(null, "best\n", "Best");
 		private static Module NoneModule = new Module(null, "none\n", "None", 0, 0);

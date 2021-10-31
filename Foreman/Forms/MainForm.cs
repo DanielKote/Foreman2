@@ -25,10 +25,10 @@ namespace Foreman
         {
 			//WindowState = FormWindowState.Maximized;
 
-			bool gotPreset = SetSelectedPreset(Properties.Settings.Default.CurrentPresetName);
-			if (gotPreset)
+			List<Preset> validPresets = GetValidPresetsList();
+			if (validPresets != null && validPresets.Count > 0)
 			{
-				using (DataLoadForm form = new DataLoadForm())
+				using (DataLoadForm form = new DataLoadForm(validPresets[0]))
 				{
 					form.ShowDialog(); //LOAD FACTORIO DATA
 					GraphViewer.Graph = new ProductionGraph(form.GetDataCache());
@@ -100,7 +100,7 @@ namespace Foreman
 			try
 			{
 				if(Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
-					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
+					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false);
 				else if(Path.GetExtension(dialog.FileName).ToLower() == ".json")
 					GraphViewer.LoadFromOldJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
 				//NOTE: MainCache will update
@@ -129,6 +129,39 @@ namespace Foreman
 
 		//---------------------------------------------------------Settings/export/additem/addrecipe
 
+		public static List<Preset> GetValidPresetsList()
+        {
+			List<Preset> presets = new List<Preset>();
+			List<string> existingPresetFiles = new List<string>();
+			foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.json"))
+				if (File.Exists(Path.ChangeExtension(presetFile, "dat")))
+					existingPresetFiles.Add(Path.GetFileNameWithoutExtension(presetFile));
+			existingPresetFiles.Sort();
+
+			if (!existingPresetFiles.Contains(Properties.Settings.Default.CurrentPresetName))
+			{
+				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to default (Factorio 1.1 Vanilla)");
+				Properties.Settings.Default.CurrentPresetName = DefaultPreset;
+			}
+			if (!existingPresetFiles.Contains(DefaultPreset))
+			{
+				MessageBox.Show("The default preset (Factorio 1.1 Vanilla) has been removed. Please re-install / re-download Foreman");
+				Application.Exit();
+				return null;
+			}
+			existingPresetFiles.Remove(Properties.Settings.Default.CurrentPresetName);
+			existingPresetFiles.Remove(DefaultPreset);
+
+			presets.Add(new Preset(Properties.Settings.Default.CurrentPresetName, true, Properties.Settings.Default.CurrentPresetName == DefaultPreset));
+			if (Properties.Settings.Default.CurrentPresetName != DefaultPreset)
+				presets.Add(new Preset(DefaultPreset, false, true));
+			foreach (string presetName in existingPresetFiles)
+				presets.Add(new Preset(presetName, false, false));
+
+			Properties.Settings.Default.Save();
+			return presets;
+		}
+
 		private void SettingsButton_Click(object sender, EventArgs e)
 		{
 			bool reload = false;
@@ -145,22 +178,8 @@ namespace Foreman
 					oldOptions.Mods.Add(kvp.Key + " - " + kvp.Value);
 				oldOptions.Mods.Sort();
 
-				foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.json"))
-					if (File.Exists(Path.ChangeExtension(presetFile, "dat")))
-						oldOptions.Presets.Add(Path.GetFileNameWithoutExtension(presetFile));
-
-				oldOptions.SelectedPreset = Properties.Settings.Default.CurrentPresetName;
-				if(!oldOptions.Presets.Contains(oldOptions.SelectedPreset))
-                {
-					if (!oldOptions.Presets.Contains(DefaultPreset))
-					{
-						MessageBox.Show("The default preset (Factorio 1.1 Vanilla) has been removed. Please re-install / re-download Foreman");
-						Close();
-						Dispose();
-						return;
-					}
-					oldOptions.SelectedPreset = DefaultPreset;
-                }					
+				oldOptions.Presets = GetValidPresetsList();
+				oldOptions.SelectedPreset = oldOptions.Presets[0].Name;
 
 				using (SettingsForm form = new SettingsForm(oldOptions))
 				{
@@ -172,8 +191,9 @@ namespace Foreman
 
 					if (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset) //different preset -> need to reload datacache
 					{
-						SetSelectedPreset(form.CurrentOptions.SelectedPreset);
-						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+						Properties.Settings.Default.CurrentPresetName = form.CurrentOptions.SelectedPreset;
+						List<Preset> validPresets = GetValidPresetsList();
+						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true);
 						Properties.Settings.Default.Save();
 					}
 					else //update the assemblers, miners, modules if we havent switched preset (if we have, then all are enabled)
@@ -190,38 +210,6 @@ namespace Foreman
 					UpdateControlValues();
 				}
 			} while (reload);
-		}
-
-		private bool SetSelectedPreset(string preset) //NOTE: this does NOT! update the cache, it only sets the string in properties.
-        {
-			if (string.IsNullOrEmpty(preset) ||
-				!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", preset + ".json" })) ||
-				!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", preset + ".dat" })))
-			{
-				if (preset != DefaultPreset)
-				{
-					string message;
-					if (string.IsNullOrEmpty(preset))
-						message = "No preset has been specified.\nResetting to default preset (Factorio 1.1 Vanilla)";
-					else
-						message = "Selected preset (" + preset + ") does not exist.\nResetting to default preset (Factorio 1.1 Vanilla)";
-					MessageBox.Show(message);
-				}
-
-				Properties.Settings.Default.CurrentPresetName = DefaultPreset;
-				if (!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", DefaultPreset + ".json" })) ||
-					!File.Exists(Path.Combine(new string[] { Application.StartupPath, "Presets", DefaultPreset + ".dat" })))
-				{
-					MessageBox.Show("The default preset (Factorio 1.1 Vanilla) has been removed. Please re-install / re-download Foreman");
-					Close();
-					Dispose();
-					return false;
-				}
-			}
-			else
-				Properties.Settings.Default.CurrentPresetName = preset;
-			Properties.Settings.Default.Save();
-			return true;
 		}
 
 		private void ExportImageButton_Click(object sender, EventArgs e)
@@ -408,13 +396,13 @@ namespace Foreman
 
 		//---------------------------------------------------------double buffering commands
 
-		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
+		public static void SetDoubleBuffered(Control c)
 		{
-			if (System.Windows.Forms.SystemInformation.TerminalServerSession)
+			if (SystemInformation.TerminalServerSession)
 				return;
-			System.Reflection.PropertyInfo aProp = typeof(System.Windows.Forms.Control).GetProperty("DoubleBuffered",
-			System.Reflection.BindingFlags.NonPublic |
-			System.Reflection.BindingFlags.Instance);
+			System.Reflection.PropertyInfo aProp = typeof(Control).GetProperty("DoubleBuffered",
+				System.Reflection.BindingFlags.NonPublic |
+				System.Reflection.BindingFlags.Instance);
 			aProp.SetValue(c, true, null);
 		}
 
@@ -428,4 +416,23 @@ namespace Foreman
 			}
 		}
     }
+
+	public class Preset : IEquatable<Preset>
+	{
+		public string Name { get; set; }
+		public bool IsCurrentlySelected { get; set; }
+		public bool IsDefaultPreset { get; set; }
+
+		public Preset(string name, bool isCurrentlySelected, bool isDefaultPreset)
+		{
+			Name = name;
+			IsCurrentlySelected = isCurrentlySelected;
+			IsDefaultPreset = isDefaultPreset;
+		}
+
+		public bool Equals(Preset other)
+		{
+			return this == other;
+		}
+	}
 }

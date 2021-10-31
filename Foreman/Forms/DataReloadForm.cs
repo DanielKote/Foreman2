@@ -13,25 +13,16 @@ namespace Foreman
         private int currentPercent;
         private string currentText;
 
-        private string JsonDataPath;
-        private string IconDataPath;
+        private Preset selectedPreset;
         private DataCache createdDataCache;
 
-        public DataLoadForm(List<KeyValuePair<string,string>> activeMods = null)
+        public DataLoadForm(Preset preset)
         {
             currentPercent = 0;
             currentText = "";
             cts = new CancellationTokenSource();
 
-            if (activeMods == null) //load the currently selected preset - dont care about mod compatibilities
-            {
-                JsonDataPath = Path.Combine(new string[] { Application.StartupPath, "Presets", Properties.Settings.Default.CurrentPresetName + ".json" }); ;
-                IconDataPath = Path.Combine(new string[] { Application.StartupPath, "Presets", Properties.Settings.Default.CurrentPresetName + ".dat" });
-            }
-            else //need to load each of the presets and find their mod list - if the mod list fits the activeMods list, then use it.
-            {
-
-            }
+            selectedPreset = preset;
 
             InitializeComponent();
         }
@@ -59,9 +50,7 @@ namespace Foreman
             var token = cts.Token;
 
             createdDataCache = new DataCache();
-            JObject jsonData = JObject.Parse(File.ReadAllText(JsonDataPath));
-            var IconCache = await IconProcessor.LoadIconCache(IconDataPath, progress, token, 0, 80);
-            await createdDataCache.LoadAllData(jsonData, IconCache, progress, token, 80, 100);
+            await createdDataCache.LoadAllData(selectedPreset, progress, token);
 
             if (token.IsCancellationRequested)
             {

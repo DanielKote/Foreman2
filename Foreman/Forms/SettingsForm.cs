@@ -16,7 +16,7 @@ namespace Foreman
             public Dictionary<Module, bool> Modules;
             public List<string> Mods;
 
-            public List<string> Presets;
+            public List<Preset> Presets;
             public string SelectedPreset;
 
             public SettingsFormOptions()
@@ -26,7 +26,7 @@ namespace Foreman
                 Modules = new Dictionary<Module, bool>();
                 Mods = new List<string>();
 
-                Presets = new List<string>();
+                Presets = new List<Preset>();
             }
 
             public SettingsFormOptions Clone()
@@ -40,7 +40,7 @@ namespace Foreman
                     clone.Modules.Add(kvp.Key, kvp.Value);
                 foreach (string mod in Mods)
                     clone.Mods.Add(mod);
-                foreach (string preset in Presets)
+                foreach (Preset preset in Presets)
                     clone.Presets.Add(preset);
 
                 clone.SelectedPreset = this.SelectedPreset;
@@ -74,7 +74,6 @@ namespace Foreman
         private SettingsFormOptions originalOptions;
         public SettingsFormOptions CurrentOptions;
         public bool ReloadRequired;
-        private bool modListEnabled = false;
 
         public SettingsForm(SettingsFormOptions options)
         {
@@ -83,6 +82,9 @@ namespace Foreman
             ReloadRequired = false;
 
             InitializeComponent();
+
+            SelectPresetMenuItem.Click += SelectPresetMenuItem_Click;
+            DeletePresetMenuItem.Click += DeletePresetMenuItem_Click;
 
             AssemblerSelectionBox.Items.AddRange(CurrentOptions.Assemblers.Keys.ToArray());
             AssemblerSelectionBox.Sorted = true;
@@ -118,7 +120,81 @@ namespace Foreman
             }
 
             ModSelectionBox.Items.AddRange(CurrentOptions.Mods.ToArray());
-            ModSelectionBox.Sorted = true;
+            for (int i = 0; i < ModSelectionBox.Items.Count; i++)
+                ModSelectionBox.SetItemChecked(i, true);
+
+            PresetsListBox.Items.AddRange(CurrentOptions.Presets.ToArray());
+        }
+
+        private void PresetsListBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+
+            var index = PresetsListBox.IndexFromPoint(e.Location);
+            if (index != ListBox.NoMatches)
+            {
+                Preset rclickedPreset = ((Preset)PresetsListBox.Items[index]);
+                PresetsListBox.SelectedIndex = index;
+
+                if(rclickedPreset.IsCurrentlySelected)
+                {
+                    SelectPresetMenuItem.Text = "Current Preset";
+                    SelectPresetMenuItem.Enabled = false;
+                }
+                else
+                {
+                    SelectPresetMenuItem.Text = "Use This Preset";
+                    SelectPresetMenuItem.Enabled = true;
+                }
+                SelectPresetMenuItem.Enabled = !rclickedPreset.IsCurrentlySelected;
+                if (rclickedPreset.IsDefaultPreset)
+                {
+                    DeletePresetMenuItem.Text = "Default Preset";
+                    DeletePresetMenuItem.Enabled = false;
+                }
+                else
+                {
+                    DeletePresetMenuItem.Text = "Delete This Preset";
+                    DeletePresetMenuItem.Enabled = !rclickedPreset.IsCurrentlySelected;
+                }
+
+                PresetMenuStrip.Show(Cursor.Position);
+                PresetMenuStrip.Visible = true;
+            }
+            else
+                PresetMenuStrip.Visible = false;
+        }
+
+        private void DeletePresetMenuItem_Click(object sender, EventArgs e)
+        {
+            Preset selectedPreset = (Preset)PresetsListBox.SelectedItem;
+            if(!selectedPreset.IsCurrentlySelected && !selectedPreset.IsDefaultPreset) //safety check - should always pass
+            {
+               if(MessageBox.Show("Are you sure you wish to delete the \""+selectedPreset.Name+"\" preset? This is irreversible.", "Confirm Delete", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    string jsonPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".json" });
+                    string iconPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".dat" });
+
+                    if (File.Exists(jsonPath))
+                        File.Delete(jsonPath);
+                    if (File.Exists(iconPath))
+                        File.Delete(iconPath);
+
+                    PresetsListBox.Items.Remove(selectedPreset);
+                    CurrentOptions.Presets.Remove(selectedPreset);
+                }
+            }
+        }
+
+        private void SelectPresetMenuItem_Click(object sender, EventArgs e)
+        {
+            Preset selectedPreset = (Preset)PresetsListBox.SelectedItem;
+            if (!selectedPreset.IsCurrentlySelected) //safety check - should always pass
+            {
+                CurrentOptions.SelectedPreset = selectedPreset.Name;
+                ReloadRequired = true;
+                this.Close();
+            }
         }
 
         //ASSEMBLER------------------------------------------------------------------------------------------
@@ -143,6 +219,11 @@ namespace Foreman
             }
         }
 
+        private void AssemblerSelectionBox_Leave(object sender, EventArgs e)
+        {
+            AssemblerSelectionBox.SelectedItem = null;
+        }
+
         //MINER------------------------------------------------------------------------------------------
         private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
@@ -163,6 +244,11 @@ namespace Foreman
                 MinerSelectionBox.SetItemChecked(i, false);
                 CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]] = false;
             }
+        }
+
+        private void MinerSelectionBox_Leave(object sender, EventArgs e)
+        {
+            MinerSelectionBox.SelectedItem = null;
         }
 
         //MODULE------------------------------------------------------------------------------------------
@@ -187,15 +273,14 @@ namespace Foreman
             }
         }
 
+        private void ModuleSelectionBox_Leave(object sender, EventArgs e)
+        {
+            ModuleSelectionBox.SelectedItem = null;
+        }
+
         //CONFIRM / RELOAD / CANCEL------------------------------------------------------------------------------------------
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            this.Close();
-        }
-
-        private void ReloadButton_Click(object sender, EventArgs e)
-        {
-            ReloadRequired = true;
             this.Close();
         }
 
@@ -205,9 +290,30 @@ namespace Foreman
             this.Close();
         }
 
-        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
+        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) { }
 
+        //PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------
+
+        private void ImportPresetButton_Click(object sender, EventArgs e)
+        {
+            using (ImportPresetForm form = new ImportPresetForm())
+            {
+                form.StartPosition = FormStartPosition.Manual;
+                form.Left = this.Left + 50;
+                form.Top = this.Top + 25;
+                form.ShowDialog();
+
+                if(!string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
+                {
+                    Preset newPreset = new Preset(form.NewPresetName, false, false);
+                    CurrentOptions.Presets.Add(newPreset);
+                    PresetsListBox.Items.Add(newPreset);
+                }
+            }
+        }
+
+        private void ComparePresetsButton_Click(object sender, EventArgs e)
+        {
 
         }
     }

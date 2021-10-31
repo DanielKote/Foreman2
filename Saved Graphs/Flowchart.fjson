@@ -1,0 +1,814 @@
+{
+  "AmountType": 0,
+  "Unit": 1,
+  "SavedPresetName": "_default (Factorio 1.1 Vanilla)",
+  "IncludedItems": [
+    "iron-plate",
+    "steel-plate",
+    "storage-tank",
+    "iron-gear-wheel",
+    "pipe",
+    "fluid-wagon",
+    "iron-ore",
+    "copper-cable",
+    "electronic-circuit",
+    "copper-plate",
+    "plastic-bar",
+    "advanced-circuit",
+    "coal",
+    "petroleum-gas",
+    "water",
+    "crude-oil",
+    "heavy-oil",
+    "light-oil",
+    "sulfur",
+    "sulfuric-acid",
+    "solid-fuel",
+    "lubricant",
+    "processing-unit",
+    "rail",
+    "electric-furnace",
+    "productivity-module",
+    "production-science-pack",
+    "flying-robot-frame",
+    "low-density-structure",
+    "utility-science-pack",
+    "engine-unit",
+    "chemical-science-pack",
+    "piercing-rounds-magazine",
+    "grenade",
+    "stone-wall",
+    "military-science-pack",
+    "transport-belt",
+    "inserter",
+    "logistic-science-pack",
+    "battery",
+    "electric-engine-unit",
+    "wood",
+    "wooden-chest",
+    "iron-chest",
+    "fast-transport-belt",
+    "express-transport-belt"
+  ],
+  "IncludedRecipes": [
+    {
+      "Name": "storage-tank",
+      "Ingredients": {
+        "iron-plate": 20.0,
+        "steel-plate": 5.0
+      },
+      "Products": {
+        "storage-tank": 1.0
+      }
+    },
+    {
+      "Name": "fluid-wagon",
+      "Ingredients": {
+        "steel-plate": 16.0,
+        "iron-gear-wheel": 10.0,
+        "storage-tank": 1.0,
+        "pipe": 8.0
+      },
+      "Products": {
+        "fluid-wagon": 1.0
+      }
+    },
+    {
+      "Name": "pipe",
+      "Ingredients": {
+        "iron-plate": 1.0
+      },
+      "Products": {
+        "pipe": 1.0
+      }
+    },
+    {
+      "Name": "steel-plate",
+      "Ingredients": {
+        "iron-plate": 5.0
+      },
+      "Products": {
+        "steel-plate": 1.0
+      }
+    },
+    {
+      "Name": "iron-gear-wheel",
+      "Ingredients": {
+        "iron-plate": 2.0
+      },
+      "Products": {
+        "iron-gear-wheel": 1.0
+      }
+    },
+    {
+      "Name": "iron-plate",
+      "Ingredients": {
+        "iron-ore": 1.0
+      },
+      "Products": {
+        "iron-plate": 1.0
+      }
+    },
+    {
+      "Name": "electronic-circuit",
+      "Ingredients": {
+        "iron-plate": 1.0,
+        "copper-cable": 3.0
+      },
+      "Products": {
+        "electronic-circuit": 1.0
+      }
+    },
+    {
+      "Name": "copper-cable",
+      "Ingredients": {
+        "copper-plate": 1.0
+      },
+      "Products": {
+        "copper-cable": 2.0
+      }
+    },
+    {
+      "Name": "advanced-circuit",
+      "Ingredients": {
+        "plastic-bar": 2.0,
+        "copper-cable": 4.0,
+        "electronic-circuit": 2.0
+      },
+      "Products": {
+        "advanced-circuit": 1.0
+      }
+    },
+    {
+      "Name": "plastic-bar",
+      "Ingredients": {
+        "coal": 1.0,
+        "petroleum-gas": 20.0
+      },
+      "Products": {
+        "plastic-bar": 2.0
+      }
+    },
+    {
+      "Name": "advanced-oil-processing",
+      "Ingredients": {
+        "water": 50.0,
+        "crude-oil": 100.0
+      },
+      "Products": {
+        "heavy-oil": 25.0,
+        "light-oil": 45.0,
+        "petroleum-gas": 55.0
+      }
+    },
+    {
+      "Name": "basic-oil-processing",
+      "Ingredients": {
+        "crude-oil": 100.0
+      },
+      "Products": {
+        "petroleum-gas": 45.0
+      }
+    },
+    {
+      "Name": "light-oil-cracking",
+      "Ingredients": {
+        "water": 30.0,
+        "light-oil": 30.0
+      },
+      "Products": {
+        "petroleum-gas": 20.0
+      }
+    },
+    {
+      "Name": "sulfuric-acid",
+      "Ingredients": {
+        "iron-plate": 1.0,
+        "sulfur": 5.0,
+        "water": 100.0
+      },
+      "Products": {
+        "sulfuric-acid": 50.0
+      }
+    },
+    {
+      "Name": "heavy-oil-cracking",
+      "Ingredients": {
+        "water": 30.0,
+        "heavy-oil": 40.0
+      },
+      "Products": {
+        "light-oil": 30.0
+      }
+    },
+    {
+      "Name": "solid-fuel-from-light-oil",
+      "Ingredients": {
+        "light-oil": 10.0
+      },
+      "Products": {
+        "solid-fuel": 1.0
+      }
+    },
+    {
+      "Name": "solid-fuel-from-petroleum-gas",
+      "Ingredients": {
+        "petroleum-gas": 20.0
+      },
+      "Products": {
+        "solid-fuel": 1.0
+      }
+    },
+    {
+      "Name": "solid-fuel-from-heavy-oil",
+      "Ingredients": {
+        "heavy-oil": 20.0
+      },
+      "Products": {
+        "solid-fuel": 1.0
+      }
+    },
+    {
+      "Name": "lubricant",
+      "Ingredients": {
+        "heavy-oil": 10.0
+      },
+      "Products": {
+        "lubricant": 10.0
+      }
+    },
+    {
+      "Name": "processing-unit",
+      "Ingredients": {
+        "electronic-circuit": 20.0,
+        "advanced-circuit": 2.0,
+        "sulfuric-acid": 5.0
+      },
+      "Products": {
+        "processing-unit": 1.0
+      }
+    },
+    {
+      "Name": "production-science-pack",
+      "Ingredients": {
+        "rail": 30.0,
+        "electric-furnace": 1.0,
+        "productivity-module": 1.0
+      },
+      "Products": {
+        "production-science-pack": 3.0
+      }
+    },
+    {
+      "Name": "utility-science-pack",
+      "Ingredients": {
+        "processing-unit": 2.0,
+        "flying-robot-frame": 1.0,
+        "low-density-structure": 3.0
+      },
+      "Products": {
+        "utility-science-pack": 3.0
+      }
+    },
+    {
+      "Name": "chemical-science-pack",
+      "Ingredients": {
+        "sulfur": 1.0,
+        "advanced-circuit": 3.0,
+        "engine-unit": 2.0
+      },
+      "Products": {
+        "chemical-science-pack": 2.0
+      }
+    },
+    {
+      "Name": "military-science-pack",
+      "Ingredients": {
+        "piercing-rounds-magazine": 1.0,
+        "grenade": 1.0,
+        "stone-wall": 2.0
+      },
+      "Products": {
+        "military-science-pack": 2.0
+      }
+    },
+    {
+      "Name": "logistic-science-pack",
+      "Ingredients": {
+        "transport-belt": 1.0,
+        "inserter": 1.0
+      },
+      "Products": {
+        "logistic-science-pack": 1.0
+      }
+    },
+    {
+      "Name": "flying-robot-frame",
+      "Ingredients": {
+        "steel-plate": 1.0,
+        "battery": 2.0,
+        "electronic-circuit": 3.0,
+        "electric-engine-unit": 1.0
+      },
+      "Products": {
+        "flying-robot-frame": 1.0
+      }
+    },
+    {
+      "Name": "wooden-chest",
+      "Ingredients": {
+        "wood": 2.0
+      },
+      "Products": {
+        "wooden-chest": 1.0
+      }
+    },
+    {
+      "Name": "iron-chest",
+      "Ingredients": {
+        "iron-plate": 8.0
+      },
+      "Products": {
+        "iron-chest": 1.0
+      }
+    },
+    {
+      "Name": "express-transport-belt",
+      "Ingredients": {
+        "iron-gear-wheel": 10.0,
+        "fast-transport-belt": 1.0,
+        "lubricant": 20.0
+      },
+      "Products": {
+        "express-transport-belt": 1.0
+      }
+    }
+  ],
+  "IncludedMods": [
+    "core|1.0",
+    "base|1.1.39",
+    "z-z-foremanexport|0.1.1"
+  ],
+  "EnabledAssemblers": [
+    "stone-furnace",
+    "steel-furnace",
+    "electric-furnace",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "oil-refinery",
+    "chemical-plant",
+    "centrifuge",
+    "rocket-silo"
+  ],
+  "EnabledMiners": [
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "pumpjack"
+  ],
+  "EnabledModules": [
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "effectivity-module",
+    "effectivity-module-2",
+    "effectivity-module-3",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3"
+  ],
+  "HiddenRecipes": [],
+  "Nodes": [
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "storage-tank",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "fluid-wagon",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "pipe",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "steel-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-gear-wheel",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "fluid-wagon",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "electronic-circuit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "copper-cable",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "advanced-circuit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "plastic-bar",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "coal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "advanced-oil-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "basic-oil-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "light-oil-cracking",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "sulfuric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "basic-oil-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "heavy-oil-cracking",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-fuel-from-light-oil",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-fuel-from-petroleum-gas",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-fuel-from-heavy-oil",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "lubricant",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "processing-unit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "processing-unit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "advanced-circuit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "production-science-pack",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "utility-science-pack",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "chemical-science-pack",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "military-science-pack",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "logistic-science-pack",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "flying-robot-frame",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "wooden-chest",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-chest",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "express-transport-belt",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    }
+  ],
+  "NodeLinks": [
+    {
+      "Supplier": 5,
+      "Consumer": 0,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 0,
+      "Consumer": 1,
+      "Item": "storage-tank"
+    },
+    {
+      "Supplier": 2,
+      "Consumer": 1,
+      "Item": "pipe"
+    },
+    {
+      "Supplier": 3,
+      "Consumer": 1,
+      "Item": "steel-plate"
+    },
+    {
+      "Supplier": 4,
+      "Consumer": 1,
+      "Item": "iron-gear-wheel"
+    },
+    {
+      "Supplier": 7,
+      "Consumer": 3,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 0,
+      "Consumer": 6,
+      "Item": "storage-tank"
+    },
+    {
+      "Supplier": 7,
+      "Consumer": 8,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 8,
+      "Item": "copper-cable"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 10,
+      "Item": "copper-cable"
+    },
+    {
+      "Supplier": 8,
+      "Consumer": 10,
+      "Item": "electronic-circuit"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 10,
+      "Item": "plastic-bar"
+    },
+    {
+      "Supplier": 12,
+      "Consumer": 11,
+      "Item": "coal"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 11,
+      "Item": "petroleum-gas"
+    },
+    {
+      "Supplier": 14,
+      "Consumer": 11,
+      "Item": "petroleum-gas"
+    },
+    {
+      "Supplier": 15,
+      "Consumer": 11,
+      "Item": "petroleum-gas"
+    }
+  ],
+  "ElementLocations": [
+    "12, 96",
+    "-264, -96",
+    "-492, 288",
+    "-252, 168",
+    "-60, 348",
+    "300, 420",
+    "72, -192",
+    "-372, 444",
+    "-528, 60",
+    "-672, 276",
+    "-804, -60",
+    "-876, 168",
+    "-960, 456",
+    "-636, 492",
+    "-852, 624",
+    "-708, 684",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396",
+    "-360, 396"
+  ]
+}

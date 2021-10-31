@@ -3,12 +3,48 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Foreman
 {
+    public class PresetErrorPackage : IComparable<PresetErrorPackage>
+    {
+        public List<string> MissingRecipes;
+        public List<string> IncorrectRecipes;
+        public List<string> MissingItems;
+        public List<string> MissingMods;
+        public List<string> AddedMods;
+        public List<string> WrongVersionMods;
+
+        public int ErrorCount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count + MissingMods.Count + AddedMods.Count + WrongVersionMods.Count; } }
+        public int MICount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count; } }
+
+        public PresetErrorPackage()
+        {
+            MissingRecipes = new List<string>();
+            IncorrectRecipes = new List<string>();
+            MissingItems = new List<string>();
+            MissingMods = new List<string>(); // in mod-name|version format
+            AddedMods = new List<string>(); //in mod-name|version format
+            WrongVersionMods = new List<string>(); //in mod-name|expected-version|preset-version format
+        }
+
+        public int CompareTo(PresetErrorPackage other) //usefull for sorting the Presets by increasing severity (mods, items/recipes)
+        {
+            int modErrorComparison = this.MissingMods.Count.CompareTo(other.MissingMods.Count);
+            if (modErrorComparison != 0)
+                return modErrorComparison;
+            modErrorComparison = this.AddedMods.Count.CompareTo(other.AddedMods.Count);
+            if (modErrorComparison != 0)
+                return modErrorComparison;
+            return this.MICount.CompareTo(other.MICount);
+        }
+    }
+
     public class DataCache
     {
         public IReadOnlyDictionary<string, string> IncludedMods { get { return includedMods; } }
@@ -22,7 +58,7 @@ namespace Foreman
         public IReadOnlyDictionary<string, Resource> Resources { get { return resources; } }
         public IReadOnlyDictionary<string, Module> Modules { get { return modules; } }
 
-        public string JObjectData { get; private set; }
+        public string PresetName { get; private set; }
 
         public Dictionary<string, Recipe> MissingRecipes { get; private set; }
         public Dictionary<string, Item> MissingItems { get; private set; }
@@ -74,14 +110,17 @@ namespace Foreman
             resourceCategories = new Dictionary<string, List<Resource>>();
         }
 
-        public async Task LoadAllData(JObject jsonData, Dictionary<int, IconColorPair> iconCache, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startPercent, int endPercent)
+        public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
         {
+            Clear();
+            JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
+            var iconCache = await IconProcessor.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, ctoken, 0, 90);
+            PresetName = preset.Name;
+
             await Task.Run(() =>
             {
-                Clear();
 
-                progress.Report(new KeyValuePair<int, string>(startPercent, "Processing Data...")); //this is SUPER quick, so we dont need to worry about timing stuff here
-                JObjectData = jsonData.ToString(Formatting.None);
+                progress.Report(new KeyValuePair<int, string>(90, "Processing Data...")); //this is SUPER quick, so we dont need to worry about timing stuff here
 
                 //process each section
                 foreach (var objJToken in jsonData["mods"].ToList())
@@ -122,13 +161,12 @@ namespace Foreman
 
                 RemoveUnusableItems();
 
-                progress.Report(new KeyValuePair<int, string>(endPercent - 4, "Checking for cyclic recipes...")); //a bit longer
+                progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes...")); //a bit longer
                 MarkCyclicRecipes();
-                progress.Report(new KeyValuePair<int, string>(endPercent - 2, "Finalizing..."));
+                progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
 
-                progress.Report(new KeyValuePair<int, string>(endPercent, "Done!"));
+                progress.Report(new KeyValuePair<int, string>(100, "Done!"));
             });
-
         }
 
         public void Clear()
@@ -150,6 +188,57 @@ namespace Foreman
             craftingCategories.Clear();
             moduleCategories.Clear();
             resourceCategories.Clear();
+        }
+
+        public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string,string> modList,  List<string> itemList, List<RecipeShort> recipeSList)
+        {
+            //parse preset
+            JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
+            HashSet<string> presetItems = new HashSet<string>();
+            Dictionary<string, RecipeShort> presetRecipes = new Dictionary<string, RecipeShort>();
+            Dictionary<string, string> presetMods = new Dictionary<string, string>();
+
+            foreach (var objJToken in jsonData["mods"].ToList())
+                presetMods.Add((string)objJToken["name"], (string)objJToken["version"]);
+            foreach (var objJToken in jsonData["items"].ToList())
+                presetItems.Add((string)objJToken["name"]);
+            foreach (var objJToken in jsonData["fluids"].ToList())
+                presetItems.Add((string)objJToken["name"]);
+
+            foreach (var objJToken in jsonData["recipes"].ToList())
+            {
+                RecipeShort recipe = new RecipeShort((string)objJToken["name"]);
+                foreach (var ingredientJToken in objJToken["ingredients"].ToList())
+                    recipe.Ingredients.Add((string)ingredientJToken["name"], (float)ingredientJToken["amount"]);
+                foreach (var productJToken in objJToken["products"].ToList())
+                    recipe.Products.Add((string)productJToken["name"], (float)productJToken["amount"]);
+                presetRecipes.Add(recipe.Name, recipe);
+            }
+
+            //compare to provided mod/item/recipe sets
+            PresetErrorPackage errors = new PresetErrorPackage();
+            foreach(var mod in modList)
+            {
+                if (!presetMods.ContainsKey(mod.Key))
+                    errors.MissingMods.Add(mod.Key + "|" + mod.Value);
+                else if (presetMods[mod.Key] != mod.Value)
+                    errors.WrongVersionMods.Add(mod.Key + "|" + mod.Value + "|" + presetMods[mod.Key]);
+            }
+            foreach (var mod in presetMods)
+                if (!modList.ContainsKey(mod.Key))
+                    errors.AddedMods.Add(mod.Key + "|" + mod.Value);
+
+            foreach (string itemName in itemList)
+                if (!presetItems.Contains(itemName))
+                    errors.MissingItems.Add(itemName);
+            foreach (RecipeShort recipeS in recipeSList)
+            {
+                if (!presetRecipes.ContainsKey(recipeS.Name))
+                    errors.MissingRecipes.Add(recipeS.Name);
+                else if(!recipeS.Equals(presetRecipes[recipeS.Name]))
+                    errors.IncorrectRecipes.Add(recipeS.Name);
+            }
+            return errors;
         }
 
         private void ProcessMod(JToken objJToken)

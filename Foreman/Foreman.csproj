@@ -106,6 +106,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.IO.Compression.ZipFile, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.Compression.ZipFile.4.3.0\lib\net46\System.IO.Compression.ZipFile.dll</HintPath>
@@ -120,6 +121,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\CustomProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\IRChooserPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -131,11 +135,11 @@
     <Compile Include="DataTypes\Group.cs" />
     <Compile Include="DataTypes\ProductionEntity.cs" />
     <Compile Include="DataTypes\Technology.cs" />
-    <Compile Include="Forms\DirectoryChooserForm.cs">
+    <Compile Include="Forms\ImportPresetForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\DirectoryChooserForm.designer.cs">
-      <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
+    <Compile Include="Forms\ImportPresetForm.designer.cs">
+      <DependentUpon>ImportPresetForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\ConsumerNode.cs" />
     <Compile Include="Models\ErrorNode.cs" />
@@ -212,8 +216,8 @@
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DirectoryChooserForm.resx">
-      <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\ImportPresetForm.resx">
+      <DependentUpon>ImportPresetForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
@@ -245,6 +249,24 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />
+    <None Include="Mod\foremanexport_0.1.1\info.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Mod\foremanexport_0.1.1\instrument-after-data.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Mod\foremanexport_0.1.1\instrument-control - ee.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Mod\foremanexport_0.1.1\instrument-control - en.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Mod\foremanexport_0.1.1\instrument-control - ne.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Mod\foremanexport_0.1.1\instrument-control - nn.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Presets\_default %28Factorio 1.1 Vanilla%29.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

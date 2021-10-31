@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.ModsGroupBox = new System.Windows.Forms.GroupBox();
+            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.ModuleSelectionNoneButton = new System.Windows.Forms.Button();
             this.ModuleSelectionAllButton = new System.Windows.Forms.Button();
@@ -43,15 +45,21 @@
             this.AssemblerSelectionBox = new System.Windows.Forms.CheckedListBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.ComparePresetsButton = new System.Windows.Forms.Button();
+            this.ImportPresetButton = new System.Windows.Forms.Button();
+            this.PresetsListBox = new System.Windows.Forms.ListBox();
             this.ConfirmButton = new System.Windows.Forms.Button();
             this.CancelSettingsButton = new System.Windows.Forms.Button();
-            this.ReloadButton = new System.Windows.Forms.Button();
-            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
+            this.PresetMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.SelectPresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DeletePresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ModsGroupBox.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.PresetMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // ModsGroupBox
@@ -68,6 +76,17 @@
             this.ModsGroupBox.TabStop = false;
             this.ModsGroupBox.Text = "Mods (read-only)";
             // 
+            // ModSelectionBox
+            // 
+            this.ModSelectionBox.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.ModSelectionBox.FormattingEnabled = true;
+            this.ModSelectionBox.Location = new System.Drawing.Point(9, 24);
+            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.ModSelectionBox.Name = "ModSelectionBox";
+            this.ModSelectionBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.ModSelectionBox.Size = new System.Drawing.Size(240, 531);
+            this.ModSelectionBox.TabIndex = 10;
+            // 
             // groupBox7
             // 
             this.groupBox7.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -79,7 +98,7 @@
             this.groupBox7.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.groupBox7.Size = new System.Drawing.Size(259, 183);
+            this.groupBox7.Size = new System.Drawing.Size(259, 184);
             this.groupBox7.TabIndex = 14;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Modules";
@@ -114,6 +133,7 @@
             this.ModuleSelectionBox.Size = new System.Drawing.Size(240, 123);
             this.ModuleSelectionBox.TabIndex = 7;
             this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
+            this.ModuleSelectionBox.Leave += new System.EventHandler(this.ModuleSelectionBox_Leave);
             // 
             // groupBox6
             // 
@@ -161,6 +181,7 @@
             this.MinerSelectionBox.Size = new System.Drawing.Size(240, 123);
             this.MinerSelectionBox.TabIndex = 4;
             this.MinerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.MinerSelectionBox_ItemCheck);
+            this.MinerSelectionBox.Leave += new System.EventHandler(this.MinerSelectionBox_Leave);
             // 
             // groupBox5
             // 
@@ -208,6 +229,7 @@
             this.AssemblerSelectionBox.Size = new System.Drawing.Size(240, 123);
             this.AssemblerSelectionBox.TabIndex = 1;
             this.AssemblerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AssemblerSelectionBox_ItemCheck);
+            this.AssemblerSelectionBox.Leave += new System.EventHandler(this.AssemblerSelectionBox_Leave);
             // 
             // groupBox2
             // 
@@ -216,7 +238,7 @@
             this.groupBox2.Controls.Add(this.groupBox6);
             this.groupBox2.Controls.Add(this.groupBox5);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.groupBox2.Location = new System.Drawing.Point(475, 2);
+            this.groupBox2.Location = new System.Drawing.Point(265, 3);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(539, 595);
             this.groupBox2.TabIndex = 17;
@@ -225,19 +247,56 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.ComparePresetsButton);
+            this.groupBox3.Controls.Add(this.ImportPresetButton);
+            this.groupBox3.Controls.Add(this.PresetsListBox);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.groupBox3.Location = new System.Drawing.Point(12, 2);
+            this.groupBox3.Location = new System.Drawing.Point(7, 3);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(453, 554);
+            this.groupBox3.Size = new System.Drawing.Size(252, 595);
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Factorio Presets:";
             // 
+            // ComparePresetsButton
+            // 
+            this.ComparePresetsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.ComparePresetsButton.Location = new System.Drawing.Point(6, 555);
+            this.ComparePresetsButton.Name = "ComparePresetsButton";
+            this.ComparePresetsButton.Size = new System.Drawing.Size(240, 32);
+            this.ComparePresetsButton.TabIndex = 2;
+            this.ComparePresetsButton.Text = "Compare Presets";
+            this.ComparePresetsButton.UseVisualStyleBackColor = true;
+            this.ComparePresetsButton.Click += new System.EventHandler(this.ComparePresetsButton_Click);
+            // 
+            // ImportPresetButton
+            // 
+            this.ImportPresetButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.ImportPresetButton.Location = new System.Drawing.Point(6, 517);
+            this.ImportPresetButton.Name = "ImportPresetButton";
+            this.ImportPresetButton.Size = new System.Drawing.Size(240, 32);
+            this.ImportPresetButton.TabIndex = 1;
+            this.ImportPresetButton.Text = "Import New Preset From Factorio";
+            this.ImportPresetButton.UseVisualStyleBackColor = true;
+            this.ImportPresetButton.Click += new System.EventHandler(this.ImportPresetButton_Click);
+            // 
+            // PresetsListBox
+            // 
+            this.PresetsListBox.DisplayMember = "Name";
+            this.PresetsListBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.PresetsListBox.FormattingEnabled = true;
+            this.PresetsListBox.ItemHeight = 16;
+            this.PresetsListBox.Location = new System.Drawing.Point(6, 24);
+            this.PresetsListBox.Name = "PresetsListBox";
+            this.PresetsListBox.Size = new System.Drawing.Size(240, 484);
+            this.PresetsListBox.TabIndex = 0;
+            this.PresetsListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PresetsListBox_MouseDown);
+            // 
             // ConfirmButton
             // 
-            this.ConfirmButton.Location = new System.Drawing.Point(12, 565);
+            this.ConfirmButton.Location = new System.Drawing.Point(7, 602);
             this.ConfirmButton.Name = "ConfirmButton";
-            this.ConfirmButton.Size = new System.Drawing.Size(261, 32);
+            this.ConfirmButton.Size = new System.Drawing.Size(701, 32);
             this.ConfirmButton.TabIndex = 25;
             this.ConfirmButton.Text = "Confirm";
             this.ConfirmButton.UseVisualStyleBackColor = true;
@@ -245,7 +304,7 @@
             // 
             // CancelSettingsButton
             // 
-            this.CancelSettingsButton.Location = new System.Drawing.Point(375, 565);
+            this.CancelSettingsButton.Location = new System.Drawing.Point(714, 602);
             this.CancelSettingsButton.Name = "CancelSettingsButton";
             this.CancelSettingsButton.Size = new System.Drawing.Size(90, 32);
             this.CancelSettingsButton.TabIndex = 26;
@@ -253,32 +312,32 @@
             this.CancelSettingsButton.UseVisualStyleBackColor = true;
             this.CancelSettingsButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
-            // ReloadButton
+            // PresetMenuStrip
             // 
-            this.ReloadButton.Location = new System.Drawing.Point(279, 565);
-            this.ReloadButton.Name = "ReloadButton";
-            this.ReloadButton.Size = new System.Drawing.Size(90, 32);
-            this.ReloadButton.TabIndex = 27;
-            this.ReloadButton.Text = "Reload";
-            this.ReloadButton.UseVisualStyleBackColor = true;
-            this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
+            this.PresetMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.PresetMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SelectPresetMenuItem,
+            this.DeletePresetMenuItem});
+            this.PresetMenuStrip.Name = "PresetMenuStrip";
+            this.PresetMenuStrip.Size = new System.Drawing.Size(167, 52);
             // 
-            // ModSelectionBox
+            // SelectPresetMenuItem
             // 
-            this.ModSelectionBox.FormattingEnabled = true;
-            this.ModSelectionBox.Location = new System.Drawing.Point(9, 24);
-            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.ModSelectionBox.Name = "ModSelectionBox";
-            this.ModSelectionBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.ModSelectionBox.Size = new System.Drawing.Size(240, 531);
-            this.ModSelectionBox.TabIndex = 10;
+            this.SelectPresetMenuItem.Name = "SelectPresetMenuItem";
+            this.SelectPresetMenuItem.Size = new System.Drawing.Size(166, 24);
+            this.SelectPresetMenuItem.Text = "Select Preset";
+            // 
+            // DeletePresetMenuItem
+            // 
+            this.DeletePresetMenuItem.Name = "DeletePresetMenuItem";
+            this.DeletePresetMenuItem.Size = new System.Drawing.Size(166, 24);
+            this.DeletePresetMenuItem.Text = "Delete Preset";
             // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1025, 609);
-            this.Controls.Add(this.ReloadButton);
+            this.ClientSize = new System.Drawing.Size(812, 641);
             this.Controls.Add(this.CancelSettingsButton);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.ConfirmButton);
@@ -297,6 +356,8 @@
             this.groupBox6.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.PresetMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -319,7 +380,12 @@
         private System.Windows.Forms.Button MinerSelectionAllButton;
         private System.Windows.Forms.Button AssemblerSelectionNoneButton;
         private System.Windows.Forms.Button AssemblerSelectionAllButton;
-        private System.Windows.Forms.Button ReloadButton;
         private CheckboxListWithErrors ModSelectionBox;
+        private System.Windows.Forms.Button ImportPresetButton;
+        private System.Windows.Forms.ListBox PresetsListBox;
+        private System.Windows.Forms.ContextMenuStrip PresetMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem SelectPresetMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem DeletePresetMenuItem;
+        private System.Windows.Forms.Button ComparePresetsButton;
     }
 }
