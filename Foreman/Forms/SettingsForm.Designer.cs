@@ -36,15 +36,6 @@
 			this.RecipeDifficultyLabel = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.ModuleSelectionNoneButton = new System.Windows.Forms.Button();
-			this.ModuleSelectionAllButton = new System.Windows.Forms.Button();
-			this.ModuleSelectionBox = new Foreman.DataObjectCheckedListBox();
-			this.MinerSelectionNoneButton = new System.Windows.Forms.Button();
-			this.MinerSelectionAllButton = new System.Windows.Forms.Button();
-			this.MinerSelectionBox = new Foreman.DataObjectCheckedListBox();
-			this.AssemblerSelectionNoneButton = new System.Windows.Forms.Button();
-			this.AssemblerSelectionAllButton = new System.Windows.Forms.Button();
-			this.AssemblerSelectionBox = new Foreman.DataObjectCheckedListBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.ShowUnavailablesCheckBox = new System.Windows.Forms.CheckBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -52,15 +43,18 @@
 			this.LoadEnabledFromSaveButton = new System.Windows.Forms.Button();
 			this.EnabledObjectsTabControl = new System.Windows.Forms.TabControl();
 			this.AssemblersPage = new System.Windows.Forms.TabPage();
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.AssemblerListView = new System.Windows.Forms.ListView();
+			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IconList = new System.Windows.Forms.ImageList(this.components);
 			this.MinersPage = new System.Windows.Forms.TabPage();
-			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+			this.MinerListView = new System.Windows.Forms.ListView();
+			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ModulesPage = new System.Windows.Forms.TabPage();
-			this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+			this.ModuleListView = new System.Windows.Forms.ListView();
+			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.RecipePage = new System.Windows.Forms.TabPage();
 			this.RecipeListView = new System.Windows.Forms.ListView();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.IconList = new System.Windows.Forms.ImageList(this.components);
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.CurrentPresetLabel = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
@@ -78,11 +72,8 @@
 			this.groupBox2.SuspendLayout();
 			this.EnabledObjectsTabControl.SuspendLayout();
 			this.AssemblersPage.SuspendLayout();
-			this.tableLayoutPanel1.SuspendLayout();
 			this.MinersPage.SuspendLayout();
-			this.tableLayoutPanel3.SuspendLayout();
 			this.ModulesPage.SuspendLayout();
-			this.tableLayoutPanel4.SuspendLayout();
 			this.RecipePage.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.PresetMenuStrip.SuspendLayout();
@@ -164,117 +155,6 @@
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Recipe:";
 			// 
-			// ModuleSelectionNoneButton
-			// 
-			this.ModuleSelectionNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ModuleSelectionNoneButton.Location = new System.Drawing.Point(133, 415);
-			this.ModuleSelectionNoneButton.Name = "ModuleSelectionNoneButton";
-			this.ModuleSelectionNoneButton.Size = new System.Drawing.Size(125, 22);
-			this.ModuleSelectionNoneButton.TabIndex = 9;
-			this.ModuleSelectionNoneButton.Text = "None";
-			this.ModuleSelectionNoneButton.UseVisualStyleBackColor = true;
-			this.ModuleSelectionNoneButton.Click += new System.EventHandler(this.ModuleSelectionNoneButton_Click);
-			// 
-			// ModuleSelectionAllButton
-			// 
-			this.ModuleSelectionAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ModuleSelectionAllButton.Location = new System.Drawing.Point(3, 415);
-			this.ModuleSelectionAllButton.Name = "ModuleSelectionAllButton";
-			this.ModuleSelectionAllButton.Size = new System.Drawing.Size(124, 22);
-			this.ModuleSelectionAllButton.TabIndex = 8;
-			this.ModuleSelectionAllButton.Text = "All";
-			this.ModuleSelectionAllButton.UseVisualStyleBackColor = true;
-			this.ModuleSelectionAllButton.Click += new System.EventHandler(this.ModuleSelectionAllButton_Click);
-			// 
-			// ModuleSelectionBox
-			// 
-			this.ModuleSelectionBox.CheckOnClick = true;
-			this.tableLayoutPanel4.SetColumnSpan(this.ModuleSelectionBox, 2);
-			this.ModuleSelectionBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ModuleSelectionBox.FormattingEnabled = true;
-			this.ModuleSelectionBox.Location = new System.Drawing.Point(4, 4);
-			this.ModuleSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-			this.ModuleSelectionBox.Name = "ModuleSelectionBox";
-			this.ModuleSelectionBox.Size = new System.Drawing.Size(253, 408);
-			this.ModuleSelectionBox.TabIndex = 7;
-			this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
-			this.ModuleSelectionBox.Enter += new System.EventHandler(this.EnableSelectionBox_Enter);
-			this.ModuleSelectionBox.Leave += new System.EventHandler(this.ModuleSelectionBox_Leave);
-			// 
-			// MinerSelectionNoneButton
-			// 
-			this.MinerSelectionNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.MinerSelectionNoneButton.Location = new System.Drawing.Point(133, 415);
-			this.MinerSelectionNoneButton.Name = "MinerSelectionNoneButton";
-			this.MinerSelectionNoneButton.Size = new System.Drawing.Size(125, 22);
-			this.MinerSelectionNoneButton.TabIndex = 6;
-			this.MinerSelectionNoneButton.Text = "None";
-			this.MinerSelectionNoneButton.UseVisualStyleBackColor = true;
-			this.MinerSelectionNoneButton.Click += new System.EventHandler(this.MinerSelectionNoneButton_Click);
-			// 
-			// MinerSelectionAllButton
-			// 
-			this.MinerSelectionAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.MinerSelectionAllButton.Location = new System.Drawing.Point(3, 415);
-			this.MinerSelectionAllButton.Name = "MinerSelectionAllButton";
-			this.MinerSelectionAllButton.Size = new System.Drawing.Size(124, 22);
-			this.MinerSelectionAllButton.TabIndex = 5;
-			this.MinerSelectionAllButton.Text = "All";
-			this.MinerSelectionAllButton.UseVisualStyleBackColor = true;
-			this.MinerSelectionAllButton.Click += new System.EventHandler(this.MinerSelectionAllButton_Click);
-			// 
-			// MinerSelectionBox
-			// 
-			this.MinerSelectionBox.CheckOnClick = true;
-			this.tableLayoutPanel3.SetColumnSpan(this.MinerSelectionBox, 2);
-			this.MinerSelectionBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.MinerSelectionBox.FormattingEnabled = true;
-			this.MinerSelectionBox.Location = new System.Drawing.Point(4, 4);
-			this.MinerSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-			this.MinerSelectionBox.Name = "MinerSelectionBox";
-			this.MinerSelectionBox.Size = new System.Drawing.Size(253, 408);
-			this.MinerSelectionBox.TabIndex = 4;
-			this.MinerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.MinerSelectionBox_ItemCheck);
-			this.MinerSelectionBox.Enter += new System.EventHandler(this.EnableSelectionBox_Enter);
-			this.MinerSelectionBox.Leave += new System.EventHandler(this.MinerSelectionBox_Leave);
-			// 
-			// AssemblerSelectionNoneButton
-			// 
-			this.AssemblerSelectionNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerSelectionNoneButton.Location = new System.Drawing.Point(133, 415);
-			this.AssemblerSelectionNoneButton.Name = "AssemblerSelectionNoneButton";
-			this.AssemblerSelectionNoneButton.Size = new System.Drawing.Size(125, 22);
-			this.AssemblerSelectionNoneButton.TabIndex = 3;
-			this.AssemblerSelectionNoneButton.Text = "None";
-			this.AssemblerSelectionNoneButton.UseVisualStyleBackColor = true;
-			this.AssemblerSelectionNoneButton.Click += new System.EventHandler(this.AssemblerSelectionNoneButton_Click);
-			// 
-			// AssemblerSelectionAllButton
-			// 
-			this.AssemblerSelectionAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerSelectionAllButton.Location = new System.Drawing.Point(3, 415);
-			this.AssemblerSelectionAllButton.Name = "AssemblerSelectionAllButton";
-			this.AssemblerSelectionAllButton.Size = new System.Drawing.Size(124, 22);
-			this.AssemblerSelectionAllButton.TabIndex = 2;
-			this.AssemblerSelectionAllButton.Text = "All";
-			this.AssemblerSelectionAllButton.UseVisualStyleBackColor = true;
-			this.AssemblerSelectionAllButton.Click += new System.EventHandler(this.AssemblerSelectionAllButton_Click);
-			// 
-			// AssemblerSelectionBox
-			// 
-			this.AssemblerSelectionBox.CheckOnClick = true;
-			this.tableLayoutPanel1.SetColumnSpan(this.AssemblerSelectionBox, 2);
-			this.AssemblerSelectionBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerSelectionBox.FormattingEnabled = true;
-			this.AssemblerSelectionBox.Location = new System.Drawing.Point(4, 4);
-			this.AssemblerSelectionBox.Margin = new System.Windows.Forms.Padding(4);
-			this.AssemblerSelectionBox.Name = "AssemblerSelectionBox";
-			this.AssemblerSelectionBox.Size = new System.Drawing.Size(253, 404);
-			this.AssemblerSelectionBox.TabIndex = 1;
-			this.AssemblerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AssemblerSelectionBox_ItemCheck);
-			this.AssemblerSelectionBox.Enter += new System.EventHandler(this.EnableSelectionBox_Enter);
-			this.AssemblerSelectionBox.Leave += new System.EventHandler(this.AssemblerSelectionBox_Leave);
-			// 
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.ShowUnavailablesCheckBox);
@@ -349,7 +229,7 @@
 			// 
 			// AssemblersPage
 			// 
-			this.AssemblersPage.Controls.Add(this.tableLayoutPanel1);
+			this.AssemblersPage.Controls.Add(this.AssemblerListView);
 			this.AssemblersPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
 			this.AssemblersPage.Location = new System.Drawing.Point(4, 25);
 			this.AssemblersPage.Name = "AssemblersPage";
@@ -358,28 +238,45 @@
 			this.AssemblersPage.Text = "Assemblers";
 			this.AssemblersPage.UseVisualStyleBackColor = true;
 			// 
-			// tableLayoutPanel1
+			// AssemblerListView
 			// 
-			this.tableLayoutPanel1.BackColor = System.Drawing.SystemColors.Control;
-			this.tableLayoutPanel1.ColumnCount = 2;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel1.Controls.Add(this.AssemblerSelectionBox, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.AssemblerSelectionNoneButton, 1, 1);
-			this.tableLayoutPanel1.Controls.Add(this.AssemblerSelectionAllButton, 0, 1);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 2;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(261, 440);
-			this.tableLayoutPanel1.TabIndex = 0;
+			this.AssemblerListView.CheckBoxes = true;
+			this.AssemblerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader4});
+			this.AssemblerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerListView.FullRowSelect = true;
+			this.AssemblerListView.GridLines = true;
+			this.AssemblerListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.AssemblerListView.HideSelection = false;
+			this.AssemblerListView.LabelWrap = false;
+			this.AssemblerListView.Location = new System.Drawing.Point(0, 0);
+			this.AssemblerListView.Margin = new System.Windows.Forms.Padding(4);
+			this.AssemblerListView.Name = "AssemblerListView";
+			this.AssemblerListView.Size = new System.Drawing.Size(261, 440);
+			this.AssemblerListView.SmallImageList = this.IconList;
+			this.AssemblerListView.TabIndex = 17;
+			this.AssemblerListView.UseCompatibleStateImageBehavior = false;
+			this.AssemblerListView.View = System.Windows.Forms.View.Details;
+			this.AssemblerListView.VirtualMode = true;
+			this.AssemblerListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.AssemblerListView_RetrieveVirtualItem);
+			this.AssemblerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListView_KeyDown);
+			this.AssemblerListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseClick);
+			this.AssemblerListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseDoubleClick);
+			// 
+			// columnHeader4
+			// 
+			this.columnHeader4.Text = "Name";
+			this.columnHeader4.Width = 225;
+			// 
+			// IconList
+			// 
+			this.IconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+			this.IconList.ImageSize = new System.Drawing.Size(24, 24);
+			this.IconList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// MinersPage
 			// 
-			this.MinersPage.Controls.Add(this.tableLayoutPanel3);
+			this.MinersPage.Controls.Add(this.MinerListView);
 			this.MinersPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
 			this.MinersPage.Location = new System.Drawing.Point(4, 25);
 			this.MinersPage.Name = "MinersPage";
@@ -388,27 +285,39 @@
 			this.MinersPage.Text = "Miners";
 			this.MinersPage.UseVisualStyleBackColor = true;
 			// 
-			// tableLayoutPanel3
+			// MinerListView
 			// 
-			this.tableLayoutPanel3.BackColor = System.Drawing.SystemColors.Control;
-			this.tableLayoutPanel3.ColumnCount = 2;
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Controls.Add(this.MinerSelectionNoneButton, 1, 1);
-			this.tableLayoutPanel3.Controls.Add(this.MinerSelectionBox, 0, 0);
-			this.tableLayoutPanel3.Controls.Add(this.MinerSelectionAllButton, 0, 1);
-			this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-			this.tableLayoutPanel3.RowCount = 2;
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(261, 440);
-			this.tableLayoutPanel3.TabIndex = 1;
+			this.MinerListView.CheckBoxes = true;
+			this.MinerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader3});
+			this.MinerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.MinerListView.FullRowSelect = true;
+			this.MinerListView.GridLines = true;
+			this.MinerListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.MinerListView.HideSelection = false;
+			this.MinerListView.LabelWrap = false;
+			this.MinerListView.Location = new System.Drawing.Point(0, 0);
+			this.MinerListView.Margin = new System.Windows.Forms.Padding(4);
+			this.MinerListView.Name = "MinerListView";
+			this.MinerListView.Size = new System.Drawing.Size(261, 440);
+			this.MinerListView.SmallImageList = this.IconList;
+			this.MinerListView.TabIndex = 17;
+			this.MinerListView.UseCompatibleStateImageBehavior = false;
+			this.MinerListView.View = System.Windows.Forms.View.Details;
+			this.MinerListView.VirtualMode = true;
+			this.MinerListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.MinerListView_RetrieveVirtualItem);
+			this.MinerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListView_KeyDown);
+			this.MinerListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseClick);
+			this.MinerListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseDoubleClick);
+			// 
+			// columnHeader3
+			// 
+			this.columnHeader3.Text = "Name";
+			this.columnHeader3.Width = 225;
 			// 
 			// ModulesPage
 			// 
-			this.ModulesPage.Controls.Add(this.tableLayoutPanel4);
+			this.ModulesPage.Controls.Add(this.ModuleListView);
 			this.ModulesPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
 			this.ModulesPage.Location = new System.Drawing.Point(4, 25);
 			this.ModulesPage.Name = "ModulesPage";
@@ -417,23 +326,35 @@
 			this.ModulesPage.Text = "Modules";
 			this.ModulesPage.UseVisualStyleBackColor = true;
 			// 
-			// tableLayoutPanel4
+			// ModuleListView
 			// 
-			this.tableLayoutPanel4.BackColor = System.Drawing.SystemColors.Control;
-			this.tableLayoutPanel4.ColumnCount = 2;
-			this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel4.Controls.Add(this.ModuleSelectionNoneButton, 1, 1);
-			this.tableLayoutPanel4.Controls.Add(this.ModuleSelectionBox, 0, 0);
-			this.tableLayoutPanel4.Controls.Add(this.ModuleSelectionAllButton, 0, 1);
-			this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel4.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-			this.tableLayoutPanel4.RowCount = 2;
-			this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-			this.tableLayoutPanel4.Size = new System.Drawing.Size(261, 440);
-			this.tableLayoutPanel4.TabIndex = 1;
+			this.ModuleListView.CheckBoxes = true;
+			this.ModuleListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader2});
+			this.ModuleListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ModuleListView.FullRowSelect = true;
+			this.ModuleListView.GridLines = true;
+			this.ModuleListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.ModuleListView.HideSelection = false;
+			this.ModuleListView.LabelWrap = false;
+			this.ModuleListView.Location = new System.Drawing.Point(0, 0);
+			this.ModuleListView.Margin = new System.Windows.Forms.Padding(4);
+			this.ModuleListView.Name = "ModuleListView";
+			this.ModuleListView.Size = new System.Drawing.Size(261, 440);
+			this.ModuleListView.SmallImageList = this.IconList;
+			this.ModuleListView.TabIndex = 17;
+			this.ModuleListView.UseCompatibleStateImageBehavior = false;
+			this.ModuleListView.View = System.Windows.Forms.View.Details;
+			this.ModuleListView.VirtualMode = true;
+			this.ModuleListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.ModuleListView_RetrieveVirtualItem);
+			this.ModuleListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListView_KeyDown);
+			this.ModuleListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseClick);
+			this.ModuleListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseDoubleClick);
+			// 
+			// columnHeader2
+			// 
+			this.columnHeader2.Text = "Name";
+			this.columnHeader2.Width = 225;
 			// 
 			// RecipePage
 			// 
@@ -466,20 +387,14 @@
 			this.RecipeListView.View = System.Windows.Forms.View.Details;
 			this.RecipeListView.VirtualMode = true;
 			this.RecipeListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.RecipeListView_RetrieveVirtualItem);
-			this.RecipeListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RecipeListView_KeyDown);
-			this.RecipeListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.RecipeListView_MouseClick);
-			this.RecipeListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.RecipeListView_MouseDoubleClick);
+			this.RecipeListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListView_KeyDown);
+			this.RecipeListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseClick);
+			this.RecipeListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseDoubleClick);
 			// 
 			// columnHeader1
 			// 
 			this.columnHeader1.Text = "Name";
 			this.columnHeader1.Width = 225;
-			// 
-			// IconList
-			// 
-			this.IconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-			this.IconList.ImageSize = new System.Drawing.Size(24, 24);
-			this.IconList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// groupBox3
 			// 
@@ -633,11 +548,8 @@
 			this.groupBox2.PerformLayout();
 			this.EnabledObjectsTabControl.ResumeLayout(false);
 			this.AssemblersPage.ResumeLayout(false);
-			this.tableLayoutPanel1.ResumeLayout(false);
 			this.MinersPage.ResumeLayout(false);
-			this.tableLayoutPanel3.ResumeLayout(false);
 			this.ModulesPage.ResumeLayout(false);
-			this.tableLayoutPanel4.ResumeLayout(false);
 			this.RecipePage.ResumeLayout(false);
 			this.groupBox3.ResumeLayout(false);
 			this.PresetMenuStrip.ResumeLayout(false);
@@ -646,19 +558,10 @@
         }
 
         #endregion
-        private DataObjectCheckedListBox ModuleSelectionBox;
-        private DataObjectCheckedListBox MinerSelectionBox;
-        private DataObjectCheckedListBox AssemblerSelectionBox;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button CancelSettingsButton;
         private System.Windows.Forms.Button ConfirmButton;
-        private System.Windows.Forms.Button ModuleSelectionNoneButton;
-        private System.Windows.Forms.Button ModuleSelectionAllButton;
-        private System.Windows.Forms.Button MinerSelectionNoneButton;
-        private System.Windows.Forms.Button MinerSelectionAllButton;
-        private System.Windows.Forms.Button AssemblerSelectionNoneButton;
-        private System.Windows.Forms.Button AssemblerSelectionAllButton;
         private System.Windows.Forms.ListBox ModSelectionBox;
         private System.Windows.Forms.Button ImportPresetButton;
         private System.Windows.Forms.ListBox PresetListBox;
@@ -676,11 +579,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TabControl EnabledObjectsTabControl;
         private System.Windows.Forms.TabPage AssemblersPage;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TabPage MinersPage;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.TabPage ModulesPage;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.Button LoadEnabledFromSaveButton;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox FilterTextBox;
@@ -690,5 +590,11 @@
         private System.Windows.Forms.ImageList IconList;
 		private System.Windows.Forms.CheckBox ShowUnavailablesCheckBox;
 		private RecipeToolTip RecipeToolTip;
+		private System.Windows.Forms.ListView AssemblerListView;
+		private System.Windows.Forms.ColumnHeader columnHeader4;
+		private System.Windows.Forms.ListView MinerListView;
+		private System.Windows.Forms.ColumnHeader columnHeader3;
+		private System.Windows.Forms.ListView ModuleListView;
+		private System.Windows.Forms.ColumnHeader columnHeader2;
 	}
 }

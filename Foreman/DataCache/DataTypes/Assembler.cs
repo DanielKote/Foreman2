@@ -15,7 +15,6 @@ namespace Foreman
 		IReadOnlyCollection<Item> AssociatedItems { get; }
 
 		bool IsMiner { get; }
-		bool Enabled { get; set; }
 		bool IsMissing { get; }
 
 		float Speed { get; }
@@ -38,7 +37,6 @@ namespace Foreman
 		public IReadOnlyCollection<Item> AssociatedItems { get { return associatedItems; } }
 
 		public bool IsMiner { get; private set; }
-		public bool Enabled { get; set; }
 
 		public bool IsMissing { get; private set; }
 		public override bool Available { get { return associatedItems.FirstOrDefault(i => i.Available) != null; } set { } }
@@ -60,7 +58,6 @@ namespace Foreman
 		public AssemblerPrototype(DataCache dCache, string name, string friendlyName, bool isMiner, bool isMissing = false) : base(dCache, name, friendlyName, "-")
 		{
 			IsMiner = isMiner;
-			Enabled = true;
 			IsMissing = isMissing;
 
 			//just some base defaults -> helps prevent overflow errors during solving if the assembler is a missing entity

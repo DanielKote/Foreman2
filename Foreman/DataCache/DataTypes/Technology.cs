@@ -10,8 +10,6 @@ namespace Foreman
 		IReadOnlyCollection<Technology> PostTechs { get; }
 		IReadOnlyCollection<Recipe> UnlockedRecipes { get; }
 		IReadOnlyCollection<Recipe> AvailableUnlockedRecipes { get; }
-
-		bool Enabled { get; set; }
 	}
 
 	public class TechnologyPrototype : DataObjectBasePrototype, Technology
@@ -20,8 +18,6 @@ namespace Foreman
 		public IReadOnlyCollection<Technology> PostTechs { get { return postTechs; } }
 		public IReadOnlyCollection<Recipe> UnlockedRecipes { get { return unlockedRecipes; } }
 		public IReadOnlyCollection<Recipe> AvailableUnlockedRecipes { get; private set; }
-
-		public bool Enabled { get; set; }
 
 		internal HashSet<TechnologyPrototype> prerequisites { get; private set; }
 		internal HashSet<TechnologyPrototype> postTechs { get; private set; }

@@ -12,7 +12,6 @@ namespace Foreman
 		IReadOnlyCollection<Module> ValidModules { get; }
 		IReadOnlyCollection<Item> AssociatedItems { get; }
 
-		bool Enabled { get; set; }
 		bool IsMissing { get; }
 	}
 
@@ -24,7 +23,6 @@ namespace Foreman
 		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
 		public IReadOnlyCollection<Item> AssociatedItems { get { return associatedItems; } }
 
-		public bool Enabled { get; set; }
 		public bool IsMissing { get; private set; }
 		public override bool Available { get { return associatedItems.FirstOrDefault(i => i.Available) != null; } set { } }
 

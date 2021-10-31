@@ -14,7 +14,6 @@ namespace Foreman
 		float Time { get; set; }
 		long RecipeID { get; }
 		bool IsMissing { get; }
-		bool Enabled { get; set; }
 
 		IReadOnlyDictionary<Item, float> ProductSet { get; }
 		IReadOnlyList<Item> ProductList { get; }
@@ -70,8 +69,6 @@ namespace Foreman
 		internal HashSet<TechnologyPrototype> myUnlockTechnologies { get; private set; }
 
 		public bool IsMissing { get; private set; }
-
-		public bool Enabled { get; set; }
 
 		private static long lastRecipeID = 0;
 		public long RecipeID { get; private set; }

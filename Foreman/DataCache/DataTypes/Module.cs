@@ -22,7 +22,6 @@ namespace Foreman
 		int Tier { get; }
 
 		bool IsMissing { get; }
-		bool Enabled { get; set; }
 	}
 
 	public class ModulePrototype : DataObjectBasePrototype, Module
@@ -39,8 +38,6 @@ namespace Foreman
 		public float PollutionBonus { get; set; }
 
 		public int Tier { get; set; }
-
-		public bool Enabled { get; set; }
 
 		public bool IsMissing { get; private set; }
 		public override bool Available { get { return AssociatedItem.Available; } set { } }

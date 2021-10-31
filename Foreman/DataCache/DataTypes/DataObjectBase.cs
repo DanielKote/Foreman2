@@ -10,6 +10,7 @@ namespace Foreman
 		string FriendlyName { get; }
 
 		bool Available { get; }
+		bool Enabled { get; set; }
 
 		Bitmap Icon { get; }
 		Color AverageColor { get; }
@@ -27,6 +28,7 @@ namespace Foreman
 		public string FriendlyName { get; private set; }
 
 		public virtual bool Available { get; set; }
+		public bool Enabled { get; set; }
 
 		private string[] OrderCompareArray;
 
@@ -36,7 +38,9 @@ namespace Foreman
 			Name = name;
 			FriendlyName = friendlyName;
 			LFriendlyName = friendlyName.ToLower();
+
 			Available = true;
+			Enabled = true;
 
 			Icon = DataCache.UnknownIcon;
 			AverageColor = Color.Black;

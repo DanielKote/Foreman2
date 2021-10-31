@@ -41,15 +41,22 @@ namespace Foreman
 			}
 		}
 
-		private static readonly Color AvailableRecipeColor = Color.White;
-		private static readonly Color UnavailableRecipeColor = Color.Pink;
+		private static readonly Color AvailableObjectColor = Color.White;
+		private static readonly Color UnavailableObjectColor = Color.Pink;
 		private static readonly Brush AvailableObjectBrush = Brushes.Black;
 		private static readonly Brush UnavailableObjectBrush = Brushes.DarkMagenta;
 
 		private SettingsFormOptions originalOptions;
 		public SettingsFormOptions CurrentOptions;
 
+		private List<ListViewItem> unfilteredAssemblerList;
+		private List<ListViewItem> unfilteredMinerList;
+		private List<ListViewItem> unfilteredModuleList;
 		private List<ListViewItem> unfilteredRecipeList;
+
+		private List<ListViewItem> filteredAssemblerList;
+		private List<ListViewItem> filteredMinerList;
+		private List<ListViewItem> filteredModuleList;
 		private List<ListViewItem> filteredRecipeList;
 
 		public SettingsForm(SettingsFormOptions options)
@@ -58,11 +65,19 @@ namespace Foreman
 			CurrentOptions = options.Clone();
 
 			InitializeComponent();
-			MainForm.SetDoubleBuffered(AssemblerSelectionBox);
-			MainForm.SetDoubleBuffered(MinerSelectionBox);
-			MainForm.SetDoubleBuffered(ModuleSelectionBox);
+			MainForm.SetDoubleBuffered(AssemblerListView);
+			MainForm.SetDoubleBuffered(MinerListView);
+			MainForm.SetDoubleBuffered(ModuleListView);
+			MainForm.SetDoubleBuffered(RecipeListView);
 
+			unfilteredAssemblerList = new List<ListViewItem>();
+			unfilteredMinerList = new List<ListViewItem>();
+			unfilteredModuleList = new List<ListViewItem>();
 			unfilteredRecipeList = new List<ListViewItem>();
+
+			filteredAssemblerList = new List<ListViewItem>();
+			filteredMinerList = new List<ListViewItem>();
+			filteredModuleList = new List<ListViewItem>();
 			filteredRecipeList = new List<ListViewItem>();
 
 			SelectPresetMenuItem.Click += SelectPresetMenuItem_Click;
@@ -71,54 +86,13 @@ namespace Foreman
 			MouseHoverDetector mhDetector = new MouseHoverDetector(100, 200);
 			mhDetector.Add(RecipeListView, RecipeListView_StartHover, RecipeListView_EndHover);
 
-			LoadRecipeList();
-			UpdateAMM();
 
 			CurrentPresetLabel.Text = CurrentOptions.SelectedPreset.Name;
 			PresetListBox.Items.AddRange(CurrentOptions.Presets.ToArray());
 			PresetListBox.Items.RemoveAt(0); //0 is the currently active preset.
 
+			LoadUnfilteredLists();
 			UpdateModList();
-		}
-
-		private void LoadRecipeList()
-		{
-			IconList.Images.Clear();
-			IconList.Images.Add(DataCache.UnknownIcon);
-
-			unfilteredRecipeList.Clear();
-
-			foreach (Recipe recipe in CurrentOptions.DCache.Recipes.Values)
-			{
-				ListViewItem lvItem = new ListViewItem();
-				if (recipe.Icon != null)
-				{
-					IconList.Images.Add(recipe.Icon);
-					lvItem.ImageIndex = IconList.Images.Count - 1;
-				}
-				else
-				{
-					lvItem.ImageIndex = 0;
-				}
-				lvItem.Text = recipe.FriendlyName;
-				lvItem.Tag = recipe;
-				lvItem.Name = recipe.Name; //key
-				lvItem.Checked = true; //have to set this to true before (potentially) changing to false in order for the check boxes to appear
-				lvItem.Checked = recipe.Enabled;
-				lvItem.BackColor = recipe.Available ? AvailableRecipeColor : UnavailableRecipeColor;
-				unfilteredRecipeList.Add(lvItem);
-			}
-			unfilteredRecipeList.Sort(delegate (ListViewItem a, ListViewItem b)
-			{
-				Recipe ra = (Recipe)a.Tag;
-				Recipe rb = (Recipe)b.Tag;
-
-				int availableDiff = ra.Available.CompareTo(rb.Available);
-				if (availableDiff != 0) return -availableDiff;
-				return ra.FriendlyName.CompareTo(rb.FriendlyName);
-			});
-
-			UpdateFilteredRecipeList();
 		}
 
 		private void UpdateModList()
@@ -139,61 +113,76 @@ namespace Foreman
 			TechnologyDifficultyLabel.Text = presetInfo.ExpensiveTechnology ? "Expensive" : "Normal";
 		}
 
-		private void UpdateAMM()
+		private void LoadUnfilteredLists()
 		{
-			string filterString = FilterTextBox.Text.ToLower();
-			bool showUnavailables = ShowUnavailablesCheckBox.Checked;
+			IconList.Images.Clear();
+			IconList.Images.Add(DataCache.UnknownIcon);
 
-			AssemblerSelectionBox.BeginUpdate();
-			AssemblerSelectionBox.Items.Clear();
-			AssemblerSelectionBox.ItemBrushes.Clear();
-			AssemblerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => !a.IsMiner && a.LFriendlyName.Contains(filterString) && (showUnavailables || a.Available)).OrderBy(a => !a.Available).ThenBy(a => a.FriendlyName).ToArray());
-			AssemblerSelectionBox.DisplayMember = "FriendlyName";
-			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
-			{
-				AssemblerSelectionBox.SetItemChecked(i, ((Assembler)AssemblerSelectionBox.Items[i]).Enabled);
-				AssemblerSelectionBox.ItemBrushes.Add(((Assembler)AssemblerSelectionBox.Items[i]).Available ? AvailableObjectBrush : UnavailableObjectBrush);
-			}
-			AssemblerSelectionBox.EndUpdate();
+			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => !a.IsMiner), unfilteredAssemblerList);
+			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.IsMiner), unfilteredMinerList);
+			LoadUnfilteredList(CurrentOptions.DCache.Modules.Values, unfilteredModuleList);
+			LoadUnfilteredList(CurrentOptions.DCache.Recipes.Values, unfilteredRecipeList);
 
-			MinerSelectionBox.BeginUpdate();
-			MinerSelectionBox.Items.Clear();
-			MinerSelectionBox.ItemBrushes.Clear();
-			MinerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => a.IsMiner && a.LFriendlyName.Contains(filterString) && (showUnavailables || a.Available)).OrderBy(a => !a.Available).ThenBy(a => a.FriendlyName).ToArray());
-			MinerSelectionBox.DisplayMember = "FriendlyName";
-			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
-			{
-				MinerSelectionBox.SetItemChecked(i, ((Assembler)MinerSelectionBox.Items[i]).Enabled);
-				MinerSelectionBox.ItemBrushes.Add(((Assembler)MinerSelectionBox.Items[i]).Available ? AvailableObjectBrush : UnavailableObjectBrush);
-			}
-			MinerSelectionBox.EndUpdate();
-
-			ModuleSelectionBox.BeginUpdate();
-			ModuleSelectionBox.Items.Clear();
-			ModuleSelectionBox.ItemBrushes.Clear();
-			ModuleSelectionBox.Items.AddRange(CurrentOptions.DCache.Modules.Values.Where(m => m.LFriendlyName.Contains(filterString) && (showUnavailables || m.Available)).OrderBy(m => !m.Available).ThenBy(m => m.FriendlyName).ToArray());
-			ModuleSelectionBox.DisplayMember = "FriendlyName";
-			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
-			{
-				ModuleSelectionBox.SetItemChecked(i, ((Module)ModuleSelectionBox.Items[i]).Enabled);
-				ModuleSelectionBox.ItemBrushes.Add(((Module)ModuleSelectionBox.Items[i]).Available ? AvailableObjectBrush : UnavailableObjectBrush);
-			}
-			ModuleSelectionBox.EndUpdate();
+			UpdateFilteredLists();
 		}
 
-		private void UpdateFilteredRecipeList()
+		private void LoadUnfilteredList(IEnumerable<DataObjectBase> origin, List<ListViewItem> lviList)
+		{
+			foreach (DataObjectBase dOjbect in origin)
+			{
+				ListViewItem lvItem = new ListViewItem();
+				if (dOjbect.Icon != null)
+				{
+					IconList.Images.Add(dOjbect.Icon);
+					lvItem.ImageIndex = IconList.Images.Count - 1;
+				}
+				else
+				{
+					lvItem.ImageIndex = 0;
+				}
+
+				lvItem.Text = dOjbect.FriendlyName;
+				lvItem.Tag = dOjbect;
+				lvItem.Name = dOjbect.Name; //key
+				lvItem.Checked = true; //have to set this to true before (potentially) changing to false in order for the check boxes to appear
+				lvItem.Checked = dOjbect.Enabled;
+				lvItem.BackColor = dOjbect.Available ? AvailableObjectColor : UnavailableObjectColor;
+				lviList.Add(lvItem);
+			}
+			unfilteredRecipeList.Sort(delegate (ListViewItem a, ListViewItem b)
+			{
+				DataObjectBase dobA = (DataObjectBase)a.Tag;
+				DataObjectBase dobB = (DataObjectBase)b.Tag;
+
+				int availableDiff = dobA.Available.CompareTo(dobB.Available);
+				if (availableDiff != 0) return -availableDiff;
+				return dobA.FriendlyName.CompareTo(dobB.FriendlyName);
+			});
+
+		}
+
+		private void UpdateFilteredLists()
+		{
+			UpdateFilteredList(unfilteredAssemblerList, filteredAssemblerList, AssemblerListView);
+			UpdateFilteredList(unfilteredMinerList, filteredMinerList, MinerListView);
+			UpdateFilteredList(unfilteredModuleList, filteredModuleList, ModuleListView);
+			UpdateFilteredList(unfilteredRecipeList, filteredRecipeList, RecipeListView);
+		}
+
+		private void UpdateFilteredList(List<ListViewItem> unfilteredList, List<ListViewItem> filteredList, ListView owner)
 		{
 			string filterString = FilterTextBox.Text.ToLower();
 			bool showUnavailables = ShowUnavailablesCheckBox.Checked;
 
-			filteredRecipeList.Clear();
+			filteredList.Clear();
 
-			foreach (ListViewItem lvItem in unfilteredRecipeList)
-				if ((showUnavailables || ((Recipe)lvItem.Tag).Available) && (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString)))
-					filteredRecipeList.Add(lvItem);
+			foreach (ListViewItem lvItem in unfilteredList)
+				if ((showUnavailables || ((DataObjectBase)lvItem.Tag).Available) && (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString)))
+					filteredList.Add(lvItem);
 
-			RecipeListView.VirtualListSize = filteredRecipeList.Count;
-			RecipeListView.Invalidate();
+
+			owner.VirtualListSize = filteredList.Count;
+			owner.Invalidate();
 		}
 
 		//PRESETS LIST------------------------------------------------------------------------------------------
@@ -281,152 +270,69 @@ namespace Foreman
 
 		private void Filters_Changed(object sender, EventArgs e)
 		{
-			UpdateAMM();
-			UpdateFilteredRecipeList();
+			UpdateFilteredLists();
 		}
 
-		//ASSEMBLER------------------------------------------------------------------------------------------
-		private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
-		{
-			((Assembler)AssemblerSelectionBox.Items[e.Index]).Enabled = (e.NewValue == CheckState.Checked);
-		}
-		private void AssemblerSelectionAllButton_Click(object sender, EventArgs e)
-		{
-			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
-			{
-				AssemblerSelectionBox.SetItemChecked(i, true);
-				((Assembler)AssemblerSelectionBox.Items[i]).Enabled = true;
-			}
-		}
-		private void AssemblerSelectionNoneButton_Click(object sender, EventArgs e)
-		{
-			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
-			{
-				AssemblerSelectionBox.SetItemChecked(i, false);
-				((Assembler)AssemblerSelectionBox.Items[i]).Enabled = false;
-			}
-		}
+		//LIST VIEWS------------------------------------------------------------------------------------------
 
-		private void AssemblerSelectionBox_Leave(object sender, EventArgs e)
-		{
-			AssemblerSelectionBox.SelectedItem = null;
-		}
-
-		//MINER------------------------------------------------------------------------------------------
-		private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
-		{
-			((Assembler)MinerSelectionBox.Items[e.Index]).Enabled = (e.NewValue == CheckState.Checked);
-		}
-		private void MinerSelectionAllButton_Click(object sender, EventArgs e)
-		{
-			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
-			{
-				MinerSelectionBox.SetItemChecked(i, true);
-				((Assembler)MinerSelectionBox.Items[i]).Enabled = true;
-			}
-		}
-		private void MinerSelectionNoneButton_Click(object sender, EventArgs e)
-		{
-			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
-			{
-				MinerSelectionBox.SetItemChecked(i, false);
-				((Assembler)MinerSelectionBox.Items[i]).Enabled = false;
-			}
-		}
-
-		private void MinerSelectionBox_Leave(object sender, EventArgs e)
-		{
-			MinerSelectionBox.SelectedItem = null;
-		}
-
-		//MODULE------------------------------------------------------------------------------------------
-		private void ModuleSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
-		{
-			((Module)ModuleSelectionBox.Items[e.Index]).Enabled = (e.NewValue == CheckState.Checked);
-		}
-		private void ModuleSelectionAllButton_Click(object sender, EventArgs e)
-		{
-			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
-			{
-				ModuleSelectionBox.SetItemChecked(i, true);
-				((Module)ModuleSelectionBox.Items[i]).Enabled = true;
-			}
-		}
-		private void ModuleSelectionNoneButton_Click(object sender, EventArgs e)
-		{
-			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
-			{
-				ModuleSelectionBox.SetItemChecked(i, false);
-				((Module)ModuleSelectionBox.Items[i]).Enabled = false;
-			}
-		}
-
-		private void ModuleSelectionBox_Leave(object sender, EventArgs e)
-		{
-			ModuleSelectionBox.SelectedItem = null;
-		}
-
-		//RECIPES----------------------------------------------------------------------------------------
-
-		private void RecipeListView_KeyDown(object sender, KeyEventArgs e)
+		private void ListView_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.A && (e.Modifiers & Keys.Control) != 0)
-				NativeMethods.SelectAllItems(RecipeListView);
+				NativeMethods.SelectAllItems(sender as ListView);
 		}
 
-		private void RecipeListView_MouseClick(object sender, MouseEventArgs e)
+		private void ListView_MouseClick(object sender, MouseEventArgs e)
 		{
-			ListViewItem lvi = RecipeListView.GetItemAt(e.X, e.Y);
+			ListViewItem lvi = (sender as ListView).GetItemAt(e.X, e.Y);
 			if (lvi != null && e.X < (lvi.Bounds.Left + 16))
 			{
 				if (lvi.Selected) //check all selected
 				{
 					bool setCheck = !lvi.Checked;
-					foreach (int index in RecipeListView.SelectedIndices)
+					foreach (int index in (sender as ListView).SelectedIndices)
 					{
-						lvi = filteredRecipeList[index];
+						lvi = (sender as ListView).Items[index];
 						lvi.Checked = setCheck;
-						(lvi.Tag as Recipe).Enabled = lvi.Checked;
+						(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
 					}
 				}
 				else
 				{
 					lvi.Checked = !lvi.Checked;
-					(lvi.Tag as Recipe).Enabled = lvi.Checked;
+					(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
 				}
-				RecipeListView.Invalidate();
+				(sender as ListView).Invalidate();
 			}
-
 		}
 
-		private void RecipeListView_MouseDoubleClick(object sender, MouseEventArgs e)
+		private void ListView_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
-			ListViewItem lvi = RecipeListView.GetItemAt(e.X, e.Y);
+			ListViewItem lvi = (sender as ListView).GetItemAt(e.X, e.Y);
 			if (lvi != null && e.X < (lvi.Bounds.Left + 16))
 			{
 				if (lvi.Selected) //check all selected
 				{
 					bool setCheck = lvi.Checked;
-					foreach (int index in RecipeListView.SelectedIndices)
+					foreach (int index in (sender as ListView).SelectedIndices)
 					{
-						lvi = filteredRecipeList[index];
+						lvi = (sender as ListView).Items[index];
 						lvi.Checked = setCheck;
-						(lvi.Tag as Recipe).Enabled = lvi.Checked;
+						(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
 					}
 				}
 				else
 				{
 					//lvi.Checked = lvi.Checked;
-					(lvi.Tag as Recipe).Enabled = lvi.Checked;
+					(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
 				}
-				RecipeListView.Invalidate();
+				(sender as ListView).Invalidate();
 			}
 		}
 
-		private void RecipeListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
-		{
-			e.Item = filteredRecipeList[e.ItemIndex];
-		}
+		private void AssemblerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredAssemblerList[e.ItemIndex]; }
+		private void MinerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredMinerList[e.ItemIndex]; }
+		private void ModuleListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredModuleList[e.ItemIndex]; }
+		private void RecipeListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredRecipeList[e.ItemIndex]; }
 
 		private void RecipeListView_StartHover(object sender, MouseEventArgs e)
 		{
@@ -598,8 +504,7 @@ namespace Foreman
 					foreach (ListViewItem item in unfilteredRecipeList)
 						item.Checked = ((Recipe)item.Tag).Enabled;
 
-					UpdateAMM();
-					UpdateFilteredRecipeList();
+					UpdateFilteredLists();
 				}
 				else if (result == DialogResult.Abort)
 				{
