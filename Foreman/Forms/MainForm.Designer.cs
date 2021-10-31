@@ -64,6 +64,7 @@
 			this.ModuleDropDown = new System.Windows.Forms.ComboBox();
 			this.ShowUnavailableCheckBox = new System.Windows.Forms.CheckBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
+			this.button1 = new System.Windows.Forms.Button();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
 			this.ButtonsAFlowLayoutPanel.SuspendLayout();
@@ -99,11 +100,12 @@
 			this.MainToolbar.Controls.Add(this.GridLinesGroupBox);
 			this.MainToolbar.Controls.Add(this.DefaultsGroupBox);
 			this.MainToolbar.Controls.Add(this.ShowUnavailableCheckBox);
+			this.MainToolbar.Controls.Add(this.button1);
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(0, 0);
 			this.MainToolbar.Margin = new System.Windows.Forms.Padding(0);
 			this.MainToolbar.Name = "MainToolbar";
-			this.MainToolbar.Size = new System.Drawing.Size(1182, 136);
+			this.MainToolbar.Size = new System.Drawing.Size(1182, 165);
 			this.MainToolbar.TabIndex = 2;
 			// 
 			// ButtonsAFlowLayoutPanel
@@ -527,16 +529,26 @@
 			this.GraphViewer.DCache = null;
 			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
-			this.GraphViewer.Location = new System.Drawing.Point(4, 136);
+			this.GraphViewer.Location = new System.Drawing.Point(4, 165);
 			this.GraphViewer.Margin = new System.Windows.Forms.Padding(4, 0, 4, 4);
 			this.GraphViewer.MouseDownElement = null;
 			this.GraphViewer.Name = "GraphViewer";
 			this.GraphViewer.RecipeTooltipEnabled = false;
 			this.GraphViewer.SelectedRateUnit = Foreman.ProductionGraphViewer.RateUnit.Per1Sec;
-			this.GraphViewer.Size = new System.Drawing.Size(1174, 713);
+			this.GraphViewer.Size = new System.Drawing.Size(1174, 684);
 			this.GraphViewer.TabIndex = 12;
 			this.GraphViewer.TooltipsEnabled = true;
 			this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
+			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(3, 139);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(75, 23);
+			this.button1.TabIndex = 18;
+			this.button1.Text = "button1";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
 			// 
 			// MainForm
 			// 
@@ -605,6 +617,7 @@
 		private System.Windows.Forms.RadioButton MediumLodRadioButton;
 		private System.Windows.Forms.RadioButton LowLodRadioButton;
 		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.Button button1;
 	}
 }
 

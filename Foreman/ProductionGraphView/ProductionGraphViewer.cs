@@ -161,8 +161,8 @@ namespace Foreman
 
 		public void AddItem(Point drawOrigin, Point newLocation)
 		{
-			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
-			itemChooser.Show(selectedItem =>
+			ItemChooserForm itemChooser = new ItemChooserForm(this);
+			itemChooser.Show(PointToScreen(drawOrigin), selectedItem =>
 			{
 				if (selectedItem != null)
 					AddRecipe(drawOrigin, selectedItem, newLocation, NewNodeType.Disconnected);
@@ -186,10 +186,10 @@ namespace Foreman
 					tempRange = LinkChecker.GetTemperatureRange(baseItem, originElement.DisplayedNode, LinkType.Input);
 			}
 
-			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
+			RecipeChooserForm recipeChooser = new RecipeChooserForm(this);
 			BaseNode newNode = null;
 			int lastRecipeWidth = 0;
-			recipeChooser.Show((nodeType, recipe) =>
+			recipeChooser.Show(PointToScreen(drawOrigin), baseItem, tempRange, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier, (nodeType, recipe) =>
 			{
 				switch (nodeType)
 				{

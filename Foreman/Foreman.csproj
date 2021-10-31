@@ -134,13 +134,13 @@
     <Compile Include="Controls\DevNodeOptionsPanel.Designer.cs">
       <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\IRChooserPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\IRChooserPanel.Designer.cs">
-      <DependentUpon>IRChooserPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\MouseHoverDetector.cs" />
+    <Compile Include="Forms\IRChooserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\IRChooserForm.Designer.cs">
+      <DependentUpon>IRChooserForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProductionGraphView\RecipePainter.cs" />
     <Compile Include="Controls\RecipeToolTip.cs">
       <SubType>Component</SubType>
@@ -255,8 +255,8 @@
     <EmbeddedResource Include="Controls\DevNodeOptionsPanel.resx">
       <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\IRChooserPanel.resx">
-      <DependentUpon>IRChooserPanel.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\IRChooserForm.resx">
+      <DependentUpon>IRChooserForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SavefileLoadForm.resx">
       <DependentUpon>SavefileLoadForm.cs</DependentUpon>

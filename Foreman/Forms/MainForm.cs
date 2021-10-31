@@ -414,6 +414,10 @@ namespace Foreman
 			Properties.Settings.Default.Save();
 			GraphViewer.UpdateNodeVisuals();
 		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+		}
 	}
 
 	public class Preset : IEquatable<Preset>
