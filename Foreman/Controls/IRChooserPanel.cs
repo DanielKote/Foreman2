@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman
@@ -164,74 +165,93 @@ namespace Foreman
 
 		protected abstract List<Group> GetSortedGroups();
 
-		protected void UpdateIRButtons(int startRow = 0, bool scrollOnly = false) //if scroll only, then we dont need to update the filtered set, just use what is there
+		private long updateID = 0;
+		protected async void UpdateIRButtons(int startRow = 0, bool scrollOnly = false) //if scroll only, then we dont need to update the filtered set, just use what is there
 		{
+			long currentID = ++updateID;
+
 			if (IRTable.Visible)
 			{
-				//if we are actually changing the filtered list, then update it (through the GetSubgroupList)
-				if (!scrollOnly)
+				await Task.Run(() =>
 				{
-					filteredIRRowsList.Clear();
-					int currentRow = 0;
-					foreach (List<KeyValuePair<DataObjectBase, Color>> sgList in GetSubgroupList().Where(n => n.Count > 0))
+					//if we are actually changing the filtered list, then update it (through the GetSubgroupList)
+					if (!scrollOnly)
 					{
-						filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
-						int currentColumn = 0;
-						foreach (KeyValuePair<DataObjectBase, Color> kvp in sgList)
+						filteredIRRowsList.Clear();
+						int currentRow = 0;
+						foreach (List<KeyValuePair<DataObjectBase, Color>> sgList in GetSubgroupList().Where(n => n.Count > 0))
 						{
-							if (currentColumn == IRButtons.GetLength(0))
+							filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
+							int currentColumn = 0;
+							foreach (KeyValuePair<DataObjectBase, Color> kvp in sgList)
 							{
-								filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
-								currentColumn = 0;
-								currentRow++;
+								if (currentColumn == IRButtons.GetLength(0))
+								{
+									filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
+									currentColumn = 0;
+									currentRow++;
+								}
+								filteredIRRowsList[currentRow][currentColumn] = kvp;
+								currentColumn++;
 							}
-							filteredIRRowsList[currentRow][currentColumn] = kvp;
-							currentColumn++;
+							currentRow++;
 						}
-						currentRow++;
 					}
-					IRScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
-					IRScrollBar.Enabled = IRScrollBar.Maximum >= IRScrollBar.LargeChange;
-				}
-				CurrentRow = startRow;
-				IRScrollBar.Value = startRow;
 
-				//update all the buttons to be based off of the filteredIRSet
-				IRTable.SuspendLayout();
-				IRButtonToolTip.RemoveAll();
-				IRTable.Controls.Clear();
-				IRTable.Controls.Add(IRScrollBar, IRTable.ColumnCount - 1, 0);
-				for (int column = 0; column < IRButtons.GetLength(0); column++)
-				{
-					for (int row = 0; row < IRButtons.GetLength(1); row++)
+					this.Invoke((MethodInvoker)delegate
 					{
-						DataObjectBase irObject = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Key : null;
-						NFButton b = IRButtons[column, row];
-						if (irObject != null) //full
+						if (!scrollOnly)
 						{
-							b.ForeColor = Color.Black;
-							b.BackColor = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Value : Color.DimGray;
-							b.Margin = new Padding(b.FlatAppearance.BorderSize);
-							b.Dock = DockStyle.Fill;
-							b.BackgroundImage = irObject.Icon;
-							b.Tag = irObject;
-							b.Enabled = true;
-							IRButtonToolTip.SetToolTip(b, string.IsNullOrEmpty(irObject.FriendlyName) ? "-" : irObject.FriendlyName);
+							IRScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
+							IRScrollBar.Enabled = IRScrollBar.Maximum >= IRScrollBar.LargeChange;
 						}
-						else
+						CurrentRow = startRow;
+						IRScrollBar.Value = startRow;
+
+						IRTable.ResumeLayout();
+						IRTable.SuspendLayout();
+					});
+
+					//update all the buttons to be based off of the filteredIRSet
+					for (int column = 0; column < IRButtons.GetLength(0); column++)
+					{
+						for (int row = 0; row < IRButtons.GetLength(1); row++)
 						{
-							b.ForeColor = Color.Gray;
-							b.BackColor = Color.DimGray;
-							b.Margin = new Padding(Math.Max(1, IRTable.Width / (IRButtons.GetLength(0) * 3)));
-							b.Dock = DockStyle.Fill;
-							b.BackgroundImage = null;
-							b.Tag = null;
-							b.Enabled = false;
+							if (currentID != updateID)
+								return;
+
+							this.Invoke((MethodInvoker)delegate
+							{
+								DataObjectBase irObject = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Key : null;
+								NFButton b = IRButtons[column, row];
+								if (irObject != null) //full
+								{
+
+									b.ForeColor = Color.Black;
+									b.BackColor = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Value : Color.DimGray;
+									//b.Margin = new Padding(b.FlatAppearance.BorderSize);
+									//b.Dock = DockStyle.Fill;
+									b.BackgroundImage = irObject.Icon;
+									b.Tag = irObject;
+									b.Enabled = true;
+									IRButtonToolTip.SetToolTip(b, string.IsNullOrEmpty(irObject.FriendlyName) ? "-" : irObject.FriendlyName);
+								}
+								else
+								{
+									b.ForeColor = Color.Gray;
+									b.BackColor = Color.DimGray;
+									//b.Margin = new Padding(Math.Max(1, IRTable.Width / (IRButtons.GetLength(0) * 3)));
+									//b.Dock = DockStyle.Fill;
+									b.BackgroundImage = null;
+									b.Tag = null;
+									b.Enabled = false;
+								}
+							});
 						}
-						IRTable.Controls.Add(IRButtons[column, row], column, row);
 					}
-				}
-				IRTable.ResumeLayout();
+				});
+				if (currentID == updateID)
+					IRTable.ResumeLayout();
 			}
 		}
 
