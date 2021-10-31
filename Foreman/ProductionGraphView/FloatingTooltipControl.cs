@@ -37,7 +37,7 @@ namespace Foreman
 		public ProductionGraphViewer GraphViewer { get; private set; }
 		public event EventHandler Closing;
 
-		public FloatingTooltipControl(Control control, Direction direction, Point graphLocation, ProductionGraphViewer parent, bool showOverride)
+		public FloatingTooltipControl(Control control, Direction direction, Point graphLocation, ProductionGraphViewer parent, bool showOverride, bool useControlLocation)
 		{
 			Control = control;
 			Direction = direction;
@@ -47,7 +47,9 @@ namespace Foreman
 			parent.ToolTipRenderer.AddToolTip(this, showOverride);
 			parent.Controls.Add(control);
 			Rectangle ttRect = GraphViewer.ToolTipRenderer.getTooltipScreenBounds(parent.GraphToScreen(graphLocation), control.Size, direction);
-			control.Location = ttRect.Location;
+
+			if (!useControlLocation)
+				control.Location = ttRect.Location;
 			control.Focus();
 		}
 

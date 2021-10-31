@@ -30,8 +30,8 @@
 		{
 			this.MainLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+			this.MenuTable = new System.Windows.Forms.TableLayoutPanel();
+			this.MenuButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.AddItemButton = new System.Windows.Forms.Button();
 			this.AddRecipeButton = new System.Windows.Forms.Button();
 			this.ExportImageButton = new System.Windows.Forms.Button();
@@ -41,7 +41,7 @@
 			this.LoadGraphButton = new System.Windows.Forms.Button();
 			this.SaveGraphButton = new System.Windows.Forms.Button();
 			this.ProductionGroupBox = new System.Windows.Forms.GroupBox();
-			this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+			this.GraphOptionsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.ShowNodeRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.HighLodRadioButton = new System.Windows.Forms.RadioButton();
@@ -51,7 +51,7 @@
 			this.LowLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.ShowUnavailableCheckBox = new System.Windows.Forms.CheckBox();
 			this.GridLinesGroupBox = new System.Windows.Forms.GroupBox();
-			this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+			this.GridlinesTable = new System.Windows.Forms.TableLayoutPanel();
 			this.AlignSelectionButton = new System.Windows.Forms.Button();
 			this.MinorGridlinesDropDown = new System.Windows.Forms.ComboBox();
 			this.GridlinesCheckbox = new System.Windows.Forms.CheckBox();
@@ -59,22 +59,23 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.DefaultsGroupBox = new System.Windows.Forms.GroupBox();
-			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+			this.DefaultsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ModuleDropDown = new System.Windows.Forms.ComboBox();
 			this.AssemblerDropDown = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
+			this.RecipeEditPanelPositionLockCheckBox = new System.Windows.Forms.CheckBox();
 			this.MainLayoutPanel.SuspendLayout();
-			this.tableLayoutPanel1.SuspendLayout();
-			this.tableLayoutPanel2.SuspendLayout();
+			this.MenuTable.SuspendLayout();
+			this.MenuButtonsTable.SuspendLayout();
 			this.ProductionGroupBox.SuspendLayout();
-			this.tableLayoutPanel5.SuspendLayout();
+			this.GraphOptionsTable.SuspendLayout();
 			this.GridLinesGroupBox.SuspendLayout();
-			this.tableLayoutPanel4.SuspendLayout();
+			this.GridlinesTable.SuspendLayout();
 			this.DefaultsGroupBox.SuspendLayout();
-			this.tableLayoutPanel3.SuspendLayout();
+			this.DefaultsTable.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// MainLayoutPanel
@@ -82,7 +83,7 @@
 			this.MainLayoutPanel.ColumnCount = 1;
 			this.MainLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MainLayoutPanel.Controls.Add(this.GraphViewer, 0, 1);
-			this.MainLayoutPanel.Controls.Add(this.tableLayoutPanel1, 0, 0);
+			this.MainLayoutPanel.Controls.Add(this.MenuTable, 0, 0);
 			this.MainLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainLayoutPanel.Location = new System.Drawing.Point(0, 0);
 			this.MainLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
@@ -103,67 +104,68 @@
 			this.GraphViewer.DCache = null;
 			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
-			this.GraphViewer.Location = new System.Drawing.Point(3, 124);
+			this.GraphViewer.Location = new System.Drawing.Point(3, 132);
 			this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
 			this.GraphViewer.MouseDownElement = null;
 			this.GraphViewer.Name = "GraphViewer";
 			this.GraphViewer.RecipeTooltipEnabled = false;
 			this.GraphViewer.SelectedRateUnit = Foreman.ProductionGraphViewer.RateUnit.Per1Sec;
-			this.GraphViewer.Size = new System.Drawing.Size(928, 534);
+			this.GraphViewer.Size = new System.Drawing.Size(928, 526);
 			this.GraphViewer.TabIndex = 12;
 			this.GraphViewer.TooltipsEnabled = true;
 			this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
 			// 
-			// tableLayoutPanel1
+			// MenuTable
 			// 
-			this.tableLayoutPanel1.AutoSize = true;
-			this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel1.ColumnCount = 6;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ProductionGroupBox, 1, 0);
-			this.tableLayoutPanel1.Controls.Add(this.ShowUnavailableCheckBox, 4, 0);
-			this.tableLayoutPanel1.Controls.Add(this.GridLinesGroupBox, 2, 0);
-			this.tableLayoutPanel1.Controls.Add(this.DefaultsGroupBox, 3, 0);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 1;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(928, 118);
-			this.tableLayoutPanel1.TabIndex = 18;
+			this.MenuTable.AutoSize = true;
+			this.MenuTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.MenuTable.ColumnCount = 6;
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuTable.Controls.Add(this.MenuButtonsTable, 0, 0);
+			this.MenuTable.Controls.Add(this.ProductionGroupBox, 1, 0);
+			this.MenuTable.Controls.Add(this.ShowUnavailableCheckBox, 4, 0);
+			this.MenuTable.Controls.Add(this.GridLinesGroupBox, 2, 0);
+			this.MenuTable.Controls.Add(this.DefaultsGroupBox, 3, 0);
+			this.MenuTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.MenuTable.Location = new System.Drawing.Point(3, 3);
+			this.MenuTable.Name = "MenuTable";
+			this.MenuTable.RowCount = 1;
+			this.MenuTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.MenuTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.MenuTable.Size = new System.Drawing.Size(928, 126);
+			this.MenuTable.TabIndex = 18;
 			// 
-			// tableLayoutPanel2
+			// MenuButtonsTable
 			// 
-			this.tableLayoutPanel2.AutoSize = true;
-			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel2.ColumnCount = 2;
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel2.Controls.Add(this.AddItemButton, 1, 2);
-			this.tableLayoutPanel2.Controls.Add(this.AddRecipeButton, 1, 3);
-			this.tableLayoutPanel2.Controls.Add(this.ExportImageButton, 1, 1);
-			this.tableLayoutPanel2.Controls.Add(this.EnableDisableButton, 1, 0);
-			this.tableLayoutPanel2.Controls.Add(this.MainHelpButton, 0, 3);
-			this.tableLayoutPanel2.Controls.Add(this.ClearButton, 0, 2);
-			this.tableLayoutPanel2.Controls.Add(this.LoadGraphButton, 0, 1);
-			this.tableLayoutPanel2.Controls.Add(this.SaveGraphButton, 0, 0);
-			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 7);
-			this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
-			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-			this.tableLayoutPanel2.RowCount = 4;
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(164, 108);
-			this.tableLayoutPanel2.TabIndex = 0;
+			this.MenuButtonsTable.AutoSize = true;
+			this.MenuButtonsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.MenuButtonsTable.ColumnCount = 2;
+			this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuButtonsTable.Controls.Add(this.AddItemButton, 1, 2);
+			this.MenuButtonsTable.Controls.Add(this.AddRecipeButton, 1, 3);
+			this.MenuButtonsTable.Controls.Add(this.ExportImageButton, 1, 1);
+			this.MenuButtonsTable.Controls.Add(this.EnableDisableButton, 1, 0);
+			this.MenuButtonsTable.Controls.Add(this.MainHelpButton, 0, 3);
+			this.MenuButtonsTable.Controls.Add(this.ClearButton, 0, 2);
+			this.MenuButtonsTable.Controls.Add(this.LoadGraphButton, 0, 1);
+			this.MenuButtonsTable.Controls.Add(this.SaveGraphButton, 0, 0);
+			this.MenuButtonsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.MenuButtonsTable.Location = new System.Drawing.Point(3, 7);
+			this.MenuButtonsTable.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
+			this.MenuButtonsTable.Name = "MenuButtonsTable";
+			this.MenuButtonsTable.RowCount = 4;
+			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.MenuButtonsTable.Size = new System.Drawing.Size(164, 116);
+			this.MenuButtonsTable.TabIndex = 0;
 			// 
 			// AddItemButton
 			// 
@@ -171,10 +173,10 @@
 			this.AddItemButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AddItemButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.AddItemButton.Location = new System.Drawing.Point(79, 56);
+			this.AddItemButton.Location = new System.Drawing.Point(79, 60);
 			this.AddItemButton.Margin = new System.Windows.Forms.Padding(2);
 			this.AddItemButton.Name = "AddItemButton";
-			this.AddItemButton.Size = new System.Drawing.Size(83, 23);
+			this.AddItemButton.Size = new System.Drawing.Size(83, 25);
 			this.AddItemButton.TabIndex = 11;
 			this.AddItemButton.Text = "Add Item";
 			this.AddItemButton.UseVisualStyleBackColor = true;
@@ -186,10 +188,10 @@
 			this.AddRecipeButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AddRecipeButton.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AddRecipeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.AddRecipeButton.Location = new System.Drawing.Point(79, 83);
+			this.AddRecipeButton.Location = new System.Drawing.Point(79, 89);
 			this.AddRecipeButton.Margin = new System.Windows.Forms.Padding(2);
 			this.AddRecipeButton.Name = "AddRecipeButton";
-			this.AddRecipeButton.Size = new System.Drawing.Size(83, 23);
+			this.AddRecipeButton.Size = new System.Drawing.Size(83, 25);
 			this.AddRecipeButton.TabIndex = 10;
 			this.AddRecipeButton.Text = "Add Recipe";
 			this.AddRecipeButton.UseVisualStyleBackColor = true;
@@ -200,10 +202,10 @@
 			this.ExportImageButton.AutoSize = true;
 			this.ExportImageButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ExportImageButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ExportImageButton.Location = new System.Drawing.Point(79, 29);
+			this.ExportImageButton.Location = new System.Drawing.Point(79, 31);
 			this.ExportImageButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ExportImageButton.Name = "ExportImageButton";
-			this.ExportImageButton.Size = new System.Drawing.Size(83, 23);
+			this.ExportImageButton.Size = new System.Drawing.Size(83, 25);
 			this.ExportImageButton.TabIndex = 8;
 			this.ExportImageButton.Text = "Export Image";
 			this.ExportImageButton.UseVisualStyleBackColor = true;
@@ -217,7 +219,7 @@
 			this.EnableDisableButton.Location = new System.Drawing.Point(79, 2);
 			this.EnableDisableButton.Margin = new System.Windows.Forms.Padding(2);
 			this.EnableDisableButton.Name = "EnableDisableButton";
-			this.EnableDisableButton.Size = new System.Drawing.Size(83, 23);
+			this.EnableDisableButton.Size = new System.Drawing.Size(83, 25);
 			this.EnableDisableButton.TabIndex = 7;
 			this.EnableDisableButton.Text = "Settings";
 			this.EnableDisableButton.UseVisualStyleBackColor = true;
@@ -228,10 +230,10 @@
 			this.MainHelpButton.AutoSize = true;
 			this.MainHelpButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.MainHelpButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.MainHelpButton.Location = new System.Drawing.Point(2, 83);
+			this.MainHelpButton.Location = new System.Drawing.Point(2, 89);
 			this.MainHelpButton.Margin = new System.Windows.Forms.Padding(2);
 			this.MainHelpButton.Name = "MainHelpButton";
-			this.MainHelpButton.Size = new System.Drawing.Size(73, 23);
+			this.MainHelpButton.Size = new System.Drawing.Size(73, 25);
 			this.MainHelpButton.TabIndex = 9;
 			this.MainHelpButton.Text = "Help";
 			this.MainHelpButton.UseVisualStyleBackColor = true;
@@ -242,10 +244,10 @@
 			this.ClearButton.AutoSize = true;
 			this.ClearButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ClearButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ClearButton.Location = new System.Drawing.Point(2, 56);
+			this.ClearButton.Location = new System.Drawing.Point(2, 60);
 			this.ClearButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ClearButton.Name = "ClearButton";
-			this.ClearButton.Size = new System.Drawing.Size(73, 23);
+			this.ClearButton.Size = new System.Drawing.Size(73, 25);
 			this.ClearButton.TabIndex = 6;
 			this.ClearButton.Text = "Clear Graph";
 			this.ClearButton.UseVisualStyleBackColor = true;
@@ -256,10 +258,10 @@
 			this.LoadGraphButton.AutoSize = true;
 			this.LoadGraphButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.LoadGraphButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.LoadGraphButton.Location = new System.Drawing.Point(2, 29);
+			this.LoadGraphButton.Location = new System.Drawing.Point(2, 31);
 			this.LoadGraphButton.Margin = new System.Windows.Forms.Padding(2);
 			this.LoadGraphButton.Name = "LoadGraphButton";
-			this.LoadGraphButton.Size = new System.Drawing.Size(73, 23);
+			this.LoadGraphButton.Size = new System.Drawing.Size(73, 25);
 			this.LoadGraphButton.TabIndex = 10;
 			this.LoadGraphButton.Text = "Load";
 			this.LoadGraphButton.UseVisualStyleBackColor = true;
@@ -273,7 +275,7 @@
 			this.SaveGraphButton.Location = new System.Drawing.Point(2, 2);
 			this.SaveGraphButton.Margin = new System.Windows.Forms.Padding(2);
 			this.SaveGraphButton.Name = "SaveGraphButton";
-			this.SaveGraphButton.Size = new System.Drawing.Size(73, 23);
+			this.SaveGraphButton.Size = new System.Drawing.Size(73, 25);
 			this.SaveGraphButton.TabIndex = 9;
 			this.SaveGraphButton.Text = "Save";
 			this.SaveGraphButton.UseVisualStyleBackColor = true;
@@ -283,51 +285,53 @@
 			// 
 			this.ProductionGroupBox.AutoSize = true;
 			this.ProductionGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ProductionGroupBox.Controls.Add(this.tableLayoutPanel5);
+			this.ProductionGroupBox.Controls.Add(this.GraphOptionsTable);
 			this.ProductionGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ProductionGroupBox.Location = new System.Drawing.Point(173, 3);
 			this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.ProductionGroupBox.Name = "ProductionGroupBox";
 			this.ProductionGroupBox.Padding = new System.Windows.Forms.Padding(0);
-			this.ProductionGroupBox.Size = new System.Drawing.Size(192, 110);
+			this.ProductionGroupBox.Size = new System.Drawing.Size(192, 118);
 			this.ProductionGroupBox.TabIndex = 4;
 			this.ProductionGroupBox.TabStop = false;
 			this.ProductionGroupBox.Text = "Graph Options:";
 			// 
-			// tableLayoutPanel5
+			// GraphOptionsTable
 			// 
-			this.tableLayoutPanel5.AutoSize = true;
-			this.tableLayoutPanel5.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel5.ColumnCount = 4;
-			this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel5.Controls.Add(this.PauseUpdatesCheckbox, 0, 3);
-			this.tableLayoutPanel5.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 2);
-			this.tableLayoutPanel5.Controls.Add(this.HighLodRadioButton, 3, 0);
-			this.tableLayoutPanel5.Controls.Add(this.DynamicLWCheckBox, 0, 1);
-			this.tableLayoutPanel5.Controls.Add(this.label6, 0, 0);
-			this.tableLayoutPanel5.Controls.Add(this.MediumLodRadioButton, 2, 0);
-			this.tableLayoutPanel5.Controls.Add(this.LowLodRadioButton, 1, 0);
-			this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 16);
-			this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-			this.tableLayoutPanel5.RowCount = 4;
-			this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel5.Size = new System.Drawing.Size(186, 81);
-			this.tableLayoutPanel5.TabIndex = 2;
+			this.GraphOptionsTable.AutoSize = true;
+			this.GraphOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.GraphOptionsTable.ColumnCount = 4;
+			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphOptionsTable.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 2);
+			this.GraphOptionsTable.Controls.Add(this.HighLodRadioButton, 3, 0);
+			this.GraphOptionsTable.Controls.Add(this.DynamicLWCheckBox, 0, 1);
+			this.GraphOptionsTable.Controls.Add(this.label6, 0, 0);
+			this.GraphOptionsTable.Controls.Add(this.MediumLodRadioButton, 2, 0);
+			this.GraphOptionsTable.Controls.Add(this.LowLodRadioButton, 1, 0);
+			this.GraphOptionsTable.Controls.Add(this.PauseUpdatesCheckbox, 0, 4);
+			this.GraphOptionsTable.Controls.Add(this.RecipeEditPanelPositionLockCheckBox, 0, 3);
+			this.GraphOptionsTable.Location = new System.Drawing.Point(3, 16);
+			this.GraphOptionsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.GraphOptionsTable.Name = "GraphOptionsTable";
+			this.GraphOptionsTable.RowCount = 5;
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.Size = new System.Drawing.Size(186, 89);
+			this.GraphOptionsTable.TabIndex = 2;
 			// 
 			// PauseUpdatesCheckbox
 			// 
 			this.PauseUpdatesCheckbox.AutoSize = true;
-			this.tableLayoutPanel5.SetColumnSpan(this.PauseUpdatesCheckbox, 4);
+			this.GraphOptionsTable.SetColumnSpan(this.PauseUpdatesCheckbox, 4);
 			this.PauseUpdatesCheckbox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 64);
-			this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 72);
+			this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
 			this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
 			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(180, 17);
 			this.PauseUpdatesCheckbox.TabIndex = 3;
@@ -338,10 +342,10 @@
 			// ShowNodeRecipeCheckBox
 			// 
 			this.ShowNodeRecipeCheckBox.AutoSize = true;
-			this.tableLayoutPanel5.SetColumnSpan(this.ShowNodeRecipeCheckBox, 4);
+			this.GraphOptionsTable.SetColumnSpan(this.ShowNodeRecipeCheckBox, 4);
 			this.ShowNodeRecipeCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 44);
-			this.ShowNodeRecipeCheckBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 38);
+			this.ShowNodeRecipeCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
 			this.ShowNodeRecipeCheckBox.Name = "ShowNodeRecipeCheckBox";
 			this.ShowNodeRecipeCheckBox.Size = new System.Drawing.Size(180, 17);
 			this.ShowNodeRecipeCheckBox.TabIndex = 6;
@@ -366,10 +370,10 @@
 			// DynamicLWCheckBox
 			// 
 			this.DynamicLWCheckBox.AutoSize = true;
-			this.tableLayoutPanel5.SetColumnSpan(this.DynamicLWCheckBox, 4);
+			this.GraphOptionsTable.SetColumnSpan(this.DynamicLWCheckBox, 4);
 			this.DynamicLWCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 24);
-			this.DynamicLWCheckBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 21);
+			this.DynamicLWCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
 			this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
 			this.DynamicLWCheckBox.Size = new System.Drawing.Size(180, 17);
 			this.DynamicLWCheckBox.TabIndex = 4;
@@ -432,39 +436,39 @@
 			// 
 			this.GridLinesGroupBox.AutoSize = true;
 			this.GridLinesGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.GridLinesGroupBox.Controls.Add(this.tableLayoutPanel4);
+			this.GridLinesGroupBox.Controls.Add(this.GridlinesTable);
 			this.GridLinesGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.GridLinesGroupBox.Location = new System.Drawing.Point(371, 3);
 			this.GridLinesGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.GridLinesGroupBox.Name = "GridLinesGroupBox";
 			this.GridLinesGroupBox.Padding = new System.Windows.Forms.Padding(0);
-			this.GridLinesGroupBox.Size = new System.Drawing.Size(208, 110);
+			this.GridLinesGroupBox.Size = new System.Drawing.Size(208, 118);
 			this.GridLinesGroupBox.TabIndex = 17;
 			this.GridLinesGroupBox.TabStop = false;
 			this.GridLinesGroupBox.Text = "Gridlines (2n scaling)";
 			// 
-			// tableLayoutPanel4
+			// GridlinesTable
 			// 
-			this.tableLayoutPanel4.AutoSize = true;
-			this.tableLayoutPanel4.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel4.ColumnCount = 2;
-			this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-			this.tableLayoutPanel4.Controls.Add(this.AlignSelectionButton, 1, 2);
-			this.tableLayoutPanel4.Controls.Add(this.MinorGridlinesDropDown, 1, 0);
-			this.tableLayoutPanel4.Controls.Add(this.GridlinesCheckbox, 0, 2);
-			this.tableLayoutPanel4.Controls.Add(this.MajorGridlinesDropDown, 1, 1);
-			this.tableLayoutPanel4.Controls.Add(this.label3, 0, 1);
-			this.tableLayoutPanel4.Controls.Add(this.label2, 0, 0);
-			this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 16);
-			this.tableLayoutPanel4.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-			this.tableLayoutPanel4.RowCount = 3;
-			this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel4.Size = new System.Drawing.Size(202, 75);
-			this.tableLayoutPanel4.TabIndex = 2;
+			this.GridlinesTable.AutoSize = true;
+			this.GridlinesTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.GridlinesTable.ColumnCount = 2;
+			this.GridlinesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GridlinesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+			this.GridlinesTable.Controls.Add(this.AlignSelectionButton, 1, 2);
+			this.GridlinesTable.Controls.Add(this.MinorGridlinesDropDown, 1, 0);
+			this.GridlinesTable.Controls.Add(this.GridlinesCheckbox, 0, 2);
+			this.GridlinesTable.Controls.Add(this.MajorGridlinesDropDown, 1, 1);
+			this.GridlinesTable.Controls.Add(this.label3, 0, 1);
+			this.GridlinesTable.Controls.Add(this.label2, 0, 0);
+			this.GridlinesTable.Location = new System.Drawing.Point(3, 16);
+			this.GridlinesTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.GridlinesTable.Name = "GridlinesTable";
+			this.GridlinesTable.RowCount = 3;
+			this.GridlinesTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GridlinesTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GridlinesTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GridlinesTable.Size = new System.Drawing.Size(202, 75);
+			this.GridlinesTable.TabIndex = 2;
 			// 
 			// AlignSelectionButton
 			// 
@@ -569,39 +573,39 @@
 			// 
 			this.DefaultsGroupBox.AutoSize = true;
 			this.DefaultsGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.DefaultsGroupBox.Controls.Add(this.tableLayoutPanel3);
+			this.DefaultsGroupBox.Controls.Add(this.DefaultsTable);
 			this.DefaultsGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.DefaultsGroupBox.Location = new System.Drawing.Point(585, 3);
 			this.DefaultsGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.DefaultsGroupBox.Name = "DefaultsGroupBox";
 			this.DefaultsGroupBox.Padding = new System.Windows.Forms.Padding(0);
-			this.DefaultsGroupBox.Size = new System.Drawing.Size(193, 110);
+			this.DefaultsGroupBox.Size = new System.Drawing.Size(193, 118);
 			this.DefaultsGroupBox.TabIndex = 7;
 			this.DefaultsGroupBox.TabStop = false;
 			this.DefaultsGroupBox.Text = "Defaults:";
 			// 
-			// tableLayoutPanel3
+			// DefaultsTable
 			// 
-			this.tableLayoutPanel3.AutoSize = true;
-			this.tableLayoutPanel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel3.ColumnCount = 2;
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
-			this.tableLayoutPanel3.Controls.Add(this.ModuleDropDown, 1, 2);
-			this.tableLayoutPanel3.Controls.Add(this.AssemblerDropDown, 1, 1);
-			this.tableLayoutPanel3.Controls.Add(this.label5, 0, 1);
-			this.tableLayoutPanel3.Controls.Add(this.RateOptionsDropDown, 1, 0);
-			this.tableLayoutPanel3.Controls.Add(this.label4, 0, 0);
-			this.tableLayoutPanel3.Controls.Add(this.label1, 0, 2);
-			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
-			this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-			this.tableLayoutPanel3.RowCount = 3;
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(187, 77);
-			this.tableLayoutPanel3.TabIndex = 2;
+			this.DefaultsTable.AutoSize = true;
+			this.DefaultsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.DefaultsTable.ColumnCount = 2;
+			this.DefaultsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.DefaultsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
+			this.DefaultsTable.Controls.Add(this.ModuleDropDown, 1, 2);
+			this.DefaultsTable.Controls.Add(this.AssemblerDropDown, 1, 1);
+			this.DefaultsTable.Controls.Add(this.label5, 0, 1);
+			this.DefaultsTable.Controls.Add(this.RateOptionsDropDown, 1, 0);
+			this.DefaultsTable.Controls.Add(this.label4, 0, 0);
+			this.DefaultsTable.Controls.Add(this.label1, 0, 2);
+			this.DefaultsTable.Location = new System.Drawing.Point(3, 16);
+			this.DefaultsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.DefaultsTable.Name = "DefaultsTable";
+			this.DefaultsTable.RowCount = 3;
+			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.DefaultsTable.Size = new System.Drawing.Size(187, 77);
+			this.DefaultsTable.TabIndex = 2;
 			// 
 			// ModuleDropDown
 			// 
@@ -674,6 +678,20 @@
 			this.label1.Text = "Modules:";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// RecipeEditPanelPositionLockCheckBox
+			// 
+			this.RecipeEditPanelPositionLockCheckBox.AutoSize = true;
+			this.GraphOptionsTable.SetColumnSpan(this.RecipeEditPanelPositionLockCheckBox, 4);
+			this.RecipeEditPanelPositionLockCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 55);
+			this.RecipeEditPanelPositionLockCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+			this.RecipeEditPanelPositionLockCheckBox.Name = "RecipeEditPanelPositionLockCheckBox";
+			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(180, 17);
+			this.RecipeEditPanelPositionLockCheckBox.TabIndex = 11;
+			this.RecipeEditPanelPositionLockCheckBox.Text = "Lock Recipe Editor to TL corner";
+			this.RecipeEditPanelPositionLockCheckBox.UseVisualStyleBackColor = true;
+			this.RecipeEditPanelPositionLockCheckBox.CheckedChanged += new System.EventHandler(this.RecipeEditPanelPositionLockCheckBox_CheckedChanged);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -689,22 +707,22 @@
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.MainLayoutPanel.ResumeLayout(false);
 			this.MainLayoutPanel.PerformLayout();
-			this.tableLayoutPanel1.ResumeLayout(false);
-			this.tableLayoutPanel1.PerformLayout();
-			this.tableLayoutPanel2.ResumeLayout(false);
-			this.tableLayoutPanel2.PerformLayout();
+			this.MenuTable.ResumeLayout(false);
+			this.MenuTable.PerformLayout();
+			this.MenuButtonsTable.ResumeLayout(false);
+			this.MenuButtonsTable.PerformLayout();
 			this.ProductionGroupBox.ResumeLayout(false);
 			this.ProductionGroupBox.PerformLayout();
-			this.tableLayoutPanel5.ResumeLayout(false);
-			this.tableLayoutPanel5.PerformLayout();
+			this.GraphOptionsTable.ResumeLayout(false);
+			this.GraphOptionsTable.PerformLayout();
 			this.GridLinesGroupBox.ResumeLayout(false);
 			this.GridLinesGroupBox.PerformLayout();
-			this.tableLayoutPanel4.ResumeLayout(false);
-			this.tableLayoutPanel4.PerformLayout();
+			this.GridlinesTable.ResumeLayout(false);
+			this.GridlinesTable.PerformLayout();
 			this.DefaultsGroupBox.ResumeLayout(false);
 			this.DefaultsGroupBox.PerformLayout();
-			this.tableLayoutPanel3.ResumeLayout(false);
-			this.tableLayoutPanel3.PerformLayout();
+			this.DefaultsTable.ResumeLayout(false);
+			this.DefaultsTable.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -743,11 +761,12 @@
 		private System.Windows.Forms.RadioButton MediumLodRadioButton;
 		private System.Windows.Forms.RadioButton LowLodRadioButton;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+		private System.Windows.Forms.TableLayoutPanel MenuTable;
+		private System.Windows.Forms.TableLayoutPanel MenuButtonsTable;
+		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
+		private System.Windows.Forms.TableLayoutPanel GridlinesTable;
+		private System.Windows.Forms.TableLayoutPanel DefaultsTable;
+		private System.Windows.Forms.CheckBox RecipeEditPanelPositionLockCheckBox;
 	}
 }
 

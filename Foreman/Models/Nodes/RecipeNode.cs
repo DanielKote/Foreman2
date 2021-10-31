@@ -88,6 +88,14 @@ namespace Foreman
 		{
 			SelectedAssembler = assembler;
 
+			//fuel
+			if (!assembler.IsBurner)
+				SetFuel(null);
+			else if (Fuel != null && assembler.Fuels.Contains(Fuel))
+				SetFuel(Fuel);
+			else
+				AutoSetFuel();
+
 			//check for invalid modules
 			for (int i = assemblerModules.Count - 1; i >= 0; i--)
 				if (assemblerModules[i].IsMissing || !SelectedAssembler.Modules.Contains(assemblerModules[i]) || !BaseRecipe.Modules.Contains(assemblerModules[i]))
@@ -122,7 +130,7 @@ namespace Foreman
 			{
 				//check for invalid modules
 				for (int i = beaconModules.Count - 1; i >= 0; i--)
-					if (beaconModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.ValidModules.Contains(beaconModules[i]))
+					if (beaconModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.Modules.Contains(beaconModules[i]))
 						beaconModules.RemoveAt(i);
 				//check for too many modules
 				while (beaconModules.Count > SelectedBeacon.ModuleSlots)
@@ -320,7 +328,7 @@ namespace Foreman
 					if (BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null || beaconModules.Count > SelectedBeacon.ModuleSlots)
 						resolutions.Add("Fix beacon modules", new Action(() => {
 							for (int i = BeaconModules.Count - 1; i >= 0; i--)
-								if (BeaconModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.ValidModules.Contains(beaconModules[i]))
+								if (BeaconModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.Modules.Contains(beaconModules[i]))
 									RemoveBeaconModule(i);
 							while (BeaconModules.Count > SelectedBeacon.ModuleSlots)
 								RemoveBeaconModule(BeaconModules.Count - 1);
@@ -503,7 +511,7 @@ namespace Foreman
 				multiplier += module.PollutionBonus;
 			foreach (Module beaconModule in BeaconModules)
 				multiplier += beaconModule.PollutionBonus * SelectedBeacon.Effectivity * BeaconCount;
-			return multiplier;
+			return multiplier > 0.2f ? multiplier : 0.2f;
 		}
 
 		public float GetBaseNumberOfAssemblers()

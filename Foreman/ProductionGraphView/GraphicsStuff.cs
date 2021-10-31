@@ -109,28 +109,38 @@ namespace Foreman
 
 		public static string FloatToString(float value)
 		{
-			string str;
 			if (value >= 100000)
-				str = value.ToString("0.00e0");
-			else if (value >= 10000)
-				str = value.ToString("0");
-			else if (value >= 100)
-				str = value.ToString("0.#");
-			else if (value >= 10)
-				str = value.ToString("0.##");
-			else if (value >= 0.1)
-				str = value.ToString("0.###");
-			else if (value != 0)
-				str = value.ToString("0.######");
-			else
-				str = "0";
-			return str;
+				return value.ToString("0.00e0");
+			if (value >= 10000)
+				return value.ToString("0");
+			if (value >= 100)
+				return value.ToString("0.#");
+			if (value >= 10)
+				return value.ToString("0.##");
+			if (value >= 0.1)
+				return value.ToString("0.###");
+			if (value != 0)
+				return value.ToString("0.######");
+			return "0";
+		}
+
+		public static string FloatToEnergy(float value)
+		{
+			if (value >= 1000000000000)
+				return (value / 1000000000000).ToString("0.##") + "PJ";
+			if (value >= 1000000000)
+				return (value / 1000000000000).ToString("0.##") + "GJ";
+			if (value >= 1000000)
+				return (value / 1000000000000).ToString("0.##") + "MJ";
+			if (value >= 1000)
+				return (value / 1000000000000).ToString("0.##") + "KJ";
+			return (value / 1000000000000).ToString("0.##") + "J";
 		}
 	}
 
 	public static class RecipePainter //As I found out the painted recipe look is rather nice. And when I needed to display it outside the tooltip, well... it moved to its own class instead of me copy-pasting the code.
 	{
-		private static readonly Brush BackgroundBrush = new SolidBrush(Color.FromArgb(65, 65, 65));
+		private static readonly Brush BackgroundBrush = new SolidBrush(Color.FromArgb(255, 65, 65, 65));
 		private static readonly Brush DarkBackgroundBrush = new SolidBrush(Color.FromArgb(255, 40, 40, 40));
 		private static readonly Brush TextBrush = new SolidBrush(Color.White);
 		private static readonly Pen BorderPen = new Pen(new SolidBrush(Color.Black), 2);
@@ -238,5 +248,4 @@ namespace Foreman
 			graphics.DrawRectangle(BorderPen, boundary);
 		}
 	}
-
 }

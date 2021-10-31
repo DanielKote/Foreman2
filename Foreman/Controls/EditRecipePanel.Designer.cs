@@ -30,825 +30,1066 @@ namespace Foreman
         /// </summary>
         private void InitializeComponent()
         {
-			this.autoOption = new System.Windows.Forms.RadioButton();
-			this.fixedOption = new System.Windows.Forms.RadioButton();
-			this.fixedTextBox = new System.Windows.Forms.TextBox();
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.PollutionLabel = new System.Windows.Forms.Label();
+			this.AutoAssemblersOption = new System.Windows.Forms.RadioButton();
+			this.FixedAssemblersOption = new System.Windows.Forms.RadioButton();
+			this.FixedAssemblerCountInput = new System.Windows.Forms.TextBox();
+			this.AssemblerInfoTable = new System.Windows.Forms.TableLayoutPanel();
+			this.AssemblerPollutionLabel = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.PollutionPercentLabel = new System.Windows.Forms.Label();
+			this.AssemblerPollutionPercentLabel = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
-			this.ProductivityPercentLabel = new System.Windows.Forms.Label();
+			this.AssemblerProductivityPercentLabel = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
-			this.SpeedPercentLabel = new System.Windows.Forms.Label();
+			this.AssemblerSpeedPercentLabel = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
-			this.EnergyPercentLabel = new System.Windows.Forms.Label();
-			this.EnergyLabel = new System.Windows.Forms.Label();
-			this.SpeedLabel = new System.Windows.Forms.Label();
-			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
-			this.button17 = new System.Windows.Forms.Button();
-			this.button18 = new System.Windows.Forms.Button();
-			this.button19 = new System.Windows.Forms.Button();
-			this.button20 = new System.Windows.Forms.Button();
-			this.button21 = new System.Windows.Forms.Button();
-			this.button22 = new System.Windows.Forms.Button();
-			this.button23 = new System.Windows.Forms.Button();
-			this.button24 = new System.Windows.Forms.Button();
-			this.button25 = new System.Windows.Forms.Button();
-			this.button26 = new System.Windows.Forms.Button();
-			this.button27 = new System.Windows.Forms.Button();
-			this.button29 = new System.Windows.Forms.Button();
-			this.label3 = new System.Windows.Forms.Label();
-			this.label1 = new System.Windows.Forms.Label();
-			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-			this.button6 = new System.Windows.Forms.Button();
-			this.button7 = new System.Windows.Forms.Button();
-			this.button11 = new System.Windows.Forms.Button();
-			this.button12 = new System.Windows.Forms.Button();
-			this.button13 = new System.Windows.Forms.Button();
-			this.button14 = new System.Windows.Forms.Button();
-			this.button15 = new System.Windows.Forms.Button();
-			this.button16 = new System.Windows.Forms.Button();
-			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.button1 = new System.Windows.Forms.Button();
-			this.button2 = new System.Windows.Forms.Button();
-			this.button3 = new System.Windows.Forms.Button();
-			this.button4 = new System.Windows.Forms.Button();
-			this.button5 = new System.Windows.Forms.Button();
-			this.button8 = new System.Windows.Forms.Button();
-			this.button9 = new System.Windows.Forms.Button();
-			this.button10 = new System.Windows.Forms.Button();
-			this.panel4 = new System.Windows.Forms.Panel();
+			this.AssemblerEnergyPercentLabel = new System.Windows.Forms.Label();
+			this.AssemblerEnergyLabel = new System.Windows.Forms.Label();
+			this.AssemblerSpeedLabel = new System.Windows.Forms.Label();
+			this.AModuleOptionsLabel = new System.Windows.Forms.Label();
+			this.AModulesLabel = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
-			this.panel5 = new System.Windows.Forms.Panel();
+			this.AssemblerTitle = new System.Windows.Forms.Label();
+			this.MainTable = new System.Windows.Forms.TableLayoutPanel();
+			this.BeaconTable = new System.Windows.Forms.TableLayoutPanel();
+			this.BModulesChoicePanel = new System.Windows.Forms.Panel();
+			this.BModulesChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+			this.SelectedBModulesPanel = new System.Windows.Forms.Panel();
+			this.SelectedBModulesTable = new System.Windows.Forms.TableLayoutPanel();
+			this.BModulesLabel = new System.Windows.Forms.Label();
+			this.BeaconTitle = new System.Windows.Forms.Label();
+			this.BModuleOptionsLabel = new System.Windows.Forms.Label();
+			this.BeaconChoicePanel = new System.Windows.Forms.Panel();
+			this.BeaconChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+			this.BeaconInfoTable = new System.Windows.Forms.TableLayoutPanel();
+			this.label14 = new System.Windows.Forms.Label();
+			this.TotalBeaconsLabel = new System.Windows.Forms.Label();
+			this.label16 = new System.Windows.Forms.Label();
+			this.BeaconEfficiencyLabel = new System.Windows.Forms.Label();
+			this.label18 = new System.Windows.Forms.Label();
+			this.BeaconModuleCountLabel = new System.Windows.Forms.Label();
+			this.label20 = new System.Windows.Forms.Label();
+			this.BeaconEnergyLabel = new System.Windows.Forms.Label();
+			this.BeaconValuesTable = new System.Windows.Forms.TableLayoutPanel();
+			this.ExtraBeaconCountInput = new System.Windows.Forms.TextBox();
+			this.BeaconsPerAssemblerCountInput = new System.Windows.Forms.TextBox();
+			this.BeaconCountInput = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
-			this.panel1 = new System.Windows.Forms.Panel();
 			this.label9 = new System.Windows.Forms.Label();
-			this.tableLayoutPanel1.SuspendLayout();
-			this.flowLayoutPanel3.SuspendLayout();
-			this.flowLayoutPanel2.SuspendLayout();
-			this.flowLayoutPanel1.SuspendLayout();
-			this.panel4.SuspendLayout();
-			this.panel5.SuspendLayout();
-			this.panel1.SuspendLayout();
+			this.label10 = new System.Windows.Forms.Label();
+			this.AssemblerTable = new System.Windows.Forms.TableLayoutPanel();
+			this.FuelOptionsPanel = new System.Windows.Forms.Panel();
+			this.FuelOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.FuelTitle = new System.Windows.Forms.Label();
+			this.AModulesChoicePanel = new System.Windows.Forms.Panel();
+			this.AModulesChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+			this.AssemblerChoicePanel = new System.Windows.Forms.Panel();
+			this.AssemblerChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+			this.SelectedAModulesPanel = new System.Windows.Forms.Panel();
+			this.SelectedAModulesTable = new System.Windows.Forms.TableLayoutPanel();
+			this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.SelectedAssemblerIcon = new System.Windows.Forms.PictureBox();
+			this.SelectedFuelIcon = new System.Windows.Forms.PictureBox();
+			this.SelectedBeaconIcon = new System.Windows.Forms.PictureBox();
+			this.ToolTip = new Foreman.CustomToolTip();
+			this.AssemblerInfoTable.SuspendLayout();
+			this.MainTable.SuspendLayout();
+			this.BeaconTable.SuspendLayout();
+			this.BModulesChoicePanel.SuspendLayout();
+			this.SelectedBModulesPanel.SuspendLayout();
+			this.BeaconChoicePanel.SuspendLayout();
+			this.BeaconInfoTable.SuspendLayout();
+			this.BeaconValuesTable.SuspendLayout();
+			this.AssemblerTable.SuspendLayout();
+			this.FuelOptionsPanel.SuspendLayout();
+			this.AModulesChoicePanel.SuspendLayout();
+			this.AssemblerChoicePanel.SuspendLayout();
+			this.SelectedAModulesPanel.SuspendLayout();
+			this.RateOptionsTable.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.SelectedAssemblerIcon)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.SelectedFuelIcon)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.SelectedBeaconIcon)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// autoOption
+			// AutoAssemblersOption
 			// 
-			this.autoOption.AutoSize = true;
-			this.autoOption.Checked = true;
-			this.autoOption.Location = new System.Drawing.Point(109, 5);
-			this.autoOption.Name = "autoOption";
-			this.autoOption.Size = new System.Drawing.Size(55, 21);
-			this.autoOption.TabIndex = 0;
-			this.autoOption.TabStop = true;
-			this.autoOption.Text = "Auto";
-			this.autoOption.UseVisualStyleBackColor = true;
-			this.autoOption.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
+			this.AutoAssemblersOption.AutoSize = true;
+			this.AutoAssemblersOption.Checked = true;
+			this.AutoAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AutoAssemblersOption.Location = new System.Drawing.Point(227, 3);
+			this.AutoAssemblersOption.Name = "AutoAssemblersOption";
+			this.AutoAssemblersOption.Size = new System.Drawing.Size(47, 20);
+			this.AutoAssemblersOption.TabIndex = 0;
+			this.AutoAssemblersOption.TabStop = true;
+			this.AutoAssemblersOption.Text = "Auto";
+			this.AutoAssemblersOption.UseVisualStyleBackColor = true;
+			this.AutoAssemblersOption.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
 			// 
-			// fixedOption
+			// FixedAssemblersOption
 			// 
-			this.fixedOption.AutoSize = true;
-			this.fixedOption.Location = new System.Drawing.Point(163, 5);
-			this.fixedOption.Name = "fixedOption";
-			this.fixedOption.Size = new System.Drawing.Size(59, 21);
-			this.fixedOption.TabIndex = 1;
-			this.fixedOption.Text = "Fixed";
-			this.fixedOption.UseVisualStyleBackColor = true;
-			this.fixedOption.CheckedChanged += new System.EventHandler(this.fixedOption_CheckedChanged);
-			this.fixedOption.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
+			this.FixedAssemblersOption.AutoSize = true;
+			this.FixedAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FixedAssemblersOption.Location = new System.Drawing.Point(280, 3);
+			this.FixedAssemblersOption.Name = "FixedAssemblersOption";
+			this.FixedAssemblersOption.Size = new System.Drawing.Size(50, 20);
+			this.FixedAssemblersOption.TabIndex = 1;
+			this.FixedAssemblersOption.Text = "Fixed";
+			this.FixedAssemblersOption.UseVisualStyleBackColor = true;
+			this.FixedAssemblersOption.CheckedChanged += new System.EventHandler(this.FixedAssemblerOption_CheckedChanged);
+			this.FixedAssemblersOption.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
 			// 
-			// fixedTextBox
+			// FixedAssemblerCountInput
 			// 
-			this.fixedTextBox.Location = new System.Drawing.Point(215, 4);
-			this.fixedTextBox.Name = "fixedTextBox";
-			this.fixedTextBox.Size = new System.Drawing.Size(92, 23);
-			this.fixedTextBox.TabIndex = 2;
-			this.fixedTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
-			this.fixedTextBox.LostFocus += new System.EventHandler(this.fixedTextBox_LostFocus);
+			this.FixedAssemblerCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FixedAssemblerCountInput.Location = new System.Drawing.Point(336, 3);
+			this.FixedAssemblerCountInput.Name = "FixedAssemblerCountInput";
+			this.FixedAssemblerCountInput.Size = new System.Drawing.Size(94, 20);
+			this.FixedAssemblerCountInput.TabIndex = 2;
+			this.FixedAssemblerCountInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
+			this.FixedAssemblerCountInput.LostFocus += new System.EventHandler(this.FixedAssemblerCountInput_LostFocus);
 			// 
-			// tableLayoutPanel1
+			// AssemblerInfoTable
 			// 
-			this.tableLayoutPanel1.ColumnCount = 3;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 68F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 52F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.Controls.Add(this.PollutionLabel, 2, 3);
-			this.tableLayoutPanel1.Controls.Add(this.label2, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.PollutionPercentLabel, 1, 3);
-			this.tableLayoutPanel1.Controls.Add(this.label4, 0, 1);
-			this.tableLayoutPanel1.Controls.Add(this.ProductivityPercentLabel, 1, 2);
-			this.tableLayoutPanel1.Controls.Add(this.label5, 0, 2);
-			this.tableLayoutPanel1.Controls.Add(this.SpeedPercentLabel, 1, 1);
-			this.tableLayoutPanel1.Controls.Add(this.label6, 0, 3);
-			this.tableLayoutPanel1.Controls.Add(this.EnergyPercentLabel, 1, 0);
-			this.tableLayoutPanel1.Controls.Add(this.EnergyLabel, 2, 0);
-			this.tableLayoutPanel1.Controls.Add(this.SpeedLabel, 2, 1);
-			this.tableLayoutPanel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(129, 18);
-			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 4;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(178, 67);
-			this.tableLayoutPanel1.TabIndex = 9;
+			this.AssemblerInfoTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.AssemblerInfoTable.ColumnCount = 3;
+			this.AssemblerTable.SetColumnSpan(this.AssemblerInfoTable, 2);
+			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
+			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 178F));
+			this.AssemblerInfoTable.Controls.Add(this.AssemblerPollutionLabel, 2, 3);
+			this.AssemblerInfoTable.Controls.Add(this.label2, 0, 0);
+			this.AssemblerInfoTable.Controls.Add(this.AssemblerPollutionPercentLabel, 1, 3);
+			this.AssemblerInfoTable.Controls.Add(this.label4, 0, 1);
+			this.AssemblerInfoTable.Controls.Add(this.AssemblerProductivityPercentLabel, 1, 2);
+			this.AssemblerInfoTable.Controls.Add(this.label5, 0, 2);
+			this.AssemblerInfoTable.Controls.Add(this.AssemblerSpeedPercentLabel, 1, 1);
+			this.AssemblerInfoTable.Controls.Add(this.label6, 0, 3);
+			this.AssemblerInfoTable.Controls.Add(this.AssemblerEnergyPercentLabel, 1, 0);
+			this.AssemblerInfoTable.Controls.Add(this.AssemblerEnergyLabel, 2, 0);
+			this.AssemblerInfoTable.Controls.Add(this.AssemblerSpeedLabel, 2, 1);
+			this.AssemblerInfoTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.AssemblerInfoTable.Location = new System.Drawing.Point(154, 39);
+			this.AssemblerInfoTable.Margin = new System.Windows.Forms.Padding(2, 7, 2, 2);
+			this.AssemblerInfoTable.Name = "AssemblerInfoTable";
+			this.AssemblerInfoTable.RowCount = 4;
+			this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerInfoTable.Size = new System.Drawing.Size(277, 60);
+			this.AssemblerInfoTable.TabIndex = 9;
 			// 
-			// PollutionLabel
+			// AssemblerPollutionLabel
 			// 
-			this.PollutionLabel.AutoSize = true;
-			this.PollutionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.PollutionLabel.Location = new System.Drawing.Point(120, 48);
-			this.PollutionLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.PollutionLabel.Name = "PollutionLabel";
-			this.PollutionLabel.Size = new System.Drawing.Size(58, 19);
-			this.PollutionLabel.TabIndex = 12;
-			this.PollutionLabel.Text = "12";
+			this.AssemblerPollutionLabel.AutoSize = true;
+			this.AssemblerPollutionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerPollutionLabel.Location = new System.Drawing.Point(126, 46);
+			this.AssemblerPollutionLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerPollutionLabel.Name = "AssemblerPollutionLabel";
+			this.AssemblerPollutionLabel.Size = new System.Drawing.Size(176, 13);
+			this.AssemblerPollutionLabel.TabIndex = 12;
+			this.AssemblerPollutionLabel.Text = "12/min";
 			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
 			this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label2.Location = new System.Drawing.Point(0, 0);
-			this.label2.Margin = new System.Windows.Forms.Padding(0);
+			this.label2.Location = new System.Drawing.Point(1, 1);
+			this.label2.Margin = new System.Windows.Forms.Padding(1);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(68, 16);
+			this.label2.Size = new System.Drawing.Size(73, 13);
 			this.label2.TabIndex = 1;
 			this.label2.Text = "Energy:";
 			// 
-			// PollutionPercentLabel
+			// AssemblerPollutionPercentLabel
 			// 
-			this.PollutionPercentLabel.AutoSize = true;
-			this.PollutionPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.PollutionPercentLabel.Location = new System.Drawing.Point(68, 48);
-			this.PollutionPercentLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.PollutionPercentLabel.Name = "PollutionPercentLabel";
-			this.PollutionPercentLabel.Size = new System.Drawing.Size(52, 19);
-			this.PollutionPercentLabel.TabIndex = 8;
-			this.PollutionPercentLabel.Text = "2000%";
+			this.AssemblerPollutionPercentLabel.AutoSize = true;
+			this.AssemblerPollutionPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerPollutionPercentLabel.Location = new System.Drawing.Point(76, 46);
+			this.AssemblerPollutionPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerPollutionPercentLabel.Name = "AssemblerPollutionPercentLabel";
+			this.AssemblerPollutionPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerPollutionPercentLabel.TabIndex = 8;
+			this.AssemblerPollutionPercentLabel.Text = "2000%";
 			// 
 			// label4
 			// 
 			this.label4.AutoSize = true;
 			this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label4.Location = new System.Drawing.Point(0, 16);
-			this.label4.Margin = new System.Windows.Forms.Padding(0);
+			this.label4.Location = new System.Drawing.Point(1, 16);
+			this.label4.Margin = new System.Windows.Forms.Padding(1);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(68, 16);
+			this.label4.Size = new System.Drawing.Size(73, 13);
 			this.label4.TabIndex = 2;
 			this.label4.Text = "Speed:";
 			// 
-			// ProductivityPercentLabel
+			// AssemblerProductivityPercentLabel
 			// 
-			this.ProductivityPercentLabel.AutoSize = true;
-			this.ProductivityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ProductivityPercentLabel.Location = new System.Drawing.Point(68, 32);
-			this.ProductivityPercentLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.ProductivityPercentLabel.Name = "ProductivityPercentLabel";
-			this.ProductivityPercentLabel.Size = new System.Drawing.Size(52, 16);
-			this.ProductivityPercentLabel.TabIndex = 7;
-			this.ProductivityPercentLabel.Text = "100%";
+			this.AssemblerProductivityPercentLabel.AutoSize = true;
+			this.AssemblerProductivityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerProductivityPercentLabel.Location = new System.Drawing.Point(76, 31);
+			this.AssemblerProductivityPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerProductivityPercentLabel.Name = "AssemblerProductivityPercentLabel";
+			this.AssemblerProductivityPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerProductivityPercentLabel.TabIndex = 7;
+			this.AssemblerProductivityPercentLabel.Text = "100%";
 			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
 			this.label5.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label5.Location = new System.Drawing.Point(0, 32);
-			this.label5.Margin = new System.Windows.Forms.Padding(0);
+			this.label5.Location = new System.Drawing.Point(1, 31);
+			this.label5.Margin = new System.Windows.Forms.Padding(1);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(68, 16);
+			this.label5.Size = new System.Drawing.Size(73, 13);
 			this.label5.TabIndex = 3;
 			this.label5.Text = "Productivity:";
 			// 
-			// SpeedPercentLabel
+			// AssemblerSpeedPercentLabel
 			// 
-			this.SpeedPercentLabel.AutoSize = true;
-			this.SpeedPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.SpeedPercentLabel.Location = new System.Drawing.Point(68, 16);
-			this.SpeedPercentLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.SpeedPercentLabel.Name = "SpeedPercentLabel";
-			this.SpeedPercentLabel.Size = new System.Drawing.Size(52, 16);
-			this.SpeedPercentLabel.TabIndex = 6;
-			this.SpeedPercentLabel.Text = "-80%";
+			this.AssemblerSpeedPercentLabel.AutoSize = true;
+			this.AssemblerSpeedPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerSpeedPercentLabel.Location = new System.Drawing.Point(76, 16);
+			this.AssemblerSpeedPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerSpeedPercentLabel.Name = "AssemblerSpeedPercentLabel";
+			this.AssemblerSpeedPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerSpeedPercentLabel.TabIndex = 6;
+			this.AssemblerSpeedPercentLabel.Text = "-80%";
 			// 
 			// label6
 			// 
 			this.label6.AutoSize = true;
 			this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label6.Location = new System.Drawing.Point(0, 48);
-			this.label6.Margin = new System.Windows.Forms.Padding(0);
+			this.label6.Location = new System.Drawing.Point(1, 46);
+			this.label6.Margin = new System.Windows.Forms.Padding(1);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(68, 19);
+			this.label6.Size = new System.Drawing.Size(73, 13);
 			this.label6.TabIndex = 4;
 			this.label6.Text = "Pollution:";
 			// 
-			// EnergyPercentLabel
-			// 
-			this.EnergyPercentLabel.AutoSize = true;
-			this.EnergyPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.EnergyPercentLabel.Location = new System.Drawing.Point(68, 0);
-			this.EnergyPercentLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.EnergyPercentLabel.Name = "EnergyPercentLabel";
-			this.EnergyPercentLabel.Size = new System.Drawing.Size(52, 16);
-			this.EnergyPercentLabel.TabIndex = 5;
-			this.EnergyPercentLabel.Text = "10000%";
-			// 
-			// EnergyLabel
-			// 
-			this.EnergyLabel.AutoSize = true;
-			this.EnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.EnergyLabel.Location = new System.Drawing.Point(120, 0);
-			this.EnergyLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.EnergyLabel.Name = "EnergyLabel";
-			this.EnergyLabel.Size = new System.Drawing.Size(58, 16);
-			this.EnergyLabel.TabIndex = 9;
-			this.EnergyLabel.Text = "5MJ";
-			// 
-			// SpeedLabel
-			// 
-			this.SpeedLabel.AutoSize = true;
-			this.SpeedLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.SpeedLabel.Location = new System.Drawing.Point(120, 16);
-			this.SpeedLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.SpeedLabel.Name = "SpeedLabel";
-			this.SpeedLabel.Size = new System.Drawing.Size(58, 16);
-			this.SpeedLabel.TabIndex = 10;
-			this.SpeedLabel.Text = "128.5";
-			// 
-			// flowLayoutPanel3
-			// 
-			this.flowLayoutPanel3.AutoScroll = true;
-			this.flowLayoutPanel3.BackColor = System.Drawing.Color.DimGray;
-			this.flowLayoutPanel3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.flowLayoutPanel3.Controls.Add(this.button17);
-			this.flowLayoutPanel3.Controls.Add(this.button18);
-			this.flowLayoutPanel3.Controls.Add(this.button19);
-			this.flowLayoutPanel3.Controls.Add(this.button20);
-			this.flowLayoutPanel3.Controls.Add(this.button21);
-			this.flowLayoutPanel3.Controls.Add(this.button22);
-			this.flowLayoutPanel3.Controls.Add(this.button23);
-			this.flowLayoutPanel3.Controls.Add(this.button24);
-			this.flowLayoutPanel3.Controls.Add(this.button25);
-			this.flowLayoutPanel3.Controls.Add(this.button26);
-			this.flowLayoutPanel3.Controls.Add(this.button27);
-			this.flowLayoutPanel3.Controls.Add(this.button29);
-			this.flowLayoutPanel3.Location = new System.Drawing.Point(134, 100);
-			this.flowLayoutPanel3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-			this.flowLayoutPanel3.Size = new System.Drawing.Size(173, 59);
-			this.flowLayoutPanel3.TabIndex = 14;
-			// 
-			// button17
-			// 
-			this.button17.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button17.FlatAppearance.BorderSize = 0;
-			this.button17.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button17.Location = new System.Drawing.Point(1, 1);
-			this.button17.Margin = new System.Windows.Forms.Padding(1);
-			this.button17.Name = "button17";
-			this.button17.Size = new System.Drawing.Size(24, 26);
-			this.button17.TabIndex = 1;
-			this.button17.UseVisualStyleBackColor = false;
-			// 
-			// button18
-			// 
-			this.button18.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button18.FlatAppearance.BorderSize = 0;
-			this.button18.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button18.Location = new System.Drawing.Point(27, 1);
-			this.button18.Margin = new System.Windows.Forms.Padding(1);
-			this.button18.Name = "button18";
-			this.button18.Size = new System.Drawing.Size(24, 26);
-			this.button18.TabIndex = 2;
-			this.button18.UseVisualStyleBackColor = false;
-			// 
-			// button19
-			// 
-			this.button19.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button19.FlatAppearance.BorderSize = 0;
-			this.button19.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button19.Location = new System.Drawing.Point(53, 1);
-			this.button19.Margin = new System.Windows.Forms.Padding(1);
-			this.button19.Name = "button19";
-			this.button19.Size = new System.Drawing.Size(24, 26);
-			this.button19.TabIndex = 3;
-			this.button19.UseVisualStyleBackColor = false;
-			// 
-			// button20
-			// 
-			this.button20.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button20.FlatAppearance.BorderSize = 0;
-			this.button20.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button20.Location = new System.Drawing.Point(79, 1);
-			this.button20.Margin = new System.Windows.Forms.Padding(1);
-			this.button20.Name = "button20";
-			this.button20.Size = new System.Drawing.Size(24, 26);
-			this.button20.TabIndex = 4;
-			this.button20.UseVisualStyleBackColor = false;
-			// 
-			// button21
-			// 
-			this.button21.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button21.FlatAppearance.BorderSize = 0;
-			this.button21.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button21.Location = new System.Drawing.Point(105, 1);
-			this.button21.Margin = new System.Windows.Forms.Padding(1);
-			this.button21.Name = "button21";
-			this.button21.Size = new System.Drawing.Size(24, 26);
-			this.button21.TabIndex = 5;
-			this.button21.UseVisualStyleBackColor = false;
-			// 
-			// button22
-			// 
-			this.button22.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button22.FlatAppearance.BorderSize = 0;
-			this.button22.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button22.Location = new System.Drawing.Point(1, 29);
-			this.button22.Margin = new System.Windows.Forms.Padding(1);
-			this.button22.Name = "button22";
-			this.button22.Size = new System.Drawing.Size(24, 26);
-			this.button22.TabIndex = 6;
-			this.button22.UseVisualStyleBackColor = false;
-			// 
-			// button23
-			// 
-			this.button23.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button23.FlatAppearance.BorderSize = 0;
-			this.button23.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button23.Location = new System.Drawing.Point(27, 29);
-			this.button23.Margin = new System.Windows.Forms.Padding(1);
-			this.button23.Name = "button23";
-			this.button23.Size = new System.Drawing.Size(24, 26);
-			this.button23.TabIndex = 7;
-			this.button23.UseVisualStyleBackColor = false;
-			// 
-			// button24
-			// 
-			this.button24.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button24.FlatAppearance.BorderSize = 0;
-			this.button24.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button24.Location = new System.Drawing.Point(53, 29);
-			this.button24.Margin = new System.Windows.Forms.Padding(1);
-			this.button24.Name = "button24";
-			this.button24.Size = new System.Drawing.Size(24, 26);
-			this.button24.TabIndex = 8;
-			this.button24.UseVisualStyleBackColor = false;
-			// 
-			// button25
-			// 
-			this.button25.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button25.FlatAppearance.BorderSize = 0;
-			this.button25.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button25.Location = new System.Drawing.Point(79, 29);
-			this.button25.Margin = new System.Windows.Forms.Padding(1);
-			this.button25.Name = "button25";
-			this.button25.Size = new System.Drawing.Size(24, 26);
-			this.button25.TabIndex = 9;
-			this.button25.UseVisualStyleBackColor = false;
-			// 
-			// button26
-			// 
-			this.button26.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button26.FlatAppearance.BorderSize = 0;
-			this.button26.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button26.Location = new System.Drawing.Point(105, 29);
-			this.button26.Margin = new System.Windows.Forms.Padding(1);
-			this.button26.Name = "button26";
-			this.button26.Size = new System.Drawing.Size(24, 26);
-			this.button26.TabIndex = 10;
-			this.button26.UseVisualStyleBackColor = false;
-			// 
-			// button27
-			// 
-			this.button27.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button27.FlatAppearance.BorderSize = 0;
-			this.button27.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button27.Location = new System.Drawing.Point(1, 57);
-			this.button27.Margin = new System.Windows.Forms.Padding(1);
-			this.button27.Name = "button27";
-			this.button27.Size = new System.Drawing.Size(24, 26);
-			this.button27.TabIndex = 11;
-			this.button27.UseVisualStyleBackColor = false;
-			// 
-			// button29
-			// 
-			this.button29.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button29.FlatAppearance.BorderSize = 0;
-			this.button29.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button29.Location = new System.Drawing.Point(27, 57);
-			this.button29.Margin = new System.Windows.Forms.Padding(1);
-			this.button29.Name = "button29";
-			this.button29.Size = new System.Drawing.Size(24, 26);
-			this.button29.TabIndex = 13;
-			this.button29.UseVisualStyleBackColor = false;
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(136, 83);
-			this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(111, 17);
-			this.label3.TabIndex = 13;
-			this.label3.Text = "Module Options:";
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(5, 83);
-			this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(107, 17);
-			this.label1.TabIndex = 12;
-			this.label1.Text = "Active Modules:";
-			// 
-			// flowLayoutPanel2
-			// 
-			this.flowLayoutPanel2.AutoScroll = true;
-			this.flowLayoutPanel2.BackColor = System.Drawing.Color.DimGray;
-			this.flowLayoutPanel2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.flowLayoutPanel2.Controls.Add(this.button6);
-			this.flowLayoutPanel2.Controls.Add(this.button7);
-			this.flowLayoutPanel2.Controls.Add(this.button11);
-			this.flowLayoutPanel2.Controls.Add(this.button12);
-			this.flowLayoutPanel2.Controls.Add(this.button13);
-			this.flowLayoutPanel2.Controls.Add(this.button14);
-			this.flowLayoutPanel2.Controls.Add(this.button15);
-			this.flowLayoutPanel2.Controls.Add(this.button16);
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(4, 100);
-			this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-			this.flowLayoutPanel2.Size = new System.Drawing.Size(122, 59);
-			this.flowLayoutPanel2.TabIndex = 11;
-			// 
-			// button6
-			// 
-			this.button6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button6.FlatAppearance.BorderSize = 0;
-			this.button6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button6.Location = new System.Drawing.Point(1, 1);
-			this.button6.Margin = new System.Windows.Forms.Padding(1);
-			this.button6.Name = "button6";
-			this.button6.Size = new System.Drawing.Size(24, 26);
-			this.button6.TabIndex = 1;
-			this.button6.UseVisualStyleBackColor = false;
-			// 
-			// button7
-			// 
-			this.button7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button7.FlatAppearance.BorderSize = 0;
-			this.button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button7.Location = new System.Drawing.Point(27, 1);
-			this.button7.Margin = new System.Windows.Forms.Padding(1);
-			this.button7.Name = "button7";
-			this.button7.Size = new System.Drawing.Size(24, 26);
-			this.button7.TabIndex = 2;
-			this.button7.UseVisualStyleBackColor = false;
-			// 
-			// button11
-			// 
-			this.button11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button11.FlatAppearance.BorderSize = 0;
-			this.button11.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button11.Location = new System.Drawing.Point(53, 1);
-			this.button11.Margin = new System.Windows.Forms.Padding(1);
-			this.button11.Name = "button11";
-			this.button11.Size = new System.Drawing.Size(24, 26);
-			this.button11.TabIndex = 3;
-			this.button11.UseVisualStyleBackColor = false;
-			// 
-			// button12
-			// 
-			this.button12.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button12.FlatAppearance.BorderSize = 0;
-			this.button12.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button12.Location = new System.Drawing.Point(79, 1);
-			this.button12.Margin = new System.Windows.Forms.Padding(1);
-			this.button12.Name = "button12";
-			this.button12.Size = new System.Drawing.Size(24, 26);
-			this.button12.TabIndex = 4;
-			this.button12.UseVisualStyleBackColor = false;
-			// 
-			// button13
-			// 
-			this.button13.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button13.FlatAppearance.BorderSize = 0;
-			this.button13.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button13.Location = new System.Drawing.Point(1, 29);
-			this.button13.Margin = new System.Windows.Forms.Padding(1);
-			this.button13.Name = "button13";
-			this.button13.Size = new System.Drawing.Size(24, 26);
-			this.button13.TabIndex = 5;
-			this.button13.UseVisualStyleBackColor = false;
-			// 
-			// button14
-			// 
-			this.button14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button14.FlatAppearance.BorderSize = 0;
-			this.button14.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button14.Location = new System.Drawing.Point(27, 29);
-			this.button14.Margin = new System.Windows.Forms.Padding(1);
-			this.button14.Name = "button14";
-			this.button14.Size = new System.Drawing.Size(24, 26);
-			this.button14.TabIndex = 6;
-			this.button14.UseVisualStyleBackColor = false;
-			// 
-			// button15
-			// 
-			this.button15.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button15.FlatAppearance.BorderSize = 0;
-			this.button15.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button15.Location = new System.Drawing.Point(53, 29);
-			this.button15.Margin = new System.Windows.Forms.Padding(1);
-			this.button15.Name = "button15";
-			this.button15.Size = new System.Drawing.Size(24, 26);
-			this.button15.TabIndex = 7;
-			this.button15.UseVisualStyleBackColor = false;
-			// 
-			// button16
-			// 
-			this.button16.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button16.FlatAppearance.BorderSize = 0;
-			this.button16.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button16.Location = new System.Drawing.Point(79, 29);
-			this.button16.Margin = new System.Windows.Forms.Padding(1);
-			this.button16.Name = "button16";
-			this.button16.Size = new System.Drawing.Size(24, 26);
-			this.button16.TabIndex = 8;
-			this.button16.UseVisualStyleBackColor = false;
-			// 
-			// flowLayoutPanel1
-			// 
-			this.flowLayoutPanel1.AutoScroll = true;
-			this.flowLayoutPanel1.BackColor = System.Drawing.Color.DimGray;
-			this.flowLayoutPanel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.flowLayoutPanel1.Controls.Add(this.button1);
-			this.flowLayoutPanel1.Controls.Add(this.button2);
-			this.flowLayoutPanel1.Controls.Add(this.button3);
-			this.flowLayoutPanel1.Controls.Add(this.button4);
-			this.flowLayoutPanel1.Controls.Add(this.button5);
-			this.flowLayoutPanel1.Controls.Add(this.button8);
-			this.flowLayoutPanel1.Controls.Add(this.button9);
-			this.flowLayoutPanel1.Controls.Add(this.button10);
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(4, 22);
-			this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(122, 59);
-			this.flowLayoutPanel1.TabIndex = 0;
-			// 
-			// button1
-			// 
-			this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button1.FlatAppearance.BorderSize = 0;
-			this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button1.Location = new System.Drawing.Point(1, 1);
-			this.button1.Margin = new System.Windows.Forms.Padding(1);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(24, 26);
-			this.button1.TabIndex = 0;
-			this.button1.UseVisualStyleBackColor = false;
-			// 
-			// button2
-			// 
-			this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button2.FlatAppearance.BorderSize = 0;
-			this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button2.Location = new System.Drawing.Point(27, 1);
-			this.button2.Margin = new System.Windows.Forms.Padding(1);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(24, 26);
-			this.button2.TabIndex = 1;
-			this.button2.UseVisualStyleBackColor = false;
-			// 
-			// button3
-			// 
-			this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button3.FlatAppearance.BorderSize = 0;
-			this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button3.Location = new System.Drawing.Point(53, 1);
-			this.button3.Margin = new System.Windows.Forms.Padding(1);
-			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(24, 26);
-			this.button3.TabIndex = 2;
-			this.button3.UseVisualStyleBackColor = false;
-			// 
-			// button4
-			// 
-			this.button4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button4.FlatAppearance.BorderSize = 0;
-			this.button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button4.Location = new System.Drawing.Point(79, 1);
-			this.button4.Margin = new System.Windows.Forms.Padding(1);
-			this.button4.Name = "button4";
-			this.button4.Size = new System.Drawing.Size(24, 26);
-			this.button4.TabIndex = 3;
-			this.button4.UseVisualStyleBackColor = false;
-			// 
-			// button5
-			// 
-			this.button5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button5.FlatAppearance.BorderSize = 0;
-			this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button5.Location = new System.Drawing.Point(1, 29);
-			this.button5.Margin = new System.Windows.Forms.Padding(1);
-			this.button5.Name = "button5";
-			this.button5.Size = new System.Drawing.Size(24, 26);
-			this.button5.TabIndex = 4;
-			this.button5.UseVisualStyleBackColor = false;
-			// 
-			// button8
-			// 
-			this.button8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button8.FlatAppearance.BorderSize = 0;
-			this.button8.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button8.Location = new System.Drawing.Point(27, 29);
-			this.button8.Margin = new System.Windows.Forms.Padding(1);
-			this.button8.Name = "button8";
-			this.button8.Size = new System.Drawing.Size(24, 26);
-			this.button8.TabIndex = 5;
-			this.button8.UseVisualStyleBackColor = false;
-			// 
-			// button9
-			// 
-			this.button9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button9.FlatAppearance.BorderSize = 0;
-			this.button9.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button9.Location = new System.Drawing.Point(53, 29);
-			this.button9.Margin = new System.Windows.Forms.Padding(1);
-			this.button9.Name = "button9";
-			this.button9.Size = new System.Drawing.Size(24, 26);
-			this.button9.TabIndex = 6;
-			this.button9.UseVisualStyleBackColor = false;
-			// 
-			// button10
-			// 
-			this.button10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-			this.button10.FlatAppearance.BorderSize = 0;
-			this.button10.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.button10.Location = new System.Drawing.Point(79, 29);
-			this.button10.Margin = new System.Windows.Forms.Padding(1);
-			this.button10.Name = "button10";
-			this.button10.Size = new System.Drawing.Size(24, 26);
-			this.button10.TabIndex = 7;
-			this.button10.UseVisualStyleBackColor = false;
-			// 
-			// panel4
-			// 
-			this.panel4.BackColor = System.Drawing.Color.DimGray;
-			this.panel4.Controls.Add(this.label7);
-			this.panel4.Controls.Add(this.fixedTextBox);
-			this.panel4.Controls.Add(this.autoOption);
-			this.panel4.Controls.Add(this.fixedOption);
-			this.panel4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.panel4.Location = new System.Drawing.Point(2, 2);
-			this.panel4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.panel4.Name = "panel4";
-			this.panel4.Size = new System.Drawing.Size(312, 30);
-			this.panel4.TabIndex = 14;
+			// AssemblerEnergyPercentLabel
+			// 
+			this.AssemblerEnergyPercentLabel.AutoSize = true;
+			this.AssemblerEnergyPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerEnergyPercentLabel.Location = new System.Drawing.Point(76, 1);
+			this.AssemblerEnergyPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerEnergyPercentLabel.Name = "AssemblerEnergyPercentLabel";
+			this.AssemblerEnergyPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerEnergyPercentLabel.TabIndex = 5;
+			this.AssemblerEnergyPercentLabel.Text = "10000%";
+			// 
+			// AssemblerEnergyLabel
+			// 
+			this.AssemblerEnergyLabel.AutoSize = true;
+			this.AssemblerEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerEnergyLabel.Location = new System.Drawing.Point(126, 1);
+			this.AssemblerEnergyLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerEnergyLabel.Name = "AssemblerEnergyLabel";
+			this.AssemblerEnergyLabel.Size = new System.Drawing.Size(176, 13);
+			this.AssemblerEnergyLabel.TabIndex = 9;
+			this.AssemblerEnergyLabel.Text = "5MJ";
+			// 
+			// AssemblerSpeedLabel
+			// 
+			this.AssemblerSpeedLabel.AutoSize = true;
+			this.AssemblerSpeedLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerSpeedLabel.Location = new System.Drawing.Point(126, 16);
+			this.AssemblerSpeedLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerSpeedLabel.Name = "AssemblerSpeedLabel";
+			this.AssemblerSpeedLabel.Size = new System.Drawing.Size(176, 13);
+			this.AssemblerSpeedLabel.TabIndex = 10;
+			this.AssemblerSpeedLabel.Text = "128.5";
+			// 
+			// AModuleOptionsLabel
+			// 
+			this.AModuleOptionsLabel.AutoSize = true;
+			this.AModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.AssemblerTable.SetColumnSpan(this.AModuleOptionsLabel, 2);
+			this.AModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AModuleOptionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+			this.AModuleOptionsLabel.Location = new System.Drawing.Point(152, 190);
+			this.AModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
+			this.AModuleOptionsLabel.Name = "AModuleOptionsLabel";
+			this.AModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(3);
+			this.AModuleOptionsLabel.Size = new System.Drawing.Size(281, 23);
+			this.AModuleOptionsLabel.TabIndex = 13;
+			this.AModuleOptionsLabel.Text = "Module Options:";
+			// 
+			// AModulesLabel
+			// 
+			this.AModulesLabel.AutoSize = true;
+			this.AModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.AModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AModulesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+			this.AModulesLabel.Location = new System.Drawing.Point(0, 190);
+			this.AModulesLabel.Margin = new System.Windows.Forms.Padding(0);
+			this.AModulesLabel.Name = "AModulesLabel";
+			this.AModulesLabel.Padding = new System.Windows.Forms.Padding(3);
+			this.AModulesLabel.Size = new System.Drawing.Size(152, 23);
+			this.AModulesLabel.TabIndex = 12;
+			this.AModulesLabel.Text = "Modules:";
 			// 
 			// label7
 			// 
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(2, 6);
-			this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+			this.label7.Location = new System.Drawing.Point(3, 1);
+			this.label7.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(113, 17);
+			this.label7.Size = new System.Drawing.Size(218, 22);
 			this.label7.TabIndex = 3;
 			this.label7.Text = "# of Assemblers:";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// panel5
+			// AssemblerTitle
 			// 
-			this.panel5.BackColor = System.Drawing.Color.DimGray;
-			this.panel5.Controls.Add(this.tableLayoutPanel1);
-			this.panel5.Controls.Add(this.label8);
-			this.panel5.Controls.Add(this.label3);
-			this.panel5.Controls.Add(this.flowLayoutPanel3);
-			this.panel5.Controls.Add(this.flowLayoutPanel1);
-			this.panel5.Controls.Add(this.label1);
-			this.panel5.Controls.Add(this.flowLayoutPanel2);
-			this.panel5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.panel5.Location = new System.Drawing.Point(2, 37);
-			this.panel5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.panel5.Name = "panel5";
-			this.panel5.Size = new System.Drawing.Size(312, 163);
-			this.panel5.TabIndex = 15;
+			this.AssemblerTitle.AutoSize = true;
+			this.AssemblerTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.AssemblerTable.SetColumnSpan(this.AssemblerTitle, 2);
+			this.AssemblerTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+			this.AssemblerTitle.Location = new System.Drawing.Point(0, 0);
+			this.AssemblerTitle.Margin = new System.Windows.Forms.Padding(0);
+			this.AssemblerTitle.Name = "AssemblerTitle";
+			this.AssemblerTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
+			this.AssemblerTitle.Size = new System.Drawing.Size(401, 32);
+			this.AssemblerTitle.TabIndex = 0;
+			this.AssemblerTitle.Text = "Assembler: (Space factory #2)";
+			// 
+			// MainTable
+			// 
+			this.MainTable.AutoSize = true;
+			this.MainTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.MainTable.ColumnCount = 1;
+			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MainTable.Controls.Add(this.BeaconTable, 0, 2);
+			this.MainTable.Controls.Add(this.AssemblerTable, 0, 1);
+			this.MainTable.Controls.Add(this.RateOptionsTable, 0, 0);
+			this.MainTable.Location = new System.Drawing.Point(0, 0);
+			this.MainTable.Margin = new System.Windows.Forms.Padding(0);
+			this.MainTable.Name = "MainTable";
+			this.MainTable.RowCount = 3;
+			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.MainTable.Size = new System.Drawing.Size(439, 552);
+			this.MainTable.TabIndex = 17;
+			// 
+			// BeaconTable
+			// 
+			this.BeaconTable.AutoSize = true;
+			this.BeaconTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.BeaconTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+			this.BeaconTable.ColumnCount = 4;
+			this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.BeaconTable.Controls.Add(this.BModulesChoicePanel, 1, 3);
+			this.BeaconTable.Controls.Add(this.SelectedBModulesPanel, 0, 3);
+			this.BeaconTable.Controls.Add(this.BModulesLabel, 0, 2);
+			this.BeaconTable.Controls.Add(this.BeaconTitle, 0, 0);
+			this.BeaconTable.Controls.Add(this.BModuleOptionsLabel, 1, 2);
+			this.BeaconTable.Controls.Add(this.BeaconChoicePanel, 0, 1);
+			this.BeaconTable.Controls.Add(this.BeaconInfoTable, 1, 1);
+			this.BeaconTable.Controls.Add(this.BeaconValuesTable, 2, 1);
+			this.BeaconTable.Controls.Add(this.SelectedBeaconIcon, 3, 0);
+			this.BeaconTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconTable.Location = new System.Drawing.Point(3, 332);
+			this.BeaconTable.Name = "BeaconTable";
+			this.BeaconTable.RowCount = 4;
+			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.BeaconTable.Size = new System.Drawing.Size(433, 217);
+			this.BeaconTable.TabIndex = 21;
+			// 
+			// BModulesChoicePanel
+			// 
+			this.BModulesChoicePanel.AutoScroll = true;
+			this.BModulesChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.BeaconTable.SetColumnSpan(this.BModulesChoicePanel, 3);
+			this.BModulesChoicePanel.Controls.Add(this.BModulesChoiceTable);
+			this.BModulesChoicePanel.Location = new System.Drawing.Point(155, 142);
+			this.BModulesChoicePanel.Name = "BModulesChoicePanel";
+			this.BModulesChoicePanel.Size = new System.Drawing.Size(272, 72);
+			this.BModulesChoicePanel.TabIndex = 20;
+			// 
+			// BModulesChoiceTable
+			// 
+			this.BModulesChoiceTable.AutoSize = true;
+			this.BModulesChoiceTable.ColumnCount = 9;
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.BModulesChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.BModulesChoiceTable.Location = new System.Drawing.Point(0, 0);
+			this.BModulesChoiceTable.Name = "BModulesChoiceTable";
+			this.BModulesChoiceTable.RowCount = 1;
+			this.BModulesChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.BModulesChoiceTable.Size = new System.Drawing.Size(268, 32);
+			this.BModulesChoiceTable.TabIndex = 0;
+			// 
+			// SelectedBModulesPanel
+			// 
+			this.SelectedBModulesPanel.AutoScroll = true;
+			this.SelectedBModulesPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.SelectedBModulesPanel.Controls.Add(this.SelectedBModulesTable);
+			this.SelectedBModulesPanel.Location = new System.Drawing.Point(3, 142);
+			this.SelectedBModulesPanel.Margin = new System.Windows.Forms.Padding(3, 3, 13, 3);
+			this.SelectedBModulesPanel.Name = "SelectedBModulesPanel";
+			this.SelectedBModulesPanel.Size = new System.Drawing.Size(136, 72);
+			this.SelectedBModulesPanel.TabIndex = 19;
+			// 
+			// SelectedBModulesTable
+			// 
+			this.SelectedBModulesTable.AutoSize = true;
+			this.SelectedBModulesTable.ColumnCount = 5;
+			this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.SelectedBModulesTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.SelectedBModulesTable.Location = new System.Drawing.Point(0, 0);
+			this.SelectedBModulesTable.Name = "SelectedBModulesTable";
+			this.SelectedBModulesTable.RowCount = 1;
+			this.SelectedBModulesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.SelectedBModulesTable.Size = new System.Drawing.Size(132, 32);
+			this.SelectedBModulesTable.TabIndex = 0;
+			// 
+			// BModulesLabel
+			// 
+			this.BModulesLabel.AutoSize = true;
+			this.BModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.BModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BModulesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+			this.BModulesLabel.Location = new System.Drawing.Point(0, 116);
+			this.BModulesLabel.Margin = new System.Windows.Forms.Padding(0);
+			this.BModulesLabel.Name = "BModulesLabel";
+			this.BModulesLabel.Padding = new System.Windows.Forms.Padding(3);
+			this.BModulesLabel.Size = new System.Drawing.Size(152, 23);
+			this.BModulesLabel.TabIndex = 12;
+			this.BModulesLabel.Text = "Modules:";
+			// 
+			// BeaconTitle
+			// 
+			this.BeaconTitle.AutoSize = true;
+			this.BeaconTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.BeaconTable.SetColumnSpan(this.BeaconTitle, 3);
+			this.BeaconTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+			this.BeaconTitle.Location = new System.Drawing.Point(0, 0);
+			this.BeaconTitle.Margin = new System.Windows.Forms.Padding(0);
+			this.BeaconTitle.Name = "BeaconTitle";
+			this.BeaconTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
+			this.BeaconTitle.Size = new System.Drawing.Size(401, 32);
+			this.BeaconTitle.TabIndex = 0;
+			this.BeaconTitle.Text = "Beacon: (Beacon 2)";
+			// 
+			// BModuleOptionsLabel
+			// 
+			this.BModuleOptionsLabel.AutoSize = true;
+			this.BModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.BeaconTable.SetColumnSpan(this.BModuleOptionsLabel, 3);
+			this.BModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BModuleOptionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+			this.BModuleOptionsLabel.Location = new System.Drawing.Point(152, 116);
+			this.BModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
+			this.BModuleOptionsLabel.Name = "BModuleOptionsLabel";
+			this.BModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(3);
+			this.BModuleOptionsLabel.Size = new System.Drawing.Size(281, 23);
+			this.BModuleOptionsLabel.TabIndex = 13;
+			this.BModuleOptionsLabel.Text = "Module Options:";
+			// 
+			// BeaconChoicePanel
+			// 
+			this.BeaconChoicePanel.AutoScroll = true;
+			this.BeaconChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.BeaconChoicePanel.Controls.Add(this.BeaconChoiceTable);
+			this.BeaconChoicePanel.Location = new System.Drawing.Point(3, 35);
+			this.BeaconChoicePanel.Margin = new System.Windows.Forms.Padding(3, 3, 13, 3);
+			this.BeaconChoicePanel.Name = "BeaconChoicePanel";
+			this.BeaconChoicePanel.Size = new System.Drawing.Size(136, 72);
+			this.BeaconChoicePanel.TabIndex = 18;
+			// 
+			// BeaconChoiceTable
+			// 
+			this.BeaconChoiceTable.AutoSize = true;
+			this.BeaconChoiceTable.ColumnCount = 5;
+			this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.BeaconChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.BeaconChoiceTable.Location = new System.Drawing.Point(0, 0);
+			this.BeaconChoiceTable.Name = "BeaconChoiceTable";
+			this.BeaconChoiceTable.RowCount = 1;
+			this.BeaconChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.BeaconChoiceTable.Size = new System.Drawing.Size(132, 32);
+			this.BeaconChoiceTable.TabIndex = 0;
+			// 
+			// BeaconInfoTable
+			// 
+			this.BeaconInfoTable.AutoSize = true;
+			this.BeaconInfoTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.BeaconInfoTable.ColumnCount = 2;
+			this.BeaconInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 68F));
+			this.BeaconInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 52F));
+			this.BeaconInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.BeaconInfoTable.Controls.Add(this.label14, 0, 0);
+			this.BeaconInfoTable.Controls.Add(this.TotalBeaconsLabel, 1, 3);
+			this.BeaconInfoTable.Controls.Add(this.label16, 0, 1);
+			this.BeaconInfoTable.Controls.Add(this.BeaconEfficiencyLabel, 1, 2);
+			this.BeaconInfoTable.Controls.Add(this.label18, 0, 2);
+			this.BeaconInfoTable.Controls.Add(this.BeaconModuleCountLabel, 1, 1);
+			this.BeaconInfoTable.Controls.Add(this.label20, 0, 3);
+			this.BeaconInfoTable.Controls.Add(this.BeaconEnergyLabel, 1, 0);
+			this.BeaconInfoTable.Location = new System.Drawing.Point(154, 34);
+			this.BeaconInfoTable.Margin = new System.Windows.Forms.Padding(2);
+			this.BeaconInfoTable.Name = "BeaconInfoTable";
+			this.BeaconInfoTable.RowCount = 4;
+			this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.BeaconInfoTable.Size = new System.Drawing.Size(120, 60);
+			this.BeaconInfoTable.TabIndex = 9;
+			// 
+			// label14
+			// 
+			this.label14.AutoSize = true;
+			this.label14.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label14.Location = new System.Drawing.Point(1, 1);
+			this.label14.Margin = new System.Windows.Forms.Padding(1);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(66, 13);
+			this.label14.TabIndex = 1;
+			this.label14.Text = "Energy:";
+			// 
+			// TotalBeaconsLabel
+			// 
+			this.TotalBeaconsLabel.AutoSize = true;
+			this.TotalBeaconsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.TotalBeaconsLabel.Location = new System.Drawing.Point(69, 46);
+			this.TotalBeaconsLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.TotalBeaconsLabel.Name = "TotalBeaconsLabel";
+			this.TotalBeaconsLabel.Size = new System.Drawing.Size(50, 13);
+			this.TotalBeaconsLabel.TabIndex = 8;
+			this.TotalBeaconsLabel.Text = "250";
+			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label16.Location = new System.Drawing.Point(1, 16);
+			this.label16.Margin = new System.Windows.Forms.Padding(1);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(66, 13);
+			this.label16.TabIndex = 2;
+			this.label16.Text = "Modules:";
+			// 
+			// BeaconEfficiencyLabel
+			// 
+			this.BeaconEfficiencyLabel.AutoSize = true;
+			this.BeaconEfficiencyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconEfficiencyLabel.Location = new System.Drawing.Point(69, 31);
+			this.BeaconEfficiencyLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.BeaconEfficiencyLabel.Name = "BeaconEfficiencyLabel";
+			this.BeaconEfficiencyLabel.Size = new System.Drawing.Size(50, 13);
+			this.BeaconEfficiencyLabel.TabIndex = 7;
+			this.BeaconEfficiencyLabel.Text = "50%";
+			// 
+			// label18
+			// 
+			this.label18.AutoSize = true;
+			this.label18.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label18.Location = new System.Drawing.Point(1, 31);
+			this.label18.Margin = new System.Windows.Forms.Padding(1);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(66, 13);
+			this.label18.TabIndex = 3;
+			this.label18.Text = "Efficiency:";
+			// 
+			// BeaconModuleCountLabel
+			// 
+			this.BeaconModuleCountLabel.AutoSize = true;
+			this.BeaconModuleCountLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconModuleCountLabel.Location = new System.Drawing.Point(69, 16);
+			this.BeaconModuleCountLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.BeaconModuleCountLabel.Name = "BeaconModuleCountLabel";
+			this.BeaconModuleCountLabel.Size = new System.Drawing.Size(50, 13);
+			this.BeaconModuleCountLabel.TabIndex = 6;
+			this.BeaconModuleCountLabel.Text = "4";
+			// 
+			// label20
+			// 
+			this.label20.AutoSize = true;
+			this.label20.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label20.Location = new System.Drawing.Point(1, 46);
+			this.label20.Margin = new System.Windows.Forms.Padding(1);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(66, 13);
+			this.label20.TabIndex = 4;
+			this.label20.Text = "#Beacons:";
+			// 
+			// BeaconEnergyLabel
+			// 
+			this.BeaconEnergyLabel.AutoSize = true;
+			this.BeaconEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconEnergyLabel.Location = new System.Drawing.Point(69, 1);
+			this.BeaconEnergyLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.BeaconEnergyLabel.Name = "BeaconEnergyLabel";
+			this.BeaconEnergyLabel.Size = new System.Drawing.Size(50, 13);
+			this.BeaconEnergyLabel.TabIndex = 5;
+			this.BeaconEnergyLabel.Text = "10MJ";
+			// 
+			// BeaconValuesTable
+			// 
+			this.BeaconValuesTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.BeaconValuesTable.ColumnCount = 2;
+			this.BeaconTable.SetColumnSpan(this.BeaconValuesTable, 2);
+			this.BeaconValuesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.BeaconValuesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.BeaconValuesTable.Controls.Add(this.ExtraBeaconCountInput, 1, 2);
+			this.BeaconValuesTable.Controls.Add(this.BeaconsPerAssemblerCountInput, 1, 1);
+			this.BeaconValuesTable.Controls.Add(this.BeaconCountInput, 1, 0);
+			this.BeaconValuesTable.Controls.Add(this.label8, 0, 0);
+			this.BeaconValuesTable.Controls.Add(this.label9, 0, 1);
+			this.BeaconValuesTable.Controls.Add(this.label10, 0, 2);
+			this.BeaconValuesTable.Dock = System.Windows.Forms.DockStyle.Left;
+			this.BeaconValuesTable.Location = new System.Drawing.Point(286, 35);
+			this.BeaconValuesTable.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
+			this.BeaconValuesTable.Name = "BeaconValuesTable";
+			this.BeaconValuesTable.RowCount = 3;
+			this.BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33332F));
+			this.BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+			this.BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+			this.BeaconValuesTable.Size = new System.Drawing.Size(144, 78);
+			this.BeaconValuesTable.TabIndex = 21;
+			// 
+			// ExtraBeaconCountInput
+			// 
+			this.ExtraBeaconCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ExtraBeaconCountInput.Location = new System.Drawing.Point(70, 54);
+			this.ExtraBeaconCountInput.Name = "ExtraBeaconCountInput";
+			this.ExtraBeaconCountInput.Size = new System.Drawing.Size(71, 20);
+			this.ExtraBeaconCountInput.TabIndex = 5;
+			// 
+			// BeaconsPerAssemblerCountInput
+			// 
+			this.BeaconsPerAssemblerCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconsPerAssemblerCountInput.Location = new System.Drawing.Point(70, 28);
+			this.BeaconsPerAssemblerCountInput.Name = "BeaconsPerAssemblerCountInput";
+			this.BeaconsPerAssemblerCountInput.Size = new System.Drawing.Size(71, 20);
+			this.BeaconsPerAssemblerCountInput.TabIndex = 4;
+			// 
+			// BeaconCountInput
+			// 
+			this.BeaconCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconCountInput.Location = new System.Drawing.Point(70, 3);
+			this.BeaconCountInput.Name = "BeaconCountInput";
+			this.BeaconCountInput.Size = new System.Drawing.Size(71, 20);
+			this.BeaconCountInput.TabIndex = 3;
 			// 
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(5, 2);
-			this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label8.Location = new System.Drawing.Point(2, 2);
+			this.label8.Margin = new System.Windows.Forms.Padding(2);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(199, 17);
+			this.label8.Size = new System.Drawing.Size(63, 21);
 			this.label8.TabIndex = 0;
-			this.label8.Text = "Assembler: (Space factory #2)";
-			// 
-			// panel1
-			// 
-			this.panel1.BackColor = System.Drawing.Color.DimGray;
-			this.panel1.Controls.Add(this.label9);
-			this.panel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.panel1.Location = new System.Drawing.Point(2, 206);
-			this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(312, 145);
-			this.panel1.TabIndex = 16;
+			this.label8.Text = "# Beacons:";
+			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label9
 			// 
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(5, 2);
-			this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label9.Location = new System.Drawing.Point(2, 27);
+			this.label9.Margin = new System.Windows.Forms.Padding(2);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(199, 17);
+			this.label9.Size = new System.Drawing.Size(63, 22);
 			this.label9.TabIndex = 1;
-			this.label9.Text = "Assembler: (Space factory #2)";
+			this.label9.Text = "/Assembler:";
+			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label10.Location = new System.Drawing.Point(2, 53);
+			this.label10.Margin = new System.Windows.Forms.Padding(2);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(63, 23);
+			this.label10.TabIndex = 2;
+			this.label10.Text = "Additional:";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// AssemblerTable
+			// 
+			this.AssemblerTable.AutoSize = true;
+			this.AssemblerTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.AssemblerTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+			this.AssemblerTable.ColumnCount = 3;
+			this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.AssemblerTable.Controls.Add(this.FuelOptionsPanel, 0, 3);
+			this.AssemblerTable.Controls.Add(this.FuelTitle, 0, 2);
+			this.AssemblerTable.Controls.Add(this.AModulesChoicePanel, 1, 5);
+			this.AssemblerTable.Controls.Add(this.AssemblerTitle, 0, 0);
+			this.AssemblerTable.Controls.Add(this.AssemblerChoicePanel, 0, 1);
+			this.AssemblerTable.Controls.Add(this.AssemblerInfoTable, 1, 1);
+			this.AssemblerTable.Controls.Add(this.SelectedAModulesPanel, 0, 5);
+			this.AssemblerTable.Controls.Add(this.AModulesLabel, 0, 4);
+			this.AssemblerTable.Controls.Add(this.AModuleOptionsLabel, 1, 4);
+			this.AssemblerTable.Controls.Add(this.SelectedAssemblerIcon, 2, 0);
+			this.AssemblerTable.Controls.Add(this.SelectedFuelIcon, 2, 2);
+			this.AssemblerTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerTable.Location = new System.Drawing.Point(3, 35);
+			this.AssemblerTable.Name = "AssemblerTable";
+			this.AssemblerTable.RowCount = 6;
+			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.AssemblerTable.Size = new System.Drawing.Size(433, 291);
+			this.AssemblerTable.TabIndex = 20;
+			// 
+			// FuelOptionsPanel
+			// 
+			this.FuelOptionsPanel.AutoScroll = true;
+			this.FuelOptionsPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.AssemblerTable.SetColumnSpan(this.FuelOptionsPanel, 3);
+			this.FuelOptionsPanel.Controls.Add(this.FuelOptionsTable);
+			this.FuelOptionsPanel.Location = new System.Drawing.Point(3, 149);
+			this.FuelOptionsPanel.Name = "FuelOptionsPanel";
+			this.FuelOptionsPanel.Size = new System.Drawing.Size(424, 38);
+			this.FuelOptionsPanel.TabIndex = 22;
+			// 
+			// FuelOptionsTable
+			// 
+			this.FuelOptionsTable.AutoSize = true;
+			this.FuelOptionsTable.ColumnCount = 13;
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333332F));
+			this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.FuelOptionsTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.FuelOptionsTable.Location = new System.Drawing.Point(0, 0);
+			this.FuelOptionsTable.Name = "FuelOptionsTable";
+			this.FuelOptionsTable.RowCount = 1;
+			this.FuelOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.FuelOptionsTable.Size = new System.Drawing.Size(420, 32);
+			this.FuelOptionsTable.TabIndex = 0;
+			// 
+			// FuelTitle
+			// 
+			this.FuelTitle.AutoSize = true;
+			this.FuelTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.AssemblerTable.SetColumnSpan(this.FuelTitle, 2);
+			this.FuelTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FuelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+			this.FuelTitle.Location = new System.Drawing.Point(0, 114);
+			this.FuelTitle.Margin = new System.Windows.Forms.Padding(0);
+			this.FuelTitle.Name = "FuelTitle";
+			this.FuelTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
+			this.FuelTitle.Size = new System.Drawing.Size(401, 32);
+			this.FuelTitle.TabIndex = 21;
+			this.FuelTitle.Text = "Fuel: (Rockets)";
+			// 
+			// AModulesChoicePanel
+			// 
+			this.AModulesChoicePanel.AutoScroll = true;
+			this.AModulesChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.AssemblerTable.SetColumnSpan(this.AModulesChoicePanel, 2);
+			this.AModulesChoicePanel.Controls.Add(this.AModulesChoiceTable);
+			this.AModulesChoicePanel.Location = new System.Drawing.Point(155, 216);
+			this.AModulesChoicePanel.Name = "AModulesChoicePanel";
+			this.AModulesChoicePanel.Size = new System.Drawing.Size(272, 72);
+			this.AModulesChoicePanel.TabIndex = 20;
+			// 
+			// AModulesChoiceTable
+			// 
+			this.AModulesChoiceTable.AutoSize = true;
+			this.AModulesChoiceTable.ColumnCount = 9;
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+			this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.AModulesChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.AModulesChoiceTable.Location = new System.Drawing.Point(0, 0);
+			this.AModulesChoiceTable.Name = "AModulesChoiceTable";
+			this.AModulesChoiceTable.RowCount = 1;
+			this.AModulesChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.AModulesChoiceTable.Size = new System.Drawing.Size(268, 32);
+			this.AModulesChoiceTable.TabIndex = 0;
+			// 
+			// AssemblerChoicePanel
+			// 
+			this.AssemblerChoicePanel.AutoScroll = true;
+			this.AssemblerChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.AssemblerChoicePanel.Controls.Add(this.AssemblerChoiceTable);
+			this.AssemblerChoicePanel.Location = new System.Drawing.Point(3, 39);
+			this.AssemblerChoicePanel.Margin = new System.Windows.Forms.Padding(3, 7, 13, 3);
+			this.AssemblerChoicePanel.Name = "AssemblerChoicePanel";
+			this.AssemblerChoicePanel.Size = new System.Drawing.Size(136, 72);
+			this.AssemblerChoicePanel.TabIndex = 18;
+			// 
+			// AssemblerChoiceTable
+			// 
+			this.AssemblerChoiceTable.AutoSize = true;
+			this.AssemblerChoiceTable.ColumnCount = 5;
+			this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.AssemblerChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.AssemblerChoiceTable.Location = new System.Drawing.Point(0, 0);
+			this.AssemblerChoiceTable.Name = "AssemblerChoiceTable";
+			this.AssemblerChoiceTable.RowCount = 1;
+			this.AssemblerChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.AssemblerChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.AssemblerChoiceTable.Size = new System.Drawing.Size(132, 32);
+			this.AssemblerChoiceTable.TabIndex = 0;
+			// 
+			// SelectedAModulesPanel
+			// 
+			this.SelectedAModulesPanel.AutoScroll = true;
+			this.SelectedAModulesPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.SelectedAModulesPanel.Controls.Add(this.SelectedAModulesTable);
+			this.SelectedAModulesPanel.Location = new System.Drawing.Point(3, 216);
+			this.SelectedAModulesPanel.Margin = new System.Windows.Forms.Padding(3, 3, 13, 3);
+			this.SelectedAModulesPanel.Name = "SelectedAModulesPanel";
+			this.SelectedAModulesPanel.Size = new System.Drawing.Size(136, 72);
+			this.SelectedAModulesPanel.TabIndex = 19;
+			// 
+			// SelectedAModulesTable
+			// 
+			this.SelectedAModulesTable.AutoSize = true;
+			this.SelectedAModulesTable.ColumnCount = 5;
+			this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.SelectedAModulesTable.Dock = System.Windows.Forms.DockStyle.Top;
+			this.SelectedAModulesTable.Location = new System.Drawing.Point(0, 0);
+			this.SelectedAModulesTable.Name = "SelectedAModulesTable";
+			this.SelectedAModulesTable.RowCount = 1;
+			this.SelectedAModulesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.SelectedAModulesTable.Size = new System.Drawing.Size(132, 32);
+			this.SelectedAModulesTable.TabIndex = 0;
+			// 
+			// RateOptionsTable
+			// 
+			this.RateOptionsTable.AutoSize = true;
+			this.RateOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.RateOptionsTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.RateOptionsTable.ColumnCount = 4;
+			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+			this.RateOptionsTable.Controls.Add(this.FixedAssemblerCountInput, 3, 0);
+			this.RateOptionsTable.Controls.Add(this.label7, 0, 0);
+			this.RateOptionsTable.Controls.Add(this.FixedAssemblersOption, 2, 0);
+			this.RateOptionsTable.Controls.Add(this.AutoAssemblersOption, 1, 0);
+			this.RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
+			this.RateOptionsTable.Name = "RateOptionsTable";
+			this.RateOptionsTable.RowCount = 1;
+			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.RateOptionsTable.Size = new System.Drawing.Size(433, 26);
+			this.RateOptionsTable.TabIndex = 18;
+			// 
+			// SelectedAssemblerIcon
+			// 
+			this.SelectedAssemblerIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.SelectedAssemblerIcon.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.SelectedAssemblerIcon.Location = new System.Drawing.Point(401, 0);
+			this.SelectedAssemblerIcon.Margin = new System.Windows.Forms.Padding(0);
+			this.SelectedAssemblerIcon.Name = "SelectedAssemblerIcon";
+			this.SelectedAssemblerIcon.Size = new System.Drawing.Size(32, 32);
+			this.SelectedAssemblerIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.SelectedAssemblerIcon.TabIndex = 23;
+			this.SelectedAssemblerIcon.TabStop = false;
+			// 
+			// SelectedFuelIcon
+			// 
+			this.SelectedFuelIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.SelectedFuelIcon.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.SelectedFuelIcon.Location = new System.Drawing.Point(401, 114);
+			this.SelectedFuelIcon.Margin = new System.Windows.Forms.Padding(0);
+			this.SelectedFuelIcon.Name = "SelectedFuelIcon";
+			this.SelectedFuelIcon.Size = new System.Drawing.Size(32, 32);
+			this.SelectedFuelIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.SelectedFuelIcon.TabIndex = 24;
+			this.SelectedFuelIcon.TabStop = false;
+			// 
+			// SelectedBeaconIcon
+			// 
+			this.SelectedBeaconIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+			this.SelectedBeaconIcon.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.SelectedBeaconIcon.Location = new System.Drawing.Point(401, 0);
+			this.SelectedBeaconIcon.Margin = new System.Windows.Forms.Padding(0);
+			this.SelectedBeaconIcon.Name = "SelectedBeaconIcon";
+			this.SelectedBeaconIcon.Size = new System.Drawing.Size(32, 32);
+			this.SelectedBeaconIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.SelectedBeaconIcon.TabIndex = 22;
+			this.SelectedBeaconIcon.TabStop = false;
+			// 
+			// ToolTip
+			// 
+			this.ToolTip.AutoPopDelay = 100000;
+			this.ToolTip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+			this.ToolTip.ForeColor = System.Drawing.Color.White;
+			this.ToolTip.InitialDelay = 200;
+			this.ToolTip.OwnerDraw = true;
+			this.ToolTip.ReshowDelay = 100;
+			this.ToolTip.TextFont = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
 			// 
 			// EditRecipePanel
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BackColor = System.Drawing.Color.Black;
-			this.Controls.Add(this.panel1);
-			this.Controls.Add(this.panel5);
-			this.Controls.Add(this.panel4);
+			this.Controls.Add(this.MainTable);
+			this.DoubleBuffered = true;
 			this.ForeColor = System.Drawing.Color.White;
 			this.Name = "EditRecipePanel";
-			this.Size = new System.Drawing.Size(317, 362);
+			this.Size = new System.Drawing.Size(439, 552);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
-			this.tableLayoutPanel1.ResumeLayout(false);
-			this.tableLayoutPanel1.PerformLayout();
-			this.flowLayoutPanel3.ResumeLayout(false);
-			this.flowLayoutPanel2.ResumeLayout(false);
-			this.flowLayoutPanel1.ResumeLayout(false);
-			this.panel4.ResumeLayout(false);
-			this.panel4.PerformLayout();
-			this.panel5.ResumeLayout(false);
-			this.panel5.PerformLayout();
-			this.panel1.ResumeLayout(false);
-			this.panel1.PerformLayout();
+			this.AssemblerInfoTable.ResumeLayout(false);
+			this.AssemblerInfoTable.PerformLayout();
+			this.MainTable.ResumeLayout(false);
+			this.MainTable.PerformLayout();
+			this.BeaconTable.ResumeLayout(false);
+			this.BeaconTable.PerformLayout();
+			this.BModulesChoicePanel.ResumeLayout(false);
+			this.BModulesChoicePanel.PerformLayout();
+			this.SelectedBModulesPanel.ResumeLayout(false);
+			this.SelectedBModulesPanel.PerformLayout();
+			this.BeaconChoicePanel.ResumeLayout(false);
+			this.BeaconChoicePanel.PerformLayout();
+			this.BeaconInfoTable.ResumeLayout(false);
+			this.BeaconInfoTable.PerformLayout();
+			this.BeaconValuesTable.ResumeLayout(false);
+			this.BeaconValuesTable.PerformLayout();
+			this.AssemblerTable.ResumeLayout(false);
+			this.AssemblerTable.PerformLayout();
+			this.FuelOptionsPanel.ResumeLayout(false);
+			this.FuelOptionsPanel.PerformLayout();
+			this.AModulesChoicePanel.ResumeLayout(false);
+			this.AModulesChoicePanel.PerformLayout();
+			this.AssemblerChoicePanel.ResumeLayout(false);
+			this.AssemblerChoicePanel.PerformLayout();
+			this.SelectedAModulesPanel.ResumeLayout(false);
+			this.SelectedAModulesPanel.PerformLayout();
+			this.RateOptionsTable.ResumeLayout(false);
+			this.RateOptionsTable.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.SelectedAssemblerIcon)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.SelectedFuelIcon)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.SelectedBeaconIcon)).EndInit();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
         }
 
         #endregion
 
-        public System.Windows.Forms.RadioButton autoOption;
-        public System.Windows.Forms.RadioButton fixedOption;
-        public System.Windows.Forms.TextBox fixedTextBox;
-		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-		private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.Label PollutionLabel;
+        public System.Windows.Forms.RadioButton AutoAssemblersOption;
+        public System.Windows.Forms.RadioButton FixedAssemblersOption;
+        public System.Windows.Forms.TextBox FixedAssemblerCountInput;
+		private System.Windows.Forms.TableLayoutPanel AssemblerInfoTable;
+		private System.Windows.Forms.Label AssemblerPollutionLabel;
 		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label PollutionPercentLabel;
+		private System.Windows.Forms.Label AssemblerPollutionPercentLabel;
 		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.Label ProductivityPercentLabel;
+		private System.Windows.Forms.Label AssemblerProductivityPercentLabel;
 		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Label SpeedPercentLabel;
+		private System.Windows.Forms.Label AssemblerSpeedPercentLabel;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.Label EnergyPercentLabel;
-		private System.Windows.Forms.Label EnergyLabel;
-		private System.Windows.Forms.Label SpeedLabel;
-		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
-		private System.Windows.Forms.Panel panel4;
+		private System.Windows.Forms.Label AssemblerEnergyPercentLabel;
+		private System.Windows.Forms.Label AssemblerEnergyLabel;
+		private System.Windows.Forms.Label AssemblerSpeedLabel;
+		private System.Windows.Forms.Label AModuleOptionsLabel;
+		private System.Windows.Forms.Label AModulesLabel;
 		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.Panel panel5;
+		private System.Windows.Forms.Label AssemblerTitle;
+		private System.Windows.Forms.TableLayoutPanel AssemblerTable;
+		private System.Windows.Forms.Panel AModulesChoicePanel;
+		private System.Windows.Forms.TableLayoutPanel AModulesChoiceTable;
+		private System.Windows.Forms.Panel AssemblerChoicePanel;
+		private System.Windows.Forms.TableLayoutPanel AssemblerChoiceTable;
+		private System.Windows.Forms.TableLayoutPanel MainTable;
+		private System.Windows.Forms.TableLayoutPanel BeaconTable;
+		private System.Windows.Forms.Panel BModulesChoicePanel;
+		private System.Windows.Forms.TableLayoutPanel BModulesChoiceTable;
+		private System.Windows.Forms.Panel SelectedBModulesPanel;
+		private System.Windows.Forms.TableLayoutPanel SelectedBModulesTable;
+		private System.Windows.Forms.Label BeaconTitle;
+		private System.Windows.Forms.Panel BeaconChoicePanel;
+		private System.Windows.Forms.TableLayoutPanel BeaconChoiceTable;
+		private System.Windows.Forms.Label BModulesLabel;
+		private System.Windows.Forms.Label BModuleOptionsLabel;
+		private System.Windows.Forms.TableLayoutPanel BeaconInfoTable;
+		private System.Windows.Forms.Label label14;
+		private System.Windows.Forms.Label TotalBeaconsLabel;
+		private System.Windows.Forms.Label label16;
+		private System.Windows.Forms.Label BeaconEfficiencyLabel;
+		private System.Windows.Forms.Label label18;
+		private System.Windows.Forms.Label BeaconModuleCountLabel;
+		private System.Windows.Forms.Label label20;
+		private System.Windows.Forms.Label BeaconEnergyLabel;
+		private System.Windows.Forms.TableLayoutPanel RateOptionsTable;
+		private System.Windows.Forms.TableLayoutPanel BeaconValuesTable;
+		public System.Windows.Forms.TextBox ExtraBeaconCountInput;
+		public System.Windows.Forms.TextBox BeaconsPerAssemblerCountInput;
+		public System.Windows.Forms.TextBox BeaconCountInput;
 		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Button button17;
-		private System.Windows.Forms.Button button18;
-		private System.Windows.Forms.Button button19;
-		private System.Windows.Forms.Button button20;
-		private System.Windows.Forms.Button button21;
-		private System.Windows.Forms.Button button22;
-		private System.Windows.Forms.Button button23;
-		private System.Windows.Forms.Button button24;
-		private System.Windows.Forms.Button button25;
-		private System.Windows.Forms.Button button26;
-		private System.Windows.Forms.Button button27;
-		private System.Windows.Forms.Button button29;
-		private System.Windows.Forms.Button button6;
-		private System.Windows.Forms.Button button7;
-		private System.Windows.Forms.Button button11;
-		private System.Windows.Forms.Button button12;
-		private System.Windows.Forms.Button button13;
-		private System.Windows.Forms.Button button14;
-		private System.Windows.Forms.Button button15;
-		private System.Windows.Forms.Button button16;
-		private System.Windows.Forms.Button button2;
-		private System.Windows.Forms.Button button3;
-		private System.Windows.Forms.Button button4;
-		private System.Windows.Forms.Button button5;
-		private System.Windows.Forms.Button button8;
-		private System.Windows.Forms.Button button9;
-		private System.Windows.Forms.Button button10;
-		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.Label label10;
+		private CustomToolTip ToolTip;
+		private System.Windows.Forms.Panel FuelOptionsPanel;
+		private System.Windows.Forms.TableLayoutPanel FuelOptionsTable;
+		private System.Windows.Forms.Label FuelTitle;
+		private System.Windows.Forms.Panel SelectedAModulesPanel;
+		private System.Windows.Forms.TableLayoutPanel SelectedAModulesTable;
+		private System.Windows.Forms.PictureBox SelectedAssemblerIcon;
+		private System.Windows.Forms.PictureBox SelectedFuelIcon;
+		private System.Windows.Forms.PictureBox SelectedBeaconIcon;
 	}
 }

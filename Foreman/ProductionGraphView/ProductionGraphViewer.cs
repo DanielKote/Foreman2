@@ -34,6 +34,7 @@ namespace Foreman
 		public bool TooltipsEnabled { get; set; }
 		private bool SubwindowOpen; //used together with tooltip enabled -> if we open up an item/recipe/assembler window, this will halt tooltip show.
 		public bool DynamicLinkWidth = false;
+		public bool LockedRecipeEditPanelPosition = true;
 
 		public DataCache DCache { get; set; }
 		public ProductionGraph Graph { get; private set; }
@@ -259,31 +260,67 @@ namespace Foreman
 
 		public void EditNode(BaseNodeElement bNodeElement)
 		{
+			if(bNodeElement is RecipeNodeElement rNodeElement)
+			{
+				EditRecipeNode(rNodeElement);
+				return;
+			}
+
 			SubwindowOpen = true;
-			Control editPanel;
-			if (bNodeElement is RecipeNodeElement rNodeElement)
-				editPanel = new EditRecipePanel(rNodeElement.DisplayedNode, this);
-			else
-				editPanel = new EditFlowPanel(bNodeElement.DisplayedNode, this);
+			Control editPanel = new EditFlowPanel(bNodeElement.DisplayedNode, this);
 
 			//offset view if necessary to ensure entire window will be seen (with 25 pixels boundary)
 			Point screenOriginPoint = GraphToScreen(new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y));
 			screenOriginPoint = new Point(screenOriginPoint.X - editPanel.Width, screenOriginPoint.Y - (editPanel.Height / 2));
 			Point offset = new Point(
-				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.X), this.Width - screenOriginPoint.X - editPanel.Width - bNodeElement.Width - ((bNodeElement is RecipeNodeElement)? 250 : 25)) / ViewScale),
-				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.Y), this.Height - screenOriginPoint.Y - editPanel.Height - 25) / ViewScale));
+				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.X), this.Width - screenOriginPoint.X - editPanel.Width - bNodeElement.Width - 25)),
+				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.Y), this.Height - screenOriginPoint.Y - editPanel.Height - 25)));
 
-			ViewOffset = Point.Add(ViewOffset, (Size)offset);
+			ViewOffset = Point.Add(ViewOffset, new Size((int)(offset.X / ViewScale), (int)(offset.Y / ViewScale)));
 			UpdateGraphBounds();
 			Invalidate();
 
-			//add the visible recipe to the right of the node if this is a recipe node
-			if(bNodeElement is RecipeNodeElement)
-				new FloatingTooltipControl(new RecipePanel(new Recipe[] { ((RecipeNode)bNodeElement.DisplayedNode).BaseRecipe }), Direction.Left, new Point(bNodeElement.X + (bNodeElement.Width / 2), bNodeElement.Y), this, true);
+			//open up the edit panel
+			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y), this, true, false);
+			fttc.Closing += (s,e) => { SubwindowOpen = false; bNodeElement.Update(); this.Invalidate(); };
+		}
+
+		public void EditRecipeNode(RecipeNodeElement rNodeElement)
+		{
+			SubwindowOpen = true;
+			Control editPanel = new EditRecipePanel((RecipeNode)rNodeElement.DisplayedNode, this);
+			RecipePanel recipePanel = new RecipePanel(new Recipe[] { ((RecipeNode)rNodeElement.DisplayedNode).BaseRecipe });
+
+			if (LockedRecipeEditPanelPosition)
+			{
+				editPanel.Location = new Point(15, 15);
+				recipePanel.Location = new Point(editPanel.Location.X + editPanel.Width + 5, editPanel.Location.Y);
+			}
+			else
+			{
+				//offset view if necessary to ensure entire window will be seen (with 25 pixels boundary). Additionally we want the tooltips to start 100 pixels above the arrow point instead of based on the center of the control (due to the dynamically changing height of the recipe option panel)
+				Point recipeEditPanelOriginPoint = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y)), editPanel.Size, Direction.Right).Location;
+				recipeEditPanelOriginPoint.Y = recipeEditPanelOriginPoint.Y + editPanel.Height / 2 - 125;
+				Point offset = new Point(
+					(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.X), this.Width - recipeEditPanelOriginPoint.X - editPanel.Width - rNodeElement.Width - 250)),
+					(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.Y), this.Height - recipeEditPanelOriginPoint.Y - editPanel.Height - 25)));
+
+				editPanel.Location = Point.Add(recipeEditPanelOriginPoint, (Size)offset);
+
+				recipePanel.Location = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y)), recipePanel.Size, Direction.Left).Location;
+				recipePanel.Location = new Point(recipePanel.Location.X, editPanel.Location.Y);
+
+				ViewOffset = Point.Add(ViewOffset, new Size((int)(offset.X / ViewScale), (int)(offset.Y / ViewScale)));
+				UpdateGraphBounds();
+				Invalidate();
+			}
+
+			//add the visible recipe to the right of the node
+			new FloatingTooltipControl(recipePanel, Direction.Left, new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
+			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
 
 			//open up the edit panel
-			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y), this, true);
-			fttc.Closing += (s,e) => { SubwindowOpen = false; bNodeElement.Update(); this.Invalidate(); };
+			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.Update(); this.Invalidate(); };
 		}
 
 		//----------------------------------------------Selection functions

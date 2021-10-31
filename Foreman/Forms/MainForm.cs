@@ -62,6 +62,9 @@ namespace Foreman
 				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
 				ShowNodeRecipeCheckBox.Checked = Properties.Settings.Default.ShowRecipeToolTip;
 
+				RecipeEditPanelPositionLockCheckBox.Checked = Properties.Settings.Default.LockedRecipeEditorPosition;
+				GraphViewer.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
+
 				if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
 					Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
 				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
@@ -259,7 +262,7 @@ namespace Foreman
 			GraphViewer.AddItem(new Point(15, 15), location);
 		}
 
-		//---------------------------------------------------------Production properties
+		//---------------------------------------------------------Production Graph properties
 
 		private void RateOptionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -288,6 +291,28 @@ namespace Foreman
 				GraphViewer.Graph.UpdateNodeValues();
 			else
 				GraphViewer.Invalidate();
+		}
+
+		private void ShowNodeRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.RecipeTooltipEnabled = ShowNodeRecipeCheckBox.Checked;
+			Properties.Settings.Default.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
+			Properties.Settings.Default.Save();
+		}
+
+		private void LODRadioButton_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
+			Properties.Settings.Default.LevelOfDetail = (int)GraphViewer.LevelOfDetail;
+			Properties.Settings.Default.Save();
+			GraphViewer.UpdateNodeVisuals();
+		}
+
+		private void RecipeEditPanelPositionLockCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
+			Properties.Settings.Default.LockedRecipeEditorPosition = RecipeEditPanelPositionLockCheckBox.Checked;
+			Properties.Settings.Default.Save();
 		}
 
 		//---------------------------------------------------------Gridlines
@@ -393,21 +418,6 @@ namespace Foreman
 				cp.ExStyle |= 0x02000000;
 				return cp;
 			}
-		}
-
-		private void ShowNodeRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			Properties.Settings.Default.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
-			GraphViewer.RecipeTooltipEnabled = ShowNodeRecipeCheckBox.Checked;
-			Properties.Settings.Default.Save();
-		}
-
-		private void LODRadioButton_CheckedChanged(object sender, EventArgs e)
-		{
-			GraphViewer.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
-			Properties.Settings.Default.LevelOfDetail = (int)GraphViewer.LevelOfDetail;
-			Properties.Settings.Default.Save();
-			GraphViewer.UpdateNodeVisuals();
 		}
 	}
 

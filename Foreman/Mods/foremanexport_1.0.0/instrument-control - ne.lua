@@ -8,11 +8,14 @@ local function ExportLocalisedString(lstring, index)
 	localised_print('<#~#>')
 end
 
-local function ExportMyBurnerSourcePrototype(entity, ttable)
+local function ExportEnergySource(entity, ttable)
+	ttable["min_energy_usage"] = (entity.energy_usage == nil) and 0 or entity.energy_usage
 	ttable["max_energy_usage"] = entity.max_energy_usage
+
 	if entity.burner_prototype ~= null then
 		ttable['fuel_type'] = 'item'
 		ttable['fuel_effectivity'] = entity.burner_prototype.effectivity
+		ttable['pollution'] = entity.burner_prototype.emissions
 
 		ttable['fuel_categories'] = {}
 		for fname, _ in pairs(entity.burner_prototype.fuel_categories) do
@@ -21,7 +24,22 @@ local function ExportMyBurnerSourcePrototype(entity, ttable)
 	elseif entity.fluid_energy_source_prototype then
 		ttable['fuel_type'] = 'fluid'
 		ttable['fuel_effectivity'] = entity.fluid_energy_source_prototype.effectivity
+		ttable['pollution'] = entity.fluid_energy_source_prototype.emissions
+
 		ttable['burns_fluid'] = entity.fluid_energy_source_prototype.burns_fluid
+	elseif entity.electric_energy_source_prototype then
+		ttable['fuel_type'] = 'electricity'
+		ttable['fuel_effectivity'] = 1
+		ttable['drain'] = entity.electric_energy_source_prototype.drain
+		ttable['pollution'] = entity.electric_energy_source_prototype.emissions
+	elseif entity.heat_energy_source_prototype  then
+		ttable['fuel_type'] = 'heat'
+		ttable['fuel_effectivity'] = 1
+		ttable['pollution'] = entity.heat_energy_source_prototype.emissions
+	elseif entity.void_energy_source_prototype  then
+		ttable['fuel_type'] = 'void'
+		ttable['fuel_effectivity'] = 1
+		ttable['pollution'] = entity.void_energy_source_prototype.emissions
 	end
 end
 
@@ -246,7 +264,7 @@ local function ExportCraftingMachines()
 				end
 			end
 
-			ExportMyBurnerSourcePrototype(machine, tmachine)
+			ExportEnergySource(machine, tmachine)
 
 			tmachine['lid'] = '$'..localindex
 			ExportLocalisedString(machine.localised_name, localindex)
@@ -289,6 +307,8 @@ local function ExportBeacons()
 					end
 				end
 			end
+
+			ExportEnergySource(beacon, tbeacon)
 		
 			tbeacon['lid'] = '$'..localindex
 			ExportLocalisedString(beacon.localised_name, localindex)
@@ -338,7 +358,7 @@ local function ExportMiners()
 				end
 			end
 
-			ExportMyBurnerSourcePrototype(miner, tminer)
+			ExportEnergySource(miner, tminer)
 
 			tminer['lid'] = '$'..localindex
 			ExportLocalisedString(miner.localised_name, localindex)
@@ -424,7 +444,7 @@ local function ExportOffshorePumps()
 				end
 			end
 
-			ExportMyBurnerSourcePrototype(opump, topump)
+			ExportEnergySource(opump, topump)
 
 			topump['lid'] = '$'..localindex
 			ExportLocalisedString(opump.localised_name, localindex)
@@ -434,6 +454,48 @@ local function ExportOffshorePumps()
 		end
 	end
 	etable['offshorepumps'] = topumps
+end
+
+local function ExportHeatUsers()
+	theatusers = {}
+	for _, huser in pairs(game.entity_prototypes) do
+		if huser.heat_energy_source_prototype  ~= nil then
+			thuser = {}
+			thuser['name'] = huser.name
+			thuser['icon_name'] = 'icon.e.'..huser.name
+			thuser['icon_alt_name'] = 'icon.i.'..huser.name
+			thuser['order'] = huser.order
+
+			thuser['associated_items'] = {}
+			if huser.items_to_place_this ~= nil then
+				for _, item in pairs(huser.items_to_place_this) do
+					if(type(item) == 'string') then
+						table.insert(thuser['associated_items'], item)
+					else
+						table.insert(thuser['associated_items'], item['name'])
+					end
+				end
+			end
+
+			thuser['allowed_effects'] = {}
+			if huser.allowed_effects then
+				for effect, allowed in pairs(huser.allowed_effects) do
+					if allowed then
+						table.insert(thuser['allowed_effects'], effect)
+					end
+				end
+			end
+
+			ExportEnergySource(huser, thuser)
+
+			thuser['lid'] = '$'..localindex
+			ExportLocalisedString(huser.localised_name, localindex)
+			localindex = localindex + 1
+
+			table.insert(theatusers, thuser)
+		end
+	end
+	etable['heatusers'] = theatusers
 end
 
 local function ExportGroups()
@@ -488,6 +550,7 @@ script.on_nth_tick(1,
 		ExportCraftingMachines()
 		ExportBeacons()
 		ExportMiners()
+		ExportHeatUsers()
 		ExportResources()
 		ExportOffshorePumps()
 		ExportGroups()

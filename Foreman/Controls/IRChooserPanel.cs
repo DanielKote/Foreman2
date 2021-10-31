@@ -64,26 +64,22 @@ namespace Foreman
 			IgnoreAssemblerCheckBox.Checked = Properties.Settings.Default.IgnoreAssemblerStatus;
 			RecipeNameOnlyFilterCheckBox.Checked = Properties.Settings.Default.RecipeNameOnlyFilter;
 
-			SuspendLayout();
-			AutoScaleDimensions = new SizeF(6f, 13f);
-			AutoScaleMode = AutoScaleMode.Font;
-			ResumeLayout();
-
-			InitializeButtons();
-
 			this.Location = originPoint;
+		}
+
+		public new void Show()
+		{
+			this.Visible = false;
+			PGViewer.Controls.Add(this);
+			InitializeButtons();
+			SetSelectedGroup(null);
 
 			//set up the event handlers last so as not to cause unexpected calls when setting checked status ob checkboxes
 			ShowHiddenCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 			IgnoreAssemblerCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 
-			FilterTextBox.Focus();
-		}
-
-		public new void Show()
-		{
-			PGViewer.Controls.Add(this);
 			this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+			this.Visible = true;
 			this.BringToFront();
 			PGViewer.PerformLayout();
 			FilterTextBox.Focus();
@@ -137,7 +133,6 @@ namespace Foreman
 				for (int row = 0; row < IRButtons.GetLength(1); row++)
 				{
 					NFButton button = new NFButton();
-					button.BackColor = Color.Gray;
 					button.BackgroundImageLayout = ImageLayout.Zoom;
 					button.UseVisualStyleBackColor = false;
 					button.FlatStyle = FlatStyle.Flat;
@@ -170,89 +165,95 @@ namespace Foreman
 		{
 			long currentID = ++updateID;
 
-			if (IRTable.Visible)
+			await Task.Run(() =>
 			{
-				await Task.Run(() =>
+				//if we are actually changing the filtered list, then update it (through the GetSubgroupList)
+				if (!scrollOnly)
 				{
-					//if we are actually changing the filtered list, then update it (through the GetSubgroupList)
-					if (!scrollOnly)
+					filteredIRRowsList.Clear();
+					int currentRow = 0;
+					foreach (List<KeyValuePair<DataObjectBase, Color>> sgList in GetSubgroupList().Where(n => n.Count > 0))
 					{
-						filteredIRRowsList.Clear();
-						int currentRow = 0;
-						foreach (List<KeyValuePair<DataObjectBase, Color>> sgList in GetSubgroupList().Where(n => n.Count > 0))
+						filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
+						int currentColumn = 0;
+						foreach (KeyValuePair<DataObjectBase, Color> kvp in sgList)
 						{
-							filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
-							int currentColumn = 0;
-							foreach (KeyValuePair<DataObjectBase, Color> kvp in sgList)
+							if (currentColumn == IRButtons.GetLength(0))
 							{
-								if (currentColumn == IRButtons.GetLength(0))
-								{
-									filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
-									currentColumn = 0;
-									currentRow++;
-								}
-								filteredIRRowsList[currentRow][currentColumn] = kvp;
-								currentColumn++;
+								filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
+								currentColumn = 0;
+								currentRow++;
 							}
-							currentRow++;
+							filteredIRRowsList[currentRow][currentColumn] = kvp;
+							currentColumn++;
 						}
+						currentRow++;
 					}
+				}
 
-					this.Invoke((MethodInvoker)delegate
+				bool so = scrollOnly;
+				this.BeginInvoke((MethodInvoker)delegate
+				{
+					if (currentID != updateID)
+						return;
+
+					if (!so)
 					{
-						if (!scrollOnly)
-						{
-							IRScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
-							IRScrollBar.Enabled = IRScrollBar.Maximum >= IRScrollBar.LargeChange;
-						}
-						CurrentRow = startRow;
-						IRScrollBar.Value = startRow;
+						IRScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
+						IRScrollBar.Enabled = IRScrollBar.Maximum >= IRScrollBar.LargeChange;
+					}
+					CurrentRow = startRow;
+					IRScrollBar.Value = startRow;
 
-						IRTable.ResumeLayout();
-						IRTable.SuspendLayout();
-					});
+					IRTable.ResumeLayout();
+					IRTable.SuspendLayout();
+				});
 
-					//update all the buttons to be based off of the filteredIRSet
-					for (int column = 0; column < IRButtons.GetLength(0); column++)
+				//update all the buttons to be based off of the filteredIRSet
+				for (int column = 0; column < IRButtons.GetLength(0); column++)
+				{
+					for (int row = 0; row < IRButtons.GetLength(1); row++)
 					{
-						for (int row = 0; row < IRButtons.GetLength(1); row++)
+						if (currentID != updateID)
+							return;
+
+						int c = column;
+						int r = row;
+						this.BeginInvoke((MethodInvoker)delegate
 						{
 							if (currentID != updateID)
 								return;
 
-							this.Invoke((MethodInvoker)delegate
-							{
-								DataObjectBase irObject = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Key : null;
-								NFButton b = IRButtons[column, row];
-								if (irObject != null) //full
+							DataObjectBase irObject = (r + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[r + startRow][c].Key : null;
+							NFButton b = IRButtons[c, r];
+							if (irObject != null) //full
 								{
 
-									b.ForeColor = Color.Black;
-									b.BackColor = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Value : Color.DimGray;
-									//b.Margin = new Padding(b.FlatAppearance.BorderSize);
-									//b.Dock = DockStyle.Fill;
-									b.BackgroundImage = irObject.Icon;
-									b.Tag = irObject;
-									b.Enabled = true;
-									IRButtonToolTip.SetToolTip(b, string.IsNullOrEmpty(irObject.FriendlyName) ? "-" : irObject.FriendlyName);
-								}
-								else
-								{
-									b.ForeColor = Color.Gray;
-									b.BackColor = Color.DimGray;
-									//b.Margin = new Padding(Math.Max(1, IRTable.Width / (IRButtons.GetLength(0) * 3)));
-									//b.Dock = DockStyle.Fill;
-									b.BackgroundImage = null;
-									b.Tag = null;
-									b.Enabled = false;
-								}
-							});
-						}
+								b.ForeColor = Color.Black;
+								b.BackColor = (r + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[r + startRow][c].Value : Color.DimGray;
+								b.BackgroundImage = irObject.Icon;
+								b.Tag = irObject;
+								b.Enabled = true;
+								IRButtonToolTip.SetToolTip(b, string.IsNullOrEmpty(irObject.FriendlyName) ? "-" : irObject.FriendlyName);
+							}
+							else
+							{
+								b.ForeColor = Color.Gray;
+								b.BackColor = Color.DimGray;
+								b.BackgroundImage = null;
+								b.Tag = null;
+								b.Enabled = false;
+							}
+						});
 					}
-				});
-				if (currentID == updateID)
-					IRTable.ResumeLayout();
-			}
+				}
+			});
+			this.BeginInvoke((MethodInvoker)delegate
+			{
+				if (currentID != updateID)
+					return;
+				IRTable.ResumeLayout();
+			});
 		}
 
 		protected void SetSelectedGroup(Group sGroup, bool causeUpdate = true)
@@ -263,8 +264,6 @@ namespace Foreman
 				StartingGroup = sGroup;
 				SelectedGroup = sGroup;
 				UpdateIRButtons();
-				//foreach (NFButton groupButton in GroupButtons)
-				//    groupButton.BackColor = (groupButton.Tag as Group == SelectedGroup) ? SelectedGroupButtonBGColor : Color.DimGray;
 			}
 			else
 			{
@@ -280,7 +279,13 @@ namespace Foreman
 			}
 		}
 
-		protected void UpdateGroupButton(Group group, bool enabled) { GroupButtonLinks[group].Enabled = enabled; }
+		protected void UpdateGroupButton(Group group, bool enabled)
+		{
+			this.BeginInvoke((MethodInvoker)delegate
+			{
+				GroupButtonLinks[group].Enabled = enabled;
+			});
+		}
 
 		//-----------------------------------------------------------------------------------------------------Group Button events
 
@@ -371,10 +376,7 @@ namespace Foreman
 		protected override ToolTip IRButtonToolTip { get { return iToolTip; } }
 		private Item selectedItem;
 
-		public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint) : base(parent, originPoint)
-		{
-			SetSelectedGroup(null);
-		}
+		public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint) : base(parent, originPoint) { }
 
 		protected override void IRChooserPanel_Disposed(object sender, EventArgs e)
 		{
@@ -518,6 +520,7 @@ namespace Foreman
 				OtherNodeOptionsTable.Visible = true;
 				AddConsumerButton.Visible = includeConsumers;
 				AddSupplyButton.Visible = includeSuppliers;
+
 				if (!(includeConsumers && KeyItem.ConsumptionRecipes.Count > 0) && !(includeSuppliers && KeyItem.ProductionRecipes.Count > 0))
 				{
 					GroupTable.Visible = false;
@@ -536,7 +539,6 @@ namespace Foreman
 					AsProductCheckBox.Visible = true;
 				}
 			}
-			SetSelectedGroup(null);
 		}
 
 		protected override List<Group> GetSortedGroups()

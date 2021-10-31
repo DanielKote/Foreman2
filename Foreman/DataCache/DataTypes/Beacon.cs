@@ -9,7 +9,7 @@ namespace Foreman
 		int ModuleSlots { get; }
 		float Effectivity { get; }
 
-		IReadOnlyCollection<Module> ValidModules { get; }
+		IReadOnlyCollection<Module> Modules { get; }
 		IReadOnlyCollection<Item> AssociatedItems { get; }
 
 		bool IsMissing { get; }
@@ -20,20 +20,20 @@ namespace Foreman
 		public int ModuleSlots { get; set; }
 		public float Effectivity { get; set; }
 
-		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
+		public IReadOnlyCollection<Module> Modules { get { return modules; } }
 		public IReadOnlyCollection<Item> AssociatedItems { get { return associatedItems; } }
 
 		public bool IsMissing { get; private set; }
 		public override bool Available { get { return associatedItems.FirstOrDefault(i => i.Available) != null; } set { } }
 
-		internal HashSet<ModulePrototype> validModules { get; private set; }
+		internal HashSet<ModulePrototype> modules { get; private set; }
 		internal List<ItemPrototype> associatedItems { get; private set; } //should honestly only be 1, but knowing modders....
 
 		public BeaconPrototype(DataCache dCache, string name, string friendlyName, bool isMissing = false) : base(dCache, name, friendlyName, "-")
 		{
 			IsMissing = isMissing;
 
-			validModules = new HashSet<ModulePrototype>();
+			modules = new HashSet<ModulePrototype>();
 			associatedItems = new List<ItemPrototype>();
 		}
 

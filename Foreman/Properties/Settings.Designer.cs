@@ -202,5 +202,17 @@ namespace Foreman.Properties {
                 this["ShowUnavailable"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LockedRecipeEditorPosition {
+            get {
+                return ((bool)(this["LockedRecipeEditorPosition"]));
+            }
+            set {
+                this["LockedRecipeEditorPosition"] = value;
+            }
+        }
     }
 }

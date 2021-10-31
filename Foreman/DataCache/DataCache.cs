@@ -930,7 +930,7 @@ namespace Foreman
 				 (allowedEffects[3] || module.PollutionBonus == 0)))
 			{
 				module.beacons.Add(beacon);
-				beacon.validModules.Add(module);
+				beacon.modules.Add(module);
 			}
 
 			beacons.Add(beacon.Name, beacon);

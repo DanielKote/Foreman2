@@ -168,7 +168,7 @@ namespace Foreman
 				if (BModuleSelectionBox.Enabled)
 				{
 					BModuleSelectionBox.Items.Add("No Modules");
-					BModuleSelectionBox.Items.AddRange(currentBeacon.ValidModules.Intersect(recipe.Modules).ToArray());
+					BModuleSelectionBox.Items.AddRange(currentBeacon.Modules.Intersect(recipe.Modules).ToArray());
 					BModuleSelectionBox.Enabled = BModuleSelectionBox.Items.Count > 0;
 					if (currentBModule != null && BModuleSelectionBox.Items.Contains(currentBModule))
 						BModuleSelectionBox.SelectedItem = currentBModule;
