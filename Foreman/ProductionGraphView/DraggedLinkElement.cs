@@ -192,7 +192,7 @@ namespace Foreman
 				recipeOptionList.Add(itemPassthroughOption);
 
 				foreach(Recipe recipe in Item.ConsumptionRecipes)
-					if(recipe.Enabled && recipe.HasEnabledAssemblers)
+					if(Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
 						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
 
 				var chooserPanel = new ChooserPanel(recipeOptionList, Parent, ChooserPanel.RecipeIconSize);
@@ -248,7 +248,7 @@ namespace Foreman
 
 
 				foreach (Recipe recipe in Item.ProductionRecipes)
-					if (recipe.Enabled && recipe.HasEnabledAssemblers)
+					if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
 						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
 
 				var chooserPanel = new ChooserPanel(recipeOptionList, Parent, ChooserPanel.RecipeIconSize);

@@ -25,7 +25,6 @@ namespace Foreman
         private Dictionary<string, Exception> FailedPaths;
 
         private const float defaultRecipeTime = 0.5f;
-        private bool defaultEnabled = false;
 
         public IReadOnlyDictionary<string, Technology> GetTechnologies() { return Technologies; }
         public IReadOnlyDictionary<string, Item> GetItems() { return Items; }
@@ -57,9 +56,8 @@ namespace Foreman
             FailedPaths = new Dictionary<string, Exception>();
         }
 
-        public void LoadData(JObject jsonData, bool enableAll, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
+        public void LoadData(JObject jsonData, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent)
         {
-            defaultEnabled = enableAll;
             progress.Report(new KeyValuePair<int, string>(startingPercent, "Preparing Icons")); //lets be honest - thats what most of the time is used for here
 
             //process mods
@@ -356,7 +354,6 @@ namespace Foreman
             foreach (var effectJToken in objJToken["allowed_effects"])
                 assembler.AllowedEffects.Add((string)effectJToken);
 
-            assembler.Enabled = defaultEnabled;
             Assemblers.Add(assembler.Name, assembler);
         }
 
@@ -371,7 +368,6 @@ namespace Foreman
             foreach (var categoryJToken in objJToken["resource_categories"])
                 miner.ResourceCategories.Add((string)categoryJToken);
 
-            miner.Enabled = defaultEnabled;
             Miners.Add(miner.Name, miner);
         }
 
@@ -412,7 +408,6 @@ namespace Foreman
                         newLimitations.AddRange(RecipeDuplicants[rname]);
             }
 
-            module.Enabled = defaultEnabled;
             Modules.Add(module.Name, module);
         }
 
@@ -500,16 +495,7 @@ namespace Foreman
                 }
             }
 
-            //step 3: update recipes to check for valid assemblers
-            foreach (Recipe recipe in Recipes.Values)
-            {
-                bool usable = false;
-                foreach (Assembler assembler in Assemblers.Values)
-                    usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category) && recipe.Ingredients.Count <= assembler.MaxIngredients;
-                recipe.HasEnabledAssemblers = usable;
-            }
-
-            //step 4: calculate unlockable items (ingredient/product of unlockable recipes -> dont care about anything that isnt part of a recipe)
+            //step 3: calculate unlockable items (ingredient/product of unlockable recipes -> dont care about anything that isnt part of a recipe)
             HashSet<Item> unusableItems = new HashSet<Item>(Items.Values);
             foreach (Recipe recipe in Recipes.Values)
             {
@@ -518,11 +504,11 @@ namespace Foreman
                 foreach (Item item in recipe.Results.Keys)
                     unusableItems.Remove(item);
             }
-            //step 4.5: remove blocked items
+            //step 3.5: remove blocked items
             foreach (Item item in unusableItems)
                 Items.Remove(item.Name);
 
-            //step 5: clean up tech tree (removing any recipes from the unlocks that are no longer present in recipe set)
+            //step 4: clean up tech tree (removing any recipes from the unlocks that are no longer present in recipe set)
             foreach(Technology tech in Technologies.Values)
                 tech.Recipes.IntersectWith(Recipes.Values);
         }

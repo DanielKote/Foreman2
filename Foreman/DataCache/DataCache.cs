@@ -88,7 +88,7 @@ namespace Foreman
             Tuple.Create(VersionOperator.EqualTo.Token(), VersionOperator.EqualTo)
         };
 
-        internal static async Task LoadAllData(bool defaultEnabled, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
+        internal static async Task LoadAllData(IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
         {
             await Task.Run(() =>
             {
@@ -105,12 +105,9 @@ namespace Foreman
                 int jsonStartingPercent = 15;
                 switch (GetGenerationType())
                 {
-                    case DataCache.GenerationType.FactorioLUA:
-                        jsonStartingPercent = 30; //15% goes to processing factorio lua
-                        FactorioLuaProcessor flp = new FactorioLuaProcessor();
-                        jsonData = flp.LoadData(progress, ctoken, 0, jsonStartingPercent);
-                        break;
-                    case DataCache.GenerationType.ForemanMod:
+                    case GenerationType.FactorioLUA:
+
+                    case GenerationType.ForemanMod:
                     default:
                         //read in the data from the foreman mod (in the script output folder)
                         string setupFile = Path.Combine(ScriptOutPath, "ForemanFactorioSetup.txt");
@@ -123,7 +120,7 @@ namespace Foreman
                         break;
                 }
                 JsonDataProcessor processor = new JsonDataProcessor();
-                processor.LoadData(jsonData, defaultEnabled, progress, ctoken, jsonStartingPercent, 95);
+                processor.LoadData(jsonData, progress, ctoken, jsonStartingPercent, 95);
 
                 foreach (KeyValuePair<string, Technology> kvp in processor.GetTechnologies())
                     Technologies.Add(kvp.Key, kvp.Value);
@@ -149,6 +146,7 @@ namespace Foreman
 
                 progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes"));
                 MarkCyclicRecipes();
+                CheckRecipesAssemblerStatus();
                 ReportErrors();
                 progress.Report(new KeyValuePair<int, string>(100, "Done!"));
             });
@@ -172,6 +170,18 @@ namespace Foreman
 
             failedFiles.Clear();
             failedPathDirectories.Clear();
+        }
+
+        public static void CheckRecipesAssemblerStatus()
+        {
+            //very quick update on recipes to check for valid assemblers (if they have none, then they are so marked)
+            foreach (Recipe recipe in Recipes.Values)
+            {
+                bool usable = false;
+                foreach (Assembler assembler in Assemblers.Values)
+                    usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category) && recipe.Ingredients.Count <= assembler.MaxIngredients;
+                recipe.HasEnabledAssemblers = usable;
+            }
         }
 
         private static void FindAllMods(IProgress<KeyValuePair<int,string>> progress, CancellationToken ctoken, int startingPercent, int endingPercent) //Vanilla game counts as a mod too.

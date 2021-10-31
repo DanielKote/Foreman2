@@ -187,112 +187,16 @@ namespace Foreman
 			return Elements.OfType<NodeElement>().FirstOrDefault(e => e.DisplayedNode == node);
 		}
 
-		public void PositionNodes()
-		{
-			if (!Elements.Any())
-			{
-				return;
-			}
-			var nodeOrder = Graph.GetTopologicalSort();
-			nodeOrder.Reverse();
-
-			if (nodeOrder.Any())
-			{
-				List<ProductionNode>[] nodePositions = new List<ProductionNode>[nodeOrder.Count()];
-				for (int i = 0; i < nodePositions.Count(); i++)
-				{
-					nodePositions[i] = new List<ProductionNode>();
-				}
-
-				nodePositions.First().AddRange(nodeOrder.OfType<ConsumerNode>());
-				foreach (RecipeNode node in nodeOrder.OfType<RecipeNode>())
-				{
-					bool PositionFound = false;
-
-					for (int i = nodePositions.Count() - 1; i >= 0 && !PositionFound; i--)
-					{
-						foreach (ProductionNode listNode in nodePositions[i])
-						{
-							if (listNode.CanUltimatelyTakeFrom(node))
-							{
-								nodePositions[i + 1].Add(node);
-								PositionFound = true;
-								break;
-							}
-						}
-					}
-
-					if (!PositionFound)
-					{
-						nodePositions.First().Add(node);
-					}
-				}
-				nodePositions.Last().AddRange(nodeOrder.OfType<SupplyNode>());
-
-				int marginX = 100;
-				int marginY = 200;
-				int y = marginY;
-				int[] tierWidths = new int[nodePositions.Count()];
-				for (int i = 0; i < nodePositions.Count(); i++)
-				{
-					var list = nodePositions[i];
-					int maxHeight = 0;
-					int x = marginX;
-
-					foreach (var node in list)
-					{
-						NodeElement control = GetElementForNode(node);
-						control.X = x;
-						control.Y = y;
-
-						x += control.Width + marginX;
-						maxHeight = Math.Max(control.Height, maxHeight);
-					}
-
-					if (maxHeight > 0) // Don't add any height for empty tiers
-					{
-						y += maxHeight + marginY;
-					}
-
-					tierWidths[i] = x;
-				}
-
-				int centrePoint = tierWidths.Last(i => i > marginX) / 2;
-				for (int i = tierWidths.Count() - 1; i >= 0; i--)
-				{
-					int offset = centrePoint - tierWidths[i] / 2;
-
-					foreach (var node in nodePositions[i])
-					{
-						NodeElement element = GetElementForNode(node);
-						element.X = element.X + offset;
-					}
-				}
-			}
-
-			UpdateNodes();
-			UpdateGraphBounds();
-			Invalidate(true);
-		}
-
 		public IEnumerable<GraphElement> GetPaintingOrder()
 		{
 			foreach (LinkElement element in Elements.OfType<LinkElement>())
-			{
 				yield return element;
-			}
 			foreach (NodeElement element in Elements.OfType<NodeElement>())
-			{
 				yield return element;
-			}
 			foreach (DraggedLinkElement element in Elements.OfType<DraggedLinkElement>())
-			{
 				yield return element;
-			}
 			foreach (GhostNodeElement element in Elements.OfType<GhostNodeElement>())
-			{
 				yield return element;
-			}
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
@@ -376,15 +280,11 @@ namespace Foreman
 
 			//all elements (nodes & lines)
 			foreach (GraphElement element in GetPaintingOrder())
-			{
 				element.Paint(graphics, new Point(element.X, element.Y));
-			}
 
 			//selection zone
 			if(currentDragOperation == DragOperation.Selection)
-            {
 				graphics.DrawRectangle(selectionPen, SelectionZone);
-            }
 
 			//everything below will be drawn directly on the screen instead of scaled/shifted based on graph
 			graphics.ResetTransform();
@@ -503,12 +403,8 @@ namespace Foreman
 		public IEnumerable<GraphElement> GetElementsAtPoint(Point point)
 		{
 			foreach (GraphElement element in GetPaintingOrder().Reverse<GraphElement>())
-			{
 				if (element.ContainsPoint(Point.Add(point, new Size(-element.X, -element.Y))))
-				{
 					yield return element;
-				}
-			}
 		}
 
 		private void ProductionGraphViewer_LostFocus(object sender, EventArgs e)
@@ -835,9 +731,7 @@ namespace Foreman
 		public void ClearFloatingControls()
 		{
 			foreach (var control in floatingTooltipControls.ToArray())
-			{
 				control.Dispose();
-			}
 		}
 
 		public Point DesktopToGraph(Point point)
@@ -898,7 +792,7 @@ namespace Foreman
 			}
 		}
 
-	public void UpdateGraphBounds(bool limitView = true)
+		public void UpdateGraphBounds(bool limitView = true)
 		{
 			if (limitView)
 			{
@@ -923,25 +817,6 @@ namespace Foreman
 				(int)(-Height / (2 * ViewScale) - ViewOffset.Y),
 				(int)(Width / ViewScale),
 				(int)(Height / ViewScale));
-		}
-
-		//Stolen from the designer file
-		protected override void Dispose(bool disposing)
-		{
-			stringFormat.Dispose();
-			foreach (var element in Elements.ToList())
-			{
-				element.Dispose();
-			}
-
-			size10Font.Dispose();
-
-			if (disposing && (components != null))
-			{
-				components.Dispose();
-			}
-			rightClickMenu.Dispose();
-			base.Dispose(disposing);
 		}
 
 		void HandleDragEntering(object sender, DragEventArgs e)
@@ -993,11 +868,17 @@ namespace Foreman
 
 						var optionList = new List<ChooserControl>();
 						optionList.Add(itemPassthroughOption);
+
 						optionList.Add(itemOutputOption);
 						foreach (Recipe recipe in item.ProductionRecipes)
-							if (recipe.Enabled && recipe.HasEnabledAssemblers)
+							if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
 								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+
 						optionList.Add(itemSupplyOption);
+						foreach (Recipe recipe in item.ConsumptionRecipes)
+							if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
+								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+
 
 						var chooserPanel = new ChooserPanel(optionList, this, ChooserPanel.RecipeIconSize);
 
@@ -1150,7 +1031,7 @@ namespace Foreman
 				Properties.Settings.Default.EnabledModules.Add(module);
 
 			//update DataCache with the updated mod info (or just update it in general to have a clean slate)
-			using (DataReloadForm form = new DataReloadForm(false))
+			using (DataReloadForm form = new DataReloadForm())
 				form.ShowDialog();
 
 			//update recipe enabled & check if they have at least one assembler (Enabled & HasEnabledAssemblers properties)
@@ -1366,6 +1247,25 @@ namespace Foreman
 			Graph.UpdateNodeValues();
 			UpdateNodes();
 			Invalidate();
+		}
+
+		//Stolen from the designer file
+		protected override void Dispose(bool disposing)
+		{
+			stringFormat.Dispose();
+			foreach (var element in Elements.ToList())
+			{
+				element.Dispose();
+			}
+
+			size10Font.Dispose();
+
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+			rightClickMenu.Dispose();
+			base.Dispose(disposing);
 		}
 	}
 }

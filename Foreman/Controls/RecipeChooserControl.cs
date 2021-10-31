@@ -13,6 +13,7 @@ namespace Foreman
 	public partial class RecipeChooserControl : ChooserControl
 	{
 		public Recipe DisplayedRecipe;
+        public bool RecipeOriginallyEnabled;
         private Bitmap ColorIcon;
         private Bitmap GrayIcon;
 
@@ -20,6 +21,7 @@ namespace Foreman
 		{
 			InitializeComponent();
 			DisplayedRecipe = recipe;
+            RecipeOriginallyEnabled = recipe.Enabled;
 
             ColorIcon = recipe.Icon;
             GrayIcon = GraphicsStuff.MakeMonochrome(recipe.Icon);
@@ -85,8 +87,10 @@ namespace Foreman
 
             iconPictureBox.Image = (enabled ? ColorIcon : GrayIcon);
 
-            this.Invalidate();
+            if(ParentForm is MainForm mForm)
+                mForm.UpdateRecipeListItemCheckmark(DisplayedRecipe);
 
+            this.Invalidate();
         }
     }
 }

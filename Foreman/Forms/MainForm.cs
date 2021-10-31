@@ -15,17 +15,30 @@ namespace Foreman
 {
 	public partial class MainForm : Form
 	{
-		private List<ListViewItem> unfilteredItemList;
-		private List<ListViewItem> unfilteredRecipeList;
+		//Updating bools are used to prevent a call to change properties.settings for each item on the 'select all' or 'select none' buttons
+		private bool AssemblerSelectionBoxItemUpdating = false;
+		private bool MinerSelectionBoxItemUpdating = false;
+		private bool ModuleSelectionBoxItemUpdating = false;
+
+		//RequiresUpdate bools are used to only update the lists when they have been changed (instead of every time the view switches to them)
+		public bool ItemListRequiresUpdate = false;
+		public bool RecipeListRequiresUpdate = false;
+
+		//unfiltered sets are used as a basis for the search functionality of item & recipe lists, along with updating checked/unchecked status of recipes
+		private HashSet<ListViewItem> unfilteredItemList;
+		private HashSet<ListViewItem> unfilteredRecipeList;
 
 		public MainForm()
 		{
 			InitializeComponent();
 			this.DoubleBuffered = true;
+			AssemblerSelectionBox.DisplayMember = "FriendlyName";
+			MinerSelectionBox.DisplayMember = "FriendlyName";
+			ModuleSelectionBox.DisplayMember = "FriendlyName";
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
-		private void Form1_Load(object sender, EventArgs e)
+		private void MainForm_Load(object sender, EventArgs e)
         {
 			WindowState = FormWindowState.Maximized;
 
@@ -118,9 +131,8 @@ namespace Foreman
 			MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
-			using (DataReloadForm form = new DataReloadForm(true))
-				form.ShowDialog();
-
+			using (DataReloadForm form = new DataReloadForm())
+				form.ShowDialog(); //LOAD FACTORIO DATA
 
 			Properties.Settings.Default.EnabledAssemblers.Clear();
 			foreach (string assembler in DataCache.Assemblers.Keys)
@@ -141,77 +153,117 @@ namespace Foreman
 
         public void LoadItemList()
 		{
-			//quick filter for only items used by the currently active recipes:
-			HashSet<Item> availableItems = new HashSet<Item>();
-			foreach(Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled && n.HasEnabledAssemblers))
-            {
-				foreach (Item item in recipe.Ingredients.Keys)
-					availableItems.Add(item);
-				foreach (Item item in recipe.Results.Keys)
-					availableItems.Add(item);
-            }
+			if (ItemListRequiresUpdate)
+			{
+				DataCache.CheckRecipesAssemblerStatus();
 
-			//Listview
-			ItemListView.Items.Clear();
-			unfilteredItemList = new List<ListViewItem>();
-			if (DataCache.UnknownIcon != null)
-			{
-				ItemImageList.Images.Add(DataCache.UnknownIcon);
-			}
-			foreach (var item in availableItems)
-			{
-				ListViewItem lvItem = new ListViewItem();
-				if (item.Icon != null)
+				//very quick filter for only items used by the currently active recipes:
+				HashSet<Item> availableItems = new HashSet<Item>();
+				foreach (Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled && n.HasEnabledAssemblers))
 				{
-					ItemImageList.Images.Add(item.Icon);
-					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
+					foreach (Item item in recipe.Ingredients.Keys)
+						availableItems.Add(item);
+					foreach (Item item in recipe.Results.Keys)
+						availableItems.Add(item);
 				}
-				else
+
+				//Listview
+				ItemListView.Items.Clear();
+				unfilteredItemList = new HashSet<ListViewItem>();
+				if (DataCache.UnknownIcon != null)
 				{
-					lvItem.ImageIndex = 0;
+					ItemImageList.Images.Add(DataCache.UnknownIcon);
 				}
-				lvItem.Text = item.FriendlyName;
-				lvItem.Tag = item;
-				unfilteredItemList.Add(lvItem);
-				ItemListView.Items.Add(lvItem);
-			}
-
-			ItemListView.Sorting = SortOrder.Ascending;
-			ItemListView.Sort();
-		}
-
-		public void LoadRecipeList()
-		{
-			RecipeListView.Items.Clear();
-			unfilteredRecipeList = new List<ListViewItem>();
-			if (DataCache.UnknownIcon != null)
-			{
-				RecipeImageList.Images.Add(DataCache.UnknownIcon);
-			}
-			foreach (var recipe in DataCache.Recipes)
-			{
-				if (recipe.Value.HasEnabledAssemblers)
+				foreach (var item in availableItems)
 				{
 					ListViewItem lvItem = new ListViewItem();
-					if (recipe.Value.Icon != null)
+					if (item.Icon != null)
 					{
-						RecipeImageList.Images.Add(recipe.Value.Icon);
-						lvItem.ImageIndex = RecipeImageList.Images.Count - 1;
+						ItemImageList.Images.Add(item.Icon);
+						lvItem.ImageIndex = ItemImageList.Images.Count - 1;
 					}
 					else
 					{
 						lvItem.ImageIndex = 0;
 					}
-					lvItem.Text = recipe.Value.FriendlyName;
-					lvItem.Tag = recipe.Value;
-					lvItem.Checked = recipe.Value.Enabled;
-					unfilteredRecipeList.Add(lvItem);
-					RecipeListView.Items.Add(lvItem);
+					lvItem.Text = item.FriendlyName;
+					lvItem.Tag = item;
+					unfilteredItemList.Add(lvItem);
+					ItemListView.Items.Add(lvItem);
 				}
-			}
 
-			RecipeListView.Sorting = SortOrder.Ascending;
-			RecipeListView.Sort();
+				ItemListView.Sorting = SortOrder.Ascending;
+				ItemListView.Sort();
+				ItemListRequiresUpdate = false;
+			}
+		}
+
+		public void UpdateRecipeListItemCheckmark(Recipe recipe)
+        {
+			if (RecipeListView.Items.ContainsKey(recipe.Name))
+				RecipeListView.Items[recipe.Name].Checked = recipe.Enabled;
+        }
+
+		public void LoadRecipeList()
+		{
+			if (RecipeListRequiresUpdate)
+			{
+				DataCache.CheckRecipesAssemblerStatus();
+
+				RecipeListView.Items.Clear();
+				unfilteredRecipeList = new HashSet<ListViewItem>();
+				if (DataCache.UnknownIcon != null)
+				{
+					RecipeImageList.Images.Add(DataCache.UnknownIcon);
+				}
+				foreach (var recipe in DataCache.Recipes)
+				{
+					if (recipe.Value.HasEnabledAssemblers)
+					{
+						ListViewItem lvItem = new ListViewItem();
+						if (recipe.Value.Icon != null)
+						{
+							RecipeImageList.Images.Add(recipe.Value.Icon);
+							lvItem.ImageIndex = RecipeImageList.Images.Count - 1;
+						}
+						else
+						{
+							lvItem.ImageIndex = 0;
+						}
+						lvItem.Text = recipe.Value.FriendlyName;
+						lvItem.Tag = recipe.Value;
+						lvItem.Name = recipe.Value.Name; //key
+						lvItem.Checked = recipe.Value.Enabled;
+						unfilteredRecipeList.Add(lvItem);
+						RecipeListView.Items.Add(lvItem);
+					}
+				}
+
+				RecipeListView.Sorting = SortOrder.Ascending;
+				RecipeListView.Sort();
+				RecipeListRequiresUpdate = false;
+			}
+		}
+
+		public void LoadEDLists()
+        {
+			AssemblerSelectionBox.Items.Clear();
+			AssemblerSelectionBox.Items.AddRange(DataCache.Assemblers.Values.ToArray());
+			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+				if (((Assembler)AssemblerSelectionBox.Items[i]).Enabled)
+					AssemblerSelectionBox.SetItemChecked(i, true);
+
+			MinerSelectionBox.Items.Clear();
+			MinerSelectionBox.Items.AddRange(DataCache.Miners.Values.ToArray());
+			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+				if (((Miner)MinerSelectionBox.Items[i]).Enabled)
+					MinerSelectionBox.SetItemChecked(i, true);
+
+			ModuleSelectionBox.Items.Clear();
+			ModuleSelectionBox.Items.AddRange(DataCache.Modules.Values.ToArray());
+			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+				if (((Module)ModuleSelectionBox.Items[i]).Enabled)
+					ModuleSelectionBox.SetItemChecked(i, true);
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)
@@ -229,13 +281,13 @@ namespace Foreman
 				optionList.Add(itemOutputOption);
 
 				foreach (Recipe recipe in item.ProductionRecipes)
-					if (recipe.Enabled && recipe.HasEnabledAssemblers)
+					if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
 						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
 
 				optionList.Add(itemSupplyOption);
 
 				foreach (Recipe recipe in item.ConsumptionRecipes)
-					if (recipe.Enabled && recipe.HasEnabledAssemblers)
+					if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
 						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
 
 
@@ -445,12 +497,6 @@ namespace Foreman
 			do
 			{
 				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
-				foreach (Assembler assembler in DataCache.Assemblers.Values)
-					oldOptions.Assemblers.Add(assembler, assembler.Enabled);
-				foreach (Miner miner in DataCache.Miners.Values)
-					oldOptions.Miners.Add(miner, miner.Enabled);
-				foreach (Module module in DataCache.Modules.Values)
-					oldOptions.Modules.Add(module, module.Enabled);
 				foreach (Mod mod in DataCache.Mods)
 				{
 					if(mod.Name == "core" || mod.Name == "base")
@@ -464,6 +510,7 @@ namespace Foreman
 				oldOptions.UserDataLocation = Properties.Settings.Default.FactorioUserDataPath;
 				oldOptions.GenerationType = (DataCache.GenerationType)(Properties.Settings.Default.GenerationType);
 				oldOptions.NormalDifficulty = (Properties.Settings.Default.FactorioNormalDifficulty);
+				oldOptions.UseSaveFileData = (Properties.Settings.Default.UseSaveFileData);
 
 				using (SettingsForm form = new SettingsForm(oldOptions))
 				{
@@ -484,30 +531,7 @@ namespace Foreman
 						Properties.Settings.Default.FactorioUserDataPath = form.CurrentOptions.UserDataLocation;
 						Properties.Settings.Default.GenerationType = (int)(form.CurrentOptions.GenerationType);
 						Properties.Settings.Default.FactorioNormalDifficulty = form.CurrentOptions.NormalDifficulty;
-
-						Properties.Settings.Default.EnabledAssemblers.Clear();
-						foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
-						{
-							kvp.Key.Enabled = kvp.Value;
-							if (kvp.Value)
-								Properties.Settings.Default.EnabledAssemblers.Add(kvp.Key.Name);
-						}
-
-						Properties.Settings.Default.EnabledMiners.Clear();
-						foreach (KeyValuePair<Miner, bool> kvp in form.CurrentOptions.Miners)
-						{
-							kvp.Key.Enabled = kvp.Value;
-							if (kvp.Value)
-								Properties.Settings.Default.EnabledMiners.Add(kvp.Key.Name);
-						}
-
-						Properties.Settings.Default.EnabledModules.Clear();
-						foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
-						{
-							kvp.Key.Enabled = kvp.Value;
-							if (kvp.Value)
-								Properties.Settings.Default.EnabledModules.Add(kvp.Key.Name);
-						}
+						Properties.Settings.Default.UseSaveFileData = form.CurrentOptions.UseSaveFileData;
 
 						Properties.Settings.Default.EnabledMods.Clear();
 						foreach (KeyValuePair<Mod, bool> kvp in form.CurrentOptions.Mods)
@@ -590,15 +614,13 @@ namespace Foreman
             AssemblerDisplayCheckBox.Checked = GraphViewer.ShowAssemblers;
 			MinerDisplayCheckBox.Checked = GraphViewer.ShowMiners;
 
+			ItemListRequiresUpdate = true;
+			RecipeListRequiresUpdate = true;
+			LoadEDLists();
+			LoadRecipeList(); //must be loaded prior to item list in order to update the recipes' "HasValidAssemblers" value (which is used in item list population)
 			LoadItemList();
-			LoadRecipeList();
 
 			GraphViewer.Invalidate();
-		}
-
-		private void ArrangeNodesButton_Click(object sender, EventArgs e)
-		{
-			GraphViewer.PositionNodes();
 		}
 
 		private void RecipeFilterTextBox_TextChanged(object sender, EventArgs e)
@@ -648,6 +670,7 @@ namespace Foreman
 		private void RecipeListView_ItemChecked(object sender, ItemCheckedEventArgs e)
 		{
 			((Recipe)e.Item.Tag).Enabled = e.Item.Checked;
+			ItemListRequiresUpdate = true;
 			GraphViewer.Invalidate();
 		}
 
@@ -781,6 +804,182 @@ namespace Foreman
 			GraphViewer.AlignSelected();
         }
 
+        private void ListTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			if (ListTabControl.SelectedIndex == 0) //the item tab
+				LoadItemList();
+			else if(ListTabControl.SelectedIndex == 1) //the recipes tab
+				LoadRecipeList();
+			GraphViewer.Invalidate();
+		}
+
+        private void ListTabControl_KeyDown(object sender, KeyEventArgs e)
+        {
+			if (ListTabControl.SelectedIndex == 1) //recipes tab
+				if (e.KeyCode == Keys.A && (e.Modifiers & Keys.Control) != 0)
+					foreach (ListViewItem item in RecipeListView.Items)
+						item.Selected = true;
+        }
+
+        private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+			if (!AssemblerSelectionBoxItemUpdating)
+			{
+				Assembler assembler = (Assembler)AssemblerSelectionBox.Items[e.Index];
+				assembler.Enabled = (e.NewValue == CheckState.Checked);
+				if (assembler.Enabled)
+					Properties.Settings.Default.EnabledAssemblers.Add(assembler.Name);
+				else
+					Properties.Settings.Default.EnabledAssemblers.Remove(assembler.Name);
+				Properties.Settings.Default.Save();
+				RecipeListRequiresUpdate = true;
+				ItemListRequiresUpdate = true;
+			}
+			DataCache.CheckRecipesAssemblerStatus();
+			GraphViewer.Invalidate();
+		}
+
+		private void AssemblerSelectionBoxAllButton_Click(object sender, EventArgs e)
+        {
+			AssemblerSelectionBoxItemUpdating = true;
+			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+				AssemblerSelectionBox.SetItemChecked(i, true);
+			Properties.Settings.Default.EnabledAssemblers.Clear();
+			foreach(Assembler assembler in DataCache.Assemblers.Values)
+            {
+				assembler.Enabled = true;
+				Properties.Settings.Default.EnabledAssemblers.Add(assembler.Name);
+            }
+			Properties.Settings.Default.Save();
+			DataCache.CheckRecipesAssemblerStatus();
+			GraphViewer.Invalidate();
+
+			RecipeListRequiresUpdate = true;
+			ItemListRequiresUpdate = true;
+			AssemblerSelectionBoxItemUpdating = false;
+		}
+
+		private void AssemblerSelectionBoxNoneButton_Click(object sender, EventArgs e)
+        {
+			AssemblerSelectionBoxItemUpdating = true;
+			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+				AssemblerSelectionBox.SetItemChecked(i, false);
+			Properties.Settings.Default.EnabledAssemblers.Clear();
+			foreach (Assembler assembler in DataCache.Assemblers.Values)
+			{
+				assembler.Enabled = false;
+			}
+			Properties.Settings.Default.Save();
+			DataCache.CheckRecipesAssemblerStatus();
+			GraphViewer.Invalidate();
+
+			RecipeListRequiresUpdate = true;
+			ItemListRequiresUpdate = true;
+			AssemblerSelectionBoxItemUpdating = false;
+		}
+
+		private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+			if (!MinerSelectionBoxItemUpdating)
+			{
+				Miner miner = (Miner)MinerSelectionBox.Items[e.Index];
+				miner.Enabled = (e.NewValue == CheckState.Checked);
+				if (miner.Enabled)
+					Properties.Settings.Default.EnabledMiners.Add(miner.Name);
+				else
+					Properties.Settings.Default.EnabledMiners.Remove(miner.Name);
+				Properties.Settings.Default.Save();
+				DataCache.CheckRecipesAssemblerStatus();
+				GraphViewer.Invalidate();
+
+				RecipeListRequiresUpdate = true;
+				ItemListRequiresUpdate = true;
+			}
+		}
+
+        private void MinerSelectionBoxAllButton_Click(object sender, EventArgs e)
+        {
+			MinerSelectionBoxItemUpdating = true;
+			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+				MinerSelectionBox.SetItemChecked(i, true);
+			Properties.Settings.Default.EnabledMiners.Clear();
+			foreach (Miner miner in DataCache.Miners.Values)
+			{
+				miner.Enabled = true;
+				Properties.Settings.Default.EnabledMiners.Add(miner.Name);
+			}
+			Properties.Settings.Default.Save();
+			DataCache.CheckRecipesAssemblerStatus();
+			GraphViewer.Invalidate();
+
+			RecipeListRequiresUpdate = true;
+			ItemListRequiresUpdate = true;
+			MinerSelectionBoxItemUpdating = false;
+		}
+
+		private void MinerSelectionBoxNoneButton_Click(object sender, EventArgs e)
+        {
+			MinerSelectionBoxItemUpdating = true;
+			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+				MinerSelectionBox.SetItemChecked(i, false);
+			Properties.Settings.Default.EnabledMiners.Clear();
+			foreach (Miner miner in DataCache.Miners.Values)
+			{
+				miner.Enabled = false;
+			}
+			Properties.Settings.Default.Save();
+			DataCache.CheckRecipesAssemblerStatus();
+			GraphViewer.Invalidate();
+
+			RecipeListRequiresUpdate = true;
+			ItemListRequiresUpdate = true;
+			MinerSelectionBoxItemUpdating = false;
+		}
+
+		private void ModuleSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+			if (!ModuleSelectionBoxItemUpdating)
+			{
+				Module module = (Module)ModuleSelectionBox.Items[e.Index];
+				module.Enabled = (e.NewValue == CheckState.Checked);
+				if (module.Enabled)
+					Properties.Settings.Default.EnabledModules.Add(module.Name);
+				else
+					Properties.Settings.Default.EnabledModules.Remove(module.Name);
+				Properties.Settings.Default.Save();
+			}
+		}
+
+        private void ModuleSelectionBoxAllButton_Click(object sender, EventArgs e)
+        {
+			ModuleSelectionBoxItemUpdating = true;
+			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+				ModuleSelectionBox.SetItemChecked(i, true);
+			Properties.Settings.Default.EnabledModules.Clear();
+			foreach (Module module in DataCache.Modules.Values)
+			{
+				module.Enabled = true;
+				Properties.Settings.Default.EnabledModules.Add(module.Name);
+			}
+			Properties.Settings.Default.Save();
+			ModuleSelectionBoxItemUpdating = false;
+		}
+
+        private void ModuleSelectionBoxNoneButton_Click(object sender, EventArgs e)
+        {
+			ModuleSelectionBoxItemUpdating = true;
+			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+				ModuleSelectionBox.SetItemChecked(i, false);
+			Properties.Settings.Default.EnabledModules.Clear();
+			foreach (Module module in DataCache.Modules.Values)
+			{
+				module.Enabled = false;
+			}
+			Properties.Settings.Default.Save();
+			ModuleSelectionBoxItemUpdating = false;
+		}
+
+
 		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
 		{
 			if (System.Windows.Forms.SystemInformation.TerminalServerSession)
@@ -800,18 +999,5 @@ namespace Foreman
 				return cp;
 			}
 		}
-
-        private void ListTabControl_SelectedIndexChanged(object sender, EventArgs e)
-        {
-			if (ListTabControl.SelectedIndex == 0) //the item tab
-				LoadItemList();
-		}
-
-        private void ListTabControl_KeyDown(object sender, KeyEventArgs e)
-        {
-			if (e.KeyCode == Keys.A && (e.Modifiers & Keys.Control) != 0)
-				foreach (ListViewItem item in RecipeListView.Items)
-					item.Selected = true;
-        }
-    }
+	}
 }

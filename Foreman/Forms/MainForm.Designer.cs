@@ -56,6 +56,7 @@
             this.ModuleDropDown = new System.Windows.Forms.ComboBox();
             this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
             this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
+            this.GraphViewer = new Foreman.ProductionGraphViewer();
             this.ListTabControl = new System.Windows.Forms.TabControl();
             this.ItemTabPage = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -71,7 +72,26 @@
             this.RecipeListView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RecipeImageList = new System.Windows.Forms.ImageList(this.components);
-            this.GraphViewer = new Foreman.ProductionGraphViewer();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel10 = new System.Windows.Forms.TableLayoutPanel();
+            this.ModuleSelectionBoxAllButton = new System.Windows.Forms.Button();
+            this.ModuleSelectionBoxNoneButton = new System.Windows.Forms.Button();
+            this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
+            this.MinerSelectionBoxAllButton = new System.Windows.Forms.Button();
+            this.MinerSelectionBoxNoneButton = new System.Windows.Forms.Button();
+            this.MinerSelectionBox = new System.Windows.Forms.CheckedListBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.AssemblerSelectionBoxAllButton = new System.Windows.Forms.Button();
+            this.AssemblerSelectionBoxNoneButton = new System.Windows.Forms.Button();
+            this.AssemblerSelectionBox = new System.Windows.Forms.CheckedListBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.MainToolbar.SuspendLayout();
             this.flowLayoutPanel3.SuspendLayout();
@@ -84,6 +104,17 @@
             this.tableLayoutPanel2.SuspendLayout();
             this.RecipeTabPage.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            this.groupBox6.SuspendLayout();
+            this.tableLayoutPanel9.SuspendLayout();
+            this.tableLayoutPanel10.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            this.tableLayoutPanel7.SuspendLayout();
+            this.tableLayoutPanel8.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.tableLayoutPanel6.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -101,7 +132,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1182, 753);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(982, 553);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // MainToolbar
@@ -117,7 +148,7 @@
             this.MainToolbar.Location = new System.Drawing.Point(4, 4);
             this.MainToolbar.Margin = new System.Windows.Forms.Padding(4);
             this.MainToolbar.Name = "MainToolbar";
-            this.MainToolbar.Size = new System.Drawing.Size(1174, 128);
+            this.MainToolbar.Size = new System.Drawing.Size(974, 128);
             this.MainToolbar.TabIndex = 2;
             // 
             // flowLayoutPanel3
@@ -454,17 +485,33 @@
             this.MinerDisplayCheckBox.UseVisualStyleBackColor = true;
             this.MinerDisplayCheckBox.CheckedChanged += new System.EventHandler(this.MinerDisplayCheckBox_CheckedChanged);
             // 
+            // GraphViewer
+            // 
+            this.GraphViewer.AllowDrop = true;
+            this.GraphViewer.BackColor = System.Drawing.Color.White;
+            this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GraphViewer.Location = new System.Drawing.Point(285, 141);
+            this.GraphViewer.Margin = new System.Windows.Forms.Padding(5);
+            this.GraphViewer.MouseDownElement = null;
+            this.GraphViewer.Name = "GraphViewer";
+            this.GraphViewer.Size = new System.Drawing.Size(692, 407);
+            this.GraphViewer.TabIndex = 12;
+            this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
+            // 
             // ListTabControl
             // 
             this.ListTabControl.Controls.Add(this.ItemTabPage);
             this.ListTabControl.Controls.Add(this.RecipeTabPage);
+            this.ListTabControl.Controls.Add(this.tabPage1);
             this.ListTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ListTabControl.ItemSize = new System.Drawing.Size(80, 21);
             this.ListTabControl.Location = new System.Drawing.Point(0, 136);
             this.ListTabControl.Margin = new System.Windows.Forms.Padding(0);
             this.ListTabControl.Name = "ListTabControl";
             this.ListTabControl.Padding = new System.Drawing.Point(0, 0);
             this.ListTabControl.SelectedIndex = 0;
-            this.ListTabControl.Size = new System.Drawing.Size(280, 617);
+            this.ListTabControl.Size = new System.Drawing.Size(280, 417);
             this.ListTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.ListTabControl.TabIndex = 17;
             this.ListTabControl.SelectedIndexChanged += new System.EventHandler(this.ListTabControl_SelectedIndexChanged);
@@ -476,7 +523,7 @@
             this.ItemTabPage.Location = new System.Drawing.Point(4, 25);
             this.ItemTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.ItemTabPage.Name = "ItemTabPage";
-            this.ItemTabPage.Size = new System.Drawing.Size(272, 588);
+            this.ItemTabPage.Size = new System.Drawing.Size(272, 388);
             this.ItemTabPage.TabIndex = 0;
             this.ItemTabPage.Text = "Items";
             this.ItemTabPage.UseVisualStyleBackColor = true;
@@ -496,7 +543,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(272, 588);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(272, 388);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // ItemFilterTextBox
@@ -513,7 +560,7 @@
             // AddItemButton
             // 
             this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddItemButton.Location = new System.Drawing.Point(4, 553);
+            this.AddItemButton.Location = new System.Drawing.Point(4, 353);
             this.AddItemButton.Margin = new System.Windows.Forms.Padding(4);
             this.AddItemButton.Name = "AddItemButton";
             this.AddItemButton.Size = new System.Drawing.Size(264, 31);
@@ -536,7 +583,7 @@
             this.ItemListView.Margin = new System.Windows.Forms.Padding(4);
             this.ItemListView.MultiSelect = false;
             this.ItemListView.Name = "ItemListView";
-            this.ItemListView.Size = new System.Drawing.Size(264, 511);
+            this.ItemListView.Size = new System.Drawing.Size(264, 311);
             this.ItemListView.SmallImageList = this.ItemImageList;
             this.ItemListView.TabIndex = 15;
             this.ItemListView.UseCompatibleStateImageBehavior = false;
@@ -562,7 +609,7 @@
             this.RecipeTabPage.Location = new System.Drawing.Point(4, 25);
             this.RecipeTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.RecipeTabPage.Name = "RecipeTabPage";
-            this.RecipeTabPage.Size = new System.Drawing.Size(272, 588);
+            this.RecipeTabPage.Size = new System.Drawing.Size(272, 388);
             this.RecipeTabPage.TabIndex = 1;
             this.RecipeTabPage.Text = "Recipes";
             this.RecipeTabPage.UseVisualStyleBackColor = true;
@@ -584,7 +631,7 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(272, 588);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(272, 388);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // RecipeFilterTextBox
@@ -601,7 +648,7 @@
             // AddRecipeButton
             // 
             this.AddRecipeButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddRecipeButton.Location = new System.Drawing.Point(4, 553);
+            this.AddRecipeButton.Location = new System.Drawing.Point(4, 353);
             this.AddRecipeButton.Margin = new System.Windows.Forms.Padding(4);
             this.AddRecipeButton.Name = "AddRecipeButton";
             this.AddRecipeButton.Size = new System.Drawing.Size(264, 31);
@@ -624,7 +671,7 @@
             this.RecipeListView.Location = new System.Drawing.Point(4, 34);
             this.RecipeListView.Margin = new System.Windows.Forms.Padding(4);
             this.RecipeListView.Name = "RecipeListView";
-            this.RecipeListView.Size = new System.Drawing.Size(264, 511);
+            this.RecipeListView.Size = new System.Drawing.Size(264, 311);
             this.RecipeListView.SmallImageList = this.RecipeImageList;
             this.RecipeListView.TabIndex = 15;
             this.RecipeListView.UseCompatibleStateImageBehavior = false;
@@ -644,33 +691,278 @@
             this.RecipeImageList.ImageSize = new System.Drawing.Size(32, 32);
             this.RecipeImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
-            // GraphViewer
+            // tabPage1
             // 
-            this.GraphViewer.AllowDrop = true;
-            this.GraphViewer.BackColor = System.Drawing.Color.White;
-            this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GraphViewer.Location = new System.Drawing.Point(285, 141);
-            this.GraphViewer.Margin = new System.Windows.Forms.Padding(5);
-            this.GraphViewer.MouseDownElement = null;
-            this.GraphViewer.Name = "GraphViewer";
-            this.GraphViewer.Size = new System.Drawing.Size(892, 607);
-            this.GraphViewer.TabIndex = 12;
-            this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
+            this.tabPage1.Controls.Add(this.tableLayoutPanel4);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(272, 388);
+            this.tabPage1.TabIndex = 2;
+            this.tabPage1.Text = "Other";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 1;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.groupBox6, 0, 2);
+            this.tableLayoutPanel4.Controls.Add(this.groupBox4, 0, 1);
+            this.tableLayoutPanel4.Controls.Add(this.groupBox3, 0, 0);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 3;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(272, 388);
+            this.tableLayoutPanel4.TabIndex = 0;
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.tableLayoutPanel9);
+            this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox6.Location = new System.Drawing.Point(3, 261);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(266, 124);
+            this.groupBox6.TabIndex = 2;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Modules";
+            // 
+            // tableLayoutPanel9
+            // 
+            this.tableLayoutPanel9.ColumnCount = 1;
+            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel9.Controls.Add(this.tableLayoutPanel10, 0, 1);
+            this.tableLayoutPanel9.Controls.Add(this.ModuleSelectionBox, 0, 0);
+            this.tableLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel9.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel9.Name = "tableLayoutPanel9";
+            this.tableLayoutPanel9.RowCount = 2;
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel9.Size = new System.Drawing.Size(260, 103);
+            this.tableLayoutPanel9.TabIndex = 0;
+            // 
+            // tableLayoutPanel10
+            // 
+            this.tableLayoutPanel10.ColumnCount = 2;
+            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel10.Controls.Add(this.ModuleSelectionBoxAllButton, 0, 0);
+            this.tableLayoutPanel10.Controls.Add(this.ModuleSelectionBoxNoneButton, 1, 0);
+            this.tableLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel10.Location = new System.Drawing.Point(3, 72);
+            this.tableLayoutPanel10.Name = "tableLayoutPanel10";
+            this.tableLayoutPanel10.RowCount = 1;
+            this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel10.Size = new System.Drawing.Size(254, 28);
+            this.tableLayoutPanel10.TabIndex = 3;
+            // 
+            // ModuleSelectionBoxAllButton
+            // 
+            this.ModuleSelectionBoxAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ModuleSelectionBoxAllButton.Location = new System.Drawing.Point(3, 3);
+            this.ModuleSelectionBoxAllButton.Name = "ModuleSelectionBoxAllButton";
+            this.ModuleSelectionBoxAllButton.Size = new System.Drawing.Size(121, 24);
+            this.ModuleSelectionBoxAllButton.TabIndex = 0;
+            this.ModuleSelectionBoxAllButton.Text = "All";
+            this.ModuleSelectionBoxAllButton.UseVisualStyleBackColor = true;
+            this.ModuleSelectionBoxAllButton.Click += new System.EventHandler(this.ModuleSelectionBoxAllButton_Click);
+            // 
+            // ModuleSelectionBoxNoneButton
+            // 
+            this.ModuleSelectionBoxNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ModuleSelectionBoxNoneButton.Location = new System.Drawing.Point(130, 3);
+            this.ModuleSelectionBoxNoneButton.Name = "ModuleSelectionBoxNoneButton";
+            this.ModuleSelectionBoxNoneButton.Size = new System.Drawing.Size(121, 24);
+            this.ModuleSelectionBoxNoneButton.TabIndex = 1;
+            this.ModuleSelectionBoxNoneButton.Text = "None";
+            this.ModuleSelectionBoxNoneButton.UseVisualStyleBackColor = true;
+            this.ModuleSelectionBoxNoneButton.Click += new System.EventHandler(this.ModuleSelectionBoxNoneButton_Click);
+            // 
+            // ModuleSelectionBox
+            // 
+            this.ModuleSelectionBox.CheckOnClick = true;
+            this.ModuleSelectionBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ModuleSelectionBox.FormattingEnabled = true;
+            this.ModuleSelectionBox.Location = new System.Drawing.Point(7, 3);
+            this.ModuleSelectionBox.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.ModuleSelectionBox.Name = "ModuleSelectionBox";
+            this.ModuleSelectionBox.Size = new System.Drawing.Size(246, 63);
+            this.ModuleSelectionBox.Sorted = true;
+            this.ModuleSelectionBox.TabIndex = 4;
+            this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.tableLayoutPanel7);
+            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox4.Location = new System.Drawing.Point(3, 132);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(266, 123);
+            this.groupBox4.TabIndex = 1;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Miners / Pumpjacks";
+            // 
+            // tableLayoutPanel7
+            // 
+            this.tableLayoutPanel7.ColumnCount = 1;
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel7.Controls.Add(this.tableLayoutPanel8, 0, 1);
+            this.tableLayoutPanel7.Controls.Add(this.MinerSelectionBox, 0, 0);
+            this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel7.Name = "tableLayoutPanel7";
+            this.tableLayoutPanel7.RowCount = 2;
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(260, 102);
+            this.tableLayoutPanel7.TabIndex = 0;
+            // 
+            // tableLayoutPanel8
+            // 
+            this.tableLayoutPanel8.ColumnCount = 2;
+            this.tableLayoutPanel8.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel8.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel8.Controls.Add(this.MinerSelectionBoxAllButton, 0, 0);
+            this.tableLayoutPanel8.Controls.Add(this.MinerSelectionBoxNoneButton, 1, 0);
+            this.tableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel8.Location = new System.Drawing.Point(3, 71);
+            this.tableLayoutPanel8.Name = "tableLayoutPanel8";
+            this.tableLayoutPanel8.RowCount = 1;
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel8.Size = new System.Drawing.Size(254, 28);
+            this.tableLayoutPanel8.TabIndex = 3;
+            // 
+            // MinerSelectionBoxAllButton
+            // 
+            this.MinerSelectionBoxAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MinerSelectionBoxAllButton.Location = new System.Drawing.Point(3, 3);
+            this.MinerSelectionBoxAllButton.Name = "MinerSelectionBoxAllButton";
+            this.MinerSelectionBoxAllButton.Size = new System.Drawing.Size(121, 24);
+            this.MinerSelectionBoxAllButton.TabIndex = 0;
+            this.MinerSelectionBoxAllButton.Text = "All";
+            this.MinerSelectionBoxAllButton.UseVisualStyleBackColor = true;
+            this.MinerSelectionBoxAllButton.Click += new System.EventHandler(this.MinerSelectionBoxAllButton_Click);
+            // 
+            // MinerSelectionBoxNoneButton
+            // 
+            this.MinerSelectionBoxNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MinerSelectionBoxNoneButton.Location = new System.Drawing.Point(130, 3);
+            this.MinerSelectionBoxNoneButton.Name = "MinerSelectionBoxNoneButton";
+            this.MinerSelectionBoxNoneButton.Size = new System.Drawing.Size(121, 24);
+            this.MinerSelectionBoxNoneButton.TabIndex = 1;
+            this.MinerSelectionBoxNoneButton.Text = "None";
+            this.MinerSelectionBoxNoneButton.UseVisualStyleBackColor = true;
+            this.MinerSelectionBoxNoneButton.Click += new System.EventHandler(this.MinerSelectionBoxNoneButton_Click);
+            // 
+            // MinerSelectionBox
+            // 
+            this.MinerSelectionBox.CheckOnClick = true;
+            this.MinerSelectionBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MinerSelectionBox.FormattingEnabled = true;
+            this.MinerSelectionBox.Location = new System.Drawing.Point(7, 3);
+            this.MinerSelectionBox.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.MinerSelectionBox.Name = "MinerSelectionBox";
+            this.MinerSelectionBox.Size = new System.Drawing.Size(246, 62);
+            this.MinerSelectionBox.Sorted = true;
+            this.MinerSelectionBox.TabIndex = 4;
+            this.MinerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.MinerSelectionBox_ItemCheck);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.tableLayoutPanel6);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox3.Location = new System.Drawing.Point(3, 3);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(266, 123);
+            this.groupBox3.TabIndex = 0;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Assemblers / Smelters:";
+            // 
+            // tableLayoutPanel6
+            // 
+            this.tableLayoutPanel6.ColumnCount = 1;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.Controls.Add(this.tableLayoutPanel5, 0, 1);
+            this.tableLayoutPanel6.Controls.Add(this.AssemblerSelectionBox, 0, 0);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 2;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(260, 102);
+            this.tableLayoutPanel6.TabIndex = 0;
+            // 
+            // tableLayoutPanel5
+            // 
+            this.tableLayoutPanel5.ColumnCount = 2;
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel5.Controls.Add(this.AssemblerSelectionBoxAllButton, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.AssemblerSelectionBoxNoneButton, 1, 0);
+            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 71);
+            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            this.tableLayoutPanel5.RowCount = 1;
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(254, 28);
+            this.tableLayoutPanel5.TabIndex = 3;
+            // 
+            // AssemblerSelectionBoxAllButton
+            // 
+            this.AssemblerSelectionBoxAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AssemblerSelectionBoxAllButton.Location = new System.Drawing.Point(3, 3);
+            this.AssemblerSelectionBoxAllButton.Name = "AssemblerSelectionBoxAllButton";
+            this.AssemblerSelectionBoxAllButton.Size = new System.Drawing.Size(121, 24);
+            this.AssemblerSelectionBoxAllButton.TabIndex = 0;
+            this.AssemblerSelectionBoxAllButton.Text = "All";
+            this.AssemblerSelectionBoxAllButton.UseVisualStyleBackColor = true;
+            this.AssemblerSelectionBoxAllButton.Click += new System.EventHandler(this.AssemblerSelectionBoxAllButton_Click);
+            // 
+            // AssemblerSelectionBoxNoneButton
+            // 
+            this.AssemblerSelectionBoxNoneButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AssemblerSelectionBoxNoneButton.Location = new System.Drawing.Point(130, 3);
+            this.AssemblerSelectionBoxNoneButton.Name = "AssemblerSelectionBoxNoneButton";
+            this.AssemblerSelectionBoxNoneButton.Size = new System.Drawing.Size(121, 24);
+            this.AssemblerSelectionBoxNoneButton.TabIndex = 1;
+            this.AssemblerSelectionBoxNoneButton.Text = "None";
+            this.AssemblerSelectionBoxNoneButton.UseVisualStyleBackColor = true;
+            this.AssemblerSelectionBoxNoneButton.Click += new System.EventHandler(this.AssemblerSelectionBoxNoneButton_Click);
+            // 
+            // AssemblerSelectionBox
+            // 
+            this.AssemblerSelectionBox.CheckOnClick = true;
+            this.AssemblerSelectionBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AssemblerSelectionBox.FormattingEnabled = true;
+            this.AssemblerSelectionBox.Location = new System.Drawing.Point(7, 3);
+            this.AssemblerSelectionBox.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.AssemblerSelectionBox.Name = "AssemblerSelectionBox";
+            this.AssemblerSelectionBox.Size = new System.Drawing.Size(246, 62);
+            this.AssemblerSelectionBox.Sorted = true;
+            this.AssemblerSelectionBox.TabIndex = 4;
+            this.AssemblerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AssemblerSelectionBox_ItemCheck);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1182, 753);
+            this.ClientSize = new System.Drawing.Size(982, 553);
             this.Controls.Add(this.tableLayoutPanel1);
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Foreman";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.MainToolbar.ResumeLayout(false);
@@ -690,6 +982,17 @@
             this.RecipeTabPage.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.groupBox6.ResumeLayout(false);
+            this.tableLayoutPanel9.ResumeLayout(false);
+            this.tableLayoutPanel10.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.tableLayoutPanel7.ResumeLayout(false);
+            this.tableLayoutPanel8.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.tableLayoutPanel6.ResumeLayout(false);
+            this.tableLayoutPanel5.ResumeLayout(false);
             this.ResumeLayout(false);
 
 		}
@@ -739,6 +1042,26 @@
         private System.Windows.Forms.ListView RecipeListView;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.Button AddItemButton;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
+        private System.Windows.Forms.Button AssemblerSelectionBoxAllButton;
+        private System.Windows.Forms.Button AssemblerSelectionBoxNoneButton;
+        private System.Windows.Forms.CheckedListBox AssemblerSelectionBox;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel10;
+        private System.Windows.Forms.Button ModuleSelectionBoxAllButton;
+        private System.Windows.Forms.Button ModuleSelectionBoxNoneButton;
+        private System.Windows.Forms.CheckedListBox ModuleSelectionBox;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel8;
+        private System.Windows.Forms.Button MinerSelectionBoxAllButton;
+        private System.Windows.Forms.Button MinerSelectionBoxNoneButton;
+        private System.Windows.Forms.CheckedListBox MinerSelectionBox;
     }
 }
 

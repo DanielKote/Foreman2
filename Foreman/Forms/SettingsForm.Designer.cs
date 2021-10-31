@@ -28,23 +28,6 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.ModsGroupBox = new System.Windows.Forms.GroupBox();
-            this.ModSelectionNoneButton = new System.Windows.Forms.Button();
-            this.ModSelectionAllButton = new System.Windows.Forms.Button();
-            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
-            this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.ModuleSelectionNoneButton = new System.Windows.Forms.Button();
-            this.ModuleSelectionAllButton = new System.Windows.Forms.Button();
-            this.ModuleSelectionBox = new System.Windows.Forms.CheckedListBox();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.MinerSelectionNoneButton = new System.Windows.Forms.Button();
-            this.MinerSelectionAllButton = new System.Windows.Forms.Button();
-            this.MinerSelectionBox = new System.Windows.Forms.CheckedListBox();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.AssemblerSelectionNoneButton = new System.Windows.Forms.Button();
-            this.AssemblerSelectionAllButton = new System.Windows.Forms.Button();
-            this.AssemblerSelectionBox = new System.Windows.Forms.CheckedListBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.IgnoreUserDataLocationCheckBox = new System.Windows.Forms.CheckBox();
@@ -56,6 +39,7 @@
             this.ConfirmButton = new System.Windows.Forms.Button();
             this.CancelSettingsButton = new System.Windows.Forms.Button();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.UseSaveFileDataCheckBox = new System.Windows.Forms.CheckBox();
             this.UseForemanModRadioButton = new System.Windows.Forms.RadioButton();
             this.UseFactorioBaseRadioButton = new System.Windows.Forms.RadioButton();
             this.UseFactorioBaseOptionsGroup = new System.Windows.Forms.GroupBox();
@@ -65,11 +49,10 @@
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.LanguageDropDown = new System.Windows.Forms.ComboBox();
             this.ReloadButton = new System.Windows.Forms.Button();
-            this.ModsGroupBox.SuspendLayout();
-            this.groupBox7.SuspendLayout();
-            this.groupBox6.SuspendLayout();
-            this.groupBox5.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.ModsGroupBox = new System.Windows.Forms.GroupBox();
+            this.ModSelectionNoneButton = new System.Windows.Forms.Button();
+            this.ModSelectionAllButton = new System.Windows.Forms.Button();
+            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
             this.groupBox3.SuspendLayout();
             this.groupBox9.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -77,209 +60,8 @@
             this.UseFactorioBaseOptionsGroup.SuspendLayout();
             this.groupBox14.SuspendLayout();
             this.groupBox13.SuspendLayout();
+            this.ModsGroupBox.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // ModsGroupBox
-            // 
-            this.ModsGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ModsGroupBox.Controls.Add(this.ModSelectionNoneButton);
-            this.ModsGroupBox.Controls.Add(this.ModSelectionAllButton);
-            this.ModsGroupBox.Controls.Add(this.ModSelectionBox);
-            this.ModsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.ModsGroupBox.Location = new System.Drawing.Point(274, 21);
-            this.ModsGroupBox.Margin = new System.Windows.Forms.Padding(4);
-            this.ModsGroupBox.Name = "ModsGroupBox";
-            this.ModsGroupBox.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.ModsGroupBox.Size = new System.Drawing.Size(257, 566);
-            this.ModsGroupBox.TabIndex = 13;
-            this.ModsGroupBox.TabStop = false;
-            this.ModsGroupBox.Text = "Mods";
-            // 
-            // ModSelectionNoneButton
-            // 
-            this.ModSelectionNoneButton.Location = new System.Drawing.Point(134, 534);
-            this.ModSelectionNoneButton.Name = "ModSelectionNoneButton";
-            this.ModSelectionNoneButton.Size = new System.Drawing.Size(115, 22);
-            this.ModSelectionNoneButton.TabIndex = 12;
-            this.ModSelectionNoneButton.Text = "None";
-            this.ModSelectionNoneButton.UseVisualStyleBackColor = true;
-            this.ModSelectionNoneButton.Click += new System.EventHandler(this.ModSelectionNoneButton_Click);
-            // 
-            // ModSelectionAllButton
-            // 
-            this.ModSelectionAllButton.Location = new System.Drawing.Point(8, 534);
-            this.ModSelectionAllButton.Name = "ModSelectionAllButton";
-            this.ModSelectionAllButton.Size = new System.Drawing.Size(115, 22);
-            this.ModSelectionAllButton.TabIndex = 11;
-            this.ModSelectionAllButton.Text = "All";
-            this.ModSelectionAllButton.UseVisualStyleBackColor = true;
-            this.ModSelectionAllButton.Click += new System.EventHandler(this.ModSelectionAllButton_Click);
-            // 
-            // ModSelectionBox
-            // 
-            this.ModSelectionBox.CheckOnClick = true;
-            this.ModSelectionBox.FormattingEnabled = true;
-            this.ModSelectionBox.Location = new System.Drawing.Point(9, 19);
-            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.ModSelectionBox.Name = "ModSelectionBox";
-            this.ModSelectionBox.Size = new System.Drawing.Size(240, 514);
-            this.ModSelectionBox.TabIndex = 10;
-            this.ModSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModSelectionBox_ItemCheck);
-            // 
-            // groupBox7
-            // 
-            this.groupBox7.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.groupBox7.Controls.Add(this.ModuleSelectionNoneButton);
-            this.groupBox7.Controls.Add(this.ModuleSelectionAllButton);
-            this.groupBox7.Controls.Add(this.ModuleSelectionBox);
-            this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.groupBox7.Location = new System.Drawing.Point(8, 403);
-            this.groupBox7.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.groupBox7.Size = new System.Drawing.Size(259, 183);
-            this.groupBox7.TabIndex = 14;
-            this.groupBox7.TabStop = false;
-            this.groupBox7.Text = "Modules";
-            // 
-            // ModuleSelectionNoneButton
-            // 
-            this.ModuleSelectionNoneButton.Location = new System.Drawing.Point(134, 152);
-            this.ModuleSelectionNoneButton.Name = "ModuleSelectionNoneButton";
-            this.ModuleSelectionNoneButton.Size = new System.Drawing.Size(115, 22);
-            this.ModuleSelectionNoneButton.TabIndex = 9;
-            this.ModuleSelectionNoneButton.Text = "None";
-            this.ModuleSelectionNoneButton.UseVisualStyleBackColor = true;
-            this.ModuleSelectionNoneButton.Click += new System.EventHandler(this.ModuleSelectionNoneButton_Click);
-            // 
-            // ModuleSelectionAllButton
-            // 
-            this.ModuleSelectionAllButton.Location = new System.Drawing.Point(7, 152);
-            this.ModuleSelectionAllButton.Name = "ModuleSelectionAllButton";
-            this.ModuleSelectionAllButton.Size = new System.Drawing.Size(115, 22);
-            this.ModuleSelectionAllButton.TabIndex = 8;
-            this.ModuleSelectionAllButton.Text = "All";
-            this.ModuleSelectionAllButton.UseVisualStyleBackColor = true;
-            this.ModuleSelectionAllButton.Click += new System.EventHandler(this.ModuleSelectionAllButton_Click);
-            // 
-            // ModuleSelectionBox
-            // 
-            this.ModuleSelectionBox.CheckOnClick = true;
-            this.ModuleSelectionBox.FormattingEnabled = true;
-            this.ModuleSelectionBox.Location = new System.Drawing.Point(8, 28);
-            this.ModuleSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.ModuleSelectionBox.Name = "ModuleSelectionBox";
-            this.ModuleSelectionBox.Size = new System.Drawing.Size(240, 123);
-            this.ModuleSelectionBox.TabIndex = 7;
-            this.ModuleSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleSelectionBox_ItemCheck);
-            // 
-            // groupBox6
-            // 
-            this.groupBox6.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.groupBox6.Controls.Add(this.MinerSelectionNoneButton);
-            this.groupBox6.Controls.Add(this.MinerSelectionAllButton);
-            this.groupBox6.Controls.Add(this.MinerSelectionBox);
-            this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.groupBox6.Location = new System.Drawing.Point(8, 212);
-            this.groupBox6.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.groupBox6.Size = new System.Drawing.Size(259, 183);
-            this.groupBox6.TabIndex = 13;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "Miners/Pumpjacks";
-            // 
-            // MinerSelectionNoneButton
-            // 
-            this.MinerSelectionNoneButton.Location = new System.Drawing.Point(133, 152);
-            this.MinerSelectionNoneButton.Name = "MinerSelectionNoneButton";
-            this.MinerSelectionNoneButton.Size = new System.Drawing.Size(115, 22);
-            this.MinerSelectionNoneButton.TabIndex = 6;
-            this.MinerSelectionNoneButton.Text = "None";
-            this.MinerSelectionNoneButton.UseVisualStyleBackColor = true;
-            this.MinerSelectionNoneButton.Click += new System.EventHandler(this.MinerSelectionNoneButton_Click);
-            // 
-            // MinerSelectionAllButton
-            // 
-            this.MinerSelectionAllButton.Location = new System.Drawing.Point(7, 152);
-            this.MinerSelectionAllButton.Name = "MinerSelectionAllButton";
-            this.MinerSelectionAllButton.Size = new System.Drawing.Size(115, 22);
-            this.MinerSelectionAllButton.TabIndex = 5;
-            this.MinerSelectionAllButton.Text = "All";
-            this.MinerSelectionAllButton.UseVisualStyleBackColor = true;
-            this.MinerSelectionAllButton.Click += new System.EventHandler(this.MinerSelectionAllButton_Click);
-            // 
-            // MinerSelectionBox
-            // 
-            this.MinerSelectionBox.CheckOnClick = true;
-            this.MinerSelectionBox.FormattingEnabled = true;
-            this.MinerSelectionBox.Location = new System.Drawing.Point(8, 28);
-            this.MinerSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.MinerSelectionBox.Name = "MinerSelectionBox";
-            this.MinerSelectionBox.Size = new System.Drawing.Size(240, 123);
-            this.MinerSelectionBox.TabIndex = 4;
-            this.MinerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.MinerSelectionBox_ItemCheck);
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.groupBox5.Controls.Add(this.AssemblerSelectionNoneButton);
-            this.groupBox5.Controls.Add(this.AssemblerSelectionAllButton);
-            this.groupBox5.Controls.Add(this.AssemblerSelectionBox);
-            this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.groupBox5.Location = new System.Drawing.Point(8, 22);
-            this.groupBox5.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.groupBox5.Size = new System.Drawing.Size(259, 182);
-            this.groupBox5.TabIndex = 12;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Assemblers/Smelters";
-            // 
-            // AssemblerSelectionNoneButton
-            // 
-            this.AssemblerSelectionNoneButton.Location = new System.Drawing.Point(133, 151);
-            this.AssemblerSelectionNoneButton.Name = "AssemblerSelectionNoneButton";
-            this.AssemblerSelectionNoneButton.Size = new System.Drawing.Size(115, 22);
-            this.AssemblerSelectionNoneButton.TabIndex = 3;
-            this.AssemblerSelectionNoneButton.Text = "None";
-            this.AssemblerSelectionNoneButton.UseVisualStyleBackColor = true;
-            this.AssemblerSelectionNoneButton.Click += new System.EventHandler(this.AssemblerSelectionNoneButton_Click);
-            // 
-            // AssemblerSelectionAllButton
-            // 
-            this.AssemblerSelectionAllButton.Location = new System.Drawing.Point(8, 151);
-            this.AssemblerSelectionAllButton.Name = "AssemblerSelectionAllButton";
-            this.AssemblerSelectionAllButton.Size = new System.Drawing.Size(115, 22);
-            this.AssemblerSelectionAllButton.TabIndex = 2;
-            this.AssemblerSelectionAllButton.Text = "All";
-            this.AssemblerSelectionAllButton.UseVisualStyleBackColor = true;
-            this.AssemblerSelectionAllButton.Click += new System.EventHandler(this.AssemblerSelectionAllButton_Click);
-            // 
-            // AssemblerSelectionBox
-            // 
-            this.AssemblerSelectionBox.CheckOnClick = true;
-            this.AssemblerSelectionBox.FormattingEnabled = true;
-            this.AssemblerSelectionBox.Location = new System.Drawing.Point(8, 27);
-            this.AssemblerSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.AssemblerSelectionBox.Name = "AssemblerSelectionBox";
-            this.AssemblerSelectionBox.Size = new System.Drawing.Size(240, 123);
-            this.AssemblerSelectionBox.TabIndex = 1;
-            this.AssemblerSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AssemblerSelectionBox_ItemCheck);
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.groupBox7);
-            this.groupBox2.Controls.Add(this.ModsGroupBox);
-            this.groupBox2.Controls.Add(this.groupBox6);
-            this.groupBox2.Controls.Add(this.groupBox5);
-            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.groupBox2.Location = new System.Drawing.Point(475, 2);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(539, 595);
-            this.groupBox2.TabIndex = 17;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Enable / Disable Loaded Objects";
             // 
             // groupBox3
             // 
@@ -367,9 +149,9 @@
             // 
             // ConfirmButton
             // 
-            this.ConfirmButton.Location = new System.Drawing.Point(12, 565);
+            this.ConfirmButton.Location = new System.Drawing.Point(230, 499);
             this.ConfirmButton.Name = "ConfirmButton";
-            this.ConfirmButton.Size = new System.Drawing.Size(261, 32);
+            this.ConfirmButton.Size = new System.Drawing.Size(500, 32);
             this.ConfirmButton.TabIndex = 25;
             this.ConfirmButton.Text = "Confirm";
             this.ConfirmButton.UseVisualStyleBackColor = true;
@@ -377,7 +159,7 @@
             // 
             // CancelSettingsButton
             // 
-            this.CancelSettingsButton.Location = new System.Drawing.Point(375, 565);
+            this.CancelSettingsButton.Location = new System.Drawing.Point(12, 499);
             this.CancelSettingsButton.Name = "CancelSettingsButton";
             this.CancelSettingsButton.Size = new System.Drawing.Size(90, 32);
             this.CancelSettingsButton.TabIndex = 26;
@@ -387,22 +169,35 @@
             // 
             // groupBox10
             // 
+            this.groupBox10.Controls.Add(this.UseSaveFileDataCheckBox);
             this.groupBox10.Controls.Add(this.UseForemanModRadioButton);
             this.groupBox10.Controls.Add(this.UseFactorioBaseRadioButton);
             this.groupBox10.Controls.Add(this.UseFactorioBaseOptionsGroup);
             this.groupBox10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.groupBox10.Location = new System.Drawing.Point(12, 204);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(453, 275);
+            this.groupBox10.Size = new System.Drawing.Size(453, 289);
             this.groupBox10.TabIndex = 19;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "Factorio Options:";
+            // 
+            // UseSaveFileDataCheckBox
+            // 
+            this.UseSaveFileDataCheckBox.AutoSize = true;
+            this.UseSaveFileDataCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.UseSaveFileDataCheckBox.Location = new System.Drawing.Point(17, 25);
+            this.UseSaveFileDataCheckBox.Name = "UseSaveFileDataCheckBox";
+            this.UseSaveFileDataCheckBox.Size = new System.Drawing.Size(248, 21);
+            this.UseSaveFileDataCheckBox.TabIndex = 20;
+            this.UseSaveFileDataCheckBox.Text = "Use Save-file data if available";
+            this.UseSaveFileDataCheckBox.UseVisualStyleBackColor = true;
+            this.UseSaveFileDataCheckBox.CheckedChanged += new System.EventHandler(this.UseSaveFileDataCheckBox_CheckedChanged);
             // 
             // UseForemanModRadioButton
             // 
             this.UseForemanModRadioButton.AutoSize = true;
             this.UseForemanModRadioButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.UseForemanModRadioButton.Location = new System.Drawing.Point(17, 35);
+            this.UseForemanModRadioButton.Location = new System.Drawing.Point(17, 79);
             this.UseForemanModRadioButton.Name = "UseForemanModRadioButton";
             this.UseForemanModRadioButton.Size = new System.Drawing.Size(426, 21);
             this.UseForemanModRadioButton.TabIndex = 19;
@@ -414,12 +209,12 @@
             // 
             this.UseFactorioBaseRadioButton.AutoSize = true;
             this.UseFactorioBaseRadioButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.UseFactorioBaseRadioButton.Location = new System.Drawing.Point(17, 68);
+            this.UseFactorioBaseRadioButton.Location = new System.Drawing.Point(17, 112);
             this.UseFactorioBaseRadioButton.Name = "UseFactorioBaseRadioButton";
-            this.UseFactorioBaseRadioButton.Size = new System.Drawing.Size(286, 21);
+            this.UseFactorioBaseRadioButton.Size = new System.Drawing.Size(352, 21);
             this.UseFactorioBaseRadioButton.TabIndex = 19;
             this.UseFactorioBaseRadioButton.TabStop = true;
-            this.UseFactorioBaseRadioButton.Text = "Auto generate objects from factorio base";
+            this.UseFactorioBaseRadioButton.Text = "Auto generate objects from factorio base LUA code";
             this.UseFactorioBaseRadioButton.UseVisualStyleBackColor = true;
             this.UseFactorioBaseRadioButton.CheckedChanged += new System.EventHandler(this.UseFactorioBaseRadioButton_CheckedChanged);
             // 
@@ -427,9 +222,9 @@
             // 
             this.UseFactorioBaseOptionsGroup.Controls.Add(this.groupBox14);
             this.UseFactorioBaseOptionsGroup.Controls.Add(this.groupBox13);
-            this.UseFactorioBaseOptionsGroup.Location = new System.Drawing.Point(10, 72);
+            this.UseFactorioBaseOptionsGroup.Location = new System.Drawing.Point(10, 116);
             this.UseFactorioBaseOptionsGroup.Name = "UseFactorioBaseOptionsGroup";
-            this.UseFactorioBaseOptionsGroup.Size = new System.Drawing.Size(434, 190);
+            this.UseFactorioBaseOptionsGroup.Size = new System.Drawing.Size(434, 162);
             this.UseFactorioBaseOptionsGroup.TabIndex = 2;
             this.UseFactorioBaseOptionsGroup.TabStop = false;
             // 
@@ -440,7 +235,7 @@
             this.groupBox14.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             this.groupBox14.Location = new System.Drawing.Point(10, 91);
             this.groupBox14.Name = "groupBox14";
-            this.groupBox14.Size = new System.Drawing.Size(415, 90);
+            this.groupBox14.Size = new System.Drawing.Size(415, 58);
             this.groupBox14.TabIndex = 2;
             this.groupBox14.TabStop = false;
             this.groupBox14.Text = "Difficulty";
@@ -448,7 +243,7 @@
             // ExpensiveDifficultyRadioButton
             // 
             this.ExpensiveDifficultyRadioButton.AutoSize = true;
-            this.ExpensiveDifficultyRadioButton.Location = new System.Drawing.Point(16, 58);
+            this.ExpensiveDifficultyRadioButton.Location = new System.Drawing.Point(127, 26);
             this.ExpensiveDifficultyRadioButton.Name = "ExpensiveDifficultyRadioButton";
             this.ExpensiveDifficultyRadioButton.Size = new System.Drawing.Size(93, 21);
             this.ExpensiveDifficultyRadioButton.TabIndex = 21;
@@ -493,7 +288,7 @@
             // 
             // ReloadButton
             // 
-            this.ReloadButton.Location = new System.Drawing.Point(279, 565);
+            this.ReloadButton.Location = new System.Drawing.Point(117, 499);
             this.ReloadButton.Name = "ReloadButton";
             this.ReloadButton.Size = new System.Drawing.Size(90, 32);
             this.ReloadButton.TabIndex = 27;
@@ -501,17 +296,65 @@
             this.ReloadButton.UseVisualStyleBackColor = true;
             this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
             // 
+            // ModsGroupBox
+            // 
+            this.ModsGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ModsGroupBox.Controls.Add(this.ModSelectionNoneButton);
+            this.ModsGroupBox.Controls.Add(this.ModSelectionAllButton);
+            this.ModsGroupBox.Controls.Add(this.ModSelectionBox);
+            this.ModsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.ModsGroupBox.Location = new System.Drawing.Point(472, 2);
+            this.ModsGroupBox.Margin = new System.Windows.Forms.Padding(4);
+            this.ModsGroupBox.Name = "ModsGroupBox";
+            this.ModsGroupBox.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.ModsGroupBox.Size = new System.Drawing.Size(257, 491);
+            this.ModsGroupBox.TabIndex = 13;
+            this.ModsGroupBox.TabStop = false;
+            this.ModsGroupBox.Text = "Mods";
+            // 
+            // ModSelectionNoneButton
+            // 
+            this.ModSelectionNoneButton.Location = new System.Drawing.Point(133, 448);
+            this.ModSelectionNoneButton.Name = "ModSelectionNoneButton";
+            this.ModSelectionNoneButton.Size = new System.Drawing.Size(115, 32);
+            this.ModSelectionNoneButton.TabIndex = 12;
+            this.ModSelectionNoneButton.Text = "None";
+            this.ModSelectionNoneButton.UseVisualStyleBackColor = true;
+            this.ModSelectionNoneButton.Click += new System.EventHandler(this.ModSelectionNoneButton_Click);
+            // 
+            // ModSelectionAllButton
+            // 
+            this.ModSelectionAllButton.Location = new System.Drawing.Point(8, 448);
+            this.ModSelectionAllButton.Name = "ModSelectionAllButton";
+            this.ModSelectionAllButton.Size = new System.Drawing.Size(115, 32);
+            this.ModSelectionAllButton.TabIndex = 11;
+            this.ModSelectionAllButton.Text = "All";
+            this.ModSelectionAllButton.UseVisualStyleBackColor = true;
+            this.ModSelectionAllButton.Click += new System.EventHandler(this.ModSelectionAllButton_Click);
+            // 
+            // ModSelectionBox
+            // 
+            this.ModSelectionBox.CheckOnClick = true;
+            this.ModSelectionBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.ModSelectionBox.FormattingEnabled = true;
+            this.ModSelectionBox.Location = new System.Drawing.Point(8, 27);
+            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.ModSelectionBox.Name = "ModSelectionBox";
+            this.ModSelectionBox.Size = new System.Drawing.Size(240, 395);
+            this.ModSelectionBox.TabIndex = 10;
+            this.ModSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModSelectionBox_ItemCheck);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1025, 609);
+            this.ClientSize = new System.Drawing.Size(742, 542);
+            this.Controls.Add(this.ModsGroupBox);
             this.Controls.Add(this.ReloadButton);
             this.Controls.Add(this.CancelSettingsButton);
             this.Controls.Add(this.groupBox10);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.ConfirmButton);
-            this.Controls.Add(this.groupBox2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
@@ -521,11 +364,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
-            this.ModsGroupBox.ResumeLayout(false);
-            this.groupBox7.ResumeLayout(false);
-            this.groupBox6.ResumeLayout(false);
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
@@ -537,20 +375,12 @@
             this.groupBox14.ResumeLayout(false);
             this.groupBox14.PerformLayout();
             this.groupBox13.ResumeLayout(false);
+            this.ModsGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);
 
 		}
 
         #endregion
-        private System.Windows.Forms.GroupBox ModsGroupBox;
-        private CheckboxListWithErrors ModSelectionBox;
-        private System.Windows.Forms.GroupBox groupBox7;
-        private System.Windows.Forms.CheckedListBox ModuleSelectionBox;
-        private System.Windows.Forms.GroupBox groupBox6;
-        private System.Windows.Forms.CheckedListBox MinerSelectionBox;
-        private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.CheckedListBox AssemblerSelectionBox;
-        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox9;
         private System.Windows.Forms.Button UserDataLocationBrowseButton;
@@ -569,15 +399,12 @@
         private System.Windows.Forms.ComboBox LanguageDropDown;
         private System.Windows.Forms.RadioButton ExpensiveDifficultyRadioButton;
         private System.Windows.Forms.RadioButton NormalDifficultyRadioButton;
-        private System.Windows.Forms.Button ModSelectionNoneButton;
-        private System.Windows.Forms.Button ModSelectionAllButton;
-        private System.Windows.Forms.Button ModuleSelectionNoneButton;
-        private System.Windows.Forms.Button ModuleSelectionAllButton;
-        private System.Windows.Forms.Button MinerSelectionNoneButton;
-        private System.Windows.Forms.Button MinerSelectionAllButton;
-        private System.Windows.Forms.Button AssemblerSelectionNoneButton;
-        private System.Windows.Forms.Button AssemblerSelectionAllButton;
         private System.Windows.Forms.Button ReloadButton;
         private System.Windows.Forms.CheckBox IgnoreUserDataLocationCheckBox;
+        private System.Windows.Forms.CheckBox UseSaveFileDataCheckBox;
+        private System.Windows.Forms.GroupBox ModsGroupBox;
+        private System.Windows.Forms.Button ModSelectionNoneButton;
+        private System.Windows.Forms.Button ModSelectionAllButton;
+        private CheckboxListWithErrors ModSelectionBox;
     }
 }

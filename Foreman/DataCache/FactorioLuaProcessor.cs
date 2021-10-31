@@ -854,9 +854,9 @@ namespace Foreman
 
                 foreach (String s in Settings.Default.EnabledMiners)
                 {
-                    if (s.Split('|')[0] == name)
+                    if (s == name)
                     {
-                        newMiner.Enabled = (s.Split('|')[1] == "True");
+                        newMiner.Enabled = true;
                     }
                 }
 

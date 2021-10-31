@@ -156,8 +156,23 @@ namespace Foreman
 			ResumeLayout(false);
 		}
 
+		private bool left = false; //prevent double calls
 		private void ChooserPanel_Leave(object sender, EventArgs e)
 		{
+			if(!left)
+            {
+				bool enabledRecipeListChanged = false;
+				foreach (Control control in controls)
+					enabledRecipeListChanged |= (control is RecipeChooserControl rcControl && rcControl.RecipeOriginallyEnabled != rcControl.DisplayedRecipe.Enabled);
+				if (enabledRecipeListChanged && ParentForm is MainForm mForm)
+				{
+					mForm.ItemListRequiresUpdate = true;
+					mForm.LoadItemList();
+				}
+
+				left = true;
+            }
+
 			Dispose();
 		}
 

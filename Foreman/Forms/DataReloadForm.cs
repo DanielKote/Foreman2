@@ -16,15 +16,13 @@ namespace Foreman
         private CancellationTokenSource cts;
         private int currentPercent;
         private string currentText;
-        private bool defaultEnabled;
 
-        public DataReloadForm(bool defaultEnabled)
+        public DataReloadForm()
         {
             this.cts = new CancellationTokenSource();
             InitializeComponent();
             currentPercent = 0;
             currentText = "";
-            this.defaultEnabled = defaultEnabled;
         }
 
         private async void ProgressForm_Load(object sender, EventArgs e)
@@ -49,7 +47,7 @@ namespace Foreman
             var progress = progressHandler as IProgress<KeyValuePair<int, string>>;
             var token = cts.Token;
 
-            await DataCache.LoadAllData(defaultEnabled, progress, token);
+            await DataCache.LoadAllData(progress, token);
 
             if (token.IsCancellationRequested)
             {
