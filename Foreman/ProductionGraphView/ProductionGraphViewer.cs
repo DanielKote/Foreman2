@@ -165,13 +165,13 @@ namespace Foreman
 		{
 			SubwindowOpen = true;
 			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
-			itemChooser.Show(selectedItem =>
+			itemChooser.ItemRequested += (o, itemRequestArgs) =>
 			{
-				if (selectedItem != null)
-					AddRecipe(drawOrigin, selectedItem, newLocation, NewNodeType.Disconnected);
-				else
-					SubwindowOpen = false;
-			});
+				AddRecipe(drawOrigin, itemRequestArgs.Item, newLocation, NewNodeType.Disconnected);
+			};
+			itemChooser.PanelClosed += (o, e) => { SubwindowOpen = false; };
+
+			itemChooser.Show();
 		}
 
 		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null)
@@ -195,47 +195,51 @@ namespace Foreman
 			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
 			BaseNode newNode = null;
 			int lastRecipeWidth = 0;
-			recipeChooser.Show((nodeType, recipe) =>
-			{
-				switch (nodeType)
-				{
-					case NodeType.Consumer:
-						newNode = Graph.CreateConsumerNode(baseItem, newLocation);
-						break;
-					case NodeType.Supplier:
-						newNode = Graph.CreateSupplierNode(baseItem, newLocation);
-						break;
-					case NodeType.Passthrough:
-						newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
-						break;
-					case NodeType.Recipe:
-						newNode = Graph.CreateRecipeNode(recipe, newLocation);
-						break;
-				}
+			recipeChooser.RecipeRequested += (o, recipeRequestArgs) =>
+			 {
+				 switch (recipeRequestArgs.NodeType)
+				 {
+					 case NodeType.Consumer:
+						 newNode = Graph.CreateConsumerNode(baseItem, newLocation);
+						 break;
+					 case NodeType.Supplier:
+						 newNode = Graph.CreateSupplierNode(baseItem, newLocation);
+						 break;
+					 case NodeType.Passthrough:
+						 newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
+						 break;
+					 case NodeType.Recipe:
+						 newNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
+						 break;
+				 }
 
 				//this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
 				//should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
 				int offsetDistance = lastRecipeWidth / 2;
-				lastRecipeWidth = 50 + Math.Max(newNode.Inputs.Count(), newNode.Outputs.Count()) * (ItemTabElement.TabWidth + ItemTabElement.TabBorder);
-				if (offsetDistance > 0)
-					offsetDistance += lastRecipeWidth / 2;
-				newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y));
-				newNode.Location = newLocation;
-				Invalidate();
+				 lastRecipeWidth = 50 + Math.Max(newNode.Inputs.Count(), newNode.Outputs.Count()) * (ItemTabElement.TabWidth + ItemTabElement.TabBorder);
+				 if (offsetDistance > 0)
+					 offsetDistance += lastRecipeWidth / 2;
+				 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y));
+				 newNode.Location = newLocation;
+				 Invalidate();
 
-				if (nNodeType == NewNodeType.Consumer)
-					Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
-				else if (nNodeType == NewNodeType.Supplier)
-					Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
+				 if (nNodeType == NewNodeType.Consumer)
+					 Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
+				 else if (nNodeType == NewNodeType.Supplier)
+					 Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
 
-				Graph.UpdateNodeStates();
-				Graph.UpdateNodeValues();
-			}, () =>
+				 Graph.UpdateNodeStates();
+				 Graph.UpdateNodeValues();
+			 };
+
+			recipeChooser.PanelClosed += (o, e) =>
 			{
 				DisposeLinkDrag();
 				Invalidate();
 				SubwindowOpen = false;
-			});
+			};
+
+			recipeChooser.Show();
 		}
 
 		public void TryDeleteSelectedNodes()
@@ -262,15 +266,22 @@ namespace Foreman
 			else
 				editPanel = new EditFlowPanel(bNodeElement.DisplayedNode, this);
 
-			//offset view if necessary to ensure entire window will be seen (with 25 pixels boundary). Only need to check the left (x) and up/down (y) since we must have clicked on a (visible) node to start the edit, so right(x) is guaranteed
+			//offset view if necessary to ensure entire window will be seen (with 25 pixels boundary)
 			Point screenOriginPoint = GraphToScreen(new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y));
 			screenOriginPoint = new Point(screenOriginPoint.X - editPanel.Width, screenOriginPoint.Y - (editPanel.Height / 2));
-			Point offset = new Point((int)(Math.Max(0, 25 - screenOriginPoint.X) / ViewScale), (int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.Y), this.Height - screenOriginPoint.Y - editPanel.Height - 25) / ViewScale));
+			Point offset = new Point(
+				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.X), this.Width - screenOriginPoint.X - editPanel.Width - bNodeElement.Width - ((bNodeElement is RecipeNodeElement)? 250 : 25)) / ViewScale),
+				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.Y), this.Height - screenOriginPoint.Y - editPanel.Height - 25) / ViewScale));
 
 			ViewOffset = Point.Add(ViewOffset, (Size)offset);
 			UpdateGraphBounds();
 			Invalidate();
 
+			//add the visible recipe to the right of the node if this is a recipe node
+			if(bNodeElement is RecipeNodeElement)
+				new FloatingTooltipControl(new RecipePanel(new Recipe[] { ((RecipeNode)bNodeElement.DisplayedNode).BaseRecipe }), Direction.Left, new Point(bNodeElement.X + (bNodeElement.Width / 2), bNodeElement.Y), this, true);
+
+			//open up the edit panel
 			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y), this, true);
 			fttc.Closing += (s,e) => { SubwindowOpen = false; bNodeElement.Update(); this.Invalidate(); };
 		}
@@ -860,7 +871,7 @@ namespace Foreman
 
 		private void ProductionGraphViewer_Resize(object sender, EventArgs e)
 		{
-			ToolTipRenderer.ClearFloatingControls();
+			ToolTipRenderer?.ClearFloatingControls(); //resize can happen before tooltip is created (due to scaling)
 		}
 
 		private void ProductionGraphViewer_Leave(object sender, EventArgs e)

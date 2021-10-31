@@ -11,6 +11,7 @@ namespace Foreman
 	public class FloatingTooltipRenderer
 	{
 		private const int border = 1;
+		private const int textPadding = 2;
 		private const int arrowSize = 10;
 
 		private static readonly Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
@@ -66,7 +67,7 @@ namespace Foreman
 			if (text != null)
 			{
 				SizeF stringSize = graphics.MeasureString(text, size10Font);
-				size = new Size((int)stringSize.Width, (int)stringSize.Height);
+				size = new Size((int)stringSize.Width + (textPadding * 2), (int)stringSize.Height + (textPadding * 2));
 			}
 
 			Point arrowPoint1 = new Point();
@@ -108,9 +109,9 @@ namespace Foreman
 			{
 				Point point;
 				if (stringFormat.Alignment == StringAlignment.Center)
-					point = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
+					point = new Point(rect.X + textPadding + rect.Width / 2, rect.Y + textPadding - 1 + rect.Height / 2);
 				else
-					point = new Point(rect.X, rect.Y + rect.Height / 2);
+					point = new Point(rect.X + textPadding, rect.Y + textPadding - 1 + rect.Height / 2);
 
 				graphics.DrawString(text, size10Font, textBrush, point, stringFormat);
 			}

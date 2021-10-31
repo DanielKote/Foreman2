@@ -36,12 +36,19 @@ namespace Foreman
 
 		private void EnableProgressBar(bool enabled)
 		{
+			this.SuspendLayout();
+			ImportProgressBar.Visible = enabled;
+			CancelImportButtonB.Visible = enabled;
+			CancelImportButtonB.Focus();
+
 			FactorioLocationGroup.Enabled = !enabled;
 			FactorioSettingsGroup.Enabled = !enabled;
 			PresetNameGroup.Enabled = !enabled;
+
+			OKButton.Visible = !enabled;
 			OKButton.Enabled = !enabled;
-			//CancelImportButton.Enabled = !enabled;
-			ImportProgressBar.Visible = enabled;
+			CancelImportButton.Visible = !enabled;
+			this.ResumeLayout();
 		}
 
 		private void BrowseButton_Click(object sender, EventArgs e)

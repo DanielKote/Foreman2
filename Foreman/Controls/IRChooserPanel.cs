@@ -9,16 +9,14 @@ namespace Foreman
 {
 	public abstract partial class IRChooserPanel : UserControl
 	{
-		public Action EndAction;
+		public event EventHandler<EventArgs> PanelClosed;
 
 		private static readonly Color SelectedGroupButtonBGColor = Color.SandyBrown;
 		protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 70, 70, 70);
 		protected static readonly Color IRButtonHiddenColor = Color.FromArgb(255, 120, 0, 0);
 		protected static readonly Color IRButtonNoAssemblerColor = Color.FromArgb(255, 100, 100, 0);
 
-		protected const int IRPanelColumns = 10;
-		protected const int IRPanelRows = 8; //8 = 294 height of IRPanel; 10 = 364 height //keep in mind that 8x10 is better for smoother scrolling
-		private NFButton[,] IRButtons = new NFButton[IRPanelRows, IRPanelColumns];
+		private NFButton[,] IRButtons;
 		private List<NFButton> GroupButtons = new List<NFButton>();
 		private Dictionary<Group, NFButton> GroupButtonLinks = new Dictionary<Group, NFButton>();
 		private List<KeyValuePair<DataObjectBase, Color>[]> filteredIRRowsList = new List<KeyValuePair<DataObjectBase, Color>[]>(); //updated on every filter command & group selection. Represents the full set of items/recipes in the IRFlowPanel (the visible ones will come from this set based on scrolling), with each array being size 10 (#buttons/line). bool (value) is the 'use BW icon'
@@ -46,31 +44,33 @@ namespace Foreman
 
 			InitializeComponent();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+			this.Disposed += IRChooserPanel_Disposed;
 
-			IRFlowPanel.Height = IRPanelRows * 35 + 12;
+			IRButtons = new NFButton[IRTable.ColumnCount - 1, IRTable.RowCount];
 
 			GroupButtonToolTip = new CustomToolTip();
 
-			IRPanelScrollBar.Minimum = 0;
-			IRPanelScrollBar.Maximum = 0;
-			IRPanelScrollBar.Enabled = false;
-			IRPanelScrollBar.SmallChange = 1;
-			IRPanelScrollBar.LargeChange = IRPanelRows;
+			IRScrollBar.Minimum = 0;
+			IRScrollBar.Maximum = 0;
+			IRScrollBar.Enabled = false;
+			IRScrollBar.SmallChange = 1;
+			IRScrollBar.LargeChange = IRTable.RowCount;
 			CurrentRow = 0;
 
-			IRFlowPanel.MouseWheel += new MouseEventHandler(IRFlowPanel_MouseWheel);
+			IRTable.MouseWheel += new MouseEventHandler(IRFlowPanel_MouseWheel);
 
 			ShowHiddenCheckBox.Checked = Properties.Settings.Default.ShowHidden;
 			IgnoreAssemblerCheckBox.Checked = Properties.Settings.Default.IgnoreAssemblerStatus;
 			RecipeNameOnlyFilterCheckBox.Checked = Properties.Settings.Default.RecipeNameOnlyFilter;
 
+			SuspendLayout();
+			AutoScaleDimensions = new SizeF(6f, 13f);
+			AutoScaleMode = AutoScaleMode.Font;
+			ResumeLayout();
+
 			InitializeButtons();
 
-			parent.Controls.Add(this);
 			this.Location = originPoint;
-			this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-			this.BringToFront();
-			parent.PerformLayout();
 
 			//set up the event handlers last so as not to cause unexpected calls when setting checked status ob checkboxes
 			ShowHiddenCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
@@ -79,12 +79,30 @@ namespace Foreman
 			FilterTextBox.Focus();
 		}
 
+		public new void Show()
+		{
+			PGViewer.Controls.Add(this);
+			this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+			this.BringToFront();
+			PGViewer.PerformLayout();
+			FilterTextBox.Focus();
+		}
+
+		//-----------------------------------------------------------------------------------------------------Button initialization & update
+
 		private void InitializeButtons()
 		{
 			//initialize the group buttons
 			SortedGroups = GetSortedGroups();
 
-			foreach (Group group in SortedGroups)
+			GroupTable.SuspendLayout();
+
+			//add any extra rows to handle the amount of sorted groups
+			for (int i = 0; i < (SortedGroups.Count - 1) / GroupTable.ColumnCount; i++)
+				GroupTable.RowStyles.Add(new RowStyle(GroupTable.RowStyles[0].SizeType, GroupTable.RowStyles[0].Height));
+
+			//add in the group buttons
+			for (int i = 0; i < SortedGroups.Count; i++)
 			{
 				NFButton button = new NFButton();
 				button.BackColor = Color.DimGray;
@@ -93,39 +111,42 @@ namespace Foreman
 				button.FlatAppearance.BorderSize = 0;
 				button.TabStop = false;
 				button.Margin = new Padding(0);
-				button.Size = new Size(64, 64);
-				button.Image = new Bitmap(group.Icon, 58, 58);
-				button.Tag = group;
+				button.Size = new Size(1, 1);
+				button.Dock = DockStyle.Fill;
+				button.Image = new Bitmap(SortedGroups[i].Icon, (int)(GroupTable.Width / (GroupTable.ColumnCount * 1.1f)), (int)(GroupTable.Width / (GroupTable.ColumnCount * 1.1f)));
+				button.Tag = SortedGroups[i];
 
-				GroupButtonToolTip.SetToolTip(button, string.IsNullOrEmpty(group.FriendlyName) ? "-" : group.FriendlyName);
+				GroupButtonToolTip.SetToolTip(button, string.IsNullOrEmpty(SortedGroups[i].FriendlyName) ? "-" : SortedGroups[i].FriendlyName);
 
 				button.Click += new EventHandler(GroupButton_Click);
 				button.MouseHover += new EventHandler(GroupButton_MouseHover);
 				button.MouseLeave += new EventHandler(GroupButton_MouseLeave);
 
 				GroupButtons.Add(button);
-				GroupButtonLinks.Add(group, button);
+				GroupButtonLinks.Add(SortedGroups[i], button);
+
+				GroupTable.Controls.Add(button, i % GroupTable.ColumnCount, i / GroupTable.ColumnCount);
 			}
-			GroupFlowPanel.SuspendLayout();
-			GroupFlowPanel.Controls.AddRange(GroupButtons.ToArray());
-			GroupFlowPanel.ResumeLayout();
+			GroupTable.ResumeLayout();
 
 			//initialize the item/recipe buttons
-			for (int row = 0; row < IRPanelRows; row++)
+			IRTable.SuspendLayout();
+			for (int column = 0; column < IRButtons.GetLength(0); column++)
 			{
-				for (int column = 0; column < IRPanelColumns; column++)
+				for (int row = 0; row < IRButtons.GetLength(1); row++)
 				{
 					NFButton button = new NFButton();
 					button.BackColor = Color.Gray;
 					button.BackgroundImageLayout = ImageLayout.Zoom;
 					button.UseVisualStyleBackColor = false;
 					button.FlatStyle = FlatStyle.Flat;
-					button.FlatAppearance.BorderSize = 2;
+					button.FlatAppearance.BorderSize = Math.Max(1, IRTable.Width / (IRButtons.GetLength(0) * 24));
 					button.TabStop = false;
 					button.ForeColor = Color.Gray;
 					button.BackColor = Color.DimGray;
-					button.Margin = new Padding(12);
-					button.Size = new Size(12, 12);
+					button.Margin = new Padding(1);
+					button.Size = new Size(1, 1);
+					button.Dock = DockStyle.Fill;
 					button.BackgroundImage = null;
 					button.Tag = null;
 					button.Enabled = false;
@@ -133,20 +154,19 @@ namespace Foreman
 					button.MouseUp += new MouseEventHandler(IRButton_MouseUp);
 					button.MouseHover += new EventHandler(IRButton_MouseHover);
 					button.MouseLeave += new EventHandler(IRButton_MouseLeave);
-					IRButtons[row, column] = button;
+					IRButtons[column, row] = button;
+
+					IRTable.Controls.Add(button, column, row);
 				}
 			}
-			IRFlowPanel.SuspendLayout();
-			IRFlowPanel.Controls.AddRange(IRButtons.Cast<Button>().ToArray());
-			IRFlowPanel.ResumeLayout();
-
+			IRTable.ResumeLayout();
 		}
 
 		protected abstract List<Group> GetSortedGroups();
 
 		protected void UpdateIRButtons(int startRow = 0, bool scrollOnly = false) //if scroll only, then we dont need to update the filtered set, just use what is there
 		{
-			if (IRFlowPanel.Visible)
+			if (IRTable.Visible)
 			{
 				//if we are actually changing the filtered list, then update it (through the GetSubgroupList)
 				if (!scrollOnly)
@@ -159,7 +179,7 @@ namespace Foreman
 						int currentColumn = 0;
 						foreach (KeyValuePair<DataObjectBase, Color> kvp in sgList)
 						{
-							if (currentColumn == IRPanelColumns)
+							if (currentColumn == IRButtons.GetLength(0))
 							{
 								filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
 								currentColumn = 0;
@@ -170,52 +190,48 @@ namespace Foreman
 						}
 						currentRow++;
 					}
-					IRPanelScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
-					IRPanelScrollBar.Enabled = IRPanelScrollBar.Maximum >= IRPanelScrollBar.LargeChange;
+					IRScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
+					IRScrollBar.Enabled = IRScrollBar.Maximum >= IRScrollBar.LargeChange;
 				}
 				CurrentRow = startRow;
-				IRPanelScrollBar.Value = startRow;
+				IRScrollBar.Value = startRow;
 
 				//update all the buttons to be based off of the filteredIRSet
-				IRFlowPanel.SuspendLayout();
-				IRFlowPanel.Visible = false;
+				IRTable.SuspendLayout();
 				IRButtonToolTip.RemoveAll();
-				IRFlowPanel.Controls.Clear();
-				for (int row = 0; row < IRPanelRows; row++)
-					for (int column = 0; column < IRPanelColumns; column++)
-						SetIRButton(
-							(row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Key : null,
-							(row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Value : Color.DimGray,
-							row, column); //if we are beyond the bounds of the filtered rows, each button is set to null (disabled)
-				IRFlowPanel.Controls.AddRange(IRButtons.Cast<Button>().ToArray());
-				IRFlowPanel.Visible = true;
-				IRFlowPanel.ResumeLayout();
-			}
-		}
-
-		private void SetIRButton(DataObjectBase irObject, Color bgColor, int row, int column)
-		{
-			NFButton b = IRButtons[row, column];
-			if (irObject != null) //full
-			{
-				b.ForeColor = Color.Black;
-				b.BackColor = bgColor; //Color.FromArgb(255,100,0,0) : Color.FromArgb(255,40,40,40);
-				b.Margin = new Padding(1);
-				b.Size = new Size(34, 34);
-				b.BackgroundImage = irObject.Icon;
-				b.Tag = irObject;
-				b.Enabled = true;
-				IRButtonToolTip.SetToolTip(b, string.IsNullOrEmpty(irObject.FriendlyName) ? "-" : irObject.FriendlyName);
-			}
-			else
-			{
-				b.ForeColor = Color.Gray;
-				b.BackColor = Color.DimGray;
-				b.Margin = new Padding(12);
-				b.Size = new Size(12, 12);
-				b.BackgroundImage = null;
-				b.Tag = null;
-				b.Enabled = false;
+				IRTable.Controls.Clear();
+				IRTable.Controls.Add(IRScrollBar, IRTable.ColumnCount - 1, 0);
+				for (int column = 0; column < IRButtons.GetLength(0); column++)
+				{
+					for (int row = 0; row < IRButtons.GetLength(1); row++)
+					{
+						DataObjectBase irObject = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Key : null;
+						NFButton b = IRButtons[column, row];
+						if (irObject != null) //full
+						{
+							b.ForeColor = Color.Black;
+							b.BackColor = (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Value : Color.DimGray;
+							b.Margin = new Padding(b.FlatAppearance.BorderSize);
+							b.Dock = DockStyle.Fill;
+							b.BackgroundImage = irObject.Icon;
+							b.Tag = irObject;
+							b.Enabled = true;
+							IRButtonToolTip.SetToolTip(b, string.IsNullOrEmpty(irObject.FriendlyName) ? "-" : irObject.FriendlyName);
+						}
+						else
+						{
+							b.ForeColor = Color.Gray;
+							b.BackColor = Color.DimGray;
+							b.Margin = new Padding(Math.Max(1, IRTable.Width / (IRButtons.GetLength(0) * 3)));
+							b.Dock = DockStyle.Fill;
+							b.BackgroundImage = null;
+							b.Tag = null;
+							b.Enabled = false;
+						}
+						IRTable.Controls.Add(IRButtons[column, row], column, row);
+					}
+				}
+				IRTable.ResumeLayout();
 			}
 		}
 
@@ -246,6 +262,8 @@ namespace Foreman
 
 		protected void UpdateGroupButton(Group group, bool enabled) { GroupButtonLinks[group].Enabled = enabled; }
 
+		//-----------------------------------------------------------------------------------------------------Group Button events
+
 		private void GroupButton_Click(object sender, EventArgs e)
 		{
 			SetSelectedGroup((Group)((NFButton)sender).Tag);
@@ -257,30 +275,13 @@ namespace Foreman
 			GroupButtonToolTip.SetText(GroupButtonToolTip.GetToolTip(control));
 			GroupButtonToolTip.Show(control, new Point(control.Width, 10));
 		}
+
 		private void GroupButton_MouseLeave(object sender, EventArgs e)
 		{
 			GroupButtonToolTip.Hide((Control)sender);
 		}
 
-		private void IRChooserPanel_Leave(object sender, EventArgs e)
-		{
-			Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-			Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-			Properties.Settings.Default.RecipeNameOnlyFilter = RecipeNameOnlyFilterCheckBox.Checked;
-			Properties.Settings.Default.Save();
-			EndAction?.Invoke();
-			Dispose();
-		}
-
-		protected void FilterCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			UpdateIRButtons();
-		}
-
-		private void FilterTextBox_TextChanged(object sender, EventArgs e)
-		{
-			UpdateIRButtons();
-		}
+		//-----------------------------------------------------------------------------------------------------IR button events (including scrolling)
 
 		private void IRPanelScrollBar_Scroll(object sender, ScrollEventArgs e)
 		{
@@ -290,15 +291,15 @@ namespace Foreman
 
 		private void IRFlowPanel_MouseWheel(object sender, MouseEventArgs e)
 		{
-			if (e.Delta < 0 && IRPanelScrollBar.Value <= (IRPanelScrollBar.Maximum - IRPanelScrollBar.LargeChange))
+			if (e.Delta < 0 && IRScrollBar.Value <= (IRScrollBar.Maximum - IRScrollBar.LargeChange))
 			{
-				IRPanelScrollBar.Value++;
-				UpdateIRButtons(IRPanelScrollBar.Value, true);
+				IRScrollBar.Value++;
+				UpdateIRButtons(IRScrollBar.Value, true);
 			}
-			else if (e.Delta > 0 && IRPanelScrollBar.Value > 0)
+			else if (e.Delta > 0 && IRScrollBar.Value > 0)
 			{
-				IRPanelScrollBar.Value--;
-				UpdateIRButtons(IRPanelScrollBar.Value, true);
+				IRScrollBar.Value--;
+				UpdateIRButtons(IRScrollBar.Value, true);
 			}
 		}
 
@@ -312,19 +313,54 @@ namespace Foreman
 		{
 			IRButtonToolTip.Hide((Control)sender);
 		}
+
+		//-----------------------------------------------------------------------------------------------------Filter
+
+		protected void FilterCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			UpdateIRButtons();
+		}
+
+		private void FilterTextBox_TextChanged(object sender, EventArgs e)
+		{
+			UpdateIRButtons();
+		}
+
+		//-----------------------------------------------------------------------------------------------------Closing functions
+
+		private void IRChooserPanel_Leave(object sender, EventArgs e)
+		{
+			Dispose();
+		}
+
+		protected virtual void IRChooserPanel_Disposed(object sender, EventArgs e)
+		{
+			Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+			Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+			Properties.Settings.Default.RecipeNameOnlyFilter = RecipeNameOnlyFilterCheckBox.Checked;
+			Properties.Settings.Default.Save();
+			PanelClosed?.Invoke(this, EventArgs.Empty);
+		}
 	}
 
 	public class ItemChooserPanel : IRChooserPanel
 	{
-		public Action<Item> CallbackMethod; //returns the selected item
-		public void Show(Action<Item> callback, Action endAction = null) { CallbackMethod = callback; EndAction = endAction; }
+		public event EventHandler<ItemRequestArgs> ItemRequested;
 
 		private ToolTip iToolTip = new CustomToolTip();
 		protected override ToolTip IRButtonToolTip { get { return iToolTip; } }
+		private Item selectedItem;
 
 		public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint) : base(parent, originPoint)
 		{
 			SetSelectedGroup(null);
+		}
+
+		protected override void IRChooserPanel_Disposed(object sender, EventArgs e)
+		{
+			base.IRChooserPanel_Disposed(sender, e);
+			if(selectedItem != null)
+				ItemRequested?.Invoke(this, new ItemRequestArgs(selectedItem));
 		}
 
 		protected override List<Group> GetSortedGroups()
@@ -418,10 +454,7 @@ namespace Foreman
 		{
 			if (e.Button == MouseButtons.Left)
 			{
-				Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-				Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-				Properties.Settings.Default.Save();
-				CallbackMethod((Item)((Button)sender).Tag);
+				selectedItem = (Item)((Button)sender).Tag;
 				Dispose();
 			}
 		}
@@ -429,8 +462,8 @@ namespace Foreman
 
 	public class RecipeChooserPanel : IRChooserPanel
 	{
-		public Action<NodeType, Recipe> CallbackMethod; //returns the selected node type and the selected recipe (or null if not a recipe node)
-		public void Show(Action<NodeType, Recipe> callback, Action endAction = null) { CallbackMethod = callback; EndAction = endAction; }
+		public event EventHandler<RecipeRequestArgs> RecipeRequested;
+
 		protected Item KeyItem;
 		protected fRange KeyItemTempRange;
 
@@ -456,20 +489,20 @@ namespace Foreman
 			RecipeNameOnlyFilterCheckBox.Visible = true;
 			if (KeyItem == null)
 			{
-				OtherNodeOptionsTableLayoutPanel.Visible = false;
+				OtherNodeOptionsTable.Visible = false;
 			}
 			else
 			{
 				ItemIconPanel.Visible = true;
 				ItemIconPanel.BackgroundImage = KeyItem.Icon;
-				OtherNodeOptionsTableLayoutPanel.Visible = true;
+				OtherNodeOptionsTable.Visible = true;
 				AddConsumerButton.Visible = includeConsumers;
 				AddSupplyButton.Visible = includeSuppliers;
 				if (!(includeConsumers && KeyItem.ConsumptionRecipes.Count > 0) && !(includeSuppliers && KeyItem.ProductionRecipes.Count > 0))
 				{
-					GroupFlowPanel.Visible = false;
-					IRFlowPanel.Visible = false;
-					IRPanelScrollBar.Visible = false;
+					GroupTable.Visible = false;
+					IRTable.Visible = false;
+					IRScrollBar.Visible = false;
 					FilterTextBox.Visible = false;
 					FilterLabel.Visible = false;
 					ShowHiddenCheckBox.Visible = false;
@@ -582,11 +615,7 @@ namespace Foreman
 		{
 			if (e.Button == MouseButtons.Left) //select recipe
 			{
-				Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-				Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-				Properties.Settings.Default.Save();
-				Recipe selectedRecipe = (Recipe)((Button)sender).Tag;
-				CallbackMethod(NodeType.Recipe, selectedRecipe);
+				RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Recipe, (Recipe)((Button)sender).Tag));
 
 				if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
 					Dispose();
@@ -601,10 +630,7 @@ namespace Foreman
 
 		private void AddSupplyButton_Click(object sender, EventArgs e)
 		{
-			Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-			Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-			Properties.Settings.Default.Save();
-			CallbackMethod(NodeType.Supplier, null);
+			RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Supplier, null));
 
 			if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
 				Dispose();
@@ -612,10 +638,7 @@ namespace Foreman
 
 		private void AddConsumerButton_Click(object sender, EventArgs e)
 		{
-			Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-			Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-			Properties.Settings.Default.Save();
-			CallbackMethod(NodeType.Consumer, null);
+			RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Consumer, null));
 
 			if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
 				Dispose();
@@ -623,10 +646,7 @@ namespace Foreman
 
 		private void AddPassthroughButton_Click(object sender, EventArgs e)
 		{
-			Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-			Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-			Properties.Settings.Default.Save();
-			CallbackMethod(NodeType.Passthrough, null);
+			RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Passthrough, null));
 
 			if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
 				Dispose();
@@ -647,5 +667,18 @@ namespace Foreman
 	{
 		public NFButton() : base() { this.SetStyle(ControlStyles.Selectable, false); }
 		protected override bool ShowFocusCues { get { return false; } }
+	}
+
+	public class RecipeRequestArgs : EventArgs
+	{
+		public Recipe Recipe;
+		public NodeType NodeType;
+		public RecipeRequestArgs(NodeType nodeType, Recipe recipe) { Recipe = recipe; NodeType = nodeType; }
+	}
+
+	public class ItemRequestArgs : EventArgs
+	{
+		public Item Item;
+		public ItemRequestArgs(Item item) { Item = item; }
 	}
 }
