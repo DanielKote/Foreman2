@@ -19,6 +19,7 @@ namespace Foreman
 			public ProductionGraphViewer.LOD LevelOfDetail;
 			public int NodeCountForSimpleView;
 			public bool DynamicLinkWidth;
+			public bool AbbreviateSciPacks;
 			public bool ShowRecipeToolTip;
 			public bool LockedRecipeEditPanelPosition;
 
@@ -104,6 +105,7 @@ namespace Foreman
 			NodeCountForSimpleViewInput.Maximum = Math.Max(NodeCountForSimpleViewInput.Maximum, options.NodeCountForSimpleView);
 			NodeCountForSimpleViewInput.Value = options.NodeCountForSimpleView;
 			ShowNodeRecipeCheckBox.Checked = Options.ShowRecipeToolTip;
+			AbbreviateSciPackCheckBox.Checked = Options.AbbreviateSciPacks;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
 			WarningArrowsCheckBox.Checked = Options.ShowWarningArrows;
 			ErrorArrowsCheckBox.Checked = Options.ShowErrorArrows;
@@ -436,6 +438,7 @@ namespace Foreman
 			Options.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
 			Options.NodeCountForSimpleView = (int)NodeCountForSimpleViewInput.Value;
 			Options.DynamicLinkWidth = DynamicLWCheckBox.Checked;
+			Options.AbbreviateSciPacks = AbbreviateSciPackCheckBox.Checked;
 			Options.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
 			Options.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
 			Options.ShowErrorArrows = ErrorArrowsCheckBox.Checked;

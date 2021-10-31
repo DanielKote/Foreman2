@@ -274,5 +274,17 @@ namespace Foreman.Properties {
                 this["ForemanVersion"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AbbreviateSciPacks {
+            get {
+                return ((bool)(this["AbbreviateSciPacks"]));
+            }
+            set {
+                this["AbbreviateSciPacks"] = value;
+            }
+        }
     }
 }

@@ -109,6 +109,7 @@
 			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
+			this.AbbreviateSciPackCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -931,9 +932,9 @@
 			this.groupBox6.Controls.Add(this.tableLayoutPanel3);
 			this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox6.Location = new System.Drawing.Point(3, 287);
+			this.groupBox6.Location = new System.Drawing.Point(3, 310);
 			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(464, 107);
+			this.groupBox6.Size = new System.Drawing.Size(464, 84);
 			this.groupBox6.TabIndex = 2;
 			this.groupBox6.TabStop = false;
 			// 
@@ -949,7 +950,7 @@
 			this.tableLayoutPanel3.RowCount = 2;
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 88);
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 65);
 			this.tableLayoutPanel3.TabIndex = 1;
 			// 
 			// groupBox5
@@ -959,7 +960,7 @@
 			this.groupBox5.Controls.Add(this.DefaultsTable);
 			this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox5.Location = new System.Drawing.Point(3, 192);
+			this.groupBox5.Location = new System.Drawing.Point(3, 215);
 			this.groupBox5.Name = "groupBox5";
 			this.groupBox5.Size = new System.Drawing.Size(464, 89);
 			this.groupBox5.TabIndex = 1;
@@ -1045,7 +1046,7 @@
 			this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(464, 183);
+			this.groupBox3.Size = new System.Drawing.Size(464, 206);
 			this.groupBox3.TabIndex = 0;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Node Graphics:";
@@ -1060,23 +1061,24 @@
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.NodeGraphicsTable.Controls.Add(this.WarningArrowsCheckBox, 0, 6);
 			this.NodeGraphicsTable.Controls.Add(this.HighLodRadioButton, 3, 0);
 			this.NodeGraphicsTable.Controls.Add(this.label6, 0, 0);
 			this.NodeGraphicsTable.Controls.Add(this.MediumLodRadioButton, 2, 0);
 			this.NodeGraphicsTable.Controls.Add(this.LowLodRadioButton, 1, 0);
-			this.NodeGraphicsTable.Controls.Add(this.RecipeEditPanelPositionLockCheckBox, 0, 4);
-			this.NodeGraphicsTable.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 3);
+			this.NodeGraphicsTable.Controls.Add(this.RecipeEditPanelPositionLockCheckBox, 0, 5);
+			this.NodeGraphicsTable.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 4);
 			this.NodeGraphicsTable.Controls.Add(this.DynamicLWCheckBox, 0, 2);
 			this.NodeGraphicsTable.Controls.Add(this.label8, 0, 1);
 			this.NodeGraphicsTable.Controls.Add(this.NodeCountForSimpleViewInput, 1, 1);
-			this.NodeGraphicsTable.Controls.Add(this.ErrorArrowsCheckBox, 0, 5);
+			this.NodeGraphicsTable.Controls.Add(this.ErrorArrowsCheckBox, 0, 6);
+			this.NodeGraphicsTable.Controls.Add(this.WarningArrowsCheckBox, 0, 7);
+			this.NodeGraphicsTable.Controls.Add(this.AbbreviateSciPackCheckBox, 0, 3);
 			this.NodeGraphicsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.NodeGraphicsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.NodeGraphicsTable.Location = new System.Drawing.Point(3, 16);
 			this.NodeGraphicsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.NodeGraphicsTable.Name = "NodeGraphicsTable";
-			this.NodeGraphicsTable.RowCount = 7;
+			this.NodeGraphicsTable.RowCount = 8;
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -1084,14 +1086,15 @@
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 164);
+			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 187);
 			this.NodeGraphicsTable.TabIndex = 28;
 			// 
 			// WarningArrowsCheckBox
 			// 
 			this.WarningArrowsCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.WarningArrowsCheckBox, 4);
-			this.WarningArrowsCheckBox.Location = new System.Drawing.Point(3, 144);
+			this.WarningArrowsCheckBox.Location = new System.Drawing.Point(3, 167);
 			this.WarningArrowsCheckBox.Name = "WarningArrowsCheckBox";
 			this.WarningArrowsCheckBox.Size = new System.Drawing.Size(238, 17);
 			this.WarningArrowsCheckBox.TabIndex = 15;
@@ -1150,7 +1153,7 @@
 			// 
 			this.RecipeEditPanelPositionLockCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.RecipeEditPanelPositionLockCheckBox, 4);
-			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 98);
+			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 121);
 			this.RecipeEditPanelPositionLockCheckBox.Name = "RecipeEditPanelPositionLockCheckBox";
 			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(191, 17);
 			this.RecipeEditPanelPositionLockCheckBox.TabIndex = 11;
@@ -1161,7 +1164,7 @@
 			// 
 			this.ShowNodeRecipeCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.ShowNodeRecipeCheckBox, 4);
-			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 75);
+			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 98);
 			this.ShowNodeRecipeCheckBox.Name = "ShowNodeRecipeCheckBox";
 			this.ShowNodeRecipeCheckBox.Size = new System.Drawing.Size(119, 17);
 			this.ShowNodeRecipeCheckBox.TabIndex = 6;
@@ -1214,7 +1217,7 @@
 			// 
 			this.ErrorArrowsCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.ErrorArrowsCheckBox, 4);
-			this.ErrorArrowsCheckBox.Location = new System.Drawing.Point(3, 121);
+			this.ErrorArrowsCheckBox.Location = new System.Drawing.Point(3, 144);
 			this.ErrorArrowsCheckBox.Name = "ErrorArrowsCheckBox";
 			this.ErrorArrowsCheckBox.Size = new System.Drawing.Size(222, 17);
 			this.ErrorArrowsCheckBox.TabIndex = 14;
@@ -1246,6 +1249,17 @@
 			this.RecipeToolTip.InitialDelay = 100000;
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
+			// 
+			// AbbreviateSciPackCheckBox
+			// 
+			this.AbbreviateSciPackCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.AbbreviateSciPackCheckBox, 4);
+			this.AbbreviateSciPackCheckBox.Location = new System.Drawing.Point(3, 75);
+			this.AbbreviateSciPackCheckBox.Name = "AbbreviateSciPackCheckBox";
+			this.AbbreviateSciPackCheckBox.Size = new System.Drawing.Size(149, 17);
+			this.AbbreviateSciPackCheckBox.TabIndex = 16;
+			this.AbbreviateSciPackCheckBox.Text = "Abbreviate science packs";
+			this.AbbreviateSciPackCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
@@ -1395,5 +1409,6 @@
 		private System.Windows.Forms.CheckBox WarningArrowsCheckBox;
 		private System.Windows.Forms.CheckBox ErrorArrowsCheckBox;
 		private System.Windows.Forms.Button SetEnabledFromSciencePacksButton;
+		private System.Windows.Forms.CheckBox AbbreviateSciPackCheckBox;
 	}
 }

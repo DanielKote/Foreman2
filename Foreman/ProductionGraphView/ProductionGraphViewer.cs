@@ -115,18 +115,12 @@ namespace Foreman
 
 		public void ClearGraph()
 		{
-			foreach (BaseNodeElement element in nodeElements)
-				element.Dispose();
-			foreach (LinkElement element in linkElements)
-				element.Dispose();
 			DisposeLinkDrag();
-			nodeElements.Clear();
-			nodeElementDictionary.Clear();
-			linkElements.Clear();
-			linkElementDictionary.Clear();
+			Graph.ClearGraph();
+			//at this point every node element and link element has been removed.
+
 			selectedNodes.Clear();
 			currentSelectionNodes.Clear();
-			Graph.ClearGraph();
 		}
 
 		public BaseNodeElement GetNodeAtPoint(Point point) //returns first such node (in case of stacking)

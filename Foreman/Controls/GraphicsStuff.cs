@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace Foreman
 {
@@ -161,7 +162,7 @@ namespace Foreman
 			int width = ((SectionWidth + 10) * recipes.Count) - 10;
 			foreach (Recipe recipe in recipes)
 			{
-				height = Math.Max(height, 110 + 20 + recipe.IngredientList.Count * 40 + recipe.ProductList.Count * 40 + recipe.MyUnlockSciencePacks.Count * 30);
+				height = Math.Max(height, 110 + 20 + recipe.IngredientList.Count * 40 + recipe.ProductList.Count * 40 + recipe.MyUnlockSciencePacks.Count * (Properties.Settings.Default.AbbreviateSciPacks? 40 : 30));
 			}
 
 
@@ -241,17 +242,33 @@ namespace Foreman
 				//unlock science packs
 				graphics.FillRectangle(DarkBackgroundBrush, new Rectangle(xOffset, yOffset, SectionWidth, 22));
 				yOffset += 2;
-				graphics.DrawString(recipes[r].MyUnlockSciencePacks.Count > 1 ? "Required science packs (options):" : "Required science packs:", SectionFont, TextBrush, 4 + xOffset, 0 + yOffset);
+				if(Properties.Settings.Default.AbbreviateSciPacks)
+					graphics.DrawString(recipes[r].MyUnlockSciencePacks.Count > 1 ? "Key required science packs (any):" : "Key required science packs:", SectionFont, TextBrush, 4 + xOffset, 0 + yOffset);
+				else
+					graphics.DrawString(recipes[r].MyUnlockSciencePacks.Count > 1 ? "Required science packs (any):" : "Required science packs:", SectionFont, TextBrush, 4 + xOffset, 0 + yOffset);
+
 				yOffset += 20;
 				for (int i = 0; i < maxSciencePackListsCount; i++)
 				{
 					if (i < recipes[r].MyUnlockSciencePacks.Count)
 					{
-						int iconSize = recipes[r].MyUnlockSciencePacks[i].Count == 0? 24 : Math.Min(24, (SectionWidth - 8) / recipes[r].MyUnlockSciencePacks[i].Count); //ensure all science packs will fit (there should be space for 8, but knowing mods... this might not be enough)
-						for (int j = 0; j < recipes[r].MyUnlockSciencePacks[i].Count; j++)
-							graphics.DrawImage(recipes[r].MyUnlockSciencePacks[i][j].Icon, xOffset + 4 + (j * iconSize), 3 + yOffset, iconSize, iconSize);
+						IReadOnlyList<Item> sciPacks = recipes[r].MyUnlockSciencePacks[i];
+						int sciPackSize = 24;
+						if(Properties.Settings.Default.AbbreviateSciPacks) //dont show the science pack if it is a prerequisite of another science pack (that we show)
+						{
+							List<Item> filteredSciPacks = new List<Item>();
+							foreach(Item pack in sciPacks)
+								if (!sciPacks.Any(p => p.ProductionRecipes.Any(pr => pr.MyUnlockSciencePacks.Any(sps => sps.Contains(pack)))))
+									filteredSciPacks.Add(pack);
+							sciPacks = filteredSciPacks;
+							sciPackSize = 32;
+						}
+
+						int iconSize = sciPacks.Count == 0? sciPackSize : Math.Min(sciPackSize, (SectionWidth - 8) / sciPacks.Count); //ensure all science packs will fit (there should be space for 8, but knowing mods... this might not be enough)
+						for (int j = 0; j < sciPacks.Count; j++)
+							graphics.DrawImage(sciPacks[j].Icon, xOffset + 4 + (j * iconSize), 3 + yOffset, iconSize, iconSize);
 					}
-					yOffset += 30;
+					yOffset += (Properties.Settings.Default.AbbreviateSciPacks? 40 : 30);
 				}
 
 				//time

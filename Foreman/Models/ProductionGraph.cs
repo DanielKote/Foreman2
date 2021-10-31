@@ -211,16 +211,11 @@ namespace Foreman
 			LinkDeleted?.Invoke(this, new NodeLinkEventArgs(link));
 		}
 
-		public void ClearGraph(bool thorough = false)
+		public void ClearGraph()
 		{
-			if(thorough)
-				foreach (BaseNode node in nodes)
-					DeleteNode(node.ReadOnlyNode);
+			foreach (BaseNode node in nodes.ToList())
+				DeleteNode(node.ReadOnlyNode);
 
-			nodes.Clear();
-			nodeLinks.Clear();
-			roToNode.Clear();
-			roToLink.Clear();
 			SerializeNodeIdSet = null;
 			lastNodeID = 0;
 		}
