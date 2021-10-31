@@ -70,7 +70,7 @@ namespace Foreman
 				GraphViewer.Invalidate();
 				GraphViewer.Focus();
 #if DEBUG
-				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
+				//await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
 				GraphViewer.Invalidate();
 #endif
 			}
@@ -104,6 +104,7 @@ namespace Foreman
 			{
 				MessageBox.Show("Could not save this file. See log for more details");
 				ErrorLogging.LogLine(String.Format("Error saving file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
 			}
 			finally
 			{
@@ -130,6 +131,7 @@ namespace Foreman
 			{
 				MessageBox.Show("Could not load this file. See log for more details");
 				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
 			}
 
 			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
@@ -140,15 +142,33 @@ namespace Foreman
 			GraphViewer.Invalidate();
 		}
 
+		private void ImportGraphButton_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog dialog = new OpenFileDialog();
+			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
+			if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
+				Directory.CreateDirectory(Path.Combine(Application.StartupPath, "Saved Graphs"));
+			dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Saved Graphs");
+			dialog.CheckFileExists = true;
+			if (dialog.ShowDialog() != DialogResult.OK)
+				return;
+
+			try
+			{
+				GraphViewer.ImportNodesFromJson((JObject)JObject.Parse(File.ReadAllText(dialog.FileName))["ProductionGraph"], GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2)));
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show("Could not import from this file. See log for more details");
+				ErrorLogging.LogLine(string.Format("Error importing from file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
+			}
+		}
+
 		private void ClearButton_Click(object sender, EventArgs e)
 		{
 			GraphViewer.ClearGraph();
 			GraphViewer.Invalidate();
-		}
-
-		private void MainHelpButton_Click(object sender, EventArgs e)
-		{
-			//yea, need to add a help window at some point...
 		}
 
 		//---------------------------------------------------------Settings/export/additem/addrecipe

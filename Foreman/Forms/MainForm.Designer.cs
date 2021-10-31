@@ -36,7 +36,7 @@
 			this.AddRecipeButton = new System.Windows.Forms.Button();
 			this.ExportImageButton = new System.Windows.Forms.Button();
 			this.EnableDisableButton = new System.Windows.Forms.Button();
-			this.MainHelpButton = new System.Windows.Forms.Button();
+			this.ImportGraphButton = new System.Windows.Forms.Button();
 			this.ClearButton = new System.Windows.Forms.Button();
 			this.LoadGraphButton = new System.Windows.Forms.Button();
 			this.SaveGraphButton = new System.Windows.Forms.Button();
@@ -133,8 +133,8 @@
 			this.MenuButtonsTable.Controls.Add(this.AddRecipeButton, 1, 3);
 			this.MenuButtonsTable.Controls.Add(this.ExportImageButton, 1, 1);
 			this.MenuButtonsTable.Controls.Add(this.EnableDisableButton, 1, 0);
-			this.MenuButtonsTable.Controls.Add(this.MainHelpButton, 0, 3);
-			this.MenuButtonsTable.Controls.Add(this.ClearButton, 0, 2);
+			this.MenuButtonsTable.Controls.Add(this.ImportGraphButton, 0, 2);
+			this.MenuButtonsTable.Controls.Add(this.ClearButton, 0, 3);
 			this.MenuButtonsTable.Controls.Add(this.LoadGraphButton, 0, 1);
 			this.MenuButtonsTable.Controls.Add(this.SaveGraphButton, 0, 0);
 			this.MenuButtonsTable.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -146,7 +146,7 @@
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.MenuButtonsTable.Size = new System.Drawing.Size(164, 108);
+			this.MenuButtonsTable.Size = new System.Drawing.Size(169, 108);
 			this.MenuButtonsTable.TabIndex = 0;
 			// 
 			// AddItemButton
@@ -155,7 +155,7 @@
 			this.AddItemButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AddItemButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.AddItemButton.Location = new System.Drawing.Point(79, 56);
+			this.AddItemButton.Location = new System.Drawing.Point(84, 56);
 			this.AddItemButton.Margin = new System.Windows.Forms.Padding(2);
 			this.AddItemButton.Name = "AddItemButton";
 			this.AddItemButton.Size = new System.Drawing.Size(83, 23);
@@ -170,7 +170,7 @@
 			this.AddRecipeButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AddRecipeButton.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AddRecipeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.AddRecipeButton.Location = new System.Drawing.Point(79, 83);
+			this.AddRecipeButton.Location = new System.Drawing.Point(84, 83);
 			this.AddRecipeButton.Margin = new System.Windows.Forms.Padding(2);
 			this.AddRecipeButton.Name = "AddRecipeButton";
 			this.AddRecipeButton.Size = new System.Drawing.Size(83, 23);
@@ -184,7 +184,7 @@
 			this.ExportImageButton.AutoSize = true;
 			this.ExportImageButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ExportImageButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ExportImageButton.Location = new System.Drawing.Point(79, 29);
+			this.ExportImageButton.Location = new System.Drawing.Point(84, 29);
 			this.ExportImageButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ExportImageButton.Name = "ExportImageButton";
 			this.ExportImageButton.Size = new System.Drawing.Size(83, 23);
@@ -198,7 +198,7 @@
 			this.EnableDisableButton.AutoSize = true;
 			this.EnableDisableButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.EnableDisableButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.EnableDisableButton.Location = new System.Drawing.Point(79, 2);
+			this.EnableDisableButton.Location = new System.Drawing.Point(84, 2);
 			this.EnableDisableButton.Margin = new System.Windows.Forms.Padding(2);
 			this.EnableDisableButton.Name = "EnableDisableButton";
 			this.EnableDisableButton.Size = new System.Drawing.Size(83, 23);
@@ -207,29 +207,29 @@
 			this.EnableDisableButton.UseVisualStyleBackColor = true;
 			this.EnableDisableButton.Click += new System.EventHandler(this.SettingsButton_Click);
 			// 
-			// MainHelpButton
+			// ImportGraphButton
 			// 
-			this.MainHelpButton.AutoSize = true;
-			this.MainHelpButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.MainHelpButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.MainHelpButton.Location = new System.Drawing.Point(2, 83);
-			this.MainHelpButton.Margin = new System.Windows.Forms.Padding(2);
-			this.MainHelpButton.Name = "MainHelpButton";
-			this.MainHelpButton.Size = new System.Drawing.Size(73, 23);
-			this.MainHelpButton.TabIndex = 9;
-			this.MainHelpButton.Text = "Help";
-			this.MainHelpButton.UseVisualStyleBackColor = true;
-			this.MainHelpButton.Click += new System.EventHandler(this.MainHelpButton_Click);
+			this.ImportGraphButton.AutoSize = true;
+			this.ImportGraphButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.ImportGraphButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ImportGraphButton.Location = new System.Drawing.Point(2, 56);
+			this.ImportGraphButton.Margin = new System.Windows.Forms.Padding(2);
+			this.ImportGraphButton.Name = "ImportGraphButton";
+			this.ImportGraphButton.Size = new System.Drawing.Size(78, 23);
+			this.ImportGraphButton.TabIndex = 9;
+			this.ImportGraphButton.Text = "Import Graph";
+			this.ImportGraphButton.UseVisualStyleBackColor = true;
+			this.ImportGraphButton.Click += new System.EventHandler(this.ImportGraphButton_Click);
 			// 
 			// ClearButton
 			// 
 			this.ClearButton.AutoSize = true;
 			this.ClearButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ClearButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ClearButton.Location = new System.Drawing.Point(2, 56);
+			this.ClearButton.Location = new System.Drawing.Point(2, 83);
 			this.ClearButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ClearButton.Name = "ClearButton";
-			this.ClearButton.Size = new System.Drawing.Size(73, 23);
+			this.ClearButton.Size = new System.Drawing.Size(78, 23);
 			this.ClearButton.TabIndex = 6;
 			this.ClearButton.Text = "Clear Graph";
 			this.ClearButton.UseVisualStyleBackColor = true;
@@ -243,7 +243,7 @@
 			this.LoadGraphButton.Location = new System.Drawing.Point(2, 29);
 			this.LoadGraphButton.Margin = new System.Windows.Forms.Padding(2);
 			this.LoadGraphButton.Name = "LoadGraphButton";
-			this.LoadGraphButton.Size = new System.Drawing.Size(73, 23);
+			this.LoadGraphButton.Size = new System.Drawing.Size(78, 23);
 			this.LoadGraphButton.TabIndex = 10;
 			this.LoadGraphButton.Text = "Load";
 			this.LoadGraphButton.UseVisualStyleBackColor = true;
@@ -257,7 +257,7 @@
 			this.SaveGraphButton.Location = new System.Drawing.Point(2, 2);
 			this.SaveGraphButton.Margin = new System.Windows.Forms.Padding(2);
 			this.SaveGraphButton.Name = "SaveGraphButton";
-			this.SaveGraphButton.Size = new System.Drawing.Size(73, 23);
+			this.SaveGraphButton.Size = new System.Drawing.Size(78, 23);
 			this.SaveGraphButton.TabIndex = 9;
 			this.SaveGraphButton.Text = "Save";
 			this.SaveGraphButton.UseVisualStyleBackColor = true;
@@ -269,7 +269,7 @@
 			this.GridLinesGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.GridLinesGroupBox.Controls.Add(this.GridlinesTable);
 			this.GridLinesGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.GridLinesGroupBox.Location = new System.Drawing.Point(173, 3);
+			this.GridLinesGroupBox.Location = new System.Drawing.Point(178, 3);
 			this.GridLinesGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.GridLinesGroupBox.Name = "GridLinesGroupBox";
 			this.GridLinesGroupBox.Padding = new System.Windows.Forms.Padding(0);
@@ -406,7 +406,7 @@
 			this.ProductionGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ProductionGroupBox.Controls.Add(this.GraphOptionsTable);
 			this.ProductionGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ProductionGroupBox.Location = new System.Drawing.Point(387, 3);
+			this.ProductionGroupBox.Location = new System.Drawing.Point(392, 3);
 			this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.ProductionGroupBox.Name = "ProductionGroupBox";
 			this.ProductionGroupBox.Padding = new System.Windows.Forms.Padding(0);
@@ -523,7 +523,7 @@
         private System.Windows.Forms.Button ClearButton;
         private System.Windows.Forms.Button EnableDisableButton;
         private System.Windows.Forms.Button ExportImageButton;
-        private System.Windows.Forms.Button MainHelpButton;
+        private System.Windows.Forms.Button ImportGraphButton;
         private System.Windows.Forms.GroupBox ProductionGroupBox;
         private System.Windows.Forms.CheckBox PauseUpdatesCheckbox;
         private System.Windows.Forms.ComboBox RateOptionsDropDown;

@@ -101,7 +101,7 @@ local function ExportRecipes()
 
 			tproduct['amount'] = amount
 
-			if product.type == 'fluid' and product.temperate ~= nil then
+			if product.type == 'fluid' and product.temperature ~= nil then
 				tproduct['temperature'] = product.temperature
 			end
 			table.insert(trecipe['products'], tproduct)

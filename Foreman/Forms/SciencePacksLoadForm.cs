@@ -71,8 +71,45 @@ namespace Foreman
 		private void Button_Click(object sender, EventArgs e)
 		{
 			Button sciPackButton = (Button)sender;
-			SciencePackButtons[sciPackButton] = !SciencePackButtons[sciPackButton];
-			sciPackButton.BackColor = SciencePackButtons[sciPackButton] ? EnabledPackBGColor : DisabledPackBGColor;
+			bool enabled = !SciencePackButtons[sciPackButton];
+			SciencePackButtons[sciPackButton] = enabled;
+			sciPackButton.BackColor = enabled ? EnabledPackBGColor : DisabledPackBGColor;
+
+			//NOTE: this is a bit wrong and can fail if there are multiple ways of getting to a given science pack (that are on different tech tree groups); ex: T3 science that can be researched either with T1A science or with T1B science (as this will consider it requiring both T1A AND T1B instead of T1A OR T1B)
+			//but this situation should ideally never happen -> I dont know any mod that allows this sort of tech tree (wouldnt it be extremely confusing to have 2+ widely different techs that can grant you a science pack???)
+
+			if (enabled) //enable all the science packs that are required to make the clicked science pack
+			{
+				HashSet<Item> requiredSciPacks = new HashSet<Item>();
+				foreach (Recipe r in (sciPackButton.Tag as Item).ProductionRecipes)
+					foreach (Technology t in r.MyUnlockTechnologies)
+						requiredSciPacks.UnionWith(t.SciPackList);
+				foreach (Button sciButton in SciencePackButtons.Keys.ToArray())
+				{
+					if (requiredSciPacks.Contains(sciButton.Tag as Item))
+					{
+						sciButton.BackColor = EnabledPackBGColor;
+						SciencePackButtons[sciButton] = true;
+					}
+				}
+			}
+			else //disable all the science packs that have the current science pack in their 'required' to make list
+			{
+				foreach (Button sciButton in SciencePackButtons.Keys.ToArray())
+				{
+					foreach (Recipe r in (sciButton.Tag as Item).ProductionRecipes)
+					{
+						foreach (Technology t in r.MyUnlockTechnologies)
+						{
+							if (t.SciPackSet.ContainsKey(sciPackButton.Tag as Item))
+							{
+								sciButton.BackColor = DisabledPackBGColor;
+								SciencePackButtons[sciButton] = false;
+							}
+						}
+					}
+				}
+			}
 		}
 
 		//------------------------------------------------------------------------------------------------------Button hovers

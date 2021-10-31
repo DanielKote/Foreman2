@@ -504,8 +504,9 @@ namespace Foreman
 						newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
 				}
 			}
-			catch //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
+			catch (Exception e) //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
 			{
+				Console.WriteLine(e);
 				DeleteNodes(newNodeCollection.newNodes);
 				return new NewNodeCollection();
 			}

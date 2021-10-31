@@ -58,6 +58,7 @@ namespace Foreman
 		private DraggedLinkElement draggedLinkElement;
 
 		private Point mouseDownStartScreenPoint;
+		private MouseButtons downButtons; //we use this to ensure that any mouse operations only count if they started on this panel
 
 		private Point ViewDragOriginPoint;
 		private bool viewBeingDragged = false; //separate from dragOperation due to being able to drag view at all stages of dragOperation
@@ -565,6 +566,8 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
+			downButtons |= e.Button;
+
 			ToolTipRenderer.ClearFloatingControls();
 			ActiveControl = null; //helps panels like IRChooserPanel (for item/recipe choosing) close when we click on the graph
 
@@ -593,6 +596,8 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
 		{
+			downButtons &= ~e.Button;
+
 			ToolTipRenderer.ClearFloatingControls();
 			Point graph_location = ScreenToGraph(e.Location);
 			GraphElement element = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(graph_location);
@@ -678,6 +683,8 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
+			downButtons &= Control.MouseButtons; //only care about those buttons that were pressed down on this control. This is also the best place to update mouse changes done outside the control (ex: clicking down, dragging outside the window, letting go, moving mouse back into window)
+
 			Point graph_location = ScreenToGraph(e.Location);
 
 			if (currentDragOperation != DragOperation.Selection) //dont care about element mouse move operations during selection operation
@@ -692,12 +699,12 @@ namespace Foreman
 					Point dragDiff = Point.Subtract(Control.MousePosition, (Size)mouseDownStartScreenPoint);
 					if (dragDiff.X * dragDiff.X + dragDiff.Y * dragDiff.Y > minDragDiff)
 					{
-						if ((Control.MouseButtons & MouseButtons.Middle) == MouseButtons.Middle || (Control.MouseButtons & MouseButtons.Right) == MouseButtons.Right)
+						if ((downButtons & MouseButtons.Middle) == MouseButtons.Middle || (downButtons & MouseButtons.Right) == MouseButtons.Right)
 							viewBeingDragged = true;
 
 						if (MouseDownElement != null) //there is an item under the mouse during drag
 							currentDragOperation = DragOperation.Item;
-						else if ((Control.MouseButtons & MouseButtons.Left) != 0)
+						else if ((downButtons & MouseButtons.Left) != 0)
 							currentDragOperation = DragOperation.Selection;
 					}
 					break;
@@ -722,7 +729,7 @@ namespace Foreman
 					}
 
 					//accept middle mouse button for view dragging purposes (while dragging item or selection)
-					if ((Control.MouseButtons & MouseButtons.Middle) == MouseButtons.Middle)
+					if ((downButtons & MouseButtons.Middle) == MouseButtons.Middle)
 						viewBeingDragged = true;
 					break;
 
@@ -734,7 +741,7 @@ namespace Foreman
 					UpdateSelection();
 
 					//accept middle mouse button for view dragging purposes (while dragging item or selection)
-					if ((Control.MouseButtons & MouseButtons.Middle) == MouseButtons.Middle)
+					if ((downButtons & MouseButtons.Middle) == MouseButtons.Middle)
 						viewBeingDragged = true;
 					break;
 			}
@@ -800,44 +807,12 @@ namespace Foreman
 				}
 				else if (e.KeyCode == Keys.V && (e.Modifiers & Keys.Control) == Keys.Control) //paste
 				{
-					ProductionGraph.NewNodeCollection newNodeCollection = null;
 					try
 					{
 						JObject json = JObject.Parse(Clipboard.GetText());
-						newNodeCollection = Graph.InsertNodesFromJson(DCache, json); //NOTE: missing items & recipes may be added here!
+						ImportNodesFromJson(json, ScreenToGraph(PointToClient(Cursor.Position)));
 					}
 					catch { Console.WriteLine("Non-Foreman paste detected."); } //clipboard string wasnt a proper json object, or didnt process properly. Likely answer: was a clip NOT from foreman.
-					if (newNodeCollection == null || newNodeCollection.newNodes.Count == 0)
-						return;
-
-					//update the locations of the new nodes to be centered around the mouse position (as opposed to wherever they were before)
-					long xAve = 0;
-					long yAve = 0;
-					foreach (ReadOnlyBaseNode newNode in newNodeCollection.newNodes)
-					{
-						xAve += newNode.Location.X;
-						yAve += newNode.Location.Y;
-					}
-					xAve /= newNodeCollection.newNodes.Count;
-					yAve /= newNodeCollection.newNodes.Count;
-
-
-					Point importCenter = new Point((int)xAve, (int)yAve);
-					Point mousePos = ScreenToGraph(PointToClient(Cursor.Position));
-					Size offset = (Size)Grid.AlignToGrid(Point.Subtract(mousePos, (Size)importCenter));
-					foreach (ReadOnlyBaseNode newNode in newNodeCollection.newNodes)
-						Graph.RequestNodeController(newNode).SetLocation(Point.Add(newNode.Location, offset));
-
-					//update the selection to be just the newly imported nodes
-					ClearSelection();
-					foreach (BaseNodeElement newNodeElement in newNodeCollection.newNodes.Select(node => nodeElementDictionary[node]))
-					{
-						selectedNodes.Add(newNodeElement);
-						newNodeElement.Highlighted = true;
-					}
-
-					UpdateGraphBounds();
-					Graph.UpdateNodeValues();
 				}
 			}
 			else if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
@@ -1012,6 +987,41 @@ namespace Foreman
 
 			//graph :)
 			info.AddValue("ProductionGraph", Graph);
+		}
+
+		public void ImportNodesFromJson(JObject json, Point origin)
+		{
+			ProductionGraph.NewNodeCollection newNodeCollection = newNodeCollection = Graph.InsertNodesFromJson(DCache, json); //NOTE: missing items & recipes may be added here!
+			if (newNodeCollection == null || newNodeCollection.newNodes.Count == 0)
+				return;
+
+			//update the locations of the new nodes to be centered around the mouse position (as opposed to wherever they were before)
+			long xAve = 0;
+			long yAve = 0;
+			foreach (ReadOnlyBaseNode newNode in newNodeCollection.newNodes)
+			{
+				xAve += newNode.Location.X;
+				yAve += newNode.Location.Y;
+			}
+			xAve /= newNodeCollection.newNodes.Count;
+			yAve /= newNodeCollection.newNodes.Count;
+
+			Point importCenter = new Point((int)xAve, (int)yAve);
+			Size offset = (Size)Grid.AlignToGrid(Point.Subtract(origin, (Size)importCenter));
+			foreach (ReadOnlyBaseNode newNode in newNodeCollection.newNodes)
+				Graph.RequestNodeController(newNode).SetLocation(Point.Add(newNode.Location, offset));
+
+			//update the selection to be just the newly imported nodes
+			ClearSelection();
+			foreach (BaseNodeElement newNodeElement in newNodeCollection.newNodes.Select(node => nodeElementDictionary[node]))
+			{
+				selectedNodes.Add(newNodeElement);
+				newNodeElement.Highlighted = true;
+			}
+			Console.WriteLine(selectedNodes.Count);
+
+			UpdateGraphBounds();
+			Graph.UpdateNodeValues();
 		}
 
 		public async Task LoadFromJson(JObject json, bool useFirstPreset, bool setEnablesFromJson)

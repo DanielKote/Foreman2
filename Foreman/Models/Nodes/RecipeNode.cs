@@ -167,6 +167,9 @@ namespace Foreman
 			if (!AllLinksValid)
 				ErrorSet |= Errors.InvalidLinks;
 
+			if (ErrorSet != Errors.Clean) //warnings are NOT processed if error has been found. This makes sense (as an error is something that trumps warnings), plus guarantees we dont accidentally check statuses of missing objects (which rightfully dont exist in regular cache)
+				return NodeState.Error;
+
 			//warning states (either not enabled or not available both throw up warnings)
 			if (!BaseRecipe.Enabled)
 				WarningSet |= Warnings.RecipeIsDisabled;
@@ -203,8 +206,6 @@ namespace Foreman
 			if (BeaconModules.Any(m => !m.Available))
 				WarningSet |= Warnings.BModuleIsUnavailable;
 
-			if (ErrorSet != Errors.Clean)
-				return NodeState.Error;
 			if (WarningSet != Warnings.Clean)
 				return NodeState.Warning;
 			return NodeState.Clean;

@@ -245,7 +245,7 @@ namespace Foreman
 
 				ProcessDataCleanup();
 #if DEBUG
-				//PrintDataCache();
+				PrintDataCache();
 #endif
 
 				progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
@@ -1264,10 +1264,12 @@ namespace Foreman
 			Dictionary<Item, int> sciencePackTiers = new Dictionary<Item, int>();
 			foreach(ItemPrototype sciPack in sciPacks)
 			{
-				int minTier = int.MaxValue; //NOTE: this also means that if a science pack has no recipe (EX: Space science pack), it will be listed at int max value tier (aka: sorted last). That is fine.
+				int minTier = int.MaxValue; 
 				foreach (Recipe recipe in sciPack.productionRecipes)
 					foreach (Technology tech in recipe.MyUnlockTechnologies)
 						minTier = Math.Min(minTier, tech.Tier);
+				if (minTier == int.MaxValue) //there are no recipes for this sci pack. EX: space science pack. We will grant it the same tier as the first tech to require this sci pack. This should sort them relatively correctly (ex - placing space sci pack last, and placing seablock starting tech first)
+					minTier = techRequirements.Where(kvp => kvp.Value.Contains(sciPack)).Select(kvp => kvp.Key).Min(t => t.Tier);
 				sciencePackTiers.Add(sciPack, minTier);
 				sciencePacks.Add(sciPack);
 			}

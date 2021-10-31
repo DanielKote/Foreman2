@@ -23,6 +23,7 @@ namespace Foreman
 		private static StringFormat topFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
 		private static Pen regularBorderPen = new Pen(Color.DimGray, 3);
 		private static Pen oversuppliedBorderPen = new Pen(Color.DarkGoldenrod, 3);
+		private static Pen disconnectedBorderPen = new Pen(Color.DarkRed, 3);
 		private static Brush textBrush = Brushes.Black;
 		private static Brush fillBrush = Brushes.White;
 
@@ -54,16 +55,18 @@ namespace Foreman
 				return LocalToGraph(new Point(0, -Height / 2));
 		}
 
-		public void UpdateValues(double consumeRate, double suppliedRate, bool isOversupplied)
+		public void UpdateValues(double recipeRate, double suppliedRate, bool isOversupplied) //if input then: recipe rate = consume rate; if output then recipe rate = production rate
 		{
 			borderPen = regularBorderPen;
-			text = GraphicsStuff.DoubleToString(consumeRate);
+			text = GraphicsStuff.DoubleToString(recipeRate);
 
 			if (isOversupplied)
 			{
 				borderPen = oversuppliedBorderPen;
 				text += "\n" + GraphicsStuff.DoubleToString(suppliedRate);
 			}
+			else if (recipeRate > 0 && !Links.Any())
+				borderPen = disconnectedBorderPen;
 
 			int textHeight = (int)graphViewer.CreateGraphics().MeasureString(text, textFont).Height;
 			Height = iconSize + textHeight + border + 3;
