@@ -31,7 +31,7 @@ namespace Foreman
 			Height = 96;
 		}
 		
-		public override void Paint(Graphics graphics)
+		public override void Paint(Graphics graphics, Point trans)
 		{
 			int i = 0;
 
@@ -58,11 +58,11 @@ namespace Foreman
 				}
 				Point position = Point.Subtract(OffsetOrder[i], new Size(iconSize / 2, iconSize / 2));
 				int scale = Convert.ToInt32(iconSize / Parent.ViewScale);
-				graphics.DrawImage(icon ?? DataCache.UnknownIcon, position.X, position.Y, scale, scale);
+				graphics.DrawImage(icon ?? DataCache.UnknownIcon, position.X + trans.X, position.Y + trans.Y, scale, scale);
 				i++;
 			}
 
-			base.Paint(graphics);
+			base.Paint(graphics, trans);
 		}
 
 		public override void Dispose()

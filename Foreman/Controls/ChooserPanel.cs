@@ -48,7 +48,9 @@ namespace Foreman
 			this.BringToFront();
 			parent.PerformLayout();
 
-			FilterTextBox.Focus();
+			//tableLayoutPanel1.Focus();
+			flowLayoutPanel1.Focus();
+			//this.Focus();
 		}
 
 		private void ChooserPanel_Load(object sender, EventArgs e)
@@ -112,11 +114,12 @@ namespace Foreman
 					CallbackMethod(SelectedControl);
 					Dispose();
 					break;
-				default:
-					FilterTextBox.Focus();
-					SendKeys.Send(e.KeyCode.ToString());
-					break;
+					//default:
+					//	FilterTextBox.Focus();
+					//	SendKeys.Send(e.KeyCode.ToString());
+					//	break;
 			}
+			e.Handled = true;
 		}
 
 		private void ChooserPanel_MouseMove(object sender, MouseEventArgs e)

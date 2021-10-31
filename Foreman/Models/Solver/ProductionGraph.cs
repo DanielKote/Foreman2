@@ -10,6 +10,8 @@ namespace Foreman
 
 	public class ProductionGraph
 	{
+		public ModuleSelector defaultModuleSelector = ModuleSelector.None;
+		public bool PauseUpdates = false;
 		public List<ProductionNode> Nodes = new List<ProductionNode>();
 		private int[,] adjacencyMatrixCache = null;
 		private AmountType selectedAmountType = AmountType.FixedAmount;
@@ -90,7 +92,7 @@ namespace Foreman
 			}
 		}
 
-		public void LinkUpAllInputs()
+		public void LinkUpAllInputs(ModuleSelector defaultModuleSelector)
 		{
 			HashSet<ProductionNode> nodesToVisit = new HashSet<ProductionNode>(Nodes);
 
@@ -99,7 +101,7 @@ namespace Foreman
 				ProductionNode currentNode = nodesToVisit.First();
 				nodesToVisit.Remove(nodesToVisit.First());
 				
-				nodesToVisit.UnionWith(CreateOrLinkAllPossibleRecipeNodes(currentNode));
+				nodesToVisit.UnionWith(CreateOrLinkAllPossibleRecipeNodes(currentNode, defaultModuleSelector));
 				nodesToVisit.UnionWith(CreateOrLinkAllPossibleSupplyNodes(currentNode));
 				CreateAllPossibleInputLinks();
 			}
@@ -165,16 +167,19 @@ namespace Foreman
 
 		public void UpdateNodeValues()
 		{
-			try
+			if (!PauseUpdates)
 			{
-				this.FindOptimalGraphToSatisfyFixedNodes();
+				try
+				{
+					this.FindOptimalGraphToSatisfyFixedNodes();
+				}
+				catch (OverflowException)
+				{
+					//If the numbers here are so big they're causing an overflow, there's not much I can do about it. It's already pretty clear in the UI that the values are unusable.
+					//At least this way it doesn't crash...
+				}
+				UpdateLinkThroughputs();
 			}
-			catch (OverflowException)
-			{
-				//If the numbers here are so big they're causing an overflow, there's not much I can do about it. It's already pretty clear in the UI that the values are unusable.
-				//At least this way it doesn't crash...
-			}
-			UpdateLinkThroughputs();
 		}
 
 		public void CreateAllPossibleInputLinks()
@@ -201,7 +206,7 @@ namespace Foreman
 		}
 
 		//Returns any nodes that are created
-		public IEnumerable<ProductionNode> CreateOrLinkAllPossibleRecipeNodes(ProductionNode node)
+		public IEnumerable<ProductionNode> CreateOrLinkAllPossibleRecipeNodes(ProductionNode node, ModuleSelector defaultModuleSelector)
 		{
 			List<ProductionNode> createdNodes = new List<ProductionNode>();
 

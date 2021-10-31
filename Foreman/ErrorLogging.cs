@@ -13,7 +13,7 @@ namespace Foreman
 		{
 			try
 			{
-				File.AppendAllText(Path.Combine(Application.StartupPath, "errorlog.txt"), message + "\n");
+				File.AppendAllText(Path.Combine(Application.StartupPath, "errorlog.txt"), "[" +  DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "]: " + message + "\n");
 			}
 			catch { } //Not good.
 		}

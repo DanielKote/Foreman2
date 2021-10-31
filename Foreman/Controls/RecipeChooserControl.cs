@@ -24,6 +24,7 @@ namespace Foreman
             ColorIcon = recipe.Icon;
             GrayIcon = GraphicsStuff.MakeMonochrome(recipe.Icon);
 
+            
             setClickHandler(new MouseEventHandler(RecipeChooserControl_MouseUp), this);
             
 		}

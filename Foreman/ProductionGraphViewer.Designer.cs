@@ -30,6 +30,10 @@
 			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseDown);
 			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseMove);
 			this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseUp);
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ProductionGraphViewer_KeyDown);
+			this.MouseEnter += new System.EventHandler(this.ProductionGraphViewer_MouseEnter);
+			this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.ProductionGraphViewer_KeyUp);
+			this.LostFocus += new System.EventHandler(this.ProductionGraphViewer_LostFocus);
 			this.ResumeLayout(false);
 
 		}

@@ -11,27 +11,27 @@ namespace Foreman
 		public LinkType Type;
 
 		private const int iconSize = 32;
-		private const int border = 4;
+		private const int border = 3;
 		private int textHeight = 11;
 		private StringFormat centreFormat = new StringFormat();
 		private Pen borderPen = new Pen(Color.Gray, 3);
 		private Brush textBrush = new SolidBrush(Color.Black);
-		private Brush fillBrush;
+		private Brush fillBrush = new SolidBrush(Color.White);
 
-		private Color fillColour;
-		public Color FillColour
+		private Color borderColor;
+		public Color BorderColor
 		{
 			get
 			{
-				return fillColour;
+				return borderColor;
 			}
 			set {
-				fillColour = value;
+				borderColor = value;
 				if (fillBrush != null)
 				{
-					fillBrush.Dispose();
+					borderPen.Dispose();
 				}
-				fillBrush = new SolidBrush(value);
+				borderPen = new Pen(value, 3);
 			}
 		}
 
@@ -46,7 +46,7 @@ namespace Foreman
 			}
 		}
 
-		public Font font = new Font(FontFamily.GenericSansSerif, 7);
+		public Font font = new Font(FontFamily.GenericSansSerif, 6);
 		public Item Item { get; private set; }
 
 		public ItemTab(Item item, LinkType type, ProductionGraphViewer parent)
@@ -55,7 +55,7 @@ namespace Foreman
 			this.Item = item;
 			this.Type = type;
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
-			FillColour = Color.White;
+			BorderColor = Color.White;
 		}
 		
 		public override System.Drawing.Point Size
@@ -69,7 +69,7 @@ namespace Foreman
 			}
 		}
 
-		public override void Paint(Graphics graphics)
+		public override void Paint(Graphics graphics, Point trans)
 		{
 			Point iconPoint = Point.Empty;
 			if (Type == LinkType.Output)
@@ -83,17 +83,17 @@ namespace Foreman
 
 			if (Type == LinkType.Output)
 			{
-				GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
-				GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
-				graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, (textHeight + border) / 2), centreFormat);
+				GraphicsStuff.FillRoundRect(trans.X, trans.Y, Width, Height, border, graphics, fillBrush);
+				GraphicsStuff.DrawRoundRect(trans.X, trans.Y, Width, Height, border, graphics, borderPen);
+				graphics.DrawString(Text, font, textBrush, new PointF(Width / 2 + trans.X, (textHeight + border) / 2 + trans.Y), centreFormat);
 			}
 			else
 			{
-				GraphicsStuff.FillRoundRect(0, 0, Width, Height, border, graphics, fillBrush);
-				GraphicsStuff.DrawRoundRect(0, 0, Width, Height, border, graphics, borderPen);
-				graphics.DrawString(Text, font, textBrush, new PointF(Width / 2, Height - (textHeight + border) / 2), centreFormat);
+				GraphicsStuff.FillRoundRect(trans.X, trans.Y, Width, Height, border, graphics, fillBrush);
+				GraphicsStuff.DrawRoundRect(trans.X, trans.Y, Width, Height, border, graphics, borderPen);
+				graphics.DrawString(Text, font, textBrush, new PointF(Width / 2 + trans.X, Height - (textHeight + border) / 2 + trans.Y), centreFormat);
 			}
-			graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
+			graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, iconPoint.X + trans.X, iconPoint.Y + trans.Y, iconSize, iconSize);
 		}
 
 		public override void Dispose()

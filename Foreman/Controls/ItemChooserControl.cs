@@ -16,6 +16,7 @@ namespace Foreman
 		public ItemChooserControl(Item item, String text, String filterText) : base(text, filterText)
 		{
 			InitializeComponent();
+			this.DoubleBuffered = true;
 
 			DisplayedItem = item;
 			TextLabel.Text = text;
@@ -25,6 +26,7 @@ namespace Foreman
 		{
 			iconPictureBox.Image = DisplayedItem != null ? DisplayedItem.Icon : null;
 			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
+			MainForm.SetDoubleBuffered(tableLayoutPanel1);
 
 			RegisterMouseEvents(this);
 		}

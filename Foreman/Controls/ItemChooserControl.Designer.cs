@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.DoubleBuffered = true;
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.iconPictureBox = new System.Windows.Forms.PictureBox();
 			this.TextLabel = new System.Windows.Forms.Label();

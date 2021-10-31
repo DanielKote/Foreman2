@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace Foreman
 {
@@ -44,7 +45,10 @@ namespace Foreman
 			{
                 if (DataCache.LocaleFiles.ContainsKey("recipe-name") && DataCache.LocaleFiles["recipe-name"].ContainsKey(Name))
                 {
-                    return DataCache.LocaleFiles["recipe-name"][Name];
+					if (DataCache.LocaleFiles["recipe-name"][Name].Contains("__"))
+						return Regex.Replace(DataCache.LocaleFiles["recipe-name"][Name], "__.+?__", "").Replace("_", "").Replace("-", " ");
+					else
+						return DataCache.LocaleFiles["recipe-name"][Name];
                 }
                 else if (Results.Count == 1)
                 {

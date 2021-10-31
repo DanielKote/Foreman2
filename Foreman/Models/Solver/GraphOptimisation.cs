@@ -1,12 +1,16 @@
-﻿using System;
+﻿//#define VERBOSEDEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+
 
 namespace Foreman
 {
     public static partial class GraphOptimisations
     {
+        private static int updateCounter = 0;
         public static void FindOptimalGraphToSatisfyFixedNodes(this ProductionGraph graph)
         {
             foreach (ProductionNode node in graph.Nodes.Where(n => n.rateType == RateType.Auto))
@@ -20,6 +24,8 @@ namespace Foreman
             }
 
             graph.UpdateLinkThroughputs();
+
+            Debug.WriteLine("UPDATE #" + updateCounter++);
         }
 
         public static void OptimiseNodeGroup(IEnumerable<ProductionNode> nodeGroup)
@@ -33,7 +39,9 @@ namespace Foreman
 
             var solution = solver.Solve();
 
+#if VERBOSEDEBUG
             Debug.WriteLine(solver.ToString());
+#endif
 
             // TODO: Handle BIG NUMBERS
             // TODO: Return error in solution!?

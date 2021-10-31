@@ -1,0 +1,7039 @@
+{
+  "AmountType": 1,
+  "Unit": 1,
+  "Nodes": [
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "geode-blue-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 523.125,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "geode-purple-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 261.5625,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "geode-lightgreen-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 209.250015,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "geode-cyan-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 209.250015,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "geode-red-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 523.125,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "geode-yellow-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 348.75,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-blue",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-purple",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-yellow",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-lightgreen",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-cyan",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-red",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-blue",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-purple",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-yellow",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-lightgreen",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-cyan",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "geode-red",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "washing-1",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 139.5,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-viscous-mud",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 10.4625,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-viscous-mud",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 3.9234376,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 8544.375
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-geodes",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 697.5,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 17437.5
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water-viscous-mud",
+      "RateType": 1,
+      "ActualRate": 27900.0,
+      "DesiredRate": 27900.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-sulfur",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 4.65,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "crystal-dust-liquify",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 352.237518,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 758.430359
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 33045.07
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "crystal-slurry-filtering-conversion-1",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 352.237518,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "filter-coal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 70.4475,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "yellow-waste-water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 140.895,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-mineralized",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 330.4507,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 17611.875
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-sulfur-dioxide",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 132.089066,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "liquid-sulfuric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 88.05938,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-purified",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 15.850688,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "sulfur",
+      "RateType": 0,
+      "ActualRate": 22.7559376
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "air-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 162.226883,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-air-filtering",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 81.11344,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-chemical-void-gas-nitrogen",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 81.11344,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "sb-wood-bricks-charcoal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 16.6463852,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "wood-bricks",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 4.1615963,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "wood-pellets",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 16.6463852,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "cellulose-fiber-algae",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 39.9513245,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "algae-green",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 7.990265,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "carbon-separation-2",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 12.7844238,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "sulfur",
+      "RateType": 0,
+      "ActualRate": 22.7559376
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 19967.4316
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-1",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-5",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-2",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-3",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-4",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 798.6972,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-6",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore1-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore2-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore3-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore4-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 399.3486,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore5-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore6-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 1167.99426
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-crushed",
+      "RateType": 0,
+      "ActualRate": 12.4853354
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-crushed",
+      "RateType": 0,
+      "ActualRate": 7.945213
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-crushed",
+      "RateType": 0,
+      "ActualRate": 798.6972
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore1-chunk",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore2-chunk",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore3-chunk",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore4-chunk",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore5-chunk",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore6-chunk",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "yellow-waste-water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "greenyellow-waste-water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "green-waste-water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "red-waste-water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "water-purified",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "water-mineralized",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-sodium-nitrate",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-salt",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "fluorite-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "sulfur",
+      "RateType": 0,
+      "ActualRate": 23.9337158
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "water-mineralized",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-crushed",
+      "RateType": 0,
+      "ActualRate": 12.4853354
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-crushed",
+      "RateType": 0,
+      "ActualRate": 7.945213
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-crushed",
+      "RateType": 0,
+      "ActualRate": 798.6972
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore6-crystal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore5-crystal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore4-crystal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore3-crystal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore2-crystal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore1-crystal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-sulfuric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrofluoric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrochloric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-nitric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "sulfur",
+      "RateType": 0,
+      "ActualRate": 23.9337158
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "air-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-air-filtering",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-chemical-void-gas-nitrogen",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-salt",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-salt-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-electrode-used",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-mineralized",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-chlorine",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-sodium-hydroxide",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-sodium-hydroxide",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-sodium-hydroxide",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-saline-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 9422.223
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-chlorine",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 9422.223
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-electrode-used",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 235.555557,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-oxygen",
+      "RateType": 0,
+      "ActualRate": 7066.6665
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-oxygen",
+      "RateType": 0,
+      "ActualRate": 7066.6665
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 5.888889,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "sb-water-mineralized-crystallization",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 11.3503046,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-crushed",
+      "RateType": 0,
+      "ActualRate": 12.4853354
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-crushed",
+      "RateType": 0,
+      "ActualRate": 7.945213
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 758.430359
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 768.6456
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 10.2152739
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore1-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 6.24266768,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore3-crushed",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 3.97260642,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "crystal-slurry-filtering-1",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "dirt-water-separation-2",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 235.555557,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-dissolution",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 47.11111,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "slag-processing-filtering-1",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 47.11111,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 2355.55566
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "filter-coal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 9.422222,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "sb-wood-bricks-charcoal",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 2.226423,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "wood-bricks",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.556605756,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "wood-pellets",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 2.226423,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "cellulose-fiber-algae",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 5.34341526,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "carbon-separation-2",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 1.70989287,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "algae-green",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 1.068683,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 15.0755558,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.7537778,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 2261.33325
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "yellow-waste-water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 18.8444443,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 41222.2227
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 1,
+      "ActualRate": 31800.0,
+      "DesiredRate": 31800.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 117.777779,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "liquid-sulfuric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 11.7777777,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-sulfur-dioxide",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 17.666666,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "sulfur",
+      "RateType": 0,
+      "ActualRate": 1.17777777
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "air-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 21.2,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-chemical-void-gas-nitrogen",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 10.6,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-air-filtering",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 10.6,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-oxygen",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "air-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-chemical-void-gas-nitrogen",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-air-filtering",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-chlorine",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 9422.223
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-oxygen",
+      "RateType": 0,
+      "ActualRate": 7066.6665
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-sodium-hydroxide",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "liquid-hydrofluoric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "fluorite-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-chunk-mix6-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "catalysator-green",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-sulfur-dioxide-calcium-sulfate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "liquid-sulfuric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "liquid-sulfuric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "sulfur",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-sulfur-dioxide",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-sulfuric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrofluoric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-sodium-nitrate",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "solid-sodium-nitrate-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-air-filtering",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "liquid-nitric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-nitric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-nitrogen-dioxide",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "air-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-air-filtering",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-chemical-void-gas-nitrogen",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-ammonia",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-nitrogen-monoxide",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "catalyst-metal-green",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "catalyst-metal-red",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "iron-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "copper-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "bauxite-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "silver-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-chlorine",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "gas-hydrogen-chloride",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 9422.223
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-chlorine",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-oxygen",
+      "RateType": 0,
+      "ActualRate": 7066.6665
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "liquid-hydrochloric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrochloric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-crushed",
+      "RateType": 0,
+      "ActualRate": 12.4853354
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-crushed",
+      "RateType": 0,
+      "ActualRate": 7.945213
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-crushed",
+      "RateType": 0,
+      "ActualRate": 798.6972
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-sulfuric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrofluoric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrochloric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-nitric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 1167.99426
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 1167.99426
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-separation",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "water-purification",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angels-water-void-water-saline",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-pure-mix1-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-pure-mix2-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-crystal-mix1-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-crystal-mix2-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-chunk-mix5-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-chunk-mix3-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-crushed-mix2-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore-crushed-mix1-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore2-pure",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore1-pure",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore3-pure",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore5-pure",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore4-pure",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "angelsore6-pure",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "catalysator-orange",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "catalysator-brown",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "catalysator-green",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Best"
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "stone-crushed",
+      "RateType": 0,
+      "ActualRate": 1167.99426
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "iron-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "copper-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "bauxite-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "silver-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gold-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "rutile-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "platinum-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "tungsten-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "iron-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "copper-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "bauxite-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "silver-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-crystal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-chunk",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore1-crushed",
+      "RateType": 0,
+      "ActualRate": 12.4853354
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore2-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore3-crushed",
+      "RateType": 0,
+      "ActualRate": 7.945213
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore4-crushed",
+      "RateType": 0,
+      "ActualRate": 798.6972
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore5-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "angels-ore6-crushed",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "mineral-sludge",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "crystal-seedling",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-chlorine",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-hydrogen",
+      "RateType": 0,
+      "ActualRate": 9422.223
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "gas-oxygen",
+      "RateType": 0,
+      "ActualRate": 7066.6665
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "solid-sodium-hydroxide",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "sulfur",
+      "RateType": 0,
+      "ActualRate": 23.9337158
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-sulfuric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrofluoric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-hydrochloric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "PassThrough",
+      "ItemName": "liquid-nitric-acid",
+      "RateType": 0,
+      "ActualRate": 0.0
+    }
+  ],
+  "NodeLinks": [
+    {
+      "Supplier": 6,
+      "Consumer": 0,
+      "Item": "geode-blue"
+    },
+    {
+      "Supplier": 22,
+      "Consumer": 0,
+      "Item": "geode-blue"
+    },
+    {
+      "Supplier": 7,
+      "Consumer": 1,
+      "Item": "geode-purple"
+    },
+    {
+      "Supplier": 22,
+      "Consumer": 1,
+      "Item": "geode-purple"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 2,
+      "Item": "geode-lightgreen"
+    },
+    {
+      "Supplier": 22,
+      "Consumer": 2,
+      "Item": "geode-lightgreen"
+    },
+    {
+      "Supplier": 10,
+      "Consumer": 3,
+      "Item": "geode-cyan"
+    },
+    {
+      "Supplier": 22,
+      "Consumer": 3,
+      "Item": "geode-cyan"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 4,
+      "Item": "geode-red"
+    },
+    {
+      "Supplier": 22,
+      "Consumer": 4,
+      "Item": "geode-red"
+    },
+    {
+      "Supplier": 8,
+      "Consumer": 5,
+      "Item": "geode-yellow"
+    },
+    {
+      "Supplier": 22,
+      "Consumer": 5,
+      "Item": "geode-yellow"
+    },
+    {
+      "Supplier": 12,
+      "Consumer": 6,
+      "Item": "geode-blue"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 7,
+      "Item": "geode-purple"
+    },
+    {
+      "Supplier": 14,
+      "Consumer": 8,
+      "Item": "geode-yellow"
+    },
+    {
+      "Supplier": 15,
+      "Consumer": 9,
+      "Item": "geode-lightgreen"
+    },
+    {
+      "Supplier": 16,
+      "Consumer": 10,
+      "Item": "geode-cyan"
+    },
+    {
+      "Supplier": 17,
+      "Consumer": 11,
+      "Item": "geode-red"
+    },
+    {
+      "Supplier": 68,
+      "Consumer": 12,
+      "Item": "geode-blue"
+    },
+    {
+      "Supplier": 69,
+      "Consumer": 13,
+      "Item": "geode-purple"
+    },
+    {
+      "Supplier": 70,
+      "Consumer": 14,
+      "Item": "geode-yellow"
+    },
+    {
+      "Supplier": 71,
+      "Consumer": 15,
+      "Item": "geode-lightgreen"
+    },
+    {
+      "Supplier": 72,
+      "Consumer": 16,
+      "Item": "geode-cyan"
+    },
+    {
+      "Supplier": 73,
+      "Consumer": 17,
+      "Item": "geode-red"
+    },
+    {
+      "Supplier": 21,
+      "Consumer": 18,
+      "Item": "water"
+    },
+    {
+      "Supplier": 24,
+      "Consumer": 18,
+      "Item": "water-viscous-mud"
+    },
+    {
+      "Supplier": 18,
+      "Consumer": 19,
+      "Item": "solid-mud"
+    },
+    {
+      "Supplier": 21,
+      "Consumer": 19,
+      "Item": "water"
+    },
+    {
+      "Supplier": 19,
+      "Consumer": 20,
+      "Item": "water-viscous-mud"
+    },
+    {
+      "Supplier": 18,
+      "Consumer": 22,
+      "Item": "water-heavy-mud"
+    },
+    {
+      "Supplier": 23,
+      "Consumer": 22,
+      "Item": "water"
+    },
+    {
+      "Supplier": 18,
+      "Consumer": 25,
+      "Item": "gas-hydrogen-sulfide"
+    },
+    {
+      "Supplier": 38,
+      "Consumer": 25,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 4,
+      "Consumer": 26,
+      "Item": "crystal-dust"
+    },
+    {
+      "Supplier": 3,
+      "Consumer": 26,
+      "Item": "crystal-dust"
+    },
+    {
+      "Supplier": 2,
+      "Consumer": 26,
+      "Item": "crystal-dust"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 26,
+      "Item": "crystal-dust"
+    },
+    {
+      "Supplier": 1,
+      "Consumer": 26,
+      "Item": "crystal-dust"
+    },
+    {
+      "Supplier": 0,
+      "Consumer": 26,
+      "Item": "crystal-dust"
+    },
+    {
+      "Supplier": 35,
+      "Consumer": 26,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 4,
+      "Consumer": 27,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 3,
+      "Consumer": 27,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 2,
+      "Consumer": 27,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 27,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 1,
+      "Consumer": 27,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 0,
+      "Consumer": 27,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 26,
+      "Consumer": 29,
+      "Item": "crystal-slurry"
+    },
+    {
+      "Supplier": 30,
+      "Consumer": 29,
+      "Item": "filter-charcoal"
+    },
+    {
+      "Supplier": 31,
+      "Consumer": 29,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 32,
+      "Consumer": 29,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 88,
+      "Consumer": 29,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 29,
+      "Consumer": 30,
+      "Item": "filter-frame"
+    },
+    {
+      "Supplier": 41,
+      "Consumer": 30,
+      "Item": "wood-charcoal"
+    },
+    {
+      "Supplier": 158,
+      "Consumer": 30,
+      "Item": "filter-frame"
+    },
+    {
+      "Supplier": 29,
+      "Consumer": 31,
+      "Item": "water-yellow-waste"
+    },
+    {
+      "Supplier": 158,
+      "Consumer": 31,
+      "Item": "water-yellow-waste"
+    },
+    {
+      "Supplier": 4,
+      "Consumer": 32,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 3,
+      "Consumer": 32,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 2,
+      "Consumer": 32,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 32,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 1,
+      "Consumer": 32,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 0,
+      "Consumer": 32,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 28,
+      "Consumer": 32,
+      "Item": "water"
+    },
+    {
+      "Supplier": 29,
+      "Consumer": 33,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 31,
+      "Consumer": 34,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 38,
+      "Consumer": 34,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 34,
+      "Consumer": 35,
+      "Item": "gas-sulfur-dioxide"
+    },
+    {
+      "Supplier": 31,
+      "Consumer": 35,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 31,
+      "Consumer": 36,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 25,
+      "Consumer": 37,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 31,
+      "Consumer": 37,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 39,
+      "Consumer": 38,
+      "Item": "gas-compressed-air"
+    },
+    {
+      "Supplier": 38,
+      "Consumer": 40,
+      "Item": "gas-nitrogen"
+    },
+    {
+      "Supplier": 42,
+      "Consumer": 41,
+      "Item": "wood-bricks"
+    },
+    {
+      "Supplier": 43,
+      "Consumer": 42,
+      "Item": "wood-pellets"
+    },
+    {
+      "Supplier": 44,
+      "Consumer": 43,
+      "Item": "cellulose-fiber"
+    },
+    {
+      "Supplier": 45,
+      "Consumer": 44,
+      "Item": "algae-green"
+    },
+    {
+      "Supplier": 31,
+      "Consumer": 45,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 46,
+      "Consumer": 45,
+      "Item": "gas-carbon-dioxide"
+    },
+    {
+      "Supplier": 41,
+      "Consumer": 46,
+      "Item": "wood-charcoal"
+    },
+    {
+      "Supplier": 37,
+      "Consumer": 47,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 33,
+      "Consumer": 48,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 166,
+      "Consumer": 48,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 48,
+      "Consumer": 49,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 48,
+      "Consumer": 50,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 48,
+      "Consumer": 51,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 48,
+      "Consumer": 52,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 48,
+      "Consumer": 53,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 48,
+      "Consumer": 54,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 49,
+      "Consumer": 55,
+      "Item": "angels-ore1"
+    },
+    {
+      "Supplier": 51,
+      "Consumer": 56,
+      "Item": "angels-ore2"
+    },
+    {
+      "Supplier": 52,
+      "Consumer": 57,
+      "Item": "angels-ore3"
+    },
+    {
+      "Supplier": 53,
+      "Consumer": 58,
+      "Item": "angels-ore4"
+    },
+    {
+      "Supplier": 50,
+      "Consumer": 59,
+      "Item": "angels-ore5"
+    },
+    {
+      "Supplier": 54,
+      "Consumer": 60,
+      "Item": "angels-ore6"
+    },
+    {
+      "Supplier": 55,
+      "Consumer": 61,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 56,
+      "Consumer": 61,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 57,
+      "Consumer": 61,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 58,
+      "Consumer": 61,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 59,
+      "Consumer": 61,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 60,
+      "Consumer": 61,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 154,
+      "Consumer": 61,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 55,
+      "Consumer": 62,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 151,
+      "Consumer": 62,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 56,
+      "Consumer": 63,
+      "Item": "angels-ore2-crushed"
+    },
+    {
+      "Supplier": 57,
+      "Consumer": 64,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 152,
+      "Consumer": 64,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 58,
+      "Consumer": 65,
+      "Item": "angels-ore4-crushed"
+    },
+    {
+      "Supplier": 59,
+      "Consumer": 66,
+      "Item": "angels-ore5-crushed"
+    },
+    {
+      "Supplier": 60,
+      "Consumer": 67,
+      "Item": "angels-ore6-crushed"
+    },
+    {
+      "Supplier": 55,
+      "Consumer": 68,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 78,
+      "Consumer": 68,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 56,
+      "Consumer": 69,
+      "Item": "angels-ore2-crushed"
+    },
+    {
+      "Supplier": 78,
+      "Consumer": 69,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 57,
+      "Consumer": 70,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 78,
+      "Consumer": 70,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 58,
+      "Consumer": 71,
+      "Item": "angels-ore4-crushed"
+    },
+    {
+      "Supplier": 78,
+      "Consumer": 71,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 59,
+      "Consumer": 72,
+      "Item": "angels-ore5-crushed"
+    },
+    {
+      "Supplier": 78,
+      "Consumer": 72,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 60,
+      "Consumer": 73,
+      "Item": "angels-ore6-crushed"
+    },
+    {
+      "Supplier": 78,
+      "Consumer": 73,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 73,
+      "Consumer": 74,
+      "Item": "water-yellow-waste"
+    },
+    {
+      "Supplier": 70,
+      "Consumer": 74,
+      "Item": "water-yellow-waste"
+    },
+    {
+      "Supplier": 68,
+      "Consumer": 74,
+      "Item": "water-yellow-waste"
+    },
+    {
+      "Supplier": 69,
+      "Consumer": 75,
+      "Item": "water-greenyellow-waste"
+    },
+    {
+      "Supplier": 71,
+      "Consumer": 76,
+      "Item": "water-green-waste"
+    },
+    {
+      "Supplier": 72,
+      "Consumer": 77,
+      "Item": "water-red-waste"
+    },
+    {
+      "Supplier": 74,
+      "Consumer": 78,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 75,
+      "Consumer": 78,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 76,
+      "Consumer": 78,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 77,
+      "Consumer": 78,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 85,
+      "Consumer": 78,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 74,
+      "Consumer": 79,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 75,
+      "Consumer": 79,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 77,
+      "Consumer": 79,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 76,
+      "Consumer": 80,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 77,
+      "Consumer": 81,
+      "Item": "solid-sodium-nitrate"
+    },
+    {
+      "Supplier": 76,
+      "Consumer": 82,
+      "Item": "solid-salt"
+    },
+    {
+      "Supplier": 75,
+      "Consumer": 83,
+      "Item": "fluorite-ore"
+    },
+    {
+      "Supplier": 74,
+      "Consumer": 84,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 47,
+      "Consumer": 84,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 183,
+      "Consumer": 84,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 87,
+      "Consumer": 85,
+      "Item": "water"
+    },
+    {
+      "Supplier": 85,
+      "Consumer": 86,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 79,
+      "Consumer": 88,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 62,
+      "Consumer": 89,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 63,
+      "Consumer": 90,
+      "Item": "angels-ore2-crushed"
+    },
+    {
+      "Supplier": 64,
+      "Consumer": 91,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 65,
+      "Consumer": 92,
+      "Item": "angels-ore4-crushed"
+    },
+    {
+      "Supplier": 66,
+      "Consumer": 93,
+      "Item": "angels-ore5-crushed"
+    },
+    {
+      "Supplier": 67,
+      "Consumer": 94,
+      "Item": "angels-ore6-crushed"
+    },
+    {
+      "Supplier": 73,
+      "Consumer": 95,
+      "Item": "angels-ore6-chunk"
+    },
+    {
+      "Supplier": 72,
+      "Consumer": 96,
+      "Item": "angels-ore5-chunk"
+    },
+    {
+      "Supplier": 71,
+      "Consumer": 97,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 70,
+      "Consumer": 98,
+      "Item": "angels-ore3-chunk"
+    },
+    {
+      "Supplier": 69,
+      "Consumer": 99,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 68,
+      "Consumer": 100,
+      "Item": "angels-ore1-chunk"
+    },
+    {
+      "Supplier": 95,
+      "Consumer": 101,
+      "Item": "angels-ore6-chunk"
+    },
+    {
+      "Supplier": 96,
+      "Consumer": 102,
+      "Item": "angels-ore5-chunk"
+    },
+    {
+      "Supplier": 97,
+      "Consumer": 103,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 98,
+      "Consumer": 104,
+      "Item": "angels-ore3-chunk"
+    },
+    {
+      "Supplier": 99,
+      "Consumer": 105,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 100,
+      "Consumer": 106,
+      "Item": "angels-ore1-chunk"
+    },
+    {
+      "Supplier": 95,
+      "Consumer": 107,
+      "Item": "angels-ore6-chunk"
+    },
+    {
+      "Supplier": 113,
+      "Consumer": 107,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 96,
+      "Consumer": 108,
+      "Item": "angels-ore5-chunk"
+    },
+    {
+      "Supplier": 116,
+      "Consumer": 108,
+      "Item": "liquid-nitric-acid"
+    },
+    {
+      "Supplier": 97,
+      "Consumer": 109,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 115,
+      "Consumer": 109,
+      "Item": "liquid-hydrochloric-acid"
+    },
+    {
+      "Supplier": 98,
+      "Consumer": 110,
+      "Item": "angels-ore3-chunk"
+    },
+    {
+      "Supplier": 113,
+      "Consumer": 110,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 99,
+      "Consumer": 111,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 114,
+      "Consumer": 111,
+      "Item": "liquid-hydrofluoric-acid"
+    },
+    {
+      "Supplier": 100,
+      "Consumer": 112,
+      "Item": "angels-ore1-chunk"
+    },
+    {
+      "Supplier": 113,
+      "Consumer": 112,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 211,
+      "Consumer": 113,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 212,
+      "Consumer": 114,
+      "Item": "liquid-hydrofluoric-acid"
+    },
+    {
+      "Supplier": 245,
+      "Consumer": 115,
+      "Item": "liquid-hydrochloric-acid"
+    },
+    {
+      "Supplier": 217,
+      "Consumer": 116,
+      "Item": "liquid-nitric-acid"
+    },
+    {
+      "Supplier": 48,
+      "Consumer": 117,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 117,
+      "Consumer": 118,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 118,
+      "Consumer": 119,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 84,
+      "Consumer": 120,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 123,
+      "Consumer": 121,
+      "Item": "water"
+    },
+    {
+      "Supplier": 121,
+      "Consumer": 122,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 125,
+      "Consumer": 124,
+      "Item": "gas-compressed-air"
+    },
+    {
+      "Supplier": 124,
+      "Consumer": 126,
+      "Item": "gas-nitrogen"
+    },
+    {
+      "Supplier": 82,
+      "Consumer": 127,
+      "Item": "solid-salt"
+    },
+    {
+      "Supplier": 127,
+      "Consumer": 128,
+      "Item": "solid-salt"
+    },
+    {
+      "Supplier": 129,
+      "Consumer": 128,
+      "Item": "angels-electrode"
+    },
+    {
+      "Supplier": 128,
+      "Consumer": 129,
+      "Item": "angels-electrode-used"
+    },
+    {
+      "Supplier": 132,
+      "Consumer": 129,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 129,
+      "Consumer": 130,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 129,
+      "Consumer": 131,
+      "Item": "water"
+    },
+    {
+      "Supplier": 133,
+      "Consumer": 132,
+      "Item": "water"
+    },
+    {
+      "Supplier": 132,
+      "Consumer": 134,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 128,
+      "Consumer": 135,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 139,
+      "Consumer": 135,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 128,
+      "Consumer": 136,
+      "Item": "solid-sodium"
+    },
+    {
+      "Supplier": 132,
+      "Consumer": 136,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 136,
+      "Consumer": 137,
+      "Item": "solid-sodium-hydroxide"
+    },
+    {
+      "Supplier": 139,
+      "Consumer": 137,
+      "Item": "solid-sodium-hydroxide"
+    },
+    {
+      "Supplier": 137,
+      "Consumer": 138,
+      "Item": "solid-sodium-hydroxide"
+    },
+    {
+      "Supplier": 140,
+      "Consumer": 139,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 141,
+      "Consumer": 140,
+      "Item": "water"
+    },
+    {
+      "Supplier": 139,
+      "Consumer": 142,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 142,
+      "Consumer": 143,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 145,
+      "Consumer": 143,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 270,
+      "Consumer": 143,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 135,
+      "Consumer": 144,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 163,
+      "Consumer": 145,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 163,
+      "Consumer": 146,
+      "Item": "angels-electrode-used"
+    },
+    {
+      "Supplier": 180,
+      "Consumer": 146,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 163,
+      "Consumer": 147,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 147,
+      "Consumer": 148,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 187,
+      "Consumer": 148,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 180,
+      "Consumer": 149,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 146,
+      "Consumer": 150,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 156,
+      "Consumer": 151,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 157,
+      "Consumer": 152,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 27,
+      "Consumer": 153,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 153,
+      "Consumer": 154,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 155,
+      "Consumer": 154,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 156,
+      "Consumer": 155,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 157,
+      "Consumer": 155,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 150,
+      "Consumer": 156,
+      "Item": "angels-ore1"
+    },
+    {
+      "Supplier": 150,
+      "Consumer": 157,
+      "Item": "angels-ore3"
+    },
+    {
+      "Supplier": 26,
+      "Consumer": 158,
+      "Item": "crystal-slurry"
+    },
+    {
+      "Supplier": 31,
+      "Consumer": 158,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 30,
+      "Consumer": 158,
+      "Item": "filter-charcoal"
+    },
+    {
+      "Supplier": 158,
+      "Consumer": 159,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 159,
+      "Consumer": 160,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 160,
+      "Consumer": 161,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 161,
+      "Consumer": 162,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 146,
+      "Consumer": 163,
+      "Item": "angels-electrode"
+    },
+    {
+      "Supplier": 178,
+      "Consumer": 163,
+      "Item": "water"
+    },
+    {
+      "Supplier": 163,
+      "Consumer": 164,
+      "Item": "slag"
+    },
+    {
+      "Supplier": 181,
+      "Consumer": 164,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 164,
+      "Consumer": 165,
+      "Item": "slag-slurry"
+    },
+    {
+      "Supplier": 167,
+      "Consumer": 165,
+      "Item": "filter-charcoal"
+    },
+    {
+      "Supplier": 174,
+      "Consumer": 165,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 177,
+      "Consumer": 165,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 165,
+      "Consumer": 166,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 165,
+      "Consumer": 167,
+      "Item": "filter-frame"
+    },
+    {
+      "Supplier": 168,
+      "Consumer": 167,
+      "Item": "wood-charcoal"
+    },
+    {
+      "Supplier": 169,
+      "Consumer": 168,
+      "Item": "wood-bricks"
+    },
+    {
+      "Supplier": 170,
+      "Consumer": 169,
+      "Item": "wood-pellets"
+    },
+    {
+      "Supplier": 171,
+      "Consumer": 170,
+      "Item": "cellulose-fiber"
+    },
+    {
+      "Supplier": 173,
+      "Consumer": 171,
+      "Item": "algae-green"
+    },
+    {
+      "Supplier": 168,
+      "Consumer": 172,
+      "Item": "wood-charcoal"
+    },
+    {
+      "Supplier": 172,
+      "Consumer": 173,
+      "Item": "gas-carbon-dioxide"
+    },
+    {
+      "Supplier": 146,
+      "Consumer": 173,
+      "Item": "water-mineralized"
+    },
+    {
+      "Supplier": 176,
+      "Consumer": 174,
+      "Item": "water"
+    },
+    {
+      "Supplier": 174,
+      "Consumer": 175,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 165,
+      "Consumer": 177,
+      "Item": "water-yellow-waste"
+    },
+    {
+      "Supplier": 146,
+      "Consumer": 178,
+      "Item": "water"
+    },
+    {
+      "Supplier": 179,
+      "Consumer": 178,
+      "Item": "water"
+    },
+    {
+      "Supplier": 178,
+      "Consumer": 180,
+      "Item": "water"
+    },
+    {
+      "Supplier": 182,
+      "Consumer": 181,
+      "Item": "gas-sulfur-dioxide"
+    },
+    {
+      "Supplier": 174,
+      "Consumer": 181,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 177,
+      "Consumer": 182,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 184,
+      "Consumer": 182,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 177,
+      "Consumer": 183,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 186,
+      "Consumer": 184,
+      "Item": "gas-compressed-air"
+    },
+    {
+      "Supplier": 184,
+      "Consumer": 185,
+      "Item": "gas-nitrogen"
+    },
+    {
+      "Supplier": 188,
+      "Consumer": 187,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 271,
+      "Consumer": 187,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 190,
+      "Consumer": 188,
+      "Item": "gas-compressed-air"
+    },
+    {
+      "Supplier": 188,
+      "Consumer": 189,
+      "Item": "gas-nitrogen"
+    },
+    {
+      "Supplier": 144,
+      "Consumer": 191,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 143,
+      "Consumer": 192,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 148,
+      "Consumer": 193,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 138,
+      "Consumer": 194,
+      "Item": "solid-sodium-hydroxide"
+    },
+    {
+      "Supplier": 162,
+      "Consumer": 195,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 197,
+      "Consumer": 196,
+      "Item": "fluorite-ore"
+    },
+    {
+      "Supplier": 198,
+      "Consumer": 196,
+      "Item": "fluorite-ore"
+    },
+    {
+      "Supplier": 204,
+      "Consumer": 196,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 208,
+      "Consumer": 196,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 83,
+      "Consumer": 197,
+      "Item": "fluorite-ore"
+    },
+    {
+      "Supplier": 199,
+      "Consumer": 198,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 200,
+      "Consumer": 198,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 201,
+      "Consumer": 198,
+      "Item": "catalysator-green"
+    },
+    {
+      "Supplier": 103,
+      "Consumer": 199,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 105,
+      "Consumer": 200,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 202,
+      "Consumer": 201,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 195,
+      "Consumer": 202,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 196,
+      "Consumer": 203,
+      "Item": "solid-calcium-sulfate"
+    },
+    {
+      "Supplier": 205,
+      "Consumer": 203,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 203,
+      "Consumer": 204,
+      "Item": "gas-sulfur-dioxide"
+    },
+    {
+      "Supplier": 205,
+      "Consumer": 204,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 206,
+      "Consumer": 205,
+      "Item": "water"
+    },
+    {
+      "Supplier": 205,
+      "Consumer": 207,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 121,
+      "Consumer": 208,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 210,
+      "Consumer": 208,
+      "Item": "gas-sulfur-dioxide"
+    },
+    {
+      "Supplier": 84,
+      "Consumer": 209,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 209,
+      "Consumer": 210,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 124,
+      "Consumer": 210,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 208,
+      "Consumer": 211,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 196,
+      "Consumer": 212,
+      "Item": "liquid-hydrofluoric-acid"
+    },
+    {
+      "Supplier": 81,
+      "Consumer": 213,
+      "Item": "solid-sodium-nitrate"
+    },
+    {
+      "Supplier": 213,
+      "Consumer": 214,
+      "Item": "solid-sodium-nitrate"
+    },
+    {
+      "Supplier": 215,
+      "Consumer": 214,
+      "Item": "gas-compressed-air"
+    },
+    {
+      "Supplier": 214,
+      "Consumer": 216,
+      "Item": "gas-nitrogen-dioxide"
+    },
+    {
+      "Supplier": 218,
+      "Consumer": 216,
+      "Item": "gas-nitrogen-dioxide"
+    },
+    {
+      "Supplier": 222,
+      "Consumer": 216,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 216,
+      "Consumer": 217,
+      "Item": "liquid-nitric-acid"
+    },
+    {
+      "Supplier": 214,
+      "Consumer": 218,
+      "Item": "gas-nitrogen-monoxide"
+    },
+    {
+      "Supplier": 219,
+      "Consumer": 218,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 226,
+      "Consumer": 218,
+      "Item": "gas-nitrogen-monoxide"
+    },
+    {
+      "Supplier": 220,
+      "Consumer": 219,
+      "Item": "gas-compressed-air"
+    },
+    {
+      "Supplier": 219,
+      "Consumer": 221,
+      "Item": "gas-nitrogen"
+    },
+    {
+      "Supplier": 223,
+      "Consumer": 222,
+      "Item": "water"
+    },
+    {
+      "Supplier": 222,
+      "Consumer": 224,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 219,
+      "Consumer": 225,
+      "Item": "gas-nitrogen"
+    },
+    {
+      "Supplier": 228,
+      "Consumer": 225,
+      "Item": "catalyst-metal-red"
+    },
+    {
+      "Supplier": 225,
+      "Consumer": 226,
+      "Item": "gas-ammonia"
+    },
+    {
+      "Supplier": 219,
+      "Consumer": 226,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 227,
+      "Consumer": 226,
+      "Item": "catalyst-metal-green"
+    },
+    {
+      "Supplier": 226,
+      "Consumer": 227,
+      "Item": "catalyst-metal-carrier"
+    },
+    {
+      "Supplier": 231,
+      "Consumer": 227,
+      "Item": "bauxite-ore"
+    },
+    {
+      "Supplier": 232,
+      "Consumer": 227,
+      "Item": "silver-ore"
+    },
+    {
+      "Supplier": 225,
+      "Consumer": 228,
+      "Item": "catalyst-metal-carrier"
+    },
+    {
+      "Supplier": 229,
+      "Consumer": 228,
+      "Item": "iron-ore"
+    },
+    {
+      "Supplier": 230,
+      "Consumer": 228,
+      "Item": "copper-ore"
+    },
+    {
+      "Supplier": 301,
+      "Consumer": 229,
+      "Item": "iron-ore"
+    },
+    {
+      "Supplier": 302,
+      "Consumer": 230,
+      "Item": "copper-ore"
+    },
+    {
+      "Supplier": 303,
+      "Consumer": 231,
+      "Item": "bauxite-ore"
+    },
+    {
+      "Supplier": 304,
+      "Consumer": 232,
+      "Item": "silver-ore"
+    },
+    {
+      "Supplier": 192,
+      "Consumer": 233,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 191,
+      "Consumer": 234,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 234,
+      "Consumer": 235,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 233,
+      "Consumer": 235,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 192,
+      "Consumer": 236,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 191,
+      "Consumer": 237,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 193,
+      "Consumer": 238,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 195,
+      "Consumer": 239,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 119,
+      "Consumer": 240,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 235,
+      "Consumer": 241,
+      "Item": "gas-hydrogen-chloride"
+    },
+    {
+      "Supplier": 242,
+      "Consumer": 241,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 243,
+      "Consumer": 242,
+      "Item": "water"
+    },
+    {
+      "Supplier": 242,
+      "Consumer": 244,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 241,
+      "Consumer": 245,
+      "Item": "liquid-hydrochloric-acid"
+    },
+    {
+      "Supplier": 106,
+      "Consumer": 246,
+      "Item": "angels-ore1-chunk"
+    },
+    {
+      "Supplier": 105,
+      "Consumer": 247,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 104,
+      "Consumer": 248,
+      "Item": "angels-ore3-chunk"
+    },
+    {
+      "Supplier": 103,
+      "Consumer": 249,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 102,
+      "Consumer": 250,
+      "Item": "angels-ore5-chunk"
+    },
+    {
+      "Supplier": 101,
+      "Consumer": 251,
+      "Item": "angels-ore6-chunk"
+    },
+    {
+      "Supplier": 89,
+      "Consumer": 252,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 90,
+      "Consumer": 253,
+      "Item": "angels-ore2-crushed"
+    },
+    {
+      "Supplier": 91,
+      "Consumer": 254,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 92,
+      "Consumer": 255,
+      "Item": "angels-ore4-crushed"
+    },
+    {
+      "Supplier": 93,
+      "Consumer": 256,
+      "Item": "angels-ore5-crushed"
+    },
+    {
+      "Supplier": 94,
+      "Consumer": 257,
+      "Item": "angels-ore6-crushed"
+    },
+    {
+      "Supplier": 211,
+      "Consumer": 258,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 212,
+      "Consumer": 259,
+      "Item": "liquid-hydrofluoric-acid"
+    },
+    {
+      "Supplier": 245,
+      "Consumer": 260,
+      "Item": "liquid-hydrochloric-acid"
+    },
+    {
+      "Supplier": 217,
+      "Consumer": 261,
+      "Item": "liquid-nitric-acid"
+    },
+    {
+      "Supplier": 107,
+      "Consumer": 262,
+      "Item": "angels-ore6-crystal"
+    },
+    {
+      "Supplier": 108,
+      "Consumer": 263,
+      "Item": "angels-ore5-crystal"
+    },
+    {
+      "Supplier": 109,
+      "Consumer": 264,
+      "Item": "angels-ore4-crystal"
+    },
+    {
+      "Supplier": 110,
+      "Consumer": 265,
+      "Item": "angels-ore3-crystal"
+    },
+    {
+      "Supplier": 111,
+      "Consumer": 266,
+      "Item": "angels-ore2-crystal"
+    },
+    {
+      "Supplier": 112,
+      "Consumer": 267,
+      "Item": "angels-ore1-crystal"
+    },
+    {
+      "Supplier": 61,
+      "Consumer": 268,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 268,
+      "Consumer": 269,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 271,
+      "Consumer": 270,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 272,
+      "Consumer": 271,
+      "Item": "water-purified"
+    },
+    {
+      "Supplier": 274,
+      "Consumer": 272,
+      "Item": "water"
+    },
+    {
+      "Supplier": 272,
+      "Consumer": 273,
+      "Item": "water-saline"
+    },
+    {
+      "Supplier": 283,
+      "Consumer": 275,
+      "Item": "angels-ore2-pure"
+    },
+    {
+      "Supplier": 284,
+      "Consumer": 275,
+      "Item": "angels-ore1-pure"
+    },
+    {
+      "Supplier": 285,
+      "Consumer": 275,
+      "Item": "angels-ore3-pure"
+    },
+    {
+      "Supplier": 289,
+      "Consumer": 275,
+      "Item": "catalysator-orange"
+    },
+    {
+      "Supplier": 286,
+      "Consumer": 276,
+      "Item": "angels-ore5-pure"
+    },
+    {
+      "Supplier": 287,
+      "Consumer": 276,
+      "Item": "angels-ore4-pure"
+    },
+    {
+      "Supplier": 288,
+      "Consumer": 276,
+      "Item": "angels-ore6-pure"
+    },
+    {
+      "Supplier": 289,
+      "Consumer": 276,
+      "Item": "catalysator-orange"
+    },
+    {
+      "Supplier": 263,
+      "Consumer": 277,
+      "Item": "angels-ore5-crystal"
+    },
+    {
+      "Supplier": 267,
+      "Consumer": 277,
+      "Item": "angels-ore1-crystal"
+    },
+    {
+      "Supplier": 264,
+      "Consumer": 277,
+      "Item": "angels-ore4-crystal"
+    },
+    {
+      "Supplier": 263,
+      "Consumer": 278,
+      "Item": "angels-ore5-crystal"
+    },
+    {
+      "Supplier": 262,
+      "Consumer": 278,
+      "Item": "angels-ore6-crystal"
+    },
+    {
+      "Supplier": 267,
+      "Consumer": 278,
+      "Item": "angels-ore1-crystal"
+    },
+    {
+      "Supplier": 289,
+      "Consumer": 278,
+      "Item": "catalysator-orange"
+    },
+    {
+      "Supplier": 251,
+      "Consumer": 279,
+      "Item": "angels-ore6-chunk"
+    },
+    {
+      "Supplier": 248,
+      "Consumer": 279,
+      "Item": "angels-ore3-chunk"
+    },
+    {
+      "Supplier": 291,
+      "Consumer": 279,
+      "Item": "catalysator-green"
+    },
+    {
+      "Supplier": 247,
+      "Consumer": 280,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 249,
+      "Consumer": 280,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 291,
+      "Consumer": 280,
+      "Item": "catalysator-green"
+    },
+    {
+      "Supplier": 254,
+      "Consumer": 281,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 255,
+      "Consumer": 281,
+      "Item": "angels-ore4-crushed"
+    },
+    {
+      "Supplier": 290,
+      "Consumer": 281,
+      "Item": "catalysator-brown"
+    },
+    {
+      "Supplier": 252,
+      "Consumer": 282,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 253,
+      "Consumer": 282,
+      "Item": "angels-ore2-crushed"
+    },
+    {
+      "Supplier": 290,
+      "Consumer": 282,
+      "Item": "catalysator-brown"
+    },
+    {
+      "Supplier": 266,
+      "Consumer": 283,
+      "Item": "angels-ore2-crystal"
+    },
+    {
+      "Supplier": 267,
+      "Consumer": 284,
+      "Item": "angels-ore1-crystal"
+    },
+    {
+      "Supplier": 265,
+      "Consumer": 285,
+      "Item": "angels-ore3-crystal"
+    },
+    {
+      "Supplier": 263,
+      "Consumer": 286,
+      "Item": "angels-ore5-crystal"
+    },
+    {
+      "Supplier": 264,
+      "Consumer": 287,
+      "Item": "angels-ore4-crystal"
+    },
+    {
+      "Supplier": 262,
+      "Consumer": 288,
+      "Item": "angels-ore6-crystal"
+    },
+    {
+      "Supplier": 290,
+      "Consumer": 289,
+      "Item": "catalysator-brown"
+    },
+    {
+      "Supplier": 291,
+      "Consumer": 289,
+      "Item": "catalysator-green"
+    },
+    {
+      "Supplier": 240,
+      "Consumer": 290,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 239,
+      "Consumer": 291,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 269,
+      "Consumer": 292,
+      "Item": "stone-crushed"
+    },
+    {
+      "Supplier": 282,
+      "Consumer": 293,
+      "Item": "iron-ore"
+    },
+    {
+      "Supplier": 281,
+      "Consumer": 294,
+      "Item": "copper-ore"
+    },
+    {
+      "Supplier": 280,
+      "Consumer": 295,
+      "Item": "bauxite-ore"
+    },
+    {
+      "Supplier": 279,
+      "Consumer": 296,
+      "Item": "silver-ore"
+    },
+    {
+      "Supplier": 278,
+      "Consumer": 297,
+      "Item": "gold-ore"
+    },
+    {
+      "Supplier": 277,
+      "Consumer": 298,
+      "Item": "rutile-ore"
+    },
+    {
+      "Supplier": 276,
+      "Consumer": 299,
+      "Item": "platinum-ore"
+    },
+    {
+      "Supplier": 275,
+      "Consumer": 300,
+      "Item": "tungsten-ore"
+    },
+    {
+      "Supplier": 293,
+      "Consumer": 301,
+      "Item": "iron-ore"
+    },
+    {
+      "Supplier": 294,
+      "Consumer": 302,
+      "Item": "copper-ore"
+    },
+    {
+      "Supplier": 295,
+      "Consumer": 303,
+      "Item": "bauxite-ore"
+    },
+    {
+      "Supplier": 296,
+      "Consumer": 304,
+      "Item": "silver-ore"
+    },
+    {
+      "Supplier": 267,
+      "Consumer": 305,
+      "Item": "angels-ore1-crystal"
+    },
+    {
+      "Supplier": 266,
+      "Consumer": 306,
+      "Item": "angels-ore2-crystal"
+    },
+    {
+      "Supplier": 265,
+      "Consumer": 307,
+      "Item": "angels-ore3-crystal"
+    },
+    {
+      "Supplier": 264,
+      "Consumer": 308,
+      "Item": "angels-ore4-crystal"
+    },
+    {
+      "Supplier": 263,
+      "Consumer": 309,
+      "Item": "angels-ore5-crystal"
+    },
+    {
+      "Supplier": 262,
+      "Consumer": 310,
+      "Item": "angels-ore6-crystal"
+    },
+    {
+      "Supplier": 246,
+      "Consumer": 311,
+      "Item": "angels-ore1-chunk"
+    },
+    {
+      "Supplier": 247,
+      "Consumer": 312,
+      "Item": "angels-ore2-chunk"
+    },
+    {
+      "Supplier": 248,
+      "Consumer": 313,
+      "Item": "angels-ore3-chunk"
+    },
+    {
+      "Supplier": 249,
+      "Consumer": 314,
+      "Item": "angels-ore4-chunk"
+    },
+    {
+      "Supplier": 250,
+      "Consumer": 315,
+      "Item": "angels-ore5-chunk"
+    },
+    {
+      "Supplier": 251,
+      "Consumer": 316,
+      "Item": "angels-ore6-chunk"
+    },
+    {
+      "Supplier": 252,
+      "Consumer": 317,
+      "Item": "angels-ore1-crushed"
+    },
+    {
+      "Supplier": 253,
+      "Consumer": 318,
+      "Item": "angels-ore2-crushed"
+    },
+    {
+      "Supplier": 254,
+      "Consumer": 319,
+      "Item": "angels-ore3-crushed"
+    },
+    {
+      "Supplier": 255,
+      "Consumer": 320,
+      "Item": "angels-ore4-crushed"
+    },
+    {
+      "Supplier": 256,
+      "Consumer": 321,
+      "Item": "angels-ore5-crushed"
+    },
+    {
+      "Supplier": 257,
+      "Consumer": 322,
+      "Item": "angels-ore6-crushed"
+    },
+    {
+      "Supplier": 240,
+      "Consumer": 323,
+      "Item": "mineral-sludge"
+    },
+    {
+      "Supplier": 239,
+      "Consumer": 324,
+      "Item": "crystal-seedling"
+    },
+    {
+      "Supplier": 237,
+      "Consumer": 325,
+      "Item": "gas-chlorine"
+    },
+    {
+      "Supplier": 236,
+      "Consumer": 326,
+      "Item": "gas-hydrogen"
+    },
+    {
+      "Supplier": 238,
+      "Consumer": 327,
+      "Item": "gas-oxygen"
+    },
+    {
+      "Supplier": 194,
+      "Consumer": 328,
+      "Item": "solid-sodium-hydroxide"
+    },
+    {
+      "Supplier": 120,
+      "Consumer": 329,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 258,
+      "Consumer": 330,
+      "Item": "liquid-sulfuric-acid"
+    },
+    {
+      "Supplier": 259,
+      "Consumer": 331,
+      "Item": "liquid-hydrofluoric-acid"
+    },
+    {
+      "Supplier": 260,
+      "Consumer": 332,
+      "Item": "liquid-hydrochloric-acid"
+    },
+    {
+      "Supplier": 261,
+      "Consumer": 333,
+      "Item": "liquid-nitric-acid"
+    }
+  ],
+  "EnabledAssemblers": [
+    "crop-farm",
+    "algae-farm-3",
+    "algae-farm-2",
+    "cooling-tower",
+    "ore-processing-machine",
+    "crystallizer-2",
+    "pellet-press-2",
+    "algae-farm-4",
+    "ore-refinery-2",
+    "ore-leaching-plant-2",
+    "separator-3",
+    "chemical-plant",
+    "angels-chemical-furnace-4",
+    "angels-chemical-furnace-2",
+    "powder-mixer",
+    "blast-furnace",
+    "bio-refugium-fish",
+    "advanced-chemical-plant-2",
+    "bio-generator-temperate-1",
+    "centrifuge",
+    "electrolyser",
+    "angels-electric-boiler-2",
+    "filtration-unit",
+    "pellet-press-4",
+    "hydro-plant",
+    "liquifier-3",
+    "angels-chemical-plant",
+    "oil-refinery-4",
+    "strand-casting-machine-3",
+    "bio-generator-desert-1",
+    "ore-crusher-2",
+    "liquifier",
+    "bio-refugium-biter",
+    "sintering-oven-4",
+    "electro-whinning-cell-3",
+    "sintering-oven-2",
+    "air-pump-2",
+    "assembling-machine-2",
+    "assembling-machine-5",
+    "induction-furnace-4",
+    "angels-air-filter-2",
+    "water-pump-3",
+    "air-pump-4",
+    "ore-floatation-cell-2",
+    "gas-refinery",
+    "electro-whinning-cell-2",
+    "ore-sorting-facility-4",
+    "strand-casting-machine",
+    "gas-refinery-small",
+    "bio-refugium-hogger",
+    "bio-arboretum-1",
+    "angels-electric-boiler",
+    "water-pump-4",
+    "angels-electric-boiler-3",
+    "sintering-oven-3",
+    "ore-processing-machine-2",
+    "electronics-machine-3",
+    "electro-whinning-cell",
+    "ore-sorting-facility",
+    "liquifier-4",
+    "casting-machine-2",
+    "induction-furnace-3",
+    "induction-furnace-2",
+    "casting-machine",
+    "gas-refinery-small-4",
+    "steam-cracker-4",
+    "casting-machine-3",
+    "assembling-machine-6",
+    "blast-furnace-3",
+    "nutrient-extractor",
+    "electronics-machine-1",
+    "salination-plant-2",
+    "oil-refinery",
+    "angels-electrolyser",
+    "filtration-unit-2",
+    "gas-refinery-4",
+    "angels-chemical-furnace",
+    "bio-generator-swamp-1",
+    "gas-refinery-small-3",
+    "ore-powderizer-3",
+    "angels-chemical-furnace-3",
+    "gas-refinery-2",
+    "assembling-machine-4",
+    "air-pump-3",
+    "ore-sorting-facility-3",
+    "pellet-press",
+    "steam-cracker-3",
+    "ore-floatation-cell",
+    "oil-refinery-2",
+    "angels-electrolyser-2",
+    "powder-mixer-2",
+    "swamp-farm",
+    "thermal-extractor",
+    "sb-ore-sorting-facility-5",
+    "bio-refugium-puffer",
+    "sintering-oven",
+    "bio-press",
+    "separator",
+    "assembling-machine-1",
+    "seed-extractor",
+    "desert-farm",
+    "temperate-farm",
+    "burner-ore-crusher",
+    "algae-farm",
+    "hydro-plant-3",
+    "ore-leaching-plant",
+    "gas-refinery-small-2",
+    "bio-processor",
+    "pellet-press-3",
+    "salination-plant",
+    "electronics-machine-2",
+    "ore-powderizer-2",
+    "gas-refinery-3",
+    "crystallizer",
+    "blast-furnace-4",
+    "ore-processing-machine-4",
+    "ore-processing-machine-3",
+    "powder-mixer-4",
+    "centrifuge-2",
+    "angels-chemical-plant-2",
+    "powder-mixer-3",
+    "strand-casting-machine-2",
+    "assembling-machine-3",
+    "ore-crusher",
+    "thermal-bore",
+    "ore-refinery",
+    "separator-2",
+    "water-pump",
+    "advanced-chemical-plant",
+    "casting-machine-4",
+    "centrifuge-3",
+    "ore-sorting-facility-2",
+    "steam-cracker",
+    "ore-crusher-3",
+    "ore-leaching-plant-3",
+    "ore-powderizer",
+    "blast-furnace-2",
+    "barreling-pump",
+    "washing-plant",
+    "induction-furnace",
+    "water-pump-2",
+    "strand-casting-machine-4",
+    "steam-cracker-2",
+    "separator-4",
+    "angels-electrolyser-4",
+    "ore-floatation-cell-3",
+    "washing-plant-2",
+    "angels-chemical-plant-4",
+    "angels-air-filter",
+    "angels-electrolyser-3",
+    "oil-refinery-3",
+    "liquifier-2",
+    "hydro-plant-2",
+    "air-pump",
+    "angels-chemical-plant-3",
+    "clarifier",
+    "electric-furnace-3",
+    "electric-furnace-2",
+    "valve-converter",
+    "steel-furnace",
+    "electric-furnace",
+    "composter",
+    "bio-butchery",
+    "bio-hatchery",
+    "stone-furnace",
+    "angels-flare-stack"
+  ],
+  "EnabledMiners": [],
+  "EnabledModules": [
+    "speed-module-2",
+    "effectivity-module-4",
+    "speed-module-8",
+    "productivity-module-6",
+    "speed-module-4",
+    "effectivity-module-2",
+    "effectivity-module-8",
+    "productivity-module-8",
+    "speed-module-6",
+    "productivity-module-2",
+    "productivity-module-4",
+    "effectivity-module-6"
+  ],
+  "EnabledMods": [
+    "core",
+    "base",
+    "boblibrary",
+    "bobenemies",
+    "bobtech",
+    "bobores",
+    "bobplates",
+    "bobelectronics",
+    "bobmodules",
+    "bobinserters",
+    "boblogistics",
+    "bobequipment",
+    "SpaceMod",
+    "ScienceCostTweakerM",
+    "bobrevamp",
+    "angelsrefining",
+    "LandfillPainting",
+    "KS_Power",
+    "bobassembly",
+    "angelspetrochem",
+    "angelssmelting",
+    "angelsbioprocessing",
+    "SeaBlock",
+    "FluidMustFlow",
+    "z-fluidmustflowfix",
+    "SantasNixieTubeDisplay",
+    "bobmining",
+    "bobpower",
+    "CircuitProcessing",
+    "myseablockpatch",
+    "Explosive Excavation",
+    "angelsaddons-storage"
+  ],
+  "EnabledRecipes": [
+    "tank",
+    "sct-waste-processing-copper",
+    "silica-processed-processing",
+    "pellet-lead-smelting",
+    "alien-artifact-green-from-small",
+    "paste-iron",
+    "angelsore1-crushed-processing",
+    "roll-aluminium-casting",
+    "solid-sodium-gold-cyanide-smelting",
+    "bob-pump-4",
+    "personal-roboport-robot-equipment-4",
+    "desert-tree-generator-3",
+    "algae-brown-burning",
+    "liquid-raw-fish-oil-filtering-1",
+    "stone-crushed",
+    "catalyst-metal-green",
+    "productivity-processor-2",
+    "circuit-board",
+    "zinc-ore-smelting",
+    "swamp-tree-generator-1",
+    "substation-2",
+    "solar-panel-large",
+    "iron-gear-wheel",
+    "nuclear-reactor-3",
+    "angels-chemical-void-gas-oxygen",
+    "sponge-titanium-smelting",
+    "speed-module-7",
+    "powder-mixer-2",
+    "paper-bleaching-3",
+    "angels-chemical-void-gas-hydrogen-sulfide",
+    "boiler-4",
+    "angels-chemical-void-liquid-cupric-chloride-solution",
+    "solar-panel-small",
+    "bob-logistic-robot-3",
+    "thermal-extractor-water",
+    "algae-blue",
+    "speed-processor-3",
+    "processed-iron-smelting",
+    "pellet-zinc-smelting",
+    "robot-brain-construction",
+    "repair-pack-3",
+    "sct-t3-laser-emitter",
+    "alien-goo",
+    "angels-plate-titanium",
+    "angels-roll-gold-converting",
+    "nutrient-extractor",
+    "angels-chemical-void-liquid-trichlorosilane",
+    "power-switch",
+    "angels-bio-void-swamp-1",
+    "angels-water-void-water-thin-mud",
+    "speed-module-5",
+    "bob-roboport-4",
+    "steel-furnace",
+    "train-stop",
+    "solid-salt-separation",
+    "beacon-3",
+    "sorting-desert-2",
+    "bio-plastic-1",
+    "angels-electrode-used",
+    "filter-lime-used",
+    "angelsore9-crystal-processing",
+    "constant-combinator",
+    "spidertron",
+    "bio-processor",
+    "fish-breeding-0",
+    "angels-wire-coil-tin-casting-fast",
+    "angelsore3-crushed-processing",
+    "angelsore2-pure",
+    "swamp-3",
+    "lab-2",
+    "molten-titanium-smelting-4",
+    "catalyst-metal-yellow",
+    "sorting-temperate-1",
+    "liquid-acetic-acid-catalyst",
+    "crystal-slurry-filtering-1",
+    "energy-shield-mk3-equipment",
+    "pipe",
+    "crystal-shard-cutting",
+    "protection-field",
+    "glass-mixture-2",
+    "angels-chemical-void-liquid-hydrofluoric-acid",
+    "steam-cracking-gas-residual",
+    "void-hydrogen-sulfide",
+    "pellet-press-2",
+    "molten-iron-smelting-3",
+    "ore-leaching-plant",
+    "rail-signal",
+    "brass-pipe",
+    "liquid-propionic-acid-catalyst",
+    "fluid-reactor",
+    "repair-pack",
+    "medium-electric-pole-2",
+    "gas-allylchlorid",
+    "personal-roboport-chargepad-equipment-2",
+    "effectivity-module-2",
+    "angels-warehouse-requester",
+    "coolant-cool-300",
+    "fluid-reactor-2",
+    "power-armor-mk2",
+    "solid-fuel-naphtha",
+    "small-alien-artifact-purple",
+    "angels-water-enrichment-1",
+    "solid-calcium-chloride",
+    "anaerobic-fermentation",
+    "SNTD-old-nixie-tube",
+    "algae-green-simple",
+    "swamp-garden-cultivating-b",
+    "boiler-5",
+    "long-handed-inserter",
+    "angels-water-enrichment-3",
+    "liquid-raw-vegetable-oil-beans",
+    "swamp-3-seed",
+    "angels-storage-tank-3",
+    "ethanol-to-ethylene-synthesis",
+    "gas-refinery",
+    "gas-methylamine",
+    "strand-casting-machine",
+    "gas-refinery-small",
+    "arithmetic-combinator",
+    "logistic-chest-storage-3",
+    "coolant",
+    "angelsore2-chunk-processing",
+    "angelsore1-pure",
+    "SNTD-nixie-tube-small",
+    "roll-iron-casting-fast",
+    "steel-pipe",
+    "angels-bio-void-desert-1",
+    "sct-prod-bioprocessor",
+    "lithium-ion-battery",
+    "manganese-ore-processing",
+    "solar-panel-equipment",
+    "angels-roll-platinum-converting",
+    "geode-red-liquify",
+    "crystal-full-harmonic",
+    "empty-nuclear-fuel-cell",
+    "deuterium-fuel-cell",
+    "void-ammonia",
+    "alien-pre-artifact-orange",
+    "puffer-butchery-2",
+    "personal-roboport-robot-equipment-2",
+    "gas-methanol-from-wood",
+    "sorting-temperate-5",
+    "puffer-butchery-4",
+    "exoskeleton-equipment",
+    "desert-5",
+    "medium-electric-pole-3",
+    "oil-refinery-2",
+    "angels-bio-void-desert-2",
+    "silo-storage",
+    "liquid-hexachloroplatinic-acid-smelting",
+    "assembling-machine-1",
+    "solid-chrome-oxide-smelting",
+    "angels-chemical-void-gas-silane",
+    "electronics-machine-2",
+    "ore-powderizer-2",
+    "turbo-stack-inserter",
+    "processed-titanium-smelting",
+    "steel-bearing-ball",
+    "solid-mud-landfill",
+    "solid-wood-pulp",
+    "angelsore-pure-mix1-processing",
+    "angelsore6-crushed",
+    "angelsore-chunk-mix1-processing",
+    "accumulator",
+    "sct-logistic-memory-unit",
+    "geode-yellow-liquify",
+    "bob-locomotive-3",
+    "lab-module",
+    "thorium-fuel-cell",
+    "deuterium-fuel-reprocessing",
+    "angels-roll-steel-converting",
+    "bio-puffer-egg-shell-powder",
+    "angels-chemical-void-gas-dimethylamine",
+    "hazard-concrete",
+    "transport-belt",
+    "catalysator-brown",
+    "piercing-rounds-magazine",
+    "desert-tree-arboretum-2",
+    "crystal-grindstone",
+    "angels-chemical-void-gas-tungsten-hexafluoride",
+    "advanced-chemical-plant-2",
+    "sulfite-pulping",
+    "angels-wire-coil-gold-casting",
+    "kraft-cooking-washing",
+    "temperate-4-seed",
+    "fish-butchery-1",
+    "titanium-bearing",
+    "fish-keeping-2",
+    "logistic-chest-requester-2",
+    "angels-brass-smelting-1",
+    "bronze-pipe",
+    "liquid-plastic-3",
+    "liquid-cellulose-acetate",
+    "angelsore8-dust",
+    "angelsore7-crystallization-5",
+    "bob-amethyst-5",
+    "nickel-processed-processing",
+    "sorting-desert-5",
+    "angels-mono-silicon-seed",
+    "thorium-plutonium-fuel-cell",
+    "roll-chrome-casting-fast",
+    "fusion-reactor-equipment-4",
+    "sintering-oven-4",
+    "solid-soil-alternative",
+    "iron-plate",
+    "gas-synthesis-separation",
+    "electro-whinning-cell-2",
+    "solid-lead-oxide-smelting",
+    "roll-tin-casting",
+    "angels-heavy-water-separation-2",
+    "fish-butchery-0",
+    "liquid-raw-vegetable-oil-filtering-2",
+    "angelsore9-crushed-processing",
+    "logistic-chest-storage",
+    "angelsore-crystal-mix1-processing",
+    "solid-clay",
+    "angelsore2-crystal",
+    "water-saline-separation",
+    "angelsore3-crystal-processing",
+    "heat-pipe-3",
+    "processed-chrome-smelting",
+    "bob-emerald-5",
+    "casting-machine",
+    "manganese-processed-processing",
+    "casting-machine-3",
+    "gas-nitrogen-dioxide",
+    "personal-laser-defense-equipment-6",
+    "blasting-charge",
+    "ore-refinery",
+    "molten-glass-smelting",
+    "logistic-chest-requester",
+    "sct-waste-processing-mixed",
+    "refined-hazard-concrete",
+    "angelsore4-crushed",
+    "productivity-module-6",
+    "repair-pack-5",
+    "powder-mixer-3",
+    "battery-mk4-equipment",
+    "solid-fuel-hydrazine",
+    "bob-small-inline-storage-tank",
+    "steam-engine-5",
+    "nutrients-refining-3",
+    "ore-floatation-cell",
+    "tree-arboretum-2",
+    "angels-water-void-water-concentrated-mud",
+    "personal-laser-defense-equipment",
+    "molten-steel-smelting-4",
+    "flying-robot-frame-3",
+    "red-stack-filter-inserter",
+    "paste-gold",
+    "yellow-waste-water-purification",
+    "bob-cargo-wagon-2",
+    "cobalt-ore-smelting",
+    "alien-pre-artifact-green",
+    "angels-chemical-void-liquid-bisphenol-a",
+    "crystal-splinter-crystalization-1",
+    "pellet-silicon-smelting",
+    "solid-salt-dissolving",
+    "gas-ammonia-from-blue-fiber",
+    "gas-sulfur-dioxide",
+    "gas-fractioning",
+    "small-lamp",
+    "gas-epichlorhydrin",
+    "angels-solder-smelting-2",
+    "aerobic-fermentation",
+    "logistic-chest-active-provider",
+    "red-fiber-algae",
+    "swamp-tree-arboretum-2",
+    "angelsore3-crystal",
+    "angelsore9-crushed",
+    "bio-rubber-tree",
+    "ore-leaching-plant-2",
+    "cement-mixture-1",
+    "angels-chemical-furnace-4",
+    "solid-nuts-nutrients",
+    "crystal-dust-liquify",
+    "angelsore7-crystallization-3",
+    "temperate-1-seed",
+    "silver-zinc-battery",
+    "silver-ore-processing",
+    "sct-htech-injector",
+    "liquid-cupric-chloride-solution",
+    "polishing-compound",
+    "personal-laser-defense-equipment-5",
+    "lead-processed-processing",
+    "green-waste-water-purification",
+    "liquifier-3",
+    "petri-dish",
+    "bio-press",
+    "water-synthesis",
+    "oil-boiler",
+    "basic-circuit-board",
+    "molten-iron-smelting-4",
+    "night-vision-equipment-3",
+    "angelsore8-powder",
+    "logistic-chest-buffer-2",
+    "solid-sodium-aluminate-smelting",
+    "molten-titanium-smelting-2",
+    "induction-furnace",
+    "geode-cyan-processing",
+    "offshore-pump",
+    "angels-plate-silver",
+    "void-deuterium",
+    "rocket-control-unit",
+    "superior-circuit-board",
+    "liquid-styrene-catalyst",
+    "kraft-causting",
+    "exoskeleton-equipment-3",
+    "tree-arboretum-0",
+    "solar-panel",
+    "angels-clay-brick",
+    "electro-whinning-cell",
+    "alien-bacteria",
+    "module-processor-board-2",
+    "bob-small-storage-tank",
+    "steam-cracker-4",
+    "empty-barrel",
+    "nitinol-bearing-ball",
+    "temperate-2-seed",
+    "gas-silane-smelting",
+    "angels-water-void-thermal-water",
+    "assembling-machine-4",
+    "seed-extractor",
+    "angelsore-chunk-mix2-processing",
+    "roll-titanium-casting",
+    "bob-ruby-3",
+    "electric-furnace",
+    "angelsore2-chunk",
+    "gas-propene-synthesis",
+    "cobalt-ore-processing",
+    "duct-cross",
+    "angels-wire-coil-copper-casting",
+    "speed-processor",
+    "effectivity-processor-2",
+    "desert-3-seed",
+    "speed-processor-2",
+    "paste-zinc",
+    "angels-chemical-plant-2",
+    "gas-dinitrogen-tetroxide",
+    "oil-separation",
+    "bio-resin-tree",
+    "coke-purification",
+    "wooden-chest",
+    "substation-4",
+    "angelsore5-crushed",
+    "crystal-splinter-cutting",
+    "small-alien-artifact-yellow",
+    "angels-air-filter",
+    "effectivity-module-6",
+    "swamp-5",
+    "angels-chemical-plant-3",
+    "angels-water-void-mineral-sludge",
+    "angels-steam-water",
+    "coolant-cool-200",
+    "artillery-wagon",
+    "small-alien-artifact-blue",
+    "angels-roll-copper-converting",
+    "lab",
+    "bob-diamond-4",
+    "bob-amethyst-4",
+    "temperate-tree-generator-2",
+    "angels-invar-smelting-1",
+    "personal-roboport-mk2-equipment",
+    "bob-logistic-zone-expander-3",
+    "iron-processed-processing",
+    "geode-red-processing",
+    "angels-chemical-void-liquid-hexafluorosilicic-acid",
+    "silver-ore-smelting",
+    "pellet-iron-smelting",
+    "processed-zinc-smelting",
+    "turbo-inserter",
+    "biter-small-butchering",
+    "roboport-antenna-1",
+    "oil-refinery-4",
+    "liquid-ferric-chloride-solution",
+    "locomotive",
+    "pellet-tungsten-smelting",
+    "molten-iron-smelting-2",
+    "speed-module",
+    "angels-solder-mixture-smelting",
+    "molten-aluminium-smelting-3",
+    "sct-lab-t2",
+    "crystal-splinter-crystalization-2",
+    "bob-robo-charge-port-large-3",
+    "copper-tungsten-alloy",
+    "roboport-door-4",
+    "gas-ammonium-chloride",
+    "bio-arboretum-1",
+    "nickel-ore-smelting",
+    "ceramic-bearing",
+    "angels-bio-void-desert-4-seed",
+    "angels-water-void-water-yellow-waste",
+    "big-electric-pole-3",
+    "angels-chemical-void-liquid-ngl",
+    "casting-machine-2",
+    "ceramic-pipe",
+    "spacex-combinator",
+    "steam-cracking-mineral-oil",
+    "liquid-fuel",
+    "sct-htech-capbank",
+    "fluid-wagon",
+    "crystal-slurry-filtering-conversion-2",
+    "mineral-oil-lubricant",
+    "solar-panel-small-2",
+    "angels-chemical-void-crude-oil",
+    "rocket-launcher",
+    "angels-coil-glass-fiber",
+    "gas-synthesis-reforming",
+    "filtration-unit-2",
+    "water-gas-shift-2",
+    "solid-sodium-perchlorate",
+    "solid-cobalt-oxide-smelting",
+    "angels-water-enriched-cooling-2",
+    "catalysator-green",
+    "personal-roboport-chargepad-equipment",
+    "angels-concrete",
+    "bob-construction-robot-5",
+    "angels-water-void-crystal-slurry",
+    "steam-cracker-3",
+    "sct-prod-chipcase",
+    "steam-cracker-2",
+    "greenyellow-waste-water-purification",
+    "liquid-hydrochloric-acid",
+    "bob-robo-charge-port-3",
+    "platinum-ore-processing",
+    "angels-glass-fiber-board",
+    "steam-engine",
+    "decider-combinator",
+    "angels-roll-tin-converting",
+    "centrifuge-2",
+    "angels-chemical-void-liquid-styrene",
+    "oil-boiler-2",
+    "roll-chrome-casting",
+    "cellulose-fiber-raw-wood",
+    "speed-module-8",
+    "angels-roll-steel-casting-fast",
+    "angels-roll-steel-casting",
+    "angels-solder",
+    "solar-panel-equipment-3",
+    "ore-floatation-cell-3",
+    "angels-chemical-void-gas-dimethylhydrazine",
+    "water-purification",
+    "chrome-processed-processing",
+    "swamp-tree-arboretum-1",
+    "catalyst-metal-red",
+    "energy-shield-mk2-equipment",
+    "programmable-speaker",
+    "sct-t2-microcircuits",
+    "effectivity-module-5",
+    "titanium-ore-processing",
+    "powder-mixer-4",
+    "angels-bio-void-desert-3-seed-dormant",
+    "angels-plate-tungsten",
+    "washing-2",
+    "angels-electric-boiler-2",
+    "logistic-chest-passive-provider-2",
+    "liquid-resin-2",
+    "angels-storage-tank-2",
+    "speed-module-3",
+    "lithium-water-electrolysis",
+    "bob-topaz-3",
+    "angelsore9-anode-sludge",
+    "gas-synthesis-methanation",
+    "habitation",
+    "roboport-door-1",
+    "liquifier",
+    "angels-solder-smelting-4",
+    "angelsore-chunk-mix6-processing",
+    "sct-mil-plating",
+    "substrate-dish",
+    "angelsore8-powder-processing",
+    "fast-accumulator-3",
+    "processed-tin-smelting",
+    "sct-htech-thermalstore",
+    "rocket-part",
+    "liquid-aqueous-sodium-hydroxide",
+    "sct-prod-biosilicate",
+    "angels-plate-platinum",
+    "biter-big-eggsperiment",
+    "bobingabout-enrichment-process",
+    "turbo-underground-belt",
+    "spidertron-remote",
+    "angelsore9-dust",
+    "crystal-powder-from-dust",
+    "liquid-fish-oil-refining",
+    "pellet-copper-smelting",
+    "drydock-assembly",
+    "seafloor-pump",
+    "blast-furnace-3",
+    "sct-bio-ground-sample",
+    "salination-plant-2",
+    "module-processor-board-3",
+    "bio-resin-resin-liquification",
+    "angels-plate-steel",
+    "angels-heavy-water-extraction",
+    "bob-robo-charge-port-large-2",
+    "angels-bio-void-desert-3-seed",
+    "fish-pressing-0",
+    "cobalt-ore-processing-alt",
+    "molten-iron-smelting-1",
+    "angelsore-crushed-mix4-processing",
+    "angelsore-chunk-mix3-processing",
+    "puffer-breeding-4",
+    "copper-processed-processing",
+    "molten-tin-smelting",
+    "beacon-2",
+    "bauxite-ore-smelting",
+    "titanium-ore-smelting",
+    "geode-blue-liquify",
+    "temperate-1",
+    "crystal-shard-blue",
+    "angels-wire-coil-silver-casting-fast",
+    "washing-5",
+    "lead-ore-processing",
+    "temperate-4",
+    "uranium-fuel-cell",
+    "separator-2",
+    "zinc-ore-processing",
+    "battery-equipment",
+    "crystal-powder-full-green",
+    "angels-warehouse-buffer",
+    "pellet-chrome-smelting",
+    "productivity-module-4",
+    "angelsore5-crystal",
+    "solid-fuel-fuel-oil",
+    "solar-panel-equipment-4",
+    "sodium-cobaltate",
+    "solid-sodium-hypochlorite",
+    "bob-robo-charge-port-large",
+    "pump",
+    "roll-silver-casting",
+    "angels-sulfur-scrubber",
+    "boiler",
+    "wood-sawing-1",
+    "processed-lead-smelting",
+    "angels-mono-silicon-1",
+    "bob-roboport-2",
+    "gas-hydrogen-chloride",
+    "bio-refugium-fish",
+    "sorting-swamp-2",
+    "personal-roboport-antenna-equipment",
+    "bob-fluid-wagon-3",
+    "liquid-polluted-fish-atmosphere",
+    "chrome-ore-smelting",
+    "gas-chlor-methane",
+    "lead-plate",
+    "angels-plate-tin",
+    "angels-quartz-crucible",
+    "sct-lab2-construction",
+    "crystal-seed",
+    "solid-nickel-carbonyl-smelting",
+    "angels-water-enriched-cooling-3",
+    "silo-buffer",
+    "fish-pressing-1",
+    "desert-tree-arboretum-1",
+    "bio-refugium-biter",
+    "solid-leafs-nutrients",
+    "swamp-4",
+    "assembling-machine-2",
+    "sct-bio-science-pack",
+    "nuclear-fuel-reprocessing",
+    "stone-wall",
+    "angels-plate-steel-pre-heating",
+    "biter-big-keeping",
+    "angels-roll-iron-converting",
+    "robot-tool-construction-2",
+    "angels-chemical-void-gas-formaldehyde",
+    "angels-chemical-void-liquid-mineral-oil",
+    "valve-inspector",
+    "bauxite-ore-processing",
+    "solid-alginic-acid",
+    "puffer-butchery-3",
+    "steam-cracking-fuel-oil",
+    "kovarex-enrichment-process",
+    "bob-cargo-wagon-3",
+    "angels-warehouse-passive-provider",
+    "plastic-pipe-to-ground",
+    "sct-t3-sulfur-lightsource",
+    "angels-chemical-furnace-3",
+    "biter-medium",
+    "angels-chemical-void-liquid-chlorauric-acid",
+    "alien-artifact-orange-from-small",
+    "carbon-separation-2",
+    "liquid-ethylbenzene-catalyst",
+    "gold-ore-processing",
+    "bio-rubber",
+    "angels-water-void-water",
+    "angelsore3-pure",
+    "wood-sawing-3",
+    "gas-tungsten-hexafluoride-smelting",
+    "angels-chemical-void-gas-urea",
+    "medium-electric-pole-4",
+    "bob-topaz-5",
+    "tin-ore-processing",
+    "angels-bio-void-temperate-3",
+    "steam-cracker",
+    "flying-robot-frame",
+    "roll-iron-casting",
+    "gas-sulfur-dioxide-calcium-sulfate",
+    "solid-dichromate-smelting",
+    "puffer-egg-5",
+    "steam-cracking-oil-residual",
+    "angels-bio-void-swamp-5-seed",
+    "sct-lab3-optics",
+    "angelsore8-crystal-processing",
+    "fusion-reactor",
+    "robot-brain-logistic-2",
+    "sct-t1-ironcore",
+    "logistic-science-pack",
+    "ore-refinery-2",
+    "angels-plate-aluminium",
+    "bob-topaz-4",
+    "thorium-processing",
+    "processed-aluminium-smelting",
+    "bob-construction-robot-3",
+    "tungsten-carbide-2",
+    "small-alien-artifact-green",
+    "logistic-chest-active-provider-2",
+    "effectivity-processor",
+    "geode-cyan-liquify",
+    "sct-lab4-construction",
+    "roll-silver-casting-fast",
+    "roll-aluminium-casting-fast",
+    "geode-yellow-processing",
+    "roboport-antenna-2",
+    "washing-4",
+    "strand-casting-machine-3",
+    "angelsore2-crystal-processing",
+    "wood-bricks",
+    "void-petroleum-gas",
+    "substation",
+    "basic-platinated-copper-wire",
+    "construction-robot",
+    "angelsore4-chunk-processing",
+    "car",
+    "modular-armor",
+    "titanium-pipe-to-ground",
+    "productivity-module-2",
+    "bob-storage-tank-all-corners",
+    "solid-aluminium-oxide-smelting",
+    "brass-pipe-to-ground",
+    "dirt-water-separation",
+    "angels-chemical-void-gas-ammonium-chloride",
+    "puffer-puffing-23",
+    "low-density-structure",
+    "insulated-cable",
+    "bob-sapphire-4",
+    "ceramic-bearing-ball",
+    "angels-chemical-void-gas-ethylene",
+    "solid-crystal-tipped-saw",
+    "sct-bio-sample-scaffold",
+    "tin-plate",
+    "angelsore1-crystal-processing",
+    "solid-geodes",
+    "biter-medium-butchering",
+    "robot-brain-logistic-4",
+    "angels-bio-void-temperate-4",
+    "desert-2",
+    "temperate-garden-b",
+    "electronics-machine-1",
+    "module-circuit-board",
+    "angels-electrolyser",
+    "roboport-chargepad-4",
+    "battery-mk3-equipment",
+    "steam-engine-2",
+    "productivity-module-7",
+    "algae-brown",
+    "chrome-ore-processing",
+    "robot-brain-construction-3",
+    "geode-lightgreen-processing",
+    "filter-ceramic-refurbish",
+    "alien-artifact-yellow-from-small",
+    "geode-blue-processing",
+    "angels-wire-coil-silver-casting",
+    "liquid-resin-3",
+    "heat-pipe-2",
+    "solid-sodium-nitrate-processing",
+    "fuel-cell",
+    "solid-sodium-carbonate-electrolysis",
+    "cement-mixture-2",
+    "solid-fertilizer",
+    "angelsore3-chunk-processing",
+    "underground-belt",
+    "biter-big-butchering",
+    "sct-lab4-manipulators",
+    "seeded-dish",
+    "heat-exchanger-2",
+    "bob-construction-robot-4",
+    "liquid-plastic-1",
+    "aluminium-processed-processing",
+    "bio-butchery",
+    "valve-return",
+    "void-steam",
+    "roboport-chargepad-1",
+    "temperate-5",
+    "solid-silver-nitrate-smelting",
+    "angels-bio-void-desert-3",
+    "liquid-fish-atmosphere",
+    "tree-generator-3",
+    "angels-storage-tank-1",
+    "temperate-3",
+    "air-separation",
+    "sct-prod-baked-biopaste",
+    "slag-processing-stone",
+    "bob-logistic-robot-5",
+    "liquid-raw-fish-oil-filtering-2",
+    "radar",
+    "oil-refining",
+    "angels-bio-void-algae-brown",
+    "catalyst-metal-blue",
+    "personal-roboport-antenna-equipment-4",
+    "red-wire",
+    "zinc-processed-processing",
+    "ultimate-underground-belt",
+    "angels-wire-coil-copper-converting",
+    "nuclear-fuel",
+    "angelsore6-crystal-processing",
+    "angels-bronze-smelting-1",
+    "molten-aluminium-smelting-1",
+    "silicon-nitride",
+    "atomic-bomb",
+    "assembling-machine-5",
+    "swamp-4-seed",
+    "molten-silicon-smelting",
+    "angels-water-void-water-heavy-mud",
+    "silo-active-provider",
+    "void-chlorine",
+    "temperate-tree-generator-3",
+    "steel-chest",
+    "water-mineralized",
+    "nitinol-pipe-to-ground",
+    "angels-wire-coil-platinum-converting",
+    "brass-gear-wheel",
+    "advanced-processing-unit",
+    "angels-chemical-void-gas-hydrogen-chloride",
+    "solid-ammonium-chloroplatinate-smelting",
+    "multi-layer-circuit-board",
+    "red-waste-water-purification",
+    "angelsore-pure-mix2-processing",
+    "temperate-tree-arboretum-2",
+    "fusion-reactor-equipment-2",
+    "bob-ruby-5",
+    "angels-roll-titanium-converting",
+    "cobalt-steel-bearing-ball",
+    "robot-brain-construction-4",
+    "paper-bleaching-2",
+    "glass-mixture-4",
+    "pellet-press",
+    "module-processor-board",
+    "casting-powder-tungsten-2",
+    "puffer-breeding-14",
+    "personal-laser-defense-equipment-2",
+    "angelsore8-anode-sludge-filtering",
+    "fish-pulp-nutrients",
+    "separator",
+    "copper-pipe",
+    "crystal-splinter-green",
+    "logistic-chest-buffer",
+    "burner-reactor-2",
+    "angelsore7-crystallization-2",
+    "angels-bio-void-desert-2-seed",
+    "sct-mil-circuit3",
+    "sb-ore-sorting-facility-5",
+    "processed-gold-smelting",
+    "strand-casting-machine-2",
+    "stone-crushed-dissolution",
+    "carbon-separation-1",
+    "heat-exchanger-3",
+    "electronic-components",
+    "molten-steel-smelting-1",
+    "strand-casting-machine-4",
+    "molten-gold-smelting",
+    "tin-ore-smelting",
+    "angelsore5-pure-processing",
+    "liquid-trichlorosilane-smelting",
+    "paste-titanium",
+    "gas-urea",
+    "algae-farm-2",
+    "cooling-tower",
+    "molten-copper-smelting",
+    "glass-mixture-3",
+    "angels-bio-void-swamp-2-seed",
+    "steam-cracking-naphtha",
+    "roll-lead-casting",
+    "angels-water-void-crystal-seedling",
+    "liquid-resin-1",
+    "fast-transport-belt",
+    "puffer-egg-3",
+    "speed-module-4",
+    "drydock-structural",
+    "bob-logistic-robot-2",
+    "liquid-polyethylene-catalyst",
+    "wood-sawing-2",
+    "large-accumulator",
+    "angelsore1-chunk",
+    "filter-ceramic",
+    "angels-plate-lead",
+    "processed-cobalt-smelting",
+    "angels-wire-coil-tin-converting",
+    "puffer-breeding-3",
+    "bob-robochest-3",
+    "liquid-perchloric-acid",
+    "bob-ruby-4",
+    "electro-whinning-cell-3",
+    "module-case",
+    "liquid-plastic-2",
+    "sintering-oven",
+    "fast-accumulator",
+    "dirt-water-separation-2",
+    "personal-roboport-robot-equipment",
+    "pellet-cobalt-smelting",
+    "angelsore8-solution",
+    "explosive-cannon-shell",
+    "angels-bio-void-alien-bacteria",
+    "pellet-gold-smelting",
+    "crystal-powder-splinter-red",
+    "solid-sodium-hydroxide",
+    "crystal-slurry-filtering-conversion-1",
+    "angels-water-void-water-light-mud",
+    "sintering-oven-3",
+    "bob-sapphire-3",
+    "valve-underflow",
+    "ore-sorting-facility",
+    "liquifier-4",
+    "salination-plant",
+    "gas-methanol-catalyst",
+    "biter-small-eggsperiment",
+    "small-alien-artifact-orange",
+    "garden-cultivating",
+    "angels-chemical-void-gas-methylamine",
+    "gold-processed-processing",
+    "stone-pipe-to-ground",
+    "powder-nickel",
+    "puffer-puffing-4",
+    "liquid-acetate-mixture",
+    "solid-soil",
+    "temperate-garden-cultivating-a",
+    "ore-sorting-facility-3",
+    "puffer-egg-4",
+    "express-stack-inserter",
+    "angels-wire-coil-tin-casting",
+    "nuclear-reactor",
+    "large-accumulator-2",
+    "nitinol-gear-wheel",
+    "processed-platinum-smelting",
+    "solid-fuel-synthesis",
+    "algae-farm",
+    "gas-refinery-small-2",
+    "solid-crystal-full-saw",
+    "puffer-puffing-12",
+    "assembly-robot",
+    "desert-4-seed",
+    "swamp-garden-b",
+    "angels-chemical-void-gas-sulfur-dioxide",
+    "glass-mixture-1",
+    "angelsore4-crystal",
+    "angelsore1-crushed",
+    "angelsore5-pure",
+    "solid-beans-nutrients",
+    "angelsore6-pure-processing",
+    "bob-pump-2",
+    "basic-silvered-copper-wire",
+    "angels-bio-void-temperate-3-seed-dormant",
+    "angels-heavy-water-separation",
+    "firearm-magazine",
+    "crystal-shard-harmonic",
+    "void-hydrogen",
+    "nutrients-refining-2",
+    "angels-concrete-brick",
+    "cathode-manganese-smelting",
+    "ore-processing-machine",
+    "effectivity-module",
+    "angels-solder-mixture",
+    "silica-ore-processing",
+    "solid-sand",
+    "steam-cracking-butane",
+    "angelsore7-crystallization-4",
+    "plutonium-nucleosynthesis",
+    "bob-logistic-zone-expander",
+    "silo-requester",
+    "composter",
+    "angels-roll-aluminium-converting",
+    "slow-accumulator-3",
+    "sct-mil-circuit1",
+    "chemical-science-pack",
+    "storage-tank",
+    "substation-3",
+    "temperate-farm",
+    "angels-chemical-void-gas-ethane",
+    "tungsten-ore-smelting",
+    "solid-rubber",
+    "paste-tungsten",
+    "processed-silicon-smelting",
+    "bio-resin-wood-reprocessing",
+    "liquid-tungstic-acid-smelting",
+    "angelsore8-crystal",
+    "ore-floatation-cell-2",
+    "solid-fuel-from-hydrogen",
+    "alien-artifact-from-small",
+    "ore-sorting-facility-4",
+    "angelsore1-crystal",
+    "roll-platinum-casting-fast",
+    "angels-wire-coil-gold-converting",
+    "angelsore3-chunk",
+    "angels-reinforced-concrete-brick",
+    "crystal-full-cutting",
+    "angels-bio-void-swamp-1-seed",
+    "ore-processing-machine-2",
+    "crystal-full-blue",
+    "biter-small-keeping",
+    "liquid-nitric-acid",
+    "gas-refinery-3",
+    "blast-furnace-4",
+    "angelsore8-sludge",
+    "roll-solder-casting",
+    "sct-mil-circuit2",
+    "enriched-fuel-from-liquid-fuel",
+    "puffer-puffing-14",
+    "bob-robochest-4",
+    "solid-lime",
+    "ore-powderizer-3",
+    "duct-end-point-outtake",
+    "energy-shield-mk5-equipment",
+    "puffer-butchery-5",
+    "coolant-used-filtration-2",
+    "crystal-full-red",
+    "landfill-red-desert-1",
+    "solid-ammonium-perchlorate",
+    "gas-dimethylamine",
+    "washing-1",
+    "molten-titanium-smelting-3",
+    "liquid-titanium-tetrachloride-smelting",
+    "gas-monochloramine",
+    "gas-melamine",
+    "clarifier",
+    "nuclear-reactor-2",
+    "hydro-plant-3",
+    "roll-gold-casting",
+    "solid-alienated-fertilizer",
+    "pellet-aluminium-smelting",
+    "tungsten-carbide",
+    "solid-saw",
+    "angels-bronze-smelting-3",
+    "ore-crusher-3",
+    "advanced-logistic-science-pack",
+    "manganese-ore-smelting",
+    "solid-zinc-oxide-smelting",
+    "hydro-plant-2",
+    "puffer-puffing-13",
+    "molten-platinum-smelting",
+    "crystal-powder-splinter-blue",
+    "angels-chemical-void-liquid-fuel-oil",
+    "silver-processed-processing",
+    "processed-tungsten-smelting",
+    "angels-water-void-liquid-coolant",
+    "tungsten-ore-processing",
+    "sct-lab-t4",
+    "angels-plate-glass-2",
+    "advanced-chemical-plant",
+    "swamp-tree-generator-2",
+    "yellow-filter-inserter",
+    "roboport",
+    "fish-pressing-2",
+    "solid-sodium-chlorate",
+    "night-vision-equipment",
+    "pellet-press-4",
+    "blast-furnace-2",
+    "gold-ore-smelting",
+    "personal-roboport-chargepad-equipment-4",
+    "alien-spores",
+    "battery-mk6-equipment",
+    "bob-robochest",
+    "iron-stick",
+    "deuterium-fuel-cell-2",
+    "angelsore6-pure",
+    "puffer-puffing-3",
+    "angels-chemical-void-gas-butadiene",
+    "powder-copper",
+    "productivity-module-5",
+    "ground-water-pump",
+    "cobalt-processed-processing",
+    "angelsore9-powder-processing",
+    "angels-chemical-void-gas-methanol",
+    "roll-titanium-casting-fast",
+    "processed-copper-smelting",
+    "rocket-fuel",
+    "sct-htech-random",
+    "effectivity-module-3",
+    "angelsore4-pure-processing",
+    "desert-upgrade",
+    "processed-manganese-smelting",
+    "bob-robo-charge-port-large-4",
+    "sct-t2-wafer-stamp",
+    "roll-copper-casting-fast",
+    "electronics-machine-3",
+    "angelsore5-crushed-processing",
+    "coolant-cool-steam",
+    "induction-furnace-3",
+    "cannon-shell",
+    "bob-emerald-3",
+    "rocket-booster-2",
+    "bob-logistic-zone-expander-4",
+    "swamp-tree-generator-3",
+    "silicon-ore-smelting",
+    "cathode-nickel-smelting",
+    "angels-water-void-water-greenyellow-waste",
+    "molten-steel-smelting-3",
+    "tree-arboretum-3",
+    "solar-panel-2",
+    "advanced-oil-refining",
+    "sct-logistic-unimover",
+    "sct-t3-femto-lasers",
+    "platinum-processed-processing",
+    "titanium-processed-processing",
+    "duct-underground",
+    "fish-keeping-3",
+    "angelsore4-pure",
+    "water-gas-shift-1",
+    "solid-pips-nutrients",
+    "powder-iron",
+    "sct-t1-magnet-coils",
+    "swamp-1-seed",
+    "washing-plant",
+    "steam-cracking-ethane",
+    "angelsore6-crystal",
+    "energy-shield-equipment",
+    "gas-dimethylhydrazine",
+    "cp-advanced-processing-board",
+    "cp-processing-board",
+    "cp-advanced-circuit-board",
+    "cp-electronic-circuit-board",
+    "angels-bio-void-bio-puffer-egg-shell",
+    "medium-electric-pole",
+    "cargo-wagon",
+    "angels-chemical-void-alien-spores",
+    "angels-chemical-void-gas-ethanol",
+    "angels-bio-void-swamp-5-seed-dormant",
+    "satellite",
+    "void-nitrogen",
+    "angels-bio-void-swamp-5",
+    "angels-bio-void-swamp-4-seed-dormant",
+    "angels-bio-void-swamp-4-seed",
+    "rocket-booster-1",
+    "intergrated-electronics",
+    "angels-bio-void-swamp-3-seed",
+    "angels-bio-void-swamp-3",
+    "angels-bio-void-swamp-2",
+    "valve-overflow",
+    "desert-tree-generator-1",
+    "angels-bio-void-desert-5-seed-dormant",
+    "phenolic-board",
+    "wooden-board-paper",
+    "angels-electrolyser-4",
+    "logistic-chest-passive-provider-3",
+    "landfill-grass-1",
+    "lithium",
+    "angels-bio-void-desert-5-seed",
+    "angels-chemical-void-liquid-perchloric-acid",
+    "angels-bio-void-desert-4-seed-dormant",
+    "fish-breeding-2",
+    "angels-bio-void-desert-1-seed",
+    "angels-bio-void-temperate-5-seed-dormant",
+    "angels-bio-void-temperate-5-seed",
+    "pellet-coke",
+    "angels-bio-void-temperate-5",
+    "angels-bio-void-temperate-4-seed-dormant",
+    "angels-bio-void-temperate-4-seed",
+    "angels-bio-void-temperate-3-seed",
+    "solid-fuel-methane",
+    "steel-pipe-to-ground",
+    "angelsore6-crushed-processing",
+    "red-stack-inserter",
+    "solid-corn-nutrients",
+    "liquid-acetic-anhydride",
+    "angels-bio-void-temperate-2-seed",
+    "angels-bio-void-temperate-2",
+    "angels-bio-void-temperate-1-seed",
+    "angelsore4-chunk",
+    "solid-sodium-sulfate-separation",
+    "battery-mk5-equipment",
+    "void-sulfur-dioxide",
+    "bob-storage-tank-all-corners-3",
+    "heat-exchanger",
+    "angels-bio-void-temperate-1",
+    "angels-bio-void-swamp-garden",
+    "angelsore9-solution",
+    "angels-bio-void-temperate-garden",
+    "personal-roboport-antenna-equipment-3",
+    "angels-bio-void-algae-blue",
+    "angels-bio-void-algae-red",
+    "angels-bio-void-algae-green",
+    "angels-bio-void-cellulose-fiber",
+    "angels-bio-void-wood",
+    "angelsore6-chunk",
+    "fusion-reactor-equipment",
+    "crystallizer",
+    "alien-pre-artifact-base",
+    "sct-lab1-mechanization",
+    "alien-pre-artifact-purple",
+    "storage-tank-4",
+    "alien-pre-artifact-blue",
+    "crystallizer-2",
+    "biter-medium-eggsperiment",
+    "algae-farm-4",
+    "small-alien-artifact-red",
+    "angels-chemical-void-gas-dinitrogen-tetroxide",
+    "tin-processed-processing",
+    "temperate-garden-cultivating-b",
+    "silo-passive-provider",
+    "angels-plate-invar",
+    "liquid-raw-vegetable-oil-filtering-1",
+    "bob-diamond-3",
+    "solid-manganese-oxide-smelting",
+    "angels-plate-cobalt-steel",
+    "solid-chromate-smelting",
+    "angels-cobalt-steel-smelting-1",
+    "swamp-2-seed",
+    "angels-plate-bronze",
+    "angels-bronze-smelting-2",
+    "angels-water-void-liquid-aqueous-sodium-hydroxide",
+    "angels-plate-brass",
+    "angels-brass-smelting-3",
+    "angelsore-crystal-mix6-processing",
+    "ore-leaching-plant-3",
+    "boiler-3",
+    "angels-chemical-void-liquid-titanium-tetrachloride",
+    "titanium-gear-wheel",
+    "alien-artifact-red-from-small",
+    "angels-chemical-void-liquid-hexachloroplatinic-acid",
+    "angels-chemical-void-liquid-sulfuric-acid",
+    "casting-machine-4",
+    "angels-chemical-void-gas-acid",
+    "angels-chemical-void-gas-acetone",
+    "angels-chemical-void-lubricant",
+    "personal-roboport-antenna-equipment-2",
+    "pellet-silver-smelting",
+    "stone-furnace",
+    "angels-chemical-void-liquid-polyethylene",
+    "temperate-tree-arboretum-0",
+    "geode-lightgreen-liquify",
+    "battery",
+    "filter-inserter",
+    "angels-chemical-void-liquid-ethylbenzene",
+    "angels-chemical-void-gas-synthesis",
+    "angels-chemical-void-liquid-naphtha",
+    "brass-chest",
+    "angels-chemical-void-gas-butane",
+    "angels-chemical-void-gas-methane",
+    "angels-chemical-void-gas-residual",
+    "fast-underground-belt",
+    "duct-t-junction",
+    "angels-chemical-void-gas-raw-1",
+    "liquid-rubber-1",
+    "angels-chemical-void-liquid-multi-phase-oil",
+    "liquid-hydrogen-fluoride",
+    "angels-chemical-void-gas-hydrazine",
+    "angels-chemical-void-gas-monochloramine",
+    "angels-chemical-void-liquid-nitric-acid",
+    "angels-chemical-void-gas-melamine",
+    "catalyst-steam-cracking-naphtha",
+    "alien-pre-artifact-red",
+    "angels-chemical-void-gas-nitrogen-dioxide",
+    "angels-wire-coil-gold-casting-fast",
+    "swamp-farm",
+    "angels-chemical-void-gas-nitrogen",
+    "angels-chemical-void-liquid-ferric-chloride-solution",
+    "temperate-garden-a",
+    "solar-panel-equipment-2",
+    "liquid-aqueous-sodium-hydroxide-reverse",
+    "angels-chemical-void-gas-epichlorhydrin",
+    "basic-tinned-copper-wire",
+    "alien-artifact-purple-from-small",
+    "angels-water-void-water-viscous-mud",
+    "express-stack-filter-inserter",
+    "angels-chemical-void-gas-allylchlorid",
+    "liquid-vegetable-oil-refining",
+    "angels-chemical-void-gas-chlorine",
+    "steel-gear-wheel",
+    "angels-chemical-void-gas-hydrogen-fluoride",
+    "angels-chemical-void-gas-carbon-dioxide",
+    "angelsore9-anode-sludge-filtering",
+    "bio-plastic-tree",
+    "temperate-tree-arboretum-1",
+    "beacon",
+    "slow-accumulator-2",
+    "powder-gold",
+    "angels-electric-boiler-3",
+    "angels-chemical-void-gas-compressed-air",
+    "angels-water-void-water-green-waste",
+    "angels-water-void-water-red-waste",
+    "solid-cobalt-hydroxide-smelting",
+    "thermal-extractor",
+    "angels-water-void-water-mineralized",
+    "tree-generator-1",
+    "solid-sodium-hydroxide-solid-sodium-sulfate",
+    "angels-solder-smelting-3",
+    "solid-limestone",
+    "angels-water-void-water-purified",
+    "copper-pipe-to-ground",
+    "gas-hydrogen-chloride-separation",
+    "astrometrics",
+    "red-filter-inserter",
+    "gas-refinery-small-4",
+    "solid-calcium-carbonate",
+    "gas-hydrazine",
+    "angels-water-void-slag-slurry",
+    "angelsore3-crushed",
+    "puffer-breeding-23",
+    "nitinol-pipe",
+    "oil-refinery",
+    "angels-roll-silver-converting",
+    "desert-3",
+    "angels-chemical-furnace",
+    "paste-cobalt",
+    "heat-pipe",
+    "water-saline",
+    "repair-pack-4",
+    "turbo-stack-filter-inserter",
+    "sorting-desert-3",
+    "washing-3",
+    "ore-powderizer",
+    "alien-pre-artifact-yellow",
+    "personal-roboport-robot-equipment-3",
+    "angels-bio-void-swamp-4",
+    "bob-locomotive-2",
+    "duct-curve",
+    "basic-splitter",
+    "roll-lead-casting-fast",
+    "void-oxygen",
+    "angelsore-chunk-mix5-processing",
+    "gas-benzene-catalyst",
+    "angels-bio-void-desert-5",
+    "roboport-antenna-3",
+    "personal-roboport-mk3-equipment",
+    "angels-wire-coil-copper-casting-fast",
+    "crystal-splinter-red",
+    "angels-chemical-void-liquid-phenol",
+    "express-transport-belt",
+    "silicon-powder",
+    "angels-hydrogen-sulfide-enrichment",
+    "steam-turbine-2",
+    "angelsore9-powder",
+    "effectivity-module-4",
+    "bio-generator-swamp-1",
+    "alien-artifact-blue-from-small",
+    "pellet-manganese-smelting",
+    "thermal-bore",
+    "solid-salt",
+    "angels-electrode",
+    "gas-hydrogen-fluoride",
+    "bronze-pipe-to-ground",
+    "logistic-chest-requester-3",
+    "copper-ore-smelting",
+    "personal-roboport-chargepad-equipment-3",
+    "platinum-ore-smelting",
+    "angels-water-enrichment-2",
+    "ore-processing-machine-4",
+    "non-return-duct",
+    "electronic-circuit",
+    "night-vision-equipment-2",
+    "silicon-wafer",
+    "roll-gold-casting-fast",
+    "cathode-silver-smelting",
+    "desert-garden-cultivating-b",
+    "electric-furnace-3",
+    "angels-chemical-void-gas-benzene",
+    "bob-construction-robot-2",
+    "gas-nitrogen-monoxide",
+    "angelsore8-crushed",
+    "turbo-splitter",
+    "rocket-silo",
+    "submachine-gun",
+    "gas-fractioning-synthesis",
+    "effectivity-module-7",
+    "angels-chemical-furnace-2",
+    "ammonium-chloride-recycling",
+    "blast-furnace",
+    "angels-chemical-void-liquid-tungstic-acid",
+    "sct-lab-t3",
+    "angels-plate-gold",
+    "steel-plate",
+    "advanced-liquid-fish-oil-refining",
+    "bio-generator-temperate-1",
+    "catalyst-metal-carrier",
+    "basic-electronic-components",
+    "processing-electronics",
+    "exoskeleton-equipment-2",
+    "filter-frame",
+    "fish-breeding-1",
+    "processed-silver-smelting",
+    "slag-processing-3",
+    "puffer-egg-1",
+    "bob-logistic-robot-4",
+    "stack-filter-inserter",
+    "swamp-5-seed",
+    "angelsore5-chunk",
+    "green-wire",
+    "angels-water-void-water-saline",
+    "swamp-tree-arboretum-0",
+    "robot-tool-construction-4",
+    "bob-fluid-wagon-2",
+    "sct-lab1-construction",
+    "copper-tungsten-pipe-to-ground",
+    "crystal-slurry-filtering-2",
+    "liquid-phenol-catalyst",
+    "brown-liquor-recovery",
+    "separator-3",
+    "fluid-reactor-3",
+    "gas-acid-catalyst",
+    "crystal-powder-full-blue",
+    "angels-pressure-tank-1",
+    "residual-oil-refining",
+    "sct-htech-thermalstore-heated",
+    "anode-lead-smelting",
+    "angels-electric-boiler",
+    "roll-platinum-casting",
+    "bob-storage-tank-all-corners-4",
+    "sct-t3-atomic-sensors",
+    "stone-pipe",
+    "liquid-bisphenol-a",
+    "gas-formaldehyde-catalyst",
+    "electric-furnace-2",
+    "energy-shield-mk6-equipment",
+    "cathode-gold-smelting",
+    "roboport-door-2",
+    "biter-queen-small-butchering",
+    "desert-farm",
+    "burner-inserter",
+    "biter-medium-breeding",
+    "sorting-swamp-3",
+    "bob-sapphire-5",
+    "gas-canister",
+    "water-separation",
+    "angels-plate-chrome",
+    "bob-roboport-3",
+    "angels-plate-nitinol",
+    "robot-brain-logistic-3",
+    "storage-tank-3",
+    "water-viscous-mud",
+    "angels-warehouse-active-provider",
+    "solar-panel-small-3",
+    "bob-pump-3",
+    "gas-refinery-2",
+    "centrifuge-3",
+    "bob-robo-charge-port-2",
+    "sb-wood-bricks-charcoal",
+    "basic-underground-belt",
+    "command",
+    "express-underground-belt",
+    "desert-2-seed",
+    "casting-powder-tungsten-1",
+    "angelsore7-crystallization-6",
+    "angels-air-filtering",
+    "crystal-splinter-harmonic",
+    "angels-chemical-void-gas-carbon-monoxide",
+    "sct-logistic-cargo-unit",
+    "oil-boiler-4",
+    "logistic-chest-passive-provider",
+    "effectivity-module-8",
+    "slag-processing-1",
+    "burner-ore-crusher",
+    "desert-garden-cultivating-a",
+    "angelsore6-chunk-processing",
+    "catalysator-orange",
+    "angels-chemical-void-liquid-hydrochloric-acid",
+    "advanced-circuit",
+    "stone-brick",
+    "sct-bio-sample-filling",
+    "biter-queen-big-butchering",
+    "battery-mk2-equipment",
+    "solid-aluminium-hydroxide-smelting",
+    "crystal-powder-full-red",
+    "ingot-iron-smelting",
+    "rail-chain-signal",
+    "lithium-cobalt-oxide",
+    "temperate-upgrade",
+    "module-contact",
+    "angelsore9-sludge",
+    "concrete-mixture-1",
+    "express-inserter",
+    "swamp-1",
+    "big-electric-pole-4",
+    "productivity-processor-3",
+    "bob-emerald-4",
+    "silo",
+    "coolant-cool-100",
+    "angels-warehouse-storage",
+    "liquid-pulping-liquor",
+    "angels-warehouse",
+    "milling-drum-used",
+    "basic-transport-belt",
+    "puffer-breeding-15",
+    "powder-cobalt",
+    "fish-keeping-1",
+    "steam-turbine-3",
+    "molten-titanium-smelting-1",
+    "pellet-tin-smelting",
+    "liquid-raw-vegetable-oil-nuts",
+    "titanium-pipe",
+    "steam-engine-4",
+    "steam-engine-3",
+    "solar-panel-large-3",
+    "solar-panel-3",
+    "fast-inserter",
+    "duct-small",
+    "angels-chemical-void-gas-ammonia",
+    "pellet-press-3",
+    "angelsore3-crushed-smelting",
+    "splitter",
+    "angelsore1-pure-processing",
+    "powder-mixer",
+    "tungsten-pipe",
+    "slag-processing-filtering-2",
+    "tungsten-gear-wheel",
+    "crystal-powder-shard-red",
+    "bob-logistic-zone-expander-2",
+    "big-electric-pole-2",
+    "fast-accumulator-2",
+    "storage-tank-2",
+    "crystal-enhancer",
+    "filter-lime",
+    "oil-boiler-3",
+    "gas-refinery-4",
+    "turbo-filter-inserter",
+    "swamp-garden-cultivating-a",
+    "sct-t3-laser-foci",
+    "boiler-2",
+    "pellet-nickel-smelting",
+    "large-accumulator-3",
+    "sct-lab2-automatization",
+    "angelsore8-anode-sludge",
+    "processed-nickel-smelting",
+    "inserter",
+    "landfill-sand-3",
+    "burner-reactor-3",
+    "washing-plant-2",
+    "artillery-shell",
+    "swamp-2",
+    "burner-reactor",
+    "filter-coal",
+    "sct-t2-reaction-nodes",
+    "duct-end-point-intake",
+    "solar-panel-large-2",
+    "sb-blue-algae-liquefaction",
+    "space-thruster",
+    "effectivity-processor-3",
+    "sb-cellulose-foraging",
+    "crystal-shard-crystalization-2",
+    "rocket-fuel-capsule",
+    "thermal-bore-water",
+    "angels-roll-solder-converting",
+    "productivity-module-3",
+    "angels-wire-coil-platinum-casting-fast",
+    "milling-drum",
+    "steel-bearing",
+    "geode-purple-liquify",
+    "angelsore1-chunk-processing",
+    "sb-water-mineralized-crystallization",
+    "rtg",
+    "robot-tool-logistic-2",
+    "biter-queen-medium-butchering",
+    "biter-medium-keeping",
+    "small-electric-pole",
+    "logistic-robot",
+    "productivity-module",
+    "bob-storage-tank-all-corners-2",
+    "gas-puffer-atmosphere",
+    "engine-unit",
+    "biter-small",
+    "biter-small-breeding",
+    "liquid-white-liquor",
+    "lead-ore-smelting",
+    "alien-processed-meat",
+    "crystal-shard-crystalization-1",
+    "puffer-butchery-1",
+    "military-science-pack",
+    "puffer-egg-2",
+    "solid-sodium",
+    "puffer-breeding-13",
+    "logistic-chest-buffer-3",
+    "puffer-breeding-12",
+    "angelsore9-dust-processing",
+    "puffer-breeding-5",
+    "sct-t2-instruments",
+    "puffer-puffing-15",
+    "angelsore1-crushed-smelting",
+    "roboport-chargepad-2",
+    "swamp-upgrade",
+    "puffer-puffing-5",
+    "robot-tool-construction-3",
+    "puffer-puffing-1",
+    "sct-t3-flash-fuel",
+    "biter-big",
+    "light-armor",
+    "angels-plate-iron",
+    "power-armor",
+    "angels-heavy-water-cooling",
+    "temperate-5-seed",
+    "iron-ore-processing",
+    "fish-butchery-3",
+    "fish-butchery-2",
+    "molten-steel-smelting-2",
+    "fish-breeding-3",
+    "solid-sodium-cyanide",
+    "angelsore7-crystallization-1",
+    "angelsore8-crushed-processing",
+    "hull-component",
+    "copper-ore-processing",
+    "gun-turret",
+    "plutonium-fuel-cell",
+    "slow-accumulator",
+    "fish-keeping-0",
+    "coke-purification-2",
+    "bio-plastic-2",
+    "roll-solder-casting-fast",
+    "sorting-temperate-3",
+    "fermentation-fruit",
+    "fermentation-corn",
+    "liquid-raw-vegetable-oil-pips",
+    "molten-aluminium-smelting-2",
+    "nitinol-bearing",
+    "artillery-targeting-remote",
+    "nutrients-refining-1",
+    "solid-fruit-nutrients",
+    "polishing-wheel",
+    "ceramic-pipe-to-ground",
+    "slag-processing-6",
+    "sorting-swamp-5",
+    "angels-plate-copper",
+    "crystal-powder-shard-green",
+    "sorting-swamp-4",
+    "landfill",
+    "powder-titanium",
+    "sorting-swamp-1",
+    "sorting-desert-4",
+    "productivity-processor",
+    "cathode-zinc-smelting",
+    "sorting-desert-1",
+    "sorting-temperate-4",
+    "sorting-temperate-2",
+    "crystal-full-green",
+    "angelsore3-pure-processing",
+    "gas-ammonia",
+    "flying-robot-frame-2",
+    "pipe-to-ground",
+    "crystal-powder-splinter-green",
+    "desert-5-seed",
+    "heavy-armor",
+    "puffer-puffing-2",
+    "desert-1-seed",
+    "desert-4",
+    "desert-1",
+    "solid-salt-from-saline",
+    "temperate-3-seed",
+    "roboport-chargepad-3",
+    "bob-robochest-2",
+    "angels-bio-void-solid-compost",
+    "temperate-2",
+    "angels-solder-smelting-1",
+    "assembling-machine-3",
+    "silicon-carbide",
+    "angels-roll-lead-converting",
+    "swamp-garden-a",
+    "copper-plate",
+    "landfill-dirt-4",
+    "desert-garden-b",
+    "desert-garden-a",
+    "slag-processing-filtering-1",
+    "angels-nitinol-smelting-1",
+    "solid-ammonium-nitrate",
+    "algae-brown-burning-wash",
+    "personal-laser-defense-equipment-4",
+    "angels-plate-glass-3",
+    "big-electric-pole",
+    "solid-sulfur",
+    "grenade",
+    "paste-copper",
+    "paste-cellulose",
+    "artillery-turret",
+    "bio-hatchery",
+    "roboport-door-3",
+    "angelsore9-crystal",
+    "bio-refugium-puffer",
+    "bio-generator-desert-1",
+    "copper-tungsten-pipe",
+    "personal-roboport-equipment",
+    "crop-farm",
+    "angels-roll-chrome-converting",
+    "electric-engine-unit",
+    "belt-immunity-equipment",
+    "solid-iron-hydroxide-smelting",
+    "sct-mil-subplating",
+    "algae-farm-3",
+    "sct-t2-micro-wafer",
+    "crystal-powder-shard-blue",
+    "fusion-reactor-equipment-3",
+    "express-splitter",
+    "crystal-shard-green",
+    "crystal-shard-red",
+    "solid-tungsten-oxide-smelting",
+    "gate",
+    "crystal-splinter-blue",
+    "ultimate-splitter",
+    "crystal-powder-slurry",
+    "geode-purple-processing",
+    "egg-shell-seed",
+    "angels-chemical-void-gas-propene",
+    "solid-plastic",
+    "personal-roboport-mk4-equipment",
+    "processing-unit",
+    "roboport-antenna-4",
+    "wood-pellets",
+    "grinding-wheel",
+    "turbo-transport-belt",
+    "paper-bleaching-1",
+    "empty-canister",
+    "angels-bio-void-desert-garden",
+    "plastic-pipe",
+    "angelsore4-crystal-processing",
+    "logistic-chest-active-provider-3",
+    "desert-tree-arboretum-0",
+    "ore-sorting-facility-2",
+    "angelsore5-crystal-processing",
+    "automation-science-pack",
+    "angelsore-chunk-mix4-processing",
+    "bio-plastic",
+    "stack-inserter",
+    "gas-synthesis-methanol",
+    "steam-turbine",
+    "thorium-fuel-reprocessing",
+    "hydro-plant",
+    "bio-resin",
+    "SNTD-nixie-tube",
+    "induction-furnace-4",
+    "temperate-tree-generator-1",
+    "robot-brain-construction-2",
+    "steam-cracking-methane",
+    "concrete-mixture-2",
+    "tree-arboretum-1",
+    "tree-generator-2",
+    "ore-crusher-2",
+    "algae-red",
+    "cellulose-fiber-algae",
+    "desert-tree-generator-2",
+    "algae-green",
+    "angels-flare-stack",
+    "robot-tool-construction",
+    "fish-pressing-3",
+    "sct-lab3-construction",
+    "angels-bio-void-desert-4",
+    "express-filter-inserter",
+    "angels-wire-coil-silver-converting",
+    "sintering-oven-2",
+    "induction-furnace-2",
+    "productivity-module-8",
+    "blue-fiber-algae",
+    "landfill-dry-dirt",
+    "liquifier-2",
+    "ore-processing-machine-3",
+    "powder-zinc",
+    "zinc-ore-processing-alt",
+    "angels-air-filter-2",
+    "solid-ammonium-paratungstate-smelting",
+    "assembling-machine-6",
+    "repair-pack-2",
+    "separator-4",
+    "angels-clay-brick-raw",
+    "cobalt-steel-gear-wheel",
+    "pellet-titanium-smelting",
+    "angels-chemical-plant-4",
+    "liquid-hexafluorosilicic-acid",
+    "roll-tin-casting-fast",
+    "angels-wire-coil-platinum-casting",
+    "slag-processing-4",
+    "angels-chemical-plant",
+    "ore-crusher",
+    "molten-silver-smelting",
+    "molten-lead-smelting",
+    "centrifuge",
+    "angels-mono-silicon-2",
+    "angelsore2-pure-processing",
+    "bob-robo-charge-port",
+    "ultimate-transport-belt",
+    "coolant-used-filtration-1",
+    "bob-diamond-5",
+    "iron-chest",
+    "sct-prod-overclocker",
+    "fast-splitter",
+    "robot-brain-logistic",
+    "liquid-naphtha-catalyst",
+    "pellet-platinum-smelting",
+    "speed-module-2",
+    "nickel-ore-processing",
+    "robot-tool-logistic",
+    "small-alien-artifact",
+    "angelsore2-crushed",
+    "cumene-process",
+    "solid-sodium-silver-cyanide-smelting",
+    "solid-resin",
+    "iron-ore-smelting",
+    "void-hydrogen-chloride",
+    "angels-wire-gold",
+    "angels-chemical-void-gas-hydrogen",
+    "angelsore-crushed-mix1-processing",
+    "production-science-pack",
+    "gas-refinery-small-3",
+    "roll-copper-casting",
+    "anode-copper-smelting",
+    "uranium-processing",
+    "explosives",
+    "energy-shield-mk4-equipment",
+    "cliff-explosives",
+    "angelsore-crystal-mix5-processing",
+    "molten-chrome-smelting",
+    "liquid-mineral-oil-catalyst",
+    "slag-processing-2",
+    "laser-turret",
+    "liquid-chlorauric-acid",
+    "angels-electrolyser-3",
+    "angels-electrolyser-2",
+    "rocket",
+    "angels-bio-void-swamp-3-seed-dormant",
+    "filtration-unit",
+    "silver-oxide",
+    "flying-robot-frame-4",
+    "liquid-hydrofluoric-acid",
+    "liquid-sulfuric-acid",
+    "pistol",
+    "solid-sodium-carbonate",
+    "biter-big-breeding",
+    "life-support",
+    "tungsten-pipe-to-ground",
+    "slag-processing-dissolution",
+    "bob-logistic-zone-interface",
+    "quartz-glass",
+    "robot-tool-logistic-3",
+    "rocket-oxidizer-capsule",
+    "refined-concrete",
+    "sodium-nitrate-acid-processing",
+    "puffer-breeding-2",
+    "angels-plate-glass-1",
+    "cobalt-steel-bearing",
+    "catalyst-steam-cracking-butane",
+    "personal-laser-defense-equipment-3",
+    "speed-module-6",
+    "gas-refining",
+    "angels-water-enriched-cooling-1",
+    "logistic-chest-storage-2",
+    "angels-chemical-void-gas-chlor-methane",
+    "puffer-breeding-1",
+    "ftl-drive",
+    "angelsore5-chunk-processing",
+    "water-separation-2",
+    "angels-steam-water-purified",
+    "heat-shield-tile",
+    "oil-refinery-3",
+    "liquid-hydrochloric-acid-solid-sodium-sulfate",
+    "titanium-bearing-ball",
+    "angelsore-crushed-mix2-processing",
+    "wind-turbine-2",
+    "utility-science-pack",
+    "rail",
+    "barreling-pump",
+    "bob-robo-charge-port-4",
+    "angelsore-crystal-mix2-processing",
+    "angelsore-crushed-mix3-processing",
+    "kraft-recovery",
+    "angels-brass-smelting-2",
+    "angelsore-crystal-mix3-processing",
+    "angelsore8-dust-processing",
+    "robot-tool-logistic-4",
+    "void-carbon-dioxide",
+    "slag-processing-5",
+    "concrete",
+    "copper-cable",
+    "bob-amethyst-3",
+    "titanium-chest",
+    "tungsten-processed-processing",
+    "sct-logistic-automated-storage"
+  ],
+  "ElementLocations": [
+    "-9, 368",
+    "124, 367",
+    "379, 371",
+    "503, 371",
+    "625, 371",
+    "255, 372",
+    "-434, 725",
+    "-371, 725",
+    "-309, 725",
+    "-244, 726",
+    "-180, 726",
+    "-120, 726",
+    "-738, -5645",
+    "-674, -5646",
+    "-613, -5646",
+    "-550, -5646",
+    "-488, -5647",
+    "-426, -5648",
+    "206, 1757",
+    "154, 1546",
+    "171, 1350",
+    "135, 2055",
+    "208, 1078",
+    "476, 1357",
+    "286, 2445",
+    "752, 1090",
+    "597, -72",
+    "60, -65",
+    "455, -58",
+    "1112, -539",
+    "1781, -534",
+    "980, 1062",
+    "279, -275",
+    "763, -1263",
+    "846, 777",
+    "890, 501",
+    "990, 368",
+    "757, 794",
+    "1195, 1812",
+    "1215, 2010",
+    "1240, 1616",
+    "1823, -74",
+    "1822, 136",
+    "1821, 342",
+    "1821, 553",
+    "1802, 757",
+    "1849, 968",
+    "940, -1263",
+    "773, -3536",
+    "994, -4042",
+    "1669, -4040",
+    "1157, -4044",
+    "1333, -4043",
+    "1500, -4041",
+    "1830, -4037",
+    "977, -4263",
+    "1139, -4261",
+    "1312, -4262",
+    "1481, -4261",
+    "1651, -4263",
+    "1818, -4260",
+    "700, -4618",
+    "3168, -4675",
+    "3230, -4675",
+    "3292, -4675",
+    "3355, -4675",
+    "3417, -4675",
+    "3481, -4675",
+    "1001, -5089",
+    "1168, -5088",
+    "1338, -5089",
+    "1507, -5090",
+    "1674, -5091",
+    "1844, -5090",
+    "2118, -5388",
+    "2288, -5387",
+    "2455, -5386",
+    "2622, -5386",
+    "1931, -4892",
+    "-361, -5648",
+    "2500, -5678",
+    "4961, -5766",
+    "4895, -5766",
+    "4831, -5765",
+    "4642, -5763",
+    "2477, -4924",
+    "2522, -5119",
+    "2482, -4725",
+    "-71, -258",
+    "3165, -6187",
+    "3227, -6188",
+    "3289, -6187",
+    "3353, -6186",
+    "3416, -6187",
+    "3479, -6187",
+    "1891, -5753",
+    "1722, -5751",
+    "1556, -5751",
+    "1383, -5752",
+    "1218, -5752",
+    "1049, -5748",
+    "3069, -6185",
+    "3006, -6185",
+    "2939, -6186",
+    "2878, -6187",
+    "2815, -6187",
+    "2752, -6186",
+    "1907, -8936",
+    "1733, -8936",
+    "1571, -8935",
+    "1400, -8933",
+    "1232, -8932",
+    "1064, -8926",
+    "2228, -8598",
+    "2288, -8599",
+    "2349, -8598",
+    "2417, -8597",
+    "3569, -4180",
+    "3571, -4674",
+    "3564, -6188",
+    "4659, -9355",
+    "5249, -6681",
+    "5295, -6882",
+    "5257, -6494",
+    "5064, -6714",
+    "5083, -6525",
+    "5118, -6926",
+    "5274, -2967",
+    "5259, -3242",
+    "5554, -3240",
+    "5598, -3496",
+    "5681, -3496",
+    "5574, -2891",
+    "5580, -2695",
+    "5765, -3493",
+    "5224, -3852",
+    "5370, -3531",
+    "5395, -3857",
+    "4577, -5762",
+    "5948, -3502",
+    "5993, -3288",
+    "5981, -3077",
+    "5308, -3856",
+    "3938, -4668",
+    "3875, -4669",
+    "3954, -1251",
+    "4360, -115",
+    "4035, -1252",
+    "4001, -4668",
+    "4665, 51",
+    "4350, -531",
+    "3726, -1254",
+    "3808, -1252",
+    "677, -1261",
+    "688, -3533",
+    "3639, -1254",
+    "4291, -735",
+    "4408, -735",
+    "1279, -539",
+    "847, -1262",
+    "868, -3536",
+    "3631, -4178",
+    "3634, -4674",
+    "4018, -119",
+    "3577, -336",
+    "3467, -533",
+    "3554, -1257",
+    "3180, -532",
+    "3169, -72",
+    "3168, 128",
+    "3168, 339",
+    "3167, 542",
+    "3139, 966",
+    "3148, 754",
+    "3568, 471",
+    "3560, 218",
+    "3574, 661",
+    "3423, 1099",
+    "4590, 493",
+    "4584, 1514",
+    "4619, 265",
+    "3716, 114",
+    "3720, 366",
+    "3360, -1263",
+    "3958, 845",
+    "4003, 657",
+    "3977, 1039",
+    "6790, -3844",
+    "6872, -3523",
+    "6917, -3738",
+    "6890, -3313",
+    "3862, -6196",
+    "3926, -6195",
+    "3990, -6194",
+    "4593, -9354",
+    "3631, -6186",
+    "5998, -7425",
+    "6047, -6530",
+    "6106, -6966",
+    "6111, -6530",
+    "6172, -6529",
+    "6239, -6732",
+    "6238, -6528",
+    "5966, -6945",
+    "5916, -7156",
+    "5790, -6698",
+    "5796, -6514",
+    "5782, -6897",
+    "5113, -7161",
+    "4966, -6522",
+    "4977, -6930",
+    "4850, -8281",
+    "4914, -8281",
+    "7573, -6529",
+    "7580, -6850",
+    "7663, -6603",
+    "7521, -7917",
+    "5036, -8281",
+    "7628, -7696",
+    "7705, -6843",
+    "7744, -6600",
+    "7798, -7078",
+    "7467, -7222",
+    "7470, -7007",
+    "7460, -7435",
+    "7884, -7081",
+    "7740, -7496",
+    "8198, -7501",
+    "8168, -7083",
+    "8408, -6525",
+    "8468, -6526",
+    "8596, -6525",
+    "8531, -6526",
+    "6905, -6526",
+    "6841, -6526",
+    "6856, -6736",
+    "3937, -9357",
+    "3873, -9359",
+    "3999, -9357",
+    "3626, -9366",
+    "3563, -9367",
+    "6826, -7356",
+    "6722, -6902",
+    "6728, -6695",
+    "6715, -7111",
+    "4975, -8281",
+    "2746, -9376",
+    "2808, -9376",
+    "2869, -9376",
+    "2931, -9375",
+    "2993, -9377",
+    "3054, -9377",
+    "3156, -9374",
+    "3219, -9374",
+    "3282, -9372",
+    "3343, -9370",
+    "3407, -9369",
+    "3467, -9369",
+    "4846, -9356",
+    "4912, -9355",
+    "4973, -9355",
+    "5038, -9354",
+    "2650, -9375",
+    "2588, -9375",
+    "2526, -9375",
+    "2463, -9375",
+    "2402, -9374",
+    "2341, -9374",
+    "703, -8909",
+    "2241, -9376",
+    "6725, -3844",
+    "6680, -3528",
+    "6654, -3302",
+    "6587, -3539",
+    "6659, -3090",
+    "517, -10269",
+    "740, -10268",
+    "964, -10266",
+    "1187, -10265",
+    "1410, -10265",
+    "1583, -10266",
+    "1756, -10265",
+    "1927, -10267",
+    "562, -10068",
+    "497, -10070",
+    "623, -10068",
+    "781, -10068",
+    "714, -10067",
+    "843, -10066",
+    "932, -10063",
+    "1383, -9625",
+    "1319, -9627",
+    "2246, -10684",
+    "2101, -10686",
+    "2038, -10685",
+    "1974, -10686",
+    "1911, -10686",
+    "1849, -10685",
+    "1786, -10685",
+    "1724, -10684",
+    "1662, -10682",
+    "8725, -10957",
+    "8786, -10959",
+    "8912, -10959",
+    "8851, -10958",
+    "2351, -10682",
+    "2413, -10683",
+    "2476, -10683",
+    "2539, -10683",
+    "2602, -10683",
+    "2666, -10682",
+    "2754, -10682",
+    "2818, -10680",
+    "2882, -10680",
+    "2945, -10681",
+    "3008, -10679",
+    "3071, -10676",
+    "3166, -10674",
+    "3227, -10672",
+    "3288, -10670",
+    "3349, -10670",
+    "3413, -10672",
+    "3476, -10671",
+    "3576, -10666",
+    "3638, -10665",
+    "3875, -10660",
+    "3936, -10660",
+    "3997, -10660",
+    "4585, -10656",
+    "4647, -10656",
+    "4834, -10660",
+    "4898, -10659",
+    "4960, -10660",
+    "5024, -10661"
+  ]
+}

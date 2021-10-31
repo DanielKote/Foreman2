@@ -17,6 +17,12 @@ namespace Foreman
 		public Item Item { get; set; }
 		public LinkType StartConnectionType { get; private set; }
 		public DragType DragType;
+		private Point newObjectLocation;
+
+		private Point pointM, pointM2;
+		private Point pointN, pointN2;
+		private Point pointMidM, pointMidA, pointMidB, pointMidN;
+		private bool linkingUp;
 
 		public override Point Location
 		{
@@ -72,10 +78,28 @@ namespace Foreman
 			}
 		}
 
-		public override void Paint(System.Drawing.Graphics graphics)
+		public void UpdateCurve() //updates all points & boundaries (important for occluding objects outside view)
 		{
-			Point pointN = Parent.ScreenToGraph(Parent.PointToClient(Cursor.Position));
-			Point pointM = pointN;
+			pointN = Parent.ScreenToGraph(Parent.PointToClient(Cursor.Position));
+			pointM = pointN;
+			newObjectLocation = pointN;
+
+			//only snap to grid if grid exists and its a free link (not linking 2 existing objects)
+			if ((SupplierElement == null || ConsumerElement == null) && Parent.ShowGrid && Parent.CurrentGridUnit > 0)
+			{
+				int X = pointN.X;
+				int Y = pointN.Y;
+
+				X += Math.Sign(X) * Parent.CurrentGridUnit / 2;
+				X -= X % Parent.CurrentGridUnit + Width / 2;
+
+				Y += Math.Sign(Y) * Parent.CurrentGridUnit / 2;
+				Y -= Y % Parent.CurrentGridUnit + Height / 2;
+
+				pointN = new Point(X, Y);
+				pointM = pointN;
+				newObjectLocation = pointN;
+			}
 
 			if (SupplierElement != null)
 			{
@@ -85,12 +109,51 @@ namespace Foreman
 			{
 				pointM = ConsumerElement.GetInputLineConnectionPoint(Item);
 			}
-			Point pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
-			Point pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 40));
 
-			using (Pen pen = new Pen(DataCache.IconAverageColour(Item.Icon), 3f))
+			linkingUp = (pointN.Y > pointM.Y);
+			if (linkingUp)
 			{
-				graphics.DrawBezier(pen, pointN, pointN2, pointM2, pointM);
+				//connecting up
+				pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 20));
+				pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 20));
+			}
+			else
+			{
+				int midX = Math.Abs(pointN.X - pointM.X) > 200 ? (pointN.X + pointM.X) / 2 : pointN.X > pointM.X ? pointN.X + 150 : pointN.X - 150;
+
+				pointMidA = new Point(midX, pointN.Y);
+				pointMidB = new Point(midX, pointM.Y);
+
+
+				pointN2 = new Point(pointN.X, pointN.Y - 120);
+				pointMidN = new Point(midX, pointN.Y - 120);
+
+				pointM2 = new Point(pointM.X, pointM.Y + 120);
+				pointMidM = new Point(midX, pointM.Y + 120);
+			}
+		}
+		public override void Paint(Graphics graphics, Point trans)
+		{
+			UpdateCurve();
+
+			if (linkingUp)
+			{
+				//connecting up
+				using (Pen pen = new Pen(Item.AverageColor, 3f))
+				{
+					if (pen.Color.GetBrightness() > 0.8)
+						pen.Color = Color.FromArgb((int)(pen.Color.R * 0.8), (int)(pen.Color.G * 0.8), (int)(pen.Color.B * 0.8));
+					graphics.DrawBezier(pen, PT(pointN,trans), PT(pointN2, trans), PT(pointM2,trans), PT(pointM,trans));
+				}
+			}
+			else
+			{
+				using (Pen pen = new Pen(Item.AverageColor, 3f))
+				{
+					graphics.DrawBezier(pen, pointN, pointN2, pointMidN, pointMidA);
+					graphics.DrawLine(pen, pointMidA, pointMidB);
+					graphics.DrawBezier(pen, pointMidB, pointMidM, pointM2, pointM);
+				}
 			}
 		}
 
@@ -111,6 +174,12 @@ namespace Foreman
 				{
 					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, Item);
 				}
+
+				Parent.Graph.UpdateNodeValues();
+				Parent.AddRemoveElements();
+				Parent.UpdateNodes();
+				Parent.UpdateGraphBounds();
+				Parent.Invalidate();
 			}
 			else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
 			{
@@ -155,13 +224,16 @@ namespace Foreman
                         }
 
 						newElement.Update();
-						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
-						new LinkElement(Parent, NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item));
+						newElement.Location = Point.Add(newObjectLocation, new Size(-newElement.Width / 2, -newElement.Height / 2));
+						NodeLink newLink = NodeLink.Create(SupplierElement.DisplayedNode, newElement.DisplayedNode, Item);
+						new LinkElement(Parent, newLink, SupplierElement, newElement);
 					}
 
 					Parent.Graph.UpdateNodeValues();
 					Parent.AddRemoveElements();
 					Parent.UpdateNodes();
+					Parent.UpdateGraphBounds();
+					Parent.Invalidate();
 				});
 
 			}
@@ -184,7 +256,6 @@ namespace Foreman
 				}
 
 				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);
-
 				chooserPanel.Show(c =>
 				{
 					if (c != null)
@@ -210,19 +281,19 @@ namespace Foreman
                             Trace.Fail("Unhandled option: " + c.ToString());
                         }
 						newElement.Update();
-						newElement.Location = Point.Add(location, new Size(-newElement.Width / 2, -newElement.Height / 2));
-						new LinkElement(Parent, NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item));
+						newElement.Location = Point.Add(newObjectLocation, new Size(-newElement.Width / 2, -newElement.Height / 2));
+						NodeLink newLink = NodeLink.Create(newElement.DisplayedNode, ConsumerElement.DisplayedNode, Item);
+						new LinkElement(Parent,newLink, newElement, ConsumerElement);
 					}
 
 					Parent.Graph.UpdateNodeValues();
 					Parent.AddRemoveElements();
 					Parent.UpdateNodes();
+					Parent.UpdateGraphBounds();
+					Parent.Invalidate();
 				});
 			}
 
-			Parent.Graph.UpdateNodeValues();
-			Parent.AddRemoveElements();
-			Parent.UpdateNodes();
 			Dispose();
 		}
 
@@ -243,7 +314,7 @@ namespace Foreman
 			}
 		}
 
-		public override void MouseUp(Point location, MouseButtons button)
+		public override void MouseUp(Point location, MouseButtons button, bool wasDragged)
 		{
 			switch (button)
 			{

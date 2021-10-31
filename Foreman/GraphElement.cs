@@ -16,6 +16,7 @@ namespace Foreman
 		public virtual Point Size { get; set; }
 		public virtual int Width { get { return Size.X; } set { Size = new Point(value, Size.Y); } }
 		public virtual int Height { get { return Size.Y; } set { Size = new Point(Size.X, value); } }
+		public bool Visible { get; protected set; }
 		public Rectangle bounds
 		{
 			get
@@ -37,21 +38,46 @@ namespace Foreman
 			Parent = parent;
 			Parent.Elements.Add(this);
 			SubElements = new HashSet<GraphElement>();
+			Visible = true;
+		}
+
+		public bool IntersectsWithZone(Rectangle zone, int xborder, int yborder)
+        {
+			return      X + Width > zone.X - xborder &&
+						X < zone.X + zone.Width + xborder &&
+						Y + Height > zone.Y - yborder &&
+						Y < zone.Y + zone.Height + yborder;
+		}
+
+		public virtual void UpdateVisibility(Rectangle zone, int xborder, int yborder)
+        {
+			Visible = IntersectsWithZone(zone, xborder, yborder);
+        }
+
+		public Point PT(Point original, int xTransform, int yTransform)
+		{
+			return new Point(original.X + xTransform, original.Y + yTransform);
+		}
+		public Point PT(Point original, Point transform)
+		{
+			return new Point(original.X + transform.X, original.Y + transform.Y);
 		}
 
 		public virtual bool ContainsPoint(Point point) { return false; }
-		public virtual void Paint(Graphics graphics)
+		public virtual void Paint(Graphics graphics, Point transform)
 		{
 			foreach (GraphElement element in SubElements)
 			{
-				graphics.TranslateTransform(element.X, element.Y);
-				element.Paint(graphics);
-				graphics.TranslateTransform(-element.X, -element.Y);
+				element.Paint(graphics, PT(transform, element.X, element.Y));
 			}
 		}
+
+		//location is relative to this element
+		public virtual List<TooltipInfo> GetToolTips(Point location) { return new List<TooltipInfo>(); }
+
 		public virtual void MouseMoved(Point location) { }
 		public virtual void MouseDown(Point location, MouseButtons button) { }
-		public virtual void MouseUp(Point location, MouseButtons button) { }
+		public virtual void MouseUp(Point location, MouseButtons button, bool wasDragged) { }
 		public virtual void Dragged(Point location) { }
 		public virtual void Dispose()
 		{

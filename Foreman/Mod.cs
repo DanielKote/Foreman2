@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Foreman
 {
 	public class Mod
 	{
-		public String Name = "";
-		public String title = "";
-		public String version = "";
+		public string Id = "";
+		public string Name = "";
+		public string title = "";
+		public string version = "";
 		public Version parsedVersion;
-		public String dir = "";
-		public String description = "";
-		public String author = "";
-		public List<String> dependencies = new List<String>();
+		public string dir = "";
+		public string description = "";
+		public string author = "";
+		public List<string> dependencies = new List<string>();
 		public List<ModDependency> parsedDependencies = new List<ModDependency>();
 		public bool Enabled = true;
 
@@ -26,21 +26,29 @@ namespace Foreman
 			}
 			if (dep.Version != null)
 			{
-				if (dep.VersionType == DependencyType.EqualTo
-					&& parsedVersion != dep.Version)
+				bool versionMatch = true;
+				switch (dep.VersionOperator)
 				{
-					return false;
+					case VersionOperator.EqualTo:
+						versionMatch = parsedVersion == dep.Version;
+						break;
+					case VersionOperator.GreaterThan:
+						versionMatch = parsedVersion > dep.Version;
+						break;
+					case VersionOperator.GreaterThanOrEqual:
+						versionMatch = parsedVersion >= dep.Version;
+						break;
+					case VersionOperator.LessThan:
+						versionMatch = parsedVersion < dep.Version;
+						break;
+					case VersionOperator.LessThanOrEqual:
+						versionMatch = parsedVersion <= dep.Version;
+						break;
 				}
-				if (dep.VersionType == DependencyType.GreaterThan
-					&& parsedVersion <= dep.Version)
-				{
+
+				if (!versionMatch)
 					return false;
-				}
-				if (dep.VersionType == DependencyType.GreaterThanOrEqual
-					&& parsedVersion < dep.Version)
-				{
-					return false;
-				}
+				
 			}
 			return true;
 		}
@@ -72,16 +80,36 @@ namespace Foreman
 
 	public class ModDependency
 	{
-		public String ModName = "";
+		public DependencyType Type = DependencyType.Required;
+		public string ModName = "";
 		public Version Version;
-		public bool Optional = false;
-		public DependencyType VersionType = DependencyType.EqualTo;
+		public VersionOperator VersionOperator = VersionOperator.EqualTo;
+
+		public bool Optional =>
+			Type == DependencyType.Optional ||
+			Type == DependencyType.OptionalHidden ||
+			Type == DependencyType.Incompatible;
+
+		public override string ToString()
+		{
+			return ModName + " " + VersionOperator.Token() + " " + Version;
+		}
+	}
+
+	public enum VersionOperator
+	{
+		EqualTo,
+		GreaterThan,
+		GreaterThanOrEqual,
+		LessThan,
+		LessThanOrEqual
 	}
 
 	public enum DependencyType
 	{
-		EqualTo,
-		GreaterThan,
-		GreaterThanOrEqual
+		Required,
+		Optional,
+		OptionalHidden,
+		Incompatible
 	}
 }

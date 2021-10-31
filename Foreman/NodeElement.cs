@@ -15,8 +15,11 @@ namespace Foreman
 
 	public partial class NodeElement : GraphElement
 	{
-		public int DragOffsetX;
-		public int DragOffsetY;
+        public bool StickyDragOrigin = false; //true: drag axies are established at start of drag; false: drag axies are established upon activation of axis limits (shift)
+		public int MouseDownOffsetX;
+		public int MouseDownOffsetY;
+		public Point DragOrigin;
+		public bool Selected = false;
 
 		public Point MousePosition = Point.Empty;
 
@@ -25,13 +28,20 @@ namespace Foreman
 		private Color supplyColour = Color.FromArgb(231, 214, 224);
 		private Color outputColour = Color.FromArgb(249, 237, 195);
 		private Color missingColour = Color.FromArgb(0xff, 0x7f, 0x6b);
+		private Color backgroundOversuppliedColor = Color.FromArgb(0xff, 0x7f, 0x6b);
         private Color darkTextColour = Color.FromArgb(69, 69, 69);
-		
-		private const int assemblerSize = 32;
-		private const int assemblerBorderX = 10;
-		private const int assemblerBorderY = 30;
+		private Color productivityTickColor = Color.FromArgb(166, 0, 0);
+		private Brush SelectionOverlayBrush = new SolidBrush(Color.FromArgb(100,100, 100, 200));
 
-		private const int tabPadding = 8;
+		//most values are attempted to fit the grid (6 * 2^n) - ex: 72 = 6 * (4+8)
+		private const int tabPadding = 7; //makes each tab be evenly spaced for grid
+		private const int baseHeight = 96;
+		public const int DeltaZ = 96 / 2 - 1; // baseHeight/2 + 1
+		private const int minWidth = 72;
+		private const int dWidth = 24;
+		private const int dHeight = 12;
+		private const int maxT10Width = 144;
+		//private const int lineWidth = 1;
 
 		public String text = "";
 		
@@ -44,16 +54,21 @@ namespace Foreman
 		public ProductionNode DisplayedNode { get; private set; }
 
 		private Brush backgroundBrush;
+		private Brush backgroundOversuppliedBrush;
 		private Brush textBrush;
+		private Pen productivityPen;
 		private Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
+		private Font size7Font = new Font(FontFamily.GenericSansSerif, 7);
+		private Font myFont;
 		private StringFormat centreFormat = new StringFormat();
 
 		public Boolean tooltipsEnabled = true;
 
 		public NodeElement(ProductionNode node, ProductionGraphViewer parent) : base(parent)
 		{
-			Width = 100;
-			Height = 90;
+			Width = minWidth;
+			Height = baseHeight;
+			myFont = size10Font;
 
 			DisplayedNode = node;
 
@@ -97,7 +112,9 @@ namespace Foreman
                 Trace.Fail("No branch for node: " + DisplayedNode.ToString());
 			}
 			backgroundBrush = new SolidBrush(backgroundColour);
+			backgroundOversuppliedBrush = new SolidBrush(backgroundOversuppliedColor);
 			textBrush = new SolidBrush(textColour);
+			productivityPen = new Pen(productivityTickColor, 5);
 
 			foreach (Item item in node.Inputs)
 			{
@@ -192,7 +209,8 @@ namespace Foreman
 					}
 					else
 					{
-						text = "Recipe: " + node.BaseRecipe.FriendlyName;
+						//text = "Recipe: " + node.BaseRecipe.FriendlyName;
+						text = node.BaseRecipe.FriendlyName;
 					}
 				}
 				else
@@ -201,18 +219,25 @@ namespace Foreman
 				}
 			}
 
+			int iconWidth = getIconWidths() + 10;
+			iconWidth = Math.Max(minWidth, iconWidth);
+
 			Graphics graphics = Parent.CreateGraphics();
-			int minWidth = (int)graphics.MeasureString(text, size10Font).Width;
+			int minTextWidth = (int)graphics.MeasureString(text, size10Font).Width + 10;
+			myFont = size10Font;
+			if(minTextWidth > maxT10Width && minTextWidth > iconWidth)
+            {
+				myFont = size7Font;
+				minTextWidth = (int)graphics.MeasureString(text, size7Font).Width + 10;
+			}
+			Width = Math.Max(iconWidth, minTextWidth);
+			Height = baseHeight;
 
-			Width = Math.Max(75, getIconWidths());
-			Width = Math.Max(Width, minWidth);
-
-			if (assemblerBox != null)
+			if (assemblerBox != null) //recipe box (update width&height if displaying assembler/miner, or just increase min width if not displaying assembler/miner) + update assembler list
 			{
 				if ((DisplayedNode is RecipeNode && Parent.ShowAssemblers)
 					|| (DisplayedNode is SupplyNode && Parent.ShowMiners))
 				{
-					Height = 120;
 					if (DisplayedNode is RecipeNode)
 					{
                         var assemblers = (DisplayedNode as RecipeNode).GetAssemblers();
@@ -227,31 +252,49 @@ namespace Foreman
 						assemblerBox.AssemblerList = (DisplayedNode as SupplyNode).GetMinimumMiners();
 					}
 					assemblerBox.Update();
-					Width = Math.Max(Width, assemblerBox.Width + 20);
-					Height = assemblerBox.Height + 80;
+					int assemblerBoxWidth = assemblerBox.Width + 20;
+					Width = Math.Max(Width, assemblerBoxWidth);
+
+					int assemblerBoxHeight = assemblerBox.Height + 20;
+					Height = Math.Max(Height, assemblerBoxHeight);
+
+					Width += dWidth;
+					Width -= Width % dWidth;
+					Height += dHeight;
+					Height -= Height % dHeight;
+
 					assemblerBox.X = (Width - assemblerBox.Width) / 2 + 2;
 					assemblerBox.Y = (Height - assemblerBox.Height) / 2 + 2;
 				}
 				else
 				{
+					Width = Math.Max(minWidth, Width) + dWidth * 2;
+
 					assemblerBox.AssemblerList.Clear();
-					Width = Math.Max(100, Width);
-					Height = 90;
 					assemblerBox.Update();
 				}
 			}
 
-			else
+			//final size confirms
+			if (Width % dWidth != 0)
 			{
-				Height = 90;
-			}			
+				Width += dWidth;
+				Width -= Width % dWidth;
+			}
+			Width -= 2;
+			if (Height % dHeight != 0)
+			{
+				Height += dHeight;
+				Height -= Height % dHeight;
+			}
+			Height -= 2;
 
+			//update tabs
 			foreach (ItemTab tab in inputTabs.Union(outputTabs))
 			{
-				tab.FillColour = chooseIconColour(tab.Item, tab.Type);
+				tab.BorderColor = chooseIconBorderColor(tab.Item, tab.Type);
 				tab.Text = getIconString(tab.Item, tab.Type);
 			}
-
 			UpdateTabOrder();
 		}
 
@@ -318,6 +361,15 @@ namespace Foreman
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y);
 		}
 
+		public ItemTab GetOutputLineItemTab(Item item)
+        {
+			if (!outputTabs.Any())
+			{
+				return null;
+			}
+			return outputTabs.First(it => it.Item == item);
+		}
+
 		public Point GetInputLineConnectionPoint(Item item)
 		{
 			if (!inputTabs.Any())
@@ -328,23 +380,70 @@ namespace Foreman
 			return new Point(X + tab.X + tab.Width / 2, Y + tab.Y + tab.Height);
 		}
 
-		public override void Paint(Graphics graphics)
+		public ItemTab GetInputLineItemTab(Item item)
 		{
-            if ((DisplayedNode is RecipeNode && !((RecipeNode) DisplayedNode).BaseRecipe.Enabled) || DisplayedNode.ManualRateNotMet())
-            {
-                GraphicsStuff.FillRoundRect(-5, -5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
-            }
+			if (!inputTabs.Any())
+			{
+				return null;
+			}
+			return inputTabs.First(it => it.Item == item);
+		}
 
-			GraphicsStuff.FillRoundRect(0, 0, Width, Height, 8, graphics, backgroundBrush);
-			graphics.DrawString(text, size10Font, textBrush, Width / 2, Height / 2, centreFormat);
-			
-			base.Paint(graphics);
+		public override void Paint(Graphics graphics, Point trans)
+		{
+			if (Visible)
+			{
+				Brush bgBrush = backgroundBrush;
+				foreach (ItemTab tab in inputTabs.Union(outputTabs))
+				{
+					if (tab.Type == LinkType.Input)
+					{
+						if (DisplayedNode.OverSupplied(tab.Item))
+						{
+							bgBrush = backgroundOversuppliedBrush;
+						}
+					}
+				}
+
+
+
+				if ((DisplayedNode is RecipeNode && !((RecipeNode)DisplayedNode).BaseRecipe.Enabled) || DisplayedNode.ManualRateNotMet())
+				{
+					GraphicsStuff.FillRoundRect(-5 + trans.X, -5 + trans.Y, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
+				}
+
+				GraphicsStuff.FillRoundRect(trans.X, trans.Y, Width, Height, 8, graphics, bgBrush);
+				graphics.DrawString(text, myFont, textBrush, (Width / 2) + trans.X, (Height / 2) + trans.Y, centreFormat);
+
+				if (DisplayedNode is RecipeNode)
+				{
+					int prodCount = 0;
+					var assemblers = (DisplayedNode as RecipeNode).GetAssemblers();
+					foreach (MachinePermutation assembler in assemblers.Keys)
+					{
+						foreach (Module module in assembler.modules)
+						{
+							if (module.ProductivityBonus > 0)
+								graphics.DrawEllipse(productivityPen, -2 + trans.X, 20 + prodCount++ * 10 + trans.Y, 5, 5);
+						}
+					}
+				}
+
+				if(Selected)
+                {
+					GraphicsStuff.FillRoundRect(trans.X, trans.Y, Width, Height, 8, graphics, SelectionOverlayBrush);
+				}
+
+				base.Paint(graphics, trans);
+			}
 		}
 
 		private String getIconString(Item item, LinkType linkType)
 		{
 			String line1Format = "{0:0.##}{1}";
+			String line1FormatB = "{0:0}{1}";
 			String line2Format = "\n({0:0.##}{1})";
+			String line2FormatB = "\n({0:0}{1})";
 			String finalString = "";
 
 			String unit = "";
@@ -374,55 +473,79 @@ namespace Foreman
 
 			if (linkType == LinkType.Input)
 			{
-				finalString = String.Format(line1Format, actualAmount, unit);
-                if (DisplayedNode.OverSupplied(item))
+				if(actualAmount < 1000)
+					finalString = String.Format(line1Format, actualAmount, unit);
+				else
+					finalString = String.Format(line1FormatB, actualAmount, unit);
+				if (DisplayedNode.OverSupplied(item))
 				{
-					finalString += String.Format(line2Format, suppliedAmount, unit);
+					if(suppliedAmount < 1000)
+						finalString += String.Format(line2Format, suppliedAmount, unit);
+					else
+						finalString += String.Format(line2FormatB, suppliedAmount, unit);
 				}
 			}
 			else
 			{
-				finalString = String.Format(line1Format, actualAmount, unit);
+				if(actualAmount < 1000)
+					finalString = String.Format(line1Format, actualAmount, unit);
+				else
+					finalString = String.Format(line1FormatB, actualAmount, unit);
 			}
 
 			return finalString;
 		}
 
-		private Color chooseIconColour(Item item, LinkType linkType)
+		private Color chooseIconBorderColor(Item item, LinkType linkType)
 		{
-			Color enough = Color.White;
-			Color tooMuch = Color.FromArgb(255, 214, 226, 230);
+			Color enough = Color.Gray;
+			Color tooMuch = Color.DarkRed;
 
-			if (linkType == LinkType.Input)
-			{
-				if (DisplayedNode.OverSupplied(item))
-				{
-					return tooMuch;
-				}
-			}
+			if (linkType == LinkType.Input && DisplayedNode.OverSupplied(item))
+				return tooMuch;
 
             return enough;
 		}
 
-		public override void MouseUp(Point location, MouseButtons button)
+		public override void MouseUp(Point location, MouseButtons button, bool wasDragged)
 		{
-			if (Parent.DraggedElement == this && !Parent.clickHasBecomeDrag)
+			if (Parent.MouseDownElement == this && !wasDragged)
 			{
 				if (button == MouseButtons.Left)
 				{
-					beginEditingNodeRate();
+					if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0)
+						beginEditingNodeRate();
 				}
 			}
 
 			if (button == MouseButtons.Right)
 			{
-				rightClickMenu.MenuItems.Clear();
-				rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-					new EventHandler((o, e) =>
-						{
-							Parent.DeleteNode(this);
-						})));
-				rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+				//check if we are in an item tab (for deleting connections)
+				bool inItemTab = false;
+				foreach (ItemTab tab in SubElements.OfType<ItemTab>())
+				{
+					if (tab.bounds.Contains(new Point(MouseDownOffsetX, MouseDownOffsetY)))
+					{
+						inItemTab = true;
+						rightClickMenu.MenuItems.Clear();
+						rightClickMenu.MenuItems.Add(new MenuItem("Delete connections",
+							new EventHandler((o, e) =>
+							{
+								Parent.RemoveAssociatedLinks(tab);
+							})));
+						rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+					}
+				}
+				if (!inItemTab)
+				{
+					rightClickMenu.MenuItems.Clear();
+					rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+						new EventHandler((o, e) =>
+							{
+								Parent.DeleteNode(this);
+							})));
+					rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+				}
 			}
 		}
 
@@ -432,22 +555,21 @@ namespace Foreman
 			new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X, Location.Y + Height / 2), Parent);
 		}
 
-		public override void MouseMoved(Point location)
-		{
-			ItemTab mousedTab = null;
-			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
-			{
-				if (tab.bounds.Contains(location))
-				{
-					mousedTab = tab;
-				}
-			}
-
+		public override List<TooltipInfo> GetToolTips(Point location)
+        {
+			List<TooltipInfo> toolTips = new List<TooltipInfo>();
 			if (tooltipsEnabled)
 			{
-				TooltipInfo tti = new TooltipInfo();
+				ItemTab mousedTab = null;
+				foreach (ItemTab tab in SubElements.OfType<ItemTab>())
+				{
+					if (tab.bounds.Contains(location))
+						mousedTab = tab;
+				}
+
 				if (mousedTab != null)
 				{
+					TooltipInfo tti = new TooltipInfo();
 					tti.Text = mousedTab.Item.FriendlyName;
 					if (mousedTab.Type == LinkType.Input)
 					{
@@ -462,13 +584,17 @@ namespace Foreman
 						tti.Direction = Direction.Down;
 						tti.ScreenLocation = Parent.GraphToScreen(GetOutputLineConnectionPoint(mousedTab.Item));
 					}
-					Parent.AddTooltip(tti);
+					toolTips.Add(tti);
 				}
 				else if (DisplayedNode is RecipeNode)
 				{
+					TooltipInfo tti = new TooltipInfo();
 					tti.Direction = Direction.Left;
 					tti.ScreenLocation = Parent.GraphToScreen(Point.Add(Location, new Size(Width, Height / 2)));
-					tti.Text = String.Format("Recipe: {0}", (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName);
+					tti.Text = String.Format("WH: {0},{1}\n", Width, Height);
+					tti.Text += String.Format("XY: {0},{1}\n", X, Y);
+
+					tti.Text += String.Format("Recipe: {0}", (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName);
 					tti.Text += String.Format("\n--Base Time: {0}s", (DisplayedNode as RecipeNode).BaseRecipe.Time);
 					tti.Text += String.Format("\n--Base Ingredients:");
 					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.Ingredients)
@@ -496,21 +622,23 @@ namespace Foreman
 					if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
 					{
 						tti.Text += String.Format("\n\nCurrent iterations: {0}", DisplayedNode.actualRate);
-					} else
+					}
+					else
 					{
 						tti.Text += String.Format("\n\nCurrent Rate: {0}/{1}",
 							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? DisplayedNode.actualRate / 60 : DisplayedNode.actualRate,
 							Parent.Graph.SelectedUnit == RateUnit.PerMinute ? "m" : "s");
 					}
-					Parent.AddTooltip(tti);
+					toolTips.Add(tti);
 				}
 
 				TooltipInfo helpToolTipInfo = new TooltipInfo();
 				helpToolTipInfo.Text = "Left click on this node to edit how fast it runs\nRight click to delete it";
 				helpToolTipInfo.Direction = Direction.None;
 				helpToolTipInfo.ScreenLocation = new Point(10, 10);
-				Parent.AddTooltip(helpToolTipInfo);
+				toolTips.Add(helpToolTipInfo);
 			}
+			return toolTips;
 		}
 
 		public override bool ContainsPoint(Point point)
@@ -531,11 +659,13 @@ namespace Foreman
 
 		public override void MouseDown(Point location, MouseButtons button)
 		{
+			MouseDownOffsetX = location.X;
+			MouseDownOffsetY = location.Y;
+
 			if (button == MouseButtons.Left)
 			{
-				Parent.DraggedElement = this;
-				DragOffsetX = location.X;
-				DragOffsetY = location.Y;
+				Parent.MouseDownElement = this;
+				DragOrigin = new Point(X, Y);
 			}
 		}
 
@@ -545,10 +675,8 @@ namespace Foreman
 
 			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
 			{
-				if (tab.bounds.Contains(new Point(DragOffsetX, DragOffsetY)))
-				{
+				if (tab.bounds.Contains(new Point(MouseDownOffsetX, MouseDownOffsetY)))
 					draggedTab = tab;
-				}
 			}
 
 			if (draggedTab != null)
@@ -562,12 +690,40 @@ namespace Foreman
 				{
 					newLink.SupplierElement = this;
 				}
-				Parent.DraggedElement = newLink;
+				Parent.MouseDownElement = newLink;
 			}
 			else
 			{
-				X += location.X - DragOffsetX;
-				Y += location.Y - DragOffsetY;
+				int xtemp = X;
+				int ytemp = Y;
+
+				//lock to grid if it is set & is visible
+				if(Parent.ShowGrid)
+                {
+					xtemp += location.X;
+					xtemp = Parent.AlignToGrid(xtemp) - Width / 2;
+
+					ytemp += location.Y;
+					ytemp = Parent.AlignToGrid(ytemp) - DeltaZ;
+                }
+				else
+                {
+					xtemp += location.X - MouseDownOffsetX;
+					ytemp += location.Y - MouseDownOffsetY;
+                }
+
+                if (Parent.LockDragToAxis)
+                {
+                    if (Math.Abs(DragOrigin.X - xtemp) > Math.Abs(DragOrigin.Y - ytemp))
+                        ytemp = Parent.AlignToGrid(DragOrigin.Y + Height / 2) - Height / 2;
+                    else
+                        xtemp = Parent.AlignToGrid(DragOrigin.X + Width / 2) - Width / 2;
+                }
+                else if (!StickyDragOrigin)
+                    DragOrigin = new Point(X, Y);
+
+				X = xtemp;
+				Y = ytemp;
 
 				foreach (ProductionNode node in DisplayedNode.InputLinks.Select<NodeLink, ProductionNode>(l => l.Supplier))
 				{

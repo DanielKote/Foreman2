@@ -12,7 +12,7 @@ namespace Foreman.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -26,24 +26,24 @@ namespace Foreman.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FactorioDataPath {
+        public string FactorioPath {
             get {
-                return ((string)(this["FactorioDataPath"]));
+                return ((string)(this["FactorioPath"]));
             }
             set {
-                this["FactorioDataPath"] = value;
+                this["FactorioPath"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FactorioModPath {
+        public string FactorioUserDataPath {
             get {
-                return ((string)(this["FactorioModPath"]));
+                return ((string)(this["FactorioUserDataPath"]));
             }
             set {
-                this["FactorioModPath"] = value;
+                this["FactorioUserDataPath"] = value;
             }
         }
         
@@ -56,18 +56,6 @@ namespace Foreman.Properties {
             }
             set {
                 this["Language"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FactorioPath {
-            get {
-                return ((string)(this["FactorioPath"]));
-            }
-            set {
-                this["FactorioPath"] = value;
             }
         }
         
@@ -117,13 +105,85 @@ namespace Foreman.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("normal")]
-        public string FactorioDifficulty {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FactorioNormalDifficulty {
             get {
-                return ((string)(this["FactorioDifficulty"]));
+                return ((bool)(this["FactorioNormalDifficulty"]));
             }
             set {
-                this["FactorioDifficulty"] = value;
+                this["FactorioNormalDifficulty"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int DefaultModules {
+            get {
+                return ((int)(this["DefaultModules"]));
+            }
+            set {
+                this["DefaultModules"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MinorGridlines {
+            get {
+                return ((int)(this["MinorGridlines"]));
+            }
+            set {
+                this["MinorGridlines"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MajorGridlines {
+            get {
+                return ((int)(this["MajorGridlines"]));
+            }
+            set {
+                this["MajorGridlines"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AltGridlines {
+            get {
+                return ((bool)(this["AltGridlines"]));
+            }
+            set {
+                this["AltGridlines"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FactorioDataPath {
+            get {
+                return ((string)(this["FactorioDataPath"]));
+            }
+            set {
+                this["FactorioDataPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int GenerationType {
+            get {
+                return ((int)(this["GenerationType"]));
+            }
+            set {
+                this["GenerationType"] = value;
             }
         }
     }

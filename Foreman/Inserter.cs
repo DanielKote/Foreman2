@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace Foreman
 {
-	class Inserter
+	public class Inserter
 	{
 		public String Name { get; private set; }
 		public float RotationSpeed { get; set; }

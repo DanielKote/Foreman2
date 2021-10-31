@@ -13,10 +13,18 @@ namespace Foreman
 	{
 		public ProductionNode BaseNode { get; private set; }
 		public ProductionGraphViewer GraphViewer { get; private set; }
+		private Font BaseAssemblerButtonFont;
+		private int BaseAssemblerButtonWidth;
+		private Font BaseModuleButtonFont;
+		private int BaseModuleButtonWidth;
 
 		public RateOptionsPanel(ProductionNode baseNode, ProductionGraphViewer graphViewer)
 		{
 			InitializeComponent();
+			BaseAssemblerButtonFont = assemblerButton.Font;
+			BaseAssemblerButtonWidth = assemblerButton.Width;
+			BaseModuleButtonFont = modulesButton.Font;
+			BaseModuleButtonWidth = modulesButton.Width;
 
 			BaseNode = baseNode;
 			GraphViewer = graphViewer;
@@ -51,6 +59,9 @@ namespace Foreman
 			else
 			{
 				unitLabel.Visible = false;
+				unitLabel.Text = "";
+				unitLabel.Width = unitLabel.PreferredWidth;
+				ratePanel.Width = ratePanel.PreferredSize.Width;
 				fixedTextBox.Width = 85;
 			}
 			fixedTextBox.Text = Convert.ToString(amountToShow);
@@ -61,7 +72,7 @@ namespace Foreman
 			if (GraphViewer.ShowAssemblers && baseNode is RecipeNode)
 			{
 				this.assemblerPanel.Visible = true;
-				updateAssemblerButtons();
+				updateButtons();
 			}
 			else
 			{
@@ -69,38 +80,10 @@ namespace Foreman
 			}
 		}
 
-		private void updateAssemblerButtons()
-		{
-			var assembler = (BaseNode as RecipeNode).Assembler;
-			if (assembler == null)
-			{
-				this.assemblerButton.Text = "Best";
-			}
-			else
-			{
-				this.assemblerButton.Text = assembler.FriendlyName;
-			}
+		private void updateValues()
+        {
+			bool valuesChanged = false;
 
-			this.modulesButton.Text = (BaseNode as RecipeNode).NodeModules.Name;
-		}
-
-		private void fixedOption_CheckedChanged(object sender, EventArgs e)
-		{
-			fixedTextBox.Enabled = fixedOption.Checked;
-			if (fixedOption.Checked)
-			{
-				BaseNode.rateType = RateType.Manual;
-			}
-			else
-			{
-				BaseNode.rateType = RateType.Auto;
-			}
-			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.UpdateNodes();
-		}
-
-		private void fixedTextBox_TextChanged(object sender, EventArgs e)
-		{
 			float newAmount;
 			if (float.TryParse(fixedTextBox.Text, out newAmount))
 			{
@@ -108,20 +91,102 @@ namespace Foreman
 				{
 					newAmount /= 60;
 				}
-				BaseNode.desiredRate = newAmount;
+
+				if (BaseNode.desiredRate != newAmount)
+				{
+					BaseNode.desiredRate = newAmount;
+					valuesChanged = true;
+				}
+			}
+
+			double newProductivity;
+			if (double.TryParse(productivityBonusTextBox.Text, out newProductivity))
+			{
+				if (BaseNode.ProductivityBonus != newProductivity)
+				{
+					BaseNode.ProductivityBonus = newProductivity;
+					valuesChanged = true;
+				}
+			}
+
+			double newSpeed;
+			if (double.TryParse(speedBonusTextBox.Text, out newSpeed))
+			{
+				if (BaseNode.SpeedBonus != newSpeed)
+				{
+					BaseNode.SpeedBonus = newSpeed;
+					valuesChanged = true;
+				}
+			}
+
+			if (valuesChanged)
+			{
 				GraphViewer.Graph.UpdateNodeValues();
 				GraphViewer.UpdateNodes();
 			}
 		}
 
-		private void KeyPressed(object sender, KeyEventArgs e)
+		private void updateButtons()
 		{
-			if (e.KeyCode == Keys.Enter)
+			var assembler = (BaseNode as RecipeNode).Assembler;
+			string newName = (assembler == null ? "Best" : assembler.FriendlyName);
+
+			assemblerButton.Font = BaseAssemblerButtonFont;
+			assemblerButton.Text = newName;
+			assemblerButton.Width = BaseAssemblerButtonWidth;
+			while(assemblerButton.Width > BaseAssemblerButtonWidth)
+            {
+				assemblerButton.Text = "";
+				assemblerButton.Width = BaseAssemblerButtonWidth;
+				assemblerButton.Font = new Font(assemblerButton.Font.FontFamily, assemblerButton.Font.Size - 1);
+				assemblerButton.Text = newName;
+			}
+
+			newName = (BaseNode as RecipeNode).NodeModules.Name;
+			modulesButton.Font = BaseModuleButtonFont;
+			modulesButton.Text = newName;
+			modulesButton.Width = BaseModuleButtonWidth;
+			while (modulesButton.Width > BaseModuleButtonWidth)
 			{
-				GraphViewer.ClearFloatingControls();
+				modulesButton.Text = "";
+				modulesButton.Width = BaseModuleButtonWidth;
+				modulesButton.Font = new Font(modulesButton.Font.FontFamily, modulesButton.Font.Size - 1);
+				modulesButton.Text = newName;
+			}
+		}
+
+		private void fixedOption_CheckedChanged(object sender, EventArgs e)
+		{
+			fixedTextBox.Enabled = fixedOption.Checked;
+			RateType updatedRateType = (fixedOption.Checked) ? RateType.Manual : RateType.Auto;
+
+			if (BaseNode.rateType != updatedRateType)
+			{
+				BaseNode.rateType = updatedRateType;
 				GraphViewer.Graph.UpdateNodeValues();
 				GraphViewer.UpdateNodes();
 			}
+		}
+
+		private void fixedTextBox_LostFocus(object sender, EventArgs e)
+		{
+			updateValues();
+		}
+
+		private void productivityBonusTextBox_LostFocus(object sender, EventArgs e)
+		{
+			updateValues();
+		}
+
+		private void speedBonusTextBox_LostFocus(object sender, EventArgs e)
+		{
+			updateValues();
+		}
+
+		private void KeyPressed(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+				updateValues();
 		}
 
 		private void assemblerButton_Click(object sender, EventArgs e)
@@ -151,18 +216,23 @@ namespace Foreman
 			{
 				if (c != null)
 				{
+					Assembler updatedAssembler = null;
 					if (c == bestOption)
 					{
-						(BaseNode as RecipeNode).Assembler = null;
+						updatedAssembler = null;
 					}
-					else
+					if (c != bestOption)
 					{
-						var assembler = DataCache.Assemblers.Single(a => a.Key == c.DisplayText).Value;
-						(BaseNode as RecipeNode).Assembler = assembler;
+						updatedAssembler = DataCache.Assemblers.Single(a => a.Key == c.DisplayText).Value;
+
 					}
-					updateAssemblerButtons();
-					GraphViewer.Graph.UpdateNodeValues();
-					GraphViewer.UpdateNodes();
+					if ((BaseNode as RecipeNode).Assembler != updatedAssembler)
+					{
+						(BaseNode as RecipeNode).Assembler = updatedAssembler;
+						updateButtons();
+						GraphViewer.Graph.UpdateNodeValues();
+						GraphViewer.UpdateNodes();
+					}
 				}
 			});
 		}
@@ -200,53 +270,26 @@ namespace Foreman
 			{
 				if (c != null)
 				{
+					ModuleSelector updatedModules;
+
 					if (c == fastestOption)
-					{
-						(BaseNode as RecipeNode).NodeModules = ModuleSelector.Fastest;
-					}
+						updatedModules = ModuleSelector.Fastest;
 					else if (c == noneOption)
-					{
-						(BaseNode as RecipeNode).NodeModules = ModuleSelector.None;
-					}
+						updatedModules = ModuleSelector.None;
 					else if (c == productivityOption)
-					{
-						(BaseNode as RecipeNode).NodeModules = ModuleSelector.Productive;
-					}
+						updatedModules = ModuleSelector.Productive;
 					else
+						updatedModules = ModuleSelector.Specific(DataCache.Modules.Single(a => a.Key == c.DisplayText).Value);
+
+					if ((BaseNode as RecipeNode).NodeModules != updatedModules)
 					{
-						var module = DataCache.Modules.Single(a => a.Key == c.DisplayText).Value;
-						(BaseNode as RecipeNode).NodeModules = ModuleSelector.Specific(module);
+						(BaseNode as RecipeNode).NodeModules = updatedModules;
+						updateButtons();
+						GraphViewer.Graph.UpdateNodeValues();
+						GraphViewer.UpdateNodes();
 					}
-					updateAssemblerButtons();
-					GraphViewer.Graph.UpdateNodeValues();
-					GraphViewer.UpdateNodes();
 				}
 			});
 		}
-
-        private void productivityBonusTextBox_TextChanged(object sender, EventArgs e)
-        {
-			double newAmount;
-            var input = (TextBox)sender;
-			if (double.TryParse(input.Text, out newAmount))
-			{
-				BaseNode.ProductivityBonus = newAmount;
-				GraphViewer.Graph.UpdateNodeValues();
-				GraphViewer.UpdateNodes();
-			}
-        }
-
-        private void speedBonusTextBox_TextChanged(object sender, EventArgs e)
-        {
-			double newAmount;
-            var input = (TextBox)sender;
-			if (double.TryParse(input.Text, out newAmount))
-			{
-				BaseNode.SpeedBonus = newAmount;
-				GraphViewer.Graph.UpdateNodeValues();
-				GraphViewer.UpdateNodes();
-			}
-
-        }
     }
 }

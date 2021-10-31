@@ -85,9 +85,9 @@ namespace Foreman
 			}
 		}
 
-		public override void Paint(System.Drawing.Graphics graphics)
+		public override void Paint(System.Drawing.Graphics graphics, Point trans)
 		{
-			base.Paint(graphics);
+			base.Paint(graphics, trans);
 		}
 	}
 
@@ -138,14 +138,14 @@ namespace Foreman
 			Height = iconSize;
 		}
 
-		public override void Paint(Graphics graphics)
+		public override void Paint(Graphics graphics, Point trans)
 		{
-			Point iconPoint = new Point((int)((Width + iconSize + stringWidth) / 2 - iconSize), (int)((Height - iconSize) / 2));
+			Point iconPoint = new Point((int)((Width + iconSize + stringWidth) / 2 - iconSize) + trans.X, (int)((Height - iconSize) / 2) + trans.Y);
 
 			graphics.DrawImage(DisplayedMachine.assembler.Icon, iconPoint.X, iconPoint.Y, iconSize, iconSize);
             if (DisplayedNumber > 0)
             {
-                graphics.DrawString(DisplayedNumber.ToString(), Font, Brushes.Black, new Point((int)((Width - iconSize - stringWidth) / 2 + stringWidth / 2), Height / 2), centreFormat);
+                graphics.DrawString(DisplayedNumber.ToString(), Font, Brushes.Black, new Point((int)((Width - iconSize - stringWidth) / 2 + stringWidth / 2)+ trans.X, Height / 2+trans.Y), centreFormat);
             }
 
 			if (DisplayedMachine.modules.Any())
@@ -155,16 +155,7 @@ namespace Foreman
 				int moduleSize = Math.Min((int)(iconSize / numModuleRows), iconSize / (2 - moduleCount % 2)) - 2;
 
 				int i = 0;
-				int x;
-
-				if (moduleCount == 1)
-				{
-					x = iconPoint.X + (iconSize - moduleSize) / 2;
-				}
-				else
-				{
-					x = iconPoint.X + (iconSize - moduleSize - moduleSize) / 2;
-				}
+				int x = iconPoint.X + (iconSize - moduleSize) / 2 - (moduleCount == 1 ? 0 : moduleSize / 2);
 				int y = iconPoint.Y + (iconSize - (moduleSize * numModuleRows)) / 2;
 				for (int r = 0; r < numModuleRows; r++)
 				{

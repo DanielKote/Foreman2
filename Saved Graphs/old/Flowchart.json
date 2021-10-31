@@ -1,0 +1,587 @@
+{
+  "AmountType": 0,
+  "Unit": 1,
+  "Nodes": [
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "advanced-circuit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "personal-roboport-equipment",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "electronic-circuit",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "plastic-bar",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "copper-cable",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "iron-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "iron-gear-wheel",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "steel-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "battery",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "light-oil-cracking",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "advanced-oil-processing",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "coal",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "water",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "crude-oil",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "heavy-oil-cracking",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "copper-plate",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Supply",
+      "ItemName": "copper-ore",
+      "RateType": 0,
+      "ActualRate": 0.0
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "sulfuric-acid",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "sulfur",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    }
+  ],
+  "NodeLinks": [
+    {
+      "Supplier": 2,
+      "Consumer": 0,
+      "Item": "electronic-circuit"
+    },
+    {
+      "Supplier": 3,
+      "Consumer": 0,
+      "Item": "plastic-bar"
+    },
+    {
+      "Supplier": 4,
+      "Consumer": 0,
+      "Item": "copper-cable"
+    },
+    {
+      "Supplier": 0,
+      "Consumer": 1,
+      "Item": "advanced-circuit"
+    },
+    {
+      "Supplier": 7,
+      "Consumer": 1,
+      "Item": "iron-gear-wheel"
+    },
+    {
+      "Supplier": 8,
+      "Consumer": 1,
+      "Item": "steel-plate"
+    },
+    {
+      "Supplier": 9,
+      "Consumer": 1,
+      "Item": "battery"
+    },
+    {
+      "Supplier": 4,
+      "Consumer": 2,
+      "Item": "copper-cable"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 2,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 10,
+      "Consumer": 3,
+      "Item": "petroleum-gas"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 3,
+      "Item": "petroleum-gas"
+    },
+    {
+      "Supplier": 12,
+      "Consumer": 3,
+      "Item": "coal"
+    },
+    {
+      "Supplier": 16,
+      "Consumer": 4,
+      "Item": "copper-plate"
+    },
+    {
+      "Supplier": 6,
+      "Consumer": 5,
+      "Item": "iron-ore"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 7,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 8,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 9,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 16,
+      "Consumer": 9,
+      "Item": "copper-plate"
+    },
+    {
+      "Supplier": 18,
+      "Consumer": 9,
+      "Item": "sulfuric-acid"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 10,
+      "Item": "light-oil"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 10,
+      "Item": "water"
+    },
+    {
+      "Supplier": 15,
+      "Consumer": 10,
+      "Item": "light-oil"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 11,
+      "Item": "water"
+    },
+    {
+      "Supplier": 14,
+      "Consumer": 11,
+      "Item": "crude-oil"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 15,
+      "Item": "water"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 15,
+      "Item": "heavy-oil"
+    },
+    {
+      "Supplier": 17,
+      "Consumer": 16,
+      "Item": "copper-ore"
+    },
+    {
+      "Supplier": 5,
+      "Consumer": 18,
+      "Item": "iron-plate"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 18,
+      "Item": "water"
+    },
+    {
+      "Supplier": 19,
+      "Consumer": 18,
+      "Item": "sulfur"
+    },
+    {
+      "Supplier": 13,
+      "Consumer": 19,
+      "Item": "water"
+    },
+    {
+      "Supplier": 10,
+      "Consumer": 19,
+      "Item": "petroleum-gas"
+    },
+    {
+      "Supplier": 11,
+      "Consumer": 19,
+      "Item": "petroleum-gas"
+    }
+  ],
+  "EnabledAssemblers": [
+    "assembling-machine-1",
+    "chemical-plant",
+    "oil-refinery",
+    "assembling-machine-3",
+    "centrifuge",
+    "assembling-machine-2",
+    "electric-furnace",
+    "steel-furnace",
+    "stone-furnace"
+  ],
+  "EnabledMiners": [
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "pumpjack"
+  ],
+  "EnabledModules": [
+    "speed-module-3",
+    "effectivity-module-3",
+    "speed-module-2",
+    "effectivity-module",
+    "productivity-module-2",
+    "productivity-module-3",
+    "speed-module",
+    "effectivity-module-2",
+    "productivity-module"
+  ],
+  "EnabledMods": [
+    "core",
+    "base"
+  ],
+  "EnabledRecipes": [
+    "personal-roboport-equipment",
+    "solar-panel-equipment",
+    "electronic-circuit",
+    "fast-inserter",
+    "battery",
+    "uranium-rounds-magazine",
+    "solar-panel",
+    "effectivity-module",
+    "solid-fuel-from-petroleum-gas",
+    "artillery-wagon",
+    "copper-plate",
+    "electric-mining-drill",
+    "transport-belt",
+    "steam-engine",
+    "explosive-rocket",
+    "energy-shield-equipment",
+    "productivity-module-2",
+    "inserter",
+    "landfill",
+    "burner-mining-drill",
+    "flamethrower",
+    "long-handed-inserter",
+    "light-armor",
+    "oil-refinery",
+    "shotgun-shell",
+    "stack-inserter",
+    "discharge-defense-remote",
+    "lab",
+    "accumulator",
+    "atomic-bomb",
+    "assembling-machine-1",
+    "iron-stick",
+    "rail-chain-signal",
+    "automation-science-pack",
+    "personal-laser-defense-equipment",
+    "power-armor-mk2",
+    "light-oil-cracking",
+    "basic-oil-processing",
+    "medium-electric-pole",
+    "decider-combinator",
+    "beacon",
+    "flying-robot-frame",
+    "production-science-pack",
+    "advanced-oil-processing",
+    "fusion-reactor-equipment",
+    "power-switch",
+    "destroyer-capsule",
+    "sulfur",
+    "power-armor",
+    "fast-transport-belt",
+    "radar",
+    "iron-plate",
+    "low-density-structure",
+    "repair-pack",
+    "stone-brick",
+    "burner-inserter",
+    "logistic-chest-storage",
+    "satellite",
+    "artillery-targeting-remote",
+    "kovarex-enrichment-process",
+    "heavy-armor",
+    "splitter",
+    "firearm-magazine",
+    "flamethrower-turret",
+    "car",
+    "gate",
+    "empty-barrel",
+    "coal-liquefaction",
+    "stone-furnace",
+    "heavy-oil-cracking",
+    "express-splitter",
+    "offshore-pump",
+    "copper-cable",
+    "rocket-control-unit",
+    "speed-module-3",
+    "stone-wall",
+    "piercing-rounds-magazine",
+    "steam-turbine",
+    "heat-pipe",
+    "speed-module-2",
+    "logistic-chest-active-provider",
+    "battery-mk2-equipment",
+    "nuclear-fuel-reprocessing",
+    "solid-fuel-from-heavy-oil",
+    "concrete",
+    "artillery-turret",
+    "pipe",
+    "sulfuric-acid",
+    "centrifuge",
+    "flamethrower-ammo",
+    "artillery-shell",
+    "big-electric-pole",
+    "fast-underground-belt",
+    "rocket-part",
+    "small-electric-pole",
+    "speed-module",
+    "chemical-plant",
+    "filter-inserter",
+    "steel-chest",
+    "storage-tank",
+    "red-wire",
+    "uranium-fuel-cell",
+    "refined-concrete",
+    "substation",
+    "explosive-cannon-shell",
+    "pumpjack",
+    "express-transport-belt",
+    "electric-furnace",
+    "productivity-module-3",
+    "cluster-grenade",
+    "engine-unit",
+    "pipe-to-ground",
+    "fluid-wagon",
+    "combat-shotgun",
+    "rail-signal",
+    "construction-robot",
+    "nuclear-reactor",
+    "underground-belt",
+    "logistic-chest-requester",
+    "spidertron",
+    "hazard-concrete",
+    "logistic-robot",
+    "processing-unit",
+    "advanced-circuit",
+    "uranium-processing",
+    "belt-immunity-equipment",
+    "discharge-defense-equipment",
+    "grenade",
+    "military-science-pack",
+    "small-lamp",
+    "distractor-capsule",
+    "iron-gear-wheel",
+    "pistol",
+    "spidertron-remote",
+    "utility-science-pack",
+    "heat-exchanger",
+    "pump",
+    "wooden-chest",
+    "boiler",
+    "land-mine",
+    "cargo-wagon",
+    "modular-armor",
+    "locomotive",
+    "tank",
+    "assembling-machine-3",
+    "logistic-chest-buffer",
+    "personal-roboport-mk2-equipment",
+    "plastic-bar",
+    "cannon-shell",
+    "explosive-uranium-cannon-shell",
+    "solid-fuel-from-light-oil",
+    "electric-engine-unit",
+    "night-vision-equipment",
+    "green-wire",
+    "defender-capsule",
+    "programmable-speaker",
+    "piercing-shotgun-shell",
+    "rocket-launcher",
+    "productivity-module",
+    "energy-shield-mk2-equipment",
+    "stack-filter-inserter",
+    "rocket",
+    "chemical-science-pack",
+    "lubricant",
+    "steel-furnace",
+    "uranium-cannon-shell",
+    "logistic-science-pack",
+    "effectivity-module-2",
+    "gun-turret",
+    "train-stop",
+    "rocket-silo",
+    "submachine-gun",
+    "rail",
+    "slowdown-capsule",
+    "poison-capsule",
+    "cliff-explosives",
+    "fast-splitter",
+    "constant-combinator",
+    "iron-chest",
+    "arithmetic-combinator",
+    "explosives",
+    "steel-plate",
+    "express-underground-belt",
+    "refined-hazard-concrete",
+    "battery-equipment",
+    "rocket-fuel",
+    "nuclear-fuel",
+    "shotgun",
+    "laser-turret",
+    "logistic-chest-passive-provider",
+    "effectivity-module-3",
+    "assembling-machine-2",
+    "roboport",
+    "exoskeleton-equipment"
+  ],
+  "ElementLocations": [
+    "-336, -996",
+    "146, -1376",
+    "-115, -766",
+    "-357, -273",
+    "-226, -529",
+    "373, -203",
+    "360, 116",
+    "373, -979",
+    "518, -986",
+    "71, -997",
+    "-817, 245",
+    "-764, 903",
+    "-329, 104",
+    "-427, 1147",
+    "-784, 1155",
+    "-519, 602",
+    "510, -184",
+    "503, 107",
+    "231, -768",
+    "-203, -263"
+  ]
+}

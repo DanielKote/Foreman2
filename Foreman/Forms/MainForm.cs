@@ -21,16 +21,19 @@ namespace Foreman
 		public MainForm()
 		{
 			InitializeComponent();
+			this.DoubleBuffered = true;
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
         {
-            //I changed the name of the variable, so this copies the value over for people who are upgrading their Foreman version
+			WindowState = FormWindowState.Maximized;
+
+            //I changed the name of the variable (again), so this copies the value over for people who are upgrading their Foreman version
             if (Properties.Settings.Default.FactorioPath == "" && Properties.Settings.Default.FactorioDataPath != "")
             {
-                Properties.Settings.Default["FactorioPath"] = Path.GetDirectoryName(Properties.Settings.Default.FactorioDataPath);
-                Properties.Settings.Default["FactorioDataPath"] = "";
+                Properties.Settings.Default.FactorioPath = Path.GetDirectoryName(Properties.Settings.Default.FactorioDataPath);
+                Properties.Settings.Default.FactorioDataPath = "";
             }
 
             if (!Directory.Exists(Properties.Settings.Default.FactorioPath))
@@ -60,7 +63,7 @@ namespace Foreman
                         {
                             if (form.ShowDialog() == DialogResult.OK && form.SelectedPath != null)
                             {
-                                Properties.Settings.Default["FactorioPath"] = form.SelectedPath;
+                                Properties.Settings.Default.FactorioPath = form.SelectedPath;
                             }
                             else
                             {
@@ -72,7 +75,7 @@ namespace Foreman
                     }
                     else
                     {
-                        Properties.Settings.Default["FactorioPath"] = installations[0].path;
+                        Properties.Settings.Default.FactorioPath = installations[0].path;
                     }
 
                     Properties.Settings.Default.Save();
@@ -85,7 +88,7 @@ namespace Foreman
                 {
                     if (form.ShowDialog() == DialogResult.OK)
                     {
-                        Properties.Settings.Default["FactorioPath"] = form.SelectedPath;
+                        Properties.Settings.Default.FactorioPath = form.SelectedPath;
                         Properties.Settings.Default.Save();
                     }
                     else
@@ -97,16 +100,12 @@ namespace Foreman
                 }
             }
 
-            if (!Directory.Exists(Properties.Settings.Default.FactorioModPath))
+            if (!Directory.Exists(Properties.Settings.Default.FactorioUserDataPath))
             {
-                if (Directory.Exists(Path.Combine(Properties.Settings.Default.FactorioPath, "mods")))
-                {
-                    Properties.Settings.Default["FactorioModPath"] = Path.Combine(Properties.Settings.Default.FactorioPath, "mods");
-                }
-                else if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods")))
-                {
-                    Properties.Settings.Default["FactorioModPath"] = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio", "mods");
-                }
+                if (Directory.Exists(Properties.Settings.Default.FactorioPath))
+                    Properties.Settings.Default.FactorioUserDataPath = Properties.Settings.Default.FactorioPath;
+                else if (Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio")))
+                    Properties.Settings.Default.FactorioUserDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "factorio");
             }
 
             if (Properties.Settings.Default.EnabledMods == null) Properties.Settings.Default.EnabledMods = new StringCollection();
@@ -114,39 +113,18 @@ namespace Foreman
             if (Properties.Settings.Default.EnabledMiners == null) Properties.Settings.Default.EnabledMiners = new StringCollection();
             if (Properties.Settings.Default.EnabledModules == null) Properties.Settings.Default.EnabledModules = new StringCollection();
 
-	    switch (Properties.Settings.Default.FactorioDifficulty)
-		    {
-                case "normal":
-                    DataCache.Difficulty = "normal";
-                    NormalDifficultyRadioButton.Checked = true;
-                    break;
-                case "expensive":
-                    DataCache.Difficulty = "expensive";
-                    ExpensiveDifficultyRadioButton.Checked = true;
-                    break;
-                default:
-                    Properties.Settings.Default.FactorioDifficulty = "normal";
-                    Properties.Settings.Default.Save();
-                    DataCache.Difficulty = "normal";
-                    NormalDifficultyRadioButton.Checked = true;
-		            break;
-		    }
+			ModuleDropDown.SelectedIndex = Properties.Settings.Default.DefaultModules;
+			MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
+			MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
+			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
             ReloadFactorioData();
-
-            // Register after loading settings to prevent an unnessecary data reload.
-            NormalDifficultyRadioButton.CheckedChanged += DifficultyChanged;
-            ExpensiveDifficultyRadioButton.CheckedChanged += DifficultyChanged;
-
-            LanguageDropDown.Items.AddRange(DataCache.Languages.ToArray());
-            LanguageDropDown.SelectedItem = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
-
             UpdateControlValues();
         }
 
         private static void ReloadFactorioData()
         {
-            using (ProgressForm form = new ProgressForm())
+            using (DataReloadForm form = new DataReloadForm())
             {
                 form.ShowDialog();
             }
@@ -245,6 +223,11 @@ namespace Foreman
 				var chooserPanel = new ChooserPanel(optionList, GraphViewer);
 
 				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
+				if (GraphViewer.ShowGrid)
+				{
+					location.X = GraphViewer.AlignToGrid(location.X);
+					location.Y = GraphViewer.AlignToGrid(location.Y);
+				}
 
 				chooserPanel.Show(c =>
 				{
@@ -316,15 +299,6 @@ namespace Foreman
 			GraphViewer.UpdateNodes();
 		}
 
-		private void AutomaticCompleteButton_Click(object sender, EventArgs e)
-		{
-			GraphViewer.Graph.LinkUpAllInputs();
-			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.AddRemoveElements();
-
-			GraphViewer.PositionNodes();
-		}
-
 		private void ClearButton_Click(object sender, EventArgs e)
 		{
 			GraphViewer.Graph.Nodes.Clear();
@@ -335,7 +309,6 @@ namespace Foreman
 		private void AssemblerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
-			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
 			GraphViewer.Graph.UpdateNodeValues();
 			GraphViewer.UpdateNodes();
 		}
@@ -390,48 +363,6 @@ namespace Foreman
 		{
 			ItemListView.Items.Clear();
 			ItemListView.Items.AddRange(unfilteredItemList.Where(i => i.Text.ToLower().Contains(ItemFilterTextBox.Text.ToLower())).ToArray());
-		}
-
-		private void FactorioDirectoryButton_Click(object sender, EventArgs e)
-		{
-			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioPath))
-			{
-				form.Text = "Locate the factorio directory";
-				if (form.ShowDialog() == DialogResult.OK)
-				{
-					Properties.Settings.Default["FactorioPath"] = form.SelectedPath;
-					Properties.Settings.Default.Save();
-
-					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
-                    ReloadFactorioData();
-					GraphViewer.LoadFromJson(savedGraph);
-					UpdateControlValues();
-				}
-			}
-		}
-
-		private void ModDirectoryButton_Click(object sender, EventArgs e)
-		{
-			using (DirectoryChooserForm form = new DirectoryChooserForm(Properties.Settings.Default.FactorioModPath))
-			{
-				form.Text = "Locate the mods directory";
-				if (form.ShowDialog() == DialogResult.OK)
-				{
-					Properties.Settings.Default["FactorioModPath"] = form.SelectedPath;
-					Properties.Settings.Default.Save();
-
-					JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
-                    ReloadFactorioData();
-					GraphViewer.LoadFromJson(savedGraph);
-					UpdateControlValues();
-				}
-			}
-		}
-
-		private void ReloadButton_Click(object sender, EventArgs e)
-		{
-			GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
-			UpdateControlValues();
 		}
 
 		private void saveGraphButton_Click(object sender, EventArgs e)
@@ -489,32 +420,81 @@ namespace Foreman
 			GraphViewer.Invalidate();
 		}
 
-		private void EnableDisableButton_Click(object sender, EventArgs e)
+		private void SettingsButton_Click(object sender, EventArgs e)
 		{
-			EnableDisableItemsForm form = new EnableDisableItemsForm();
-			form.ShowDialog();
-			SaveEnabledObjects();
+			SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
+			foreach (Assembler assembler in DataCache.Assemblers.Values)
+				oldOptions.Assemblers.Add(assembler, assembler.Enabled);
+			foreach (Miner miner in DataCache.Miners.Values)
+				oldOptions.Miners.Add(miner, miner.Enabled);
+			foreach (Module module in DataCache.Modules.Values)
+				oldOptions.Modules.Add(module, module.Enabled);
+			foreach (Mod mod in DataCache.Mods)
+				oldOptions.Mods.Add(mod, mod.Enabled);
+			foreach (Language language in DataCache.Languages)
+				oldOptions.LanguageOptions.Add(language);
+			oldOptions.selectedLanguage = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
+			oldOptions.InstallLocation = Properties.Settings.Default.FactorioPath;
+			oldOptions.UserDataLocation = Properties.Settings.Default.FactorioUserDataPath;
+			oldOptions.GenerationType = (DataCache.GenerationType)(Properties.Settings.Default.GenerationType);
+			oldOptions.NormalDifficulty = (Properties.Settings.Default.FactorioNormalDifficulty);
 
-			if (form.ModsChanged)
+
+
+			using (SettingsForm form = new SettingsForm(oldOptions))
 			{
-				GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
-				UpdateControlValues();
+				form.ShowDialog();
+
+				if (!oldOptions.Equals(form.CurrentOptions) || form.ReloadRequested) //some changes have been made OR reload was requested
+				{
+					DataCache.LocaleFiles.Clear();
+					DataCache.LoadLocaleFiles(form.CurrentOptions.selectedLanguage.Name);
+					Properties.Settings.Default.Language = form.CurrentOptions.selectedLanguage.Name;
+
+					Properties.Settings.Default.FactorioPath = form.CurrentOptions.InstallLocation;
+					Properties.Settings.Default.FactorioUserDataPath = form.CurrentOptions.UserDataLocation;
+					Properties.Settings.Default.GenerationType = (int)(form.CurrentOptions.GenerationType);
+					Properties.Settings.Default.FactorioNormalDifficulty = form.CurrentOptions.NormalDifficulty;
+
+					Properties.Settings.Default.EnabledAssemblers.Clear();
+					foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
+					{
+						kvp.Key.Enabled = kvp.Value;
+						if (kvp.Value)
+							Properties.Settings.Default.EnabledAssemblers.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+					}
+
+					Properties.Settings.Default.EnabledMiners.Clear();
+					foreach (KeyValuePair<Miner, bool> kvp in form.CurrentOptions.Miners)
+					{
+						kvp.Key.Enabled = kvp.Value;
+						if (kvp.Value)
+							Properties.Settings.Default.EnabledMiners.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+					}
+
+					Properties.Settings.Default.EnabledModules.Clear();
+					foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
+					{
+						kvp.Key.Enabled = kvp.Value;
+						if (kvp.Value)
+							Properties.Settings.Default.EnabledModules.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+					}
+
+					Properties.Settings.Default.EnabledMods.Clear();
+					foreach (KeyValuePair<Mod, bool> kvp in form.CurrentOptions.Mods)
+					{
+						kvp.Key.Enabled = kvp.Value;
+						if (kvp.Value)
+							Properties.Settings.Default.EnabledMods.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+					}
+
+					Properties.Settings.Default.Save();
+
+					GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+					GraphViewer.UpdateNodes();
+					UpdateControlValues();
+				}
 			}
-		}
-
-		private void SaveEnabledObjects()
-		{
-			Properties.Settings.Default.EnabledMods.Clear();
-			Properties.Settings.Default.EnabledAssemblers.Clear();
-			Properties.Settings.Default.EnabledMiners.Clear();
-			Properties.Settings.Default.EnabledModules.Clear();
-
-			Properties.Settings.Default.EnabledMods.AddRange(DataCache.Mods.Select<Mod, string>(m => m.Name + "|" + m.Enabled.ToString()).ToArray());
-			Properties.Settings.Default.EnabledAssemblers.AddRange(DataCache.Assemblers.Values.Select<Assembler, string>(a => a.Name + "|" + a.Enabled.ToString()).ToArray());
-			Properties.Settings.Default.EnabledMiners.AddRange(DataCache.Miners.Values.Select<Miner, string>(m => m.Name + "|" + m.Enabled.ToString()).ToArray());
-			Properties.Settings.Default.EnabledModules.AddRange(DataCache.Modules.Values.Select<Module, string>(m => m.Name + "|" + m.Enabled.ToString()).ToArray());
-
-			Properties.Settings.Default.Save();
 		}
 
 		private void ItemListView_KeyDown(object sender, KeyEventArgs e)
@@ -562,20 +542,6 @@ namespace Foreman
 			{
 				AddItemButton.PerformClick();
 			}
-		}
-
-		private void LanguageDropDown_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			String newLocale = (LanguageDropDown.SelectedItem as Language).Name;
-
-			DataCache.LocaleFiles.Clear();
-			DataCache.LoadLocaleFiles(newLocale);
-
-			GraphViewer.UpdateNodes();
-			UpdateControlValues();
-
-			Properties.Settings.Default["Language"] = newLocale;
-			Properties.Settings.Default.Save();
 		}
 
 		private void UpdateControlValues()
@@ -696,25 +662,112 @@ namespace Foreman
 			}
 		}
 
-        private void DifficultyChanged(object sender, EventArgs e)
+        private void MinorGridlinesDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var currentDifficulty = DataCache.Difficulty;
+			int updatedGridUnit = 0;
+			if (MinorGridlinesDropDown.SelectedIndex > 0)
+				updatedGridUnit = 6 * (int)(Math.Pow(2, MinorGridlinesDropDown.SelectedIndex - 1));
 
-            if (NormalDifficultyRadioButton.Checked)
-                DataCache.Difficulty = "normal";
-            else if (ExpensiveDifficultyRadioButton.Checked)
-                DataCache.Difficulty = "expensive";
+			if(GraphViewer.CurrentGridUnit != updatedGridUnit)
+            {
+				GraphViewer.CurrentGridUnit = updatedGridUnit;
+				GraphViewer.Invalidate();
+            }
 
-            if (currentDifficulty == DataCache.Difficulty)
-                return;
+			Properties.Settings.Default.MinorGridlines = MinorGridlinesDropDown.SelectedIndex;
+			Properties.Settings.Default.Save();
+		}
 
-            Properties.Settings.Default.FactorioDifficulty = DataCache.Difficulty;
-            Properties.Settings.Default.Save();
+		private void MajorGridlinesDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			int updatedGridUnit = 0;
+			if (MajorGridlinesDropDown.SelectedIndex > 0)
+				updatedGridUnit = 6 * (int)(Math.Pow(2, MajorGridlinesDropDown.SelectedIndex - 1));
 
-            JObject savedGraph = JObject.Parse(JsonConvert.SerializeObject(GraphViewer));
-            ReloadFactorioData();
-            GraphViewer.LoadFromJson(savedGraph);
-            UpdateControlValues();
+			if (GraphViewer.CurrentMajorGridUnit != updatedGridUnit)
+			{
+				GraphViewer.CurrentMajorGridUnit = updatedGridUnit;
+				GraphViewer.Invalidate();
+			}
+
+			Properties.Settings.Default.MajorGridlines = MajorGridlinesDropDown.SelectedIndex;
+			Properties.Settings.Default.Save();
+		}
+
+        private void ModuleDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			switch(ModuleDropDown.SelectedIndex)
+            {
+				case 1:
+					GraphViewer.Graph.defaultModuleSelector = ModuleSelector.Fastest;
+					break;
+
+				case 2:
+					GraphViewer.Graph.defaultModuleSelector = ModuleSelector.Productive;
+					break;
+
+				case 0:
+				default:
+					GraphViewer.Graph.defaultModuleSelector = ModuleSelector.None;
+					break;
+            }
+
+			Properties.Settings.Default.DefaultModules = ModuleDropDown.SelectedIndex;
+			Properties.Settings.Default.Save();
+		}
+
+        private void gridlinesCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+			if (GraphViewer.ShowGrid != GridlinesCheckbox.Checked)
+			{
+				GraphViewer.ShowGrid = GridlinesCheckbox.Checked;
+				GraphViewer.Invalidate();
+			}
+
+			Properties.Settings.Default.AltGridlines = (GridlinesCheckbox.Checked);
+			Properties.Settings.Default.Save();
+		}
+
+		private void GraphViewer_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Space)
+			{
+				GraphViewer.ShowGrid = !GraphViewer.ShowGrid;
+				GridlinesCheckbox.Checked = GraphViewer.ShowGrid;
+			}
+		}
+
+		private void PauseUpdatesCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+			GraphViewer.Graph.PauseUpdates = PauseUpdatesCheckbox.Checked;
+			GraphViewer.Graph.UpdateNodeValues();
+			GraphViewer.UpdateNodes();
+			GraphViewer.Invalidate();
         }
+
+        private void AlignSelectionButton_Click(object sender, EventArgs e)
+        {
+			GraphViewer.AlignSelected();
+        }
+
+		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
+		{
+			if (System.Windows.Forms.SystemInformation.TerminalServerSession)
+				return;
+			System.Reflection.PropertyInfo aProp = typeof(System.Windows.Forms.Control).GetProperty("DoubleBuffered",
+			System.Reflection.BindingFlags.NonPublic |
+			System.Reflection.BindingFlags.Instance);
+			aProp.SetValue(c, true, null);
+		}
+
+		protected override CreateParams CreateParams
+		{
+			get
+			{
+				CreateParams cp = base.CreateParams;
+				cp.ExStyle |= 0x02000000;
+				return cp;
+			}
+		}
     }
 }

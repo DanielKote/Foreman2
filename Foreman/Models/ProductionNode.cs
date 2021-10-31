@@ -101,10 +101,19 @@ namespace Foreman
 
         internal bool OverSupplied(Item item)
         {
-            return (Math.Round(GetConsumeRate(item), 2) < Math.Round(GetSuppliedRate(item), 2));
-        }
+			//supply & consume > 1 ---> allow for 0.1% error
+			//supply & consume [0.001 -> 1]  ---> allow for 2% error
+			//supply & consume [0 ->0.001] ---> allow for any errors (as long as neither are 0)
+			//supply & consume = 0 ---> no errors if both are exactly 0
 
-        internal bool ManualRateNotMet()
+			float consumeRate = GetConsumeRate(item);
+			float supplyRate = GetSuppliedRate(item);
+			if ((consumeRate == 0 && supplyRate == 0) || (supplyRate < 0.001 && supplyRate < 0.001))
+				return false;
+			return ((supplyRate - consumeRate) / supplyRate) > ((consumeRate > 1 && supplyRate > 1) ? 0.001f : 0.05f);
+		}
+
+		internal bool ManualRateNotMet()
         {
             // TODO: Hard-coded epsilon is gross :(
             return rateType == RateType.Manual && Math.Abs(actualRate - desiredRate) > 0.0001;
@@ -149,7 +158,7 @@ namespace Foreman
 			: base(graph)
 		{
 			BaseRecipe = baseRecipe;
-			NodeModules = ModuleSelector.Fastest;
+			NodeModules = graph.defaultModuleSelector ?? ModuleSelector.None;
 		}
 
 		public override IEnumerable<Item> Inputs

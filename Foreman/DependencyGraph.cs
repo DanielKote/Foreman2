@@ -28,6 +28,7 @@ namespace Foreman
 					{
 						if (!DependencySatisfied(dep))
 						{
+                            ErrorLogging.LogLine(String.Format("Could not find dependency for Mod '{0}'. It requires '{1}'.", mod.Name, dep));
 							if (mod.Enabled)
 							{
 								changeMade = true;

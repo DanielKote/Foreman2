@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Foreman</RootNamespace>
     <AssemblyName>Foreman</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -63,7 +63,7 @@
   <PropertyGroup>
     <ManifestKeyFile>Foreman_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(BuildingInsideVisualStudioCode)'!='true' ">
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -84,6 +84,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Google.OrTools, Version=5.1.4075.23203, Culture=neutral, PublicKeyToken=e5e5a4177ad79658, processorArchitecture=AMD64">
       <HintPath>..\packages\Google.OrTools.5.1.4077\lib\net40\Google.OrTools.dll</HintPath>
@@ -102,6 +111,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.IO.Compression.ZipFile, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Compression.ZipFile.4.3.0\lib\net46\System.IO.Compression.ZipFile.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -129,6 +142,7 @@
     </Compile>
     <Compile Include="DataCache.cs" />
     <Compile Include="DependencyGraph.cs" />
+    <Compile Include="Extensions\VersionOperatorExtensions.cs" />
     <Compile Include="Forms\InstallationChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -141,16 +155,17 @@
     <Compile Include="Forms\DirectoryChooserForm.Designer.cs">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EnableDisableItems.cs">
+    <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\EnableDisableItems.Designer.cs">
-      <DependentUpon>EnableDisableItems.cs</DependentUpon>
+    <Compile Include="Forms\SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FactorioPropertyTree.cs" />
     <Compile Include="GhostNodeElement.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="ErrorLogging.cs" />
+    <Compile Include="LBitmap.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\FoundInstallation.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
@@ -178,11 +193,11 @@
     <Compile Include="Models\ProductionNode.cs" />
     <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Forms\ProgressForm.cs">
+    <Compile Include="Forms\DataReloadForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ProgressForm.Designer.cs">
-      <DependentUpon>ProgressForm.cs</DependentUpon>
+    <Compile Include="Forms\DataReloadForm.Designer.cs">
+      <DependentUpon>DataReloadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\RateOptionsPanel.cs">
@@ -214,6 +229,7 @@
     <Compile Include="ZipStorer.cs" />
     <EmbeddedResource Include="Controls\CheckboxListWithErrors.resx">
       <DependentUpon>CheckboxListWithErrors.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ChooserControl.resx">
       <DependentUpon>ChooserControl.cs</DependentUpon>
@@ -229,8 +245,8 @@
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\EnableDisableItems.resx">
-      <DependentUpon>EnableDisableItems.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImageExportForm.resx">
       <DependentUpon>ImageExportForm.cs</DependentUpon>
@@ -238,8 +254,8 @@
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ProgressForm.resx">
-      <DependentUpon>ProgressForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\DataReloadForm.resx">
+      <DependentUpon>DataReloadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -266,6 +282,7 @@
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />
     <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
