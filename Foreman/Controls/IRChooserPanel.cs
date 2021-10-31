@@ -417,15 +417,15 @@ namespace Foreman
 				foreach (Subgroup sgroup in group.Subgroups)
 				{
 					List<KeyValuePair<DataObjectBase, Color>> itemList = new List<KeyValuePair<DataObjectBase, Color>>();
-					foreach (Item item in sgroup.Items.Where(n => ((ShowUnavailable || n.Available) && (n.LFriendlyName.Contains(filterString) || n.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))))
+					foreach (Item item in sgroup.Items.Where(i => ((ShowUnavailable || i.Available) && (i.LFriendlyName.Contains(filterString) || i.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))))
 					{
 						bool visible = (ShowUnavailable || item.Available) &&
 							((item.ConsumptionRecipes.Any(r => r.Enabled && (ShowUnavailable || r.Available))) ||
 							(item.ProductionRecipes.Any(r => r.Enabled && (ShowUnavailable || r.Available))));
 
 						bool validAssembler =
-							(item.ConsumptionRecipes.Any(r => (ShowUnavailable || r.Available) && r.Assemblers.Any(a => a.Enabled && (ShowUnavailable || a.Available)))) ||
-							(item.ProductionRecipes.Any(r => (ShowUnavailable || r.Available) && r.Assemblers.Any(a => a.Enabled && (ShowUnavailable || a.Available))));
+							(item.ConsumptionRecipes.Any(r => r.Enabled && (ShowUnavailable || r.Available) && r.Assemblers.Any(a => a.Enabled && (ShowUnavailable || a.Available)))) ||
+							(item.ProductionRecipes.Any(r => r.Enabled && (ShowUnavailable || r.Available) && r.Assemblers.Any(a => a.Enabled && (ShowUnavailable || a.Available))));
 
 
 						Color bgColor = (visible && item.Available) ? validAssembler ? IRButtonDefaultColor : IRButtonNoAssemblerColor : IRButtonHiddenColor;
@@ -520,9 +520,9 @@ namespace Foreman
 				AddConsumerButton.Visible = asIngredient;
 				AddSupplyButton.Visible = asProduct;
 
-				bool hasConsumptionRecipes = KeyItem.ConsumptionRecipes.Count > 0;
+				bool hasConsumptionRecipes = Properties.Settings.Default.ShowUnavailable? KeyItem.ConsumptionRecipes.Count > 0 : KeyItem.ConsumptionRecipes.Count(r => r.Available) > 0;
 				bool hasFuelConsumptionRecipes = KeyItem.FuelsEntities.FirstOrDefault(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.FirstOrDefault(r => r.Enabled) != null) != null;
-				bool hasProductionRecipes = KeyItem.ProductionRecipes.Count > 0;
+				bool hasProductionRecipes = Properties.Settings.Default.ShowUnavailable ? KeyItem.ProductionRecipes.Count > 0 : KeyItem.ProductionRecipes.Count(r => r.Available) > 0;
 				bool hasFuelProductionRecipes = (KeyItem.FuelOrigin != null && KeyItem.FuelOrigin.FuelsEntities.Any(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.Any(r => r.Enabled)));
 
 				if (!(asIngredient && (hasConsumptionRecipes || hasFuelConsumptionRecipes)) && !(asProduct && (hasProductionRecipes || hasFuelProductionRecipes))) //no valid recipes
@@ -586,12 +586,12 @@ namespace Foreman
 				foreach (Subgroup sgroup in group.Subgroups)
 				{
 					List<KeyValuePair<DataObjectBase, Color>> recipeList = new List<KeyValuePair<DataObjectBase, Color>>();
-					//filter for the items first (simpler and clears out most recipes if there is a key item provided). NOTE: need to filter for use of item in ingredients, products, and any recipe that has an assembler that has this item as fuel or burn result
+					//filter recipes... I tried to break up the filter into several parts to prevent this from being one GIANT '.where' call
 					foreach (Recipe recipe in sgroup.Recipes.Where(r => ignoreItem ||
-						(includeConsumers && r.IngredientSet.ContainsKey(KeyItem)) ||
-						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem)) ||
-						(includeConsumers && includeFuel && KeyItem.FuelsEntities.Count > 0 && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem))) ||
-						(includeSuppliers && includeFuel && KeyItem.FuelOrigin != null && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem.FuelOrigin)))))
+						(includeConsumers && r.IngredientSet.ContainsKey(KeyItem) && (KeyItemTempRange.Ignore || r.IngredientTemperatureMap[KeyItem].Contains(KeyItemTempRange))) || //consumers of item with temperature range containing required
+						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem) && (KeyItemTempRange.Ignore || KeyItemTempRange.Contains(r.ProductTemperatureMap[KeyItem]))) || //producers of item with temperature within the temperature range
+						(includeConsumers && includeFuel && KeyItem.FuelsEntities.Count > 0 && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem) && (a.Enabled || ignoreAssemblerStatus))) || //consumers of item (as fuel) -> have to check assembler status here for this specific assembler that accepts this fuel
+						(includeSuppliers && includeFuel && KeyItem.FuelOrigin != null && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem.FuelOrigin) && (a.Enabled || ignoreAssemblerStatus))))) //producers of item (as fuel remains) -> check assembler status here as well for same reason
 					{
 						//quick hidden / enabled / available assembler check (done prior to name check for speed)
 						if ((recipe.Enabled || showHidden) && (recipe.Assemblers.Any(a => a.Enabled) || ignoreAssemblerStatus) && (recipe.Available || ShowUnavailable))
@@ -602,18 +602,12 @@ namespace Foreman
 								recipe.IngredientList.Any(i => i.LFriendlyName.Contains(filterString) || i.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1) ||
 								recipe.ProductList.Any(i => i.LFriendlyName.Contains(filterString) || i.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))))
 							{
-								//further check for temperature
-								if (KeyItemTempRange.Ignore ||
-									(includeConsumers && recipe.IngredientTemperatureMap[KeyItem].Contains(KeyItemTempRange)) ||
-									(includeSuppliers && KeyItemTempRange.Contains(recipe.ProductTemperatureMap[KeyItem])))
-								{
-									//holy... so - we finally finished all the checks, eh? Well, throw it on the pile of recipes to show then.
-									Color bgColor = !recipe.Enabled ? IRButtonHiddenColor :
-										(!recipe.Available || !recipe.Assemblers.Any(a => a.Available)) ? IRButtonUnavailableColor :
-										!recipe.Assemblers.Any(a => a.Enabled) ? IRButtonNoAssemblerColor : IRButtonDefaultColor;
-									recipeCounter++;
-									recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
-								}
+								//holy... so - we finally finished all the checks, eh? Well, throw it on the pile of recipes to show then.
+								Color bgColor = !recipe.Enabled ? IRButtonHiddenColor :
+									(!recipe.Available || !recipe.Assemblers.Any(a => a.Available)) ? IRButtonUnavailableColor :
+									!recipe.Assemblers.Any(a => a.Enabled) ? IRButtonNoAssemblerColor : IRButtonDefaultColor;
+								recipeCounter++;
+								recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
 							}
 						}
 					}

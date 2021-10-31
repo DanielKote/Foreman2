@@ -110,14 +110,14 @@ namespace Foreman
 			foreach (ItemTabElement tab in OutputTabs)
 			{
 				x += TabPadding;
-				tab.Location = new Point(x + (tab.Width / 2), -Height / 2);
+				tab.Location = new Point(x + (tab.Width / 2), (-Height / 2) + 1);
 				x += tab.Width;
 			}
 			x = -GetIconWidths(InputTabs) / 2;
 			foreach (ItemTabElement tab in InputTabs)
 			{
 				x += TabPadding;
-				tab.Location = new Point(x + (tab.Width / 2), Height / 2);
+				tab.Location = new Point(x + (tab.Width / 2), (Height / 2) - 1);
 				x += tab.Width;
 			}
 		}

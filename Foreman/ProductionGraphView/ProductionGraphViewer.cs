@@ -289,7 +289,7 @@ namespace Foreman
 				proceed = (MessageBox.Show("You are deleting " + selectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
 			if (proceed)
 			{
-				foreach (BaseNodeElement node in selectedNodes)
+				foreach (BaseNodeElement node in selectedNodes.ToList())
 					Graph.DeleteNode(node.DisplayedNode);
 				selectedNodes.Clear();
 				Graph.UpdateNodeValues();
@@ -543,6 +543,7 @@ namespace Foreman
 			BaseNodeElement element = nodeElementDictionary[e.node];
 			nodeElementDictionary.Remove(e.node);
 			nodeElements.Remove(element);
+			selectedNodes.Remove(element);
 			element.Dispose();
 			Invalidate();
 		}

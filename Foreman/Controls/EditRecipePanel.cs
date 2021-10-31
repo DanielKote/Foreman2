@@ -21,6 +21,8 @@ namespace Foreman
 		private List<Button> BeaconModules;
 		private List<Button> BModuleOptions;
 
+		private Dictionary<object, int> LastScrollY;
+
 		private readonly ProductionGraphViewer myGraphViewer;
 		private readonly RecipeNodeController nodeController;
 		private readonly ReadOnlyRecipeNode nodeData;
@@ -51,6 +53,23 @@ namespace Foreman
 			BeaconModules = new List<Button>();
 			BModuleOptions = new List<Button>();
 
+			//setup scrolling
+			LastScrollY = new Dictionary<object, int>();
+			LastScrollY.Add(AssemblerChoicePanel, 0);
+			LastScrollY.Add(FuelOptionsPanel, 0);
+			LastScrollY.Add(SelectedAModulesPanel, 0);
+			LastScrollY.Add(AModulesChoicePanel, 0);
+			LastScrollY.Add(BeaconChoicePanel, 0);
+			LastScrollY.Add(SelectedBModulesPanel, 0);
+			LastScrollY.Add(BModulesChoicePanel, 0);
+			AssemblerChoicePanel.MouseWheel += new MouseEventHandler(OptionsPanel_MouseWheel);
+			FuelOptionsPanel.MouseWheel += new MouseEventHandler(OptionsPanel_MouseWheel);
+			SelectedAModulesPanel.MouseWheel += new MouseEventHandler(OptionsPanel_MouseWheel);
+			AModulesChoicePanel.MouseWheel += new MouseEventHandler(OptionsPanel_MouseWheel);
+			BeaconChoicePanel.MouseWheel += new MouseEventHandler(OptionsPanel_MouseWheel);
+			SelectedBModulesPanel.MouseWheel += new MouseEventHandler(OptionsPanel_MouseWheel);
+			BModulesChoicePanel.MouseWheel += new MouseEventHandler(OptionsPanel_MouseWheel);
+
 			UpdateRowHeights(AssemblerChoiceTable);
 			UpdateRowHeights(FuelOptionsTable);
 			UpdateRowHeights(SelectedAModulesTable);
@@ -69,6 +88,18 @@ namespace Foreman
 			BeaconCountInput.ValueChanged += BeaconInput_ValueChanged;
 			BeaconsPerAssemblerInput.ValueChanged += BeaconInput_ValueChanged;
 			ConstantBeaconInput.ValueChanged += BeaconInput_ValueChanged;
+		}
+
+		private void OptionsPanel_MouseWheel(object sender, MouseEventArgs e)
+		{
+			//had to set up this slightly convoluted scrolling option to account for mouse wheel events being WAY too fast -> it would skip from start to end in a single tick, potentially missing out several lines worth of items.
+			Panel sPanel = sender as Panel;
+
+			if (e.Delta < 0 && LastScrollY[sender] < sPanel.Controls[0].Height - sPanel.Height + 5)
+				LastScrollY[sender] += sPanel.Height / 4;
+			else if (e.Delta > 0 && LastScrollY[sender] > 0)
+				LastScrollY[sender] -= sPanel.Height / 4;
+			sPanel.AutoScrollPosition = new Point(0, LastScrollY[sender]);
 		}
 
 		private void InitializeRates()
@@ -140,10 +171,14 @@ namespace Foreman
 
 		private void SetupFuelOptions()
 		{
-			CleanTable(FuelOptionsTable, nodeData.SelectedAssembler.Fuels.Count(f => f.Enabled));
+
+			List<Item> fuels = nodeData.SelectedAssembler.Fuels.Where(f => f.ProductionRecipes.Any(r => r.Enabled && r.Assemblers.Any(a => a.Enabled))).ToList();
+
+			CleanTable(FuelOptionsTable, fuels.Count);
+			FuelOptionsPanel.Height = (int)(FuelOptionsTable.RowStyles[0].Height * (fuels.Count <= 13 ? 1.2 : 2.2));
 
 			FuelOptions.Clear();
-			foreach (Item fuel in nodeData.SelectedAssembler.Fuels.Where(a => a.Enabled))
+			foreach (Item fuel in fuels)
 			{
 				Button button = InitializeBaseButton(fuel);
 				button.Click += new EventHandler(FuelButton_Click);
@@ -158,7 +193,7 @@ namespace Foreman
 		private void UpdateFuel()
 		{
 			foreach (Button fbutton in FuelOptions)
-				fbutton.BackColor = ((Item)fbutton.Tag == nodeData.Fuel) ? SelectedColor : (((Item)fbutton.Tag).IsMissing || !((Item)fbutton.Tag).Available) ? ErrorColor : FuelOptionsTable.BackColor;
+				fbutton.BackColor = ((Item)fbutton.Tag == nodeData.Fuel) ? SelectedColor : (((Item)fbutton.Tag).IsMissing || !((Item)fbutton.Tag).Available || !((Item)fbutton.Tag).ProductionRecipes.Any(r => r.Available && r.Assemblers.Any(a => a.Available))) ? ErrorColor : FuelOptionsTable.BackColor;
 
 			FuelTitle.Text = string.Format("Fuel: {0}", nodeData.Fuel == null ? "-none-" : nodeData.Fuel.FriendlyName);
 			SelectedFuelIcon.Image = nodeData.Fuel?.Icon;
@@ -168,13 +203,16 @@ namespace Foreman
 
 		private void SetupAssemblerModuleOptions()
 		{
-			List<Module> moduleOptions = nodeData.BaseRecipe.Modules.Intersect(nodeData.SelectedAssembler.Modules).OrderBy(m => m.LFriendlyName).ToList();
+			List<Module> moduleOptions = nodeData.BaseRecipe.Modules.Intersect(nodeData.SelectedAssembler.Modules).Where(m => m.Enabled).OrderBy(m => m.LFriendlyName).ToList();
 
 			CleanTable(AModulesChoiceTable, moduleOptions.Count);
 			AModuleOptions.Clear();
 			for (int i = 0; i < moduleOptions.Count; i++)
 			{
 				Button button = InitializeBaseButton(moduleOptions[i]);
+				if (!moduleOptions[i].Available)
+					button.BackColor = ErrorColor;
+
 				button.Click += new EventHandler(AModuleOptionButton_Click);
 
 				AModulesChoiceTable.Controls.Add(button, AModuleOptions.Count % (AModulesChoiceTable.ColumnCount - 1), AModuleOptions.Count / (AModulesChoiceTable.ColumnCount - 1));
@@ -251,7 +289,7 @@ namespace Foreman
 
 		private void SetupBeaconModuleOptions()
 		{
-			List<Module> moduleOptions = nodeData.SelectedBeacon == null ? new List<Module>() : nodeData.BaseRecipe.Modules.Intersect(nodeData.SelectedAssembler.Modules).Intersect(nodeData.SelectedBeacon.Modules).OrderBy(m => m.LFriendlyName).ToList();
+			List<Module> moduleOptions = nodeData.SelectedBeacon == null ? new List<Module>() : nodeData.BaseRecipe.Modules.Intersect(nodeData.SelectedAssembler.Modules).Intersect(nodeData.SelectedBeacon.Modules).Where(m => m.Enabled).OrderBy(m => m.LFriendlyName).ToList();
 			int moduleSlots = nodeData.SelectedBeacon == null ? 0 : nodeData.SelectedBeacon.ModuleSlots;
 
 			CleanTable(BModulesChoiceTable, moduleOptions.Count);
@@ -259,6 +297,9 @@ namespace Foreman
 			for (int i = 0; i < moduleOptions.Count; i++)
 			{
 				Button button = InitializeBaseButton(moduleOptions[i]);
+				if (!moduleOptions[i].Available)
+					button.BackColor = ErrorColor;
+
 				button.Click += new EventHandler(BModuleOptionButton_Click);
 
 				BModulesChoiceTable.Controls.Add(button, BModuleOptions.Count % (BModulesChoiceTable.ColumnCount - 1), BModuleOptions.Count / (BModulesChoiceTable.ColumnCount - 1));
@@ -469,7 +510,13 @@ namespace Foreman
 		private void Button_MouseHover(object sender, EventArgs e)
 		{
 			Control control = (Control)sender;
-			if (control.Tag is DataObjectBase dob)
+			if(control.Tag is Item fuel)
+			{
+				//the only items in this panel are fuels
+				ToolTip.SetText(fuel.FriendlyName + "\nFuel value: " + GraphicsStuff.DoubleToEnergy(fuel.FuelValue, "J"));
+				ToolTip.Show(this, Point.Add(PointToClient(Control.MousePosition), new Size(15, 5)));
+			}
+			else if (control.Tag is DataObjectBase dob)
 			{
 				ToolTip.SetText(dob.FriendlyName);
 				ToolTip.Show(this, Point.Add(PointToClient(Control.MousePosition), new Size(15, 5)));

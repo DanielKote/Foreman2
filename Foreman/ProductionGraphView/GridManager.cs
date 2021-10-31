@@ -9,11 +9,12 @@ namespace Foreman
 		public int CurrentMajorGridUnit = 0;
 		public bool ShowGrid = false;
 		public bool LockDragToAxis = false;
+		public bool ShowZeroAxis = false;
 		public Point DragOrigin;
 
-		private static readonly Pen gridPen = new Pen(Color.FromArgb(220, 220, 220), 1);
-		private static readonly Pen gridMPen = new Pen(Color.FromArgb(180, 180, 180), 1);
-		private static readonly Brush gridBrush = new SolidBrush(Color.FromArgb(230, 230, 230));
+		private static readonly Pen gridPen = new Pen(Color.FromArgb(230, 230, 230), 1);
+		private static readonly Pen gridMPen = new Pen(Color.FromArgb(200, 200, 200), 1);
+		private static readonly Brush gridBrush = new SolidBrush(Color.FromArgb(240, 240, 240));
 		private static readonly Pen zeroAxisPen = new Pen(Color.FromArgb(140, 140, 140), 2);
 		private static readonly Pen lockedAxisPen = new Pen(Color.FromArgb(180, 80, 80), 4);
 
@@ -60,8 +61,11 @@ namespace Foreman
 				}
 
 				//zero axis
-				graphics.DrawLine(zeroAxisPen, 0, visibleGraphBounds.Y, 0, visibleGraphBounds.Y + visibleGraphBounds.Height);
-				graphics.DrawLine(zeroAxisPen, visibleGraphBounds.X, 0, visibleGraphBounds.X + visibleGraphBounds.Width, 0);
+				if (ShowZeroAxis)
+				{
+					graphics.DrawLine(zeroAxisPen, 0, visibleGraphBounds.Y, 0, visibleGraphBounds.Y + visibleGraphBounds.Height);
+					graphics.DrawLine(zeroAxisPen, visibleGraphBounds.X, 0, visibleGraphBounds.X + visibleGraphBounds.Width, 0);
+				}
 			}
 
 			//drag axis

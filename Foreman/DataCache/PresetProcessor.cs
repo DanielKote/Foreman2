@@ -128,22 +128,32 @@ namespace Foreman
 			//read in recipes
 			foreach (var objJToken in jsonData["recipes"].ToList())
 			{
+
 				RecipeShort recipe = new RecipeShort((string)objJToken["name"]);
 				foreach (var ingredientJToken in objJToken["ingredients"].ToList())
 				{
-					string ingredientName = (string)ingredientJToken["name"];
-					if (recipe.Ingredients.ContainsKey(ingredientName))
-						recipe.Ingredients[ingredientName] += (double)ingredientJToken["amount"];
-					else
-						recipe.Ingredients.Add(ingredientName, (double)ingredientJToken["amount"]);
+					double amount = (double)ingredientJToken["amount"];
+					if (amount > 0)
+					{
+						string ingredientName = (string)ingredientJToken["name"];
+						if (recipe.Ingredients.ContainsKey(ingredientName))
+							recipe.Ingredients[ingredientName] +=amount;
+						else
+							recipe.Ingredients.Add(ingredientName, amount);
+					}
 				}
 				foreach (var productJToken in objJToken["products"].ToList())
 				{
-					string productName = (string)productJToken["name"];
-					if (recipe.Products.ContainsKey(productName))
-						recipe.Products[productName] += (double)productJToken["amount"];
-					else
-						recipe.Products.Add(productName, (double)productJToken["amount"]);
+					double amount = (double)productJToken["amount"];
+					if (amount > 0)
+					{
+
+						string productName = (string)productJToken["name"];
+						if (recipe.Products.ContainsKey(productName))
+							recipe.Products[productName] += amount;
+						else
+							recipe.Products.Add(productName, amount);
+					}
 				}
 				presetRecipes.Add(recipe.Name, recipe);
 			}
@@ -158,11 +168,15 @@ namespace Foreman
 
 				foreach (var productJToken in objJToken["products"])
 				{
-					string productName = (string)productJToken["name"];
-					if (recipe.Products.ContainsKey(productName))
-						recipe.Products[productName] += (double)productJToken["amount"];
-					else
-						recipe.Products.Add(productName, (double)productJToken["amount"]);
+					double amount = (double)productJToken["amount"];
+					if (amount > 0)
+					{
+						string productName = (string)productJToken["name"];
+						if (recipe.Products.ContainsKey(productName))
+							recipe.Products[productName] += amount;
+						else
+							recipe.Products.Add(productName, amount);
+					}
 				}
 				if (recipe.Products.Count == 0)
 					continue;

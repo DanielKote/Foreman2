@@ -31,14 +31,14 @@ namespace Foreman
 		{
 			this.SuspendLayout();
 			// 
-			// GraphInfoForm
+			// GraphSummaryForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(727, 526);
 			this.DoubleBuffered = true;
-			this.Name = "GraphInfoForm";
-			this.Text = "GraphInfoForm";
+			this.Name = "GraphSummaryForm";
+			this.Text = "Factory summary:";
 			this.ResumeLayout(false);
 
 		}

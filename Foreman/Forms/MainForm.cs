@@ -226,6 +226,17 @@ namespace Foreman
 						List<Preset> validPresets = GetValidPresetsList();
 						await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
 					}
+					else //not loading a new preset -> update the enabled statuses
+					{
+						foreach (Recipe recipe in GraphViewer.DCache.Recipes.Values)
+							recipe.Enabled = options.EnabledObjects.Contains(recipe);
+						foreach (Assembler assembler in GraphViewer.DCache.Assemblers.Values)
+							assembler.Enabled = options.EnabledObjects.Contains(assembler);
+						foreach (Beacon beacon in GraphViewer.DCache.Beacons.Values)
+							beacon.Enabled = options.EnabledObjects.Contains(beacon);
+						foreach (Module module in GraphViewer.DCache.Modules.Values)
+							module.Enabled = options.EnabledObjects.Contains(module);
+					}
 
 					GraphViewer.LevelOfDetail = options.LevelOfDetail;
 					Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
@@ -248,15 +259,6 @@ namespace Foreman
 
 					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
 					Properties.Settings.Default.Save();
-
-					foreach (Recipe recipe in GraphViewer.DCache.Recipes.Values)
-						recipe.Enabled = options.EnabledObjects.Contains(recipe);
-					foreach (Assembler assembler in GraphViewer.DCache.Assemblers.Values)
-						assembler.Enabled = options.EnabledObjects.Contains(assembler);
-					foreach (Beacon beacon in GraphViewer.DCache.Beacons.Values)
-						beacon.Enabled = options.EnabledObjects.Contains(beacon);
-					foreach (Module module in GraphViewer.DCache.Modules.Values)
-						module.Enabled = options.EnabledObjects.Contains(module);
 
 					GraphViewer.Graph.UpdateNodeStates();
 					GraphViewer.UpdateNodeVisuals();

@@ -108,10 +108,9 @@ namespace Foreman
 				else if (StartConnectionType == LinkType.Output && mousedElement.DisplayedNode.Inputs.Contains(Item))
 					ConsumerElement = mousedElement;
 
-				//if we have found a possible connection above (both supplier & consumer are no longer null), but the item is temperature dependent AND the temperature check fails, break connection
+				//if we have found a possible connection above (both supplier & consumer are no longer null), but the item temperature check fails, break connection
 				if (SupplierElement != null &&
 					ConsumerElement != null &&
-					Item.IsTemperatureDependent &&
 					!LinkChecker.IsValidTemperatureConnection(Item, SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode))
 				{
 					if (StartConnectionType == LinkType.Input)

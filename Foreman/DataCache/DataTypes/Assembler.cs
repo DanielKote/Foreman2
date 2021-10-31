@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Foreman
@@ -15,9 +14,6 @@ namespace Foreman
 	{
 		public IReadOnlyCollection<Recipe> Recipes { get { return recipes; } }
 		public double BaseProductivityBonus { get; set; }
-
-		public override bool Available { get { return associatedItems.Any(i => i.Available); } set { } }
-
 
 		internal HashSet<RecipePrototype> recipes { get; private set; }
 

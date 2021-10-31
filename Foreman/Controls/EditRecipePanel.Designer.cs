@@ -152,7 +152,7 @@ namespace Foreman
 			this.AssemblerInfoTable.ColumnCount = 4;
 			this.AssemblerTable.SetColumnSpan(this.AssemblerInfoTable, 2);
 			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 70F));
 			this.AssemblerInfoTable.Controls.Add(this.AssemblerPollutionLabel, 2, 3);
@@ -189,10 +189,10 @@ namespace Foreman
 			this.AssemblerPollutionLabel.AutoSize = true;
 			this.AssemblerInfoTable.SetColumnSpan(this.AssemblerPollutionLabel, 2);
 			this.AssemblerPollutionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerPollutionLabel.Location = new System.Drawing.Point(153, 46);
+			this.AssemblerPollutionLabel.Location = new System.Drawing.Point(154, 46);
 			this.AssemblerPollutionLabel.Margin = new System.Windows.Forms.Padding(1);
 			this.AssemblerPollutionLabel.Name = "AssemblerPollutionLabel";
-			this.AssemblerPollutionLabel.Size = new System.Drawing.Size(156, 13);
+			this.AssemblerPollutionLabel.Size = new System.Drawing.Size(155, 13);
 			this.AssemblerPollutionLabel.TabIndex = 12;
 			this.AssemblerPollutionLabel.Text = "12/min";
 			// 
@@ -212,9 +212,9 @@ namespace Foreman
 			this.AssemblerPollutionPercentLabel.AutoSize = true;
 			this.AssemblerPollutionPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AssemblerPollutionPercentLabel.Location = new System.Drawing.Point(103, 46);
-			this.AssemblerPollutionPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerPollutionPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
 			this.AssemblerPollutionPercentLabel.Name = "AssemblerPollutionPercentLabel";
-			this.AssemblerPollutionPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerPollutionPercentLabel.Size = new System.Drawing.Size(45, 13);
 			this.AssemblerPollutionPercentLabel.TabIndex = 8;
 			this.AssemblerPollutionPercentLabel.Text = "2000%";
 			// 
@@ -234,9 +234,9 @@ namespace Foreman
 			this.AssemblerProductivityPercentLabel.AutoSize = true;
 			this.AssemblerProductivityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AssemblerProductivityPercentLabel.Location = new System.Drawing.Point(103, 31);
-			this.AssemblerProductivityPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerProductivityPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
 			this.AssemblerProductivityPercentLabel.Name = "AssemblerProductivityPercentLabel";
-			this.AssemblerProductivityPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerProductivityPercentLabel.Size = new System.Drawing.Size(45, 13);
 			this.AssemblerProductivityPercentLabel.TabIndex = 7;
 			this.AssemblerProductivityPercentLabel.Text = "100%";
 			// 
@@ -256,9 +256,9 @@ namespace Foreman
 			this.AssemblerSpeedPercentLabel.AutoSize = true;
 			this.AssemblerSpeedPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AssemblerSpeedPercentLabel.Location = new System.Drawing.Point(103, 16);
-			this.AssemblerSpeedPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerSpeedPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
 			this.AssemblerSpeedPercentLabel.Name = "AssemblerSpeedPercentLabel";
-			this.AssemblerSpeedPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerSpeedPercentLabel.Size = new System.Drawing.Size(45, 13);
 			this.AssemblerSpeedPercentLabel.TabIndex = 6;
 			this.AssemblerSpeedPercentLabel.Text = "-80%";
 			// 
@@ -278,9 +278,9 @@ namespace Foreman
 			this.AssemblerEnergyPercentLabel.AutoSize = true;
 			this.AssemblerEnergyPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AssemblerEnergyPercentLabel.Location = new System.Drawing.Point(103, 1);
-			this.AssemblerEnergyPercentLabel.Margin = new System.Windows.Forms.Padding(1);
+			this.AssemblerEnergyPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
 			this.AssemblerEnergyPercentLabel.Name = "AssemblerEnergyPercentLabel";
-			this.AssemblerEnergyPercentLabel.Size = new System.Drawing.Size(48, 13);
+			this.AssemblerEnergyPercentLabel.Size = new System.Drawing.Size(45, 13);
 			this.AssemblerEnergyPercentLabel.TabIndex = 5;
 			this.AssemblerEnergyPercentLabel.Text = "10000%";
 			// 
@@ -289,10 +289,10 @@ namespace Foreman
 			this.AssemblerEnergyLabel.AutoSize = true;
 			this.AssemblerInfoTable.SetColumnSpan(this.AssemblerEnergyLabel, 2);
 			this.AssemblerEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerEnergyLabel.Location = new System.Drawing.Point(153, 1);
+			this.AssemblerEnergyLabel.Location = new System.Drawing.Point(154, 1);
 			this.AssemblerEnergyLabel.Margin = new System.Windows.Forms.Padding(1);
 			this.AssemblerEnergyLabel.Name = "AssemblerEnergyLabel";
-			this.AssemblerEnergyLabel.Size = new System.Drawing.Size(156, 13);
+			this.AssemblerEnergyLabel.Size = new System.Drawing.Size(155, 13);
 			this.AssemblerEnergyLabel.TabIndex = 9;
 			this.AssemblerEnergyLabel.Text = "5MJ";
 			// 
@@ -301,10 +301,10 @@ namespace Foreman
 			this.AssemblerSpeedLabel.AutoSize = true;
 			this.AssemblerInfoTable.SetColumnSpan(this.AssemblerSpeedLabel, 2);
 			this.AssemblerSpeedLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerSpeedLabel.Location = new System.Drawing.Point(153, 16);
+			this.AssemblerSpeedLabel.Location = new System.Drawing.Point(154, 16);
 			this.AssemblerSpeedLabel.Margin = new System.Windows.Forms.Padding(1);
 			this.AssemblerSpeedLabel.Name = "AssemblerSpeedLabel";
-			this.AssemblerSpeedLabel.Size = new System.Drawing.Size(156, 13);
+			this.AssemblerSpeedLabel.Size = new System.Drawing.Size(155, 13);
 			this.AssemblerSpeedLabel.TabIndex = 10;
 			this.AssemblerSpeedLabel.Text = "128.5";
 			// 
@@ -367,7 +367,7 @@ namespace Foreman
 			this.AssemblerTable.SetColumnSpan(this.AModuleOptionsLabel, 2);
 			this.AModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AModuleOptionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.AModuleOptionsLabel.Location = new System.Drawing.Point(152, 218);
+			this.AModuleOptionsLabel.Location = new System.Drawing.Point(152, 222);
 			this.AModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.AModuleOptionsLabel.Name = "AModuleOptionsLabel";
 			this.AModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(3);
@@ -381,7 +381,7 @@ namespace Foreman
 			this.AModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
 			this.AModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AModulesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.AModulesLabel.Location = new System.Drawing.Point(0, 218);
+			this.AModulesLabel.Location = new System.Drawing.Point(0, 222);
 			this.AModulesLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.AModulesLabel.Name = "AModulesLabel";
 			this.AModulesLabel.Padding = new System.Windows.Forms.Padding(3);
@@ -433,7 +433,7 @@ namespace Foreman
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MainTable.Size = new System.Drawing.Size(472, 585);
+			this.MainTable.Size = new System.Drawing.Size(472, 589);
 			this.MainTable.TabIndex = 17;
 			// 
 			// BeaconTable
@@ -456,7 +456,7 @@ namespace Foreman
 			this.BeaconTable.Controls.Add(this.BeaconValuesTable, 2, 1);
 			this.BeaconTable.Controls.Add(this.SelectedBeaconIcon, 3, 0);
 			this.BeaconTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.BeaconTable.Location = new System.Drawing.Point(3, 360);
+			this.BeaconTable.Location = new System.Drawing.Point(3, 364);
 			this.BeaconTable.Name = "BeaconTable";
 			this.BeaconTable.RowCount = 4;
 			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -884,7 +884,7 @@ namespace Foreman
 			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.AssemblerTable.Size = new System.Drawing.Size(466, 319);
+			this.AssemblerTable.Size = new System.Drawing.Size(466, 323);
 			this.AssemblerTable.TabIndex = 20;
 			// 
 			// FuelOptionsPanel
@@ -895,7 +895,7 @@ namespace Foreman
 			this.FuelOptionsPanel.Controls.Add(this.FuelOptionsTable);
 			this.FuelOptionsPanel.Location = new System.Drawing.Point(3, 177);
 			this.FuelOptionsPanel.Name = "FuelOptionsPanel";
-			this.FuelOptionsPanel.Size = new System.Drawing.Size(460, 38);
+			this.FuelOptionsPanel.Size = new System.Drawing.Size(460, 42);
 			this.FuelOptionsPanel.TabIndex = 22;
 			// 
 			// FuelOptionsTable
@@ -920,8 +920,8 @@ namespace Foreman
 			this.FuelOptionsTable.Location = new System.Drawing.Point(0, 0);
 			this.FuelOptionsTable.Name = "FuelOptionsTable";
 			this.FuelOptionsTable.RowCount = 1;
-			this.FuelOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-			this.FuelOptionsTable.Size = new System.Drawing.Size(456, 32);
+			this.FuelOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
+			this.FuelOptionsTable.Size = new System.Drawing.Size(456, 34);
 			this.FuelOptionsTable.TabIndex = 0;
 			// 
 			// FuelTitle
@@ -945,7 +945,7 @@ namespace Foreman
 			this.AModulesChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.AssemblerTable.SetColumnSpan(this.AModulesChoicePanel, 2);
 			this.AModulesChoicePanel.Controls.Add(this.AModulesChoiceTable);
-			this.AModulesChoicePanel.Location = new System.Drawing.Point(155, 244);
+			this.AModulesChoicePanel.Location = new System.Drawing.Point(155, 248);
 			this.AModulesChoicePanel.Name = "AModulesChoicePanel";
 			this.AModulesChoicePanel.Size = new System.Drawing.Size(308, 72);
 			this.AModulesChoicePanel.TabIndex = 20;
@@ -1006,7 +1006,7 @@ namespace Foreman
 			this.SelectedAModulesPanel.AutoScroll = true;
 			this.SelectedAModulesPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.SelectedAModulesPanel.Controls.Add(this.SelectedAModulesTable);
-			this.SelectedAModulesPanel.Location = new System.Drawing.Point(3, 244);
+			this.SelectedAModulesPanel.Location = new System.Drawing.Point(3, 248);
 			this.SelectedAModulesPanel.Margin = new System.Windows.Forms.Padding(3, 3, 13, 3);
 			this.SelectedAModulesPanel.Name = "SelectedAModulesPanel";
 			this.SelectedAModulesPanel.Size = new System.Drawing.Size(136, 72);
@@ -1104,7 +1104,7 @@ namespace Foreman
 			this.DoubleBuffered = true;
 			this.ForeColor = System.Drawing.Color.White;
 			this.Name = "EditRecipePanel";
-			this.Size = new System.Drawing.Size(472, 585);
+			this.Size = new System.Drawing.Size(472, 589);
 			this.AssemblerInfoTable.ResumeLayout(false);
 			this.AssemblerInfoTable.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).EndInit();

@@ -147,7 +147,7 @@ namespace Foreman
 			ingredientTemperatureMap.Remove(item);
 		}
 
-		public void InternalOneWayAddProduct(ItemPrototype item, double quantity, double temperature = 0)
+		public void InternalOneWayAddProduct(ItemPrototype item, double quantity, double temperature = double.NaN)
 		{
 			if (productSet.ContainsKey(item))
 				productSet[item] += quantity;
@@ -155,7 +155,7 @@ namespace Foreman
 			{
 				productSet.Add(item, quantity);
 				productList.Add(item);
-				productTemperatureMap.Add(item, temperature);
+				productTemperatureMap.Add(item, double.IsNaN(temperature)? item.DefaultTemperature : temperature);
 			}
 		}
 

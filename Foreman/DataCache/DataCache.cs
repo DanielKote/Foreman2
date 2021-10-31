@@ -292,7 +292,7 @@ namespace Foreman
 			{
 				if (!assemblers.ContainsKey(iAssembler) && !missingAssemblers.ContainsKey(iAssembler))
 				{
-					AssemblerPrototype missingAssembler = new AssemblerPrototype(this, iAssembler, iAssembler, EntityType.Assembler, EnergySource.Void); //dont know, dont care about entity type we will just treat it as a void-assembler (and let fuel io + recipe figure it out)
+					AssemblerPrototype missingAssembler = new AssemblerPrototype(this, iAssembler, iAssembler, EntityType.Assembler, EnergySource.Void, true); //dont know, dont care about entity type we will just treat it as a void-assembler (and let fuel io + recipe figure it out)
 					missingAssemblers.Add(missingAssembler.Name, missingAssembler);
 				}
 			}
@@ -316,7 +316,7 @@ namespace Foreman
 			{
 				if (!beacons.ContainsKey(iBeacon) && !missingBeacons.ContainsKey(iBeacon))
 				{
-					BeaconPrototype missingBeacon = new BeaconPrototype(this, iBeacon, iBeacon, EnergySource.Void);
+					BeaconPrototype missingBeacon = new BeaconPrototype(this, iBeacon, iBeacon, EnergySource.Void, true);
 					missingBeacons.Add(missingBeacon.Name, missingBeacon);
 				}
 			}
@@ -510,37 +510,32 @@ namespace Foreman
 
 			foreach (var productJToken in objJToken["products"].ToList())
 			{
-				string name = (string)productJToken["name"];
+				ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
 				double amount = (double)productJToken["amount"];
-				double temperature = 0;
-				if ((string)productJToken["type"] == "fluid" && productJToken["temperature"] != null)
-				{
-					temperature = (double)productJToken["temperature"];
-					if (((ItemPrototype)items[name]).DefaultTemperature != temperature)
-						((ItemPrototype)items[name]).IsTemperatureDependent = true;
-				}
-
 				if (amount != 0)
 				{
-					recipe.InternalOneWayAddProduct((ItemPrototype)items[name], amount, temperature);
-					((ItemPrototype)items[name]).productionRecipes.Add(recipe);
+					double temperature = product.DefaultTemperature;
+					if ((string)productJToken["type"] == "fluid" && productJToken["temperature"] != null)
+						temperature = (double)productJToken["temperature"];
+
+					recipe.InternalOneWayAddProduct(product, amount, temperature);
+					product.productionRecipes.Add(recipe);
 				}
 			}
 
 			foreach (var ingredientJToken in objJToken["ingredients"].ToList())
 			{
-				string name = (string)ingredientJToken["name"];
+				ItemPrototype ingredient = (ItemPrototype)items[(string)ingredientJToken["name"]];
 				double amount = (double)ingredientJToken["amount"];
-
-				double minTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["minimum_temperature"] != null) ? (double)ingredientJToken["minimum_temperature"] : double.NegativeInfinity;
-				double maxTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"] != null) ? (double)ingredientJToken["maximum_temperature"] : double.PositiveInfinity;
-				if (minTemp < MinTemp) minTemp = double.NegativeInfinity;
-				if (maxTemp > MaxTemp) maxTemp = double.PositiveInfinity;
-
 				if (amount != 0)
 				{
-					recipe.InternalOneWayAddIngredient((ItemPrototype)items[name], amount, minTemp, maxTemp);
-					((ItemPrototype)items[name]).consumptionRecipes.Add(recipe);
+					double minTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["minimum_temperature"] != null) ? (double)ingredientJToken["minimum_temperature"] : double.NegativeInfinity;
+					double maxTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"] != null) ? (double)ingredientJToken["maximum_temperature"] : double.PositiveInfinity;
+					if (minTemp < MinTemp) minTemp = double.NegativeInfinity;
+					if (maxTemp > MaxTemp) maxTemp = double.PositiveInfinity;
+
+					recipe.InternalOneWayAddIngredient(ingredient, amount, minTemp, maxTemp);
+					ingredient.consumptionRecipes.Add(recipe);
 				}
 			}
 
@@ -972,7 +967,6 @@ namespace Foreman
 			//boiler is a ingredient to product conversion with product coming out at the  target_temperature *C at a rate based on energy efficiency & energy use to bring the INGREDIENT to the given temperature (basically ingredient goes from default temp to target temp, then shifts to product). we will add an extra recipe for this
 			double temp = (double)objJToken["target_temperature"];
 
-
 			//I will be honest here. Testing has shown that the actual 'speed' is dependent on the incoming temperature (not the default temperature), as could have likely been expected.
 			//this means that if you put in 65* water instead of 15* water to boil it to 165* steam it will result in 1.5x the 'maximum' output as listed in the factorio info menu and calculated below.
 			//so if some mod does some wonky things like water pre-heating, or uses boiler to heat other fluids at non-default temperatures (I havent found any such mods, but testing shows it is possible to make such a mod)
@@ -1053,11 +1047,8 @@ namespace Foreman
 				recipe.Time = 1;
 
 				recipe.InternalOneWayAddIngredient(ingredient, 60, double.IsNaN(minTemp) ? double.NegativeInfinity : minTemp, double.IsNaN(maxTemp) ? double.PositiveInfinity : maxTemp);
-				if (!double.IsNaN(minTemp) || !double.IsNaN(minTemp))
-					ingredient.IsTemperatureDependent = true;
 
 				ingredient.consumptionRecipes.Add(recipe);
-
 
 				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
 				{
@@ -1389,6 +1380,25 @@ namespace Foreman
 				group.SortSubgroups();
 			foreach (SubgroupPrototype sgroup in subgroups.Values)
 				sgroup.SortIRs();
+
+			//step 13: update the temperature dependent status of items (fluids)
+			foreach(ItemPrototype fluid in items.Values.Where(i => i.IsFluid))
+			{
+				fRange productionRange = new fRange(double.MaxValue, double.MinValue);
+				fRange consumptionRange = new fRange(double.MinValue, double.MaxValue); //a bit different -> the min value is the LARGEST minimum of each consumption recipe, and the max value is the SMALLEST max of each consumption recipe
+
+				foreach(Recipe recipe in fluid.productionRecipes)
+				{
+					productionRange.Min = Math.Min(productionRange.Min, recipe.ProductTemperatureMap[fluid]);
+					productionRange.Max = Math.Max(productionRange.Max, recipe.ProductTemperatureMap[fluid]);
+				}
+				foreach (Recipe recipe in fluid.consumptionRecipes)
+				{
+					consumptionRange.Min = Math.Max(consumptionRange.Min, recipe.IngredientTemperatureMap[fluid].Min);
+					consumptionRange.Max = Math.Min(consumptionRange.Max, recipe.IngredientTemperatureMap[fluid].Max);
+				}
+				fluid.IsTemperatureDependent = !(consumptionRange.Contains(productionRange));
+			}
 		}
 
 		//--------------------------------------------------------------------DEBUG PRINTING FUNCTIONS
@@ -1420,6 +1430,7 @@ namespace Foreman
 			Console.WriteLine("Beacons:");
 			foreach (BeaconPrototype beacon in beacons.Values)
 				if (beacon.Available) Console.WriteLine("    " + beacon);
+
 			Console.WriteLine("UNAVAILABLE: ----------------------------------------------------------------");
 			Console.WriteLine("Technologies:");
 			foreach (TechnologyPrototype tech in technologies.Values)
@@ -1473,6 +1484,22 @@ namespace Foreman
 				}
 			}
 
+			Console.WriteLine("TEMPERATURE DEPENDENT FLUIDS: ----------------------------------------------------------------");
+			foreach (ItemPrototype fluid in items.Values.Where(i => i.IsFluid && i.IsTemperatureDependent))
+			{
+				Console.WriteLine(fluid.Name);
+				HashSet<double> productionTemps = new HashSet<double>();
+				foreach (Recipe recipe in fluid.productionRecipes)
+					productionTemps.Add(recipe.ProductTemperatureMap[fluid]);
+				Console.Write("   Production ranges:          >");
+				foreach (double temp in productionTemps.ToList().OrderBy(t => t))
+					Console.Write(temp + ", ");
+				Console.WriteLine();
+				Console.Write("   Failed Consumption ranges:  >");
+				foreach (Recipe recipe in fluid.consumptionRecipes.Where(r => productionTemps.Any(t => !r.IngredientTemperatureMap[fluid].Contains(t))))
+					Console.Write("(" + recipe.IngredientTemperatureMap[fluid].Min + ">" + recipe.IngredientTemperatureMap[fluid].Max + ": " + recipe.Name + "), ");
+				Console.WriteLine();
+			}
 		}
 	}
 }

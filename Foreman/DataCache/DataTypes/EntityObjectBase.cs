@@ -42,6 +42,8 @@ namespace Foreman
 
 	internal class EntityObjectBasePrototype : DataObjectBasePrototype, EntityObjectBase
 	{
+		public override bool Available { get { return associatedItems.Any(i => i.productionRecipes.Any(r => r.Available)); } set { } }
+
 		public IReadOnlyCollection<Module> Modules { get { return modules; } }
 		public IReadOnlyCollection<Item> Fuels { get { return fuels; } }
 		public IReadOnlyCollection<Item> AssociatedItems { get { return associatedItems; } }

@@ -15,7 +15,7 @@ namespace Foreman
 		{
 			if (!IsPossibleConnection(item, supplier, consumer))
 				return false;
-			if (!item.IsFluid)
+			if (!item.IsFluid || !item.IsTemperatureDependent)
 				return true;
 
 			fRange supplierTempRange = GetTemperatureRange(item, supplier, LinkType.Output);

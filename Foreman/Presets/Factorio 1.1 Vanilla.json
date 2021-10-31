@@ -15,10 +15,6 @@
     {
       "name": "foremanexport",
       "version": "1.0.0"
-    },
-    {
-      "name": "z-barrelfix",
-      "version": "1.1.1"
     }
   ],
   "technologies": [

@@ -512,26 +512,9 @@ namespace Foreman
 				DialogResult result = form.ShowDialog();
 
 				if(result == DialogResult.OK)
-				{
-					foreach (ListViewItem item in unfilteredAssemblerList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredBeaconList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredMinerList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredModuleList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredPowerList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredRecipeList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-
-					UpdateFilteredLists();
-				}
+					UpdateEnabledStatus();
 				else if (result == DialogResult.Abort)
-				{
 					MessageBox.Show("Error while reading save file. Try running factorio, opening the save game, saving again, and retrying?");
-				}
 			}
 		}
 
@@ -545,24 +528,53 @@ namespace Foreman
 				DialogResult result = form.ShowDialog();
 
 				if (result == DialogResult.OK)
-				{
-					foreach (ListViewItem item in unfilteredAssemblerList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredBeaconList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredMinerList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredModuleList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredPowerList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-					foreach (ListViewItem item in unfilteredRecipeList)
-						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
-
-					UpdateFilteredLists();
-				}
+					UpdateEnabledStatus();
 			}
+		}
 
+		private void UpdateEnabledStatus()
+		{
+			//this requires a bit of juggling in order to prevent listview (virtual) from throwing a fit. we will ensure filtered lists contain all from unfiltered, then conduct the check updates, then update filtered.
+
+			filteredAssemblerList.Clear();
+			filteredAssemblerList.AddRange(unfilteredAssemblerList);
+			AssemblerListView.VirtualListSize = filteredAssemblerList.Count;
+
+			filteredBeaconList.Clear();
+			filteredBeaconList.AddRange(unfilteredBeaconList);
+			BeaconListView.VirtualListSize = filteredBeaconList.Count;
+
+			filteredMinerList.Clear();
+			filteredMinerList.AddRange(unfilteredMinerList);
+			MinerListView.VirtualListSize = filteredMinerList.Count;
+
+			filteredModuleList.Clear();
+			filteredModuleList.AddRange(unfilteredModuleList);
+			ModuleListView.VirtualListSize = filteredModuleList.Count;
+
+			filteredPowerList.Clear();
+			filteredPowerList.AddRange(unfilteredPowerList);
+			PowerListView.VirtualListSize = filteredPowerList.Count;
+
+			filteredRecipeList.Clear();
+			filteredRecipeList.AddRange(unfilteredRecipeList);
+			RecipeListView.VirtualListSize = filteredRecipeList.Count;
+
+
+			foreach (ListViewItem item in unfilteredAssemblerList)
+				item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
+			foreach (ListViewItem item in unfilteredBeaconList)
+				item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
+			foreach (ListViewItem item in unfilteredMinerList)
+				item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
+			foreach (ListViewItem item in unfilteredModuleList)
+				item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
+			foreach (ListViewItem item in unfilteredPowerList)
+				item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
+			foreach (ListViewItem item in unfilteredRecipeList)
+				item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
+
+			UpdateFilteredLists();
 		}
 	}
 }
