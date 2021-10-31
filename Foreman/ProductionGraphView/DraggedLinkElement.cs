@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Foreman
 {
@@ -73,6 +74,7 @@ namespace Foreman
 				myGraphViewer.Graph.UpdateNodeValues();
 				myGraphViewer.UpdateGraphBounds();
 				myGraphViewer.Invalidate();
+				myGraphViewer.DisposeLinkDrag();
 			}
 			else //at least one null -> this is an 'add new recipe' operation
 			{
@@ -82,9 +84,11 @@ namespace Foreman
 				bool includeSuppliers = StartConnectionType == LinkType.Input && SupplierElement == null;
 				bool includeConsumers = StartConnectionType == LinkType.Output && ConsumerElement == null;
 				if (includeSuppliers)
-					myGraphViewer.AddRecipe(screenPoint, Item, Point.Add(newObjectLocation, new Size(0, myGraphViewer.SimpleView? (NodeElement.baseHeight / 2) : (NodeElement.baseWIconHeight / 2))), ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
+					myGraphViewer.AddRecipe(screenPoint, Item, Point.Add(newObjectLocation, new Size(0, myGraphViewer.SimpleView ? (NodeElement.baseHeight / 2) : (NodeElement.baseWIconHeight / 2))), ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
 				else if (includeConsumers)
 					myGraphViewer.AddRecipe(screenPoint, Item, Point.Add(newObjectLocation, new Size(0, myGraphViewer.SimpleView ? (-NodeElement.baseHeight / 2) : (-NodeElement.baseWIconHeight / 2))), ProductionGraphViewer.NewNodeType.Consumer, SupplierElement);
+				else
+					Trace.Fail("Both null dragged link!");
 			}
 		}
 

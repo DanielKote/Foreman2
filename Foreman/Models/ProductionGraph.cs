@@ -223,7 +223,7 @@ namespace Foreman
 			NodeValuesUpdated?.Invoke(this, EventArgs.Empty);
 		}
 
-		public NewNodeCollection InsertNodesFromJson(DataCache cache, JToken json, float multiplier) //cache is necessary since we will possibly be adding to mssing items/recipes
+		public NewNodeCollection InsertNodesFromJson(DataCache cache, JToken json) //cache is necessary since we will possibly be adding to mssing items/recipes
         {
 			NewNodeCollection newNodeCollection = new NewNodeCollection();
 			Dictionary<int, BaseNode> oldNodeIndices = new Dictionary<int, BaseNode>(); //the links between the node index (as imported) and the newly created node (which will now have a different index). Used to link up nodes
@@ -295,7 +295,7 @@ namespace Foreman
 
 				newNode.RateType = (RateType)(int)nodeJToken["RateType"];
 				if (newNode.RateType == RateType.Manual)
-					newNode.DesiredRate = (float)nodeJToken["DesiredRate"] * multiplier;
+					newNode.DesiredRate = (float)nodeJToken["DesiredRate"];
 
 				oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode);
 				newNodeCollection.newNodes.Add(newNode);

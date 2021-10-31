@@ -252,6 +252,11 @@ namespace Foreman
 		{
 			//RateOptionsPanel newPanel = new RateOptionsPanel(DisplayedNode, Parent);
 			//new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), Parent);
+
+			DisplayedNode.DesiredRate += 1;
+			DisplayedNode.RateType = RateType.Manual;
+			myGraphViewer.Invalidate();
+			myGraphViewer.Graph.UpdateNodeValues();
 		}
 
         public override void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0)

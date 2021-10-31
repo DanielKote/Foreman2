@@ -14,13 +14,13 @@ namespace Foreman
 		int NodeID { get; }
 		Point Location { get; set; }
 
-		RateType RateType { get; }
 		IEnumerable<Item> Inputs { get; }
 		IEnumerable<Item> Outputs { get; }
 		
 		IReadOnlyList<NodeLink> InputLinks { get; }
 		IReadOnlyList<NodeLink> OutputLinks { get; }
 
+		RateType RateType { get; set; }
 		float ActualRate { get; }
 		float DesiredRate { get; set; }
 

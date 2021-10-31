@@ -9,6 +9,8 @@ namespace Foreman
 {
     public abstract partial class IRChooserPanel : UserControl
     {
+        public Action EndAction;
+
         private static readonly Color SelectedGroupButtonBGColor = Color.FromArgb(255,255,180,100);
         protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 70, 70, 70);
         protected static readonly Color IRButtonHiddenColor = Color.FromArgb(255, 120, 0, 0);
@@ -142,12 +144,10 @@ namespace Foreman
             return groups;
         }
 
-        private int upD = 0;
         protected void UpdateIRButtons(int startRow = 0, bool scrollOnly = false) //if scroll only, then we dont need to update the filtered set, just use what is there
         {
             if (IRFlowPanel.Visible)
             {
-
                 //if we are actually changing the filtered list, then update it (through the GetSubgroupList)
                 if (!scrollOnly)
                 {
@@ -268,11 +268,9 @@ namespace Foreman
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.RecipeNameOnlyFilter = RecipeNameOnlyFilterCheckBox.Checked;
             Properties.Settings.Default.Save();
-            QuittingScripts();
+            EndAction?.Invoke();
             Dispose();
         }
-
-        protected virtual void QuittingScripts() { }
 
         protected void FilterCheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -319,7 +317,6 @@ namespace Foreman
     public class ItemChooserPanel : IRChooserPanel
     {
         public Action<Item> CallbackMethod; //returns the selected item
-        public Action EndAction;
         public void Show(Action<Item> callback, Action endAction = null) { CallbackMethod = callback; EndAction = endAction; }
 
         private ToolTip iToolTip = new CustomToolTip();
@@ -418,17 +415,11 @@ namespace Foreman
                 Dispose();
             }
         }
-
-        protected override void QuittingScripts()
-        {
-            EndAction?.Invoke();
-        }
     }
 
     public class RecipeChooserPanel : IRChooserPanel
     {
         public Action<NodeType, Recipe> CallbackMethod; //returns the selected node type and the selected recipe (or null if not a recipe node)
-        public Action EndAction; //calls when the panel closes
         public void Show(Action<NodeType, Recipe> callback, Action endAction = null) { CallbackMethod = callback; EndAction = endAction; }
         protected Item KeyItem;
         protected fRange KeyItemTempRange;
@@ -638,11 +629,6 @@ namespace Foreman
 
             (IRButtonToolTip as RecipeToolTip).SetRecipe((Recipe)((Button)sender).Tag);
             (IRButtonToolTip as RecipeToolTip).Show(control, new Point(control.Width, yoffset));
-        }
-
-        protected override void QuittingScripts()
-        {
-            EndAction?.Invoke();
         }
     }
 

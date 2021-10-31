@@ -7,6 +7,9 @@ using System.Windows.Forms;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using Newtonsoft.Json;
+using System.Text;
+using System.IO;
 
 namespace Foreman
 {
@@ -16,7 +19,7 @@ namespace Foreman
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
-		private enum DragOperation { None, Item, Selection, Processed }
+		private enum DragOperation { None, Item, Selection }
 		public enum NewNodeType { Disconnected, Supplier, Consumer }
 
 		public AmountType SelectedAmountType { get; set; }
@@ -29,6 +32,8 @@ namespace Foreman
 		public DataCache DCache { get; set; }
 		public ProductionGraph Graph { get; private set; }
 		public Grid Grid { get; private set; }
+
+		public GraphElement MouseDownElement { get; set; }
 
 		public IReadOnlyDictionary<BaseNode, NodeElement> NodeElementDictionary { get { return nodeElementDictionary; } }
 		public IReadOnlyDictionary<NodeLink, LinkElement> LinkElementDictionary { get { return linkElementDictionary; } }
@@ -50,12 +55,6 @@ namespace Foreman
 		private DraggedLinkElement draggedLinkElement;
 
 		private Point mouseDownStartScreenPoint;
-		private GraphElement mouseDownElement;
-		public GraphElement MouseDownElement
-		{
-			get { return mouseDownElement; }
-			set { mouseDownStartScreenPoint = Control.MousePosition; mouseDownElement = value; }
-		}
 
 		private Point ViewDragOriginPoint;
 		private bool viewBeingDragged = false; //separate from dragOperation due to being able to drag view at all stages of dragOperation
@@ -70,12 +69,12 @@ namespace Foreman
 		private Point SelectionZoneOriginPoint;
 
 		private HashSet<NodeElement> selectedNodes; //main list of selected nodes
-		private HashSet<NodeElement> CurrentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
+		private HashSet<NodeElement> currentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
 
 		private ContextMenu rightClickMenu = new ContextMenu();
 		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
 
-		StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
+		private StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
 
 		public ProductionGraphViewer()
 		{
@@ -104,7 +103,7 @@ namespace Foreman
 			linkElements = new List<LinkElement>();
 
 			selectedNodes = new HashSet<NodeElement>();
-			CurrentSelectionNodes = new HashSet<NodeElement>();
+			currentSelectionNodes = new HashSet<NodeElement>();
 
 			UpdateGraphBounds();
 			Invalidate();
@@ -116,13 +115,13 @@ namespace Foreman
 				element.Dispose();
 			foreach (LinkElement element in linkElements)
 				element.Dispose();
-			draggedLinkElement?.Dispose();
+			DisposeLinkDrag();
 			nodeElements.Clear();
 			nodeElementDictionary.Clear();
 			linkElements.Clear();
 			linkElementDictionary.Clear();
 			selectedNodes.Clear();
-			CurrentSelectionNodes.Clear();
+			currentSelectionNodes.Clear();
 			Graph.ClearGraph();
 		}
 
@@ -221,8 +220,7 @@ namespace Foreman
 				Graph.UpdateNodeValues();
 			}, () =>
 			{
-				draggedLinkElement?.Dispose();
-				draggedLinkElement = null;
+				DisposeLinkDrag();
 				Invalidate();
 			});
         }
@@ -252,21 +250,29 @@ namespace Foreman
 			{
 				foreach (NodeElement selectedNode in selectedNodes)
 					selectedNode.Highlighted = true;
-				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+				foreach (NodeElement newlySelectedNode in currentSelectionNodes)
 					newlySelectedNode.Highlighted = false;
 			}
 			else if ((Control.ModifierKeys & Keys.Control) != 0)  //add zone
 			{
 				foreach (NodeElement selectedNode in selectedNodes)
 					selectedNode.Highlighted = true;
-				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+				foreach (NodeElement newlySelectedNode in currentSelectionNodes)
 					newlySelectedNode.Highlighted = true;
 			}
 			else //add zone (additive with ctrl or simple selection)
 			{
-				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+				foreach (NodeElement newlySelectedNode in currentSelectionNodes)
 					newlySelectedNode.Highlighted = true;
 			}
+		}
+
+		private void ClearSelection()
+        {
+			foreach (NodeElement element in nodeElements)
+				element.Highlighted = false;
+			selectedNodes.Clear();
+			currentSelectionNodes.Clear();
 		}
 
 		public void AlignSelected()
@@ -311,20 +317,30 @@ namespace Foreman
 			selectionPen.Width = 2 / ViewScale;
 
 			//grid
-			Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? mouseDownElement as NodeElement : null);
+			Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as NodeElement : null);
 
 			//process link element widths
 			if (DynamicLinkWidth)
 			{
-				float max = 0;
+				float itemMax = 0;
+				float fluidMax = 0;
 				foreach (LinkElement element in linkElements)
-					max = Math.Max(max, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
-				if (max > 0)
-					foreach (LinkElement element in linkElements)
-						element.LinkWidth = minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / max) / (element.Item.IsFluid ? 10 : 1);
-				else
-					foreach (LinkElement element in linkElements)
-						element.LinkWidth = minLinkWidth;
+				{
+					if (element.Item.IsFluid)
+						fluidMax = Math.Max(fluidMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
+					else
+						itemMax = Math.Max(itemMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
+				}
+				itemMax += itemMax == 0 ? 1 : 0;
+				fluidMax += fluidMax == 0 ? 1 : 0;
+
+				foreach (LinkElement element in linkElements)
+                {
+					if (element.Item.IsFluid)
+						element.LinkWidth = minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / fluidMax);
+					else
+						element.LinkWidth = minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / itemMax);
+				}
 			}
 			else
 			{
@@ -516,6 +532,7 @@ namespace Foreman
 			ClearFloatingControls();
 			ActiveControl = null; //helps panels like IRChooserPanel (for item/recipe choosing) close when we click on the graph
 
+			mouseDownStartScreenPoint = Control.MousePosition;
 			Point graph_location = ScreenToGraph(e.Location);
 
 			GraphElement clickedElement = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(ScreenToGraph(e.Location));
@@ -523,7 +540,6 @@ namespace Foreman
 
 			if (e.Button == MouseButtons.Middle || (e.Button == MouseButtons.Right && clickedElement == null)) //scrolling - middle button always, right if not clicking on element
 			{
-				viewBeingDragged = true;
 				ViewDragOriginPoint = graph_location;
 			}
 			else if (e.Button == MouseButtons.Left && clickedElement == null) //selection
@@ -543,16 +559,38 @@ namespace Foreman
 		{
 			ClearFloatingControls();
 			Point graph_location = ScreenToGraph(e.Location);
+			GraphElement element = null;
 
 			if (!viewBeingDragged && currentDragOperation != DragOperation.Selection) //dont care about mouse up operations on elements if we were dragging view or selection
 			{
-				GraphElement element = (GraphElement)draggedLinkElement?? GetNodeAtPoint(graph_location);
+				element = (GraphElement)draggedLinkElement?? GetNodeAtPoint(graph_location);
 				element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
 			}
 
 			switch (e.Button)
 			{
 				case MouseButtons.Right:
+					if(viewBeingDragged)
+						viewBeingDragged = false;
+					else if(currentDragOperation == DragOperation.None && element == null) //right click on an empty space -> show add item/recipe menu
+                    {
+						Point screenPoint = new Point(e.Location.X - 150, 15);
+						screenPoint.X = Math.Max(15, Math.Min(Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
+
+						rightClickMenu.MenuItems.Clear();
+						rightClickMenu.MenuItems.Add(new MenuItem("Add Item",
+							new EventHandler((o, ee) =>
+							{
+								AddItem(screenPoint, ScreenToGraph(e.Location));
+							})));
+						rightClickMenu.MenuItems.Add(new MenuItem("Add Recipe",
+							new EventHandler((o, ee) =>
+							{
+								AddRecipe(screenPoint, null,  ScreenToGraph(e.Location), NewNodeType.Disconnected);
+							})));
+						rightClickMenu.Show(this, e.Location);
+					}
+					break;
 				case MouseButtons.Middle:
                     viewBeingDragged = false;
                     break;
@@ -562,7 +600,7 @@ namespace Foreman
 					{
 						if ((Control.ModifierKeys & Keys.Alt) != 0) //removal zone processing
 						{
-							foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+							foreach (NodeElement newlySelectedNode in currentSelectionNodes)
 								selectedNodes.Remove(newlySelectedNode);
 						}
 						else
@@ -570,10 +608,10 @@ namespace Foreman
 							if ((Control.ModifierKeys & Keys.Control) == 0) //if we arent using control, then we are just selecting
 								selectedNodes.Clear();
 
-							foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+							foreach (NodeElement newlySelectedNode in currentSelectionNodes)
 								selectedNodes.Add(newlySelectedNode);
 						}
-						CurrentSelectionNodes.Clear();
+						currentSelectionNodes.Clear();
 					}
 					//this is a release of a left click (non-drag operation) -> modify selection if clicking on node & using modifier keys
 					else if (currentDragOperation == DragOperation.None && MouseDownElement is NodeElement clickedNode)
@@ -621,6 +659,9 @@ namespace Foreman
 					Point dragDiff = Point.Subtract(Control.MousePosition, (Size)mouseDownStartScreenPoint);
 					if (dragDiff.X * dragDiff.X + dragDiff.Y * dragDiff.Y > minDragDiff)
 					{
+						if ((Control.MouseButtons & MouseButtons.Middle) == MouseButtons.Middle || (Control.MouseButtons & MouseButtons.Right) == MouseButtons.Right)
+							viewBeingDragged = true;
+
 						if (MouseDownElement != null) //there is an item under the mouse during drag
 							currentDragOperation = DragOperation.Item;
 						else if ((Control.MouseButtons & MouseButtons.Left) != 0)
@@ -646,9 +687,9 @@ namespace Foreman
 
 				case DragOperation.Selection:
 					SelectionZone = new Rectangle(Math.Min(SelectionZoneOriginPoint.X, graph_location.X), Math.Min(SelectionZoneOriginPoint.Y, graph_location.Y), Math.Abs(SelectionZoneOriginPoint.X - graph_location.X), Math.Abs(SelectionZoneOriginPoint.Y - graph_location.Y));
-					CurrentSelectionNodes.Clear();
+					currentSelectionNodes.Clear();
 					foreach(NodeElement element in nodeElements.Where(element => element.IntersectsWithZone(SelectionZone, -20, -20)))
-						CurrentSelectionNodes.Add(element);
+						currentSelectionNodes.Add(element);
 
 					UpdateSelection();
 					break;
@@ -690,15 +731,74 @@ namespace Foreman
 
 		private void ProductionGraphViewer_KeyDown(object sender, KeyEventArgs e)
         {
-			if(currentDragOperation == DragOperation.Selection) //possible changes to selection type
+			if(currentDragOperation == DragOperation.None)
+            {
+				if ((e.KeyCode == Keys.C || e.KeyCode == Keys.X) && (e.Modifiers & Keys.Control) == Keys.Control) //copy or cut
+				{
+					StringBuilder stringBuilder = new StringBuilder();
+					JsonSerializer serialiser = JsonSerializer.Create();
+					serialiser.Formatting = Formatting.None;
+					var writer = new JsonTextWriter(new StringWriter(stringBuilder));
+
+					Graph.SerializeNodeList = new List<BaseNode>();
+					Graph.SerializeNodeList.AddRange(selectedNodes.Select(node => node.DisplayedNode)); //set the list of nodes we will serialize
+					serialiser.Serialize(writer, Graph);
+					Graph.SerializeNodeList.Clear();
+					Graph.SerializeNodeList = null;
+
+					Clipboard.SetText(stringBuilder.ToString());
+
+					if (e.KeyCode == Keys.X) //cut
+						foreach (NodeElement node in selectedNodes)
+							Graph.DeleteNode(node.DisplayedNode);
+				}
+				else if (e.KeyCode == Keys.V && (e.Modifiers & Keys.Control) == Keys.Control) //paste
+				{
+					ProductionGraph.NewNodeCollection newNodeCollection = null;
+					try
+					{
+						JObject json = JObject.Parse(Clipboard.GetText());
+						newNodeCollection = Graph.InsertNodesFromJson(DCache, json); //NOTE: missing items & recipes may be added here!
+					}
+					catch { Console.WriteLine("Non-Foreman paste detected."); } //clipboard string wasnt a proper json object, or didnt process properly. Likely answer: was a clip NOT from foreman.
+					if (newNodeCollection == null)
+						return;
+
+					//update the locations of the new nodes to be centered around the mouse position (as opposed to wherever they were before)
+					long xTotal = 0;
+					long yTotal = 0;
+					foreach(BaseNode newNode in newNodeCollection.newNodes)
+                    {
+						xTotal += newNode.Location.X;
+						yTotal += newNode.Location.Y;
+                    }
+
+					Point importCenter = new Point( (int)(xTotal / newNodeCollection.newNodes.Count), (int)(yTotal / newNodeCollection.newNodes.Count));
+					Point mousePos = ScreenToGraph(PointToClient(Cursor.Position));
+					Size offset = new Size(mousePos.X - importCenter.X, mousePos.Y - importCenter.Y);
+					foreach (BaseNode newNode in newNodeCollection.newNodes)
+						newNode.Location = Point.Add(newNode.Location, offset);
+
+					//update the selection to be just the newly imported nodes
+					ClearSelection();
+					foreach (NodeElement newNodeElement in newNodeCollection.newNodes.Select(node => nodeElementDictionary[node]))
+					{
+						selectedNodes.Add(newNodeElement);
+						newNodeElement.Highlighted = true;
+					}
+
+					UpdateGraphBounds();
+					Graph.UpdateNodeValues();
+				}
+			}
+			else if(currentDragOperation == DragOperation.Selection) //possible changes to selection type
 				UpdateSelection();
+
 			Invalidate();
         }
 
 		private void ProductionGraphViewer_KeyUp(object sender, KeyEventArgs e)
 		{
-			if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
-				UpdateSelection();
 			if (currentDragOperation == DragOperation.None)
 			{
 				switch (e.KeyCode)
@@ -708,8 +808,11 @@ namespace Foreman
 						e.Handled = true;
 						break;
 				}
-				Invalidate();
 			}
+			else if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
+				UpdateSelection();
+
+			Invalidate();
 		}
 
 		//----------------------------------------------Keyboard events
@@ -746,11 +849,15 @@ namespace Foreman
 				processed = true;
 			}
 
-			Invalidate();
 			if (processed)
+			{
+				Invalidate();
 				return true;
+			}
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
+
+
 
 		//----------------------------------------------Viewpoint events
 
@@ -953,7 +1060,7 @@ namespace Foreman
 			}
 
 			//add all nodes
-			ProductionGraph.NewNodeCollection newNodes = Graph.InsertNodesFromJson(DCache, json["ProductionGraph"], 1f);
+			Graph.InsertNodesFromJson(DCache, json["ProductionGraph"]);
 
 			UpdateGraphBounds();
 			Graph.UpdateNodeValues();

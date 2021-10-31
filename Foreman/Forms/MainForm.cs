@@ -78,6 +78,7 @@ namespace Foreman
 			var writer = new JsonTextWriter(new StreamWriter(dialog.FileName));
 			try
 			{
+				GraphViewer.Graph.SerializeNodeList = null; //we want to save everything.
 				serialiser.Serialize(writer, GraphViewer);
 			}
 			catch (Exception exception)
