@@ -35,6 +35,8 @@ namespace Foreman
             Temperature = 0;
             IsTemperatureDependent = false;
 			IsMissingItem = isMissing;
+			if (isMissing)
+				myCache.MissingItems.Add(this.Name, this);
 		}
 
 		internal void InternalOneWayAddConsumptionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds an ingredient

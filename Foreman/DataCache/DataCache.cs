@@ -60,12 +60,10 @@ namespace Foreman
 
         public string PresetName { get; private set; }
 
-        public Dictionary<string, Recipe> MissingRecipes { get; private set; }
+        public HashSet<Recipe> MissingRecipes { get; private set; }
         public Dictionary<string, Item> MissingItems { get; private set; }
         public Subgroup MissingSubgroup { get; private set; }
-
         public Technology StartingTech { get; private set; }
-
         public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
 
         private Dictionary<string, string> includedMods; //name : version
@@ -78,7 +76,6 @@ namespace Foreman
         private Dictionary<string, Miner> miners;
         private Dictionary<string, Resource> resources;
         private Dictionary<string, Module> modules;
-
 
         private Dictionary<string, List<Recipe>> craftingCategories;
         private Dictionary<string, List<Module>> moduleCategories;
@@ -99,7 +96,7 @@ namespace Foreman
             modules = new Dictionary<string, Module>();
 
             MissingItems = new Dictionary<string, Item>();
-            MissingRecipes = new Dictionary<string, Recipe>();
+            MissingRecipes = new HashSet<Recipe>();
             MissingSubgroup = new Subgroup(this, "", "");
             MissingSubgroup.SetGroup(new Group(this, "", "", ""));
 
@@ -207,7 +204,7 @@ namespace Foreman
             return mods;
         }
 
-        public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string,string> modList,  List<string> itemList, List<RecipeShort> recipeSList)
+        public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string,string> modList,  List<string> itemList, Dictionary<string, List<RecipeShort>> recipeShortSet)
         {
 
             string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
@@ -231,9 +228,21 @@ namespace Foreman
             {
                 RecipeShort recipe = new RecipeShort((string)objJToken["name"]);
                 foreach (var ingredientJToken in objJToken["ingredients"].ToList())
-                    recipe.Ingredients.Add((string)ingredientJToken["name"], (float)ingredientJToken["amount"]);
+                {
+                    string ingredientName = (string)ingredientJToken["name"];
+                    if (recipe.Ingredients.ContainsKey(ingredientName))
+                        recipe.Ingredients[ingredientName] += (float)ingredientJToken["amount"];
+                    else
+                        recipe.Ingredients.Add(ingredientName, (float)ingredientJToken["amount"]);
+                }
                 foreach (var productJToken in objJToken["products"].ToList())
-                    recipe.Products.Add((string)productJToken["name"], (float)productJToken["amount"]);
+                {
+                    string productName = (string)productJToken["name"];
+                    if (recipe.Products.ContainsKey(productName))
+                        recipe.Products[productName] += (float)productJToken["amount"];
+                    else
+                        recipe.Products.Add(productName, (float)productJToken["amount"]);
+                }
                 presetRecipes.Add(recipe.Name, recipe);
             }
 
@@ -253,12 +262,18 @@ namespace Foreman
             foreach (string itemName in itemList)
                 if (!presetItems.Contains(itemName))
                     errors.MissingItems.Add(itemName);
-            foreach (RecipeShort recipeS in recipeSList)
+            foreach (List<RecipeShort> recipeShortList in recipeShortSet.Values)
             {
-                if (!presetRecipes.ContainsKey(recipeS.Name))
-                    errors.MissingRecipes.Add(recipeS.Name);
-                else if(!recipeS.Equals(presetRecipes[recipeS.Name]))
-                    errors.IncorrectRecipes.Add(recipeS.Name);
+                foreach (RecipeShort recipeS in recipeShortList)
+                {
+                    if (recipeS.isMissing)
+                        continue;
+
+                    if (!presetRecipes.ContainsKey(recipeS.Name))
+                        errors.MissingRecipes.Add(recipeS.Name);
+                    else if (!recipeS.Equals(presetRecipes[recipeS.Name]))
+                        errors.IncorrectRecipes.Add(recipeS.Name);
+                }
             }
             return errors;
         }

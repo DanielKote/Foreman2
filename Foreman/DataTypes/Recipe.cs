@@ -8,13 +8,27 @@ namespace Foreman
 {
 	public class RecipeShort : IEquatable<RecipeShort>
 	{
-		public string Name;
-		public Dictionary<string, float> Ingredients;
-		public Dictionary<string, float> Products;
+		public string Name { get; private set; }
+		public long RecipeID { get; private set; }
+		public bool isMissing { get; private set; }
+		public Dictionary<string, float> Ingredients { get; private set; }
+		public Dictionary<string, float> Products { get; private set; }
+
+		public RecipeShort(string name)
+        {
+			Name = name;
+			RecipeID = -1;
+			isMissing = false;
+			Ingredients = new Dictionary<string, float>();
+			Products = new Dictionary<string, float>();
+        }
 
 		public RecipeShort(Recipe recipe)
 		{
 			Name = recipe.Name;
+			RecipeID = recipe.RecipeID;
+			isMissing = recipe.IsMissingRecipe;
+
 			Ingredients = new Dictionary<string, float>();
 			foreach (var kvp in recipe.IngredientSet)
 				Ingredients.Add(kvp.Key.Name, kvp.Value);
@@ -23,24 +37,30 @@ namespace Foreman
 				Products.Add(kvp.Key.Name, kvp.Value);
 		}
 
-		public RecipeShort(string name)
+		public RecipeShort(JToken recipe)
 		{
-			Name = name;
+			Name = (string)recipe["Name"];
+			RecipeID = (long)recipe["RecipeID"];
+			isMissing = (bool)recipe["isMissing"];
+
 			Ingredients = new Dictionary<string, float>();
+			foreach (JProperty ingredient in recipe["Ingredients"])
+				Ingredients.Add((string)ingredient.Name, (float)ingredient.Value);
+			
 			Products = new Dictionary<string, float>();
+			foreach (JProperty ingredient in recipe["Products"])
+				Products.Add((string)ingredient.Name, (float)ingredient.Value);
 		}
 
-		public static List<RecipeShort> GetListFromJson(JToken jdata)
+		public static Dictionary<string, List<RecipeShort>> GetSetFromJson(JToken jdata)
         {
-			List<RecipeShort> resultList = new List<RecipeShort>();
+			Dictionary<string, List<RecipeShort>> resultList = new Dictionary<string, List<RecipeShort>>();
 			foreach(JToken recipe in jdata)
             {
-				RecipeShort newShort = new RecipeShort((string)recipe["Name"]);
-				foreach (JProperty ingredient in recipe["Ingredients"])
-					newShort.Ingredients.Add((string)ingredient.Name, (float)ingredient.Value);
-				foreach (JProperty ingredient in recipe["Products"])
-					newShort.Products.Add((string)ingredient.Name, (float)ingredient.Value);
-				resultList.Add(newShort);
+				RecipeShort newShort = new RecipeShort(recipe);
+				if (!resultList.ContainsKey(newShort.Name))
+					resultList.Add(newShort.Name, new List<RecipeShort>());
+				resultList[newShort.Name].Add(newShort);
 			}
 			return resultList;
         }
@@ -102,13 +122,16 @@ namespace Foreman
 
 		public bool IsMissingRecipe { get; private set; }
 		public bool IsCyclic { get; set; }
-
 		public bool HasEnabledAssemblers { get { return validAssemblers.FirstOrDefault(a => a.Enabled) != null; } }
-
 		public bool Hidden { get; set; }
+
+		private static long lastRecipeID = 0;
+		public long RecipeID { get; private set; }
 
 		public Recipe(DataCache dCache, string name, string friendlyName, Subgroup subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
+			RecipeID = lastRecipeID++;
+
 			MySubgroup = subgroup;
 			MySubgroup.InternalOneWayAddRecipe(this);
 
@@ -116,6 +139,8 @@ namespace Foreman
 			this.Hidden = false;
 			this.IsCyclic = false;
 			this.IsMissingRecipe = isMissing;
+			if (isMissing)
+				myCache.MissingRecipes.Add(this);
 
 			ingredientSet = new Dictionary<Item, float>();
 			ingredientList = new List<Item>();
@@ -232,6 +257,6 @@ namespace Foreman
 			myUnlockTechnologies.Remove(technology);
         }
 
-		public override string ToString() { return String.Format("Recipe: {0}", Name); }
+		public override string ToString() { return String.Format("Recipe: {0} Id:{1}", Name, RecipeID); }
 	}
 }

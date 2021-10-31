@@ -922,16 +922,24 @@ namespace Foreman
 			//prepare list of used items & list of used recipes (with their inputs & outputs)
 			HashSet<string> includedItems = new HashSet<string>();
 			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
+			List<Recipe> includedMissingRecipes = new List<Recipe>(); //why wont this work with a hashset! I want a hashset!
 			foreach(ProductionNode node in Graph.Nodes)
             {
-				if(node is RecipeNode rnode)
-					includedRecipes.Add(rnode.BaseRecipe);
+				if (node is RecipeNode rnode)
+				{
+					if(rnode.BaseRecipe.IsMissingRecipe)
+						includedMissingRecipes.Add(rnode.BaseRecipe);
+					else
+						includedRecipes.Add(rnode.BaseRecipe);
+				}
+
 				foreach (Item input in node.Inputs)
 					includedItems.Add(input.Name);
 				foreach (Item output in node.Outputs)
 					includedItems.Add(output.Name);
             }
 			List<RecipeShort> includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
+			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
 			
 			//write
 			info.AddValue("AmountType", Graph.SelectedAmountType);
@@ -961,10 +969,6 @@ namespace Foreman
 
 		public void LoadFromJson(JObject json, bool useFirstPreset, bool enableEverything = false)
 		{
-			//clear graph
-			Graph.Nodes.Clear();
-			Elements.Clear();
-
 			//grab mod list
 			Dictionary<string, string> modSet = new Dictionary<string, string>();
 			foreach (string str in json["IncludedMods"].Select(t => (string)t).ToList())
@@ -975,7 +979,7 @@ namespace Foreman
 
 			//grab recipe list
 			List<string> itemNames = json["IncludedItems"].Select(t => (string)t).ToList();
-			List<RecipeShort> recipeShorts = RecipeShort.GetListFromJson(json["IncludedRecipes"]);
+			Dictionary<string, List<RecipeShort>> recipeShorts = RecipeShort.GetSetFromJson(json["IncludedRecipes"]);
 
 			//now - two options:
 			// a) we are told to use the first preset (basically, the selected preset) - so that is the only one added to the possible Presets
@@ -1023,11 +1027,17 @@ namespace Foreman
 						form.ShowDialog();
 
 						chosenPreset = form.ChosenPreset;
+
+						return;
 					}
 				}
 			}
 
+			//clear graph
+			Graph.Nodes.Clear();
+			Elements.Clear();
 
+			//load new preset
 			using (DataLoadForm form = new DataLoadForm(chosenPreset))
 			{
 				form.ShowDialog(); //LOAD FACTORIO DATA
@@ -1081,26 +1091,21 @@ namespace Foreman
             }
 
 			//check all items for existance
-			if (json["IncludedItems"] != null)
-			{
-				foreach (string iItem in json["IncludedItems"].Select(t => (string)t).ToList())
-				{
-					if (!Graph.DCache.Items.ContainsKey(iItem))
-					{
-						Item missingItem = new Item(Graph.DCache, iItem, iItem, false, Graph.DCache.MissingSubgroup, "", true);
-						Graph.DCache.MissingItems.Add(missingItem.Name, missingItem);
-					}
-				}
-			}
+			foreach (string iItem in json["IncludedItems"].Select(t => (string)t).ToList())
+				if (!Graph.DCache.Items.ContainsKey(iItem) && !Graph.DCache.MissingItems.ContainsKey(iItem)) //want to check for missing items too - in this case dont want duplicates
+					new Item(Graph.DCache, iItem, iItem, false, Graph.DCache.MissingSubgroup, "", true); //datacache will take care of it.
 
 			//check all recipes for compliance (and add the necessary recipes/items to the missing set)
-			if (json["IncludedRecipes"] != null)
+			//at the same time set up the recipeLinks (recipe ID -> recipe). we will use them to get the correct recipe to the nodes
+			Dictionary<string, List<RecipeShort>> includedRecipes = RecipeShort.GetSetFromJson(json["IncludedRecipes"]);
+			Dictionary<long, Recipe> recipeLinks = new Dictionary<long, Recipe>();
+			foreach (List<RecipeShort> recipeShortList in includedRecipes.Values)
 			{
-				List<RecipeShort> includedRecipes = RecipeShort.GetListFromJson(json["IncludedRecipes"]);
-
-				foreach (RecipeShort iRecipe in includedRecipes)
+				foreach (RecipeShort iRecipe in recipeShortList)
 				{
-					//recipe check #1 : does its name exist in database
+					Recipe recipe = null;
+
+					//recipe check #1 : does its name exist in database (note: we dont quite care about extra missing recipes here - so what if we have a couple identical ones? they will combine during save/load anyway)
 					bool recipeExists = Graph.DCache.Recipes.ContainsKey(iRecipe.Name);
 					//recipe check #2 : do the number of ingredients & products match?
 					recipeExists &= iRecipe.Ingredients.Count == Graph.DCache.Recipes[iRecipe.Name].IngredientList.Count;
@@ -1108,36 +1113,35 @@ namespace Foreman
 					//recipe check #3 : do the ingredients & products from the loaded data exist within the actual recipe?
 					if (recipeExists)
 					{
-						Recipe recipe = Graph.DCache.Recipes[iRecipe.Name];
-						//check #2 (from above)
+						recipe = Graph.DCache.Recipes[iRecipe.Name];
+						//check #2 (from above) - dodnt care about amounts of each
 						foreach (string ingredient in iRecipe.Ingredients.Keys)
 							recipeExists &= Graph.DCache.Items.ContainsKey(ingredient) && recipe.IngredientSet.ContainsKey(Graph.DCache.Items[ingredient]);
 						foreach (string product in iRecipe.Products.Keys)
 							recipeExists &= Graph.DCache.Items.ContainsKey(product) && recipe.ProductSet.ContainsKey(Graph.DCache.Items[product]);
 					}
+
 					if (!recipeExists)
 					{
-						if (!Graph.DCache.MissingRecipes.ContainsKey(iRecipe.Name))
+						Recipe missingRecipe = new Recipe(Graph.DCache, iRecipe.Name, iRecipe.Name, Graph.DCache.MissingSubgroup, "", true);
+						foreach (var ingredient in iRecipe.Ingredients)
 						{
-							Recipe missingRecipe = new Recipe(Graph.DCache, iRecipe.Name, iRecipe.Name, Graph.DCache.MissingSubgroup, "", true);
-							foreach (var ingredient in iRecipe.Ingredients)
-							{
-								if (Graph.DCache.Items.ContainsKey(ingredient.Key))
-									missingRecipe.AddIngredient(Graph.DCache.Items[ingredient.Key], ingredient.Value);
-								else
-									missingRecipe.AddIngredient(Graph.DCache.MissingItems[ingredient.Key], ingredient.Value);
-							}
-							foreach (var product in iRecipe.Products)
-							{
-								if (Graph.DCache.Items.ContainsKey(product.Key))
-									missingRecipe.AddProduct(Graph.DCache.Items[product.Key], product.Value);
-								else
-									missingRecipe.AddProduct(Graph.DCache.MissingItems[product.Key], product.Value);
-							}
-
-							Graph.DCache.MissingRecipes.Add(missingRecipe.Name, missingRecipe);
+							if (Graph.DCache.Items.ContainsKey(ingredient.Key))
+								missingRecipe.AddIngredient(Graph.DCache.Items[ingredient.Key], ingredient.Value);
+							else
+								missingRecipe.AddIngredient(Graph.DCache.MissingItems[ingredient.Key], ingredient.Value);
 						}
+						foreach (var product in iRecipe.Products)
+						{
+							if (Graph.DCache.Items.ContainsKey(product.Key))
+								missingRecipe.AddProduct(Graph.DCache.Items[product.Key], product.Value);
+							else
+								missingRecipe.AddProduct(Graph.DCache.MissingItems[product.Key], product.Value);
+						}
+						recipe = missingRecipe;
 					}
+
+					recipeLinks.Add(iRecipe.RecipeID, recipe);
 				}
 			}
 
@@ -1178,22 +1182,16 @@ namespace Foreman
 						}
 					case "Recipe":
 						{
-							string recipeName = (string)node["RecipeName"];
-							if (Graph.DCache.MissingRecipes.ContainsKey(recipeName)) //missing list checked first in case of same recipe name (but different ingredients/products)
-								newNode = RecipeNode.Create(Graph.DCache.MissingRecipes[recipeName], Graph);
-							else if (Graph.DCache.Recipes.ContainsKey(recipeName))
-								newNode = RecipeNode.Create(Graph.DCache.Recipes[recipeName], Graph);
+							long recipeID = (long)node["RecipeID"];
+							newNode = RecipeNode.Create(recipeLinks[recipeID], Graph);
 
-							if (newNode != null)
+							if (node["Assembler"] != null)
 							{
-								if (node["Assembler"] != null)
-								{
-									var assemblerKey = (string)node["Assembler"];
-									if (Graph.DCache.Assemblers.ContainsKey(assemblerKey))
-										(newNode as RecipeNode).Assembler = Graph.DCache.Assemblers[assemblerKey];
-								}
-								(newNode as RecipeNode).NodeModules = ModuleSelector.Load(node, Graph.DCache);
+								var assemblerKey = (string)node["Assembler"];
+								if (Graph.DCache.Assemblers.ContainsKey(assemblerKey))
+									(newNode as RecipeNode).Assembler = Graph.DCache.Assemblers[assemblerKey];
 							}
+							(newNode as RecipeNode).NodeModules = ModuleSelector.Load(node, Graph.DCache);
 							break;
 						}
                     default:

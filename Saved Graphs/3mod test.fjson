@@ -1,0 +1,178 @@
+{
+  "AmountType": 0,
+  "Unit": 1,
+  "SavedPresetName": "Krastorio 2 - extended",
+  "IncludedItems": [
+    "iron-gear-wheel",
+    "fast-transport-belt",
+    "lubricant",
+    "express-transport-belt",
+    "rubber",
+    "steel-plate",
+    "steel-gear-wheel",
+    "steel-rod"
+  ],
+  "IncludedRecipes": [
+    {
+      "Name": "express-transport-belt",
+      "RecipeID": 2172,
+      "isMissing": false,
+      "Ingredients": {
+        "steel-gear-wheel": 6.0,
+        "fast-transport-belt": 1.0,
+        "lubricant": 20.0
+      },
+      "Products": {
+        "express-transport-belt": 1.0
+      }
+    },
+    {
+      "Name": "express-transport-belt",
+      "RecipeID": 2428,
+      "isMissing": true,
+      "Ingredients": {
+        "iron-gear-wheel": 10.0,
+        "fast-transport-belt": 1.0,
+        "lubricant": 20.0
+      },
+      "Products": {
+        "express-transport-belt": 1.0
+      }
+    },
+    {
+      "Name": "express-transport-belt",
+      "RecipeID": 2427,
+      "isMissing": true,
+      "Ingredients": {
+        "rubber": 1.0,
+        "steel-plate": 1.0,
+        "steel-gear-wheel": 2.0,
+        "steel-rod": 1.0,
+        "lubricant": 20.0
+      },
+      "Products": {
+        "express-transport-belt": 1.0
+      }
+    }
+  ],
+  "IncludedMods": [
+    "core|1.0",
+    "Concretexture|1.2.2",
+    "Enhanced_Map_Colors|1.5.5",
+    "FNEI|0.4.1",
+    "Krastorio2|1.0.23",
+    "Krastorio2_Modules_Updated|0.1.5",
+    "PickerAtheneum|1.2.4",
+    "PickerBeltTools|1.2.5",
+    "PickerDollies|1.1.6",
+    "PickerExtended|4.1.3",
+    "PickerInventoryTools|1.1.13",
+    "PickerPipeTools|1.1.3",
+    "PickerTweaks|2.2.5",
+    "base|1.1.8",
+    "clock|1.1.0",
+    "even-distribution|1.0.10",
+    "foremanexport|1.0.0",
+    "helmod|0.12.5",
+    "ixuBottleneck|0.2.1",
+    "krastorio2_extended_endgame|1.0.0",
+    "stdlib|1.4.6",
+    "z-barrelfix|1.1.1"
+  ],
+  "EnabledAssemblers": [
+    "kr-fusion-reactor",
+    "stone-furnace",
+    "steel-furnace",
+    "electric-furnace",
+    "kr-advanced-furnace",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "kr-advanced-assembling-machine",
+    "kr-greenhouse",
+    "kr-bio-lab",
+    "kr-crusher",
+    "oil-refinery",
+    "kr-electrolysis-plant",
+    "kr-filtration-plant",
+    "kr-atmospheric-condenser",
+    "kr-fluid-burner",
+    "chemical-plant",
+    "kr-advanced-chemical-plant",
+    "kr-fuel-refinery",
+    "kr-research-server",
+    "kr-quantum-computer",
+    "centrifuge",
+    "kr-matter-plant",
+    "kr-matter-assembler",
+    "kr-stabilizer-charging-station",
+    "kr-air-purifier",
+    "rocket-silo"
+  ],
+  "EnabledMiners": [
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "kr-electric-mining-drill-mk2",
+    "kr-electric-mining-drill-mk3",
+    "kr-quarry-drill",
+    "kr-mineral-water-pumpjack",
+    "pumpjack",
+    "offshore-pump"
+  ],
+  "EnabledModules": [
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "speed-module-4",
+    "speed-module-5",
+    "speed-module-6",
+    "effectivity-module",
+    "effectivity-module-2",
+    "effectivity-module-3",
+    "effectivity-module-4",
+    "effectivity-module-5",
+    "effectivity-module-6",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3",
+    "productivity-module-4",
+    "productivity-module-5",
+    "productivity-module-6"
+  ],
+  "HiddenRecipes": [],
+  "Nodes": [
+    {
+      "NodeType": "Recipe",
+      "RecipeID": 2428,
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeID": 2427,
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeID": 2172,
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    }
+  ],
+  "NodeLinks": [],
+  "ElementLocations": [
+    "-384, -12",
+    "-384, 156",
+    "-384, -180"
+  ]
+}
