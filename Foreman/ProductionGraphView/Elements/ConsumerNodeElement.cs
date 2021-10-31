@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace Foreman
 			DisplayedNode = node;
 		}
 
-		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
+		protected override void DetailsDraw(IGraphics graphics, Point trans, bool simple)
 		{
 			if (simple)
 				return;

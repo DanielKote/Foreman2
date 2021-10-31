@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Foreman
 
 	public struct TooltipInfo
 	{
-		public TooltipInfo(Point screenLocation, Size screenSize, Direction direction, string text, Action<Graphics, Point> customDraw)
+		public TooltipInfo(Point screenLocation, Size screenSize, Direction direction, string text, Action<IGraphics, Point> customDraw)
 		{
 			ScreenLocation = screenLocation;
 			ScreenSize = screenSize;
@@ -26,7 +27,7 @@ namespace Foreman
 		public Size ScreenSize;
 		public Direction Direction;
 		public string Text;
-		public Action<Graphics, Point> CustomDraw;
+		public Action<IGraphics, Point> CustomDraw;
 	}
 
 	public class FloatingTooltipControl : IDisposable

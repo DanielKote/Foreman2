@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -8,7 +9,7 @@ namespace Foreman
 {
 	public static class GraphicsStuff
 	{
-		public static int DrawText(Graphics graphics, Brush textBrush, StringFormat textFormat, string text, Font baseFont, Rectangle textbox, bool singleLine = false) //returns the width of the actually drawn text
+		public static int DrawText(IGraphics graphics, Brush textBrush, StringFormat textFormat, string text, Font baseFont, Rectangle textbox, bool singleLine = false) //returns the width of the actually drawn text
 		{
 			float textLength = 0;
 			Font textFont = new Font(baseFont, baseFont.Style);
@@ -41,7 +42,7 @@ namespace Foreman
 		}
 
 
-		public static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)
+		public static void DrawRoundRect(int x, int y, int width, int height, int radius, IGraphics graphics, Pen pen)
 		{
 			int radius2 = radius * 2;
 			int Left = x;
@@ -64,7 +65,7 @@ namespace Foreman
 			}
 		}
 
-		public static void FillRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Brush brush)
+		public static void FillRoundRect(int x, int y, int width, int height, int radius, IGraphics graphics, Brush brush)
 		{
 			int radius2 = radius * 2;
 			int Left = x;
@@ -87,7 +88,7 @@ namespace Foreman
 			}
 		}
 
-		public static void FillRoundRectTLFlag(int x, int y, int width, int height, int radius, Graphics graphics, Brush brush)
+		public static void FillRoundRectTLFlag(int x, int y, int width, int height, int radius, IGraphics graphics, Brush brush)
 		{
 			int radius2 = radius * 2;
 			int Left = x;
@@ -161,16 +162,12 @@ namespace Foreman
 			int height = 0;
 			int width = ((SectionWidth + 10) * recipes.Count) - 10;
 			foreach (Recipe recipe in recipes)
-			{
 				height = Math.Max(height, 110 + 20 + recipe.IngredientList.Count * 40 + recipe.ProductList.Count * 40 + recipe.MyUnlockSciencePacks.Count * (Properties.Settings.Default.AbbreviateSciPacks? 40 : 30));
-			}
-
-
 
 			return new Size(width, height);
 		}
 
-		public static void Paint(IList<Recipe> recipes, Graphics graphics, Point offset)
+		public static void Paint(IList<Recipe> recipes, IGraphics graphics, Point offset)
 		{
 			Rectangle boundary = new Rectangle(offset, GetSize(recipes));
 			graphics.FillRectangle(BackgroundBrush, boundary);

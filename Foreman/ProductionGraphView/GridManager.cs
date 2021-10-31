@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Drawing;
 
 namespace Foreman
@@ -23,7 +24,7 @@ namespace Foreman
 			CurrentGridUnit = Properties.Settings.Default.MinorGridlines;
 		}
 
-		public void Paint(Graphics graphics, float viewScale, Rectangle visibleGraphBounds, BaseNodeElement draggedNode = null)
+		public void Paint(IGraphics graphics, float viewScale, Rectangle visibleGraphBounds, BaseNodeElement draggedNode = null)
 		{
 			if (ShowGrid)
 			{

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -28,7 +29,7 @@ namespace Foreman
 			Visible = visible;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(IGraphics graphics, bool simple)
 		{
 			if (simple)
 				return;

@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using System.Diagnostics;
+using SvgNet.SvgGdi;
 
 namespace Foreman
 {
@@ -165,7 +166,7 @@ namespace Foreman
 			return false;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(IGraphics graphics, bool simple)
 		{
 			if (NodeStateRequiresUpdate)
 				UpdateState();
@@ -198,7 +199,7 @@ namespace Foreman
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, selectionOverlayBrush);
 		}
 
-		protected abstract void DetailsDraw(Graphics graphics, Point trans, bool simple); //draw the inside of the node.
+		protected abstract void DetailsDraw(IGraphics graphics, Point trans, bool simple); //draw the inside of the node.
 
 		public override List<TooltipInfo> GetToolTips(Point graph_point)
 		{

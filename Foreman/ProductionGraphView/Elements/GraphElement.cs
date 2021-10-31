@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -98,7 +99,7 @@ namespace Foreman
 			return Bounds.Contains(GraphToLocal(graph_point));
 		}
 
-		public void Paint(Graphics graphics, bool simple)
+		public void Paint(IGraphics graphics, bool simple)
 		{
 			if (Visible)
 			{
@@ -111,7 +112,7 @@ namespace Foreman
 			}
 		}
 
-		protected abstract void Draw(Graphics graphics, bool simple);
+		protected abstract void Draw(IGraphics graphics, bool simple);
 
 		public virtual List<TooltipInfo> GetToolTips(Point graph_point) { return new List<TooltipInfo>(); }
 		public virtual void MouseMoved(Point graph_point) { }

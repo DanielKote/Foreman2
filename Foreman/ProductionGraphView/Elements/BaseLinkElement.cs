@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Drawing;
 
 namespace Foreman
@@ -103,7 +104,7 @@ namespace Foreman
 			return false;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(IGraphics graphics, bool simple)
 		{
 			UpdateCurve();
 

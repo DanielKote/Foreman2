@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Drawing.Imaging;
+using SvgNet.SvgGdi;
 
 namespace Foreman
 {
@@ -53,8 +54,10 @@ namespace Foreman
 			}
 
 			Bitmap image = new Bitmap(graphViewer.Graph.Bounds.Width * scale, graphViewer.Graph.Bounds.Height * scale);
-			using (Graphics graphics = Graphics.FromImage(image))
+			using (Graphics g = Graphics.FromImage(image))
 			{
+				GdiGraphics graphics = new GdiGraphics(g);
+
 				graphics.ScaleTransform(scale, scale);
 				graphics.TranslateTransform(-graphViewer.Graph.Bounds.X, -graphViewer.Graph.Bounds.Y);
 				graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SvgNet.SvgGdi;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -101,7 +102,7 @@ namespace Foreman
 			base.UpdateState();
 		}
 
-		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
+		protected override void DetailsDraw(IGraphics graphics, Point trans, bool simple)
 		{
 			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
 			{
@@ -281,7 +282,7 @@ namespace Foreman
 				ttiRecipe.Direction = Direction.Left;
 				ttiRecipe.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(Width / 2, 0)));
 				ttiRecipe.ScreenSize = RecipePainter.GetSize(Recipes);
-				ttiRecipe.CustomDraw = new Action<Graphics, Point>((Graphics g, Point offset) => { RecipePainter.Paint(Recipes, g, offset); });
+				ttiRecipe.CustomDraw = new Action<IGraphics, Point>((IGraphics g, Point offset) => { RecipePainter.Paint(Recipes, g, offset); });
 				tooltips.Add(ttiRecipe);
 			}
 

@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.IO;
 using System.Threading.Tasks;
+using SvgNet.SvgGdi;
 
 namespace Foreman
 {
@@ -433,8 +434,7 @@ namespace Foreman
 			foreach (GraphElement element in GetPaintingOrder())
 				element.UpdateVisibility(visibleGraphBounds);
 
-			//proceed with the paint operations
-			base.OnPaint(e);
+			//viewpoint shifting
 			e.Graphics.ResetTransform();
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 			e.Graphics.Clear(this.BackColor);
@@ -442,10 +442,12 @@ namespace Foreman
 			e.Graphics.ScaleTransform(ViewScale, ViewScale);
 			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 
-			Paint(e.Graphics);
+			//proceed with the paint operations
+			base.OnPaint(e);
+			Paint(new GdiGraphics(e.Graphics));
 		}
 
-		public new void Paint(Graphics graphics)
+		public new void Paint(IGraphics graphics)
 		{
 			selectionPen.Width = 2 / ViewScale;
 

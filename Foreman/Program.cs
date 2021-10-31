@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SvgNet.SvgGdi;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +21,7 @@ namespace Foreman
 		[STAThread]
 		static void Main()
 		{
-			//test10(); return;
+			//test11(); return;
 
 			ErrorLogging.ClearLog();
 			Application.EnableVisualStyles();
@@ -28,7 +29,34 @@ namespace Foreman
 			Application.Run(new MainForm());
 		}
 
-		public static void test10()
+
+		public static void test11()
+		{
+			var ig = new SvgGraphics(Color.WhiteSmoke);
+			ig.DrawLine(Pens.Black, 0, 0, 0, 10);
+			ig.DrawLine(Pens.Black, 0, 10, 10, 10);
+			ig.DrawLine(Pens.Black, 10, 10, 10, 0);
+			ig.DrawLine(Pens.Black, 10, 0, 0, 0);
+
+			string s = ig.WriteSVGString();
+			string tempFile = Path.Combine(Application.StartupPath, "foo.svg");
+			var tw = new StreamWriter(tempFile, false);
+			tw.Write(s);
+			tw.Close();
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+			public static void test10()
 		{
 			List<List<int>> technologies = new List<List<int>>();
 			technologies.Add(new List<int>(new int[] { 1, 2, 3 }));

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Drawing;
 using System.Linq;
 
@@ -21,7 +22,7 @@ namespace Foreman
 
 		public PointingArrowRenderer(ProductionGraphViewer viewer) { Viewer = viewer; }
 
-		public void Paint(Graphics graphics, ProductionGraph graph)
+		public void Paint(IGraphics graphics, ProductionGraph graph)
 		{
 			if (ShowWarningArrows)
 				foreach (Point warningPoint in graph.Nodes.Where(node => node.State == NodeState.Warning).Select(node => Viewer.GraphToScreen(node.Location)))
@@ -31,7 +32,7 @@ namespace Foreman
 					DrawArrow(graphics, errorPoint, ErrorArrowPen);
 		}
 
-		private void DrawArrow(Graphics graphics, Point nodeOrigin, Pen arrowPen)
+		private void DrawArrow(IGraphics graphics, Point nodeOrigin, Pen arrowPen)
 		{
 			if (nodeOrigin.X > -Padding && nodeOrigin.X < Viewer.Width + Padding && nodeOrigin.Y > -Padding && nodeOrigin.Y < Viewer.Height + Padding) //roughly 'in bounds'
 				return;
@@ -81,7 +82,7 @@ namespace Foreman
 			//if we are here, then there was no need to paint the arrow (within borders). Due to previous checks this shouldnt happen though.
 		}
 
-		private void DrawArrow(Graphics graphics, Point origin, Point endpoint, float length,  Pen arrowPen)
+		private void DrawArrow(IGraphics graphics, Point origin, Point endpoint, float length,  Pen arrowPen)
 		{
 			SizeF sizedVector = new SizeF(origin.X - endpoint.X, origin.Y - endpoint.Y);
 			float vectorLength = (float)Math.Sqrt(sizedVector.Width * sizedVector.Width + sizedVector.Height * sizedVector.Height);

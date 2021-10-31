@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -112,11 +113,8 @@ namespace Foreman
 
 		private void OnDraw(object sender, DrawToolTipEventArgs e)
 		{
-			using (Graphics g = e.Graphics)
-			{
-				Recipe[] recipes = (comparedRecipe == null) ? new Recipe[] { displayedRecipe } : new Recipe[] { displayedRecipe, comparedRecipe };
-				RecipePainter.Paint(recipes, g, new Point(0, 0));
-			}
+			Recipe[] recipes = (comparedRecipe == null) ? new Recipe[] { displayedRecipe } : new Recipe[] { displayedRecipe, comparedRecipe };
+			RecipePainter.Paint(recipes, new GdiGraphics(e.Graphics), new Point(0, 0));
 		}
 
 		public static int GetRecipeToolTipHeight(Recipe recipe)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
+using SvgNet.SvgGdi;
 
 namespace Foreman
 {
@@ -72,7 +73,7 @@ namespace Foreman
 			Height = iconSize + textHeight + border + 3;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(IGraphics graphics, bool simple)
 		{
 			Point trans = LocalToGraph(new Point(0, 0));
 
@@ -83,12 +84,12 @@ namespace Foreman
 			{
 				if (LinkType == LinkType.Output)
 				{
-					graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y + ((textHeight + border - Bounds.Height - 10) / 2)), topFormat);
+					graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y + ((textHeight + border - Bounds.Height - 10) / 2)));
 					graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y + (Bounds.Height / 2) - border - iconSize, iconSize, iconSize);
 				}
 				else
 				{
-					graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y - ((textHeight + border - Bounds.Height - 10) / 2)), bottomFormat);
+					graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y - ((textHeight + border - Bounds.Height - 10) / 2)));
 					graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y - (Bounds.Height / 2) + border, iconSize, iconSize);
 				}
 			}

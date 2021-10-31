@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvgNet.SvgGdi;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Foreman
 				control.Dispose();
 		}
 
-		public void Paint(Graphics graphics, bool paintAll)
+		public void Paint(IGraphics graphics, bool paintAll)
 		{
 			if (paintAll)
 			{
@@ -62,7 +63,7 @@ namespace Foreman
 			}
 		}
 
-		private void DrawTooltip(Point screenArrowPoint, Size size, Direction direction, Graphics graphics, string text = null, Action<Graphics, Point> custonDraw = null) //places the tool tip centered on the arrow
+		private void DrawTooltip(Point screenArrowPoint, Size size, Direction direction, IGraphics graphics, string text = null, Action<IGraphics, Point> custonDraw = null) //places the tool tip centered on the arrow
 		{
 			if (text != null)
 			{
@@ -81,7 +82,7 @@ namespace Foreman
 		}
 
 
-		private void DrawTooltip(Point screenArrowPoint, Rectangle bounds, Direction direction, Graphics graphics, String text = null, Action<Graphics, Point> customDraw = null) //places the tool tip based on the bounds provided
+		private void DrawTooltip(Point screenArrowPoint, Rectangle bounds, Direction direction, IGraphics graphics, String text = null, Action<IGraphics, Point> customDraw = null) //places the tool tip based on the bounds provided
 		{
 			Point arrowPoint1 = new Point();
 			Point arrowPoint2 = new Point();

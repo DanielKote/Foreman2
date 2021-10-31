@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.Linq;
+using SvgNet.SvgGdi;
 
 namespace Foreman
 {
@@ -421,6 +422,20 @@ namespace Foreman
 				cp.ExStyle |= 0x02000000;
 				return cp;
 			}
+		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			var ig = new SvgGraphics();
+			ig.TranslateTransform(-GraphViewer.Graph.Bounds.X, -GraphViewer.Graph.Bounds.Y);
+			ig.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+			GraphViewer.Paint(ig);
+
+			string s = ig.WriteSVGString();
+			string tempFile = Path.Combine(Application.StartupPath, "foo.svg");
+			var tw = new StreamWriter(tempFile, false);
+			tw.Write(s);
+			tw.Close();
 		}
 	}
 

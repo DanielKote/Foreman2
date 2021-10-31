@@ -54,6 +54,7 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.GraphSummaryButton = new System.Windows.Forms.Button();
+			this.button1 = new System.Windows.Forms.Button();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MenuTable.SuspendLayout();
 			this.MenuButtonsTable.SuspendLayout();
@@ -114,6 +115,7 @@
 			this.MenuTable.Controls.Add(this.MenuButtonsTable, 0, 0);
 			this.MenuTable.Controls.Add(this.GridLinesGroupBox, 1, 0);
 			this.MenuTable.Controls.Add(this.ProductionGroupBox, 2, 0);
+			this.MenuTable.Controls.Add(this.button1, 3, 0);
 			this.MenuTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MenuTable.Location = new System.Drawing.Point(3, 3);
 			this.MenuTable.Name = "MenuTable";
@@ -485,6 +487,16 @@
 			this.GraphSummaryButton.UseVisualStyleBackColor = true;
 			this.GraphSummaryButton.Click += new System.EventHandler(this.GraphSummaryButton_Click);
 			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(588, 3);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(75, 23);
+			this.button1.TabIndex = 18;
+			this.button1.Text = "button1";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -543,6 +555,7 @@
 		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
 		private System.Windows.Forms.TableLayoutPanel GridlinesTable;
 		private System.Windows.Forms.Button GraphSummaryButton;
+		private System.Windows.Forms.Button button1;
 	}
 }
 
