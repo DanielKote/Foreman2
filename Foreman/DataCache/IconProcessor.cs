@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define IgnoreIcons
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -9,6 +11,17 @@ using System.Runtime.InteropServices;
 
 namespace Foreman
 {
+    public struct IconColorPair
+    {
+        public Bitmap Icon;
+        public Color Color;
+        public IconColorPair(Bitmap icon, Color color)
+        {
+            this.Icon = icon;
+            this.Color = color;
+        }
+    }
+
     public struct IconInfo
     {
         public string iconPath;
@@ -46,7 +59,6 @@ namespace Foreman
         {
             if (unknownIcon == null)
             {
-
                 unknownIcon = LoadImage("UnknownIcon.png");
                 if (unknownIcon == null)
                 {
@@ -60,8 +72,11 @@ namespace Foreman
             return unknownIcon;
         }
 
-        public static Bitmap GetIcon(IconInfo iinfo, List<IconInfo> iinfos)
+        public static IconColorPair GetIconAndColor(IconInfo iinfo, List<IconInfo> iinfos)
         {
+#if IgnoreIcons
+            return new IconColorPair(GetUnknownIcon(), Color.Black);
+#endif
             if (iinfos == null)
                 iinfos = new List<IconInfo>();
             int mainIconSize = iinfo.iconSize > 0 ? iinfo.iconSize : 32;
@@ -79,7 +94,7 @@ namespace Foreman
                     empty = false;
             }
             if (empty)
-                return null;
+                return new IconColorPair(null, Color.Black);
 
             Bitmap icon = new Bitmap(IconCanvasSize, IconCanvasSize, PixelFormat.Format32bppArgb);
             //using(Graphics g = Graphics.FromImage(icon)) { g.FillRectangle(Brushes.Gray, new Rectangle(0, 0, icon.Width, icon.Height)); }
@@ -96,18 +111,18 @@ namespace Foreman
                 //NOTE: tint is applied as pre-multiplied alpha, so: A(result) = A(original); RGB(result) = RGB(tint) + RGB(original) * (255 - A(tint))
                 if (ii.iconTint != NoTint)
                 {
-                    BitmapData bmpData = iconImage.LockBits(new Rectangle(0, 0, iconImage.Width, iconImage.Height), ImageLockMode.ReadWrite, iconImage.PixelFormat);
+                    BitmapData iconData = iconImage.LockBits(new Rectangle(0, 0, iconImage.Width, iconImage.Height), ImageLockMode.ReadWrite, iconImage.PixelFormat);
                     int bytesPerPixel = Bitmap.GetPixelFormatSize(iconImage.PixelFormat) / 8;
-                    int byteCount = bmpData.Stride * iconImage.Height;
+                    int byteCount = iconData.Stride * iconImage.Height;
                     byte[] pixels = new byte[byteCount];
-                    IntPtr ptrFirstPixel = bmpData.Scan0;
+                    IntPtr ptrFirstPixel = iconData.Scan0;
                     Marshal.Copy(ptrFirstPixel, pixels, 0, pixels.Length);
-                    int heightInPixels = bmpData.Height;
-                    int widthInBytes = bmpData.Width * bytesPerPixel;
+                    int heightInPixels = iconData.Height;
+                    int widthInBytes = iconData.Width * bytesPerPixel;
 
                     for (int y = 0; y < heightInPixels; y++)
                     {
-                        int currentLine = y * bmpData.Stride;
+                        int currentLine = y * iconData.Stride;
                         for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
                         {
                             int pixelA = pixels[currentLine + x + 3];
@@ -122,9 +137,10 @@ namespace Foreman
                     }
                     // copy modified bytes back
                     Marshal.Copy(pixels, 0, ptrFirstPixel, pixels.Length);
-                    iconImage.UnlockBits(bmpData);
+                    iconImage.UnlockBits(iconData);
                 }
 
+                //draw the processed icon (singluar) onto the main canvas
                 using(Graphics g = Graphics.FromImage(icon))
                 {
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -137,27 +153,15 @@ namespace Foreman
                         iconDrawSize);
                     g.DrawImage(iconImage, iconBorder);
                 }
-            }
-            return icon;
-        }
 
-        public static Color GetAverageColor(Bitmap icon, bool darkenIfWhite = true)
-        {
-            if (icon == null)
-                return Color.Black;
-
-            using (Bitmap pixel = new Bitmap(1, 1))
-            using (Graphics g = Graphics.FromImage(pixel))
-            {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.DrawImage(icon, new Rectangle(0, 0, 1, 1)); //Scale the icon down to a 1-pixel image, which does the averaging for us
-                Color result = pixel.GetPixel(0, 0);
-                //Set alpha to 255, also lighten the colours to make them more pastel-y
-                result = Color.FromArgb(255, result.R + (255 - result.R) / 2, result.G + (255 - result.G) / 2, result.B + (255 - result.B) / 2);
-                if(result.GetBrightness() > 0.8) //too white
-                    return Color.FromArgb((int)(result.R * 0.8), (int)(result.G * 0.8), (int)(result.B * 0.8));
-                return result;
             }
+            Color averageColor = GetAverageColor(icon);
+            if (averageColor.GetBrightness() > 0.9)
+                icon = AddBorder(icon);
+            if (averageColor.GetBrightness() > 0.7)
+                averageColor = Color.FromArgb((int)(averageColor.A * 0.7), (int)(averageColor.R * 0.7), (int)(averageColor.G * 0.7), (int)(averageColor.B * 0.7));
+
+            return new IconColorPair(icon, averageColor);
         }
 
         private static Bitmap LoadImage(String fileName, int resultSize = 32)
@@ -197,7 +201,7 @@ namespace Foreman
             {
                 using (Bitmap image = new Bitmap(fullPath)) //If you don't do this, the file is locked for the lifetime of the bitmap
                 {
-                    Bitmap bmp = new Bitmap(resultSize,resultSize);
+                    Bitmap bmp = new Bitmap(resultSize, resultSize);
                     using (Graphics g = Graphics.FromImage(bmp))
                         g.DrawImage(image, new Rectangle(0, 0, (resultSize * image.Width / image.Height), resultSize));
                     return bmp;
@@ -207,6 +211,95 @@ namespace Foreman
             {
                 return null;
             }
+        }
+
+        public static Color GetAverageColor(Bitmap icon)
+        {
+            if (icon == null)
+                return Color.Black;
+
+            BitmapData iconData = icon.LockBits(new Rectangle(0, 0, icon.Width, icon.Height), ImageLockMode.ReadOnly, icon.PixelFormat);
+            int bytesPerPixel = Bitmap.GetPixelFormatSize(icon.PixelFormat) / 8;
+            int byteCount = iconData.Stride * icon.Height;
+            byte[] iconPixels = new byte[byteCount];
+            IntPtr ptrFirstPixel = iconData.Scan0;
+            Marshal.Copy(ptrFirstPixel, iconPixels, 0, iconPixels.Length);
+            int heightInPixels = iconData.Height;
+            int widthInBytes = iconData.Width * bytesPerPixel;
+
+            int[] totalPixel = { 0, 0, 0, 0 };
+            for (int y = 0; y < heightInPixels; y++)
+            {
+                int currentLine = y * iconData.Stride;
+                for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
+                {
+                    totalPixel[3] += iconPixels[currentLine + x];     //B
+                    totalPixel[2] += iconPixels[currentLine + x + 1]; //G
+                    totalPixel[1] += iconPixels[currentLine + x + 2]; //R
+                    totalPixel[0] += iconPixels[currentLine + x + 3]; //A
+                }
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                totalPixel[i] /= (byteCount / bytesPerPixel);
+                totalPixel[i] = Math.Min(totalPixel[i], 255);
+            }
+            icon.UnlockBits(iconData);
+
+            return Color.FromArgb(totalPixel[0], totalPixel[1], totalPixel[2], totalPixel[3]);
+        }
+
+        private const int iconBorder = 1; //border is drawn on a new layer as 
+        public static Bitmap AddBorder(Bitmap icon)
+        {
+            Bitmap canvas = new Bitmap(icon.Width, icon.Height, icon.PixelFormat);
+            BitmapData iconData = icon.LockBits(new Rectangle(0, 0, icon.Width, icon.Height), ImageLockMode.ReadOnly, icon.PixelFormat);
+            BitmapData canvasData = canvas.LockBits(new Rectangle(0, 0, icon.Width, icon.Height), ImageLockMode.WriteOnly, icon.PixelFormat);
+            int bytesPerPixel = Bitmap.GetPixelFormatSize(icon.PixelFormat) / 8; //same for both
+            int byteCount = iconData.Stride * icon.Height; //same for both
+            byte[] iconPixels = new byte[byteCount];
+            byte[] canvasPixels = new byte[byteCount];
+
+            IntPtr ptrFirstPixel = iconData.Scan0;
+            Marshal.Copy(ptrFirstPixel, iconPixels, 0, iconPixels.Length);
+            int heightInPixels = iconData.Height;
+            int widthInBytes = iconData.Width * bytesPerPixel;
+
+            for (int y = iconBorder; y < heightInPixels - iconBorder; y++)
+            {
+                int currentLine = y * iconData.Stride;
+                for (int x = iconBorder * bytesPerPixel; x < widthInBytes - iconBorder * bytesPerPixel; x += bytesPerPixel)
+                {
+                    if(iconPixels[currentLine + x + 3] > 11) //check if A >= 10
+                    {
+                        for (int iy = -iconBorder; iy <= iconBorder; iy++)
+                        {
+                            for (int ix = -iconBorder * bytesPerPixel; ix <= iconBorder * bytesPerPixel; ix += bytesPerPixel)
+                            {
+                                int currentCanvasIndex = currentLine + iy * iconData.Stride + x + ix;
+                                canvasPixels[currentCanvasIndex] = 64;
+                                canvasPixels[currentCanvasIndex + 1] = 64;
+                                canvasPixels[currentCanvasIndex + 2] = 64;
+                                canvasPixels[currentCanvasIndex + 3] = 64;
+                            }
+                        }
+                    }
+                }
+            }
+            ptrFirstPixel = canvasData.Scan0;
+            Marshal.Copy(canvasPixels, 0, ptrFirstPixel, canvasPixels.Length);
+            icon.UnlockBits(iconData);
+            canvas.UnlockBits(canvasData);
+
+            //draw the processed icon (singluar) onto the main canvas
+            using (Graphics g = Graphics.FromImage(canvas))
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImageUnscaled(icon, 0, 0);
+            }
+
+            return canvas;
         }
     }
 }

@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataTypes\Assembler.cs" />
+    <Compile Include="DataTypes\DataObjectBase.cs" />
     <Compile Include="DataTypes\Technology.cs" />
     <Compile Include="Forms\DirectoryChooserForm.cs">
       <SubType>Form</SubType>

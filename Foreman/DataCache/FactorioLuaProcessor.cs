@@ -456,8 +456,8 @@ namespace Foreman
             {
                 return;
             }
-            Item newItem = new Item(name);
-            newItem.Icon = GetIcon(values);
+            Item newItem = new Item(name, "");
+            newItem.SetIconAndColor(GetIconAndColor(values));
 
             if (!Items.ContainsKey(name))
             {
@@ -508,7 +508,7 @@ namespace Foreman
                     return;
                 }
 
-                Recipe newRecipe = new Recipe(name);
+                Recipe newRecipe = new Recipe(name, "");
                 newRecipe.Time = (time == 0.0f) ? defaultRecipeTime : time;
                 foreach (KeyValuePair<Item, float> kvp in ingredients)
                     newRecipe.Ingredients.Add(kvp.Key, kvp.Value);
@@ -522,7 +522,7 @@ namespace Foreman
                     if (newRecipe.Name.StartsWith("empty-") || newRecipe.Name.StartsWith("fill-"))
                         return;
                 }
-                newRecipe.Icon = GetIcon(values);
+                newRecipe.SetIconAndColor(GetIconAndColor(values));
 
                 foreach (Item result in results.Keys)
                     result.ProductionRecipes.Add(newRecipe);
@@ -715,7 +715,7 @@ namespace Foreman
             Item newItem;
             if (!Items.ContainsKey(itemName))
             {
-                Items.Add(itemName, newItem = new Item(itemName));
+                Items.Add(itemName, newItem = new Item(itemName, ""));
             }
             else
             {
@@ -729,7 +729,7 @@ namespace Foreman
             try
             {
                 Assembler newAssembler = new Assembler(name);
-                newAssembler.Icon = GetIcon(values);
+                newAssembler.Icon = GetIconAndColor(values).Icon;
 
                 // 0.17 compat, ingredient_count no longer required
                 newAssembler.MaxIngredients = GetLuaValueOrDefault<int>(values, "ingredient_count", true, 10);
@@ -780,7 +780,7 @@ namespace Foreman
             {
                 Assembler newFurnace = new Assembler(name);
 
-                newFurnace.Icon = GetIcon(values);
+                newFurnace.Icon = GetIconAndColor(values).Icon;
                 newFurnace.MaxIngredients = 1;
                 newFurnace.ModuleSlots = GetLuaValueOrDefault<int>(values, "module_slots", true, 0);
                 if (newFurnace.ModuleSlots == 0)
@@ -829,7 +829,7 @@ namespace Foreman
             {
                 Miner newMiner = new Miner(name);
 
-                newMiner.Icon = GetIcon(values);
+                newMiner.Icon = GetIconAndColor(values).Icon;
                 // 0.17 compat, mining_power no longer required
                 newMiner.MiningPower = GetLuaValueOrDefault<float>(values, "mining_power", true, 1);
                 newMiner.Speed = GetLuaValueOrDefault<float>(values, "mining_speed");
@@ -1047,7 +1047,7 @@ namespace Foreman
             }
         }
 
-        private Bitmap GetIcon(LuaTable values)
+        private IconColorPair GetIconAndColor(LuaTable values)
         {
             string fileName = GetLuaValueOrDefault<string>(values, "icon", true);
             int defaultIconSize = GetLuaValueOrDefault<int>(values, "icon_size", true, 0);
@@ -1116,7 +1116,7 @@ namespace Foreman
                     }
                 }
             }
-            return IconProcessor.GetIcon(mIconInfo, iconInfos);
+            return IconProcessor.GetIconAndColor(mIconInfo, iconInfos);
         }
 
     }

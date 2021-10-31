@@ -191,19 +191,6 @@ namespace Foreman
 			return node;
 		}
 
-        //If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
-        private float ValidateRecipeRate(float amount)
-		{
-			if (Graph.SelectedAmountType == AmountType.FixedAmount)
-			{
-				return (float)Math.Ceiling(Math.Round(amount, RoundingDP)); //Subtracting a very small number stops the amount from getting rounded up due to FP errors. It's a bit hacky but it works for now.
-			}
-			else
-			{
-				return (float)Math.Round(amount, RoundingDP);
-			}
-		}
-
 		public override string DisplayName
 		{
 			get { return BaseRecipe.FriendlyName; }
@@ -223,36 +210,23 @@ namespace Foreman
 			info.AddValue("RateType", rateType);
 			info.AddValue("ActualRate", actualRate);
             if (rateType == RateType.Manual)
-            {
                 info.AddValue("DesiredRate", desiredRate);
-            }
 			if (Assembler != null)
-			{
 				info.AddValue("Assembler", Assembler.Name);
-			}
 			NodeModules.GetObjectData(info, context);
-
 		}
 
 		public override float GetConsumeRate(Item item)
         {
-			if (BaseRecipe.IsMissingRecipe
-				|| !BaseRecipe.Ingredients.ContainsKey(item))
-			{
+			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.Ingredients.ContainsKey(item))
 				return 0f;
-			}
-
 			return (float)Math.Round(BaseRecipe.Ingredients[item] * actualRate, RoundingDP);
         }
 
         public override float GetSupplyRate(Item item)
         {
-			if (BaseRecipe.IsMissingRecipe
-				|| !BaseRecipe.Results.ContainsKey(item))
-			{
+			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.Results.ContainsKey(item))
 				return 0f;
-			}
-
 			return (float)Math.Round(BaseRecipe.Results[item] * actualRate * ProductivityMultiplier(), RoundingDP);
         }
 

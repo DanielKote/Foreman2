@@ -167,7 +167,7 @@ namespace Foreman
 				if (enabledRecipeListChanged && ParentForm is MainForm mForm)
 				{
 					mForm.ItemListRequiresUpdate = true;
-					mForm.LoadItemList();
+					mForm.UpdateVisibleItemList();
 				}
 
 				left = true;

@@ -62,7 +62,7 @@ namespace Foreman
         public static Dictionary<String, Exception> failedFiles = new Dictionary<string, Exception>();
         public static Dictionary<String, Exception> failedPathDirectories = new Dictionary<string, Exception>();
  
-        public static Bitmap UnknownIcon;
+        public static Bitmap UnknownIcon { get { return IconProcessor.GetUnknownIcon(); } }
 
         private static Dictionary<String, byte[]> zipHashes = new Dictionary<string, byte[]>();
         private static GenerationType GetGenerationType() { return (GenerationType)(Settings.Default.GenerationType); }
@@ -88,6 +88,8 @@ namespace Foreman
             Tuple.Create(VersionOperator.EqualTo.Token(), VersionOperator.EqualTo)
         };
 
+        public static event EventHandler DataLoaded;
+
         internal static async Task LoadAllData(IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
         {
             await Task.Run(() =>
@@ -99,7 +101,6 @@ namespace Foreman
                 FindAllMods(progress, ctoken, 0, 15); //gets mod enable status from Properties.Settings.Default
                 LoadAllLanguages();
                 LoadLocaleFiles(Properties.Settings.Default.Language);
-                UnknownIcon = IconProcessor.GetUnknownIcon();
 
                 JObject jsonData;
                 int jsonStartingPercent = 15;
@@ -146,10 +147,13 @@ namespace Foreman
 
                 progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes"));
                 MarkCyclicRecipes();
+                progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
                 CheckRecipesAssemblerStatus();
                 ReportErrors();
-                progress.Report(new KeyValuePair<int, string>(100, "Done!"));
             });
+
+            DataLoaded?.Invoke(null, EventArgs.Empty);
+            progress.Report(new KeyValuePair<int, string>(100, "Done!"));
         }
 
         public static void Clear()

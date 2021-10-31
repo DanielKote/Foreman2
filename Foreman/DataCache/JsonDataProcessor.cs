@@ -145,7 +145,7 @@ namespace Foreman
             progress.Report(new KeyValuePair<int, string>(endingPercent, ""));
         }
 
-        private Bitmap ProcessIcon(JToken iconInfoJToken)
+        private IconColorPair ProcessIcon(JToken iconInfoJToken)
         {
             string mainIconPath = (string)iconInfoJToken["icon"];
             int defaultIconSize = (int)iconInfoJToken["icon_size"];
@@ -163,14 +163,14 @@ namespace Foreman
                 picon.SetIconTint((double)iconJToken["tint"][3], (double)iconJToken["tint"][0], (double)iconJToken["tint"][1], (double)iconJToken["tint"][2]);
                 iicons.Add(picon);
             }
-            return IconProcessor.GetIcon(iicon, iicons);
+            return IconProcessor.GetIconAndColor(iicon, iicons);
         }
 
         private void ProcessTechnology(JToken objJToken)
         {
             Technology technology = new Technology((string)objJToken["name"]);
             technology.LName = (string)objJToken["localised_name"];
-            technology.Icon = ProcessIcon(objJToken["icon_info"]);
+            technology.Icon = ProcessIcon(objJToken["icon_info"]).Icon;
             Technologies.Add(technology.Name, technology);
         }
 
@@ -193,29 +193,26 @@ namespace Foreman
 
         private void ProcessItem(JToken objJToken)
         {
-            Item item = new Item((string)objJToken["name"]);
-            item.LName = (string)objJToken["localised_name"];
-            item.Icon = ProcessIcon(objJToken["icon_info"]);
+            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"]);
+            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
             Items.Add(item.Name, item);
         }
 
         private void ProcessFluid(JToken objJToken)
         {
-            Item item = new Item((string)objJToken["name"]);
-            item.LName = (string)objJToken["localised_name"];
+            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"]);
             item.Temperature = (double)objJToken["default_temperature"];
-            item.Icon = ProcessIcon(objJToken["icon_info"]);
+            item.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
             Items.Add(item.Name, item);
         }
 
         private void ProcessRecipe(JToken objJToken)
         {
-            Recipe recipe = new Recipe((string)objJToken["name"]);
-            recipe.LName = (string)objJToken["localised_name"];
+            Recipe recipe = new Recipe((string)objJToken["name"], (string)objJToken["localised_name"]);
             recipe.Time = (float)objJToken["energy"] > 0 ? (float)objJToken["energy"] : defaultRecipeTime;
             recipe.Category = (string)objJToken["category"];
             recipe.IsAvailableAtStart = (bool)objJToken["enabled"];
-            recipe.Icon = ProcessIcon(objJToken["icon_info"]);
+            recipe.SetIconAndColor(ProcessIcon(objJToken["icon_info"]));
             Recipes.Add(recipe.Name, recipe);
         }
         private void ProcessRecipeProducts(JToken objJToken)
@@ -259,8 +256,7 @@ namespace Foreman
                         FluidDuplicants[name].Add(fluidName);
 
                         Item defaultFluid = Items[name];
-                        Item newFluid = new Item(fluidName);
-                        newFluid.LName = defaultFluid.LName + " (" + temp + "*)";
+                        Item newFluid = new Item(fluidName, defaultFluid.LName + " (" + temp + "*)");
                         newFluid.Temperature = temp;
                         newFluid.Icon = defaultFluid.Icon;
 
@@ -304,10 +300,9 @@ namespace Foreman
 
                     for (int j = 0; j < baseRecipeCount; j++)
                     {
-                        Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1));
+                        Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1), recipes[j].LName);
                         newRecipe.Category = recipes[j].Category;
                         newRecipe.Enabled = recipes[j].Enabled;
-                        newRecipe.LName = recipes[j].LName;
                         newRecipe.Time = recipes[j].Time;
                         newRecipe.Icon = recipes[j].Icon;
 
@@ -347,7 +342,7 @@ namespace Foreman
             assembler.Speed = (float)objJToken["crafting_speed"];
             assembler.MaxIngredients = (int)objJToken["ingredient_count"];
             assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
-            assembler.Icon = ProcessIcon(objJToken["icon_info"]);
+            assembler.Icon = ProcessIcon(objJToken["icon_info"]).Icon;
 
             foreach (var categoryJToken in objJToken["crafting_categories"])
                 assembler.Categories.Add((string)categoryJToken);
@@ -363,7 +358,7 @@ namespace Foreman
             miner.LName = (string)objJToken["localised_name"];
             miner.MiningPower = (float)objJToken["mining_speed"];
             miner.ModuleSlots = (int)objJToken["module_inventory_size"];
-            miner.Icon = ProcessIcon(objJToken["icon_info"]);
+            miner.Icon = ProcessIcon(objJToken["icon_info"]).Icon;
 
             foreach (var categoryJToken in objJToken["resource_categories"])
                 miner.ResourceCategories.Add((string)categoryJToken);

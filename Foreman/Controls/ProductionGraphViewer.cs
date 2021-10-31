@@ -1063,7 +1063,7 @@ namespace Foreman
 				{
 					if (!DataCache.Items.ContainsKey(iItem))
 					{
-						Item missingItem = new Item(iItem);
+						Item missingItem = new Item(iItem, iItem);
 						missingItem.IsMissingItem = true;
 						DataCache.MissingItems.Add(missingItem.Name, missingItem);
 					}
@@ -1097,8 +1097,7 @@ namespace Foreman
 
 						if (!DataCache.MissingRecipes.ContainsKey(recipeName))
 						{
-							Recipe missingRecipe = new Recipe(recipeName);
-							missingRecipe.IsMissingRecipe = true;
+							Recipe missingRecipe = new Recipe(recipeName, recipeName);
 							foreach (string ingredient in ingredients)
 							{
 								if (DataCache.Items.ContainsKey(ingredient))
