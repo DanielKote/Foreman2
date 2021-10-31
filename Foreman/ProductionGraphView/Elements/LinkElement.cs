@@ -8,13 +8,13 @@ namespace Foreman
 {
 	public class LinkElement : BaseLinkElement
 	{
-		public NodeLink DisplayedLink { get; private set; }
+		public ReadOnlyNodeLink DisplayedLink { get; private set; }
 		public override Item Item { get { return DisplayedLink.Item; } protected set { } }
 
 		public ItemTabElement SupplierTab { get; protected set; }
 		public ItemTabElement ConsumerTab { get; protected set; }
 
-		public LinkElement(ProductionGraphViewer graphViewer, NodeLink displayedLink, BaseNodeElement supplierElement, BaseNodeElement consumerElement) : base(graphViewer)
+		public LinkElement(ProductionGraphViewer graphViewer, ReadOnlyNodeLink displayedLink, BaseNodeElement supplierElement, BaseNodeElement consumerElement) : base(graphViewer)
 		{
 			if (supplierElement == null || consumerElement == null)
 				Trace.Fail("Link element being created with one of the connected elements being null!");

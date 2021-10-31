@@ -532,6 +532,7 @@ namespace Foreman
 					IRScrollBar.Visible = false;
 					FilterTextBox.Visible = false;
 					FilterLabel.Visible = false;
+					RecipeNameOnlyFilterCheckBox.Visible = false;
 					ShowHiddenCheckBox.Visible = false;
 					IgnoreAssemblerCheckBox.Visible = false;
 					ItemIconPanel.Location = new Point(4, 4);

@@ -33,13 +33,14 @@ namespace Foreman
 
 		public DataCache DCache { get; set; }
 		public ProductionGraph Graph { get; private set; }
-		public Grid Grid { get; private set; }
+		public GridManager Grid { get; private set; }
 		public FloatingTooltipRenderer ToolTipRenderer { get; private set; }
+		public PointingArrowRenderer ArrowRenderer { get; private set; }
 
 		public GraphElement MouseDownElement { get; set; }
 
-		public IReadOnlyDictionary<BaseNode, BaseNodeElement> NodeElementDictionary { get { return nodeElementDictionary; } }
-		public IReadOnlyDictionary<NodeLink, LinkElement> LinkElementDictionary { get { return linkElementDictionary; } }
+		public IReadOnlyDictionary<ReadOnlyBaseNode, BaseNodeElement> NodeElementDictionary { get { return nodeElementDictionary; } }
+		public IReadOnlyDictionary<ReadOnlyNodeLink, LinkElement> LinkElementDictionary { get { return linkElementDictionary; } }
 
 		public IReadOnlyCollection<BaseNodeElement> SelectedNodes { get { return selectedNodes; } }
 
@@ -50,9 +51,9 @@ namespace Foreman
 		private static readonly Pen pausedBorders = new Pen(Color.FromArgb(255, 80, 80), 5);
 		private static readonly Pen selectionPen = new Pen(Color.FromArgb(100, 100, 200), 2);
 
-		private Dictionary<BaseNode, BaseNodeElement> nodeElementDictionary;
+		private Dictionary<ReadOnlyBaseNode, BaseNodeElement> nodeElementDictionary;
 		private List<BaseNodeElement> nodeElements;
-		private Dictionary<NodeLink, LinkElement> linkElementDictionary;
+		private Dictionary<ReadOnlyNodeLink, LinkElement> linkElementDictionary;
 		private List<LinkElement> linkElements;
 		private DraggedLinkElement draggedLinkElement;
 
@@ -96,13 +97,13 @@ namespace Foreman
 			Graph.LinkDeleted += Graph_LinkDeleted;
 			Graph.NodeValuesUpdated += Graph_NodeValuesUpdated;
 
-			Grid = new Grid();
-
+			Grid = new GridManager();
 			ToolTipRenderer = new FloatingTooltipRenderer(this);
+			ArrowRenderer = new PointingArrowRenderer(this);
 
-			nodeElementDictionary = new Dictionary<BaseNode, BaseNodeElement>();
+			nodeElementDictionary = new Dictionary<ReadOnlyBaseNode, BaseNodeElement>();
 			nodeElements = new List<BaseNodeElement>();
-			linkElementDictionary = new Dictionary<NodeLink, LinkElement>();
+			linkElementDictionary = new Dictionary<ReadOnlyNodeLink, LinkElement>();
 			linkElements = new List<LinkElement>();
 
 			selectedNodes = new HashSet<BaseNodeElement>();
@@ -190,7 +191,7 @@ namespace Foreman
 			}
 
 			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
-			BaseNode newNode = null;
+			ReadOnlyBaseNode newNode = null;
 			int lastNodeWidth = 0;
 			recipeChooser.RecipeRequested += (o, recipeRequestArgs) =>
 			 {
@@ -206,7 +207,7 @@ namespace Foreman
 						 newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
 						 break;
 					 case NodeType.Recipe:
-						 RecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
+						 ReadOnlyRecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
 						 newNode = rNode;
 						 if ((nNodeType == NewNodeType.Consumer && !recipeRequestArgs.Recipe.IngredientSet.ContainsKey(baseItem)) || (nNodeType == NewNodeType.Supplier && !recipeRequestArgs.Recipe.ProductSet.ContainsKey(baseItem))) 
 						 {
@@ -227,15 +228,16 @@ namespace Foreman
 							 }
 							 List<Assembler> assemblerOptions = Graph.AssemblerSelector.GetOrderedAssemblerList(recipeRequestArgs.Recipe, style);
 
+							 RecipeNodeController controller = (RecipeNodeController)Graph.RequestNodeController(rNode);
 							 if(nNodeType == NewNodeType.Consumer)
 							 {
-								 rNode.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem)));
-								 rNode.SetFuel(baseItem);
+								 controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem)));
+								 controller.SetFuel(baseItem);
 							 }
 							 else // if(nNodeType == NewNodeType.Supplier)
 							 {
-								 rNode.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem.FuelOrigin)));
-								 rNode.SetFuel(baseItem.FuelOrigin);
+								 controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem.FuelOrigin)));
+								 controller.SetFuel(baseItem.FuelOrigin);
 							 }
 						 }
 						 break;
@@ -248,28 +250,25 @@ namespace Foreman
 				 lastNodeWidth = newNodeElement.Width; //effectively: this recipe width
 				 if (offsetDistance > 0)
 					 offsetDistance += (lastNodeWidth / 2) + 12;
+				 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), newLocation.Y);
 				 if (offsetLocationToItemTabLevel)
-					 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y + (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0)));
+					Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, Grid.AlignToGrid(newLocation.Y + (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0))));
 				 else
-					 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y));
-
-				 newNode.Location = newLocation;
-				 Invalidate();
+					Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, newLocation.Y));
 
 				 if (nNodeType == NewNodeType.Consumer)
 					 Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
 				 else if (nNodeType == NewNodeType.Supplier)
 					 Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
 
-				 Graph.UpdateNodeStates();
+				 DisposeLinkDrag();
 				 Graph.UpdateNodeValues();
 			 };
 
 			recipeChooser.PanelClosed += (o, e) =>
 			{
-				DisposeLinkDrag();
-				Invalidate();
 				SubwindowOpen = false;
+				Invalidate();
 			};
 
 			recipeChooser.Show();
@@ -285,7 +284,6 @@ namespace Foreman
 				foreach (BaseNodeElement node in selectedNodes)
 					Graph.DeleteNode(node.DisplayedNode);
 				selectedNodes.Clear();
-				Graph.UpdateNodeStates();
 				Graph.UpdateNodeValues();
 			}
 		}
@@ -314,14 +312,20 @@ namespace Foreman
 
 			//open up the edit panel
 			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y), this, true, false);
-			fttc.Closing += (s, e) => { SubwindowOpen = false; bNodeElement.Update(); Graph.UpdateNodeValues(); };
+			fttc.Closing += (s, e) =>
+			{
+				SubwindowOpen = false;
+				//bNodeElement.Update();
+				Graph.UpdateNodeValues();
+			};
 		}
 
 		public void EditRecipeNode(RecipeNodeElement rNodeElement)
 		{
 			SubwindowOpen = true;
-			Control editPanel = new EditRecipePanel((RecipeNode)rNodeElement.DisplayedNode, this);
-			RecipePanel recipePanel = new RecipePanel(new Recipe[] { ((RecipeNode)rNodeElement.DisplayedNode).BaseRecipe });
+			ReadOnlyRecipeNode rNode = (ReadOnlyRecipeNode)rNodeElement.DisplayedNode;
+			Control editPanel = new EditRecipePanel(rNode, this);
+			RecipePanel recipePanel = new RecipePanel(new Recipe[] { rNode.BaseRecipe });
 
 			if (LockedRecipeEditPanelPosition)
 			{
@@ -392,7 +396,7 @@ namespace Foreman
 		public void AlignSelected()
 		{
 			foreach (BaseNodeElement ne in selectedNodes)
-				ne.Location = Grid.AlignToGrid(ne.Location);
+				ne.SetLocation(Grid.AlignToGrid(ne.Location));
 			Invalidate();
 		}
 
@@ -451,9 +455,9 @@ namespace Foreman
 				double fluidMax = 0;
 				foreach (LinkElement element in linkElements)
 				{
-					if (element.Item.IsFluid)
+					if (element.Item.IsFluid && !element.Item.Name.StartsWith("§§")) //§§ is the foreman added special items (currently just §§heat). ignore them
 						fluidMax = Math.Max(fluidMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
-					else if (element.Item.Name != "§§heat") //ignore heat as an item	
+					else
 						itemMax = Math.Max(itemMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
 				}
 				itemMax += itemMax == 0 ? 1 : 0;
@@ -484,6 +488,9 @@ namespace Foreman
 
 			//everything below will be drawn directly on the screen instead of scaled/shifted based on graph
 			graphics.ResetTransform();
+
+			//warning/error arrows
+			ArrowRenderer.Paint(graphics, Graph);
 
 			//floating tooltips
 			ToolTipRenderer.Paint(graphics, TooltipsEnabled && !SubwindowOpen && currentDragOperation == DragOperation.None && !viewBeingDragged);
@@ -534,14 +541,14 @@ namespace Foreman
 		private void Graph_NodeAdded(object sender, NodeEventArgs e)
 		{
 			BaseNodeElement element = null;
-			if (e.node is SupplierNode)
-				element = new SupplierNodeElement(this, e.node);
-			else if (e.node is ConsumerNode)
-				element = new ConsumerNodeElement(this, e.node);
-			else if (e.node is PassthroughNode)
-				element = new PassthroughNodeElement(this, e.node);
-			else if (e.node is RecipeNode)
-				element = new RecipeNodeElement(this, e.node);
+			if (e.node is ReadOnlySupplierNode snode)
+				element = new SupplierNodeElement(this, snode);
+			else if (e.node is ReadOnlyConsumerNode cnode)
+				element = new ConsumerNodeElement(this, cnode);
+			else if (e.node is ReadOnlyPassthroughNode pnode)
+				element = new PassthroughNodeElement(this, pnode);
+			else if (e.node is ReadOnlyRecipeNode rnode)
+				element = new RecipeNodeElement(this, rnode);
 			else
 				Trace.Fail("Unexpected node type created in graph.");
 
@@ -701,7 +708,7 @@ namespace Foreman
 						Point endPoint = MouseDownElement.Location;
 						if (startPoint != endPoint)
 							foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
-								node.Location = new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y);
+								node.SetLocation(new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y));
 
 					}
 					else //dragging single item
@@ -775,7 +782,7 @@ namespace Foreman
 
 					Graph.SerializeNodeIdSet = new HashSet<int>();
 					foreach (BaseNodeElement selectedNode in selectedNodes)
-						Graph.SerializeNodeIdSet.Add(selectedNode.ID);
+						Graph.SerializeNodeIdSet.Add(selectedNode.DisplayedNode.NodeID);
 					serialiser.Serialize(writer, Graph);
 					Graph.SerializeNodeIdSet.Clear();
 					Graph.SerializeNodeIdSet = null;
@@ -814,7 +821,7 @@ namespace Foreman
 					Point mousePos = ScreenToGraph(PointToClient(Cursor.Position));
 					Size offset = (Size)Grid.AlignToGrid(Point.Subtract(mousePos, (Size)importCenter));
 					foreach (ReadOnlyBaseNode newNode in newNodeCollection.newNodes)
-						Graph.RequestNodeController(newNode).Location = Point.Add(newNode.Location, offset);
+						Graph.RequestNodeController(newNode).SetLocation(Point.Add(newNode.Location, offset));
 
 					//update the selection to be just the newly imported nodes
 					ClearSelection();
@@ -880,25 +887,25 @@ namespace Foreman
 			if ((keyData & Keys.KeyCode) == Keys.Left)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
-					node.Location = new Point(node.X - moveUnit, node.Y);
+					node.SetLocation(new Point(node.X - moveUnit, node.Y));
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Right)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
-					node.Location = new Point(node.X + moveUnit, node.Y);
+					node.SetLocation(new Point(node.X + moveUnit, node.Y));
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Up)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
-					node.Location = new Point(node.X, node.Y - moveUnit);
+					node.SetLocation(new Point(node.X, node.Y - moveUnit));
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Down)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
-					node.Location = new Point(node.X, node.Y + moveUnit);
+					node.SetLocation(new Point(node.X, node.Y + moveUnit));
 				processed = true;
 			}
 

@@ -30,11 +30,13 @@ namespace Foreman
 		private Pen borderPen;
 		private string text = "";
 
-		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) //item tab is always to be owned by a node
-			: base(graphViewer, node)
+		private readonly ReadOnlyBaseNode DisplayedNode;
+
+		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) : base(graphViewer, node)
 		{
 			RightClickMenu = new ContextMenu();
 
+			DisplayedNode = node.DisplayedNode;
 			this.Item = item;
 			this.LinkType = type;
 
@@ -96,14 +98,19 @@ namespace Foreman
 			TooltipInfo tti = new TooltipInfo();
 			BaseNodeElement parentNode = (BaseNodeElement)myParent;
 
-			if (parentNode.DisplayedNode is RecipeNode rNode)
-				tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(Item);
+			if (parentNode.DisplayedNode is ReadOnlyRecipeNode rNode)
+			{
+				if(LinkType == LinkType.Input)
+					tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(Item);
+				else //if(LinkType == LinkType.Output)
+					tti.Text = rNode.BaseRecipe.GetProductFriendlyName(Item);
+			}
 			else if (!Item.IsTemperatureDependent)
 				tti.Text = Item.FriendlyName;
 			else
 			{
 				fRange tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, (LinkType == LinkType.Input) ? LinkType.Output : LinkType.Input); //input type tab means output of connection link and vice versa
-				if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
+				if (tempRange.Ignore && DisplayedNode is ReadOnlyPassthroughNode)
 					tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType); //if there was no temp range on this side of this throughput node, try to just copy the other side
 				tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
 			}
@@ -125,18 +132,18 @@ namespace Foreman
 		{
 			if (button == MouseButtons.Right)
 			{
-				List<NodeLink> connections = new List<NodeLink>();
+				List<ReadOnlyNodeLink> connections = new List<ReadOnlyNodeLink>();
 				if (LinkType == LinkType.Input)
-					connections.AddRange(((BaseNodeElement)myParent).DisplayedNode.InputLinks.Where(l => l.Item == Item));
+					connections.AddRange(DisplayedNode.InputLinks.Where(l => l.Item == Item));
 				else //if (LinkType == LinkType.Output)
-					connections.AddRange(((BaseNodeElement)myParent).DisplayedNode.OutputLinks.Where(l => l.Item == Item));
+					connections.AddRange(DisplayedNode.OutputLinks.Where(l => l.Item == Item));
 
 
 				RightClickMenu.MenuItems.Clear();
 				RightClickMenu.MenuItems.Add(new MenuItem("Delete connections",
 					new EventHandler((o, e) =>
 					{
-						foreach (NodeLink link in connections)
+						foreach (ReadOnlyNodeLink link in connections)
 							graphViewer.Graph.DeleteLink(link);
 						graphViewer.Graph.UpdateNodeValues();
 					}))

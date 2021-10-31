@@ -113,7 +113,7 @@ namespace Foreman
 
 			string name = item.FriendlyName;
 			if (item.IsTemperatureDependent)
-				name += " (" + ProductTemperatureMap[item].ToString("0") + "°)";
+				name += string.Format(" ({0}°c)", ProductTemperatureMap[item].ToString("0"));
 
 			return name;
 		}

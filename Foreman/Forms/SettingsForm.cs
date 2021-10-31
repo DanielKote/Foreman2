@@ -22,11 +22,14 @@ namespace Foreman
 			public bool ShowRecipeToolTip;
 			public bool LockedRecipeEditPanelPosition;
 
+			public bool ShowErrorArrows;
+			public bool ShowWarningArrows;
+
 			public AssemblerSelector.Style DefaultAssemblerStyle;
 			public ModuleSelector.Style DefaultModuleStyle;
 			
 			public bool DEV_ShowUnavailableItems;
-
+			public bool DEV_UseRecipeBWFilters;
 
 			public SettingsFormOptions(DataCache cache)
 			{
@@ -99,6 +102,8 @@ namespace Foreman
 			NodeCountForSimpleViewInput.Value = options.NodeCountForSimpleView;
 			ShowNodeRecipeCheckBox.Checked = Options.ShowRecipeToolTip;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
+			WarningArrowsCheckBox.Checked = Options.ShowWarningArrows;
+			ErrorArrowsCheckBox.Checked = Options.ShowErrorArrows;
 
 			switch(Options.LevelOfDetail)
 			{
@@ -119,6 +124,7 @@ namespace Foreman
 			ModuleSelectorStyleDropDown.SelectedIndex = (int)Options.DefaultModuleStyle;
 
 			ShowUnavailablesCheckBox.Checked = Options.DEV_ShowUnavailableItems;
+			LoadBarrelingCheckBox.Checked = !Options.DEV_UseRecipeBWFilters;
 
 			//lists
 			LoadUnfilteredLists();
@@ -413,11 +419,14 @@ namespace Foreman
 			Options.DynamicLinkWidth = DynamicLWCheckBox.Checked;
 			Options.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
 			Options.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
+			Options.ShowErrorArrows = ErrorArrowsCheckBox.Checked;
+			Options.ShowWarningArrows = WarningArrowsCheckBox.Checked;
 
 			Options.DefaultAssemblerStyle = (AssemblerSelector.Style)AssemblerSelectorStyleDropDown.SelectedIndex;
 			Options.DefaultModuleStyle = (ModuleSelector.Style)ModuleSelectorStyleDropDown.SelectedIndex;
 
 			Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
+			Options.DEV_UseRecipeBWFilters = !LoadBarrelingCheckBox.Checked;
 		}
 
 		//PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------

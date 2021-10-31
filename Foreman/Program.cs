@@ -20,12 +20,31 @@ namespace Foreman
 		[STAThread]
 		static void Main()
 		{
-			//test7(); return;
+			//test9(); return;
 
 			ErrorLogging.ClearLog();
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
+		}
+
+		public static void test9()
+		{
+			Console.WriteLine(double.PositiveInfinity);
+			Console.WriteLine(double.NegativeInfinity);
+		}
+
+		public static void test8()
+		{
+			Point a = new Point(0, 0);
+			Point b = new Point(100, 20);
+			int c = 25;
+			bool horizontal = true;
+
+			if (horizontal)
+				Console.WriteLine(new Point(a.X + ((b.X - a.X) * (c - a.Y) / (b.Y - a.Y)), c));
+			else
+				Console.WriteLine(new Point(c, a.Y + ((b.Y - a.Y) * (c - a.X) / (b.X - a.X))));
 		}
 
 		public static void test7()

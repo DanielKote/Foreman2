@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	[Serializable]
-	public class NodeLink
+	public class NodeLink : ISerializable
 	{
 		private readonly NodeLinkController controller;
 		public NodeLinkController Controller { get { return controller; } }
@@ -45,7 +45,7 @@ namespace Foreman
 
 	public class ReadOnlyNodeLink
 	{
-		public ReadOnlyBaseNode Supplier { get { return MyLink.ConsumerNode.ReadOnlyNode; } }
+		public ReadOnlyBaseNode Supplier { get { return MyLink.SupplierNode.ReadOnlyNode; } }
 		public ReadOnlyBaseNode Consumer { get { return MyLink.ConsumerNode.ReadOnlyNode; } }
 		public Item Item { get { return MyLink.Item; } }
 		public double Throughput { get { return MyLink.Throughput; } }
@@ -60,12 +60,6 @@ namespace Foreman
 
 	public class NodeLinkController
 	{
-		public ReadOnlyBaseNode Supplier { get; }
-		public ReadOnlyBaseNode Consumer { get; }
-		public Item Item { get; }
-		public double Throughput { get; }
-		public bool IsValid { get; }
-
 		private readonly NodeLink MyLink;
 
 		protected NodeLinkController(NodeLink link) { MyLink = link; }

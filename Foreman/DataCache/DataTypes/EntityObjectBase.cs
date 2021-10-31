@@ -32,7 +32,9 @@ namespace Foreman
 		double EnergyConsumption { get; }
 		double EnergyProduction { get; }
 		double ConsumptionEffectivity { get; }
-		double MaxTemperature { get; } //steam generators
+
+		//steam generators
+		double OperationTemperature { get; }
 
 		double Pollution { get; }
 	}
@@ -61,7 +63,7 @@ namespace Foreman
 		public double EnergyConsumption { get; internal set; }
 		public double EnergyProduction { get; internal set; }
 		public double ConsumptionEffectivity { get; internal set; }
-		public double MaxTemperature { get; internal set; }
+		public double OperationTemperature { get; internal set; }
 
 		public double Pollution { get; internal set; }
 
@@ -83,7 +85,7 @@ namespace Foreman
 			EnergyConsumption = 1000; //default value to prevent issues with missing objects
 			EnergyProduction = 0;
 			ConsumptionEffectivity = 1f;
-			MaxTemperature = double.MaxValue;
+			OperationTemperature = double.MaxValue;
 
 			Pollution = 0;
 		}

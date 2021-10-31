@@ -93,7 +93,6 @@
 			this.GraphViewer.NodeCountForSimpleView = 200;
 			this.GraphViewer.MouseDownElement = null;
 			this.GraphViewer.Name = "GraphViewer";
-			this.GraphViewer.SelectedRateUnit = Foreman.ProductionGraphViewer.RateUnit.Per1Sec;
 			this.GraphViewer.ShowRecipeToolTip = false;
 			this.GraphViewer.Size = new System.Drawing.Size(928, 634);
 			this.GraphViewer.TabIndex = 12;

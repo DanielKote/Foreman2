@@ -143,7 +143,7 @@ namespace Foreman
 		// Constrain a ratio on the output side of a node
 		public void AddOutputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
 		{
-			Debug.Assert(links.All(x => x.Supplier == node));
+			Debug.Assert(links.All(x => x.SupplierNode == node));
 
 			addRatio(node, item, links, rate, EndpointType.SUPPLY);
 		}
@@ -151,7 +151,7 @@ namespace Foreman
 		// Constrain a ratio on the input side of a node
 		public void AddInputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
 		{
-			Debug.Assert(links.All(x => x.Consumer == node));
+			Debug.Assert(links.All(x => x.ConsumerNode == node));
 
 			addRatio(node, item, links, rate, EndpointType.CONSUME);
 		}
@@ -162,7 +162,7 @@ namespace Foreman
 		// Consuming less than is being produced is fine. This represents a backup.
 		public void AddInputLink(BaseNode node, Item item, IEnumerable<NodeLink> links)
 		{
-			Debug.Assert(links.All(x => x.Consumer == node));
+			Debug.Assert(links.All(x => x.ConsumerNode == node));
 
 			// Each item input/output to a recipe has one varible per link. These variables should be
 			// related to one another using one of the other Ratio methods.
@@ -255,7 +255,7 @@ namespace Foreman
 
 		private Variable variableFor(NodeLink inputLink, EndpointType type)
 		{
-			return variableFor(Tuple.Create(inputLink, type), makeName("link", type, inputLink.Consumer.ToString(), inputLink.Item.FriendlyName));
+			return variableFor(Tuple.Create(inputLink, type), makeName("link", type, inputLink.ConsumerNode.ToString(), inputLink.Item.FriendlyName));
 		}
 
 		private string makeName(params object[] components)

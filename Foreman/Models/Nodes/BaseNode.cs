@@ -11,7 +11,7 @@ namespace Foreman
 	public enum NodeState { Clean, Warning, Error }
 
 	[Serializable]
-	public abstract partial class BaseNode
+	public abstract partial class BaseNode : ISerializable
 	{
 		public abstract BaseNodeController Controller { get; }
 		public ReadOnlyBaseNode ReadOnlyNode { get; protected set; }
@@ -20,11 +20,16 @@ namespace Foreman
 
 		public Point Location { get; set; }
 
-		public RateType RateType { get; set; }
+		private RateType rateType;
+		public RateType RateType { get { return rateType; } set { if (rateType != value) { rateType = value; UpdateState(); } } }
+
 		public double ActualRatePerSec { get; private set; }
-		public virtual double DesiredRatePerSec { get; set; }
+
+		private double desiredRatePerSec;
+		public virtual double DesiredRatePerSec { get { return desiredRatePerSec; } set { if (desiredRatePerSec != value) { desiredRatePerSec = value; UpdateState(); } } }
+
 		public double ActualRate { get { return ActualRatePerSec * MyGraph.GetRateMultipler(); } }
-		public double DesiredRate { get { return ActualRatePerSec * MyGraph.GetRateMultipler(); } }
+		public double DesiredRate { get { return DesiredRatePerSec * MyGraph.GetRateMultipler(); } set { DesiredRatePerSec = value / MyGraph.GetRateMultipler(); } }
 
 		public abstract IEnumerable<Item> Inputs { get; }
 		public abstract IEnumerable<Item> Outputs { get; }
@@ -34,43 +39,34 @@ namespace Foreman
 
 		public NodeState State { get; protected set; }
 
-		public event EventHandler<EventArgs> NodeStateChanged;
+		public event EventHandler<EventArgs> NodeStateChanged; //includes node state, as well as any changes that may influence the input/output links (ex: switching fuel, assembler, etc.)
+		public event EventHandler<EventArgs> NodeValuesChanged; //includes actual amount / actual rate changes (ex: graph solved), as well as minor updates (ex:beacon numbers, etc.)
 
 		internal BaseNode(ProductionGraph graph, int nodeID)
 		{
 			MyGraph = graph;
 			NodeID = nodeID;
 
-			RateType = RateType.Auto;
-			DesiredRatePerSec = 0;
+			rateType = RateType.Auto;
+			desiredRatePerSec = 0;
 			Location = new Point(0, 0);
 
 			InputLinks = new List<NodeLink>();
 			OutputLinks = new List<NodeLink>();
-
-			MyGraph.GraphOptionsChanged += Graph_OnOptionsChanged;
-			UpdateState();
 		}
 
 		public bool AllLinksValid { get { return (InputLinks.Count(l => !l.IsValid) + OutputLinks.Count(l => !l.IsValid) == 0); } }
 
-		public virtual bool UpdateState()
+		public virtual void UpdateState()
 		{
-			if (State == NodeState.Clean && !AllLinksValid)
-			{
-				State = NodeState.Error;
-				return true;
-			}
-			return false;
-		}
-
-		private void Graph_OnOptionsChanged(object graph, EventArgs e)
-		{
-			if (UpdateState())
+			NodeState originalState = State;
+			State = AllLinksValid ? NodeState.Clean : NodeState.Error;
+			if (State != originalState)
 				OnNodeStateChanged();
 		}
 
 		protected virtual void OnNodeStateChanged() { NodeStateChanged?.Invoke(this, EventArgs.Empty); }
+		protected virtual void OnNodeValuesChanged() { NodeValuesChanged?.Invoke(this, EventArgs.Empty); }
 
 		public abstract double GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
 		public abstract double GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
@@ -110,20 +106,23 @@ namespace Foreman
 		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
 	}
 
-	public class ReadOnlyBaseNode
+	public abstract class ReadOnlyBaseNode
 	{
-		public int NodeID { get { return MyNode.NodeID; } }
-		public Point Location { get { return MyNode.Location; } }
-		public IEnumerable<Item> Inputs { get { return MyNode.Inputs; } }
-		public IEnumerable<Item> Outputs { get { return MyNode.Outputs; } }
+		public int NodeID => MyNode.NodeID;
+		public Point Location => MyNode.Location;
+		public IEnumerable<Item> Inputs => MyNode.Inputs;
+		public IEnumerable<Item> Outputs => MyNode.Outputs;
 
 		public IEnumerable<ReadOnlyNodeLink> InputLinks { get { foreach (NodeLink nodeLink in MyNode.InputLinks) yield return nodeLink.ReadOnlyLink; } }
 		public IEnumerable<ReadOnlyNodeLink> OutputLinks { get { foreach (NodeLink nodeLink in MyNode.OutputLinks) yield return nodeLink.ReadOnlyLink; } }
 
-		public RateType RateType { get { return MyNode.RateType; } }
-		public double ActualRate { get { return MyNode.ActualRate; } }
-		public double DesiredRate { get { return MyNode.DesiredRate; } }
-		public NodeState State { get { return MyNode.State; } }
+		public RateType RateType => MyNode.RateType;
+		public double ActualRate => MyNode.ActualRate;
+		public double DesiredRate => MyNode.DesiredRate;
+		public NodeState State => MyNode.State;
+
+		public abstract List<string> GetErrors();
+		public abstract List<string> GetWarnings();
 
 		public double GetConsumeRate(Item item) => MyNode.GetConsumeRate(item);
 		public double GetSupplyRate(Item item) => MyNode.GetSupplyRate(item);
@@ -135,17 +134,17 @@ namespace Foreman
 		private readonly BaseNode MyNode;
 
 		public event EventHandler<EventArgs> NodeStateChanged;
+		public event EventHandler<EventArgs> NodeValuesChanged;
 
 		public ReadOnlyBaseNode(BaseNode node)
 		{
 			MyNode = node;
 			MyNode.NodeStateChanged += Node_NodeStateChanged;
+			MyNode.NodeValuesChanged += Node_NodeValuesChanged;
 		}
 
-		private void Node_NodeStateChanged(object sender, EventArgs e)
-		{
-			NodeStateChanged?.Invoke(this, EventArgs.Empty);
-		}
+		private void Node_NodeStateChanged(object sender, EventArgs e) { NodeStateChanged?.Invoke(this, EventArgs.Empty); }
+		private void Node_NodeValuesChanged(object sender, EventArgs e) { NodeValuesChanged?.Invoke(this, EventArgs.Empty); }
 
 		public override string ToString() { return "RO: " + MyNode.ToString(); }
 	}
@@ -153,34 +152,18 @@ namespace Foreman
 
 	public abstract class BaseNodeController
 	{
-		public int NodeID { get { return MyNode.NodeID; } }
-		public Point Location { get { return MyNode.Location; } set { if (MyNode.Location != value) { MyNode.Location = value; } } }
-
-		public IEnumerable<Item> Inputs { get { return MyNode.Inputs; } }
-		public IEnumerable<Item> Outputs { get { return MyNode.Inputs; } }
-
-		public IEnumerable<NodeLinkController> InputLinks { get { foreach (NodeLink link in MyNode.InputLinks) yield return link.Controller; } }
-		public IEnumerable<NodeLinkController> OutputLinks { get { foreach (NodeLink link in MyNode.OutputLinks) yield return link.Controller; } }
-
-		public RateType RateType { get { return MyNode.RateType; } set { if (MyNode.RateType != value) { MyNode.RateType = value; } } }
-
-		public event EventHandler<EventArgs> NodeStateChanged;
-
 		private readonly BaseNode MyNode;
 
 		protected BaseNodeController(BaseNode myNode)
 		{
 			MyNode = myNode;
-			MyNode.NodeStateChanged += MyNode_NodeStateChanged;
 		}
 
-		private void MyNode_NodeStateChanged(object sender, EventArgs e)
-		{
-			NodeStateChanged?.Invoke(this, EventArgs.Empty);
-		}
+		public void SetLocation(Point location) { if(MyNode.Location != location) MyNode.Location = location; }
 
-		public abstract List<string> GetErrors();
-		public abstract List<string> GetWarnings();
+		public void SetRateType(RateType type) { if (MyNode.RateType != type) MyNode.RateType = type; }
+		public virtual void SetDesiredRate(double rate) { if (MyNode.DesiredRate != rate) MyNode.DesiredRate = rate; }
+
 		public abstract Dictionary<string, Action> GetErrorResolutions();
 		public abstract Dictionary<string, Action> GetWarningResolutions();
 
@@ -191,10 +174,11 @@ namespace Foreman
 			{
 				resolutions.Add("Delete invalid links", new Action(() =>
 				{
-					foreach (NodeLinkController invalidLink in InputLinks.Where(l => l.IsValid))
-						invalidLink.Delete();
-					foreach (NodeLinkController invalidLink in OutputLinks.Where(l => l.IsValid))
-						invalidLink.Delete();
+					foreach (NodeLink invalidLink in MyNode.InputLinks.Where(l => !l.IsValid).ToList())
+						MyNode.MyGraph.DeleteLink(invalidLink.ReadOnlyLink);
+					foreach (NodeLink invalidLink in MyNode.OutputLinks.Where(l => !l.IsValid).ToList())
+						MyNode.MyGraph.DeleteLink(invalidLink.ReadOnlyLink);
+					MyNode.UpdateState();
 				}));
 			}
 			return resolutions;

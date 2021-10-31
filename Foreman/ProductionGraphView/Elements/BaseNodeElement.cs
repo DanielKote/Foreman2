@@ -11,11 +11,12 @@ namespace Foreman
 	public abstract class BaseNodeElement : GraphElement
 	{
 		public bool Highlighted = false; //selection - note that this doesnt mean it is or isnt in selection (at least not during drag operation - ex: dragging a not-selection over a group of selected nodes will change their highlight status, but wont add them to the 'selected' set until you let go of the drag)
-		public BaseNode DisplayedNode { get; private set; }
+		public ReadOnlyBaseNode DisplayedNode { get; private set; }
 
-		public override int X { get { return DisplayedNode.Location.X; } set { DisplayedNode.Location = new Point(value, DisplayedNode.Location.Y); } }
-		public override int Y { get { return DisplayedNode.Location.Y; } set { DisplayedNode.Location = new Point(DisplayedNode.Location.X, value); } }
-		public override Point Location { get { return DisplayedNode.Location; } set { DisplayedNode.Location = value; } }
+		public override int X { get { return DisplayedNode.Location.X; } set { Trace.Fail("Base node element location cant be set through X parameter! Use SetLocation(Point)"); } }
+		public override int Y { get { return DisplayedNode.Location.Y; } set { Trace.Fail("Base node element location cant be set through Y parameter! Use SetLocation(Point)"); } }
+		public override Point Location { get { return DisplayedNode.Location; } set { Trace.Fail("Base node element location cant be set through Location parameter! Use SetLocation(Point)"); } }
+		public void SetLocation(Point location) { graphViewer.Graph.RequestNodeController(DisplayedNode).SetLocation(location); }
 
 		protected abstract Brush CleanBgBrush { get; }
 		private static readonly Brush errorBgBrush = Brushes.Coral;
@@ -49,12 +50,17 @@ namespace Foreman
 		private Point MouseDownNodeLocation; //location of this node the moment the mouse click down first happened - in graph coordinates
 		private bool DragStarted;
 
+		private bool NodeStateRequiresUpdate; //these are set by the events called from the node (as well as calling for invalidation). Any paint call checks for these, and if true resets them to false and calls the appropriate update functions
+		private bool NodeValuesRequireUpdate; //this removes the need to manually update the nodes after any change, as well as not spamming update calls after every change (being based on paint refresh - aka: when it actually matters)
+
 		protected ErrorNoticeElement errorNotice;
 
-		public BaseNodeElement(ProductionGraphViewer graphViewer, BaseNode node) : base(graphViewer)
+		public BaseNodeElement(ProductionGraphViewer graphViewer, ReadOnlyBaseNode node) : base(graphViewer)
 		{
 			DisplayedNode = node;
 			DragStarted = false;
+			DisplayedNode.NodeStateChanged += DisplayedNode_NodeStateChanged;
+			DisplayedNode.NodeValuesChanged += DisplayedNode_NodeValuesChanged;
 
 			InputTabs = new List<ItemTabElement>();
 			OutputTabs = new List<ItemTabElement>();
@@ -70,6 +76,9 @@ namespace Foreman
 				OutputTabs.Add(new ItemTabElement(item, LinkType.Output, base.graphViewer, this));
 		}
 
+		private void DisplayedNode_NodeValuesChanged(object sender, EventArgs e) { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
+		private void DisplayedNode_NodeStateChanged(object sender, EventArgs e) { NodeValuesRequireUpdate = true; graphViewer.Invalidate(); }
+
 		public virtual void Update()
 		{
 			//update error notice
@@ -77,13 +86,16 @@ namespace Foreman
 			errorNotice.X = -Width / 2;
 			errorNotice.Y = -Height / 2;
 
+			UpdateTabOrder();
+		}
 
+		public virtual void UpdateValues()
+		{
 			//update tab values
 			foreach (ItemTabElement tab in InputTabs)
 				tab.UpdateValues(DisplayedNode.GetConsumeRate(tab.Item), DisplayedNode.GetSuppliedRate(tab.Item), DisplayedNode.IsOversupplied(tab.Item)); //for inputs we want the consumption/supply/oversupply values
 			foreach (ItemTabElement tab in OutputTabs)
 				tab.UpdateValues(DisplayedNode.GetSupplyRate(tab.Item), 0, false); //for outputs we only care to display the supply rate
-			UpdateTabOrder();
 		}
 
 		private void UpdateTabOrder()
@@ -118,13 +130,13 @@ namespace Foreman
 		private int GetItemTabXHeuristic(ItemTabElement tab)
 		{
 			int total = 0;
-			IEnumerable<NodeLink> links;
+			IEnumerable<ReadOnlyNodeLink> links;
 			if (tab.LinkType == LinkType.Input)
 				links = DisplayedNode.InputLinks.Where(l => l.Item == tab.Item);
 			else //if(tab.Type == LinkType.Output)
 				links = DisplayedNode.OutputLinks.Where(l => l.Item == tab.Item);
 
-			foreach (NodeLink link in links)
+			foreach (ReadOnlyNodeLink link in links)
 			{
 				Point diff = Point.Subtract(link.Supplier.Location, (Size)DisplayedNode.Location);
 				diff.Y = Math.Max(0, diff.Y);
@@ -159,6 +171,14 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, bool simple)
 		{
+			if (NodeStateRequiresUpdate)
+				Update();
+			if(NodeStateRequiresUpdate || NodeValuesRequireUpdate)
+				UpdateValues();
+			NodeStateRequiresUpdate = false;
+			NodeValuesRequireUpdate = false;
+
+
 			Point trans = LocalToGraph(new Point(0, 0)); //all draw operations happen in graph 0,0 origin coordinates. So we need to transform all our draw operations to the local 0,0 (center of object)
 
 			//background
@@ -283,12 +303,12 @@ namespace Foreman
 
 				if (Location != newLocation)
 				{
-					Location = newLocation;
+					SetLocation(newLocation);
 
 					this.UpdateTabOrder();
-					foreach (BaseNode node in DisplayedNode.InputLinks.Select(l => l.Supplier))
+					foreach (ReadOnlyBaseNode node in DisplayedNode.InputLinks.Select(l => l.Supplier))
 						graphViewer.NodeElementDictionary[node].UpdateTabOrder();
-					foreach (BaseNode node in DisplayedNode.OutputLinks.Select(l => l.Consumer))
+					foreach (ReadOnlyBaseNode node in DisplayedNode.OutputLinks.Select(l => l.Consumer))
 						graphViewer.NodeElementDictionary[node].UpdateTabOrder();
 				}
 			}

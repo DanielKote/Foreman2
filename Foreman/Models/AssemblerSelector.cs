@@ -70,9 +70,18 @@ namespace Foreman
 						break;
 				}
 
+				Console.WriteLine("ASSEMBLERS:");
+				foreach (Assembler aa in recipe.Assemblers
+					.OrderByDescending(a => a.Enabled)
+					.ThenByDescending(a => (a.IsBurner && includeBurners) || (!a.IsBurner && includeNonBurners))
+					.ThenByDescending(a => a.Available)
+					.ThenByDescending(a => orderDirection * ((a.Speed * 1000000) + a.ModuleSlots))
+					.ToList())
+					Console.WriteLine(aa);
+
 				return recipe.Assemblers
-					.OrderByDescending(a => (a.IsBurner && includeBurners) || (!a.IsBurner && includeNonBurners))
-					.ThenByDescending(a => a.Enabled)
+					.OrderByDescending(a => a.Enabled)
+					.ThenByDescending(a => (a.IsBurner && includeBurners) || (!a.IsBurner && includeNonBurners))
 					.ThenByDescending(a => a.Available)
 					.ThenByDescending(a => orderDirection * ((a.Speed * 1000000) + a.ModuleSlots))
 					.ToList();

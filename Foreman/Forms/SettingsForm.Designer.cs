@@ -84,6 +84,7 @@
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
 			this.AdvancedOptionsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ShowUnavailablesCheckBox = new System.Windows.Forms.CheckBox();
+			this.LoadBarrelingCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox6 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -105,8 +106,8 @@
 			this.NodeCountForSimpleViewInput = new System.Windows.Forms.NumericUpDown();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
-			this.ScaleAssemblerCountCheckBox = new System.Windows.Forms.CheckBox();
-			this.ScaleItemFlowCheckBox = new System.Windows.Forms.CheckBox();
+			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
+			this.WarningArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -131,7 +132,6 @@
 			this.groupBox7.SuspendLayout();
 			this.AdvancedOptionsTable.SuspendLayout();
 			this.groupBox6.SuspendLayout();
-			this.tableLayoutPanel3.SuspendLayout();
 			this.groupBox5.SuspendLayout();
 			this.DefaultsTable.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -862,9 +862,9 @@
 			this.groupBox7.Controls.Add(this.AdvancedOptionsTable);
 			this.groupBox7.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox7.Location = new System.Drawing.Point(3, 443);
+			this.groupBox7.Location = new System.Drawing.Point(3, 400);
 			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Size = new System.Drawing.Size(464, 42);
+			this.groupBox7.Size = new System.Drawing.Size(464, 85);
 			this.groupBox7.TabIndex = 3;
 			this.groupBox7.TabStop = false;
 			this.groupBox7.Text = "Advanced";
@@ -877,15 +877,16 @@
 			this.AdvancedOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.AdvancedOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.AdvancedOptionsTable.Controls.Add(this.ShowUnavailablesCheckBox, 0, 0);
+			this.AdvancedOptionsTable.Controls.Add(this.LoadBarrelingCheckBox, 0, 1);
 			this.AdvancedOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AdvancedOptionsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.AdvancedOptionsTable.Location = new System.Drawing.Point(3, 16);
 			this.AdvancedOptionsTable.Name = "AdvancedOptionsTable";
-			this.AdvancedOptionsTable.RowCount = 2;
+			this.AdvancedOptionsTable.RowCount = 3;
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.AdvancedOptionsTable.Size = new System.Drawing.Size(458, 23);
+			this.AdvancedOptionsTable.Size = new System.Drawing.Size(458, 66);
 			this.AdvancedOptionsTable.TabIndex = 0;
 			// 
 			// ShowUnavailablesCheckBox
@@ -898,14 +899,24 @@
 			this.ShowUnavailablesCheckBox.Text = "Show unavailable items (DEV)";
 			this.ShowUnavailablesCheckBox.UseVisualStyleBackColor = true;
 			// 
+			// LoadBarrelingCheckBox
+			// 
+			this.LoadBarrelingCheckBox.AutoSize = true;
+			this.LoadBarrelingCheckBox.Location = new System.Drawing.Point(3, 26);
+			this.LoadBarrelingCheckBox.Name = "LoadBarrelingCheckBox";
+			this.LoadBarrelingCheckBox.Size = new System.Drawing.Size(199, 17);
+			this.LoadBarrelingCheckBox.TabIndex = 1;
+			this.LoadBarrelingCheckBox.Text = "Load barreling & crating recipes (DEV)";
+			this.LoadBarrelingCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// groupBox6
 			// 
 			this.groupBox6.Controls.Add(this.tableLayoutPanel3);
 			this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox6.Location = new System.Drawing.Point(3, 241);
+			this.groupBox6.Location = new System.Drawing.Point(3, 287);
 			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(464, 196);
+			this.groupBox6.Size = new System.Drawing.Size(464, 107);
 			this.groupBox6.TabIndex = 2;
 			this.groupBox6.TabStop = false;
 			this.groupBox6.Text = "Time Unit Options:";
@@ -913,18 +924,16 @@
 			// tableLayoutPanel3
 			// 
 			this.tableLayoutPanel3.ColumnCount = 2;
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel3.Controls.Add(this.ScaleAssemblerCountCheckBox, 0, 0);
-			this.tableLayoutPanel3.Controls.Add(this.ScaleItemFlowCheckBox, 0, 1);
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
 			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
 			this.tableLayoutPanel3.RowCount = 2;
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 177);
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 88);
 			this.tableLayoutPanel3.TabIndex = 1;
 			// 
 			// groupBox5
@@ -934,7 +943,7 @@
 			this.groupBox5.Controls.Add(this.DefaultsTable);
 			this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox5.Location = new System.Drawing.Point(3, 146);
+			this.groupBox5.Location = new System.Drawing.Point(3, 192);
 			this.groupBox5.Name = "groupBox5";
 			this.groupBox5.Size = new System.Drawing.Size(464, 89);
 			this.groupBox5.TabIndex = 1;
@@ -1020,7 +1029,7 @@
 			this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(464, 137);
+			this.groupBox3.Size = new System.Drawing.Size(464, 183);
 			this.groupBox3.TabIndex = 0;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Node Graphics:";
@@ -1035,6 +1044,7 @@
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.NodeGraphicsTable.Controls.Add(this.WarningArrowsCheckBox, 0, 6);
 			this.NodeGraphicsTable.Controls.Add(this.HighLodRadioButton, 3, 0);
 			this.NodeGraphicsTable.Controls.Add(this.label6, 0, 0);
 			this.NodeGraphicsTable.Controls.Add(this.MediumLodRadioButton, 2, 0);
@@ -1044,18 +1054,21 @@
 			this.NodeGraphicsTable.Controls.Add(this.DynamicLWCheckBox, 0, 2);
 			this.NodeGraphicsTable.Controls.Add(this.label8, 0, 1);
 			this.NodeGraphicsTable.Controls.Add(this.NodeCountForSimpleViewInput, 1, 1);
+			this.NodeGraphicsTable.Controls.Add(this.ErrorArrowsCheckBox, 0, 5);
 			this.NodeGraphicsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.NodeGraphicsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.NodeGraphicsTable.Location = new System.Drawing.Point(3, 16);
 			this.NodeGraphicsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.NodeGraphicsTable.Name = "NodeGraphicsTable";
-			this.NodeGraphicsTable.RowCount = 5;
+			this.NodeGraphicsTable.RowCount = 7;
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 118);
+			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 164);
 			this.NodeGraphicsTable.TabIndex = 28;
 			// 
 			// HighLodRadioButton
@@ -1196,25 +1209,27 @@
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
 			// 
-			// ScaleAssemblerCountCheckBox
+			// ErrorArrowsCheckBox
 			// 
-			this.ScaleAssemblerCountCheckBox.AutoSize = true;
-			this.ScaleAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 3);
-			this.ScaleAssemblerCountCheckBox.Name = "ScaleAssemblerCountCheckBox";
-			this.ScaleAssemblerCountCheckBox.Size = new System.Drawing.Size(212, 17);
-			this.ScaleAssemblerCountCheckBox.TabIndex = 0;
-			this.ScaleAssemblerCountCheckBox.Text = "Scale fixed factory numbers by time unit";
-			this.ScaleAssemblerCountCheckBox.UseVisualStyleBackColor = true;
+			this.ErrorArrowsCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.ErrorArrowsCheckBox, 4);
+			this.ErrorArrowsCheckBox.Location = new System.Drawing.Point(3, 121);
+			this.ErrorArrowsCheckBox.Name = "ErrorArrowsCheckBox";
+			this.ErrorArrowsCheckBox.Size = new System.Drawing.Size(222, 17);
+			this.ErrorArrowsCheckBox.TabIndex = 14;
+			this.ErrorArrowsCheckBox.Text = "Display arrows pointing to any node errors";
+			this.ErrorArrowsCheckBox.UseVisualStyleBackColor = true;
 			// 
-			// ScaleItemFlowCheckBox
+			// WarningArrowsCheckBox
 			// 
-			this.ScaleItemFlowCheckBox.AutoSize = true;
-			this.ScaleItemFlowCheckBox.Location = new System.Drawing.Point(3, 26);
-			this.ScaleItemFlowCheckBox.Name = "ScaleItemFlowCheckBox";
-			this.ScaleItemFlowCheckBox.Size = new System.Drawing.Size(234, 17);
-			this.ScaleItemFlowCheckBox.TabIndex = 1;
-			this.ScaleItemFlowCheckBox.Text = "Scale fixed item/fluid throughput by time unit";
-			this.ScaleItemFlowCheckBox.UseVisualStyleBackColor = true;
+			this.WarningArrowsCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.WarningArrowsCheckBox, 4);
+			this.WarningArrowsCheckBox.Location = new System.Drawing.Point(3, 144);
+			this.WarningArrowsCheckBox.Name = "WarningArrowsCheckBox";
+			this.WarningArrowsCheckBox.Size = new System.Drawing.Size(238, 17);
+			this.WarningArrowsCheckBox.TabIndex = 15;
+			this.WarningArrowsCheckBox.Text = "Display arrows pointing to any node warnings";
+			this.WarningArrowsCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
@@ -1268,8 +1283,6 @@
 			this.AdvancedOptionsTable.ResumeLayout(false);
 			this.AdvancedOptionsTable.PerformLayout();
 			this.groupBox6.ResumeLayout(false);
-			this.tableLayoutPanel3.ResumeLayout(false);
-			this.tableLayoutPanel3.PerformLayout();
 			this.groupBox5.ResumeLayout(false);
 			this.groupBox5.PerformLayout();
 			this.DefaultsTable.ResumeLayout(false);
@@ -1362,7 +1375,8 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.NumericUpDown NodeCountForSimpleViewInput;
-		private System.Windows.Forms.CheckBox ScaleAssemblerCountCheckBox;
-		private System.Windows.Forms.CheckBox ScaleItemFlowCheckBox;
+		private System.Windows.Forms.CheckBox LoadBarrelingCheckBox;
+		private System.Windows.Forms.CheckBox WarningArrowsCheckBox;
+		private System.Windows.Forms.CheckBox ErrorArrowsCheckBox;
 	}
 }

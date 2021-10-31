@@ -22,17 +22,13 @@ namespace Foreman
 			ReadOnlyNode = new ReadOnlyPassthroughNode(this);
 		}
 
-		public override bool UpdateState()
+		public override void UpdateState()
 		{
 			NodeState oldState = State;
 			State = (PassthroughItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean;
 			base.UpdateState();
 			if (oldState != State)
-			{
 				OnNodeStateChanged();
-				return true;
-			}
-			return false;
 		}
 
 		public override double GetConsumeRate(Item item) { return ActualRate; }
@@ -48,7 +44,6 @@ namespace Foreman
 			info.AddValue("Location", Location);
 			info.AddValue("Item", PassthroughItem.Name);
 			info.AddValue("RateType", RateType);
-			info.AddValue("ActualRate", ActualRatePerSec);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredRate", DesiredRatePerSec);
 		}
@@ -58,28 +53,11 @@ namespace Foreman
 
 	public class ReadOnlyPassthroughNode : ReadOnlyBaseNode
 	{
-		public Item PassthroughItem { get { return MyNode.PassthroughItem; } }
+		public Item PassthroughItem => MyNode.PassthroughItem;
 
 		private readonly PassthroughNode MyNode;
 
 		public ReadOnlyPassthroughNode(PassthroughNode node) : base(node) { MyNode = node; }
-
-	}
-
-	public class PassthroughNodeController : BaseNodeController
-	{
-		public Item PassthroughItem { get { return MyNode.PassthroughItem; } }
-
-		private readonly PassthroughNode MyNode;
-
-		protected PassthroughNodeController(PassthroughNode myNode) : base(myNode) { MyNode = myNode; }
-
-		public static PassthroughNodeController GetController(PassthroughNode node)
-		{
-			if (node.Controller != null)
-				return (PassthroughNodeController)node.Controller;
-			return new PassthroughNodeController(node);
-		}
 
 		public override List<string> GetErrors()
 		{
@@ -91,10 +69,26 @@ namespace Foreman
 			return errors;
 		}
 
+		public override List<string> GetWarnings() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
+	}
+
+	public class PassthroughNodeController : BaseNodeController
+	{
+		private readonly PassthroughNode MyNode;
+
+		protected PassthroughNodeController(PassthroughNode myNode) : base(myNode) { MyNode = myNode; }
+
+		public static PassthroughNodeController GetController(PassthroughNode node)
+		{
+			if (node.Controller != null)
+				return (PassthroughNodeController)node.Controller;
+			return new PassthroughNodeController(node);
+		}
+
 		public override Dictionary<string, Action> GetErrorResolutions()
 		{
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-			if (PassthroughItem.IsMissing)
+			if (MyNode.PassthroughItem.IsMissing)
 				resolutions.Add("Delete node", new Action(() => this.Delete()));
 			else
 				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
@@ -102,7 +96,6 @@ namespace Foreman
 			return resolutions;
 		}
 
-		public override List<string> GetWarnings() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
 		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
 	}
 }

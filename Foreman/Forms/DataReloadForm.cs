@@ -45,7 +45,7 @@ namespace Foreman
 				}
 			}) as IProgress<KeyValuePair<int, string>>;
 
-			createdDataCache = new DataCache();
+			createdDataCache = new DataCache(Properties.Settings.Default.UseRecipeBWfilters);
 			await createdDataCache.LoadAllData(selectedPreset, progress);
 			DialogResult = DialogResult.OK;
 			Close();

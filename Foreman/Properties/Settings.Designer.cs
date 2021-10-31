@@ -226,5 +226,41 @@ namespace Foreman.Properties {
                 this["NodeCountForSimpleView"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseRecipeBWfilters {
+            get {
+                return ((bool)(this["UseRecipeBWfilters"]));
+            }
+            set {
+                this["UseRecipeBWfilters"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowWarningArrows {
+            get {
+                return ((bool)(this["ShowWarningArrows"]));
+            }
+            set {
+                this["ShowWarningArrows"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowErrorArrows {
+            get {
+                return ((bool)(this["ShowErrorArrows"]));
+            }
+            set {
+                this["ShowErrorArrows"] = value;
+            }
+        }
     }
 }

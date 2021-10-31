@@ -141,12 +141,6 @@
     <Compile Include="Controls\EditFlowPanel.Designer.cs">
       <DependentUpon>EditFlowPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\DevNodeOptionsPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\DevNodeOptionsPanel.Designer.cs">
-      <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\IRChooserPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -212,7 +206,6 @@
     <Compile Include="Models\Nodes\ConsumerNode.cs" />
     <Compile Include="Models\Nodes\PassthroughNode.cs" />
     <Compile Include="Models\Nodes\RecipeNode.cs" />
-    <Compile Include="Models\Nodes\Solver\CyclicNodeTester.cs" />
     <Compile Include="Models\Nodes\SupplierNode.cs" />
     <Compile Include="DataCache\DataCache.cs" />
     <Compile Include="Forms\SettingsForm.cs">
@@ -234,17 +227,17 @@
     <Compile Include="ProductionGraphView\Elements\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
     <Compile Include="DataCache\IconCacheProcessor.cs" />
-    <Compile Include="Models\Nodes\Solver\GoogleSolver.cs" />
+    <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
     <Compile Include="ProductionGraphView\Elements\GraphElement.cs" />
-    <Compile Include="Models\Nodes\Solver\GraphOptimisation.cs" />
+    <Compile Include="Models\Solver\GraphOptimisation.cs" />
     <Compile Include="Forms\ImageExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ImageExportForm.Designer.cs">
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionGraphView\Grid.cs" />
+    <Compile Include="ProductionGraphView\GridManager.cs" />
     <Compile Include="ProductionGraphView\Elements\ItemTabElement.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
@@ -255,8 +248,9 @@
     <Compile Include="DataCache\DataTypes\Item.cs" />
     <Compile Include="ProductionGraphView\Elements\LinkElement.cs" />
     <Compile Include="Models\Nodes\BaseNode.cs" />
-    <Compile Include="Models\Nodes\Solver\ProductionSolver.cs" />
+    <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="ProductionGraphView\FloatingTooltipRenderer.cs" />
+    <Compile Include="ProductionGraphView\PointingArrowRenderer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\DataReloadForm.cs">
       <SubType>Form</SubType>
@@ -280,9 +274,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\EditFlowPanel.resx">
       <DependentUpon>EditFlowPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\DevNodeOptionsPanel.resx">
-      <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>

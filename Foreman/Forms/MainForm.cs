@@ -36,9 +36,9 @@ namespace Foreman
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
-				if (!Enum.IsDefined(typeof(ProductionGraphViewer.RateUnit), Properties.Settings.Default.DefaultRateUnit))
-					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraphViewer.RateUnit.Per1Sec;
-				GraphViewer.SelectedRateUnit = (ProductionGraphViewer.RateUnit)Properties.Settings.Default.DefaultRateUnit;
+				if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
+					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
+				GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)Properties.Settings.Default.DefaultRateUnit;
 
 				if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
 					Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
@@ -55,9 +55,11 @@ namespace Foreman
 				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
 
 				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
+				GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
+				GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
 
-				RateOptionsDropDown.Items.AddRange(ProductionGraphViewer.RateUnitNames);
-				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
+				RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
+				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
 				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
@@ -94,7 +96,7 @@ namespace Foreman
 			var writer = new JsonTextWriter(new StreamWriter(dialog.FileName));
 			try
 			{
-				GraphViewer.Graph.SerializeNodeList = null; //we want to save everything.
+				GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
 				serialiser.Serialize(writer, GraphViewer);
 			}
 			catch (Exception exception)
@@ -133,6 +135,11 @@ namespace Foreman
 				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
 			}
 
+			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
+			Properties.Settings.Default.DefaultRateUnit = (int)GraphViewer.Graph.SelectedRateUnit;
+			Properties.Settings.Default.DefaultAssemblerOption = (int)GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
+			Properties.Settings.Default.DefaultModuleOption = (int)GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
+			Properties.Settings.Default.Save();
 			GraphViewer.Invalidate();
 		}
 
@@ -196,7 +203,11 @@ namespace Foreman
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
 			options.DefaultAssemblerStyle = GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
 			options.DefaultModuleStyle = GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
+			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
+			options.ShowErrorArrows = GraphViewer.ArrowRenderer.ShowErrorArrows;
+
 			options.DEV_ShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
+			options.DEV_UseRecipeBWFilters = Properties.Settings.Default.UseRecipeBWfilters;
 
 			using (SettingsForm form = new SettingsForm(options))
 			{
@@ -205,9 +216,11 @@ namespace Foreman
 				form.Top = this.Top + 50;
 				form.ShowDialog();
 
-				if (form.Options.SelectedPreset != options.Presets[0]) //different preset -> need to reload datacache
+				if (options.SelectedPreset != options.Presets[0] || options.DEV_UseRecipeBWFilters != Properties.Settings.Default.UseRecipeBWfilters) //different preset or recipeBWFilter change -> need to reload datacache
 				{
 					Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset.Name;
+					Properties.Settings.Default.UseRecipeBWfilters = options.DEV_UseRecipeBWFilters;
+
 					List<Preset> validPresets = GetValidPresetsList();
 					await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
 				}
@@ -226,6 +239,11 @@ namespace Foreman
 				Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
 				GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
 				Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
+				GraphViewer.ArrowRenderer.ShowWarningArrows = options.ShowWarningArrows;
+				Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
+				GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
+				Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;
+
 				Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
 				Properties.Settings.Default.Save();
 
@@ -260,7 +278,7 @@ namespace Foreman
 		private void RateOptionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			Properties.Settings.Default.DefaultRateUnit = RateOptionsDropDown.SelectedIndex;
-			GraphViewer.SelectedRateUnit = (ProductionGraphViewer.RateUnit)RateOptionsDropDown.SelectedIndex;
+			GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)RateOptionsDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
 			GraphViewer.Graph.UpdateNodeValues();
 		}

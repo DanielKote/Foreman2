@@ -212,8 +212,6 @@ local function ExportEntities()
 			elseif entity.pumping_speed ~= nil then tentity['speed'] = entity.pumping_speed end
 
 			if entity.fluid ~= nil then tentity['fluid_product'] = entity.fluid.name end
-			if entity.maximum_temperature ~= nil then tentity['maximum_temperature'] = entity.maximum_temperature end
-			if entity.target_temperature ~= nil then tentity['target_temperature'] = entity.target_temperature end
 			if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_tick'] = entity.fluid_usage_per_tick end
 
 			if entity.module_inventory_size ~= nil then tentity['module_inventory_size'] =  entity.module_inventory_size end
@@ -258,6 +256,8 @@ local function ExportEntities()
 
 			--fluid boxes for input/output of boiler & generator need to be processed (almost guaranteed to be 'steam' and 'water', but... tests have shown that we can heat up whatever we want)
 			if entity.type == 'boiler' then
+				tentity['target_temperature'] = entity.target_temperature
+
 				if entity.fluidbox_prototypes[1].filter ~= nil then
 					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
 				end
@@ -265,6 +265,14 @@ local function ExportEntities()
 					tentity['fluid_product'] = entity.fluidbox_prototypes[2].filter.name
 				end
 			elseif entity.type == 'generator' then
+				tentity['full_power_temperature'] = entity.maximum_temperature
+
+				if entity.fluidbox_prototypes[1].minimum_temperature ~= nil then
+					tentity['minimum_temperature'] = entity.fluidbox_prototypes[1].minimum_temperature
+				end
+				if entity.fluidbox_prototypes[1].maximum_temperature ~= nil then
+					tentity['maximum_temperature'] = entity.fluidbox_prototypes[1].maximum_temperature
+				end
 				if entity.fluidbox_prototypes[1].filter ~= nil then
 					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
 				end

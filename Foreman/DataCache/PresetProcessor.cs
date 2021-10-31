@@ -38,7 +38,7 @@ namespace Foreman
 			if (!File.Exists(presetPath))
 				return null;
 
-			DataCache presetCache = new DataCache();
+			DataCache presetCache = new DataCache(Properties.Settings.Default.UseRecipeBWfilters);
 			await presetCache.LoadAllData(preset, null, false);
 
 			//compare to provided mod/item/recipe sets (recipes have a chance of existing in multitudes - aka: missing recipes)
@@ -207,7 +207,9 @@ namespace Foreman
 						continue;
 
 					string ingredient = (string)objJToken["fluid_ingredient"];
-					RecipeShort recipe = new RecipeShort(string.Format("§§r:g:{0}", ingredient));
+					double minTemp = (double)(objJToken["minimum_temperature"] ?? double.NaN);
+					double maxTemp = (double)(objJToken["maximum_temperature"] ?? double.NaN);
+					RecipeShort recipe = new RecipeShort(string.Format("§§r:g:{0}:{1}>{2}", ingredient, minTemp, maxTemp));
 					recipe.Ingredients.Add(ingredient, 60);
 
 					if (!presetRecipes.ContainsKey(recipe.Name))

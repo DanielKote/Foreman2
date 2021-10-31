@@ -17,16 +17,22 @@ namespace Foreman
 
 		private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
 
-		private AssemblerElement assembler;
-		private BeaconElement beacon;
+		private readonly AssemblerElement AssemblerElement;
+		private readonly BeaconElement BeaconElement;
 
-		public RecipeNodeElement(ProductionGraphViewer graphViewer, BaseNode node) : base(graphViewer, node)
+		private string RecipeName { get { return DisplayedNode.BaseRecipe.FriendlyName; } }
+
+		private new readonly ReadOnlyRecipeNode DisplayedNode;
+
+		public RecipeNodeElement(ProductionGraphViewer graphViewer, ReadOnlyRecipeNode node) : base(graphViewer, node)
 		{
-			assembler = new AssemblerElement(graphViewer, this);
-			assembler.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+			DisplayedNode = node;
 
-			beacon = new BeaconElement(graphViewer, this);
-			beacon.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+			AssemblerElement = new AssemblerElement(graphViewer, this);
+			AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+
+			BeaconElement = new BeaconElement(graphViewer, this);
+			BeaconElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 
 			Update();
 		}
@@ -35,22 +41,22 @@ namespace Foreman
 		{
 			if (InputTabs.Count == 0 && OutputTabs.Count != 0)
 			{
-				assembler.Location = new Point(-30, -2);
-				beacon.Location = new Point(-18, 32);
+				AssemblerElement.Location = new Point(-30, -2);
+				BeaconElement.Location = new Point(-18, 32);
 			}
 			else if (OutputTabs.Count == 0 && InputTabs.Count != 0)
 			{
-				assembler.Location = new Point(-30, -22);
-				beacon.Location = new Point(-18, 12);
+				AssemblerElement.Location = new Point(-30, -22);
+				BeaconElement.Location = new Point(-18, 12);
 			}
 			else
 			{
-				assembler.Location = new Point(-30, -12);
-				beacon.Location = new Point(-18, 22);
+				AssemblerElement.Location = new Point(-30, -12);
+				BeaconElement.Location = new Point(-18, 22);
 			}
 
-			assembler.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
-			beacon.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+			AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+			BeaconElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 
 			int width = Math.Max(MinWidth, Math.Max(GetIconWidths(InputTabs), GetIconWidths(OutputTabs)) + 10);
 			if (width % WidthD != 0)
@@ -66,15 +72,15 @@ namespace Foreman
 			//could potentially be done by just deleting all the old ones and remaking them from scratch, but come on - thats much more intensive than just doing some checks!
 			foreach (ItemTabElement oldTab in InputTabs.Where(tab => !DisplayedNode.Inputs.Contains(tab.Item)).ToList())
 			{
-				foreach (NodeLink link in DisplayedNode.InputLinks.Where(link => link.Item == oldTab.Item).ToList())
-					link.Delete();
+				foreach (ReadOnlyNodeLink link in DisplayedNode.InputLinks.Where(link => link.Item == oldTab.Item).ToList())
+					graphViewer.Graph.DeleteLink(link);
 				InputTabs.Remove(oldTab);
 				oldTab.Dispose();
 			}
 			foreach (ItemTabElement oldTab in OutputTabs.Where(tab => !DisplayedNode.Outputs.Contains(tab.Item)).ToList())
 			{
-				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(link => link.Item == oldTab.Item).ToList())
-					link.Delete();
+				foreach (ReadOnlyNodeLink link in DisplayedNode.OutputLinks.Where(link => link.Item == oldTab.Item).ToList())
+					graphViewer.Graph.DeleteLink(link);
 				OutputTabs.Remove(oldTab);
 				oldTab.Dispose();
 			}
@@ -90,27 +96,23 @@ namespace Foreman
 
 		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
 		{
-			if (simple)
+			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
 			{
-				//productivity ticks
-				int pModules = ((RecipeNode)DisplayedNode).AssemblerModules.Count(m => m.ProductivityBonus > 0);
-				pModules += (int)(((RecipeNode)DisplayedNode).BeaconModules.Count(m => m.ProductivityBonus > 0) * ((RecipeNode)DisplayedNode).BeaconCount);
-			}
-			else if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
-			{
-				//text
-				string text = DisplayedNode.DisplayName;
-				bool oversupplied = DisplayedNode.IsOversupplied();
-				Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 35, trans.Y - (Height / 2) + (oversupplied ? 30 : 25), (Width - 10 - 35), Height - (oversupplied ? 60 : 50));
-				//graphics.DrawRectangle(devPen, textSlot);
-				int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, text, BaseFont, textSlot);
+				if (!simple)
+				{
+					//text
+					bool oversupplied = DisplayedNode.IsOversupplied();
+					Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 35, trans.Y - (Height / 2) + (oversupplied ? 30 : 25), (Width - 10 - 35), Height - (oversupplied ? 60 : 50));
+					//graphics.DrawRectangle(devPen, textSlot);
+					int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
 
-				//assembler icon
-				graphics.DrawImage(((RecipeNode)DisplayedNode).SelectedAssembler == null ? DataCache.UnknownIcon : ((RecipeNode)DisplayedNode).SelectedAssembler.Icon, trans.X - Math.Min((Width / 2) - 5, (textLength / 2) + 32), trans.Y - 16, 32, 32);
+					//assembler icon
+					graphics.DrawImage(DisplayedNode.SelectedAssembler == null ? DataCache.UnknownIcon : DisplayedNode.SelectedAssembler.Icon, trans.X - Math.Min((Width / 2) - 5, (textLength / 2) + 32), trans.Y - 16, 32, 32);
+				}
 
 				//productivity ticks
-				int pModules = ((RecipeNode)DisplayedNode).AssemblerModules.Count(m => m.ProductivityBonus > 0);
-				pModules += (int)(((RecipeNode)DisplayedNode).BeaconModules.Count(m => m.ProductivityBonus > 0) * ((RecipeNode)DisplayedNode).BeaconCount);
+				int pModules = DisplayedNode.AssemblerModules.Count(m => m.ProductivityBonus > 0);
+				pModules += (int)(DisplayedNode.BeaconModules.Count(m => m.ProductivityBonus > 0) * DisplayedNode.BeaconCount);
 
 				for (int i = 0; i < pModules && i < 6; i++)
 					graphics.DrawEllipse(productivityPen, trans.X - (Width / 2) - 3, trans.Y - (Height / 2) + 10 + i * 12, 6, 6);
@@ -128,7 +130,7 @@ namespace Foreman
 
 			if (graphViewer.ShowRecipeToolTip)
 			{
-				Recipe[] Recipes = new Recipe[] { ((RecipeNode)DisplayedNode).BaseRecipe };
+				Recipe[] Recipes = new Recipe[] { DisplayedNode.BaseRecipe };
 				TooltipInfo ttiRecipe = new TooltipInfo();
 				ttiRecipe.Direction = Direction.Left;
 				ttiRecipe.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(Width / 2, 0)));

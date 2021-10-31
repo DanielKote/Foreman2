@@ -61,8 +61,6 @@ namespace Foreman
 		public event EventHandler<NodeLinkEventArgs> LinkDeleted;
 		public event EventHandler<EventArgs> NodeValuesUpdated;
 
-		public event EventHandler<EventArgs> GraphOptionsChanged;
-
 		public Rectangle Bounds
 		{
 			get
@@ -113,6 +111,7 @@ namespace Foreman
 			node.Location = location;
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
+			node.UpdateState();
 			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
 			return (ReadOnlyConsumerNode)node.ReadOnlyNode;
 		}
@@ -123,6 +122,7 @@ namespace Foreman
 			node.Location = location;
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
+			node.UpdateState();
 			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
 			return (ReadOnlySupplierNode)node.ReadOnlyNode;
 		}
@@ -133,6 +133,7 @@ namespace Foreman
 			node.Location = location;
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
+			node.UpdateState();
 			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
 			return (ReadOnlyPassthroughNode)node.ReadOnlyNode;
 		}
@@ -151,6 +152,7 @@ namespace Foreman
 				rnController.AutoSetAssembler();
 				rnController.AutoSetAssemblerModules();
 			}
+			node.UpdateState();
 			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
 			return (ReadOnlyRecipeNode)node.ReadOnlyNode;
 		}
@@ -243,29 +245,32 @@ namespace Foreman
 					yield return node;
 		}
 
-		public IEnumerable<IEnumerable<ReadOnlyBaseNode>> GetConnectedComponents() //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving
+		public IEnumerable<IEnumerable<ReadOnlyBaseNode>> GetConnectedNodeGroups() { foreach (IEnumerable<BaseNode> group in GetConnectedComponents()) yield return group.Select(node => node.ReadOnlyNode); }
+		private IEnumerable<IEnumerable<BaseNode>> GetConnectedComponents() //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving
 		{
-			HashSet<ReadOnlyBaseNode> unvisitedNodes = new HashSet<ReadOnlyBaseNode>(Nodes);
+			//there is an optimized solution for connected components where we keep track of the various groups and modify them as each node/link is added/removed, but testing shows that this calculation below takes under 1ms even for larg 1000+ node graphs, so why bother.
 
-			List<HashSet<ReadOnlyBaseNode>> connectedComponents = new List<HashSet<ReadOnlyBaseNode>>();
+			HashSet<BaseNode> unvisitedNodes = new HashSet<BaseNode>(nodes);
+
+			List<HashSet<BaseNode>> connectedComponents = new List<HashSet<BaseNode>>();
 
 			while (unvisitedNodes.Any())
 			{
-				connectedComponents.Add(new HashSet<ReadOnlyBaseNode>());
-				HashSet<ReadOnlyBaseNode> toVisitNext = new HashSet<ReadOnlyBaseNode>();
+				connectedComponents.Add(new HashSet<BaseNode>());
+				HashSet<BaseNode> toVisitNext = new HashSet<BaseNode>();
 				toVisitNext.Add(unvisitedNodes.First());
 
 				while (toVisitNext.Any())
 				{
-					ReadOnlyBaseNode currentNode = toVisitNext.First();
+					BaseNode currentNode = toVisitNext.First();
 
-					foreach (ReadOnlyNodeLink link in currentNode.InputLinks)
-						if (unvisitedNodes.Contains(link.Supplier))
-							toVisitNext.Add(link.Supplier);
+					foreach (NodeLink link in currentNode.InputLinks)
+						if (unvisitedNodes.Contains(link.SupplierNode))
+							toVisitNext.Add(link.SupplierNode);
 
-					foreach (ReadOnlyNodeLink link in currentNode.OutputLinks)
-						if (unvisitedNodes.Contains(link.Consumer))
-							toVisitNext.Add(link.Consumer);
+					foreach (NodeLink link in currentNode.OutputLinks)
+						if (unvisitedNodes.Contains(link.ConsumerNode))
+							toVisitNext.Add(link.ConsumerNode);
 
 					connectedComponents.Last().Add(currentNode);
 					toVisitNext.Remove(currentNode);
@@ -281,9 +286,7 @@ namespace Foreman
 			if (!PauseUpdates)
 			{
 				try { OptimizeGraphNodeValues(); }
-				catch (OverflowException) { }
-				//If the numbers here are so big they're causing an overflow, there's not much I can do about it. It's already pretty clear in the UI that the values are unusable.
-				//At least this way it doesn't crash...
+				catch (OverflowException) { } //overflow can theoretically be possible for extremely unbalanced recipes, but with the limit of double and the artificial limit set on max throughput this should never happen.
 			}
 			NodeValuesUpdated?.Invoke(this, EventArgs.Empty); //called even if no changes have been made in order to re-draw the graph (since something required a node value update - link deletion? node addition? whatever)
 		}
@@ -366,8 +369,8 @@ namespace Foreman
 									else
 										rNodeController.SetFuel(cache.MissingItems[(string)nodeJToken["Fuel"]]);
 								}
-								else if (rNode.SelectedAssembler.IsBurner) //and fuel is null :/
-									rNodeController.SetFuel(FuelSelector.GetFuel(rNode.SelectedAssembler));
+								else if (rNode.SelectedAssembler.IsBurner) //and fuel is null... well - its the import. set it as null (and consider it an error)
+									rNodeController.SetFuel(null);
 
 								if (nodeJToken["Burnt"] != null)
 								{
@@ -379,6 +382,8 @@ namespace Foreman
 									if (rNode.FuelRemains != burntItem)
 										rNode.SetBurntOverride(burntItem);
 								}
+								else if (rNode.Fuel != null && rNode.Fuel.BurnResult != null) //same as above - there should be a burn result, but there isnt...
+									rNode.SetBurntOverride(null);
 
 								if (nodeJToken["Beacon"] != null)
 								{

@@ -23,17 +23,13 @@ namespace Foreman
 			ReadOnlyNode = new ReadOnlyConsumerNode(this);
 		}
 
-		public override bool UpdateState()
+		public override void UpdateState()
 		{
 			NodeState oldState = State;
 			State = (ConsumedItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean;
 			base.UpdateState();
 			if (oldState != State)
-			{
 				OnNodeStateChanged();
-				return true;
-			}
-			return false;
 		}
 
 		public override double GetConsumeRate(Item item) { return ActualRate; }
@@ -49,7 +45,6 @@ namespace Foreman
 			info.AddValue("Location", Location);
 			info.AddValue("Item", ConsumedItem.Name);
 			info.AddValue("RateType", RateType);
-			info.AddValue("ActualRate", ActualRatePerSec);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredRate", DesiredRatePerSec);
 		}
@@ -59,28 +54,11 @@ namespace Foreman
 
 	public class ReadOnlyConsumerNode : ReadOnlyBaseNode
 	{
-		public Item ConsumedItem { get { return MyNode.ConsumedItem; } }
+		public Item ConsumedItem => MyNode.ConsumedItem;
 
 		private readonly ConsumerNode MyNode;
 
 		public ReadOnlyConsumerNode(ConsumerNode node) : base(node) { MyNode = node; }
-
-	}
-
-	public class ConsumerNodeController : BaseNodeController
-	{
-		public Item ConsumedItem { get { return MyNode.ConsumedItem; } }
-
-		private readonly ConsumerNode MyNode;
-
-		protected ConsumerNodeController(ConsumerNode myNode) : base(myNode) { MyNode = myNode; }
-
-		public static ConsumerNodeController GetController(ConsumerNode node)
-		{
-			if (node.Controller != null)
-				return (ConsumerNodeController)node.Controller;
-			return new ConsumerNodeController(node);
-		}
 
 		public override List<string> GetErrors()
 		{
@@ -92,10 +70,26 @@ namespace Foreman
 			return errors;
 		}
 
+		public override List<string> GetWarnings() { Trace.Fail("Consumer node never has the warning state!"); return null; }
+	}
+
+	public class ConsumerNodeController : BaseNodeController
+	{
+		private readonly ConsumerNode MyNode;
+
+		protected ConsumerNodeController(ConsumerNode myNode) : base(myNode) { MyNode = myNode; }
+
+		public static ConsumerNodeController GetController(ConsumerNode node)
+		{
+			if (node.Controller != null)
+				return (ConsumerNodeController)node.Controller;
+			return new ConsumerNodeController(node);
+		}
+
 		public override Dictionary<string, Action> GetErrorResolutions()
 		{
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-			if (ConsumedItem.IsMissing)
+			if (MyNode.ConsumedItem.IsMissing)
 				resolutions.Add("Delete node", new Action(() => this.Delete()));
 			else
 				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
@@ -103,7 +97,6 @@ namespace Foreman
 			return resolutions;
 		}
 
-		public override List<string> GetWarnings() { Trace.Fail("Consumer node never has the warning state!"); return null; }
 		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Consumer node never has the warning state!"); return null; }
 	}
 }

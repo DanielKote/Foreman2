@@ -12,16 +12,17 @@ namespace Foreman
 	{
 		protected override Brush CleanBgBrush { get { return passthroughBGBrush; } }
 		private static Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
-		private PassthroughNode passthroughNode { get { return (PassthroughNode)DisplayedNode; } }
 
+		private string ItemName { get { return DisplayedNode.PassthroughItem.FriendlyName; } }
 
-		public PassthroughNodeElement(ProductionGraphViewer graphViewer, BaseNode node) : base(graphViewer, node)
+		private new readonly ReadOnlyPassthroughNode DisplayedNode;
+
+		public PassthroughNodeElement(ProductionGraphViewer graphViewer, ReadOnlyPassthroughNode node) : base(graphViewer, node)
 		{
 			Width = PassthroughNodeWidth;
 			Height = BaseSimpleHeight;
+			DisplayedNode = node;
 		}
-
-		public override void Update() { base.Update(); }
 
 		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
 		{
@@ -47,7 +48,7 @@ namespace Foreman
 			if (exclusive)
 			{
 				TooltipInfo helpToolTipInfo = new TooltipInfo();
-				helpToolTipInfo.Text = string.Format("Left click on this node to edit the throughput of {0}.\nRight click for options.", passthroughNode.PassthroughItem.FriendlyName);
+				helpToolTipInfo.Text = string.Format("Left click on this node to edit the throughput of {0}.\nRight click for options.", ItemName);
 				helpToolTipInfo.Direction = Direction.None;
 				helpToolTipInfo.ScreenLocation = new Point(10, 10);
 				tooltips.Add(helpToolTipInfo);

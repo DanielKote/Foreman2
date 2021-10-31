@@ -81,11 +81,14 @@ namespace Foreman
 		private TechnologyPrototype startingTech;
 		private AssemblerPrototype missingAssembler; //missing recipes will have this set as their one and only assembler.
 
+		private readonly bool UseRecipeBWLists;
 		private static readonly Regex[] recipeWhiteList = { new Regex("^empty-barrel$") }; //whitelist takes priority over blacklist
 		private static readonly Regex[] recipeBlackList = { new Regex("-barrel$"), new Regex("^deadlock-packrecipe-"), new Regex("^deadlock-unpackrecipe-"), new Regex("^deadlock-plastic-packaging$") };
 
-		public DataCache()
+		public DataCache(bool filterRecipes) //if true then the read recipes will be filtered by the white and black lists above. In most cases this is desirable (why bother with barreling, etc???), but if the user want to use them, then so be it.
 		{
+			UseRecipeBWLists = filterRecipes;
+
 			includedMods = new Dictionary<string, string>();
 			technologies = new Dictionary<string, Technology>();
 			groups = new Dictionary<string, Group>();
@@ -953,7 +956,7 @@ namespace Foreman
 				recipe = new RecipePrototype(
 					this,
 					boilRecipeName,
-					ingredient == product ? string.Format("{0} boiling to {1} °c", ingredient.FriendlyName, temp.ToString()) : string.Format("{0} boiling to {1} °c {2}", ingredient.FriendlyName, temp.ToString(), product.FriendlyName),
+					ingredient == product ? string.Format("{0} boiling to {1}°c", ingredient.FriendlyName, temp.ToString()) : string.Format("{0} boiling to {1}°c {2}", ingredient.FriendlyName, temp.ToString(), product.FriendlyName),
 					energySubgroupBoiling,
 					boilRecipeName);
 
@@ -1009,17 +1012,19 @@ namespace Foreman
 			ItemPrototype ingredient = (ItemPrototype)items[(string)objJToken["fluid_ingredient"]];
 
 			aEntity.Speed = (double)objJToken["fluid_usage_per_tick"];
-			aEntity.MaxTemperature = (double)objJToken["maximum_temperature"];
+			aEntity.OperationTemperature = (double)objJToken["full_power_temperature"];
+			double minTemp = (double)(objJToken["minimum_temperature"] ?? double.NaN);
+			double maxTemp = (double)(objJToken["maximum_temperature"] ?? double.NaN);
 			//actual energy production is a bit more complicated here (as it involves actual temperatures), but we will have to handle it in the graph (after all values have been calculated and we know the amounts and temperatures getting passed here, we can calc the energy produced)
 
 			RecipePrototype recipe;
-			string generationRecipeName = string.Format("§§r:g:{0}", ingredient.Name);
+			string generationRecipeName = string.Format("§§r:g:{0}:{1}>{2}", ingredient.Name, minTemp, maxTemp);
 			if (!recipes.ContainsKey(generationRecipeName))
 			{
 				recipe = new RecipePrototype(
 					this,
 					generationRecipeName,
-					ingredient.FriendlyName + " to Electricity",
+					string.Format("{0} to Electricity", ingredient.FriendlyName),
 					energySubgroupEnergy,
 					generationRecipeName);
 
@@ -1027,7 +1032,10 @@ namespace Foreman
 
 				recipe.Time = 1;
 
-				recipe.InternalOneWayAddIngredient(ingredient, 60);
+				recipe.InternalOneWayAddIngredient(ingredient, 60, double.IsNaN(minTemp) ? double.NegativeInfinity : minTemp, double.IsNaN(maxTemp) ? double.PositiveInfinity : maxTemp);
+				if (!double.IsNaN(minTemp) || !double.IsNaN(minTemp))
+					ingredient.IsTemperatureDependent = true;
+
 				ingredient.consumptionRecipes.Add(recipe);
 
 				if (aEntity.associatedItems.Count == 0)
@@ -1144,16 +1152,15 @@ namespace Foreman
 				recipe.Available = recipe.myUnlockTechnologies.FirstOrDefault(t => t.Available) != null;
 
 			//step 3: mark any recipe for barelling / crating as unavailable
-			foreach (RecipePrototype recipe in recipes.Values)
-				if (recipeWhiteList.FirstOrDefault(white => white.IsMatch(recipe.Name)) == null && recipeBlackList.FirstOrDefault(black => black.IsMatch(recipe.Name)) != null) //if we dont match a whitelist and match a blacklist...
-					recipe.Available = false;
+			if(UseRecipeBWLists)
+				foreach (RecipePrototype recipe in recipes.Values)
+					if (recipeWhiteList.FirstOrDefault(white => white.IsMatch(recipe.Name)) == null && recipeBlackList.FirstOrDefault(black => black.IsMatch(recipe.Name)) != null) //if we dont match a whitelist and match a blacklist...
+						recipe.Available = false;
 
 			//step 4: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
 			foreach (RecipePrototype recipe in recipes.Values)
-			{
 				if (recipe.myUnlockTechnologies.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0 && !recipe.Name.StartsWith("§§"))) //§§ denotes foreman added recipes. ignored during this pass (but not during the assembler check pass)
 					recipe.Available = false;
-			}
 
 			//step 5 (loop) switch any recipe with no available assemblers to unavailable, switch any useless item to unavailable (no available recipe produces it, it isnt used by any available recipe / only by incineration recipes
 			bool clean = false;

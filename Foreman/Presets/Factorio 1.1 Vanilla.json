@@ -11532,11 +11532,11 @@
       "icon_alt_name": "icon.i.boiler",
       "order": "z-b[steam-power]-a[boiler]",
       "type": "boiler",
-      "target_temperature": 165,
       "associated_items": [
         "boiler"
       ],
       "allowed_effects": {},
+      "target_temperature": 165,
       "fluid_ingredient": "water",
       "fluid_product": "steam",
       "max_energy_usage": 30000,
@@ -11556,12 +11556,13 @@
       "icon_alt_name": "icon.i.steam-engine",
       "order": "z-b[steam-power]-b[steam-engine]",
       "type": "generator",
-      "maximum_temperature": 165,
       "fluid_usage_per_tick": 0.5,
       "associated_items": [
         "steam-engine"
       ],
       "allowed_effects": {},
+      "full_power_temperature": 165,
+      "minimum_temperature": 100,
       "fluid_ingredient": "steam",
       "max_energy_usage": 0,
       "energy_usage": 0,
@@ -11600,11 +11601,11 @@
       "icon_alt_name": "icon.i.heat-exchanger",
       "order": "z-f[nuclear-energy]-c[heat-exchanger]",
       "type": "boiler",
-      "target_temperature": 500,
       "associated_items": [
         "heat-exchanger"
       ],
       "allowed_effects": {},
+      "target_temperature": 500,
       "fluid_ingredient": "water",
       "fluid_product": "steam",
       "max_energy_usage": 166666.66666666666,
@@ -11621,12 +11622,13 @@
       "icon_alt_name": "icon.i.steam-turbine",
       "order": "z-f[nuclear-energy]-d[steam-turbine]",
       "type": "generator",
-      "maximum_temperature": 500,
       "fluid_usage_per_tick": 1,
       "associated_items": [
         "steam-turbine"
       ],
       "allowed_effects": {},
+      "full_power_temperature": 500,
+      "minimum_temperature": 100,
       "fluid_ingredient": "steam",
       "max_energy_usage": 0,
       "energy_usage": 0,

@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Foreman
 {
-	public class Grid
+	public class GridManager
 	{
 		public int CurrentGridUnit = 0;
 		public int CurrentMajorGridUnit = 0;
@@ -17,7 +17,7 @@ namespace Foreman
 		private static readonly Pen zeroAxisPen = new Pen(Color.FromArgb(140, 140, 140), 2);
 		private static readonly Pen lockedAxisPen = new Pen(Color.FromArgb(180, 80, 80), 4);
 
-		public Grid()
+		public GridManager()
 		{
 			CurrentGridUnit = Properties.Settings.Default.MinorGridlines;
 		}

@@ -5,44 +5,46 @@ namespace Foreman
 {
 	public partial class EditFlowPanel : UserControl
 	{
-		private ProductionGraphViewer myGraphViewer;
-		private BaseNode BaseNode;
+		private readonly ProductionGraphViewer myGraphViewer;
+		private readonly BaseNodeController nodeController;
+		private readonly ReadOnlyBaseNode nodeData;
 
-		public EditFlowPanel(BaseNode baseNode, ProductionGraphViewer graphViewer)
+		public EditFlowPanel(ReadOnlyBaseNode node, ProductionGraphViewer graphViewer)
 		{
 			InitializeComponent();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			FixedFlowInput.Maximum = (decimal)ProductionGraph.MaxSetFlow;
 
-			this.BaseNode = baseNode;
+			nodeData = node;
+			nodeController = graphViewer.Graph.RequestNodeController(node);
 			myGraphViewer = graphViewer;
-			RateLabel.Text = string.Format("Item Flowrate (per {0})", myGraphViewer.GetRateName());
+			RateLabel.Text = string.Format("Item Flowrate (per {0})", myGraphViewer.Graph.GetRateName());
 
 			InitializeRates();
 		}
 
 		private void InitializeRates()
 		{
-			if (BaseNode.RateType == RateType.Auto)
+			if (nodeData.RateType == RateType.Auto)
 			{
 				AutoOption.Checked = true;
 				FixedFlowInput.Enabled = false;
-				FixedFlowInput.Value = Math.Min(FixedFlowInput.Maximum, (decimal)BaseNode.ActualRate);
+				FixedFlowInput.Value = Math.Min(FixedFlowInput.Maximum, (decimal)nodeData.ActualRate);
 			}
 			else
 			{
 				FixedOption.Checked = true;
 				FixedFlowInput.Enabled = true;
-				FixedFlowInput.Value = Math.Min(FixedFlowInput.Maximum, (decimal)BaseNode.DesiredRate);
+				FixedFlowInput.Value = Math.Min(FixedFlowInput.Maximum, (decimal)nodeData.DesiredRate);
 			}
 			UpdateFixedFlowInputDecimals(FixedFlowInput);
 		}
 
 		private void SetFixedRate()
 		{
-			if (BaseNode.DesiredRate != (double)FixedFlowInput.Value)
+			if (nodeData.DesiredRate != (double)FixedFlowInput.Value)
 			{
-				BaseNode.DesiredRate = (double)FixedFlowInput.Value;
+				nodeController.SetDesiredRate((double)FixedFlowInput.Value);
 				myGraphViewer.Graph.UpdateNodeValues();
 			}
 			UpdateFixedFlowInputDecimals(FixedFlowInput);
@@ -60,9 +62,9 @@ namespace Foreman
 			FixedFlowInput.Enabled = FixedOption.Checked;
 			RateType updatedRateType = (FixedOption.Checked) ? RateType.Manual : RateType.Auto;
 
-			if (BaseNode.RateType != updatedRateType)
+			if (nodeData.RateType != updatedRateType)
 			{
-				BaseNode.RateType = updatedRateType;
+				nodeController.SetRateType(updatedRateType);
 				myGraphViewer.Graph.UpdateNodeValues();
 			}
 		}

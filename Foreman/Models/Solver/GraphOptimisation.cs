@@ -13,9 +13,6 @@ namespace Foreman
 		private int updateCounter = 0;
 		public void OptimizeGraphNodeValues()
 		{
-			foreach (BaseNode node in Nodes.Where(n => n.RateType == RateType.Auto))
-				node.ResetSolvedRate();
-
 			foreach (var nodeGroup in GetConnectedComponents())
 				OptimiseNodeGroup(nodeGroup);
 
@@ -69,14 +66,10 @@ namespace Foreman
 	// easy to understand as a whole.
 	public abstract partial class BaseNode
 	{
-		internal void ResetSolvedRate()
-		{
-			ActualRatePerSec = 0;
-		}
-
 		internal virtual void SetSolvedRate(double rate)
 		{
 			ActualRatePerSec = rate;
+			NodeValuesChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		internal void AddConstraints(ProductionSolver solver)

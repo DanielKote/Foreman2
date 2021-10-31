@@ -10,7 +10,7 @@ namespace Foreman
 	{
 		public enum Errors
 		{
-			Clean = 0b_000_000_000,
+			Clean = 0b_0000_0000_0000,
 			RecipeIsMissing = 0b_0000_0000_0001,
 			AssemblerIsMissing = 0b_0000_0000_0010,
 			BurnerNoFuelSet = 0b_0000_0000_0100,
@@ -22,7 +22,7 @@ namespace Foreman
 			BeaconIsMissing = 0b_0001_0000_0000,
 			BModuleIsMissing = 0b_0010_0000_0000,
 			BModuleLimitExceeded = 0b_0100_0000_0000,
-			InvalidLinks = 0b_100_000_000
+			InvalidLinks = 0b_1000_0000_0000
 		}
 		public enum Warnings
 		{
@@ -34,7 +34,7 @@ namespace Foreman
 			NoAvailableAssemblers = 0b_0000_0000_0001_0000,
 			FuelIsUnavailable = 0b_0000_0000_0010_0000,
 			FuelIsUncraftable = 0b_0000_0000_0100_0000,
-			NoAvailableFuels = 0b_0000_1000_0000_0000,
+			NoAvailableFuels = 0b_0000_0000_1000_0000,
 			AModuleIsDisabled = 0b_0000_0001_0000_0000,
 			AModuleIsUnavailable = 0b_0000_0010_0000_0000,
 			BeaconIsDisabled = 0b_0000_0100_0000_0000,
@@ -52,24 +52,30 @@ namespace Foreman
 		public double NeighbourCount { get; set; }
 
 		private Assembler assembler;
-		public Assembler SelectedAssembler { get { return assembler; }set { if (value != null) assembler = value; } }
-		public Item Fuel { get { return fuel; } set { fuel = value; fuelRemainsOverride = null; } }
+		public Assembler SelectedAssembler { get { return assembler; } set { if (value != null) { assembler = value; UpdateState(); } } }
+		public Item Fuel { get { return fuel; } set { fuel = value; fuelRemainsOverride = null; UpdateState(); } }
 		public Item FuelRemains { get { return fuelRemainsOverride ?? ((Fuel != null && Fuel.BurnResult != null) ? Fuel.BurnResult : null); } }
-		public void SetBurntOverride(Item item) { if (Fuel == null || Fuel.BurnResult != item) fuelRemainsOverride = item; }
+		public void SetBurntOverride(Item item) { if (Fuel == null || Fuel.BurnResult != item) fuelRemainsOverride = item; UpdateState(); }
 		private Item fuel;
 		private Item fuelRemainsOverride; //returns as BurntItem if set (error import)
 
-		public Beacon SelectedBeacon { get; set; }
-		public double BeaconCount { get; set; }
-		public double BeaconsPerAssembler { get; set; }
-		public double BeaconsConst { get; set; }
+		private Beacon selectedBeacon;
+		public Beacon SelectedBeacon { get { return selectedBeacon; } set { if (selectedBeacon != value) { selectedBeacon = value; UpdateState(); } } }
+		private double beaconCount;
+		public double BeaconCount { get { return beaconCount; } set { if (beaconCount != value) { beaconCount = value; OnNodeValuesChanged(); } } }
+		private double beaconsPerAssembler;
+		public double BeaconsPerAssembler { get { return beaconsPerAssembler; } set { if (beaconsPerAssembler != value) { beaconsPerAssembler = value; OnNodeValuesChanged(); } } }
+		private double beaconsConst;
+		public double BeaconsConst { get { return beaconsConst; } set { if (beaconsConst != value) { beaconsConst = value; OnNodeValuesChanged(); } } }
 
-		public List<Module> AssemblerModules { get; private set; }
-		public List<Module> BeaconModules { get; private set; }
+		private List<Module> assemblerModules;
+		private List<Module> beaconModules;
+		public IReadOnlyList<Module> AssemblerModules { get { return assemblerModules.ToList(); } }
+		public IReadOnlyList<Module> BeaconModules { get { return beaconModules.ToList(); } }
 
 		public double DesiredAssemblerCount { get; set; }
-		public double ActualAssemblerCount { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier() * MyGraph.GetRateMultipler()); } }
-		public override double DesiredRatePerSec { get { return DesiredAssemblerCount * SelectedAssembler.Speed * GetSpeedMultiplier() * MyGraph.GetRateMultipler() / BaseRecipe.Time; } set { Trace.Fail("Desired rate set on a recipe node!"); } }
+		public double ActualAssemblerCount { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier()); } }
+		public override double DesiredRatePerSec { get { return DesiredAssemblerCount * SelectedAssembler.Speed * GetSpeedMultiplier() / (BaseRecipe.Time); } set { Trace.Fail("Desired rate set on a recipe node!"); } }
 
 		public override IEnumerable<Item> Inputs
 		{
@@ -99,6 +105,9 @@ namespace Foreman
 			controller = RecipeNodeController.GetController(this);
 			ReadOnlyNode = new ReadOnlyRecipeNode(this);
 
+			beaconModules = new List<Module>();
+			assemblerModules = new List<Module>();
+
 			SelectedAssembler = recipe.Assemblers.First(); //everything here works under the assumption that assember isnt null.
 			SelectedBeacon = null;
 			NeighbourCount = 0;
@@ -107,20 +116,14 @@ namespace Foreman
 			BeaconsPerAssembler = 0;
 			BeaconsConst = 0;
 
-			BeaconModules = new List<Module>();
-			AssemblerModules = new List<Module>();
 		}
 
-		public override bool UpdateState()
+		public override void UpdateState()
 		{
 			NodeState oldState = State;
 			State = GetUpdatedState();
 			if (oldState != State)
-			{
 				OnNodeStateChanged();
-				return true;
-			}
-			return false;
 		}
 
 		private NodeState GetUpdatedState()
@@ -183,7 +186,7 @@ namespace Foreman
 					WarningSet |= Warnings.FuelIsUnavailable;
 				if (Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) == null)
 					WarningSet |= Warnings.FuelIsUncraftable;
-				if (SelectedAssembler.Fuels.FirstOrDefault(f => f.Enabled && f.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) != null)
+				if (SelectedAssembler.Fuels.FirstOrDefault(f => f.Enabled && f.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) == null)
 					WarningSet |= Warnings.NoAvailableFuels;
 			}
 			if (AssemblerModules.FirstOrDefault(m => !m.Enabled) != null)
@@ -207,7 +210,20 @@ namespace Foreman
 			if (WarningSet != Warnings.Clean)
 				return NodeState.Warning;
 			return NodeState.Clean;
+
 		}
+
+		//------------------------------------------------------------------------ module list functions
+
+		public void ClearAssemblerModules() { assemblerModules.Clear(); UpdateState(); }
+		public void AddAssemblerModule(Module module) { assemblerModules.Add(module); UpdateState(); }
+		public void AddAssemblerModules(IEnumerable<Module> modules) { assemblerModules.AddRange(modules); UpdateState(); }
+		public void RemoveAssemblerModuleAt(int index) { if(index >= 0 && index < assemblerModules.Count) { assemblerModules.RemoveAt(index); UpdateState(); } }
+
+		public void ClearBeaconModules() { beaconModules.Clear(); UpdateState(); }
+		public void AddBeaconModule(Module module) { beaconModules.Add(module); UpdateState(); }
+		public void AddBeaconModules(IEnumerable<Module> modules) { beaconModules.AddRange(modules); UpdateState(); }
+		public void RemoveBeaconModuleAt(int index) { if (index >= 0 && index < beaconModules.Count) { beaconModules.RemoveAt(index); UpdateState(); } }
 
 		//------------------------------------------------------------------------ multipliers (speed/productivity/consumption/pollution) & rates
 
@@ -287,8 +303,6 @@ namespace Foreman
 
 				double recipeRate = BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] * GetProductivityMultiplier() : 0;
 				//burner rate is much the same as above (without the productivity), just have to make sure we still use the Burner item!
-				double g = GetSpeedMultiplier();
-				double f = GetConsumptionMultiplier();
 				double burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.ConsumptionEffectivity) / Fuel.FuelValue;
 				return recipeRate + burnerRate;
 			}
@@ -319,7 +333,6 @@ namespace Foreman
 			info.AddValue("Location", Location);
 			info.AddValue("RecipeID", BaseRecipe.RecipeID);
 			info.AddValue("RateType", RateType);
-			info.AddValue("ActualRate", ActualRatePerSec);
 			info.AddValue("Neighbours", NeighbourCount);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredAssemblers", DesiredAssemblerCount);
@@ -348,100 +361,27 @@ namespace Foreman
 
 	public class ReadOnlyRecipeNode : ReadOnlyBaseNode
 	{
-		public Recipe BaseRecipe { get { return MyNode.BaseRecipe; } }
-		public double NeighbourCount { get { return MyNode.NeighbourCount; } }
-		public double BeaconCount { get { return MyNode.BeaconCount; } }
-		public double BeaconsPerAssembler { get { return MyNode.BeaconsPerAssembler; } }
-		public double BeaconsConst { get { return MyNode.BeaconsConst; } }
+		public Recipe BaseRecipe => MyNode.BaseRecipe;
+		public Assembler SelectedAssembler => MyNode.SelectedAssembler;
+		public Item Fuel => MyNode.Fuel;
+		public Item FuelRemains => MyNode.FuelRemains;
+		public IReadOnlyList<Module> AssemblerModules => MyNode.AssemblerModules;
 
-		//----------------------------------------------------------------------- Get functions (not dependent on rate)
-
-		public double GetAssemblerEnergyConsumption() //Watts
-		{
-			return MyNode.SelectedAssembler.EnergyDrain + (MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier());
-		}
-
-		public double GetAssemblerElectricalProduction() //Watts
-		{
-			return MyNode.SelectedAssembler.EnergyProduction; //no consumption multiplier => generators cant have modules / beacon effects
-		}
-
-		public double GetAssemblerPollutionProduction() //pollution/sec
-		{
-			return MyNode.SelectedAssembler.Pollution * MyNode.GetPollutionMultiplier() * GetAssemblerEnergyConsumption(); //pollution is counted in per energy
-		}
-
-		public double GetBeaconPollutionProduction() //pollution/sec
-		{
-			if (MyNode.SelectedBeacon == null)
-				return 0;
-			return GetTotalBeacons() * MyNode.SelectedBeacon.Pollution * (MyNode.SelectedBeacon.EnergyConsumption + MyNode.SelectedBeacon.EnergyDrain);
-		}
-
-		public double GetTotalBeacons()
-		{
-			if (MyNode.SelectedBeacon == null)
-				return 0;
-			return Math.Ceiling(((int)(MyNode.ActualAssemblerCount + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
-		}
-
-		//----------------------------------------------------------------------- Get functions (rate dependent)
-
-		public double GetTotalAssemblerFuelConsumption() //fuel items / time unit
-		{
-			if (MyNode.Fuel == null)
-				return 0;
-			return (MyNode.MyGraph.GetRateMultipler() * BaseRecipe.Time * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier() * MyNode.ActualRatePerSec) /
-				(MyNode.SelectedAssembler.Speed * MyNode.GetSpeedMultiplier() * MyNode.SelectedAssembler.ConsumptionEffectivity * MyNode.Fuel.FuelValue);
-		}
-
-		public double GetTotalAssemblerElectricalConsumption() // J/time unit
-		{
-			if (MyNode.SelectedAssembler.EnergySource != EnergySource.Electric)
-				return 0;
-
-			double partialAssembler = MyNode.ActualAssemblerCount % 1;
-			double entireAssemblers = MyNode.ActualAssemblerCount - partialAssembler;
-
-			return MyNode.MyGraph.GetRateMultipler() * (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * MyNode.SelectedAssembler.EnergyDrain) + (MyNode.ActualAssemblerCount * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
-		}
-
-		public double GetTotalAssemblerElectricalProduction() // J/time unit
-		{
-			return MyNode.MyGraph.GetRateMultipler() * GetAssemblerElectricalProduction() * MyNode.ActualAssemblerCount;
-		}
-
-		public double GetTotalBeaconElectricalConsumption() // J/time unit
-		{
-			if (MyNode.SelectedBeacon == null || MyNode.SelectedBeacon.EnergySource != EnergySource.Electric)
-				return 0;
-			return MyNode.MyGraph.GetRateMultipler() * GetTotalBeacons() * (MyNode.SelectedBeacon.EnergyConsumption + MyNode.SelectedBeacon.EnergyDrain);
-		}
-
-		private readonly RecipeNode MyNode;
-
-		public ReadOnlyRecipeNode(RecipeNode node) : base(node) { }
-	}
-
-	public class RecipeNodeController : BaseNodeController
-	{
-		public Recipe BaseRecipe { get { return MyNode.BaseRecipe; } }
+		public Beacon SelectedBeacon => MyNode.SelectedBeacon;
+		public IReadOnlyList<Module> BeaconModules => MyNode.BeaconModules;
 
 		public double NeighbourCount => MyNode.NeighbourCount;
 		public double BeaconCount => MyNode.BeaconCount;
 		public double BeaconsPerAssembler => MyNode.BeaconsPerAssembler;
-		public double BeaconsConst => MyNode.BeaconCount;
+		public double BeaconsConst => MyNode.BeaconsConst;
 
-		private readonly RecipeNode MyNode;
+		public double DesiredAssemblerCount => MyNode.DesiredAssemblerCount;
+		public double ActualAssemblerCount => MyNode.ActualAssemblerCount;
 
-		protected RecipeNodeController(RecipeNode myNode) : base(myNode) { MyNode = myNode; }
-
-		public static RecipeNodeController GetController(RecipeNode node)
-		{
-			if (node.Controller != null)
-				return (RecipeNodeController)node.Controller;
-			return new RecipeNodeController(node);
-		}
+		public double GetConsumptionMultiplier() => MyNode.GetConsumptionMultiplier();
+		public double GetSpeedMultiplier() => MyNode.GetSpeedMultiplier();
+		public double GetProductivityMultiplier() => MyNode.GetProductivityMultiplier();
+		public double GetPollutionMultiplier() => MyNode.GetPollutionMultiplier();
 
 		//------------------------------------------------------------------------ warning / errors functions
 
@@ -456,6 +396,8 @@ namespace Foreman
 				output.Add(string.Format("> Recipe \"{0}\" doesnt exist in preset!", MyNode.BaseRecipe.FriendlyName));
 				return output; //missing recipe is an automatic end -> we dont care about any other errors, since the only solution is to delete the node.
 			}
+
+			Console.WriteLine(Convert.ToString((int)ErrorSet, 2));
 
 			if ((ErrorSet & RecipeNode.Errors.AssemblerIsMissing) != 0)
 				output.Add(string.Format("> Assembler \"{0}\" doesnt exist in preset!", MyNode.SelectedAssembler.FriendlyName));
@@ -482,6 +424,224 @@ namespace Foreman
 
 			return output;
 		}
+
+		public override List<string> GetWarnings()
+		{
+			RecipeNode.Warnings WarningSet = MyNode.WarningSet;
+
+			List<string> output = new List<string>();
+
+			//recipe
+			if ((WarningSet & RecipeNode.Warnings.RecipeIsDisabled) != 0)
+				output.Add("X> Selected recipe is disabled.");
+			if ((WarningSet & RecipeNode.Warnings.RecipeIsUnavailable) != 0)
+				output.Add("X> Selected recipe is unavailable in regular play.");
+
+			if ((WarningSet & RecipeNode.Warnings.NoAvailableAssemblers) != 0)
+				output.Add("X> No enabled assemblers for this recipe.");
+			else
+			{
+				if ((WarningSet & RecipeNode.Warnings.AssemblerIsDisabled) != 0)
+					output.Add("> Selected assembler is disabled.");
+				if ((WarningSet & RecipeNode.Warnings.AssemblerIsUnavailable) != 0)
+					output.Add("> Selected assembler is unavailable in regular play.");
+			}
+
+			//fuel
+			if ((WarningSet & RecipeNode.Warnings.NoAvailableFuels) != 0)
+				output.Add("X> No fuel can be produced.");
+			else
+			{
+				if ((WarningSet & RecipeNode.Warnings.FuelIsUnavailable) != 0)
+					output.Add("> Selected fuel is unavailable in regular play.");
+				if ((WarningSet & RecipeNode.Warnings.FuelIsUncraftable) != 0)
+					output.Add("> Selected fuel cant be produced.");
+			}
+
+			//modules & beacon modules
+			if ((WarningSet & RecipeNode.Warnings.AModuleIsDisabled) != 0)
+				output.Add("> Some selected assembler modules are disabled.");
+			if ((WarningSet & RecipeNode.Warnings.AModuleIsUnavailable) != 0)
+				output.Add("> Some selected assembler modules are unavailable in regular play.");
+			if ((WarningSet & RecipeNode.Warnings.BeaconIsDisabled) != 0)
+				output.Add("> Selected beacon is disabled.");
+			if ((WarningSet & RecipeNode.Warnings.BeaconIsUnavailable) != 0)
+				output.Add("> Selected beacon is unavailable in regular play.");
+			if ((WarningSet & RecipeNode.Warnings.BModuleIsDisabled) != 0)
+				output.Add("> Some selected beacon modules are disabled.");
+			if ((WarningSet & RecipeNode.Warnings.BModuleIsUnavailable) != 0)
+				output.Add("> Some selected beacon modules are unavailable in regular play.");
+
+			return output;
+		}
+
+		//----------------------------------------------------------------------- Get functions (single assembler/beacon info)
+
+		public double GetGeneratorMinimumTemperature()
+		{
+			if (SelectedAssembler.EntityType == EntityType.Generator)
+			{
+				//minimum temperature accepted by generator is the largest of either the default temperature (at which point the power generation is 0 and it actually doesnt consume anything), or the set min temp
+				Item fluidBase = BaseRecipe.IngredientList[0]; //generators have 1 input & 0 output. only input is the fluid being consumed.
+				return Math.Max(fluidBase.DefaultTemperature + 0.1, BaseRecipe.IngredientTemperatureMap[fluidBase].Min);
+			}
+			Trace.Fail("Cant ask for minimum generator temperature for a non-generator!");
+			return 0;
+		}
+
+		public double GetGeneratorMaximumTemperature()
+		{
+			if (SelectedAssembler.EntityType == EntityType.Generator)
+				return BaseRecipe.IngredientTemperatureMap[BaseRecipe.IngredientList[0]].Max;
+			Trace.Fail("Cant ask for maximum generator temperature for a non-generator!");
+			return 0;
+		}
+
+		public double GetGeneratorAverageTemperature()
+		{
+			if (SelectedAssembler.EntityType != EntityType.Generator)
+				Trace.Fail("Cant ask for average generator temperature for a non-generator!");
+
+			return GetAverageTemperature(MyNode, MyNode.BaseRecipe.IngredientList[0]);
+			double GetAverageTemperature(BaseNode node, Item item)
+			{
+				if (node is PassthroughNode || node == MyNode)
+				{
+					double totalFlow = 0;
+					double totalTemperatureFlow = 0;
+					double totalTemperature = 0;
+					foreach (NodeLink link in node.InputLinks) //Throughput node: all same item. Generator node: only input is the fluid item.
+					{
+						totalFlow += link.Throughput;
+						double temperature = GetAverageTemperature(link.SupplierNode, item);
+						totalTemperatureFlow += temperature * link.Throughput;
+						totalTemperature += temperature;
+					}
+					if (totalFlow == 0)
+					{
+						if (node.InputLinks.Count == 0)
+							return SelectedAssembler.OperationTemperature;
+						else
+							return totalTemperature / node.InputLinks.Count;
+					}
+					return totalTemperatureFlow / totalFlow;
+				}
+				else if (node is SupplierNode)
+					return SelectedAssembler.OperationTemperature; //assume supplier is optimal temperature (cant exactly set to infinity or something as that would just cause the final result to be infinity)
+				else if (node is RecipeNode rnode)
+					return rnode.BaseRecipe.ProductTemperatureMap[item];
+				Trace.Fail("Unexpected node type in generator calculation!");
+				return 0;
+			}
+		}
+
+		public double GetGeneratorEffectivity()
+		{
+			Item fluid = MyNode.BaseRecipe.IngredientList[0];
+			return Math.Min((GetGeneratorAverageTemperature() - fluid.DefaultTemperature) / (MyNode.SelectedAssembler.OperationTemperature - fluid.DefaultTemperature), 1);
+		}
+
+		public double GetGeneratorElectricalProduction() //Watts
+		{
+			if (SelectedAssembler.EntityType == EntityType.Generator)
+				return MyNode.SelectedAssembler.EnergyProduction * GetGeneratorEffectivity();
+			return MyNode.SelectedAssembler.EnergyProduction; //no consumption multiplier => generators cant have modules / beacon effects
+		}
+
+
+		public double GetAssemblerSpeed()
+		{
+			return MyNode.SelectedAssembler.Speed * MyNode.GetSpeedMultiplier();
+		}
+
+		public double GetAssemblerEnergyConsumption() //Watts
+		{
+			return MyNode.SelectedAssembler.EnergyDrain + (MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier());
+		}
+
+		public double GetAssemblerPollutionProduction() //pollution/sec
+		{
+			return MyNode.SelectedAssembler.Pollution * MyNode.GetPollutionMultiplier() * GetAssemblerEnergyConsumption(); //pollution is counted in per energy
+		}
+
+		public double GetBeaconEnergyConsumption() //Watts
+		{
+			if (MyNode.SelectedBeacon == null || MyNode.SelectedBeacon.EnergySource != EnergySource.Electric)
+				return 0;
+			return MyNode.SelectedBeacon.EnergyConsumption + MyNode.SelectedBeacon.EnergyDrain;
+		}
+
+		public double GetBeaconPollutionProduction() //pollution/sec
+		{
+			if (MyNode.SelectedBeacon == null)
+				return 0;
+			return MyNode.SelectedBeacon.Pollution * GetBeaconEnergyConsumption();
+		}
+
+		//----------------------------------------------------------------------- Get functions (totals)
+
+		public double GetTotalCrafts()
+		{
+			return GetAssemblerSpeed() * MyNode.MyGraph.GetRateMultipler() / MyNode.BaseRecipe.Time;
+		}
+
+		public double GetTotalAssemblerFuelConsumption() //fuel items / time unit
+		{
+			if (MyNode.Fuel == null)
+				return 0;
+			return (MyNode.MyGraph.GetRateMultipler() * BaseRecipe.Time * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier() * MyNode.ActualRatePerSec) /
+				(MyNode.SelectedAssembler.Speed * MyNode.GetSpeedMultiplier() * MyNode.SelectedAssembler.ConsumptionEffectivity * MyNode.Fuel.FuelValue);
+		}
+
+		public double GetTotalAssemblerElectricalConsumption() // J/time unit
+		{
+			if (MyNode.SelectedAssembler.EnergySource != EnergySource.Electric)
+				return 0;
+
+			double partialAssembler = MyNode.ActualAssemblerCount % 1;
+			double entireAssemblers = MyNode.ActualAssemblerCount - partialAssembler;
+
+			return MyNode.MyGraph.GetRateMultipler() * (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * MyNode.SelectedAssembler.EnergyDrain) + (MyNode.ActualAssemblerCount * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
+		}
+
+		public double GetTotalGeneratorElectricalProduction() // J/time unit ; this is also when the temperature range of incoming fuel is taken into account
+		{
+			return MyNode.MyGraph.GetRateMultipler() * GetGeneratorElectricalProduction() * MyNode.ActualAssemblerCount;
+		}
+
+		public double GetTotalBeacons()
+		{
+			if (MyNode.SelectedBeacon == null)
+				return 0;
+			return Math.Ceiling(((int)(MyNode.ActualAssemblerCount + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
+		}
+
+		public double GetTotalBeaconElectricalConsumption() // J/time unit
+		{
+			if (MyNode.SelectedBeacon == null)
+				return 0;
+			return MyNode.MyGraph.GetRateMultipler() * GetTotalBeacons() * GetBeaconEnergyConsumption();
+		}
+
+		private readonly RecipeNode MyNode;
+
+		public ReadOnlyRecipeNode(RecipeNode node) : base(node) { MyNode = node; }
+	}
+
+	public class RecipeNodeController : BaseNodeController
+	{
+		private readonly RecipeNode MyNode;
+
+		protected RecipeNodeController(RecipeNode myNode) : base(myNode) { MyNode = myNode; }
+
+		public static RecipeNodeController GetController(RecipeNode node)
+		{
+			if (node.Controller != null)
+				return (RecipeNodeController)node.Controller;
+			return new RecipeNodeController(node);
+		}
+
+		//------------------------------------------------------------------------ warning / errors functions
 
 		public override Dictionary<string, Action> GetErrorResolutions()
 		{
@@ -531,50 +691,6 @@ namespace Foreman
 			return resolutions;
 		}
 
-		public override List<string> GetWarnings()
-		{
-			RecipeNode.Warnings WarningSet = MyNode.WarningSet;
-
-			List<string> output = new List<string>();
-
-			//recipe
-			if ((WarningSet & RecipeNode.Warnings.RecipeIsDisabled) != 0)
-				output.Add("X> Selected recipe is disabled.");
-			if ((WarningSet & RecipeNode.Warnings.RecipeIsUnavailable) != 0)
-				output.Add("X> Selected recipe is unavailable in regular play.");
-
-			if ((WarningSet & RecipeNode.Warnings.AssemblerIsDisabled) != 0)
-				output.Add("> Selected assembler is disabled.");
-			if ((WarningSet & RecipeNode.Warnings.AssemblerIsUnavailable) != 0)
-				output.Add("X> Selected assembler is unavailable in regular play.");
-			if ((WarningSet & RecipeNode.Warnings.NoAvailableAssemblers) != 0)
-				output.Add("X> No enabled assemblers for this recipe.");
-
-			//fuel
-			if ((WarningSet & RecipeNode.Warnings.FuelIsUnavailable) != 0)
-				output.Add("> Selected fuel is unavailable in regular play.");
-			if ((WarningSet & RecipeNode.Warnings.FuelIsUncraftable) != 0)
-				output.Add("X> Selected fuel cant be produced.");
-			if ((WarningSet & RecipeNode.Warnings.NoAvailableFuels) != 0)
-				output.Add("X> No fuel can be produced.");
-
-			//modules & beacon modules
-			if ((WarningSet & RecipeNode.Warnings.AModuleIsDisabled) != 0)
-				output.Add("> Some selected assembler modules are disabled.");
-			if ((WarningSet & RecipeNode.Warnings.AModuleIsUnavailable) != 0)
-				output.Add("> Some selected assembler modules are unavailable in regular play.");
-			if ((WarningSet & RecipeNode.Warnings.BeaconIsDisabled) != 0)
-				output.Add("> Selected beacon is disabled.");
-			if ((WarningSet & RecipeNode.Warnings.BeaconIsUnavailable) != 0)
-				output.Add("> Selected beacon is unavailable in regular play.");
-			if ((WarningSet & RecipeNode.Warnings.BModuleIsDisabled) != 0)
-				output.Add("> Some selected beacon modules are disabled.");
-			if ((WarningSet & RecipeNode.Warnings.BModuleIsUnavailable) != 0)
-				output.Add("> Some selected beacon modules are unavailable in regular play.");
-
-			return output;
-		}
-
 		public override Dictionary<string, Action> GetWarningResolutions()
 		{
 			RecipeNode.Warnings WarningSet = MyNode.WarningSet;
@@ -593,7 +709,6 @@ namespace Foreman
 					for (int i = MyNode.AssemblerModules.Count - 1; i >= 0; i--)
 						if (!MyNode.AssemblerModules[i].Enabled || !MyNode.AssemblerModules[i].Available)
 							RemoveAssemblerModule(i);
-					MyNode.UpdateState();
 				}));
 
 			if ((WarningSet & (RecipeNode.Warnings.BeaconIsDisabled | RecipeNode.Warnings.BeaconIsUnavailable)) != 0)
@@ -605,13 +720,20 @@ namespace Foreman
 				for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
 					if (!MyNode.BeaconModules[i].Enabled || !MyNode.BeaconModules[i].Available)
 						RemoveBeaconModule(i);
-				MyNode.UpdateState();
 			}));
 
 			return resolutions;
 		}
 
 		//-----------------------------------------------------------------------Set functions
+
+		public override void SetDesiredRate(double rate) { Trace.Fail("Desired rate set requested from recipe node!"); }
+		public void SetDesiredAssemblerCount(double count) { if (MyNode.DesiredAssemblerCount != count) MyNode.DesiredAssemblerCount = count; }
+
+		public void SetNeighbourCount(double count) { if (MyNode.NeighbourCount != count) MyNode.NeighbourCount = count; }
+		public void SetBeaconCount(double count) { if (MyNode.BeaconCount != count) MyNode.BeaconCount = count; }
+		public void SetBeaconsPerAssembler(double beacons) { if (MyNode.BeaconsPerAssembler != beacons) MyNode.BeaconsPerAssembler = beacons; }
+		public void SetBeaconsCont(double beacons) { if (MyNode.BeaconsConst != beacons) MyNode.BeaconsConst = beacons; }
 
 		public void SetAssembler(Assembler assembler)
 		{
@@ -630,17 +752,15 @@ namespace Foreman
 			//check for invalid modules
 			for (int i = MyNode.AssemblerModules.Count - 1; i >= 0; i--)
 				if (MyNode.AssemblerModules[i].IsMissing || !MyNode.SelectedAssembler.Modules.Contains(MyNode.AssemblerModules[i]) || !MyNode.BaseRecipe.Modules.Contains(MyNode.AssemblerModules[i]))
-					MyNode.AssemblerModules.RemoveAt(i);
+					MyNode.RemoveAssemblerModuleAt(i);
 			//check for too many modules
 			while (MyNode.AssemblerModules.Count > MyNode.SelectedAssembler.ModuleSlots)
-				MyNode.AssemblerModules.RemoveAt(MyNode.AssemblerModules.Count - 1);
+				MyNode.RemoveAssemblerModuleAt(MyNode.AssemblerModules.Count - 1);
 			//check if any modules work (if none work, then turn off beacon)
 			if (MyNode.SelectedAssembler.Modules.Count == 0 || MyNode.BaseRecipe.Modules.Count == 0)
 				SetBeacon(null);
 			else //update beacon
 				SetBeacon(MyNode.SelectedBeacon);
-
-			MyNode.UpdateState();
 		}
 
 		public void AutoSetAssembler()
@@ -670,7 +790,6 @@ namespace Foreman
 				MyNode.Fuel = fuel;
 				MyNode.MyGraph.FuelSelector.UseFuel(fuel);
 			}
-			MyNode.UpdateState();
 		}
 
 		public void AutoSetFuel()
@@ -684,7 +803,7 @@ namespace Foreman
 
 			if (MyNode.SelectedBeacon == null)
 			{
-				MyNode.BeaconModules.Clear();
+				MyNode.ClearBeaconModules();
 				MyNode.BeaconCount = 0;
 				MyNode.BeaconsPerAssembler = 0;
 				MyNode.BeaconsConst = 0;
@@ -694,70 +813,59 @@ namespace Foreman
 				//check for invalid modules
 				for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
 					if (MyNode.BeaconModules[i].IsMissing || !MyNode.SelectedAssembler.Modules.Contains(MyNode.BeaconModules[i]) || !MyNode.BaseRecipe.Modules.Contains(MyNode.BeaconModules[i]) || !MyNode.SelectedBeacon.Modules.Contains(MyNode.BeaconModules[i]))
-						MyNode.BeaconModules.RemoveAt(i);
+						MyNode.RemoveBeaconModuleAt(i);
 				//check for too many modules
 				while (MyNode.BeaconModules.Count > MyNode.SelectedBeacon.ModuleSlots)
-					MyNode.BeaconModules.RemoveAt(MyNode.BeaconModules.Count - 1);
+					MyNode.RemoveBeaconModuleAt(MyNode.BeaconModules.Count - 1);
 			}
-			MyNode.UpdateState();
 		}
 
 		public void AddAssemblerModule(Module module)
 		{
-			MyNode.AssemblerModules.Add(module);
-			MyNode.UpdateState();
+			MyNode.AddAssemblerModule(module);
 		}
 
 		public void RemoveAssemblerModule(int index)
 		{
 			if (index >= 0 && index < MyNode.AssemblerModules.Count)
-				MyNode.AssemblerModules.RemoveAt(index);
-			MyNode.UpdateState();
+				MyNode.RemoveAssemblerModuleAt(index);
 		}
 
 		public void SetAssemblerModules(IEnumerable<Module> modules)
 		{
-			MyNode.AssemblerModules.Clear();
+			MyNode.ClearAssemblerModules();
 			if (modules != null)
-				foreach (Module module in modules)
-					MyNode.AssemblerModules.Add(module);
-			MyNode.UpdateState();
+				MyNode.AddAssemblerModules(modules);
 		}
 
 		public void AutoSetAssemblerModules()
 		{
-			MyNode.AssemblerModules.Clear();
-			MyNode.AssemblerModules.AddRange(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, BaseRecipe));
-			MyNode.UpdateState();
+			MyNode.ClearAssemblerModules();
+			MyNode.AddAssemblerModules(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, MyNode.BaseRecipe));
 		}
 
 		public void AutoSetAssemblerModules(ModuleSelector.Style style)
 		{
-			MyNode.AssemblerModules.Clear();
-			MyNode.AssemblerModules.AddRange(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, BaseRecipe, style));
-			MyNode.UpdateState();
+			MyNode.ClearAssemblerModules();
+			MyNode.AddAssemblerModules(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, MyNode.BaseRecipe, style));
 		}
 
 		public void AddBeaconModule(Module module)
 		{
-			MyNode.BeaconModules.Add(module);
-			MyNode.UpdateState();
+			MyNode.AddBeaconModule(module);
 		}
 
 		public void RemoveBeaconModule(int index)
 		{
 			if (index >= 0 && index < MyNode.BeaconModules.Count)
-				MyNode.BeaconModules.RemoveAt(index);
-			MyNode.UpdateState();
+				MyNode.RemoveBeaconModuleAt(index);
 		}
 
 		public void SetBeaconModules(IEnumerable<Module> modules)
 		{
-			MyNode.BeaconModules.Clear();
+			MyNode.ClearBeaconModules();
 			if (modules != null)
-				foreach (Module module in modules)
-					MyNode.BeaconModules.Add(module);
-			MyNode.UpdateState();
+				MyNode.AddBeaconModules(modules);
 		}
 	}
 }

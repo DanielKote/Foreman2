@@ -74,7 +74,7 @@ namespace ForemanTest
 
         internal BuiltData Build()
         {
-            DataCache dCache = new DataCache();
+            DataCache dCache = new DataCache(true);
             var graph = new ProductionGraph(dCache);
 
             foreach (var node in this.nodes)

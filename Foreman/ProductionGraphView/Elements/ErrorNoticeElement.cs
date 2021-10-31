@@ -14,8 +14,11 @@ namespace Foreman
 		private const int ErrorIconSize = 24;
 		private static readonly Bitmap errorIcon = IconCache.GetIcon(Path.Combine("Graphics", "ErrorIcon.png"), 64);
 
+		private readonly ReadOnlyBaseNode DisplayedNode;
+
 		public ErrorNoticeElement(ProductionGraphViewer graphViewer, BaseNodeElement parent) : base(graphViewer, parent)
 		{
+			DisplayedNode = parent.DisplayedNode;
 			Width = ErrorIconSize;
 			Height = ErrorIconSize;
 		}
@@ -40,13 +43,14 @@ namespace Foreman
 				return null;
 
 			List<string> text = null;
-			switch (((BaseNodeElement)myParent).DisplayedNode.State)
+			BaseNodeController nodeController = graphViewer.Graph.RequestNodeController(DisplayedNode);
+			switch (DisplayedNode.State)
 			{
 				case NodeState.Error:
-					text = ((BaseNodeElement)myParent).DisplayedNode.GetErrors();
+					text = DisplayedNode.GetErrors();
 					break;
 				case NodeState.Warning:
-					text = ((BaseNodeElement)myParent).DisplayedNode.GetWarnings();
+					text = DisplayedNode.GetWarnings();
 					break;
 				case NodeState.Clean:
 				default:
@@ -79,13 +83,14 @@ namespace Foreman
 				return;
 
 			Dictionary<string, Action> resolutions = null;
+			BaseNodeController nodeController = graphViewer.Graph.RequestNodeController(DisplayedNode);
 			switch (((BaseNodeElement)myParent).DisplayedNode.State)
 			{
 				case NodeState.Error:
-					resolutions = ((BaseNodeElement)myParent).DisplayedNode.GetErrorResolutions();
+					resolutions = nodeController.GetErrorResolutions();
 					break;
 				case NodeState.Warning:
-					resolutions = ((BaseNodeElement)myParent).DisplayedNode.GetWarningResolutions();
+					resolutions = nodeController.GetWarningResolutions();
 					break;
 				case NodeState.Clean:
 				default:
@@ -96,7 +101,7 @@ namespace Foreman
 			{
 				foreach (Action resolution in resolutions.Values)
 					resolution.Invoke();
-				((BaseNodeElement)myParent).Update();
+				graphViewer.Graph.UpdateNodeValues();
 			}
 			else if (button == MouseButtons.Right)
 			{
@@ -107,7 +112,7 @@ namespace Foreman
 						RightClickMenu.MenuItems.Add(new MenuItem(kvp.Key, new EventHandler((o, e) =>
 						{
 							kvp.Value.Invoke();
-							((BaseNodeElement)myParent).Update();
+							graphViewer.Graph.UpdateNodeValues();
 						})));
 
 					RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));

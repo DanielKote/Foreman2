@@ -22,17 +22,13 @@ namespace Foreman
 			ReadOnlyNode = new ReadOnlySupplierNode(this);
 		}
 
-		public override bool UpdateState()
+		public override void UpdateState()
 		{
 			NodeState oldState = State;
 			State = (SuppliedItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean;
 			base.UpdateState();
 			if (oldState != State)
-			{
 				OnNodeStateChanged();
-				return true;
-			}
-			return false;
 		}
 
 		public override double GetConsumeRate(Item item) { throw new ArgumentException("Supplier does not consume! nothing should be asking for the consume rate"); }
@@ -48,7 +44,6 @@ namespace Foreman
 			info.AddValue("Location", Location);
 			info.AddValue("Item", SuppliedItem.Name);
 			info.AddValue("RateType", RateType);
-			info.AddValue("ActualRate", ActualRatePerSec);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredRate", DesiredRatePerSec);
 		}
@@ -58,28 +53,11 @@ namespace Foreman
 
 	public class ReadOnlySupplierNode : ReadOnlyBaseNode
 	{
-		public Item SuppliedItem { get { return MyNode.SuppliedItem; } }
+		public Item SuppliedItem => MyNode.SuppliedItem;
 
 		private readonly SupplierNode MyNode;
 
 		public ReadOnlySupplierNode(SupplierNode node) : base(node) { MyNode = node; }
-
-	}
-
-	public class SupplierNodeController : BaseNodeController
-	{
-		public Item SuppliedItem { get { return MyNode.SuppliedItem; } }
-
-		private readonly SupplierNode MyNode;
-
-		protected SupplierNodeController(SupplierNode myNode) : base(myNode) { MyNode = myNode; }
-
-		public static SupplierNodeController GetController(SupplierNode node)
-		{
-			if (node.Controller != null)
-				return (SupplierNodeController)node.Controller;
-			return new SupplierNodeController(node);
-		}
 
 		public override List<string> GetErrors()
 		{
@@ -91,10 +69,26 @@ namespace Foreman
 			return errors;
 		}
 
+		public override List<string> GetWarnings() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
+	}
+
+	public class SupplierNodeController : BaseNodeController
+	{
+		private readonly SupplierNode MyNode;
+
+		protected SupplierNodeController(SupplierNode myNode) : base(myNode) { MyNode = myNode; }
+
+		public static SupplierNodeController GetController(SupplierNode node)
+		{
+			if (node.Controller != null)
+				return (SupplierNodeController)node.Controller;
+			return new SupplierNodeController(node);
+		}
+
 		public override Dictionary<string, Action> GetErrorResolutions()
 		{
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-			if (SuppliedItem.IsMissing)
+			if (MyNode.SuppliedItem.IsMissing)
 				resolutions.Add("Delete node", new Action(() => this.Delete()));
 			else
 				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
@@ -102,7 +96,6 @@ namespace Foreman
 			return resolutions;
 		}
 
-		public override List<string> GetWarnings() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
 		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
 	}
 }
