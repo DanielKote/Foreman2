@@ -16,16 +16,17 @@ namespace Foreman
 		private HashSet<Recipe> consumptionRecipes;
 		private HashSet<Resource> miningResources;
 
-		public bool IsMissingItem { get { return myCache.MissingItems.ContainsKey(Name); } }
+		public bool IsMissingItem { get; private set; }
+
 		public bool IsFluid { get; private set; }
         public bool IsTemperatureDependent { get; set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
 
 		public double Temperature { get; set; } //for liquids
 
-		public Item(DataCache dCache, string name, string friendlyName, bool isfluid, Subgroup subgroup, string order) : base(dCache, name, friendlyName, order)
+		public Item(DataCache dCache, string name, string friendlyName, bool isfluid, Subgroup subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
 			MySubgroup = subgroup;
-			MySubgroup.Items.Add(this);
+			MySubgroup.InternalOneWayAddItem(this);
 			productionRecipes = new HashSet<Recipe>();
 			consumptionRecipes = new HashSet<Recipe>();
 			miningResources = new HashSet<Resource>();
@@ -33,6 +34,7 @@ namespace Foreman
 			IsFluid = isfluid;
             Temperature = 0;
             IsTemperatureDependent = false;
+			IsMissingItem = isMissing;
 		}
 
 		internal void InternalOneWayAddConsumptionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds an ingredient

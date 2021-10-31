@@ -1,0 +1,88 @@
+{
+  "AmountType": 0,
+  "Unit": 1,
+  "SavedPresetName": "Factorio 1.1 Vanilla",
+  "IncludedItems": [
+    "iron-gear-wheel",
+    "fast-transport-belt",
+    "lubricant",
+    "express-transport-belt"
+  ],
+  "IncludedRecipes": [
+    {
+      "Name": "express-transport-belt",
+      "Ingredients": {
+        "iron-gear-wheel": 10.0,
+        "fast-transport-belt": 1.0,
+        "lubricant": 20.0
+      },
+      "Products": {
+        "express-transport-belt": 1.0
+      }
+    }
+  ],
+  "IncludedMods": [
+    "core|1.0",
+    "base|1.1.41",
+    "foremanexport|1.0.0",
+    "z-barrelfix|1.1.1"
+  ],
+  "EnabledAssemblers": [
+    "stone-furnace",
+    "steel-furnace",
+    "electric-furnace",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "oil-refinery",
+    "chemical-plant",
+    "centrifuge",
+    "rocket-silo"
+  ],
+  "EnabledMiners": [
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "pumpjack",
+    "offshore-pump"
+  ],
+  "EnabledModules": [
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "effectivity-module",
+    "effectivity-module-2",
+    "effectivity-module-3",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3"
+  ],
+  "HiddenRecipes": [],
+  "Nodes": [
+    {
+      "NodeType": "Recipe",
+      "RecipeName": "express-transport-belt",
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "None"
+    },
+    {
+      "NodeType": "Consumer",
+      "ItemName": "express-transport-belt",
+      "RateType": 0,
+      "ActualRate": 0.0
+    }
+  ],
+  "NodeLinks": [
+    {
+      "Supplier": 0,
+      "Consumer": 1,
+      "Item": "express-transport-belt"
+    }
+  ],
+  "ElementLocations": [
+    "12, 108",
+    "12, -132"
+  ]
+}

@@ -21,6 +21,7 @@ namespace Foreman
 		{
             //test4(); return;
 
+            ErrorLogging.ClearLog();
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());

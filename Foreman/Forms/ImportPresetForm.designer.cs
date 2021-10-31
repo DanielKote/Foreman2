@@ -41,10 +41,10 @@
             this.RecipeDifficultyGroup = new System.Windows.Forms.GroupBox();
             this.ExpensiveRecipeRButton = new System.Windows.Forms.RadioButton();
             this.NormalRecipeRButton = new System.Windows.Forms.RadioButton();
-            this.CancelButton = new System.Windows.Forms.Button();
+            this.CancelImportButton = new System.Windows.Forms.Button();
             this.PresetNameGroup = new System.Windows.Forms.GroupBox();
-            this.PresetNameTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.PresetNameTextBox = new System.Windows.Forms.TextBox();
             this.ImportProgressBar = new Foreman.CustomProgressBar();
             this.FactorioLocationGroup.SuspendLayout();
             this.FactorioSettingsGroup.SuspendLayout();
@@ -192,16 +192,17 @@
             this.NormalRecipeRButton.Text = "Normal";
             this.NormalRecipeRButton.UseVisualStyleBackColor = true;
             // 
-            // CancelButton
+            // CancelImportButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(435, 241);
-            this.CancelButton.Margin = new System.Windows.Forms.Padding(4);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(177, 32);
-            this.CancelButton.TabIndex = 6;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+            this.CancelImportButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.CancelImportButton.Location = new System.Drawing.Point(435, 241);
+            this.CancelImportButton.Margin = new System.Windows.Forms.Padding(4);
+            this.CancelImportButton.Name = "CancelImportButton";
+            this.CancelImportButton.Size = new System.Drawing.Size(177, 32);
+            this.CancelImportButton.TabIndex = 6;
+            this.CancelImportButton.Text = "Cancel";
+            this.CancelImportButton.UseVisualStyleBackColor = true;
+            this.CancelImportButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // PresetNameGroup
             // 
@@ -214,16 +215,6 @@
             this.PresetNameGroup.TabStop = false;
             this.PresetNameGroup.Text = "Preset Name:";
             // 
-            // PresetNameTextBox
-            // 
-            this.PresetNameTextBox.BackColor = System.Drawing.Color.Moccasin;
-            this.PresetNameTextBox.Location = new System.Drawing.Point(7, 22);
-            this.PresetNameTextBox.MaxLength = 30;
-            this.PresetNameTextBox.Name = "PresetNameTextBox";
-            this.PresetNameTextBox.Size = new System.Drawing.Size(183, 22);
-            this.PresetNameTextBox.TabIndex = 0;
-            this.PresetNameTextBox.TextChanged += new System.EventHandler(this.PresetNameTextBox_TextChanged);
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -233,6 +224,16 @@
             this.label3.Size = new System.Drawing.Size(397, 15);
             this.label3.TabIndex = 5;
             this.label3.Text = "(5-30 characters: letters, numbers, space, brackets, dash or underscore)";
+            // 
+            // PresetNameTextBox
+            // 
+            this.PresetNameTextBox.BackColor = System.Drawing.Color.Moccasin;
+            this.PresetNameTextBox.Location = new System.Drawing.Point(7, 22);
+            this.PresetNameTextBox.MaxLength = 30;
+            this.PresetNameTextBox.Name = "PresetNameTextBox";
+            this.PresetNameTextBox.Size = new System.Drawing.Size(183, 22);
+            this.PresetNameTextBox.TabIndex = 0;
+            this.PresetNameTextBox.TextChanged += new System.EventHandler(this.PresetNameTextBox_TextChanged);
             // 
             // ImportProgressBar
             // 
@@ -248,20 +249,22 @@
             this.AcceptButton = this.OKButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.CancelImportButton;
             this.ClientSize = new System.Drawing.Size(624, 288);
             this.Controls.Add(this.PresetNameGroup);
             this.Controls.Add(this.ImportProgressBar);
-            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.CancelImportButton);
             this.Controls.Add(this.FactorioSettingsGroup);
             this.Controls.Add(this.FactorioLocationGroup);
             this.Controls.Add(this.OKButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.Name = "ImportPresetForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
-            this.Text = "Importing Preset";
+            this.Text = "Import Preset";
             this.FactorioLocationGroup.ResumeLayout(false);
             this.FactorioSettingsGroup.ResumeLayout(false);
             this.FactorioSettingsGroup.PerformLayout();
@@ -290,7 +293,7 @@
         private System.Windows.Forms.RadioButton ExpensiveRecipeRButton;
         private System.Windows.Forms.RadioButton NormalRecipeRButton;
         private CustomProgressBar ImportProgressBar;
-        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.Button CancelImportButton;
         private System.Windows.Forms.GroupBox PresetNameGroup;
         private System.Windows.Forms.TextBox PresetNameTextBox;
         private System.Windows.Forms.Label label3;

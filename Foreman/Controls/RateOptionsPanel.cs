@@ -64,7 +64,7 @@ namespace Foreman
             this.productivityBonusTextBox.Text = Convert.ToString(baseNode.ProductivityBonus);
             this.speedBonusTextBox.Text = Convert.ToString(baseNode.SpeedBonus);
 
-			if (baseNode is RecipeNode rNode)
+			if (baseNode is RecipeNode rNode && DCache.Recipes.ContainsKey(rNode.BaseRecipe.Name))
 			{
 				this.assemblerPanel.Visible = true;
 				Recipe recipe = rNode.BaseRecipe;

@@ -138,6 +138,8 @@ namespace Foreman
                     ProcessResource(objJToken);
                 foreach (var objJToken in jsonData["miners"].ToList())
                     ProcessMiner(objJToken, iconCache);
+                foreach (var objJToken in jsonData["offshorepumps"].ToList())
+                    ProcessOffshorePump(objJToken, iconCache);
                 foreach (var objJToken in jsonData["recipes"].ToList())
                     ProcessRecipe(objJToken, iconCache);
                 foreach (var objJToken in jsonData["modules"].ToList())
@@ -191,10 +193,29 @@ namespace Foreman
             resourceCategories.Clear();
         }
 
+        public static Dictionary<string,string> ReadModList(Preset preset)
+        {
+            Dictionary<string, string> mods = new Dictionary<string, string>();
+            string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+            if (!File.Exists(presetPath))
+                return mods;
+
+            JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
+            foreach (var objJToken in jsonData["mods"].ToList())
+                mods.Add((string)objJToken["name"], (string)objJToken["version"]);
+
+            return mods;
+        }
+
         public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string,string> modList,  List<string> itemList, List<RecipeShort> recipeSList)
         {
+
+            string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+            if (!File.Exists(presetPath))
+                return null;
+
             //parse preset
-            JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
+            JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
             HashSet<string> presetItems = new HashSet<string>();
             Dictionary<string, RecipeShort> presetRecipes = new Dictionary<string, RecipeShort>();
             Dictionary<string, string> presetMods = new Dictionary<string, string>();
@@ -311,7 +332,6 @@ namespace Foreman
                 (string)objJToken["name"]);
 
             resource.Time = (float)objJToken["mining_time"];
-            resource.Hardness = 0.5f;
             foreach (var productJToken in objJToken["products"])
                 if (items.ContainsKey((string)productJToken["name"]))
                     resource.AddResult(items[(string)productJToken["name"]]);
@@ -333,7 +353,7 @@ namespace Foreman
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
 
-            miner.MiningPower = (float)objJToken["mining_speed"];
+            miner.MiningSpeed = (float)objJToken["mining_speed"];
             miner.ModuleSlots = (int)objJToken["module_inventory_size"];
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
                 miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
@@ -343,6 +363,37 @@ namespace Foreman
                     foreach (Resource resource in resourceCategories[(string)categoryJToken])
                         resource.AddMiner(miner);
 
+            miners.Add(miner.Name, miner);
+        }
+
+        private void ProcessOffshorePump(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+        {
+            Miner miner = new Miner(
+                this,
+                (string)objJToken["name"],
+                (string)objJToken["localised_name"]);
+
+            miner.MiningSpeed = (float)objJToken["pumping_speed"];
+            miner.ModuleSlots = 0;
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+
+            string fluidName = (string)objJToken["fluid"];
+            if (!items.ContainsKey(fluidName))
+                return;
+            Item fluid = items[fluidName];
+
+            //now to add an extra 'resource' if there isnt one with the type of fluid being pumped out here. Once we ensure there is one, we add this miner to it
+            string rcName = "fer." + fluid.Name;
+            if(!resources.ContainsKey(rcName))
+            {
+                Resource extraResource = new Resource(this, rcName);
+                extraResource.Time = (1f/60); //'mining-speed' of 20, and time of 1/60s (every tick) leads to 1200 water per second. mods can set the mining/pumping-speed.
+                extraResource.AddResult(fluid);
+                resources.Add(extraResource.Name, extraResource);
+            }
+
+            resources[rcName].AddMiner(miner);
             miners.Add(miner.Name, miner);
         }
 
@@ -398,9 +449,6 @@ namespace Foreman
             }
 
             recipes.Add(recipe.Name, recipe);
-
-            if (recipe.Name.Contains("scrap"))
-                Console.WriteLine(recipe.Name);
         }
 
         private void ProcessModule(JToken objJToken)
@@ -526,7 +574,21 @@ namespace Foreman
 
             //step 3: try and delete all items (can only delete if item isnt produced/consumed by any recipe, and isnt part of assemblers, miners, modules (that exist in this cache)
             foreach (Item item in items.Values.ToList())
-                TryDeleteItem(item);
+                TryDeleteItem(item); //soft delete
+
+            //step 3.5: clean up those items which are kind of useless (those that are not produced anywhere, and are used in a single recipe that uses only them)
+            //this is necessary to take care of those mods that add item destruction and allow for any item (read - all of them) to be destroyed.
+            foreach(Item item in items.Values.ToList())
+            {
+                if(item.ProductionRecipes.Count == 0)
+                {
+                    bool useful = false;
+                    foreach (Recipe recipe in item.ConsumptionRecipes)
+                        useful |= (recipe.IngredientList.Count > 1 || recipe.ProductList.Count != 0); //recipe with multiple items coming in or some ingredients coming out -> not an incineration type
+                    if (!useful)
+                        TryDeleteItem(item, true); //hard delete.
+                }
+            }
 
             //step 4: clean up groups and subgroups (basically, clear the entire dictionary and for each recipe & item 'add' their subgroup & group into the dictionary.
             groups.Clear();
@@ -568,14 +630,39 @@ namespace Foreman
             technologies.Remove(technology.Name);
             Console.WriteLine("Deleting technology: " + technology);
         }
-        private bool TryDeleteItem(Item item)
+        private bool TryDeleteItem(Item item, bool forceDelete = false)
         {
+            if(forceDelete) //remove it from every production & consumption recipe, remove recipe if it no longer has any ingredients & products, then proceed.
+            {
+                Console.WriteLine("FORCEFUL DELETE! Deleting item: " + item);
+                foreach (Recipe r in item.ConsumptionRecipes)
+                {
+                    r.InternalOneWayDeleteIngredient(item);
+                    if (r.IngredientList.Count == 0 && r.ProductList.Count == 0)
+                        DeleteRecipe(r);
+                }
+                foreach (Recipe r in item.ProductionRecipes)
+                {
+                    r.InternalOneWayDeleteProduct(item);
+                    if (r.IngredientList.Count == 0 && r.ProductList.Count == 0)
+                        DeleteRecipe(r);
+                }
+
+                if (assemblers.ContainsKey(item.Name))
+                    DeleteAssembler(assemblers[item.Name]);
+                if (miners.ContainsKey(item.Name))
+                    DeleteMiner(miners[item.Name]);
+                if (modules.ContainsKey(item.Name))
+                    DeleteModule(modules[item.Name]);
+            }
+
             //can only delete an item if it has no production recipes, consumption recipes, module, assembler, or miner associated with it.
-            if( item.ProductionRecipes.Count == 0 && 
+            if( forceDelete || (
+                item.ProductionRecipes.Count == 0 && 
                 item.ConsumptionRecipes.Count == 0 && 
                 !assemblers.ContainsKey(item.Name) &&
                 !miners.ContainsKey(item.Name) &&
-                !modules.ContainsKey(item.Name))
+                !modules.ContainsKey(item.Name)))
             {
                 foreach (Resource resource in item.MiningResources)
                 {
@@ -583,8 +670,11 @@ namespace Foreman
                     if (resource.ResultingItems.Count == 0)
                         DeleteResource(resource);
                 }
+
+                item.MySubgroup.InternalOneWayRemoveItem(item);
                 items.Remove(item.Name);
-                Console.WriteLine("Deleting item: " + item);
+                if(!forceDelete)
+                    Console.WriteLine("Deleting item: " + item);
                 return true;
             }
             return false;
@@ -607,6 +697,8 @@ namespace Foreman
                 module.InternalOneWayRemoveRecipe(recipe);
             foreach (Technology tech in recipe.MyUnlockTechnologies)
                 tech.InternalOneWayRemoveRecipe(recipe);
+
+            recipe.MySubgroup.InternalOneWayRemoveRecipe(recipe);
             recipes.Remove(recipe.Name);
             Console.WriteLine("Deleting recipe: " + recipe);
         }

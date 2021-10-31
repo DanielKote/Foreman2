@@ -5,14 +5,26 @@ namespace Foreman
 {
     public class Group : DataObjectBase
     {
-        public List<Subgroup> Subgroups { get; private set; }
+        public IReadOnlyList<Subgroup> Subgroups { get { return subgroups; } }
+
+        private List<Subgroup> subgroups;
 
         public Group(DataCache dCache, string name, string lname, string order) : base(dCache, name, lname, order)
         {
-            Subgroups = new List<Subgroup>();
+            subgroups = new List<Subgroup>();
         }
 
-        public void SortSubgroups() { Subgroups.Sort(); } //sort them by their order string
+        public void SortSubgroups() { subgroups.Sort(); } //sort them by their order string
+
+        internal void InternalOneWayAddSubgroup(Subgroup sgroup)
+        {
+            subgroups.Add(sgroup);
+        }
+
+        internal void InternalOneWayRemoveSubgroup(Subgroup sgroup)
+        {
+            subgroups.Remove(sgroup);
+        }
 
     }
 
@@ -20,21 +32,41 @@ namespace Foreman
     {
         public Group MyGroup { get; private set; }
 
-        public List<Recipe> Recipes { get; private set; }
-        public List<Item> Items { get; private set; }
+        public IReadOnlyList<Recipe> Recipes { get { return recipes; } }
+        public IReadOnlyList<Item> Items { get { return items; } }
+
+        private List<Recipe> recipes;
+        private List<Item> items;
 
         public Subgroup(DataCache dCache, string name, string order) : base(dCache, name, name, order)
         {
-            Recipes = new List<Recipe>();
-            Items = new List<Item>();
+            recipes = new List<Recipe>();
+            items = new List<Item>();
         }
 
         internal void SetGroup(Group myGroup)
         {
             MyGroup = myGroup;
-            MyGroup.Subgroups.Add(this);
+            MyGroup.InternalOneWayAddSubgroup(this);
         }
 
-        public void SortIRs() { Recipes.Sort(); Items.Sort(); } //sort them by their order string
+        public void SortIRs() { recipes.Sort(); items.Sort(); } //sort them by their order string
+
+        internal void InternalOneWayAddRecipe(Recipe recipe)
+        {
+            recipes.Add(recipe);
+        }
+        internal void InternalOneWayAddItem(Item item)
+        {
+            items.Add(item);
+        }
+        internal void InternalOneWayRemoveRecipe(Recipe recipe)
+        {
+            recipes.Remove(recipe);
+        }
+        internal void InternalOneWayRemoveItem(Item item)
+        {
+            items.Remove(item);
+        }
     }
 }

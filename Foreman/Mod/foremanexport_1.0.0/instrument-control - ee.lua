@@ -14,6 +14,7 @@ local AvailableModules = {}
 local AvailableAMachines = {}
 local AvailableMiners = {}
 local AvailableResources = {}
+local AvailableOffshorePumps = {}
 
 --these are the name -> icon index dictionaries. an object with a given name will ask the correct dictionary for the icon index, which will then give him the actual icon information from the IconCollection dictionary
 local IconsTech = {}
@@ -269,8 +270,26 @@ local function ProcessPrototypes()
 	for name, _ in pairs(AvailableResources) do
 		LOG(name)
 	end
-	
-	--1.8: just list all the groups and subgroups for debugging if necessary
+
+	--1.8.0: process available offshore pumps (will be placed as miners)
+	for name, entity in pairs(game.entity_prototypes) do
+		if AvailableItems[name] and entity.fluid then
+			AvailableOffshorePumps[name] = entity
+		end
+	end
+
+	LOG('-------------------------AVAILABLE RAW MINERS----------------------')
+	for name, _ in pairs(AvailableOffshorePumps) do
+		LOG(name)
+	end
+	LOG('-------------------------BLOCKED RAW MINERS----------------------')
+	for name, entity in pairs(game.entity_prototypes) do
+		if (entity.fluid) and (not AvailableOffshorePumps[name]) then
+			LOG(name)
+		end
+	end
+
+	--1.9: just list all the groups and subgroups for debugging if necessary
 	LOG('-------------------------GROUPS----------------------')
 	for name, _ in pairs(game.item_group_prototypes) do
 		LOG(name)
@@ -758,6 +777,37 @@ local function ExportResources()
 	ExportLine('],', 1)
 end
 
+local function ExportOffshorePumps()
+	ExportLine('"offshorepumps": [', 1)
+	counter = 0
+	for _, _ in pairs(AvailableOffshorePumps) do
+		counter = counter + 1
+	end
+	for name, opump in pairs(AvailableOffshorePumps) do
+		ExportLine('{', 2)
+		
+		ExportParameter('name', opump.name, false, ',', 3)
+		ExportParameter('icon_name', 'icon.i.'..opump.name, false, ',', 3)
+
+		ExportLine('"localised_name": "', 3)
+		ExportLocalisedString(opump.localised_name)
+		ExportLine('",', 0)
+		
+		ExportParameter('fluid', opump.fluid.name, false, ',', 3)
+		ExportParameter('pumping_speed', opump.pumping_speed, true, ',', 3)
+		
+		ExportParameter('order', opump.order, false, '', 3)
+		
+		counter = counter - 1 
+		if counter > 0 then
+			ExportLine('},', 2)
+		else
+			ExportLine('}', 2)
+		end
+	end
+	ExportLine('],', 1)
+end
+
 local function ExportGroups()
 	ExportLine('"groups": [', 1)
 	counter = 0
@@ -845,6 +895,7 @@ script.on_nth_tick(1,
 		ExportCraftingMachines()
 		ExportMiners()
 		ExportResources()
+		ExportOffshorePumps()
 		ExportGroups()
 		ExportSubGroups()
 		ExportLine('}', 0)

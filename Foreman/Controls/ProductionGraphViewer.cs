@@ -64,7 +64,7 @@ namespace Foreman
 
 		public bool DynamicLinkWidth = false;
 		private const int minLinkWidth = 3;
-		private const int maxLinkWidth = 50;
+		private const int maxLinkWidth = 40;
 
 		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
 		StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
@@ -985,16 +985,16 @@ namespace Foreman
 			List<Preset> allPresets = MainForm.GetValidPresetsList();
 			Dictionary<Preset, PresetErrorPackage> presetErrors = new Dictionary<Preset, PresetErrorPackage>();
 			Preset chosenPreset = null;
-			if(useFirstPreset)
+			if (useFirstPreset)
 				chosenPreset = allPresets[0];
 			else
-            {
+			{
 				//test for the preset specified in the json save
 				Preset savedWPreset = allPresets.FirstOrDefault(p => p.Name == (string)json["SavedPresetName"]);
 				if (savedWPreset != null)
-                {
+				{
 					var errors = DataCache.TestPreset(savedWPreset, modSet, itemNames, recipeShorts);
-					if (errors.ErrorCount == 0) //no errors found here. We will then use this exact preset and not search for a different one
+					if (errors != null && errors.ErrorCount == 0) //no errors found here. We will then use this exact preset and not search for a different one
 						chosenPreset = savedWPreset;
 					else
 					{
@@ -1002,19 +1002,30 @@ namespace Foreman
 						presetErrors.Add(savedWPreset, errors);
 						allPresets.Remove(savedWPreset);
 					}
-                }
+				}
 
 				//havent found the preset, or it returned some errors (not good) -> have to search for best fit (and leave the decision to user if we have multiple)
 				if (chosenPreset == null)
 				{
 					foreach (Preset preset in allPresets)
-						presetErrors.Add(preset, DataCache.TestPreset(preset, modSet, itemNames, recipeShorts));
+					{
+						PresetErrorPackage errors = DataCache.TestPreset(preset, modSet, itemNames, recipeShorts);
+						if (errors != null)
+							presetErrors.Add(preset, errors);
+					}
 
 					//show the menu to select the preferred preset
+					using (PresetSelectionForm form = new PresetSelectionForm())
+					{
+						form.StartPosition = FormStartPosition.Manual;
+						form.Left = this.Left + 150;
+						form.Top = this.Top + 100;
+						form.ShowDialog();
 
-					//usedPreset = whatever the user selected
+						chosenPreset = form.ChosenPreset;
+					}
 				}
-            }
+			}
 
 
 			using (DataLoadForm form = new DataLoadForm(chosenPreset))
@@ -1076,7 +1087,7 @@ namespace Foreman
 				{
 					if (!Graph.DCache.Items.ContainsKey(iItem))
 					{
-						Item missingItem = new Item(Graph.DCache, iItem, iItem, false, Graph.DCache.MissingSubgroup, "");
+						Item missingItem = new Item(Graph.DCache, iItem, iItem, false, Graph.DCache.MissingSubgroup, "", true);
 						Graph.DCache.MissingItems.Add(missingItem.Name, missingItem);
 					}
 				}
@@ -1091,7 +1102,10 @@ namespace Foreman
 				{
 					//recipe check #1 : does its name exist in database
 					bool recipeExists = Graph.DCache.Recipes.ContainsKey(iRecipe.Name);
-					//recipe check #2 : do the ingredients & products from the loaded data exist within the actual recipe?
+					//recipe check #2 : do the number of ingredients & products match?
+					recipeExists &= iRecipe.Ingredients.Count == Graph.DCache.Recipes[iRecipe.Name].IngredientList.Count;
+					recipeExists &= iRecipe.Products.Count == Graph.DCache.Recipes[iRecipe.Name].ProductList.Count;
+					//recipe check #3 : do the ingredients & products from the loaded data exist within the actual recipe?
 					if (recipeExists)
 					{
 						Recipe recipe = Graph.DCache.Recipes[iRecipe.Name];
@@ -1103,11 +1117,9 @@ namespace Foreman
 					}
 					if (!recipeExists)
 					{
-						//if we are here, then we failed either check 1 or check 2: this is a missing recipe
-
 						if (!Graph.DCache.MissingRecipes.ContainsKey(iRecipe.Name))
 						{
-							Recipe missingRecipe = new Recipe(Graph.DCache, iRecipe.Name, iRecipe.Name, Graph.DCache.MissingSubgroup, "");
+							Recipe missingRecipe = new Recipe(Graph.DCache, iRecipe.Name, iRecipe.Name, Graph.DCache.MissingSubgroup, "", true);
 							foreach (var ingredient in iRecipe.Ingredients)
 							{
 								if (Graph.DCache.Items.ContainsKey(ingredient.Key))
@@ -1140,28 +1152,28 @@ namespace Foreman
 					case "Consumer":
 						{
 							string itemName = (string)node["ItemName"];
-							if (Graph.DCache.Items.ContainsKey(itemName))
-								newNode = ConsumerNode.Create(Graph.DCache.Items[itemName], Graph);
-							else if (Graph.DCache.MissingItems.ContainsKey(itemName))
+							if (Graph.DCache.MissingItems.ContainsKey(itemName))
 								newNode = ConsumerNode.Create(Graph.DCache.MissingItems[itemName], Graph);
+							else if (Graph.DCache.Items.ContainsKey(itemName))
+								newNode = ConsumerNode.Create(Graph.DCache.Items[itemName], Graph);
 							break;
 						}
 					case "Supply":
 						{
 							string itemName = (string)node["ItemName"];
-							if (Graph.DCache.Items.ContainsKey(itemName))
-								newNode = SupplierNode.Create(Graph.DCache.Items[itemName], Graph);
-							else if (Graph.DCache.MissingItems.ContainsKey(itemName))
+							if (Graph.DCache.MissingItems.ContainsKey(itemName))
 								newNode = SupplierNode.Create(Graph.DCache.MissingItems[itemName], Graph);
+							else if (Graph.DCache.Items.ContainsKey(itemName))
+								newNode = SupplierNode.Create(Graph.DCache.Items[itemName], Graph);
 							break;
 						}
 					case "PassThrough":
 						{
 							string itemName = (string)node["ItemName"];
-							if (Graph.DCache.Items.ContainsKey(itemName))
-								newNode = PassthroughNode.Create(Graph.DCache.Items[itemName], Graph);
-							else if (Graph.DCache.MissingItems.ContainsKey(itemName))
-								newNode = PassthroughNode.Create(Graph.DCache.MissingItems[itemName], Graph);
+							if (Graph.DCache.MissingItems.ContainsKey(itemName))
+                                newNode = PassthroughNode.Create(Graph.DCache.MissingItems[itemName], Graph);
+                            else if (Graph.DCache.Items.ContainsKey(itemName))
+                                newNode = PassthroughNode.Create(Graph.DCache.Items [itemName], Graph);
 							break;
 						}
 					case "Recipe":

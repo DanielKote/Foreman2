@@ -499,8 +499,8 @@ namespace Foreman
 
 		public void beginEditingNodeRate()
 		{
-			RateOptionsPanel newPanel = new RateOptionsPanel(DisplayedNode, Parent);
-			new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), Parent);
+			//RateOptionsPanel newPanel = new RateOptionsPanel(DisplayedNode, Parent);
+			//new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), Parent);
 		}
 
 		public override List<TooltipInfo> GetToolTips(Point location)

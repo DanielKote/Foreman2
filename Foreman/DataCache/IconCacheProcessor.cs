@@ -293,6 +293,8 @@ namespace Foreman
             if (String.IsNullOrEmpty(fileName))
                 return null;
             fileName = fileName.ToLower().Replace("/","\\");
+            while (fileName.IndexOf("\\\\") != -1) //found this error in krastorio - apparently factorio ignores multiple slashes in file name
+                fileName = fileName.Replace("\\\\", "\\");
 
             //if the image isnt currently in the cache, process it and add it to cache
             if (!bitmapCache.ContainsKey(fileName))
@@ -306,19 +308,29 @@ namespace Foreman
 
                     file = Path.Combine(folderLinks[origin], file);
                     try { bitmapCache.Add(fileName, new Bitmap(file)); }
-                    catch { bitmapCache.Add(fileName, null); FailedPathCount++; }
+                    catch {
+                        bitmapCache.Add(fileName, null);
+                        FailedPathCount++;
+                        ErrorLogging.LogLine("IconCacheProcessor: given fileName not found in mod folders: " + fileName);
+                    }
                     
                 }
                 else if (archiveFileLinks.ContainsKey(fileName))
                 {
                     try { bitmapCache.Add(fileName, new Bitmap(archiveFileLinks[fileName].Open()));}
-                    catch { bitmapCache.Add(fileName, null); FailedPathCount++; }
+                    catch
+                    {
+                        bitmapCache.Add(fileName, null);
+                        FailedPathCount++;
+                        ErrorLogging.LogLine("IconCacheProcessor: given fileName not found in mod folders: " + fileName);
+                    }
 
                 }
                 else
                 {
                     FailedPathCount++;
                     bitmapCache.Add(fileName, null);
+                    ErrorLogging.LogLine("IconCacheProcessor: given fileName not found in mod folders: " + fileName);
                 }
             }
 

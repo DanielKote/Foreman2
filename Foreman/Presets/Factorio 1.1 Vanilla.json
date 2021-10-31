@@ -10,7 +10,7 @@
     },
     {
       "name": "foremanexport",
-      "version": "0.1.1"
+      "version": "1.0.0"
     },
     {
       "name": "z-barrelfix",
@@ -10814,6 +10814,16 @@
         }
       ],
       "minable": true
+    }
+  ],
+  "offshorepumps": [
+    {
+      "name": "offshore-pump",
+      "icon_name": "icon.i.offshore-pump",
+      "localised_name": "Offshore pump",
+      "fluid": "water",
+      "pumping_speed": 20,
+      "order": "z-b[fluids]-a[offshore-pump]"
     }
   ],
   "groups": [

@@ -100,20 +100,22 @@ namespace Foreman
 
 		private HashSet<Technology> myUnlockTechnologies;
 
+		public bool IsMissingRecipe { get; private set; }
 		public bool IsCyclic { get; set; }
-		public bool IsMissingRecipe { get { return myCache.MissingRecipes.ContainsKey(Name); } }
+
 		public bool HasEnabledAssemblers { get { return validAssemblers.FirstOrDefault(a => a.Enabled) != null; } }
 
 		public bool Hidden { get; set; }
 
-		public Recipe(DataCache dCache, string name, string friendlyName, Subgroup subgroup, string order) : base(dCache, name, friendlyName, order)
+		public Recipe(DataCache dCache, string name, string friendlyName, Subgroup subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
 			MySubgroup = subgroup;
-			MySubgroup.Recipes.Add(this);
+			MySubgroup.InternalOneWayAddRecipe(this);
 
 			Time = 0.5f;
 			this.Hidden = false;
 			this.IsCyclic = false;
+			this.IsMissingRecipe = isMissing;
 
 			ingredientSet = new Dictionary<Item, float>();
 			ingredientList = new List<Item>();

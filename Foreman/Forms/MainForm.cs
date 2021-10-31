@@ -175,12 +175,9 @@ namespace Foreman
 					oldOptions.Miners.Add(miner, miner.Enabled);
 				foreach (Module module in GraphViewer.Graph.DCache.Modules.Values)
 					oldOptions.Modules.Add(module, module.Enabled);
-				foreach (KeyValuePair<string,string> kvp in GraphViewer.Graph.DCache.IncludedMods)
-					oldOptions.Mods.Add(kvp.Key + " - " + kvp.Value);
-				oldOptions.Mods.Sort();
 
 				oldOptions.Presets = GetValidPresetsList();
-				oldOptions.SelectedPreset = oldOptions.Presets[0].Name;
+				oldOptions.SelectedPreset = oldOptions.Presets[0];
 
 				using (SettingsForm form = new SettingsForm(oldOptions))
 				{
@@ -192,7 +189,7 @@ namespace Foreman
 
 					if (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset) //different preset -> need to reload datacache
 					{
-						Properties.Settings.Default.CurrentPresetName = form.CurrentOptions.SelectedPreset;
+						Properties.Settings.Default.CurrentPresetName = form.CurrentOptions.SelectedPreset.Name;
 						List<Preset> validPresets = GetValidPresetsList();
 						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, true);
 						Properties.Settings.Default.Save();
@@ -216,6 +213,9 @@ namespace Foreman
 		private void ExportImageButton_Click(object sender, EventArgs e)
 		{
 			ImageExportForm form = new ImageExportForm(GraphViewer);
+			form.StartPosition = FormStartPosition.Manual;
+			form.Left = this.Left + 150;
+			form.Top = this.Top + 100;
 			form.Show();
 		}
 

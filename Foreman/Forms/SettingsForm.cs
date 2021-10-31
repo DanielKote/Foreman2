@@ -14,17 +14,15 @@ namespace Foreman
             public Dictionary<Assembler, bool> Assemblers;
             public Dictionary<Miner, bool> Miners;
             public Dictionary<Module, bool> Modules;
-            public List<string> Mods;
 
             public List<Preset> Presets;
-            public string SelectedPreset;
+            public Preset SelectedPreset;
 
             public SettingsFormOptions()
             {
                 Assemblers = new Dictionary<Assembler, bool>();
                 Miners = new Dictionary<Miner, bool>();
                 Modules = new Dictionary<Module, bool>();
-                Mods = new List<string>();
 
                 Presets = new List<Preset>();
             }
@@ -38,8 +36,6 @@ namespace Foreman
                     clone.Miners.Add(kvp.Key, kvp.Value);
                 foreach (KeyValuePair<Module, bool> kvp in Modules)
                     clone.Modules.Add(kvp.Key, kvp.Value);
-                foreach (string mod in Mods)
-                    clone.Mods.Add(mod);
                 foreach (Preset preset in Presets)
                     clone.Presets.Add(preset);
 
@@ -117,24 +113,51 @@ namespace Foreman
                 }
             }
 
-            ModSelectionBox.Items.AddRange(CurrentOptions.Mods.ToArray());
-            for (int i = 0; i < ModSelectionBox.Items.Count; i++)
-                ModSelectionBox.SetItemChecked(i, true);
+            CurrentPresetLabel.Text = CurrentOptions.SelectedPreset.Name;
+            PresetListBox.Items.AddRange(CurrentOptions.Presets.ToArray());
+            PresetListBox.Items.RemoveAt(0); //0 is the currently active preset.
 
-            CurrentPresetLabel.Text = CurrentOptions.SelectedPreset;
-            PresetsListBox.Items.AddRange(CurrentOptions.Presets.ToArray());
-            PresetsListBox.Items.RemoveAt(0); //0 is the currently active preset.
+            UpdateModList();
         }
 
-        private void PresetsListBox_MouseDown(object sender, MouseEventArgs e)
+        private void UpdateModList()
+        {
+            Preset selectedPreset = (Preset)PresetListBox.SelectedItem;
+            if (selectedPreset == null)
+                selectedPreset = CurrentOptions.SelectedPreset;
+
+            Dictionary<string, string> mods = DataCache.ReadModList(selectedPreset);
+            ModSelectionBox.Items.Clear();
+            if (mods != null)
+            {
+                List<string> modList = mods.Select(kvp => kvp.Key + "_" + kvp.Value).ToList();
+                modList.Sort();
+                ModSelectionBox.Items.AddRange(modList.ToArray());
+            }
+        }
+
+        //PRESETS LIST------------------------------------------------------------------------------------------
+        private void EnableSelectionBox_Enter(object sender, EventArgs e) { PresetListBox.SelectedItem = null; }
+        private void CurrentPresetLabel_Click(object sender, EventArgs e) { PresetListBox.SelectedItem = null; }
+
+        private void PresetListBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            UpdateModList();
+            if(PresetListBox.SelectedItem == null)
+                CurrentPresetLabel.Font = new Font(CurrentPresetLabel.Font, FontStyle.Bold);
+            else
+                CurrentPresetLabel.Font = new Font(CurrentPresetLabel.Font, FontStyle.Regular);
+        }
+
+        private void PresetListBox_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Right) return;
 
-            var index = PresetsListBox.IndexFromPoint(e.Location);
+            var index = PresetListBox.IndexFromPoint(e.Location);
             if (index != ListBox.NoMatches)
             {
-                Preset rclickedPreset = ((Preset)PresetsListBox.Items[index]);
-                PresetsListBox.SelectedIndex = index;
+                Preset rclickedPreset = ((Preset)PresetListBox.Items[index]);
+                PresetListBox.SelectedIndex = index;
 
                 if(rclickedPreset.IsCurrentlySelected)
                 {
@@ -167,7 +190,7 @@ namespace Foreman
 
         private void DeletePresetMenuItem_Click(object sender, EventArgs e)
         {
-            Preset selectedPreset = (Preset)PresetsListBox.SelectedItem;
+            Preset selectedPreset = (Preset)PresetListBox.SelectedItem;
             if(!selectedPreset.IsCurrentlySelected && !selectedPreset.IsDefaultPreset) //safety check - should always pass
             {
                if(MessageBox.Show("Are you sure you wish to delete the \""+selectedPreset.Name+"\" preset? This is irreversible.", "Confirm Delete", MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -180,7 +203,7 @@ namespace Foreman
                     if (File.Exists(iconPath))
                         File.Delete(iconPath);
 
-                    PresetsListBox.Items.Remove(selectedPreset);
+                    PresetListBox.Items.Remove(selectedPreset);
                     CurrentOptions.Presets.Remove(selectedPreset);
                 }
             }
@@ -188,10 +211,10 @@ namespace Foreman
 
         private void SelectPresetMenuItem_Click(object sender, EventArgs e)
         {
-            Preset selectedPreset = (Preset)PresetsListBox.SelectedItem;
+            Preset selectedPreset = (Preset)PresetListBox.SelectedItem;
             if (!selectedPreset.IsCurrentlySelected) //safety check - should always pass
             {
-                CurrentOptions.SelectedPreset = selectedPreset.Name;
+                CurrentOptions.SelectedPreset = selectedPreset;
                 this.Close();
             }
         }
@@ -289,8 +312,6 @@ namespace Foreman
             this.Close();
         }
 
-        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) { }
-
         //PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------
 
         private void ImportPresetButton_Click(object sender, EventArgs e)
@@ -307,11 +328,11 @@ namespace Foreman
                     GC.Collect(); //we just added a new preset - this required the opening of (potentially) alot of zip files and processing of a ton of bitmaps that are now stuck in garbate. In large mod packs like A&B this could clear out 2GB+ of memory.
                     Preset newPreset = new Preset(form.NewPresetName, false, false);
                     CurrentOptions.Presets.Add(newPreset);
-                    PresetsListBox.Items.Add(newPreset);
+                    PresetListBox.Items.Add(newPreset);
 
                     if(MessageBox.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
-                        CurrentOptions.SelectedPreset = newPreset.Name;
+                        CurrentOptions.SelectedPreset = newPreset;
                         this.Close();
                     }
                 }

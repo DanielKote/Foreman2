@@ -14,7 +14,6 @@ namespace Foreman
 
 		public string Category { get; set; }
 
-		public float Hardness { get; set;}
 		public float Time { get; set;}
 
 		private HashSet<Miner> validMiners;
@@ -22,7 +21,6 @@ namespace Foreman
 
 		public Resource(DataCache dCache, string name) : base(dCache, name, name, "-")
 		{
-			Hardness = 0.5f;
 			validMiners = new HashSet<Miner>();
 			resultingItems = new HashSet<Item>();
 		}
@@ -53,7 +51,7 @@ namespace Foreman
 	public class Miner : ProductionEntity
 	{
 		public IReadOnlyCollection<Resource> MineableResources { get { return mineableResources; } }
-		public float MiningPower { get; set; }
+		public float MiningSpeed { get; set; }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
 		private HashSet<Resource> mineableResources;

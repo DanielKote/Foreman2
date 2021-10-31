@@ -50,7 +50,7 @@ namespace Foreman
 			foreach (Miner miner in resource.ValidMiners.Where(m =>m.Enabled))
 			{
 				// TODO: Find correct recipe to pass in here. Needed to disallow productivity modules.
-				allowedPermutations.AddRange(miner.GetAllPermutations(null));
+				//allowedPermutations.AddRange(miner.GetAllPermutations(null));
 			}
 
 			List<MachinePermutation> sortedPermutations = allowedPermutations.OrderBy(p => p.GetMinerRate(resource)).ToList();
