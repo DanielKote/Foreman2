@@ -538,13 +538,7 @@ namespace Foreman
 				}
 				if (!inItemTab)
 				{
-					rightClickMenu.MenuItems.Clear();
-					rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-						new EventHandler((o, e) =>
-							{
-								Parent.DeleteNode(this);
-							})));
-					rightClickMenu.Show(Parent, Parent.GraphToScreen(Point.Add(location, new Size(X, Y))));
+					Parent.OpenNodeMenu(this);
 				}
 			}
 		}

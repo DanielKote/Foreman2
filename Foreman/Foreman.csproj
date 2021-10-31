@@ -42,6 +42,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -127,7 +128,6 @@
   <ItemGroup>
     <Compile Include="Assembler.cs" />
     <Compile Include="AssemblerBox.cs" />
-    <Compile Include="CancellableProgress.cs" />
     <Compile Include="Controls\CheckboxListWithErrors.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -143,6 +143,7 @@
     <Compile Include="DataCache.cs" />
     <Compile Include="DependencyGraph.cs" />
     <Compile Include="Extensions\VersionOperatorExtensions.cs" />
+    <Compile Include="FModDataProcessor.cs" />
     <Compile Include="Forms\InstallationChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -165,7 +166,9 @@
     <Compile Include="GhostNodeElement.cs" />
     <Compile Include="DraggedLinkElement.cs" />
     <Compile Include="ErrorLogging.cs" />
+    <Compile Include="IconProcessor.cs" />
     <Compile Include="LBitmap.cs" />
+    <Compile Include="LuaDataProcessor.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\FoundInstallation.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
@@ -178,7 +181,6 @@
     <Compile Include="Forms\ImageExportForm.Designer.cs">
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Inserter.cs" />
     <Compile Include="ItemTab.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>

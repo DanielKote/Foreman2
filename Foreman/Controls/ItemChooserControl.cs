@@ -22,11 +22,17 @@ namespace Foreman
 			TextLabel.Text = text;
 		}
 
+		internal override void UpdateIconSize(int iconSize)
+		{
+			ItemLayoutPanel.ColumnStyles[0].Width = iconSize;
+			iconPictureBox.Size = new Size(iconSize, iconSize);
+		}
+
 		private void RecipeChooserSupplyNodeOption_Load(object sender, EventArgs e)
 		{
 			iconPictureBox.Image = DisplayedItem != null ? DisplayedItem.Icon : null;
-			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
-			MainForm.SetDoubleBuffered(tableLayoutPanel1);
+			iconPictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+			MainForm.SetDoubleBuffered(ItemLayoutPanel);
 
 			RegisterMouseEvents(this);
 		}

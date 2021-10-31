@@ -29,36 +29,36 @@
 		private void InitializeComponent()
 		{
 			this.DoubleBuffered = true;
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.ItemLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.iconPictureBox = new System.Windows.Forms.PictureBox();
 			this.TextLabel = new System.Windows.Forms.Label();
-			this.tableLayoutPanel1.SuspendLayout();
+			this.ItemLayoutPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
 			// 
-			this.tableLayoutPanel1.AutoSize = true;
-			this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel1.ColumnCount = 2;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.tableLayoutPanel1.Controls.Add(this.iconPictureBox, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.TextLabel, 1, 0);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 1;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.TabIndex = 2;
+			this.ItemLayoutPanel.AutoSize = true;
+			this.ItemLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.ItemLayoutPanel.ColumnCount = 2;
+			this.ItemLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 64F));
+			this.ItemLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.ItemLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.ItemLayoutPanel.Controls.Add(this.iconPictureBox, 0, 0);
+			this.ItemLayoutPanel.Controls.Add(this.TextLabel, 1, 0);
+			this.ItemLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ItemLayoutPanel.Location = new System.Drawing.Point(0, 0);
+			this.ItemLayoutPanel.Name = "tableLayoutPanel1";
+			this.ItemLayoutPanel.RowCount = 1;
+			this.ItemLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.ItemLayoutPanel.TabIndex = 2;
 			// 
 			// iconPictureBox
 			// 
 			this.iconPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.iconPictureBox.Location = new System.Drawing.Point(3, 3);
 			this.iconPictureBox.Name = "iconPictureBox";
-			this.iconPictureBox.Size = new System.Drawing.Size(30, 35);
+			this.iconPictureBox.Size = new System.Drawing.Size(10, 10);
 			this.iconPictureBox.TabIndex = 0;
 			this.iconPictureBox.TabStop = false;
 			// 
@@ -78,10 +78,10 @@
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BackColor = System.Drawing.Color.White;
-			this.Controls.Add(this.tableLayoutPanel1);
+			this.Controls.Add(this.ItemLayoutPanel);
 			this.Name = "SupplyNodeChooserControl";
 			this.Load += new System.EventHandler(this.RecipeChooserSupplyNodeOption_Load);
-			this.tableLayoutPanel1.ResumeLayout(false);
+			this.ItemLayoutPanel.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -90,7 +90,7 @@
 
 		#endregion
 
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+		private System.Windows.Forms.TableLayoutPanel ItemLayoutPanel;
 		private System.Windows.Forms.PictureBox iconPictureBox;
 		private System.Windows.Forms.Label TextLabel;
 	}

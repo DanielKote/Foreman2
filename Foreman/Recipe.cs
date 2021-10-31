@@ -10,7 +10,8 @@ namespace Foreman
 	public class Recipe
 	{
 		public String Name { get; private set; }
-		public float Time { get; private set; }
+		public string LName;
+		public float Time { get; set; }
 		public String Category { get; set; }
 		public Dictionary<Item, float> Results { get; private set; }
 		public Dictionary<Item, float> Ingredients { get; private set; }
@@ -43,7 +44,9 @@ namespace Foreman
 		{
 			get
 			{
-                if (DataCache.LocaleFiles.ContainsKey("recipe-name") && DataCache.LocaleFiles["recipe-name"].ContainsKey(Name))
+				if (!String.IsNullOrEmpty(LName))
+					return LName;
+				if (DataCache.LocaleFiles.ContainsKey("recipe-name") && DataCache.LocaleFiles["recipe-name"].ContainsKey(Name))
                 {
 					if (DataCache.LocaleFiles["recipe-name"][Name].Contains("__"))
 						return Regex.Replace(DataCache.LocaleFiles["recipe-name"][Name], "__.+?__", "").Replace("_", "").Replace("-", " ");
@@ -62,12 +65,12 @@ namespace Foreman
 		}
         public Boolean Enabled { get; set; }
 
-		public Recipe(String name, float time, Dictionary<Item, float> ingredients, Dictionary<Item, float> results)
+		public Recipe(String name)
 		{
 			this.Name = name;
-			this.Time = time;
-			this.Ingredients = ingredients;
-			this.Results = results;
+			this.Time = 0.5f;
+			this.Ingredients = new Dictionary<Item, float>();
+			this.Results = new Dictionary<Item, float>();
             this.Enabled = true; //Nothing will have been loaded yet to disable recipes.
 		}
 

@@ -17,6 +17,7 @@ namespace Foreman
 		public Resource(String name)
 		{
 			Name = name;
+			Hardness = 0.5f;
 		}
 	}
 

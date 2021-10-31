@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace Foreman
 {
-	public class ChooserControl : UserControl
+	public abstract class ChooserControl : UserControl
 	{
 		public String DisplayText = "";
 		public String FilterText = "";
@@ -19,6 +19,8 @@ namespace Foreman
 			this.DisplayText = text;
 			this.FilterText = filterText;
 		}
+
+		internal abstract void UpdateIconSize(int iconSize);
 
 		protected void RegisterMouseEvents(Control control)
 		{

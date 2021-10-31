@@ -29,12 +29,12 @@
 		private void InitializeComponent()
 		{
 			this.iconPictureBox = new System.Windows.Forms.PictureBox();
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.RecipeLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.nameLabel = new System.Windows.Forms.Label();
 			this.inputListBox = new System.Windows.Forms.ListBox();
 			this.outputListBox = new System.Windows.Forms.ListBox();
 			((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).BeginInit();
-			this.tableLayoutPanel1.SuspendLayout();
+			this.RecipeLayoutPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// iconPictureBox
@@ -42,35 +42,35 @@
 			this.iconPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.iconPictureBox.Location = new System.Drawing.Point(3, 3);
 			this.iconPictureBox.Name = "iconPictureBox";
-			this.tableLayoutPanel1.SetRowSpan(this.iconPictureBox, 2);
-			this.iconPictureBox.Size = new System.Drawing.Size(30, 74);
+			this.RecipeLayoutPanel.SetRowSpan(this.iconPictureBox, 2);
+			this.iconPictureBox.Size = new System.Drawing.Size(10, 10);
 			this.iconPictureBox.TabIndex = 0;
 			this.iconPictureBox.TabStop = false;
 			// 
 			// tableLayoutPanel1
 			// 
-			this.tableLayoutPanel1.AutoSize = true;
-			this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel1.ColumnCount = 3;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel1.Controls.Add(this.iconPictureBox, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.nameLabel, 1, 0);
-			this.tableLayoutPanel1.Controls.Add(this.inputListBox, 1, 1);
-			this.tableLayoutPanel1.Controls.Add(this.outputListBox, 2, 1);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 2;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.TabIndex = 1;
+			this.RecipeLayoutPanel.AutoSize = true;
+			this.RecipeLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.RecipeLayoutPanel.ColumnCount = 3;
+			this.RecipeLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 64F));
+			this.RecipeLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.RecipeLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.RecipeLayoutPanel.Controls.Add(this.iconPictureBox, 0, 0);
+			this.RecipeLayoutPanel.Controls.Add(this.nameLabel, 1, 0);
+			this.RecipeLayoutPanel.Controls.Add(this.inputListBox, 1, 1);
+			this.RecipeLayoutPanel.Controls.Add(this.outputListBox, 2, 1);
+			this.RecipeLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.RecipeLayoutPanel.Location = new System.Drawing.Point(0, 0);
+			this.RecipeLayoutPanel.Name = "tableLayoutPanel1";
+			this.RecipeLayoutPanel.RowCount = 2;
+			this.RecipeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.RecipeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.RecipeLayoutPanel.TabIndex = 1;
 			// 
 			// nameLabel
 			// 
 			this.nameLabel.AutoSize = true;
-			this.tableLayoutPanel1.SetColumnSpan(this.nameLabel, 2);
+			this.RecipeLayoutPanel.SetColumnSpan(this.nameLabel, 2);
 			this.nameLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.nameLabel.Location = new System.Drawing.Point(39, 0);
 			this.nameLabel.Name = "nameLabel";
@@ -86,6 +86,7 @@
 			this.inputListBox.Name = "inputListBox";
 			this.inputListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.inputListBox.TabIndex = 2;
+			this.inputListBox.Enabled = false;
 			// 
 			// outputListBox
 			// 
@@ -95,6 +96,7 @@
 			this.outputListBox.Name = "outputListBox";
 			this.outputListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.outputListBox.TabIndex = 3;
+			this.outputListBox.Enabled = false;
 			// 
 			// RecipeChooserControl
 			// 
@@ -103,13 +105,13 @@
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AutoSize = true;
 			this.BackColor = System.Drawing.Color.White;
-			this.Controls.Add(this.tableLayoutPanel1);
+			this.Controls.Add(this.RecipeLayoutPanel);
 			this.DoubleBuffered = true;
 			this.Name = "RecipeChooserControl";
 			this.Load += new System.EventHandler(this.RecipeChooserOption_Load);
 			((System.ComponentModel.ISupportInitialize)(this.iconPictureBox)).EndInit();
-			this.tableLayoutPanel1.ResumeLayout(false);
-			this.tableLayoutPanel1.PerformLayout();
+			this.RecipeLayoutPanel.ResumeLayout(false);
+			this.RecipeLayoutPanel.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -117,7 +119,7 @@
 		#endregion
 
 		private System.Windows.Forms.PictureBox iconPictureBox;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+		private System.Windows.Forms.TableLayoutPanel RecipeLayoutPanel;
 		private System.Windows.Forms.Label nameLabel;
 		private System.Windows.Forms.ListBox inputListBox;
 		private System.Windows.Forms.ListBox outputListBox;

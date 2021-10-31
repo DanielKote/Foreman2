@@ -38,7 +38,7 @@
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.EnableDisableButton = new System.Windows.Forms.Button();
             this.ExportImageButton = new System.Windows.Forms.Button();
-            this.HelpButton = new System.Windows.Forms.Button();
+            this.MainHelpButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
             this.rateOptionsDropDown = new System.Windows.Forms.ComboBox();
@@ -173,7 +173,7 @@
             this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.flowLayoutPanel2.Controls.Add(this.EnableDisableButton);
             this.flowLayoutPanel2.Controls.Add(this.ExportImageButton);
-            this.flowLayoutPanel2.Controls.Add(this.HelpButton);
+            this.flowLayoutPanel2.Controls.Add(this.MainHelpButton);
             this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(120, 4);
             this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4);
@@ -203,15 +203,15 @@
             this.ExportImageButton.UseVisualStyleBackColor = true;
             this.ExportImageButton.Click += new System.EventHandler(this.ExportImageButton_Click);
             // 
-            // HelpButton
+            // MainHelpButton
             // 
-            this.HelpButton.Location = new System.Drawing.Point(4, 84);
-            this.HelpButton.Margin = new System.Windows.Forms.Padding(4);
-            this.HelpButton.Name = "HelpButton";
-            this.HelpButton.Size = new System.Drawing.Size(100, 32);
-            this.HelpButton.TabIndex = 9;
-            this.HelpButton.Text = "Help";
-            this.HelpButton.UseVisualStyleBackColor = true;
+            this.MainHelpButton.Location = new System.Drawing.Point(4, 84);
+            this.MainHelpButton.Margin = new System.Windows.Forms.Padding(4);
+            this.MainHelpButton.Name = "MainHelpButton";
+            this.MainHelpButton.Size = new System.Drawing.Size(100, 32);
+            this.MainHelpButton.TabIndex = 9;
+            this.MainHelpButton.Text = "Help";
+            this.MainHelpButton.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
@@ -467,6 +467,8 @@
             this.ListTabControl.Size = new System.Drawing.Size(280, 617);
             this.ListTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.ListTabControl.TabIndex = 17;
+            this.ListTabControl.SelectedIndexChanged += new System.EventHandler(this.ListTabControl_SelectedIndexChanged);
+            this.ListTabControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListTabControl_KeyDown);
             // 
             // ItemTabPage
             // 
@@ -532,6 +534,7 @@
             this.ItemListView.LabelWrap = false;
             this.ItemListView.Location = new System.Drawing.Point(4, 34);
             this.ItemListView.Margin = new System.Windows.Forms.Padding(4);
+            this.ItemListView.MultiSelect = false;
             this.ItemListView.Name = "ItemListView";
             this.ItemListView.Size = new System.Drawing.Size(264, 511);
             this.ItemListView.SmallImageList = this.ItemImageList;
@@ -545,7 +548,7 @@
             // h_Name
             // 
             this.h_Name.Text = "Name";
-            this.h_Name.Width = 175;
+            this.h_Name.Width = 225;
             // 
             // ItemImageList
             // 
@@ -579,6 +582,8 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(272, 588);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
@@ -610,7 +615,7 @@
             this.RecipeListView.CheckBoxes = true;
             this.RecipeListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
-            this.RecipeListView.Dock = System.Windows.Forms.DockStyle.Left;
+            this.RecipeListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RecipeListView.FullRowSelect = true;
             this.RecipeListView.GridLines = true;
             this.RecipeListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
@@ -619,7 +624,7 @@
             this.RecipeListView.Location = new System.Drawing.Point(4, 34);
             this.RecipeListView.Margin = new System.Windows.Forms.Padding(4);
             this.RecipeListView.Name = "RecipeListView";
-            this.RecipeListView.Size = new System.Drawing.Size(260, 511);
+            this.RecipeListView.Size = new System.Drawing.Size(264, 511);
             this.RecipeListView.SmallImageList = this.RecipeImageList;
             this.RecipeListView.TabIndex = 15;
             this.RecipeListView.UseCompatibleStateImageBehavior = false;
@@ -631,7 +636,7 @@
             // columnHeader1
             // 
             this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 175;
+            this.columnHeader1.Width = 225;
             // 
             // RecipeImageList
             // 
@@ -716,12 +721,6 @@
 		private System.Windows.Forms.TabPage RecipeTabPage;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		private System.Windows.Forms.TextBox ItemFilterTextBox;
-		private System.Windows.Forms.Button AddItemButton;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-		private System.Windows.Forms.TextBox RecipeFilterTextBox;
-		private System.Windows.Forms.Button AddRecipeButton;
-		private System.Windows.Forms.ListView RecipeListView;
-		private System.Windows.Forms.ColumnHeader columnHeader1;
 		private System.Windows.Forms.ImageList RecipeImageList;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox ModuleDropDown;
@@ -733,7 +732,13 @@
         private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
         private System.Windows.Forms.CheckBox PauseUpdatesCheckbox;
         private System.Windows.Forms.Button AlignSelectionButton;
-        private System.Windows.Forms.Button HelpButton;
+        private System.Windows.Forms.Button MainHelpButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.TextBox RecipeFilterTextBox;
+        private System.Windows.Forms.Button AddRecipeButton;
+        private System.Windows.Forms.ListView RecipeListView;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.Button AddItemButton;
     }
 }
 

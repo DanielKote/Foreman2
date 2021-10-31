@@ -191,12 +191,11 @@ namespace Foreman
 				recipeOptionList.Add(itemOutputOption);
 				recipeOptionList.Add(itemPassthroughOption);
 
-				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Ingredients.Keys.Contains(Item) && r.Enabled && r.Category != "incinerator" && r.Category != "incineration"))
-				{
-					recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
-				}
+				foreach(Recipe recipe in Item.ConsumptionRecipes)
+					if(recipe.Enabled)
+						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
 
-				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);
+				var chooserPanel = new ChooserPanel(recipeOptionList, Parent, ChooserPanel.RecipeIconSize);
 				chooserPanel.Show(c =>
 				{
 					if (c != null)
@@ -247,15 +246,12 @@ namespace Foreman
 				recipeOptionList.Add(itemSupplyOption);
 				recipeOptionList.Add(itemPassthroughOption);
 
-				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Results.Keys.Contains(Item) && r.Enabled && r.Category != "incinerator" && r.Category != "incineration"))
-				{
-					if (recipe.Category != "incinerator" && recipe.Category != "incineration")
-					{
-						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
-					}
-				}
 
-				var chooserPanel = new ChooserPanel(recipeOptionList, Parent);
+				foreach (Recipe recipe in Item.ProductionRecipes)
+					if (recipe.Enabled)
+						recipeOptionList.Add(new RecipeChooserControl(recipe, "Use recipe " + recipe.FriendlyName, recipe.FriendlyName));
+
+				var chooserPanel = new ChooserPanel(recipeOptionList, Parent, ChooserPanel.RecipeIconSize);
 				chooserPanel.Show(c =>
 				{
 					if (c != null)

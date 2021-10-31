@@ -13,7 +13,10 @@ namespace Foreman
 		public static List<String> localeCategories = new List<String> { "item-name", "fluid-name", "entity-name", "equipment-name" };
 
 		public String Name { get; private set; }
-		public HashSet<Recipe> Recipes { get; private set; }
+		public string LName { get; set; }
+		public HashSet<Recipe> ProductionRecipes { get; private set; }
+		public HashSet<Recipe> ConsumptionRecipes { get; private set; }
+		public double Temperature { get; set; } //for liquids
 
 		private Bitmap icon;
 		public Bitmap Icon
@@ -33,18 +36,29 @@ namespace Foreman
 		{
 			get
 			{
+				if (!String.IsNullOrEmpty(LName))
+					return LName;
+
+				string calcName = "";
+				string localeString = "";
 				foreach (String category in localeCategories)
 				{
-					if (DataCache.LocaleFiles.ContainsKey(category) && DataCache.LocaleFiles[category].ContainsKey(Name))
+					string[] SplitName = Name.Split('\f');
+					if (DataCache.LocaleFiles.ContainsKey(category) && DataCache.LocaleFiles[category].ContainsKey(SplitName[0]))
 					{
-						if (DataCache.LocaleFiles[category][Name].Contains("__"))
-							return Regex.Replace(DataCache.LocaleFiles[category][Name], "__.+?__", "").Replace("_", "").Replace("-", " ");
+						localeString = DataCache.LocaleFiles[category][SplitName[0]];
+						if (DataCache.LocaleFiles[category][SplitName[0]].Contains("__"))
+							calcName = Regex.Replace(DataCache.LocaleFiles[category][SplitName[0]], "__.+?__", "").Replace("_", "").Replace("-", " ");
 						else
-							return DataCache.LocaleFiles[category][Name];
+							calcName =  DataCache.LocaleFiles[category][SplitName[0]];
+						if(SplitName.Length > 1)
+							calcName += " (" + SplitName + "*)";
 					}
-				}
 
-				return Name;
+				}
+				return calcName;
+				Console.WriteLine(Name + ": >>" + LName + "<< compared: >>" + calcName + "<<. LOCALE STRING: >>"+localeString+"<<");
+				return LName;
 			}
 		}
 		public Boolean IsMissingItem = false;
@@ -57,7 +71,8 @@ namespace Foreman
 		public Item(String name)
 		{
 			Name = name;
-			Recipes = new HashSet<Recipe>();
+			ProductionRecipes = new HashSet<Recipe>();
+			ConsumptionRecipes = new HashSet<Recipe>();
 		}
 
 		public override int GetHashCode()
@@ -132,7 +147,7 @@ namespace Foreman
 			}
 
 			//darken color if it is too bright
-			TooBright = (result.GetBrightness() > 0.85);
+			TooBright = (result.GetBrightness() > 0.90);
 
 			if (TooBright && darkenIfWhite)
 				AverageColor = Color.FromArgb((int)(result.R * 0.8), (int)(result.G * 0.8), (int)(result.B * 0.8));
@@ -140,7 +155,7 @@ namespace Foreman
 				AverageColor = result;
 		}
 
-		private const int iconBorder = 2;
+		private const int iconBorder = 1;
 		private static readonly Color iconBorderColor = Color.FromArgb(150, 100, 100, 100);
 		private void ProcessIcon(Bitmap inicon)
         {

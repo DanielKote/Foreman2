@@ -124,14 +124,24 @@ namespace Foreman
 
         private static void ReloadFactorioData()
         {
-            using (DataReloadForm form = new DataReloadForm())
-            {
-                form.ShowDialog();
-            }
+			using (DataReloadForm form = new DataReloadForm())
+			{
+				form.ShowDialog();
+			}
         }
 
         public void LoadItemList()
 		{
+			//quick filter for only items used by the currently active recipes:
+			HashSet<Item> availableItems = new HashSet<Item>();
+			foreach(Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled))
+            {
+				foreach (Item item in recipe.Ingredients.Keys)
+					availableItems.Add(item);
+				foreach (Item item in recipe.Results.Keys)
+					availableItems.Add(item);
+            }
+
 			//Listview
 			ItemListView.Items.Clear();
 			unfilteredItemList = new List<ListViewItem>();
@@ -139,20 +149,20 @@ namespace Foreman
 			{
 				ItemImageList.Images.Add(DataCache.UnknownIcon);
 			}
-			foreach (var item in DataCache.Items)
+			foreach (var item in availableItems)
 			{
 				ListViewItem lvItem = new ListViewItem();
-				if (item.Value.Icon != null)
+				if (item.Icon != null)
 				{
-					ItemImageList.Images.Add(item.Value.Icon);
+					ItemImageList.Images.Add(item.Icon);
 					lvItem.ImageIndex = ItemImageList.Images.Count - 1;
 				}
 				else
 				{
 					lvItem.ImageIndex = 0;
 				}
-				lvItem.Text = item.Value.FriendlyName;
-				lvItem.Tag = item.Value;
+				lvItem.Text = item.FriendlyName;
+				lvItem.Tag = item;
 				unfilteredItemList.Add(lvItem);
 				ItemListView.Items.Add(lvItem);
 			}
@@ -202,25 +212,21 @@ namespace Foreman
 				var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
 
 				var optionList = new List<ChooserControl>();
-				optionList.Add(itemOutputOption);
-				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
-				{
-					if (recipe.Results.ContainsKey(item))
-					{
-						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-					}
-				}
-				optionList.Add(itemSupplyOption);
-                
-				foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
-				{
-					if (recipe.Ingredients.ContainsKey(item))
-					{
-						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-					}
-				}
 
-				var chooserPanel = new ChooserPanel(optionList, GraphViewer);
+				optionList.Add(itemOutputOption);
+
+				foreach (Recipe recipe in item.ProductionRecipes)
+					if (recipe.Enabled)
+						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+
+				optionList.Add(itemSupplyOption);
+
+				foreach (Recipe recipe in item.ConsumptionRecipes)
+					if (recipe.Enabled)
+						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+
+
+				var chooserPanel = new ChooserPanel(optionList, GraphViewer, ChooserPanel.RecipeIconSize);
 
 				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 				if (GraphViewer.ShowGrid)
@@ -337,7 +343,7 @@ namespace Foreman
 				AddItemButton.Enabled = true;
 				AddItemButton.Text = "Add Item";
 			}
-			else if (ItemListView.SelectedItems.Count > 1)
+			else if (ItemListView.SelectedItems.Count > 1) //disabled now
 			{
 				AddItemButton.Enabled = true;
 				AddItemButton.Text = "Add Items";
@@ -422,79 +428,90 @@ namespace Foreman
 
 		private void SettingsButton_Click(object sender, EventArgs e)
 		{
-			SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
-			foreach (Assembler assembler in DataCache.Assemblers.Values)
-				oldOptions.Assemblers.Add(assembler, assembler.Enabled);
-			foreach (Miner miner in DataCache.Miners.Values)
-				oldOptions.Miners.Add(miner, miner.Enabled);
-			foreach (Module module in DataCache.Modules.Values)
-				oldOptions.Modules.Add(module, module.Enabled);
-			foreach (Mod mod in DataCache.Mods)
-				oldOptions.Mods.Add(mod, mod.Enabled);
-			foreach (Language language in DataCache.Languages)
-				oldOptions.LanguageOptions.Add(language);
-			oldOptions.selectedLanguage = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
-			oldOptions.InstallLocation = Properties.Settings.Default.FactorioPath;
-			oldOptions.UserDataLocation = Properties.Settings.Default.FactorioUserDataPath;
-			oldOptions.GenerationType = (DataCache.GenerationType)(Properties.Settings.Default.GenerationType);
-			oldOptions.NormalDifficulty = (Properties.Settings.Default.FactorioNormalDifficulty);
-
-
-
-			using (SettingsForm form = new SettingsForm(oldOptions))
+			bool reload = false;
+			do
 			{
-				form.ShowDialog();
-
-				if (!oldOptions.Equals(form.CurrentOptions) || form.ReloadRequested) //some changes have been made OR reload was requested
+				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
+				foreach (Assembler assembler in DataCache.Assemblers.Values)
+					oldOptions.Assemblers.Add(assembler, assembler.Enabled);
+				foreach (Miner miner in DataCache.Miners.Values)
+					oldOptions.Miners.Add(miner, miner.Enabled);
+				foreach (Module module in DataCache.Modules.Values)
+					oldOptions.Modules.Add(module, module.Enabled);
+				foreach (Mod mod in DataCache.Mods)
 				{
-					DataCache.LocaleFiles.Clear();
-					DataCache.LoadLocaleFiles(form.CurrentOptions.selectedLanguage.Name);
-					Properties.Settings.Default.Language = form.CurrentOptions.selectedLanguage.Name;
-
-					Properties.Settings.Default.FactorioPath = form.CurrentOptions.InstallLocation;
-					Properties.Settings.Default.FactorioUserDataPath = form.CurrentOptions.UserDataLocation;
-					Properties.Settings.Default.GenerationType = (int)(form.CurrentOptions.GenerationType);
-					Properties.Settings.Default.FactorioNormalDifficulty = form.CurrentOptions.NormalDifficulty;
-
-					Properties.Settings.Default.EnabledAssemblers.Clear();
-					foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
-					{
-						kvp.Key.Enabled = kvp.Value;
-						if (kvp.Value)
-							Properties.Settings.Default.EnabledAssemblers.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
-					}
-
-					Properties.Settings.Default.EnabledMiners.Clear();
-					foreach (KeyValuePair<Miner, bool> kvp in form.CurrentOptions.Miners)
-					{
-						kvp.Key.Enabled = kvp.Value;
-						if (kvp.Value)
-							Properties.Settings.Default.EnabledMiners.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
-					}
-
-					Properties.Settings.Default.EnabledModules.Clear();
-					foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
-					{
-						kvp.Key.Enabled = kvp.Value;
-						if (kvp.Value)
-							Properties.Settings.Default.EnabledModules.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
-					}
-
-					Properties.Settings.Default.EnabledMods.Clear();
-					foreach (KeyValuePair<Mod, bool> kvp in form.CurrentOptions.Mods)
-					{
-						kvp.Key.Enabled = kvp.Value;
-						if (kvp.Value)
-							Properties.Settings.Default.EnabledMods.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
-					}
-
-					Properties.Settings.Default.Save();
-
-					GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
-					GraphViewer.UpdateNodes();
-					UpdateControlValues();
+					if(mod.Name == "core" || mod.Name == "base")
+						mod.Enabled = true;
+					oldOptions.Mods.Add(mod, mod.Enabled);
 				}
-			}
+				foreach (Language language in DataCache.Languages)
+					oldOptions.LanguageOptions.Add(language);
+				oldOptions.selectedLanguage = DataCache.Languages.FirstOrDefault(l => l.Name == Properties.Settings.Default.Language);
+				oldOptions.InstallLocation = Properties.Settings.Default.FactorioPath;
+				oldOptions.UserDataLocation = Properties.Settings.Default.FactorioUserDataPath;
+				oldOptions.GenerationType = (DataCache.GenerationType)(Properties.Settings.Default.GenerationType);
+				oldOptions.NormalDifficulty = (Properties.Settings.Default.FactorioNormalDifficulty);
+
+				using (SettingsForm form = new SettingsForm(oldOptions))
+				{
+					form.StartPosition = FormStartPosition.Manual;
+					form.Left = this.Left + 250;
+					form.Top = this.Top + 25;
+					form.ShowDialog();
+					reload = form.ReloadRequested;
+
+					if (!oldOptions.Equals(form.CurrentOptions) || reload) //some changes have been made OR reload was requested
+					{
+						DataCache.LocaleFiles.Clear();
+						DataCache.LoadLocaleFiles((form.CurrentOptions.selectedLanguage == null)? "en" : form.CurrentOptions.selectedLanguage.Name);
+						if(form.CurrentOptions.selectedLanguage != null)
+							Properties.Settings.Default.Language = form.CurrentOptions.selectedLanguage.Name;
+
+						Properties.Settings.Default.FactorioPath = form.CurrentOptions.InstallLocation;
+						Properties.Settings.Default.FactorioUserDataPath = form.CurrentOptions.UserDataLocation;
+						Properties.Settings.Default.GenerationType = (int)(form.CurrentOptions.GenerationType);
+						Properties.Settings.Default.FactorioNormalDifficulty = form.CurrentOptions.NormalDifficulty;
+
+						Properties.Settings.Default.EnabledAssemblers.Clear();
+						foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
+						{
+							kvp.Key.Enabled = kvp.Value;
+							if (kvp.Value)
+								Properties.Settings.Default.EnabledAssemblers.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+						}
+
+						Properties.Settings.Default.EnabledMiners.Clear();
+						foreach (KeyValuePair<Miner, bool> kvp in form.CurrentOptions.Miners)
+						{
+							kvp.Key.Enabled = kvp.Value;
+							if (kvp.Value)
+								Properties.Settings.Default.EnabledMiners.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+						}
+
+						Properties.Settings.Default.EnabledModules.Clear();
+						foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
+						{
+							kvp.Key.Enabled = kvp.Value;
+							if (kvp.Value)
+								Properties.Settings.Default.EnabledModules.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+						}
+
+						Properties.Settings.Default.EnabledMods.Clear();
+						foreach (KeyValuePair<Mod, bool> kvp in form.CurrentOptions.Mods)
+						{
+							kvp.Key.Enabled = kvp.Value;
+							if (kvp.Value)
+								Properties.Settings.Default.EnabledMods.Add(kvp.Key.Name + "|" + kvp.Value.ToString());
+						}
+
+						Properties.Settings.Default.Save();
+
+						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)));
+						GraphViewer.UpdateNodes();
+						UpdateControlValues();
+					}
+				}
+			} while (reload);
 		}
 
 		private void ItemListView_KeyDown(object sender, KeyEventArgs e)
@@ -618,6 +635,7 @@ namespace Foreman
 		private void RecipeListView_ItemChecked(object sender, ItemCheckedEventArgs e)
 		{
 			((Recipe)e.Item.Tag).Enabled = e.Item.Checked;
+			GraphViewer.Invalidate();
 		}
 
 		private void AddRecipeButton_Click(object sender, EventArgs e)
@@ -769,5 +787,18 @@ namespace Foreman
 				return cp;
 			}
 		}
+
+        private void ListTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			if (ListTabControl.SelectedIndex == 0) //the item tab
+				LoadItemList();
+		}
+
+        private void ListTabControl_KeyDown(object sender, KeyEventArgs e)
+        {
+			if (e.KeyCode == Keys.A && (e.Modifiers & Keys.Control) != 0)
+				foreach (ListViewItem item in RecipeListView.Items)
+					item.Selected = true;
+        }
     }
 }

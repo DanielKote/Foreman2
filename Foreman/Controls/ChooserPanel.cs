@@ -11,6 +11,10 @@ namespace Foreman
 {
 	public partial class ChooserPanel : UserControl
 	{
+		public const int RecipeIconSize = 64;
+		public const int ModuleIconSize = 32;
+		public const int AssemblerIconSize = 32;
+
 		public Action<ChooserControl> CallbackMethod;
 
 		private List<ChooserControl> controls;
@@ -36,11 +40,14 @@ namespace Foreman
 			}
 		}
 
-		public ChooserPanel(IEnumerable<ChooserControl> controls, ProductionGraphViewer parent)
+		public ChooserPanel(IEnumerable<ChooserControl> controls, ProductionGraphViewer parent, int IconSize)
 			: base()
 		{
 			InitializeComponent();
+
 			this.controls = controls.ToList();
+			foreach (ChooserControl cc in controls)
+				cc.UpdateIconSize(IconSize);
 
 			parent.Controls.Add(this);
 			this.Location = new Point(parent.Width / 2 - Width / 2, parent.Height / 2 - Height / 2);

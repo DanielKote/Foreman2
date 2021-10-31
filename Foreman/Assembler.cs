@@ -38,6 +38,7 @@ namespace Foreman
 	public abstract class ProductionEntity
 	{
 		public String Name { get; protected set; }
+		public string LName;
 		public bool Enabled { get; set; }
 		public Bitmap Icon { get; set; }
 		public int ModuleSlots { get; set; }
@@ -47,6 +48,8 @@ namespace Foreman
 		{
 			get
 			{
+				if (!String.IsNullOrEmpty(LName))
+					return LName;
 				if (!String.IsNullOrWhiteSpace(friendlyName))
 				{
 					return friendlyName;
@@ -137,9 +140,10 @@ namespace Foreman
 			}
 		}
 		public bool Enabled { get; set; }
-		public float SpeedBonus { get; set; }
+		public float SpeedBonus { get; private set; }
         public float ProductivityBonus { get; private set; }
 		public string Name { get; private set; }
+		public string LName;
 		private String friendlyName;
         private List<string> allowedIn;
 
@@ -147,6 +151,8 @@ namespace Foreman
 		{
 			get
 			{
+				if (!String.IsNullOrEmpty(LName))
+					return LName;
 				if (!String.IsNullOrWhiteSpace(friendlyName))
 				{
 					return friendlyName;
@@ -162,13 +168,13 @@ namespace Foreman
 			}
 		}
 
-        public Module(String name, float speedBonus, float productivityBonus, List<String> allowedIn)
+        public Module(String name, float speedBonus, float productivityBonus, List<string> allowedIn)
 		{
-			SpeedBonus = speedBonus;
-			ProductivityBonus = productivityBonus;
 			Name = name;
 			Enabled = true;
-            this.allowedIn = allowedIn;
+			this.SpeedBonus = speedBonus;
+			this.ProductivityBonus = productivityBonus;
+			this.allowedIn = allowedIn;
 		}
 
         public bool AllowedIn(Recipe recipe)

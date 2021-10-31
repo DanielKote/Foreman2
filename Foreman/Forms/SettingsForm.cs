@@ -90,6 +90,7 @@ namespace Foreman
         private SettingsFormOptions originalOptions;
         public SettingsFormOptions CurrentOptions;
         public bool ReloadRequested;
+        private bool modListEnabled = true;
 
         public SettingsForm(SettingsFormOptions options)
         {
@@ -101,14 +102,8 @@ namespace Foreman
 
             InstallLocationTextBox.Text = CurrentOptions.InstallLocation;
             UserDataLocationTextBox.Text = CurrentOptions.UserDataLocation;
-
-            if (CurrentOptions.GenerationType == DataCache.GenerationType.ForemanMod)
-            {
-                UseForemanModRadioButton.Checked = true;
-                UseFactorioBaseOptionsGroup.Enabled = false;
-            }
-            else if (CurrentOptions.GenerationType == DataCache.GenerationType.FactorioLUA)
-                UseFactorioBaseRadioButton.Checked = true;
+            if (CurrentOptions.InstallLocation == CurrentOptions.UserDataLocation)
+                IgnoreUserDataLocationCheckBox.Checked = true;
 
             if (CurrentOptions.NormalDifficulty)
                 NormalDifficultyRadioButton.Checked = true;
@@ -123,7 +118,7 @@ namespace Foreman
             AssemblerSelectionBox.DisplayMember = "FriendlyName";
             for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
             {
-                if (((Assembler)AssemblerSelectionBox.Items[i]).Enabled)
+                if (CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[i]])
                 {
                     AssemblerSelectionBox.SetItemChecked(i, true);
                 }
@@ -134,7 +129,7 @@ namespace Foreman
             MinerSelectionBox.DisplayMember = "FriendlyName";
             for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
             {
-                if (((Miner)MinerSelectionBox.Items[i]).Enabled)
+                if (CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]])
                 {
                     MinerSelectionBox.SetItemChecked(i, true);
                 }
@@ -145,7 +140,7 @@ namespace Foreman
             ModuleSelectionBox.DisplayMember = "FriendlyName";
             for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
             {
-                if (((Module)ModuleSelectionBox.Items[i]).Enabled)
+                if (CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[i]])
                 {
                     ModuleSelectionBox.SetItemChecked(i, true);
                 }
@@ -157,10 +152,8 @@ namespace Foreman
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
             {
                 Mod mod = (Mod)ModSelectionBox.Items[i];
-                if (mod.Enabled)
-                {
+                if(CurrentOptions.Mods[mod])
                     ModSelectionBox.SetItemChecked(i, true);
-                }
 
                 foreach (ModDependency dep in mod.parsedDependencies)
                 {
@@ -180,7 +173,20 @@ namespace Foreman
                     }
                 }
 			}
-		}
+
+            //do this last to set the options on the mods before disabling / enabling changes
+            if (CurrentOptions.GenerationType == DataCache.GenerationType.ForemanMod)
+            {
+                UseForemanModRadioButton.Checked = true;
+                UseFactorioBaseOptionsGroup.Enabled = false;
+                setModListEnabled(false);
+            }
+            else if (CurrentOptions.GenerationType == DataCache.GenerationType.FactorioLUA)
+            {
+                UseFactorioBaseRadioButton.Checked = true;
+                setModListEnabled(true);
+            }
+        }
 
         private Mod getModFromName(string name)
         {
@@ -194,8 +200,23 @@ namespace Foreman
             return null;
         }
 
+        private void setModListEnabled(bool enabled)
+        {
+            modListEnabled = enabled;
+            if (modListEnabled)
+            {
+                ModSelectionBox.BackColor = Color.FromKnownColor(KnownColor.Window);
+                ModsGroupBox.Text = "Mods";
+            }
+            else
+            {
+                ModSelectionBox.BackColor = Color.FromKnownColor(KnownColor.Control);
+                ModsGroupBox.Text = "Mods (read-only):";
+            }
+        }
+
         //ASSEMBLER------------------------------------------------------------------------------------------
-		private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
 		{
             CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
 		}
@@ -263,36 +284,41 @@ namespace Foreman
         //MODS------------------------------------------------------------------------------------------
         private void ModSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
 		{
-			Mod mod = (Mod)ModSelectionBox.Items[e.Index];
-            CurrentOptions.Mods[mod] = (e.NewValue == CheckState.Checked);
+            if (modListEnabled)
+            {
+                Mod mod = (Mod)ModSelectionBox.Items[e.Index];
+                CurrentOptions.Mods[mod] = (e.NewValue == CheckState.Checked);
 
-            //have to go through the dependecies when changing mod state. mod incompatibilities, versions, full dependencies are checked at load (similar to factorio)
-			if (CurrentOptions.Mods[mod])
-			{
-				for (int i = 0; i < ModSelectionBox.Items.Count; i++)
-				{
-                    Mod otherMod = (Mod)ModSelectionBox.Items[i];
-                    if(mod.DependsOn(otherMod, true))
+                //have to go through the dependecies when changing mod state. mod incompatibilities, versions, full dependencies are checked at load (similar to factorio)
+                if (CurrentOptions.Mods[mod])
+                {
+                    for (int i = 0; i < ModSelectionBox.Items.Count; i++)
                     {
-                        ModSelectionBox.SetItemChecked(i, true);
-                        CurrentOptions.Mods[otherMod] = true;
+                        Mod otherMod = (Mod)ModSelectionBox.Items[i];
+                        if (mod.DependsOn(otherMod, true))
+                        {
+                            ModSelectionBox.SetItemChecked(i, true);
+                            CurrentOptions.Mods[otherMod] = true;
+                        }
                     }
-				}
-			}
-			else
-			{
-				for (int i = 0; i < ModSelectionBox.Items.Count; i++)
-				{
-                    Mod otherMod = (Mod)ModSelectionBox.Items[i];
-                    if (mod.DependsOn(otherMod, true))
+                }
+                else
+                {
+                    for (int i = 0; i < ModSelectionBox.Items.Count; i++)
                     {
-                        ModSelectionBox.SetItemChecked(i, false);
-                        CurrentOptions.Mods[otherMod] = false;
+                        Mod otherMod = (Mod)ModSelectionBox.Items[i];
+                        if (mod.DependsOn(otherMod, true))
+                        {
+                            ModSelectionBox.SetItemChecked(i, false);
+                            CurrentOptions.Mods[otherMod] = false;
+                        }
                     }
-				}
-			}
-
-
+                }
+            }
+            else
+            {
+                e.NewValue = e.CurrentValue;
+            }
 		}
         private void ModSelectionAllButton_Click(object sender, EventArgs e)
         {
@@ -332,10 +358,41 @@ namespace Foreman
             this.Close();
         }
 
+        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //check locations for validity (only if they arent the same ones we started with, just to prevent an endless loop)
+            if (!TestInstallationDirectoryForValidity(InstallLocationTextBox.Text) && (CurrentOptions.InstallLocation != originalOptions.InstallLocation))
+            {
+                CurrentOptions.InstallLocation = originalOptions.InstallLocation;
+                InstallLocationTextBox.Text = CurrentOptions.InstallLocation;
+                e.Cancel = true;
+            }
+
+            if (!IgnoreUserDataLocationCheckBox.Checked)
+            {
+                if (!TestUserDataDirectoryForValidity(UserDataLocationTextBox.Text) && (CurrentOptions.UserDataLocation != originalOptions.UserDataLocation))
+                {
+                    CurrentOptions.UserDataLocation = originalOptions.UserDataLocation;
+                    UserDataLocationTextBox.Text = CurrentOptions.UserDataLocation;
+                    e.Cancel = true;
+                }
+            }
+            else if (e.Cancel == false)
+            {
+                CurrentOptions.UserDataLocation = CurrentOptions.InstallLocation; //we are actually closing, so set up the userdatalocation to what it is for processing
+                foreach (Mod mod in CurrentOptions.Mods.Keys.ToArray())
+                    if (mod.Name == "core" || mod.Name == "base")
+                        CurrentOptions.Mods[mod] = true;
+            }
+
+        }
+
         //FACTORIO SETTINGS------------------------------------------------------------------------------------------
         private void UseFactorioBaseRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             UseFactorioBaseOptionsGroup.Enabled = UseFactorioBaseRadioButton.Checked;
+            //note: we dont change the ability to change mod selections, since you need a reload for that
+
             CurrentOptions.GenerationType = (UseFactorioBaseRadioButton.Checked ? DataCache.GenerationType.FactorioLUA : DataCache.GenerationType.ForemanMod);
         }
 
@@ -388,30 +445,6 @@ namespace Foreman
         {
             if(UserDataLocationTextBox.Enabled)
                 CurrentOptions.UserDataLocation = UserDataLocationTextBox.Text;
-        }
-
-        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            //check locations for validity (only if they arent the same ones we started with, just to prevent an endless loop)
-            if (!TestInstallationDirectoryForValidity(InstallLocationTextBox.Text) && (CurrentOptions.InstallLocation != originalOptions.InstallLocation))
-            {
-                CurrentOptions.InstallLocation = originalOptions.InstallLocation;
-                InstallLocationTextBox.Text = CurrentOptions.InstallLocation;
-                e.Cancel = true;
-            }
-
-            if (!IgnoreUserDataLocationCheckBox.Checked)
-            {
-                if (!TestUserDataDirectoryForValidity(UserDataLocationTextBox.Text) && (CurrentOptions.UserDataLocation != originalOptions.UserDataLocation))
-                {
-                    CurrentOptions.UserDataLocation = originalOptions.UserDataLocation;
-                    UserDataLocationTextBox.Text = CurrentOptions.UserDataLocation;
-                    e.Cancel = true;
-                }
-            }
-            else if(e.Cancel == false)
-                CurrentOptions.UserDataLocation = CurrentOptions.InstallLocation; //we are actually closing, so set up the userdatalocation to what it is for processing
-
         }
 
         private bool TestInstallationDirectoryForValidity(string installLocation)

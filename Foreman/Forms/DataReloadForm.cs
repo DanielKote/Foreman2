@@ -14,15 +14,22 @@ namespace Foreman
     public partial class DataReloadForm : Form
     {
         private List<string> enabledMods;
-        private CancellationTokenSource cts; 
+        private CancellationTokenSource cts;
+        private int currentPercent;
+        private static readonly string[] ProcessNames = { "Reading Factorio mod data...", "Processing Factorio mod LUA code...", "Creating icons...", "Checking for cyclic recipes..." };
+        public static readonly int[] ProcessBreakpoints = { 0, 15, 30, 98, 200 };
+        private int currentBPindex;
 
         public DataReloadForm()
         {
             this.cts = new CancellationTokenSource();
             InitializeComponent();
+            currentPercent = 0;
+            currentBPindex = 0;
+            this.Text = "Preparing Foreman: " + ProcessNames[currentBPindex];
         }
 
-        public DataReloadForm(List<string> enabledMods) : this()
+        public DataReloadForm(List<string> enabledMods, DataCache.GenerationType generationType) : this()
         {
             this.enabledMods = enabledMods;
         }
@@ -35,16 +42,24 @@ namespace Foreman
             #endif
             var progressHandler = new Progress<int>(value =>
             {
-                progressBar.Value = value;
+                if (value > currentPercent)
+                {
+                    if(value >= ProcessBreakpoints[currentBPindex+1])
+                    {
+                        currentBPindex++;
+                        if ((DataCache.GenerationType)Properties.Settings.Default.GenerationType == DataCache.GenerationType.ForemanMod && currentBPindex == 1)
+                            currentBPindex = 2; //skip lua title if we are loading directly with mod
+
+                        this.Text = "Preparing Foreman: " + ProcessNames[currentBPindex];
+                    }
+                    currentPercent = value;
+                    progressBar.Value = value;
+                }
             });
             var progress = progressHandler as IProgress<int>;
             var token = cts.Token;
 
-
-            await Task.Run(() =>
-            {
-                DataCache.LoadAllData(this.enabledMods, new CancellableProgress(progress, token));
-            });
+            await DataCache.LoadAllData(enabledMods, progress, token);
 
             if (token.IsCancellationRequested)
             {

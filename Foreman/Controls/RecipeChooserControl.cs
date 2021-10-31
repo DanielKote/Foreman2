@@ -16,7 +16,7 @@ namespace Foreman
         private Bitmap ColorIcon;
         private Bitmap GrayIcon;
 
-		public RecipeChooserControl(Recipe recipe, String text, String filterText) : base(text, filterText)
+        public RecipeChooserControl(Recipe recipe, String text, String filterText) : base(text, filterText)
 		{
 			InitializeComponent();
 			DisplayedRecipe = recipe;
@@ -24,10 +24,14 @@ namespace Foreman
             ColorIcon = recipe.Icon;
             GrayIcon = GraphicsStuff.MakeMonochrome(recipe.Icon);
 
-            
             setClickHandler(new MouseEventHandler(RecipeChooserControl_MouseUp), this);
-            
 		}
+
+        internal override void UpdateIconSize(int iconSize)
+        {
+            RecipeLayoutPanel.ColumnStyles[0].Width = iconSize;
+            iconPictureBox.Size = new Size(iconSize, iconSize);
+        }
 
         private static void setClickHandler(MouseEventHandler h, Control c)
         {
@@ -52,7 +56,7 @@ namespace Foreman
 				outputListBox.Items.Add(String.Format("{0} ({1})", result.FriendlyName, DisplayedRecipe.Results[result]));
 			}
             iconPictureBox.Image = DisplayedRecipe.Icon;
-			iconPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
+			iconPictureBox.SizeMode = PictureBoxSizeMode.Zoom;
 
             fakeDisable(DisplayedRecipe.Enabled);
 
@@ -84,8 +88,5 @@ namespace Foreman
             this.Invalidate();
 
         }
-
-
-
     }
 }

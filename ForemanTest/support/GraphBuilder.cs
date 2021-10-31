@@ -159,7 +159,13 @@ namespace ForemanTest
                 if (name == null)
                     name = "recipe-" + GetSequence();
 
-                Recipe recipe = new Recipe(name, duration, itemizeKeys(inputs), itemizeKeys(outputs));
+                Recipe recipe = new Recipe(name);
+                recipe.Time = duration;
+                foreach (KeyValuePair<string, float> kvp in inputs)
+                    recipe.Ingredients.Add(DataCache.Items[kvp.Key], kvp.Value);
+                foreach (KeyValuePair<string, float> kvp in outputs)
+                    recipe.Results.Add(DataCache.Items[kvp.Key], kvp.Value);
+
                 Built = RecipeNode.Create(recipe, graph);
                 this.Built.ProductivityBonus = efficiency;
 
@@ -197,10 +203,10 @@ namespace ForemanTest
                 return this;
             }
 
-            private Dictionary<Item, float> itemizeKeys(Dictionary<string, float> d)
-            {
-                return d.ToDictionary(kp => new Item(kp.Key), kp => kp.Value);
-            }
+            //private Dictionary<Item, float> itemizeKeys(Dictionary<string, float> d)
+            //{
+            //    return d.ToDictionary(kp => new Item(kp.Key), kp => kp.Value);
+            //}
         }
 
         public class BuiltData

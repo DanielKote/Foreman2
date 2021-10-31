@@ -212,7 +212,7 @@ namespace Foreman
 
 			foreach (Item item in node.Inputs)
 			{
-				var recipePool = item.Recipes.Where(r => !r.IsCyclic);   //Ignore recipes that can ultimately supply themselves, like filling/emptying barrels or certain modded recipes
+				var recipePool = item.ProductionRecipes.Where(r => !r.IsCyclic);   //Ignore recipes that can ultimately supply themselves, like filling/emptying barrels or certain modded recipes
 
 				foreach (Recipe recipe in recipePool.Where(r => r.Enabled))
 				{

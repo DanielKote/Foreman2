@@ -117,6 +117,8 @@ namespace Foreman
 
 		private Rectangle visibleGraphBounds;
 
+		private ContextMenu rightClickMenu = new ContextMenu();
+
 		public Rectangle GraphBounds
 		{
 			get
@@ -821,9 +823,60 @@ namespace Foreman
 
 		void ProductionGraphViewer_KeyUp(object sender, KeyEventArgs e)
 		{
-			if(currentDragOperation == DragOperation.Selection) //possible changes to selection type
+			if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
 				UpdateSelection();
-			Invalidate();
+			if (currentDragOperation == DragOperation.None)
+			{
+				switch (e.KeyCode)
+				{
+					case Keys.Delete:
+						TryDeleteSelectedNodes();
+						e.Handled = true;
+						break;
+				}
+				Invalidate();
+			}
+		}
+
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+			bool processed = false;
+			int moveUnit = (CurrentGridUnit > 0) ? CurrentGridUnit : 6;
+			if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) //large move
+				moveUnit = (CurrentMajorGridUnit > CurrentGridUnit) ? CurrentMajorGridUnit : moveUnit * 4;
+
+			if ((keyData & Keys.KeyCode) == Keys.Left)
+			{
+				Console.WriteLine((int)(keyData));
+				Console.WriteLine((int)(keyData & Keys.Left));
+				Console.WriteLine((int)(Keys.Left));
+
+				foreach (NodeElement node in SelectedNodes)
+					node.X -= moveUnit;
+				processed = true;
+			}
+			else if ((keyData & Keys.KeyCode) == Keys.Right)
+			{
+				foreach (NodeElement node in SelectedNodes)
+					node.X += moveUnit;
+				processed = true;
+			}
+			else if ((keyData & Keys.KeyCode) == Keys.Up)
+			{
+				foreach (NodeElement node in SelectedNodes)
+					node.Y -= moveUnit;
+				processed = true;
+			}
+			else if ((keyData & Keys.KeyCode) == Keys.Down)
+			{
+				foreach (NodeElement node in SelectedNodes)
+					node.Y += moveUnit;
+				processed = true;
+			}
+
+			if (processed)
+				return true;
+			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
 		void ProductionGraphViewer_Resized(object sender, EventArgs e)
@@ -885,8 +938,20 @@ namespace Foreman
 				Invalidate();
 			}
 		}
+		public void TryDeleteSelectedNodes()
+		{
+			bool proceed = true;
+			if (SelectedNodes.Count > 10)
+				proceed = (MessageBox.Show("You are deleting " + SelectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
+			if (proceed)
+			{
+				foreach (NodeElement node in SelectedNodes)
+					DeleteNode(node);
+				SelectedNodes.Clear();
+			}
+		}
 
-		public void UpdateGraphBounds(bool limitView = true)
+	public void UpdateGraphBounds(bool limitView = true)
 		{
 			if (limitView)
 			{
@@ -928,6 +993,7 @@ namespace Foreman
 			{
 				components.Dispose();
 			}
+			rightClickMenu.Dispose();
 			base.Dispose(disposing);
 		}
 
@@ -981,16 +1047,12 @@ namespace Foreman
 						var optionList = new List<ChooserControl>();
 						optionList.Add(itemPassthroughOption);
 						optionList.Add(itemOutputOption);
-						foreach (Recipe recipe in DataCache.Recipes.Values.Where(r => r.Enabled))
-						{
-							if (recipe.Results.ContainsKey(item) && recipe.Category != "incinerator" && recipe.Category != "incineration")
-							{
+						foreach (Recipe recipe in item.ProductionRecipes)
+							if (recipe.Enabled)
 								optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-							}
-						}
 						optionList.Add(itemSupplyOption);
 
-						var chooserPanel = new ChooserPanel(optionList, this);
+						var chooserPanel = new ChooserPanel(optionList, this, ChooserPanel.RecipeIconSize);
 
 						Point location = GhostDragElement.Location;
 						if (ShowGrid)
@@ -1064,6 +1126,25 @@ namespace Foreman
 			return original;
 		}
 
+		public void OpenNodeMenu(NodeElement node)
+		{
+			rightClickMenu.MenuItems.Clear();
+			rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+				new EventHandler((o, e) =>
+				{
+					DeleteNode(node);
+				})));
+			if (SelectedNodes.Count > 2 && SelectedNodes.Contains(node))
+			{
+				rightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
+				new EventHandler((o, e) =>
+				{
+					TryDeleteSelectedNodes();
+				})));
+			}
+			rightClickMenu.Show(Parent, Point.Add(Control.MousePosition, new Size(0, -20)));
+		}
+
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("AmountType", Graph.SelectedAmountType);
@@ -1083,7 +1164,7 @@ namespace Foreman
 			info.AddValue("ElementLocations", elementLocations);
 		}
 
-		public void LoadFromJson(JObject json)
+		public void LoadFromJson(JObject json, bool resetEnabledStates = false)
 		{
 			Graph.Nodes.Clear();
 			Elements.Clear();
@@ -1097,7 +1178,7 @@ namespace Foreman
 			List<String> enabledMods = DataCache.Mods.Where(m => m.Enabled).Select(m => m.Name).ToList();
 
 
-            using (DataReloadForm form = new DataReloadForm(enabledMods))
+            using (DataReloadForm form = new DataReloadForm(enabledMods, (DataCache.GenerationType)(Properties.Settings.Default.GenerationType)))
             {
                 form.ShowDialog();
             }
@@ -1172,7 +1253,7 @@ namespace Foreman
 							}
 							else
 							{
-								Recipe missingRecipe = new Recipe(recipeName, 0f, new Dictionary<Item, float>(), new Dictionary<Item, float>());
+								Recipe missingRecipe = new Recipe(recipeName);
 								missingRecipe.IsMissingRecipe = true;
 								DataCache.Recipes.Add(recipeName, missingRecipe);
 								newNode = RecipeNode.Create(missingRecipe, Graph);

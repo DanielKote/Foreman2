@@ -208,7 +208,7 @@ namespace Foreman
 				optionList.Add(new ItemChooserControl(item, assembler.FriendlyName, assembler.FriendlyName));
 			}
 
-			var chooserPanel = new ChooserPanel(optionList, GraphViewer);
+			var chooserPanel = new ChooserPanel(optionList, GraphViewer, ChooserPanel.AssemblerIconSize);
 
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 
@@ -262,7 +262,7 @@ namespace Foreman
 				optionList.Add(new ItemChooserControl(item, module.FriendlyName, module.FriendlyName));
 			}
 
-			var chooserPanel = new ChooserPanel(optionList, GraphViewer);
+			var chooserPanel = new ChooserPanel(optionList, GraphViewer, ChooserPanel.ModuleIconSize);
 
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 

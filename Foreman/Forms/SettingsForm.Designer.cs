@@ -28,9 +28,10 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ModsGroupBox = new System.Windows.Forms.GroupBox();
             this.ModSelectionNoneButton = new System.Windows.Forms.Button();
             this.ModSelectionAllButton = new System.Windows.Forms.Button();
+            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.ModuleSelectionNoneButton = new System.Windows.Forms.Button();
             this.ModuleSelectionAllButton = new System.Windows.Forms.Button();
@@ -53,7 +54,7 @@
             this.InstallLocationBrowseButton = new System.Windows.Forms.Button();
             this.InstallLocationTextBox = new System.Windows.Forms.TextBox();
             this.ConfirmButton = new System.Windows.Forms.Button();
-            this.CancelButton = new System.Windows.Forms.Button();
+            this.CancelSettingsButton = new System.Windows.Forms.Button();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
             this.UseForemanModRadioButton = new System.Windows.Forms.RadioButton();
             this.UseFactorioBaseRadioButton = new System.Windows.Forms.RadioButton();
@@ -64,8 +65,7 @@
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.LanguageDropDown = new System.Windows.Forms.ComboBox();
             this.ReloadButton = new System.Windows.Forms.Button();
-            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
-            this.groupBox1.SuspendLayout();
+            this.ModsGroupBox.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -79,21 +79,21 @@
             this.groupBox13.SuspendLayout();
             this.SuspendLayout();
             // 
-            // groupBox1
+            // ModsGroupBox
             // 
-            this.groupBox1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.groupBox1.Controls.Add(this.ModSelectionNoneButton);
-            this.groupBox1.Controls.Add(this.ModSelectionAllButton);
-            this.groupBox1.Controls.Add(this.ModSelectionBox);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            this.groupBox1.Location = new System.Drawing.Point(274, 21);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.groupBox1.Size = new System.Drawing.Size(257, 566);
-            this.groupBox1.TabIndex = 13;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Mods";
+            this.ModsGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ModsGroupBox.Controls.Add(this.ModSelectionNoneButton);
+            this.ModsGroupBox.Controls.Add(this.ModSelectionAllButton);
+            this.ModsGroupBox.Controls.Add(this.ModSelectionBox);
+            this.ModsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.ModsGroupBox.Location = new System.Drawing.Point(274, 21);
+            this.ModsGroupBox.Margin = new System.Windows.Forms.Padding(4);
+            this.ModsGroupBox.Name = "ModsGroupBox";
+            this.ModsGroupBox.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.ModsGroupBox.Size = new System.Drawing.Size(257, 566);
+            this.ModsGroupBox.TabIndex = 13;
+            this.ModsGroupBox.TabStop = false;
+            this.ModsGroupBox.Text = "Mods";
             // 
             // ModSelectionNoneButton
             // 
@@ -114,6 +114,17 @@
             this.ModSelectionAllButton.Text = "All";
             this.ModSelectionAllButton.UseVisualStyleBackColor = true;
             this.ModSelectionAllButton.Click += new System.EventHandler(this.ModSelectionAllButton_Click);
+            // 
+            // ModSelectionBox
+            // 
+            this.ModSelectionBox.CheckOnClick = true;
+            this.ModSelectionBox.FormattingEnabled = true;
+            this.ModSelectionBox.Location = new System.Drawing.Point(9, 19);
+            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.ModSelectionBox.Name = "ModSelectionBox";
+            this.ModSelectionBox.Size = new System.Drawing.Size(240, 514);
+            this.ModSelectionBox.TabIndex = 10;
+            this.ModSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModSelectionBox_ItemCheck);
             // 
             // groupBox7
             // 
@@ -259,11 +270,11 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.groupBox7);
-            this.groupBox2.Controls.Add(this.groupBox1);
+            this.groupBox2.Controls.Add(this.ModsGroupBox);
             this.groupBox2.Controls.Add(this.groupBox6);
             this.groupBox2.Controls.Add(this.groupBox5);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.groupBox2.Location = new System.Drawing.Point(11, 6);
+            this.groupBox2.Location = new System.Drawing.Point(475, 2);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(539, 595);
             this.groupBox2.TabIndex = 17;
@@ -275,7 +286,7 @@
             this.groupBox3.Controls.Add(this.groupBox9);
             this.groupBox3.Controls.Add(this.groupBox4);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.groupBox3.Location = new System.Drawing.Point(559, 6);
+            this.groupBox3.Location = new System.Drawing.Point(12, 2);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(453, 185);
             this.groupBox3.TabIndex = 18;
@@ -356,7 +367,7 @@
             // 
             // ConfirmButton
             // 
-            this.ConfirmButton.Location = new System.Drawing.Point(559, 569);
+            this.ConfirmButton.Location = new System.Drawing.Point(12, 565);
             this.ConfirmButton.Name = "ConfirmButton";
             this.ConfirmButton.Size = new System.Drawing.Size(261, 32);
             this.ConfirmButton.TabIndex = 25;
@@ -364,15 +375,15 @@
             this.ConfirmButton.UseVisualStyleBackColor = true;
             this.ConfirmButton.Click += new System.EventHandler(this.ConfirmButton_Click);
             // 
-            // CancelButton
+            // CancelSettingsButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(922, 569);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(90, 32);
-            this.CancelButton.TabIndex = 26;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+            this.CancelSettingsButton.Location = new System.Drawing.Point(375, 565);
+            this.CancelSettingsButton.Name = "CancelSettingsButton";
+            this.CancelSettingsButton.Size = new System.Drawing.Size(90, 32);
+            this.CancelSettingsButton.TabIndex = 26;
+            this.CancelSettingsButton.Text = "Cancel";
+            this.CancelSettingsButton.UseVisualStyleBackColor = true;
+            this.CancelSettingsButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // groupBox10
             // 
@@ -380,7 +391,7 @@
             this.groupBox10.Controls.Add(this.UseFactorioBaseRadioButton);
             this.groupBox10.Controls.Add(this.UseFactorioBaseOptionsGroup);
             this.groupBox10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.groupBox10.Location = new System.Drawing.Point(559, 207);
+            this.groupBox10.Location = new System.Drawing.Point(12, 204);
             this.groupBox10.Name = "groupBox10";
             this.groupBox10.Size = new System.Drawing.Size(453, 275);
             this.groupBox10.TabIndex = 19;
@@ -393,10 +404,10 @@
             this.UseForemanModRadioButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             this.UseForemanModRadioButton.Location = new System.Drawing.Point(17, 35);
             this.UseForemanModRadioButton.Name = "UseForemanModRadioButton";
-            this.UseForemanModRadioButton.Size = new System.Drawing.Size(271, 21);
+            this.UseForemanModRadioButton.Size = new System.Drawing.Size(426, 21);
             this.UseForemanModRadioButton.TabIndex = 19;
             this.UseForemanModRadioButton.TabStop = true;
-            this.UseForemanModRadioButton.Text = "Use Foreman mod to generate objects";
+            this.UseForemanModRadioButton.Text = "Use Foreman mod to generate objects (Highly Recommended!)";
             this.UseForemanModRadioButton.UseVisualStyleBackColor = true;
             // 
             // UseFactorioBaseRadioButton
@@ -482,7 +493,7 @@
             // 
             // ReloadButton
             // 
-            this.ReloadButton.Location = new System.Drawing.Point(826, 569);
+            this.ReloadButton.Location = new System.Drawing.Point(279, 565);
             this.ReloadButton.Name = "ReloadButton";
             this.ReloadButton.Size = new System.Drawing.Size(90, 32);
             this.ReloadButton.TabIndex = 27;
@@ -490,24 +501,13 @@
             this.ReloadButton.UseVisualStyleBackColor = true;
             this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
             // 
-            // ModSelectionBox
-            // 
-            this.ModSelectionBox.CheckOnClick = true;
-            this.ModSelectionBox.FormattingEnabled = true;
-            this.ModSelectionBox.Location = new System.Drawing.Point(9, 19);
-            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.ModSelectionBox.Name = "ModSelectionBox";
-            this.ModSelectionBox.Size = new System.Drawing.Size(240, 514);
-            this.ModSelectionBox.TabIndex = 10;
-            this.ModSelectionBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModSelectionBox_ItemCheck);
-            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1022, 609);
+            this.ClientSize = new System.Drawing.Size(1025, 609);
             this.Controls.Add(this.ReloadButton);
-            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.CancelSettingsButton);
             this.Controls.Add(this.groupBox10);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.ConfirmButton);
@@ -518,9 +518,10 @@
             this.Name = "SettingsForm";
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
-            this.groupBox1.ResumeLayout(false);
+            this.ModsGroupBox.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             this.groupBox6.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
@@ -541,7 +542,7 @@
 		}
 
         #endregion
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox ModsGroupBox;
         private CheckboxListWithErrors ModSelectionBox;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.CheckedListBox ModuleSelectionBox;
@@ -557,7 +558,7 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Button InstallLocationBrowseButton;
         private System.Windows.Forms.TextBox InstallLocationTextBox;
-        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.Button CancelSettingsButton;
         private System.Windows.Forms.Button ConfirmButton;
         private System.Windows.Forms.GroupBox groupBox10;
         private System.Windows.Forms.RadioButton UseForemanModRadioButton;
