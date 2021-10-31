@@ -162,7 +162,7 @@ namespace Foreman
 			if (!roToNode.ContainsKey(supplier) || !roToNode.ContainsKey(consumer) || !supplier.Outputs.Contains(item) || !consumer.Inputs.Contains(item))
 				Trace.Fail(string.Format("Node link creation called with invalid parameters! consumer:{0}. supplier:{1}. item:{2}.", consumer.ToString(), supplier.ToString(), item.ToString()));
 			if (supplier.OutputLinks.Any(l => l.Item == item && l.Consumer == consumer)) //check for an already existing connection
-				return null;
+				return supplier.OutputLinks.First(l => l.Item == item && l.Consumer == consumer);
 
 			BaseNode supplierNode = roToNode[supplier];
 			BaseNode consumerNode = roToNode[consumer];

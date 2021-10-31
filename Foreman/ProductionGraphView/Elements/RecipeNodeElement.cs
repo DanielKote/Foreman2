@@ -34,10 +34,10 @@ namespace Foreman
 			BeaconElement = new BeaconElement(graphViewer, this);
 			BeaconElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 
-			Update();
+			UpdateState();
 		}
 
-		public override void Update()
+		public override void UpdateState()
 		{
 			if (InputTabs.Count == 0 && OutputTabs.Count != 0)
 			{
@@ -58,13 +58,12 @@ namespace Foreman
 			AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 			BeaconElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 
-			int width = Math.Max(MinWidth, Math.Max(GetIconWidths(InputTabs), GetIconWidths(OutputTabs)) + 10);
-			if (width % WidthD != 0)
+			Width = Math.Max(MinWidth, Math.Max(GetIconWidths(InputTabs), GetIconWidths(OutputTabs)) + 10);
+			if (Width % WidthD != 0)
 			{
-				width += WidthD;
-				width -= width % WidthD;
+				Width += WidthD;
+				Width -= Width % WidthD;
 			}
-			Width = width - 2;
 			Height = (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) ? BaseSimpleHeight : BaseRecipeHeight;
 
 			//update tabs (necessary now that it is possible that an item was added or removed)... I am looking at you furnaces!!!
@@ -85,13 +84,13 @@ namespace Foreman
 				oldTab.Dispose();
 			}
 			foreach (Item item in DisplayedNode.Inputs)
-				if (InputTabs.FirstOrDefault(tab => tab.Item == item) == null)
+				if (!InputTabs.Any(tab => tab.Item == item))
 					InputTabs.Add(new ItemTabElement(item, LinkType.Input, graphViewer, this));
 			foreach (Item item in DisplayedNode.Outputs)
-				if (OutputTabs.FirstOrDefault(tab => tab.Item == item) == null)
+				if (!OutputTabs.Any(tab => tab.Item == item))
 					OutputTabs.Add(new ItemTabElement(item, LinkType.Output, graphViewer, this));
 
-			base.Update();
+			base.UpdateState();
 		}
 
 		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)

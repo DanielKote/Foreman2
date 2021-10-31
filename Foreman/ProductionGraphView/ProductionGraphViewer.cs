@@ -249,8 +249,14 @@ namespace Foreman
 				 int offsetDistance = lastNodeWidth / 2;
 				 lastNodeWidth = newNodeElement.Width; //effectively: this recipe width
 				 if (offsetDistance > 0)
-					 offsetDistance += (lastNodeWidth / 2) + 12;
-				 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), newLocation.Y);
+				 {
+					 offsetDistance += (lastNodeWidth / 2);
+					 int newOffsetDistance = Grid.AlignToGrid(offsetDistance);
+					 if (newOffsetDistance < offsetDistance)
+						 newOffsetDistance += Grid.CurrentGridUnit;
+					 offsetDistance = newOffsetDistance;
+				 }
+				 newLocation = new Point(newLocation.X + offsetDistance, newLocation.Y);
 				 if (offsetLocationToItemTabLevel)
 					Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, Grid.AlignToGrid(newLocation.Y + (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0))));
 				 else
@@ -268,6 +274,7 @@ namespace Foreman
 			recipeChooser.PanelClosed += (o, e) =>
 			{
 				SubwindowOpen = false;
+				DisposeLinkDrag();
 				Invalidate();
 			};
 
@@ -354,7 +361,7 @@ namespace Foreman
 			//add the visible recipe to the right of the node
 			new FloatingTooltipControl(recipePanel, Direction.Left, new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
 			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
-			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.Update(); Graph.UpdateNodeValues(); };
+			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.UpdateState(); Graph.UpdateNodeValues(); };
 		}
 
 		//----------------------------------------------Selection functions
@@ -417,7 +424,7 @@ namespace Foreman
 			try
 			{
 				foreach (BaseNodeElement node in nodeElements)
-					node.Update();
+					node.UpdateState();
 			}
 			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
 			Invalidate();
@@ -520,8 +527,8 @@ namespace Foreman
 		{
 			BaseNodeElement supplier = nodeElementDictionary[e.nodeLink.Supplier];
 			BaseNodeElement consumer = nodeElementDictionary[e.nodeLink.Consumer];
-			supplier.Update();
-			consumer.Update();
+			supplier.UpdateState();
+			consumer.UpdateState();
 
 			LinkElement element = new LinkElement(this, e.nodeLink, supplier, consumer);
 			linkElementDictionary.Add(e.nodeLink, element);

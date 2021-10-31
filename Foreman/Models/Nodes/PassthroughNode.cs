@@ -34,8 +34,8 @@ namespace Foreman
 		public override double GetConsumeRate(Item item) { return ActualRate; }
 		public override double GetSupplyRate(Item item) { return ActualRate; }
 
-		internal override double inputRateFor(Item item) { return MyGraph.GetRateMultipler(); }
-		internal override double outputRateFor(Item item) { return MyGraph.GetRateMultipler(); }
+		internal override double inputRateFor(Item item) { return 1; }
+		internal override double outputRateFor(Item item) { return 1; }
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{

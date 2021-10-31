@@ -54,9 +54,9 @@ namespace Foreman
 			{
 				node.SetSolvedRate(solution?.ActualRate(node) ?? 0);
 				foreach (NodeLink link in node.OutputLinks)
-					link.Throughput = solution?.Throughput(link) ?? 0;
+					link.ThroughputPerSec = solution?.Throughput(link) ?? 0;
 				foreach (NodeLink link in node.InputLinks)
-					link.Throughput = solution?.Throughput(link) ?? 0;
+					link.ThroughputPerSec = solution?.Throughput(link) ?? 0;
 
 			}
 		}

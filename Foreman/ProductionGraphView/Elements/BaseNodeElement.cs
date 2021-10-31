@@ -16,7 +16,9 @@ namespace Foreman
 		public override int X { get { return DisplayedNode.Location.X; } set { Trace.Fail("Base node element location cant be set through X parameter! Use SetLocation(Point)"); } }
 		public override int Y { get { return DisplayedNode.Location.Y; } set { Trace.Fail("Base node element location cant be set through Y parameter! Use SetLocation(Point)"); } }
 		public override Point Location { get { return DisplayedNode.Location; } set { Trace.Fail("Base node element location cant be set through Location parameter! Use SetLocation(Point)"); } }
-		public void SetLocation(Point location) { graphViewer.Graph.RequestNodeController(DisplayedNode).SetLocation(location); }
+		public void SetLocation(Point location) { 
+			graphViewer.Graph.RequestNodeController(DisplayedNode).SetLocation(location);
+		}
 
 		protected abstract Brush CleanBgBrush { get; }
 		private static readonly Brush errorBgBrush = Brushes.Coral;
@@ -36,12 +38,13 @@ namespace Foreman
 		protected static StringFormat TextFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
 
 		//most values are attempted to fit the grid (6 * 2^n) - ex: 72 = 6 * (4+8)
-		protected const int BaseSimpleHeight = 94; // 98 fits grid, -2 for border
-		protected const int BaseRecipeHeight = 130; //144 fits grid, -2 for border
+		protected const int BaseSimpleHeight = 96; // 96 fits grid
+		protected const int BaseRecipeHeight = 144; //144 fits grid
 		protected const int TabPadding = 7; //makes each tab be evenly spaced for grid
-		protected const int WidthD = 24; //(6*4) -> width will be divisible by this (-2 on each to leave a space between adjacent nodes)
-		protected const int PassthroughNodeWidth = 72;
-		protected const int MinWidth = 144;
+		protected const int WidthD = 24; //(6*4) -> width will be divisible by this
+		protected const int PassthroughNodeWidth = WidthD * 3;
+		protected const int MinWidth = WidthD * 6;
+		protected const int BorderSpacing = 1; //the drawn node will be smaller by this in all directions (graph looks nicer if adjacent nodes have a slight gap between them)
 
 		protected List<ItemTabElement> InputTabs;
 		protected List<ItemTabElement> OutputTabs;
@@ -79,7 +82,7 @@ namespace Foreman
 		private void DisplayedNode_NodeValuesChanged(object sender, EventArgs e) { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
 		private void DisplayedNode_NodeStateChanged(object sender, EventArgs e) { NodeValuesRequireUpdate = true; graphViewer.Invalidate(); }
 
-		public virtual void Update()
+		public virtual void UpdateState()
 		{
 			//update error notice
 			errorNotice.SetVisibility(DisplayedNode.State != NodeState.Clean);
@@ -100,8 +103,8 @@ namespace Foreman
 
 		private void UpdateTabOrder()
 		{
-			InputTabs = InputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
-			OutputTabs = OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
+			InputTabs = InputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Name).ToList(); //then by ensures same result no matter who came first
+			OutputTabs = OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Name).ToList();
 
 			int x = -GetIconWidths(OutputTabs) / 2;
 			foreach (ItemTabElement tab in OutputTabs)
@@ -130,17 +133,10 @@ namespace Foreman
 		private int GetItemTabXHeuristic(ItemTabElement tab)
 		{
 			int total = 0;
-			IEnumerable<ReadOnlyNodeLink> links;
-			if (tab.LinkType == LinkType.Input)
-				links = DisplayedNode.InputLinks.Where(l => l.Item == tab.Item);
-			else //if(tab.Type == LinkType.Output)
-				links = DisplayedNode.OutputLinks.Where(l => l.Item == tab.Item);
-
-			foreach (ReadOnlyNodeLink link in links)
+			foreach (ReadOnlyNodeLink link in tab.Links)
 			{
-				Point diff = Point.Subtract(link.Supplier.Location, (Size)DisplayedNode.Location);
-				diff.Y = Math.Max(0, diff.Y);
-				total += Convert.ToInt32(Math.Atan2(diff.X, diff.Y) * 1000);
+				Point diff = Point.Subtract(link.Supplier.Location, (Size)link.Consumer.Location);
+				total += Convert.ToInt32(Math.Atan2(tab.LinkType == LinkType.Input? diff.X : -diff.X, Math.Abs(diff.Y)) * 1000 + (diff.Y > 0? 1 : 0)); //x needs to be flipped depending on which endpoint we are calculating for. y is absoluted to take care of down connections. slight addition in case of up connection ensures that 2 equal connections will prioritize the up over the down.
 			}
 			return total;
 		}
@@ -172,7 +168,7 @@ namespace Foreman
 		protected override void Draw(Graphics graphics, bool simple)
 		{
 			if (NodeStateRequiresUpdate)
-				Update();
+				UpdateState();
 			if(NodeStateRequiresUpdate || NodeValuesRequireUpdate)
 				UpdateValues();
 			NodeStateRequiresUpdate = false;
@@ -185,8 +181,8 @@ namespace Foreman
 			Brush bgBrush = DisplayedNode.State == NodeState.Error ? errorBgBrush : CleanBgBrush;
 			Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOversupplied() ? oversuppliedFlowBorderBrush : equalFlowBorderBrush;
 
-			GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 10, graphics, borderBrush); //flow status border
-			GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, bgBrush); //basic background (with given background brush)
+			GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing, trans.Y - (Height / 2) + BorderSpacing, Width - (2 * BorderSpacing), Height - (2 * BorderSpacing), 10, graphics, borderBrush); //flow status border
+			GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing + 3, trans.Y - (Height / 2) + BorderSpacing + 3, Width - (2 * BorderSpacing) - 6, Height - (2 * BorderSpacing) - 6, 7, graphics, bgBrush); //basic background (with given background brush)
 			if (DisplayedNode.RateType == RateType.Manual)
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, ManualRateBGFilterBrush); //darken background if its a manual rate set
 

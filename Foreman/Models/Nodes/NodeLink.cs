@@ -12,7 +12,8 @@ namespace Foreman
 		public ReadOnlyNodeLink ReadOnlyLink { get; protected set; }
 
 		public Item Item { get; private set; }
-		public double Throughput { get; internal set; }
+		public double ThroughputPerSec { get; internal set; }
+		public double Throughput { get { return ThroughputPerSec * MyGraph.GetRateMultipler(); } }
 		public bool IsValid { get; private set; }
 
 		public readonly ProductionGraph MyGraph;
@@ -45,11 +46,11 @@ namespace Foreman
 
 	public class ReadOnlyNodeLink
 	{
-		public ReadOnlyBaseNode Supplier { get { return MyLink.SupplierNode.ReadOnlyNode; } }
-		public ReadOnlyBaseNode Consumer { get { return MyLink.ConsumerNode.ReadOnlyNode; } }
-		public Item Item { get { return MyLink.Item; } }
-		public double Throughput { get { return MyLink.Throughput; } }
-		public bool IsValid { get { return MyLink.IsValid; } }
+		public ReadOnlyBaseNode Supplier => MyLink.SupplierNode.ReadOnlyNode;
+		public ReadOnlyBaseNode Consumer => MyLink.ConsumerNode.ReadOnlyNode;
+		public Item Item => MyLink.Item;
+		public double Throughput => MyLink.Throughput;
+		public bool IsValid => MyLink.IsValid;
 
 		private readonly NodeLink MyLink;
 

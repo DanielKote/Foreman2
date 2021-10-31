@@ -149,7 +149,7 @@ namespace Foreman
 					ErrorSet |= Errors.InvalidFuelRemains;
 			}
 
-			if (AssemblerModules.FirstOrDefault(m => m.IsMissing) != null)
+			if (AssemblerModules.Any(m => m.IsMissing))
 				ErrorSet |= Errors.AModuleIsMissing;
 			if (AssemblerModules.Count > SelectedAssembler.ModuleSlots)
 				ErrorSet |= Errors.AModuleLimitExceeded;
@@ -158,7 +158,7 @@ namespace Foreman
 			{
 				if (SelectedBeacon.IsMissing)
 					ErrorSet |= Errors.BeaconIsMissing;
-				if (BeaconModules.FirstOrDefault(m => m.IsMissing) != null)
+				if (BeaconModules.Any(m => m.IsMissing))
 					ErrorSet |= Errors.BModuleIsMissing;
 				if (BeaconModules.Count > SelectedBeacon.ModuleSlots)
 					ErrorSet |= Errors.BModuleLimitExceeded;
@@ -178,20 +178,20 @@ namespace Foreman
 				WarningSet |= Warnings.AssemblerIsDisabled;
 			if (!SelectedAssembler.Available)
 				WarningSet |= Warnings.AssemblerIsUnavailable;
-			if (BaseRecipe.Assemblers.FirstOrDefault(a => a.Enabled) == null)
+			if (!BaseRecipe.Assemblers.Any(a => a.Enabled))
 				WarningSet |= Warnings.NoAvailableAssemblers;
 			if (Fuel != null)
 			{
 				if (!Fuel.Available)
 					WarningSet |= Warnings.FuelIsUnavailable;
-				if (Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) == null)
+				if (!Fuel.ProductionRecipes.Any(r => r.Enabled && r.Assemblers.Any(a => a.Enabled)))
 					WarningSet |= Warnings.FuelIsUncraftable;
-				if (SelectedAssembler.Fuels.FirstOrDefault(f => f.Enabled && f.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) == null)
+				if (!SelectedAssembler.Fuels.Any(f => f.Enabled && f.ProductionRecipes.Any(r => r.Enabled && r.Assemblers.Any(a => a.Enabled))))
 					WarningSet |= Warnings.NoAvailableFuels;
 			}
-			if (AssemblerModules.FirstOrDefault(m => !m.Enabled) != null)
+			if (AssemblerModules.Any(m => !m.Enabled))
 				WarningSet |= Warnings.AModuleIsDisabled;
-			if (AssemblerModules.FirstOrDefault(m => !m.Available) != null)
+			if (AssemblerModules.Any(m => !m.Available))
 				WarningSet |= Warnings.AModuleIsUnavailable;
 			if (SelectedBeacon != null)
 			{
@@ -200,9 +200,9 @@ namespace Foreman
 				if (!SelectedBeacon.Available)
 					WarningSet |= Warnings.BeaconIsUnavailable;
 			}
-			if (BeaconModules.FirstOrDefault(m => !m.Enabled) != null)
+			if (BeaconModules.Any(m => !m.Enabled))
 				WarningSet |= Warnings.BModuleIsDisabled;
-			if (BeaconModules.FirstOrDefault(m => !m.Available) != null)
+			if (BeaconModules.Any(m => !m.Available))
 				WarningSet |= Warnings.BModuleIsUnavailable;
 
 			if (ErrorSet != Errors.Clean)
@@ -655,7 +655,7 @@ namespace Foreman
 				if ((ErrorSet & RecipeNode.Errors.AssemblerIsMissing) != 0)
 					resolutions.Add("Auto-select assembler", new Action(() => AutoSetAssembler()));
 
-				if ((ErrorSet & (RecipeNode.Errors.FuelIsMissing | RecipeNode.Errors.InvalidFuel)) != 0 && MyNode.SelectedAssembler.Fuels.FirstOrDefault(f => !f.IsMissing) != null)
+				if ((ErrorSet & (RecipeNode.Errors.FuelIsMissing | RecipeNode.Errors.InvalidFuel)) != 0 && MyNode.SelectedAssembler.Fuels.Any(f => !f.IsMissing))
 					resolutions.Add("Auto-select fuel", new Action(() => AutoSetFuel()));
 
 				if ((ErrorSet & RecipeNode.Errors.InvalidFuelRemains) != 0 && MyNode.SelectedAssembler.Fuels.Contains(MyNode.Fuel))

@@ -967,6 +967,7 @@ namespace Foreman
 				recipe.InternalOneWayAddIngredient(ingredient, 60);
 				ingredient.consumptionRecipes.Add(recipe);
 				recipe.InternalOneWayAddProduct(product, 60, temp);
+				product.productionRecipes.Add(recipe);
 
 				if (aEntity.associatedItems.Count == 0)
 				{
@@ -1149,12 +1150,12 @@ namespace Foreman
 
 			//step 2: update recipe unlock status
 			foreach (RecipePrototype recipe in recipes.Values)
-				recipe.Available = recipe.myUnlockTechnologies.FirstOrDefault(t => t.Available) != null;
+				recipe.Available = recipe.myUnlockTechnologies.Any(t => t.Available);
 
 			//step 3: mark any recipe for barelling / crating as unavailable
 			if(UseRecipeBWLists)
 				foreach (RecipePrototype recipe in recipes.Values)
-					if (recipeWhiteList.FirstOrDefault(white => white.IsMatch(recipe.Name)) == null && recipeBlackList.FirstOrDefault(black => black.IsMatch(recipe.Name)) != null) //if we dont match a whitelist and match a blacklist...
+					if (!recipeWhiteList.Any(white => white.IsMatch(recipe.Name)) && recipeBlackList.Any(black => black.IsMatch(recipe.Name))) //if we dont match a whitelist and match a blacklist...
 						recipe.Available = false;
 
 			//step 4: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
@@ -1169,7 +1170,7 @@ namespace Foreman
 				clean = true;
 
 				//5.1: mark any recipe with no available assemblers to unavailable.
-				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && r.Assemblers.FirstOrDefault(a => a.Available) == null))
+				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available)))
 				{
 					recipe.Available = false;
 					clean = false;
@@ -1178,7 +1179,7 @@ namespace Foreman
 				//5.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
 				//this will also update assembler availability status for those whose items become unavailable automatically.
 				//note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
-				foreach (ItemPrototype item in items.Values.Where(i => i.Available && i.ProductionRecipes.FirstOrDefault(r => r.Available) == null))
+				foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available)))
 				{
 					bool useful = false;
 					foreach (RecipePrototype r in item.consumptionRecipes.Where(r => r.Available))
@@ -1218,10 +1219,10 @@ namespace Foreman
 
 			//step 8: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
 			foreach (SubgroupPrototype subgroup in subgroups.Values)
-				if (subgroup.items.FirstOrDefault(i => i.Available) == null && subgroup.recipes.FirstOrDefault(r => r.Available) == null)
+				if (!subgroup.items.Any(i => i.Available) && !subgroup.recipes.Any(r => r.Available))
 					subgroup.Available = false;
 			foreach (GroupPrototype group in groups.Values)
-				if (group.subgroups.FirstOrDefault(sg => sg.Available) == null)
+				if (!group.subgroups.Any(sg => sg.Available))
 					group.Available = false;
 
 			//step 9: sort groups/subgroups

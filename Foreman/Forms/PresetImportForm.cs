@@ -95,7 +95,7 @@ namespace Foreman
 			}
 
 			List<Preset> existingPresets = MainForm.GetValidPresetsList();
-			if (existingPresets.FirstOrDefault(p => p.Name.ToLower() == NewPresetName.ToLower()) != null)
+			if (existingPresets.Any(p => p.Name.ToLower() == NewPresetName.ToLower()))
 			{
 				if (MessageBox.Show("This preset name is already in use. Do you wish to overwrite?", "Confirm Overwrite", MessageBoxButtons.YesNo) != DialogResult.Yes)
 				{
@@ -423,7 +423,7 @@ namespace Foreman
 			List<Preset> existingPresets = MainForm.GetValidPresetsList();
 			if (filteredText.Length < 5)
 				PresetNameTextBox.BackColor = Color.Moccasin;
-			else if (existingPresets.FirstOrDefault(p => p.Name.ToLower() == filteredText.ToLower()) != null)
+			else if (existingPresets.Any(p => p.Name.ToLower() == filteredText.ToLower()))
 				PresetNameTextBox.BackColor = Color.Pink;
 			else
 				PresetNameTextBox.BackColor = Color.LightGreen;

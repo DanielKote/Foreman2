@@ -16,7 +16,7 @@ namespace Foreman
 		public IReadOnlyCollection<Recipe> Recipes { get { return recipes; } }
 		public double BaseProductivityBonus { get; set; }
 
-		public override bool Available { get { return associatedItems.FirstOrDefault(i => i.Available) != null; } set { } }
+		public override bool Available { get { return associatedItems.Any(i => i.Available); } set { } }
 
 
 		internal HashSet<RecipePrototype> recipes { get; private set; }

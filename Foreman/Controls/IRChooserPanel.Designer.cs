@@ -307,8 +307,8 @@ namespace Foreman
 			this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
 			this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
 			this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
-			this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9.996402F));
-			this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
+			this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9.996403F));
+			this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 12F));
 			this.IRTable.Controls.Add(this.IRScrollBar, 10, 0);
 			this.IRTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.IRTable.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
@@ -330,11 +330,11 @@ namespace Foreman
 			// IRScrollBar
 			// 
 			this.IRScrollBar.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.IRScrollBar.Location = new System.Drawing.Point(259, 0);
+			this.IRScrollBar.Location = new System.Drawing.Point(260, 0);
 			this.IRScrollBar.Name = "IRScrollBar";
 			this.IRScrollBar.Padding = new System.Windows.Forms.Padding(0, 0, 1, 0);
 			this.IRTable.SetRowSpan(this.IRScrollBar, 8);
-			this.IRScrollBar.Size = new System.Drawing.Size(22, 208);
+			this.IRScrollBar.Size = new System.Drawing.Size(21, 208);
 			this.IRScrollBar.TabIndex = 3;
 			this.IRScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.IRPanelScrollBar_Scroll);
 			// 

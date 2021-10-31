@@ -13,7 +13,7 @@ namespace Foreman
 	{
 		public double BeaconEffectivity { get; set; }
 
-		public override bool Available { get { return associatedItems.FirstOrDefault(i => i.Available) != null; } set { } }
+		public override bool Available { get { return associatedItems.Any(i => i.Available); } set { } }
 
 		public BeaconPrototype(DataCache dCache, string name, string friendlyName, EnergySource source, bool isMissing = false) : base(dCache, name, friendlyName, EntityType.Beacon, source, isMissing)
 		{

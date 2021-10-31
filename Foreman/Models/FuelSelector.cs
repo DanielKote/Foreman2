@@ -36,9 +36,9 @@ namespace Foreman
 
 			//check for valid fuel in order from highest standards to lowest
 			Item fuel = assembler.Fuels.OrderBy(item => item.Available)
-				.ThenBy(item => item.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null)
-				.ThenBy(item => item.ProductionRecipes.FirstOrDefault(r => r.Available) != null)
-				.ThenBy(item => item.ProductionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null)
+				.ThenBy(item => item.ProductionRecipes.Any(r => r.Enabled))
+				.ThenBy(item => item.ProductionRecipes.Any(r => r.Available))
+				.ThenBy(item => item.ProductionRecipes.Any(r => r.Assemblers.Any(a => a.Enabled)))
 				.ThenBy(item => item.ProductionRecipes.Count > 0)
 				.ThenBy(item => fuelPriority.IndexOf(item))
 				.LastOrDefault();

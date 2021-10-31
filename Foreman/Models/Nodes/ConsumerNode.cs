@@ -35,7 +35,7 @@ namespace Foreman
 		public override double GetConsumeRate(Item item) { return ActualRate; }
 		public override double GetSupplyRate(Item item) { throw new ArgumentException("Consumer does not supply! nothing should be asking for the supply rate"); }
 
-		internal override double inputRateFor(Item item) { return MyGraph.GetRateMultipler(); }
+		internal override double inputRateFor(Item item) { return 1; }
 		internal override double outputRateFor(Item item) { throw new ArgumentException("Consumer should not have outputs!"); }
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)

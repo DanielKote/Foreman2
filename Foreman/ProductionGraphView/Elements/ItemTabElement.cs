@@ -13,6 +13,7 @@ namespace Foreman
 
 		public LinkType LinkType;
 		public Item Item { get; private set; }
+		public IEnumerable<ReadOnlyNodeLink> Links { get { return LinkType == LinkType.Input ? DisplayedNode.InputLinks.Where(l => Item == Item) : DisplayedNode.OutputLinks.Where(l => l.Item == Item); } }
 
 		private const int iconSize = 32;
 		private const int border = 3;
