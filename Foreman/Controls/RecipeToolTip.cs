@@ -22,7 +22,7 @@ namespace Foreman
 		public CustomToolTip()
 		{
 			this.AutoPopDelay = 100000;
-			this.InitialDelay = 100000;
+			this.InitialDelay = 100000; //we will be manually showing this - so we dont want the auto-show to happen.
 			this.ReshowDelay = 100000;
 			this.TextFont = new Font(FontFamily.GenericSansSerif, 7.8f, FontStyle.Regular);
 
@@ -79,7 +79,7 @@ namespace Foreman
 		public RecipeToolTip()
 		{
 			this.AutoPopDelay = 100000;
-			this.InitialDelay = 100;
+			this.InitialDelay = 100000; //we will be manually showing this - so we dont want the auto-show to happen.
 			this.ReshowDelay = 100000;
 
 			this.OwnerDraw = true;

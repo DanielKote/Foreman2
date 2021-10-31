@@ -122,6 +122,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BenchmarkTimer.cs" />
+    <Compile Include="Controls\DataObjectCheckedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -138,7 +141,7 @@
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MouseHoverDetector.cs" />
-    <Compile Include="Controls\RecipePainter.cs" />
+    <Compile Include="ProductionGraphView\RecipePainter.cs" />
     <Compile Include="Controls\RecipeToolTip.cs">
       <SubType>Component</SubType>
     </Compile>

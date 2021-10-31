@@ -57,6 +57,7 @@ namespace Foreman
 				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
+				ShowUnavailableCheckBox.Checked = Properties.Settings.Default.ShowUnavailable;
 
 				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
 				ShowNodeRecipeCheckBox.Checked = Properties.Settings.Default.ShowRecipeToolTip;
@@ -226,7 +227,7 @@ namespace Foreman
 						Properties.Settings.Default.Save();
 					}
 
-					GraphViewer.Invalidate();
+					GraphViewer.UpdateNodeVisuals();
 					UpdateControlValues();
 				}
 			} while (reload);
@@ -346,8 +347,10 @@ namespace Foreman
 
 		//---------------------------------------------------------Assemblers
 
-		private void SimpleViewCheckBox_CheckedChanged(object sender, EventArgs e)
+		private void DEV_ShowUnavailableCheckBox_CheckChanged(object sender, EventArgs e)
 		{
+			Properties.Settings.Default.ShowUnavailable = ShowUnavailableCheckBox.Checked;
+			Properties.Settings.Default.Save();
 
 		}
 

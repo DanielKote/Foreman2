@@ -17,14 +17,16 @@ namespace Foreman
 		public override int Y { get { return DisplayedNode.Location.Y; } set { DisplayedNode.Location = new Point(DisplayedNode.Location.X, value); } }
 		public override Point Location { get { return DisplayedNode.Location; } set { DisplayedNode.Location = value; } }
 
-		protected abstract Brush BgBrush { get; }
+		protected abstract Brush CleanBgBrush { get; }
+		private static readonly Brush errorBgBrush = Brushes.Coral;
 
-		private static readonly Brush errorBgBrush = new SolidBrush(Color.FromArgb(255, 140, 120));
-		private static readonly Brush oversuppliedBgBrush = new SolidBrush(Color.FromArgb(255, 140, 120));
-		private static readonly Brush errorBorderBrush = new SolidBrush(Color.DarkRed);
+		private static readonly Brush equalFlowBorderBrush = Brushes.DarkGreen;
+		private static readonly Brush oversuppliedFlowBorderBrush = Brushes.DarkGoldenrod;
+		private static readonly Brush undersuppliedFlowBorderBrush = Brushes.DarkRed;
+
 		private static readonly Brush selectionOverlayBrush = new SolidBrush(Color.FromArgb(100, 100, 100, 200));
 
-		protected static readonly Brush TextBrush = new SolidBrush(Color.FromArgb(0, 0, 0));
+		protected static readonly Brush TextBrush = Brushes.Black;
 		protected static readonly Font BaseFont = new Font(FontFamily.GenericSansSerif, 10);
 		protected static readonly Font TitleFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold);
 
@@ -67,7 +69,7 @@ namespace Foreman
 		public virtual void Update()
 		{
 			//update error notice
-			errorNotice.SetVisibility(!DisplayedNode.IsValid);
+			errorNotice.SetVisibility(DisplayedNode.State != NodeState.Clean);
 			errorNotice.X = -Width / 2;
 			errorNotice.Y = -Height / 2;
 
@@ -156,11 +158,14 @@ namespace Foreman
 			Point trans = LocalToGraph(new Point(0, 0)); //all draw operations happen in graph 0,0 origin coordinates. So we need to transform all our draw operations to the local 0,0 (center of object)
 
 			//background
-			Brush bgBrush = DisplayedNode.IsValid ? !DisplayedNode.IsOversupplied() ? BgBrush : oversuppliedBgBrush : errorBgBrush;
-			if(!DisplayedNode.IsValid || DisplayedNode.ManualRateNotMet())
-				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) - 5, trans.Y - (Height / 2) - 5, Width + 10, Height + 10, 13, graphics, errorBorderBrush); //error border
+			Brush bgBrush = DisplayedNode.State == NodeState.Error ? errorBgBrush : CleanBgBrush;
+			Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOversupplied() ? oversuppliedFlowBorderBrush : equalFlowBorderBrush;
 
-			GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, bgBrush);
+			GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 10, graphics, borderBrush); //flow status border
+			GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, bgBrush); //basic background (with given background brush)
+			if (DisplayedNode.State == NodeState.Warning)
+				GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, errorBgBrush); //warning flag
+
 
 			//draw in all the inside details for this node
 			DetailsDraw(graphics, trans);
@@ -229,7 +234,8 @@ namespace Foreman
 						new EventHandler((o, e) =>
 						{
 							graphViewer.TryDeleteSelectedNodes();
-						})));
+						}))
+					{  });
 				}
 				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
 			}

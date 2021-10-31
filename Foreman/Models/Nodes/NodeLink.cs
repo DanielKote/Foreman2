@@ -25,7 +25,7 @@ namespace Foreman
 		public BaseNode Consumer { get { return consumer; } }
 		public Item Item { get; private set; }
 		public double Throughput { get; set; }
-		public bool IsValid { get { return LinkChecker.IsValidTemperatureConnection(Item, supplier, consumer); } }
+		public bool IsValid { get; private set; }
 
 		internal BaseNodePrototype supplier;
 		internal BaseNodePrototype consumer;
@@ -36,6 +36,8 @@ namespace Foreman
 			this.supplier = supplier;
 			this.consumer = consumer;
 			Item = item;
+
+			IsValid = LinkChecker.IsValidTemperatureConnection(Item, supplier, consumer); //only need to check once -> item & recipe temperatures cant change.
 		}
 
 		public void Delete() { MyGraph.DeleteLink(this); }

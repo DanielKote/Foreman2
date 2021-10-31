@@ -29,13 +29,31 @@ namespace Foreman
 		internal override double inputRateFor(Item item) { return 1; }
 		internal override double outputRateFor(Item item) { return 1; }
 
-		public override bool IsValid { get { return !PassthroughItem.IsMissing; } }
-		public override string GetErrors()
+		public override void UpdateState() { State = (PassthroughItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean; }
+
+		public override List<string> GetErrors()
 		{
-			if (!IsValid)
-				return string.Format("Item \"{0}\" doesnt exist in preset!", PassthroughItem.FriendlyName);
-			return null;
+			List<string> errors = new List<string>();
+			if (PassthroughItem.IsMissing)
+				errors.Add(string.Format("> Item \"{0}\" doesnt exist in preset!", PassthroughItem.FriendlyName));
+			else if (!AllLinksValid)
+				errors.Add("> Some links are invalid!");
+			return errors;
 		}
+
+		public override Dictionary<string, Action> GetErrorResolutions()
+		{
+			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+			if(PassthroughItem.IsMissing)
+				resolutions.Add("Delete node", new Action(() => this.Delete()));
+			else
+				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
+					resolutions.Add(kvp.Key, kvp.Value);
+			return resolutions;
+		}
+
+		public override List<string> GetWarnings() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
+		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{

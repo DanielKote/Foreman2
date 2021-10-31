@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace Foreman
 {
@@ -10,6 +11,10 @@ namespace Foreman
 
 		IReadOnlyCollection<Recipe> ProductionRecipes { get; }
 		IReadOnlyCollection<Recipe> ConsumptionRecipes { get; }
+
+		IReadOnlyCollection<Recipe> AvailableProductionRecipes { get; }
+		IReadOnlyCollection<Recipe> AvailableConsumptionRecipes { get; }
+
 		bool IsMissing { get; }
 		bool IsFluid { get; }
 		bool IsTemperatureDependent { get; }
@@ -28,6 +33,8 @@ namespace Foreman
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }
 		public IReadOnlyCollection<Recipe> ConsumptionRecipes { get { return consumptionRecipes; } }
+		public IReadOnlyCollection<Recipe> AvailableProductionRecipes { get; private set; }
+		public IReadOnlyCollection<Recipe> AvailableConsumptionRecipes { get; private set; }
 
 		public bool IsMissing { get; private set; }
 
@@ -61,7 +68,11 @@ namespace Foreman
 			IsMissing = isMissing;
 		}
 
-		public override string ToString() { return String.Format("Item: {0}", Name); }
+		internal void UpdateAvailabilities()
+		{
+			AvailableConsumptionRecipes = new HashSet<Recipe>(consumptionRecipes.Where(r => r.Available));
+			AvailableProductionRecipes = new HashSet<Recipe>(productionRecipes.Where(r => r.Available));
+		}
 
 		public string GetTemperatureRangeFriendlyName(fRange tempRange)
 		{
@@ -85,5 +96,7 @@ namespace Foreman
 
 			return name;
 		}
+
+		public override string ToString() { return string.Format("Item: {0}", Name); }
 	}
 }

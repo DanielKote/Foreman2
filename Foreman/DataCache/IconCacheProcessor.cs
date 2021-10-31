@@ -43,7 +43,7 @@ namespace Foreman
 
 	public class IconCacheProcessor : IDisposable
 	{
-		internal static readonly Color NoTint = Color.FromArgb(255, 255, 255, 255);
+		internal static readonly Color NoTint = Color.White;
 
 		public int TotalPathCount { get; private set; }
 		public int FailedPathCount { get; private set; }
@@ -127,6 +127,7 @@ namespace Foreman
 				iconJObject["recipes"].Count() +
 				iconJObject["items"].Count() +
 				iconJObject["fluids"].Count() +
+				iconJObject["entities"].Count() +
 				iconJObject["groups"].Count();
 
 			progress.Report(new KeyValuePair<int, string>(startingPercent, "Creating icons."));
@@ -154,6 +155,12 @@ namespace Foreman
 				if (token.IsCancellationRequested) return false;
 				progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
 				ProcessIcon(iconJToken, 32);
+			}
+			foreach (var iconJToken in iconJObject["entities"].ToList())
+			{
+				if (token.IsCancellationRequested) return false;
+				progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
+				ProcessIcon(iconJToken, 64);
 			}
 			foreach (var iconJToken in iconJObject["groups"].ToList())
 			{

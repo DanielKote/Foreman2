@@ -33,12 +33,23 @@ namespace Foreman
 			if (assembler == null || !assembler.IsBurner)
 				return null;
 
-			Item fuel = fuelPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(assembler)); //last added -> most recent
+			//check for valid fuel in order from highest standards to lowest
+			Item fuel = fuelPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(assembler) && item.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null);
 			if (fuel == null)
-				fuel = assembler.ValidFuels.FirstOrDefault();
-			if(fuel != null)
-				UseFuel(fuel);
+				fuel = assembler.Fuels.FirstOrDefault(i => i.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null);
+			if(fuel == null)
+				fuel = fuelPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(assembler) && item.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null);
+			if(fuel == null)
+				fuel = assembler.Fuels.FirstOrDefault(i => i.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null);
+			if(fuel == null)
+				fuel = fuelPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(assembler) && item.ProductionRecipes.Count > 0);
+			if(fuel == null)
+				fuel = assembler.Fuels.FirstOrDefault(i => i.ProductionRecipes.Count > 0);
+			if(fuel == null)
+				fuel = assembler.Fuels.FirstOrDefault();
 
+			if (fuel != null)
+				UseFuel(fuel);
 			return fuel;
 		}
 

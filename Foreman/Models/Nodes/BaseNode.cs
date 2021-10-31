@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public enum RateType { Auto, Manual };
+	public enum NodeState { Clean, Warning, Error }
 
 	public interface BaseNode : ISerializable
 	{
@@ -25,8 +26,13 @@ namespace Foreman
 		float ActualRate { get; }
 		float DesiredRate { get; set; }
 
-		bool IsValid { get; }
-		string GetErrors();
+		NodeState State { get; }
+		void UpdateState();
+
+		List<string> GetErrors();
+		List<string> GetWarnings();
+		Dictionary<string, Action> GetErrorResolutions(); //<resolution title : action that will happen if this resolution is picked> ex: <"delete node", Action(will delete this node)>
+		Dictionary<string, Action> GetWarningResolutions();
 
 		float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
 		float GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
@@ -42,6 +48,7 @@ namespace Foreman
 		float GetPollutionMultiplier();
 
 		void Delete();
+
 	}
 
 	[Serializable]
@@ -64,8 +71,6 @@ namespace Foreman
 		public float ActualRate { get; protected set; } // The rate the solver calculated is appropriate for this node.
 		public float DesiredRate { get; set; } // If the rateType is manual, this field contains the rate the user desires.
 
-		public abstract bool IsValid { get; }
-
 		internal List<NodeLinkPrototype> inputLinks { get; private set; }
 		internal List<NodeLinkPrototype> outputLinks { get; private set; }
 
@@ -77,7 +82,30 @@ namespace Foreman
 		public virtual float GetConsumptionMultiplier() { return 1; }
 		public virtual float GetPollutionMultiplier() { return 1; }
 
-		public abstract string GetErrors();
+		public NodeState State { get; protected set; }
+		public abstract void UpdateState();
+
+		public abstract List<string> GetErrors();
+		public abstract List<string> GetWarnings();
+		public abstract Dictionary<string, Action> GetErrorResolutions();
+		public abstract Dictionary<string, Action> GetWarningResolutions();
+
+		protected bool AllLinksValid { get { return (inputLinks.Count(l => !l.IsValid) + outputLinks.Count(l => !l.IsValid) == 0); } }
+		protected Dictionary<string, Action> GetInvalidConnectionResolutions()
+		{
+			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+			if(!AllLinksValid)
+			{
+				resolutions.Add("Delete invalid links", new Action(() =>
+				{
+					foreach (NodeLinkPrototype invalidLink in InputLinks.Where(l => l.IsValid))
+						invalidLink.Delete();
+					foreach (NodeLinkPrototype invalidLink in outputLinks.Where(l => l.IsValid))
+						invalidLink.Delete();
+				}));
+			}
+			return resolutions;
+		}
 
 		public void Delete() { MyGraph.DeleteNode(this); }
 

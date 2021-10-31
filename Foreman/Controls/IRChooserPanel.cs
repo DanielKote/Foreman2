@@ -11,7 +11,7 @@ namespace Foreman
 	{
 		public Action EndAction;
 
-		private static readonly Color SelectedGroupButtonBGColor = Color.FromArgb(255, 255, 180, 100);
+		private static readonly Color SelectedGroupButtonBGColor = Color.SandyBrown;
 		protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 70, 70, 70);
 		protected static readonly Color IRButtonHiddenColor = Color.FromArgb(255, 120, 0, 0);
 		protected static readonly Color IRButtonNoAssemblerColor = Color.FromArgb(255, 100, 100, 0);
@@ -36,10 +36,13 @@ namespace Foreman
 		protected abstract void IRButton_MouseUp(object sender, MouseEventArgs e);
 		//protected abstract void IRButton_Hover(object sender, EventArgs e);
 
+		protected bool ShowUnavailable { get; private set; }
+
 		public IRChooserPanel(ProductionGraphViewer parent, Point originPoint)
 		{
 			PGViewer = parent;
 			this.DoubleBuffered = true;
+			this.ShowUnavailable = Properties.Settings.Default.ShowUnavailable;
 
 			InitializeComponent();
 			IRFlowPanel.Height = IRPanelRows * 35 + 12;
@@ -137,12 +140,7 @@ namespace Foreman
 
 		}
 
-		protected virtual List<Group> GetSortedGroups()
-		{
-			List<Group> groups = PGViewer.DCache.Groups.Values.ToList();
-			groups.Sort();
-			return groups;
-		}
+		protected abstract List<Group> GetSortedGroups();
 
 		protected void UpdateIRButtons(int startRow = 0, bool scrollOnly = false) //if scroll only, then we dont need to update the filtered set, just use what is there
 		{
@@ -330,11 +328,11 @@ namespace Foreman
 		protected override List<Group> GetSortedGroups()
 		{
 			List<Group> groups = new List<Group>();
-			foreach (Group group in PGViewer.DCache.Groups.Values)
+			foreach (Group group in ShowUnavailable ? PGViewer.DCache.Groups.Values : PGViewer.DCache.AvailableGroups)
 			{
 				int itemCount = 0;
 				foreach (Subgroup sgroup in group.Subgroups)
-					itemCount += sgroup.Items.Count;
+					itemCount += ShowUnavailable ? sgroup.Items.Count : sgroup.AvailableItems.Count;
 				if (itemCount > 0)
 					groups.Add(group);
 			}
@@ -348,6 +346,7 @@ namespace Foreman
 			string filterString = FilterTextBox.Text.ToLower();
 			bool ignoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
 			bool showHidden = ShowHiddenCheckBox.Checked;
+
 			Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>> filteredItems = new Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>>();
 			Dictionary<Group, int> filteredItemCount = new Dictionary<Group, int>();
 			foreach (Group group in SortedGroups)
@@ -357,15 +356,24 @@ namespace Foreman
 				foreach (Subgroup sgroup in group.Subgroups)
 				{
 					List<KeyValuePair<DataObjectBase, Color>> itemList = new List<KeyValuePair<DataObjectBase, Color>>();
-					foreach (Item item in sgroup.Items.Where(n => n.LFriendlyName.Contains(filterString) || n.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))
+					foreach (Item item in sgroup.Items.Where(n => ((ShowUnavailable || n.Available) && (n.LFriendlyName.Contains(filterString) || n.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))))
 					{
-						bool visible =
+						bool visible = (ShowUnavailable || item.Available) && (ShowUnavailable?
 							(item.ConsumptionRecipes.FirstOrDefault(n => n.Enabled) != null) ||
-							(item.ProductionRecipes.FirstOrDefault(n => n.Enabled) != null);
-						bool validAssembler =
+							(item.ProductionRecipes.FirstOrDefault(n => n.Enabled) != null)
+							:
+							(item.AvailableConsumptionRecipes.FirstOrDefault(n => n.Enabled) != null) ||
+							(item.AvailableProductionRecipes.FirstOrDefault(n => n.Enabled) != null));
+
+						bool validAssembler = ShowUnavailable ?
 							(item.ConsumptionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null) ||
-							(item.ProductionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null);
-						Color bgColor = (visible ? (validAssembler ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
+							(item.ProductionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null)
+							:
+							(item.AvailableConsumptionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null) ||
+							(item.AvailableProductionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null);
+
+
+						Color bgColor = (visible && item.Available) ? validAssembler ? IRButtonDefaultColor : IRButtonNoAssemblerColor : IRButtonHiddenColor;
 
 						if ((visible || showHidden) && (validAssembler || ignoreAssemblerStatus))
 						{
@@ -479,11 +487,11 @@ namespace Foreman
 		protected override List<Group> GetSortedGroups()
 		{
 			List<Group> groups = new List<Group>();
-			foreach (Group group in PGViewer.DCache.Groups.Values)
+			foreach (Group group in ShowUnavailable ? PGViewer.DCache.Groups.Values : PGViewer.DCache.AvailableGroups)
 			{
 				int recipeCount = 0;
 				foreach (Subgroup sgroup in group.Subgroups)
-					recipeCount += sgroup.Recipes.Count;
+					recipeCount += ShowUnavailable ? sgroup.Recipes.Count : sgroup.AvailableRecipes.Count;
 				if (recipeCount > 0)
 					groups.Add(group);
 			}
@@ -501,6 +509,7 @@ namespace Foreman
 			bool includeSuppliers = AsProductCheckBox.Checked;
 			bool includeConsumers = AsIngredientCheckBox.Checked;
 			bool ignoreItem = KeyItem == null;
+
 			Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>> filteredRecipes = new Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>>();
 			Dictionary<Group, int> filteredRecipeCount = new Dictionary<Group, int>();
 			foreach (Group group in SortedGroups)
@@ -514,8 +523,8 @@ namespace Foreman
 						(includeConsumers && r.IngredientSet.ContainsKey(KeyItem)) ||
 						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem))))
 					{
-						//quick hidden / enabled assembler check (done prior to name check for speed)
-						if ((recipe.Enabled || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus))
+						//quick hidden / enabled / available assembler check (done prior to name check for speed)
+						if ((recipe.Enabled || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus) && (recipe.Available || ShowUnavailable))
 						{
 							//name check - have to check recipe name along with all ingredients and products (both friendly name and base name) - if selected
 							if (recipe.LFriendlyName.Contains(filterString) ||

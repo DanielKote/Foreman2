@@ -10,7 +10,7 @@ namespace Foreman
 {
 	public class ConsumerNodeElement : BaseNodeElement
 	{
-		protected override Brush BgBrush { get { return consumerBgBrush; } }
+		protected override Brush CleanBgBrush { get { return consumerBgBrush; } }
 		private static Brush consumerBgBrush = new SolidBrush(Color.FromArgb(249, 237, 195));
 
 		private static StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };

@@ -10,7 +10,7 @@ namespace Foreman
 {
 	public class RecipeNodeElement : BaseNodeElement
 	{
-		protected override Brush BgBrush { get { return recipeBgBrush; } }
+		protected override Brush CleanBgBrush { get { return recipeBgBrush; } }
 		private static readonly Brush recipeBgBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
 		private static readonly Pen productivityPen = new Pen(new SolidBrush(Color.FromArgb(166, 0, 0)), 6);
 		private static readonly Pen productivityPlusPen = new Pen(productivityPen.Brush, 2);
@@ -26,11 +26,11 @@ namespace Foreman
 			base.Height = (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low)? BaseSimpleHeight : BaseRecipeHeight;
 
 			assembler = new AssemblerElement(graphViewer, this);
-			assembler.Location = new Point(-32, -12);
+			assembler.Location = new Point(-30, -12);
 			assembler.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 
 			beacon = new BeaconElement(graphViewer, this);
-			beacon.Location = new Point(-20, 22);
+			beacon.Location = new Point(-18, 22);
 			beacon.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 		}
 

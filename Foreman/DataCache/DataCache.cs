@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,16 +13,14 @@ namespace Foreman
 	{
 		public string PresetName { get; private set; }
 
+		public IEnumerable<Group> AvailableGroups { get { return groups.Values.Where(g => g.Available); } }
+		public IEnumerable<Subgroup> AvailableSubgroups{ get { return subgroups.Values.Where(g => g.Available); } }
+		public IEnumerable<Item> AvailableItems { get { return items.Values.Where(g => g.Available); } }
+		public IEnumerable<Recipe> AvailableRecipes { get { return recipes.Values.Where(g => g.Available); } }
+
 		//mods: <name, version>
 		//others: <name, object>
 
-		//TECHNOLOGY:   guaranteed to be researchable
-		//RECIPE:       guaranteed to be unlockable through a technology above, have a valid assembler, and have at least 1 input or output
-		//ITEM:         guaranteed to have at least 1 recipe that isnt a direct create or destroy (nothing->item or item->nothing; 1 ingredient/product only).
-		//ASSEMBLER:    guaranteed to be creatable (associated item has valid recipe)
-		//BEACON:       same as assembler
-		//SUBGROUP:     guaranteed to have at least 1 recipe or item
-		//GROUP:        guaranteed to have at least 1 subgroup
 		public IReadOnlyDictionary<string, string> IncludedMods { get { return includedMods; } }
 		//public IReadOnlyDictionary<string, Technology> Technologies { get { return technologies; } } //at the moment technology isnt actually used. All the links are set up (tech to recipe, tech to tech, recipe to tech, etc), but enabling/disabling technologies does not impact anything. This is due to (A) not having a technology screen and (B) to allow save file loading of enabled status to just load enabled recipes and not care about tech->recipe inconsistencies (if any)
 		public IReadOnlyDictionary<string, Group> Groups { get { return groups; } }
@@ -183,7 +179,10 @@ namespace Foreman
 				foreach (SubgroupPrototype sg in subgroups.Values)
 					sg.SortIRs();
 
-				RemoveUnusableItems();
+				UpdateUnavailableStatus();
+#if DEBUG
+				PrintAllAvailabilities();
+#endif
 
 				progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
 				progress.Report(new KeyValuePair<int, string>(100, "Done!"));
@@ -624,6 +623,8 @@ namespace Foreman
 
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				module.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
+				module.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
 
 			module.SpeedBonus = (float)objJToken["module_effects_speed"];
 			module.ProductivityBonus = (float)objJToken["module_effects_productivity"];
@@ -634,8 +635,8 @@ namespace Foreman
 			{
 				if (recipes.ContainsKey((string)recipe)) //only add if the recipe is in the list of recipes (if it isnt, means it was deleted either in data phase of LUA or during foreman export cleanup)
 				{
-					((RecipePrototype)recipes[(string)recipe]).validModules.Add(module);
-					module.validRecipes.Add((RecipePrototype)recipes[(string)recipe]);
+					((RecipePrototype)recipes[(string)recipe]).modules.Add(module);
+					module.recipes.Add((RecipePrototype)recipes[(string)recipe]);
 				}
 			}
 
@@ -643,8 +644,8 @@ namespace Foreman
 			{
 				foreach (RecipePrototype recipe in recipes.Values)
 				{
-					recipe.validModules.Add(module);
-					module.validRecipes.Add(recipe);
+					recipe.modules.Add(module);
+					module.recipes.Add(recipe);
 				}
 			}
 
@@ -662,6 +663,8 @@ namespace Foreman
 
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				technology.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+
+			technology.Available = !(bool)objJToken["hidden"] && (bool)objJToken["enabled"]; //not sure - factorio documentation states 'enabled' means 'available at start', but in this case 'enabled' being false seems to represent the technology not appearing on screen (same as hidden)??? I will just work with what tests show -> tech is available if it is enabled & not hidden.
 
 			foreach (var recipe in objJToken["recipes"])
 			{
@@ -702,6 +705,12 @@ namespace Foreman
 
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				assembler.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
+				assembler.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
+			if (objJToken["associated_items"] != null)
+				foreach (string item in objJToken["associated_items"].Select(i => (string)i))
+					if (items.ContainsKey(item))
+						assembler.associatedItems.Add((ItemPrototype)items[item]);
 
 			foreach (var categoryJToken in objJToken["crafting_categories"])
 			{
@@ -709,8 +718,8 @@ namespace Foreman
 				{
 					foreach (RecipePrototype recipe in craftingCategories[(string)categoryJToken])
 					{
-						recipe.validAssemblers.Add(assembler);
-						assembler.validRecipes.Add(recipe);
+						recipe.assemblers.Add(assembler);
+						assembler.recipes.Add(recipe);
 					}
 				}
 			}
@@ -728,8 +737,8 @@ namespace Foreman
 				 (allowedEffects[2] || module.ProductivityBonus == 0) &&
 				 (allowedEffects[3] || module.PollutionBonus == 0)))
 			{
-				module.validAssemblers.Add(assembler);
-				assembler.validModules.Add(module);
+				module.assemblers.Add(assembler);
+				assembler.modules.Add(module);
 			}
 
 			assemblers.Add(assembler.Name, assembler);
@@ -737,6 +746,9 @@ namespace Foreman
 
 		private void ProcessMiner(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> resourceCategories)
 		{
+			if (!items.ContainsKey((string)objJToken["name"])) //ex: character
+				return;
+
 			AssemblerPrototype assembler = new AssemblerPrototype(
 				this,
 				(string)objJToken["name"],
@@ -745,10 +757,16 @@ namespace Foreman
 
 			assembler.Speed = (float)objJToken["mining_speed"];
 			assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
-			assembler.BaseProductivityBonus = (float)objJToken["base_productivity"];
+			assembler.BaseProductivityBonus = objJToken["base_productivity"] == null? 0f : (float)objJToken["base_productivity"];
 
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				assembler.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
+				assembler.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
+			if (objJToken["associated_items"] != null)
+				foreach (string item in objJToken["associated_items"].Select(i => (string)i))
+					if (items.ContainsKey(item))
+						assembler.associatedItems.Add((ItemPrototype)items[item]);
 
 			foreach (var categoryJToken in objJToken["resource_categories"])
 			{
@@ -756,8 +774,8 @@ namespace Foreman
 				{
 					foreach (RecipePrototype recipe in resourceCategories[(string)categoryJToken])
 					{
-						recipe.validAssemblers.Add(assembler);
-						assembler.validRecipes.Add(recipe);
+						recipe.assemblers.Add(assembler);
+						assembler.recipes.Add(recipe);
 					}
 				}
 			}
@@ -775,8 +793,8 @@ namespace Foreman
 				 (allowedEffects[2] || module.ProductivityBonus == 0) &&
 				 (allowedEffects[3] || module.PollutionBonus == 0)))
 			{
-				module.validAssemblers.Add(assembler);
-				assembler.validModules.Add(module);
+				module.assemblers.Add(assembler);
+				assembler.modules.Add(module);
 			}
 			assemblers.Add(assembler.Name, assembler);
 		}
@@ -795,6 +813,12 @@ namespace Foreman
 
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				assembler.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
+				assembler.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
+			if (objJToken["associated_items"] != null)
+				foreach (string item in objJToken["associated_items"].Select(i => (string)i))
+					if (items.ContainsKey(item))
+						assembler.associatedItems.Add((ItemPrototype)items[item]);
 
 			string fluidName = (string)objJToken["fluid"];
 			if (!items.ContainsKey(fluidName))
@@ -824,8 +848,8 @@ namespace Foreman
 			else
 				recipe = (RecipePrototype)recipes["$r:" + fluid.Name];
 
-			recipe.validAssemblers.Add(assembler);
-			assembler.validRecipes.Add(recipe);
+			recipe.assemblers.Add(assembler);
+			assembler.recipes.Add(recipe);
 
 			assemblers.Add(assembler.Name, assembler);
 		}
@@ -842,6 +866,12 @@ namespace Foreman
 
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				beacon.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
+				beacon.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
+			if (objJToken["associated_items"] != null)
+				foreach (string item in objJToken["associated_items"].Select(i => (string)i))
+					if (items.ContainsKey(item))
+						beacon.associatedItems.Add((ItemPrototype)items[item]);
 
 			List<string> allowedEffectsList = objJToken["allowed_effects"].Select(token => (string)token).ToList();
 			bool[] allowedEffects = new bool[] {
@@ -856,7 +886,7 @@ namespace Foreman
 				 (allowedEffects[2] || module.ProductivityBonus == 0) &&
 				 (allowedEffects[3] || module.PollutionBonus == 0)))
 			{
-				module.validBeacons.Add(beacon);
+				module.beacons.Add(beacon);
 				beacon.validModules.Add(module);
 			}
 
@@ -865,6 +895,9 @@ namespace Foreman
 
 		private void ProcessBurnerInfo(JToken objJToken, Dictionary<string, List<ItemPrototype>> fuelCategories)
 		{
+			if (!items.ContainsKey((string)objJToken["name"])) //ex: character
+				return;
+
 			AssemblerPrototype assembler = (AssemblerPrototype)assemblers[(string)objJToken["name"]];
 			assembler.EnergyConsumption = (float)objJToken["max_energy_usage"];
 			if (objJToken["fuel_type"] != null)
@@ -880,7 +913,7 @@ namespace Foreman
 						{
 							foreach (ItemPrototype item in fuelCategories[(string)categoryJToken])
 							{
-								assembler.validFuels.Add(item);
+								assembler.fuels.Add(item);
 								item.fuelsAssemblers.Add(assembler);
 							}
 						}
@@ -898,7 +931,7 @@ namespace Foreman
 
 					foreach (ItemPrototype fluid in items.Values.Where(i => i.IsFluid && i.FuelValue > 0))
 					{
-						assembler.validFuels.Add(fluid);
+						assembler.fuels.Add(fluid);
 						fluid.fuelsAssemblers.Add(assembler);
 					}
 				}
@@ -907,230 +940,173 @@ namespace Foreman
 
 		//------------------------------------------------------Finalization steps of LoadAllData (cleanup and cyclic checks)
 
-		private void RemoveUnusableItems()
+		private void UpdateUnavailableStatus()
 		{
-			//The data read by the dataCache (json preset) has already had its technology filtered such that only those tech that are 'unlockable' (aka: not hidden, disabled or broken)
-			//will be added. The list of recipes and items have also been culled to include only recipes that are unlocked at start or unlocked by unlockable tech,
-			//with items being only those that are part of the ingredients or products of the filtered recipes.
-			//also - barreling recipes (and crating from deadlock crating) have been removed in mod.
-			//NOTE: this is the reason why cheat assemblers (for creative mode) dont appear here.
+			//The data read by the dataCache (json preset) includes everything. We need to now process it such that any items/recipes that cant be used dont appear.
+			//thus any object that has Unavailable set to true should be ignored. We will leave the option to use them to the user, but in most cases its better without them
 
-			//so in this last filter we just need to clear out any recipes with no valid assemblers, recipes with 0/0 ingredients/products, items that no longer have any recipes (as ingredient or product) or are an assembler/beacon,
-			//and items that arent created anywhere and are only consumed by a single recipe with 1 ingredient and 0 products (burn/incinerate type recipes)
-			//Additionally we process groups and subgroups to include only those that have items/recipes (removing for example the 'signals' group)
-
-
-			bool changed = true;
-			while (changed)
+			//quick function to depth-first search the tech tree to calculate the availability of the technology. Hashset used to keep track of visited tech and not have to re-check them.
+			HashSet<TechnologyPrototype> temp_unlockableTechSet = new HashSet<TechnologyPrototype>();
+			bool IsUnlockable(TechnologyPrototype tech)
 			{
-				changed = false;
-
-				//step 1: delete any recipes with no unlocks (if they are unlocked at start they will be part of the 'start-tech' -> aka: have an unlock)
-				//step 1.1: also delete any recipes with no viable assembler
-				//step 1.2: and the recipes with no ingredients and products (... industrial revolution, what are those aetheric glow recipes????)
-				foreach (RecipePrototype recipe in recipes.Values.ToList())
-				{
-					if (recipe.myUnlockTechnologies.Count == 0 || recipe.validAssemblers.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0))
-					{
-						DeleteRecipe(recipe);
-						changed = true;
-					}
-				}
-
-				//step 2: delete any assemblers / beacons / modules whose associated items have no valid production recipes
-				foreach (AssemblerPrototype assembler in assemblers.Values.ToList())
-				{
-					if (assembler.AssociatedItem.ProductionRecipes.Count == 0)
-					{
-						DeleteAssembler(assembler);
-						changed = true;
-					}
-				}
-				foreach (BeaconPrototype beacon in beacons.Values.ToList())
-				{
-					if (beacon.AssociatedItem.ProductionRecipes.Count == 0)
-					{
-						DeleteBeacon(beacon);
-						changed = true;
-					}
-				}
-				foreach (ModulePrototype module in modules.Values.ToList())
-				{
-					if (module.AssociatedItem.ProductionRecipes.Count == 0)
-					{
-						DeleteModule(module);
-						changed = true;
-					}
-				}
-
-				//step 3: try and delete all items (can only delete if item isnt produced/consumed by any recipe, and isnt part of assemblers (that exist in this cache)
-				foreach (ItemPrototype item in items.Values.ToList())
-					changed |= TryDeleteItem(item); //soft delete
-
-				//step 4: clean up those items which are kind of useless (those that are not produced anywhere, arent an assembler, and are used in a single recipe that uses only them)
-				//this is necessary to take care of those mods that add item destruction and allow for any item (read - all of them) to be destroyed.
-				//NOTE: the checks for assembler/beacon/module do allow for nothing->item recipes as 'valid' for the purposes of creating the assembler/beacon/module. This is by design.
-				foreach (ItemPrototype item in items.Values.ToList())
-				{
-					if (item.productionRecipes.Count == 0)
-					{
-						bool useful = false;
-						foreach (RecipePrototype r in item.consumptionRecipes)
-							useful |= (r.ingredientList.Count > 1 || r.productList.Count != 0); //recipe with multiple items coming in or some ingredients coming out -> not an incineration type
-						if (assemblers.Values.FirstOrDefault(a => (ItemPrototype)a.AssociatedItem == item) != null)
-							useful = true;
-						if (beacons.Values.FirstOrDefault(b => (ItemPrototype)b.AssociatedItem == item) != null)
-							useful = true;
-						if (modules.Values.FirstOrDefault(m => (ItemPrototype)m.AssociatedItem == item) != null)
-							useful = true;
-						if (!useful)
-							changed |= TryDeleteItem(item, true); //hard delete.
-					}
-				}
-			}
-
-			//step 4: clean up groups and subgroups (basically, clear the entire dictionary and for each recipe & item 'add' their subgroup & group into the dictionary.
-			//this is done after the cleaning loop actually removing all items/recipes/etc. has finished once without any changes.
-			groups.Clear();
-			subgroups.Clear();
-			foreach (ItemPrototype item in Items.Values)
-				if (!subgroups.ContainsKey(item.mySubgroup.Name))
-					subgroups.Add(item.mySubgroup.Name, item.mySubgroup);
-			foreach (RecipePrototype recipe in recipes.Values)
-				if (!subgroups.ContainsKey(recipe.mySubgroup.Name))
-					subgroups.Add(recipe.mySubgroup.Name, recipe.mySubgroup);
-			foreach (SubgroupPrototype subgroup in subgroups.Values)
-				if (!groups.ContainsKey(subgroup.myGroup.Name))
-					groups.Add(subgroup.myGroup.Name, subgroup.myGroup);
-		}
-
-		//------------------------------------------------------private deletion functions to ensure all links are preserved
-
-		/* //tech is currently not in use
-        private void DeleteTechnology(TechnologyPrototype technology)
-        {
-            foreach (TechnologyPrototype tech in technology.prerequisites)
-                tech.postTechs.Remove(technology);
-            foreach (TechnologyPrototype tech in technology.postTechs)
-                tech.prerequisites.Remove(technology);
-            foreach (RecipePrototype recipe in technology.unlockedRecipes)
-            {
-                recipe.myUnlockTechnologies.Remove(technology);
-                if (recipe.myUnlockTechnologies.Count == 0)
-                    DeleteRecipe(recipe);
-            }
-            technologies.Remove(technology.Name);
-            Console.WriteLine("Deleting technology: " + technology);
-        }
-        */
-
-		private bool TryDeleteItem(ItemPrototype item, bool forceDelete = false)
-		{
-			if (forceDelete) //remove it from every production & consumption recipe, remove recipe if it no longer has any ingredients & products, then proceed.
-			{
-				foreach (RecipePrototype r in item.consumptionRecipes)
-				{
-					r.InternalOneWayDeleteIngredient(item);
-					if (r.ingredientList.Count == 0 && r.productList.Count == 0)
-						DeleteRecipe(r);
-				}
-				foreach (RecipePrototype r in item.productionRecipes)
-				{
-					r.InternalOneWayDeleteProduct(item);
-					if (r.ingredientList.Count == 0 && r.productList.Count == 0)
-						DeleteRecipe(r);
-				}
-
-				if (assemblers.ContainsKey(item.Name))
-					DeleteAssembler((AssemblerPrototype)assemblers[item.Name]);
-				if (beacons.ContainsKey(item.Name))
-					DeleteBeacon((BeaconPrototype)beacons[item.Name]);
-				if (modules.ContainsKey(item.Name))
-					DeleteModule((ModulePrototype)modules[item.Name]);
-			}
-
-			//can only delete an item if it has no production recipes, consumption recipes, module, assembler, or miner associated with it.
-			if (forceDelete || (
-				item.productionRecipes.Count == 0 &&
-				item.consumptionRecipes.Count == 0 &&
-				!assemblers.ContainsKey(item.Name) &&
-				!beacons.ContainsKey(item.Name) &&
-				!modules.ContainsKey(item.Name)))
-			{
-				foreach (AssemblerPrototype p in item.fuelsAssemblers)
-					p.validFuels.Remove(item);
-
-				item.mySubgroup.items.Remove(item);
-				items.Remove(item.Name);
-				if (forceDelete)
-					Console.WriteLine("FORCEFUL DELETE! Deleting item: " + item);
+				if (!tech.Available)
+					return false;
+				else if (temp_unlockableTechSet.Contains(tech))
+					return true;
+				else if (tech.prerequisites.Count == 0)
+					return true;
 				else
-					Console.WriteLine("Deleting item: " + item);
-				return true;
+				{
+					bool available = true;
+					foreach (TechnologyPrototype preTech in tech.prerequisites)
+						available = available && IsUnlockable(preTech);
+					tech.Available = available;
+
+					if (available)
+						temp_unlockableTechSet.Add(tech);
+					return available;
+				}
 			}
-			return false;
-		}
-		private void DeleteRecipe(RecipePrototype recipe)
-		{
-			foreach (ItemPrototype item in recipe.ingredientList)
+
+			//step 1: update tech unlock status
+			foreach (TechnologyPrototype tech in technologies.Values)
+				IsUnlockable(tech);
+
+			//step 2: update recipe unlock status
+			foreach (TechnologyPrototype tech in technologies.Values)
+				foreach (RecipePrototype recipe in tech.unlockedRecipes)
+					recipe.Available |= tech.Available;
+			foreach (RecipePrototype recipe in startingTech.unlockedRecipes)
+				recipe.Available = true;
+
+			//step 3: mark any recipe for barelling / crating as unavailable
+			foreach (RecipePrototype recipe in recipes.Values)
+				if (recipe.Name != "empty-barrel" && (recipe.Name.EndsWith("-barrel") || recipe.Name.StartsWith("deadlock-")))
+					recipe.Available = false;
+
+			//step 4: mark any recipe with no unlocks, no vaild assemblers, and 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
+			foreach (RecipePrototype recipe in recipes.Values.ToList())
+				if (recipe.myUnlockTechnologies.Count == 0 || recipe.assemblers.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0))
+					recipe.Available = false;
+
+			//step 5: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
+			//note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
+			foreach (ItemPrototype item in items.Values.ToList())
 			{
-				item.consumptionRecipes.Remove(recipe);
-				TryDeleteItem(item);
+				if (item.productionRecipes.FirstOrDefault(r => r.Available) == null)
+				{
+					bool useful = false;
+					foreach (RecipePrototype r in item.consumptionRecipes.Where(r => r.Available))
+						useful |= (r.ingredientList.Count > 1 || r.productList.Count != 0); //recipe with multiple items coming in or some ingredients coming out -> not an incineration type
+					if(!useful)
+					{
+						item.Available = false;
+						foreach (RecipePrototype r in item.consumptionRecipes) //from above these recipes are all item->nothing
+							r.Available = false;
+					}
+				}
 			}
-			foreach (ItemPrototype item in recipe.productList)
+
+			//step 6: clean up groups and subgroups (delete any subgroups that have no items/recipes, then delete any groups that have no subgroups)
+			foreach(SubgroupPrototype subgroup in subgroups.Values.ToList())
 			{
-				item.productionRecipes.Remove(recipe);
-				TryDeleteItem(item);
+				if (subgroup.items.Count == 0 && subgroup.recipes.Count == 0)
+				{
+					((GroupPrototype)subgroup.MyGroup).subgroups.Remove(subgroup);
+					subgroups.Remove(subgroup.Name);
+				}
 			}
-			foreach (AssemblerPrototype assembler in recipe.validAssemblers)
-				assembler.validRecipes.Remove(recipe);
-			foreach (ModulePrototype module in recipe.validModules)
-				module.validRecipes.Remove(recipe);
-			foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
-				tech.unlockedRecipes.Remove(recipe);
+			foreach (GroupPrototype group in groups.Values.ToList())
+				if (group.subgroups.Count == 0)
+					groups.Remove(group.Name);
 
-			recipe.mySubgroup.recipes.Remove(recipe);
-			recipes.Remove(recipe.Name);
-			Console.WriteLine("Deleting recipe: " + recipe);
+			//step 7: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
+			foreach (SubgroupPrototype subgroup in subgroups.Values)
+				if (subgroup.items.FirstOrDefault(i => i.Available) == null && subgroup.recipes.FirstOrDefault(r => r.Available) == null)
+					subgroup.Available = false;
+			foreach (GroupPrototype group in groups.Values)
+				if (group.subgroups.FirstOrDefault(sg => sg.Available) == null)
+					group.Available = false;
+
+			//step 8: update all the 'available' sets where necessary (we actually make a separate set for these so we dont have to rely on 'where' calls every time)
+			foreach (TechnologyPrototype tech in technologies.Values)
+				tech.UpdateAvailabilities();
+			foreach (GroupPrototype group in groups.Values)
+				group.UpdateAvailabilities();
+			foreach (SubgroupPrototype sgroup in subgroups.Values)
+				sgroup.UpdateAvailabilities();
+			foreach (ItemPrototype item in items.Values)
+				item.UpdateAvailabilities();
+			foreach (AssemblerPrototype assembler in assemblers.Values)
+				assembler.UpdateAvailabilities();
+			foreach (ModulePrototype module in modules.Values)
+				module.UpdateAvailabilities();
+
+			//step 9: finally, we set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.
+			foreach (RecipePrototype recipe in recipes.Values)
+				recipe.Enabled = recipe.Available;
+			foreach (AssemblerPrototype assembler in assemblers.Values)
+				assembler.Enabled = assembler.Available;
+			foreach (ModulePrototype module in modules.Values)
+				module.Enabled = module.Available;
+			foreach (BeaconPrototype beacon in beacons.Values)
+				beacon.Enabled = beacon.Available;
 		}
-		private void DeleteAssembler(AssemblerPrototype assembler)
-		{
-			foreach (RecipePrototype recipe in assembler.validRecipes)
-			{
-				recipe.validAssemblers.Remove(assembler);
-				if (recipe.validAssemblers.Count == 0)
-					DeleteRecipe(recipe);
-			}
-			foreach (ModulePrototype module in assembler.validModules)
-				module.validAssemblers.Remove(assembler);
-			foreach (ItemPrototype item in assembler.validFuels)
-				item.fuelsAssemblers.Remove(assembler);
 
-			assemblers.Remove(assembler.Name);
-			TryDeleteItem(assembler.AssociatedItem as ItemPrototype);
-			Console.WriteLine("Deleting assembler: " + assembler);
-		}
-		private void DeleteModule(ModulePrototype module)
-		{
-			foreach (RecipePrototype recipe in module.validRecipes)
-				recipe.validModules.Remove(module);
-			foreach (AssemblerPrototype assembler in module.validAssemblers)
-				assembler.validModules.Remove(module);
-			foreach (BeaconPrototype beacon in module.validBeacons)
-				beacon.validModules.Remove(module);
+		//--------------------------------------------------------------------DEBUG PRINTING FUNCTIONS
 
-			modules.Remove(module.Name);
-			TryDeleteItem(module.AssociatedItem as ItemPrototype);
-			Console.WriteLine("Deleting module: " + module.Name);
-		}
-		private void DeleteBeacon(BeaconPrototype beacon)
+		private void PrintAllAvailabilities()
 		{
-			foreach (ModulePrototype module in beacon.validModules)
-				module.validBeacons.Remove(beacon);
-
-			beacons.Remove(beacon.Name);
-			TryDeleteItem(beacon.AssociatedItem as ItemPrototype);
-			Console.WriteLine("Deleting beacon: " + beacon.Name);
+			Console.WriteLine("AVAILABLE: ----------------------------------------------------------------");
+			Console.WriteLine("Technologies:");
+			foreach (TechnologyPrototype tech in technologies.Values)
+				if (tech.Available) Console.WriteLine("    " + tech);
+			Console.WriteLine("Groups:");
+			foreach (GroupPrototype group in groups.Values)
+				if (group.Available) Console.WriteLine("    " + group);
+			Console.WriteLine("Subgroups:");
+			foreach (SubgroupPrototype sgroup in subgroups.Values)
+				if (sgroup.Available) Console.WriteLine("    " + sgroup);
+			Console.WriteLine("Items:");
+			foreach (ItemPrototype item in items.Values)
+				if (item.Available) Console.WriteLine("    " + item);
+			Console.WriteLine("Assemblers:");
+			foreach (AssemblerPrototype assembler in assemblers.Values)
+				if (assembler.Available) Console.WriteLine("    " + assembler);
+			Console.WriteLine("Modules:");
+			foreach (ModulePrototype module in modules.Values)
+				if (module.Available) Console.WriteLine("    " + module);
+			Console.WriteLine("Recipes:");
+			foreach (RecipePrototype recipe in recipes.Values)
+				if(recipe.Available) Console.WriteLine("    " + recipe);
+			Console.WriteLine("Beacons:");
+			foreach (BeaconPrototype beacon in beacons.Values)
+				if(beacon.Available) Console.WriteLine("    " + beacon);
+			Console.WriteLine("UNAVAILABLE: ----------------------------------------------------------------");
+			Console.WriteLine("Technologies:");
+			foreach (TechnologyPrototype tech in technologies.Values)
+				if (!tech.Available) Console.WriteLine("    " + tech);
+			Console.WriteLine("Groups:");
+			foreach (GroupPrototype group in groups.Values)
+				if (!group.Available) Console.WriteLine("    " + group);
+			Console.WriteLine("Subgroups:");
+			foreach (SubgroupPrototype sgroup in subgroups.Values)
+				if (!sgroup.Available) Console.WriteLine("    " + sgroup);
+			Console.WriteLine("Items:");
+			foreach (ItemPrototype item in items.Values)
+				if (!item.Available) Console.WriteLine("    " + item);
+			Console.WriteLine("Assemblers:");
+			foreach (AssemblerPrototype assembler in assemblers.Values)
+				if (!assembler.Available) Console.WriteLine("    " + assembler);
+			Console.WriteLine("Modules:");
+			foreach (ModulePrototype module in modules.Values)
+				if (!module.Available) Console.WriteLine("    " + module);
+			Console.WriteLine("Recipes:");
+			foreach (RecipePrototype recipe in recipes.Values)
+				if (!recipe.Available) Console.WriteLine("    " + recipe);
+			Console.WriteLine("Beacons:");
+			foreach (BeaconPrototype beacon in beacons.Values)
+				if (!beacon.Available) Console.WriteLine("    " + beacon);
 		}
 	}
 }

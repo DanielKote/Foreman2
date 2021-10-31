@@ -306,7 +306,10 @@ namespace Foreman
 			try
 			{
 				foreach (BaseNodeElement node in nodeElements)
+				{
+					node.DisplayedNode.UpdateState();
 					node.Update();
+				}
 			}
 			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
 			Invalidate();
@@ -634,7 +637,7 @@ namespace Foreman
 				ViewScale /= 1.1f;
 
 			ViewScale = Math.Max(ViewScale, 0.01f);
-			ViewScale = Math.Min(ViewScale, 5f);
+			ViewScale = Math.Min(ViewScale, 2f);
 
 			Point newZoomCenter = ScreenToGraph(e.Location);
 			ViewOffset.Offset(newZoomCenter.X - oldZoomCenter.X, newZoomCenter.Y - oldZoomCenter.Y);
@@ -866,6 +869,7 @@ namespace Foreman
 			info.AddValue("EnabledRecipes", DCache.Recipes.Values.Where(r => r.Enabled).Select(r => r.Name));
 			info.AddValue("EnabledAssemblers", DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
 			info.AddValue("EnabledModules", DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
+			info.AddValue("EnabledBeacons", DCache.Beacons.Values.Where(b => b.Enabled).Select(b => b.Name));
 
 			//graph :)
 			info.AddValue("ProductionGraph", Graph);
@@ -984,6 +988,12 @@ namespace Foreman
 			//update enabled statuses
 			if (!enableEverything)
 			{
+				foreach (Beacon beacon in DCache.Beacons.Values)
+					beacon.Enabled = false;
+				foreach (string beacon in json["EnabledBeacons"].Select(t => (string)t).ToList())
+					if (DCache.Beacons.ContainsKey(beacon))
+						DCache.Beacons[beacon].Enabled = true;
+
 				foreach (Assembler assembler in DCache.Assemblers.Values)
 					assembler.Enabled = false;
 				foreach (string name in json["EnabledAssemblers"].Select(t => (string)t).ToList())

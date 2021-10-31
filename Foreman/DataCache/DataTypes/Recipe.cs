@@ -24,8 +24,8 @@ namespace Foreman
 		IReadOnlyList<Item> IngredientList { get; }
 		IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get; }
 
-		IReadOnlyCollection<Assembler> ValidAssemblers { get; }
-		IReadOnlyCollection<Module> ValidModules { get; }
+		IReadOnlyCollection<Assembler> Assemblers { get; }
+		IReadOnlyCollection<Module> Modules { get; }
 
 		IReadOnlyCollection<Technology> MyUnlockTechnologies { get; }
 
@@ -49,8 +49,8 @@ namespace Foreman
 		public IReadOnlyList<Item> IngredientList { get { return ingredientList; } }
 		public IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get { return ingredientTemperatureMap; } }
 
-		public IReadOnlyCollection<Assembler> ValidAssemblers { get { return validAssemblers; } }
-		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
+		public IReadOnlyCollection<Assembler> Assemblers { get { return assemblers; } }
+		public IReadOnlyCollection<Module> Modules { get { return modules; } }
 
 		public IReadOnlyCollection<Technology> MyUnlockTechnologies { get { return myUnlockTechnologies; } }
 
@@ -64,13 +64,14 @@ namespace Foreman
 		internal Dictionary<Item, fRange> ingredientTemperatureMap { get; private set; }
 		internal List<ItemPrototype> ingredientList { get; private set; }
 
-		internal HashSet<AssemblerPrototype> validAssemblers { get; private set; }
-		internal HashSet<ModulePrototype> validModules { get; private set; }
+		internal HashSet<AssemblerPrototype> assemblers { get; private set; }
+		internal HashSet<ModulePrototype> modules { get; private set; }
 
 		internal HashSet<TechnologyPrototype> myUnlockTechnologies { get; private set; }
 
 		public bool IsMissing { get; private set; }
-		public bool HasEnabledAssemblers { get { return validAssemblers.FirstOrDefault(a => a.Enabled) != null; } }
+		public bool HasEnabledAssemblers { get { return assemblers.FirstOrDefault(a => a.Enabled) != null; } }
+
 		public bool Enabled { get; set; }
 
 		private static long lastRecipeID = 0;
@@ -95,8 +96,8 @@ namespace Foreman
 			productList = new List<ItemPrototype>();
 			productTemperatureMap = new Dictionary<Item, float>();
 
-			validAssemblers = new HashSet<AssemblerPrototype>();
-			validModules = new HashSet<ModulePrototype>();
+			assemblers = new HashSet<AssemblerPrototype>();
+			modules = new HashSet<ModulePrototype>();
 			myUnlockTechnologies = new HashSet<TechnologyPrototype>();
 		}
 

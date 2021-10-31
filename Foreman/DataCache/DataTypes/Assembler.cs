@@ -6,9 +6,12 @@ namespace Foreman
 {
 	public interface Assembler : DataObjectBase
 	{
-		IReadOnlyCollection<Recipe> ValidRecipes { get; }
-		IReadOnlyCollection<Module> ValidModules { get; }
-		Item AssociatedItem { get; }
+		IReadOnlyCollection<Recipe> Recipes { get; }
+		IReadOnlyCollection<Module> Modules { get; }
+		IReadOnlyCollection<Item> Fuels { get; }
+		IReadOnlyCollection<Recipe> AvailableRecipes { get; }
+		IReadOnlyCollection<Item> AvailableFuels { get; }
+		IReadOnlyCollection<Item> AssociatedItems { get; }
 
 		bool IsMiner { get; }
 		bool Enabled { get; set; }
@@ -22,18 +25,22 @@ namespace Foreman
 		bool IsBurner { get; }
 		float EnergyConsumption { get; }
 		float EnergyEffectivity { get; }
-		IReadOnlyCollection<Item> ValidFuels { get; }
 	}
 
 	public class AssemblerPrototype : DataObjectBasePrototype, Assembler
 	{
-		public IReadOnlyCollection<Recipe> ValidRecipes { get { return validRecipes; } }
-		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
-		public Item AssociatedItem { get { return myCache.Items[Name]; } }
+		public IReadOnlyCollection<Recipe> Recipes { get { return recipes; } }
+		public IReadOnlyCollection<Module> Modules { get { return modules; } }
+		public IReadOnlyCollection<Item> Fuels { get { return fuels; } }
+		public IReadOnlyCollection<Recipe> AvailableRecipes { get; private set; }
+		public IReadOnlyCollection<Item> AvailableFuels { get; private set; }
+		public IReadOnlyCollection<Item> AssociatedItems { get { return associatedItems; } }
 
 		public bool IsMiner { get; private set; }
 		public bool Enabled { get; set; }
+
 		public bool IsMissing { get; private set; }
+		public override bool Available { get { return associatedItems.FirstOrDefault(i => i.Available) != null; } set { } }
 
 		public float Speed { get; set; }
 
@@ -43,11 +50,11 @@ namespace Foreman
 		public bool IsBurner { get; set; }
 		public float EnergyConsumption { get; set; }
 		public float EnergyEffectivity { get; set; }
-		public IReadOnlyCollection<Item> ValidFuels { get { return validFuels; } }
 
-		internal HashSet<RecipePrototype> validRecipes { get; private set; }
-		internal HashSet<ModulePrototype> validModules { get; private set; }
-		internal HashSet<ItemPrototype> validFuels { get; private set; }
+		internal HashSet<RecipePrototype> recipes { get; private set; }
+		internal HashSet<ModulePrototype> modules { get; private set; }
+		internal HashSet<ItemPrototype> fuels { get; private set; }
+		internal List<ItemPrototype> associatedItems { get; private set; } //should honestly only be 1, but knowing modders....
 
 		public AssemblerPrototype(DataCache dCache, string name, string friendlyName, bool isMiner, bool isMissing = false) : base(dCache, name, friendlyName, "-")
 		{
@@ -55,9 +62,16 @@ namespace Foreman
 			Enabled = true;
 			IsMissing = isMissing;
 
-			validRecipes = new HashSet<RecipePrototype>();
-			validModules = new HashSet<ModulePrototype>();
-			validFuels = new HashSet<ItemPrototype>();
+			recipes = new HashSet<RecipePrototype>();
+			modules = new HashSet<ModulePrototype>();
+			fuels = new HashSet<ItemPrototype>();
+			associatedItems = new List<ItemPrototype>();
+		}
+
+		internal void UpdateAvailabilities()
+		{
+			AvailableRecipes = new HashSet<Recipe>(recipes.Where(r => r.Available));
+			AvailableFuels = new HashSet<Item>(fuels.Where(i => i.Available));
 		}
 
 		public override string ToString()

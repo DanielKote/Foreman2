@@ -57,11 +57,11 @@ namespace Foreman
 				graphics.DrawString("Speed:\nProd:\nPower:", infoFont, textBrush, trans.X + Width, trans.Y);
 				graphics.DrawString(string.Format("{0:P0}\n{1:P0}\n{2:P0}", recipeNode.GetSpeedMultiplier(), recipeNode.GetProductivityMultiplier(), recipeNode.GetConsumptionMultiplier()), infoFont, textBrush, trans.X + Width + 30, trans.Y);
 
-				textbox = new Rectangle(trans.X + Width, trans.Y + 26, 65, 30);
+				textbox = new Rectangle(trans.X + Width, trans.Y + 26, 60, 30);
 			}
 			else
 			{
-				textbox = new Rectangle(trans.X + Width, trans.Y + 10, 65, 30);
+				textbox = new Rectangle(trans.X + Width, trans.Y + 10, 60, 30);
 			}
 
 			//quantity

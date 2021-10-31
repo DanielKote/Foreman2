@@ -10,7 +10,7 @@ namespace Foreman
 {
 	public class PassthroughNodeElement : BaseNodeElement
 	{
-		protected override Brush BgBrush { get { return passthroughBGBrush; } }
+		protected override Brush CleanBgBrush { get { return passthroughBGBrush; } }
 		private static Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
 		private PassthroughNode passthroughNode { get { return (PassthroughNode)DisplayedNode; } }
 

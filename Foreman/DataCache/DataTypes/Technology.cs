@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Foreman
 {
@@ -8,6 +9,7 @@ namespace Foreman
 		IReadOnlyCollection<Technology> Prerequisites { get; }
 		IReadOnlyCollection<Technology> PostTechs { get; }
 		IReadOnlyCollection<Recipe> UnlockedRecipes { get; }
+		IReadOnlyCollection<Recipe> AvailableUnlockedRecipes { get; }
 
 		bool Enabled { get; set; }
 	}
@@ -17,6 +19,7 @@ namespace Foreman
 		public IReadOnlyCollection<Technology> Prerequisites { get { return prerequisites; } }
 		public IReadOnlyCollection<Technology> PostTechs { get { return postTechs; } }
 		public IReadOnlyCollection<Recipe> UnlockedRecipes { get { return unlockedRecipes; } }
+		public IReadOnlyCollection<Recipe> AvailableUnlockedRecipes { get; private set; }
 
 		public bool Enabled { get; set; }
 
@@ -29,6 +32,11 @@ namespace Foreman
 			prerequisites = new HashSet<TechnologyPrototype>();
 			postTechs = new HashSet<TechnologyPrototype>();
 			unlockedRecipes = new HashSet<RecipePrototype>();
+		}
+
+		internal void UpdateAvailabilities()
+		{
+			AvailableUnlockedRecipes = new HashSet<Recipe>(unlockedRecipes.Where(r => r.Enabled));
 		}
 
 		public override int GetHashCode()

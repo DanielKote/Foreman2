@@ -20,10 +20,10 @@ namespace Foreman
 
 		private static StringFormat bottomFormat = new StringFormat() { LineAlignment = StringAlignment.Far, Alignment = StringAlignment.Center };
 		private static StringFormat topFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
-		private static Pen regularBorderPen = new Pen(Color.Gray, 3);
+		private static Pen regularBorderPen = new Pen(Color.DimGray, 3);
 		private static Pen oversuppliedBorderPen = new Pen(Color.DarkRed, 3);
-		private static Brush textBrush = new SolidBrush(Color.Black);
-		private static Brush fillBrush = new SolidBrush(Color.White);
+		private static Brush textBrush = Brushes.Black;
+		private static Brush fillBrush = Brushes.White;
 
 		private static Font textFont = new Font(FontFamily.GenericSansSerif, 6);
 

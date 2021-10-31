@@ -286,27 +286,27 @@ namespace Foreman
 
 						string assemblerName = (string)nodeJToken["Assembler"];
 						if (cache.Assemblers.ContainsKey(assemblerName))
-							recipeNode.SelectedAssembler = cache.Assemblers[assemblerName];
+							recipeNode.SetAssembler(cache.Assemblers[assemblerName]);
 						else
-							recipeNode.SelectedAssembler = cache.MissingAssemblers[assemblerName];
+							recipeNode.SetAssembler(cache.MissingAssemblers[assemblerName]);
 
 						foreach (string moduleName in nodeJToken["AssemblerModules"].Select(t => (string)t).ToList())
 						{
 							if (cache.Modules.ContainsKey(moduleName))
-								recipeNode.AssemblerModules.Add(cache.Modules[moduleName]);
+								recipeNode.AddAssemblerModule(cache.Modules[moduleName]);
 							else
-								recipeNode.AssemblerModules.Add(cache.MissingModules[moduleName]);
+								recipeNode.AddAssemblerModule(cache.MissingModules[moduleName]);
 						}
 
 						if (nodeJToken["Fuel"] != null)
 						{
 							if (cache.Items.ContainsKey((string)nodeJToken["Fuel"]))
-								recipeNode.BurnerItem = cache.Items[(string)nodeJToken["Fuel"]];
+								recipeNode.SetFuel(cache.Items[(string)nodeJToken["Fuel"]]);
 							else
-								recipeNode.BurnerItem = cache.MissingItems[(string)nodeJToken["Fuel"]];
+								recipeNode.SetFuel(cache.MissingItems[(string)nodeJToken["Fuel"]]);
 						}
 						else if (recipeNode.SelectedAssembler.IsBurner) //and fuel is null :/
-							recipeNode.BurnerItem = FuelSelector.GetFuel(recipeNode.SelectedAssembler);
+							recipeNode.SetFuel(FuelSelector.GetFuel(recipeNode.SelectedAssembler));
 
 						if(nodeJToken["Burnt"] != null)
 						{
@@ -315,7 +315,7 @@ namespace Foreman
 								burntItem = cache.Items[(string)nodeJToken["Burnt"]];
 							else
 								burntItem = cache.MissingItems[(string)nodeJToken["Burnt"]];
-							if (recipeNode.BurntItem != burntItem)
+							if (recipeNode.FuelRemains != burntItem)
 								recipeNode.SetBurntOverride(burntItem);
 						}
 
@@ -323,16 +323,16 @@ namespace Foreman
 						{
 							string beaconName = (string)nodeJToken["Beacon"];
 							if (cache.Beacons.ContainsKey(beaconName))
-								recipeNode.SelectedBeacon = cache.Beacons[beaconName];
+								recipeNode.SetBeacon(cache.Beacons[beaconName]);
 							else
-								recipeNode.SelectedBeacon = cache.MissingBeacons[beaconName];
+								recipeNode.SetBeacon(cache.MissingBeacons[beaconName]);
 
 							foreach (string moduleName in nodeJToken["BeaconModules"].Select(t => (string)t).ToList())
 							{
 								if (cache.Modules.ContainsKey(moduleName))
-									recipeNode.BeaconModules.Add(cache.Modules[moduleName]);
+									recipeNode.AddBeaconModule(cache.Modules[moduleName]);
 								else
-									recipeNode.BeaconModules.Add(cache.MissingModules[moduleName]);
+									recipeNode.AddBeaconModule(cache.MissingModules[moduleName]);
 							}
 							recipeNode.BeaconCount = (float)nodeJToken["BeaconCount"];
 						}

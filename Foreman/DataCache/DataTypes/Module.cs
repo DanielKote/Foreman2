@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace Foreman
 {
 	public interface Module : DataObjectBase
 	{
-		IReadOnlyCollection<Recipe> ValidRecipes { get; }
-		IReadOnlyCollection<Assembler> ValidAssemblers { get; }
-		IReadOnlyCollection<Beacon> ValidBeacons { get; }
+		IReadOnlyCollection<Recipe> Recipes { get; }
+		IReadOnlyCollection<Assembler> Assemblers { get; }
+		IReadOnlyCollection<Beacon> Beacons { get; }
+		IReadOnlyCollection<Recipe> AvailableRecipes { get; }
+
 		Item AssociatedItem { get; }
 
 		float SpeedBonus { get; }
@@ -21,9 +24,10 @@ namespace Foreman
 
 	public class ModulePrototype : DataObjectBasePrototype, Module
 	{
-		public IReadOnlyCollection<Recipe> ValidRecipes { get { return validRecipes; } }
-		public IReadOnlyCollection<Assembler> ValidAssemblers { get { return validAssemblers; } }
-		public IReadOnlyCollection<Beacon> ValidBeacons { get { return validBeacons; } }
+		public IReadOnlyCollection<Recipe> Recipes { get { return recipes; } }
+		public IReadOnlyCollection<Assembler> Assemblers { get { return assemblers; } }
+		public IReadOnlyCollection<Beacon> Beacons { get { return beacons; } }
+		public IReadOnlyCollection<Recipe> AvailableRecipes { get; private set; }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
 		public float SpeedBonus { get; set; }
@@ -32,11 +36,13 @@ namespace Foreman
 		public float PollutionBonus { get; set; }
 
 		public bool Enabled { get; set; }
-		public bool IsMissing { get; private set; }
 
-		internal HashSet<RecipePrototype> validRecipes { get; private set; }
-		internal HashSet<AssemblerPrototype> validAssemblers { get; private set; }
-		internal HashSet<BeaconPrototype> validBeacons { get; private set; }
+		public bool IsMissing { get; private set; }
+		public override bool Available { get { return AssociatedItem.Available; } set { } }
+
+		internal HashSet<RecipePrototype> recipes { get; private set; }
+		internal HashSet<AssemblerPrototype> assemblers { get; private set; }
+		internal HashSet<BeaconPrototype> beacons { get; private set; }
 
 		public ModulePrototype(DataCache dCache, string name, string friendlyName, bool isMissing = false) : base(dCache, name, friendlyName, "-")
 		{
@@ -47,9 +53,16 @@ namespace Foreman
 			ProductivityBonus = 0;
 			ConsumptionBonus = 0;
 			PollutionBonus = 0;
-			validRecipes = new HashSet<RecipePrototype>();
-			validAssemblers = new HashSet<AssemblerPrototype>();
-			validBeacons = new HashSet<BeaconPrototype>();
+			recipes = new HashSet<RecipePrototype>();
+			assemblers = new HashSet<AssemblerPrototype>();
+			beacons = new HashSet<BeaconPrototype>();
 		}
+
+		internal void UpdateAvailabilities()
+		{
+			AvailableRecipes = new HashSet<Recipe>(recipes.Where(r => r.Enabled));
+		}
+
+		public override string ToString() { return string.Format("Module: {0}", Name); }
 	}
 }

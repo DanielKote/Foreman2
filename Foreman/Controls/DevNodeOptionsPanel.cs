@@ -40,7 +40,7 @@ namespace Foreman
 				updateInProgress = true;
 				Recipe recipe = recipeNode.BaseRecipe;
 
-				AssemblerSelectionBox.Items.AddRange(recipe.ValidAssemblers.Where(a => a.Enabled).ToArray());
+				AssemblerSelectionBox.Items.AddRange(recipe.Assemblers.Where(a => a.Enabled).ToArray());
 				if (recipeNode.SelectedAssembler != null && !AssemblerSelectionBox.Items.Contains(recipeNode.SelectedAssembler))
 					AssemblerSelectionBox.Items.Add(recipeNode.SelectedAssembler);
 
@@ -51,10 +51,10 @@ namespace Foreman
 					AModuleSelectionBox.Items.Add(recipeNode.AssemblerModules[0]);
 					AModuleSelectionBox.SelectedItem = recipeNode.AssemblerModules[0];
 				}
-				if (recipeNode.BurnerItem != null)
+				if (recipeNode.Fuel != null)
 				{
-					AFuelSelectionBox.Items.Add(recipeNode.BurnerItem);
-					AFuelSelectionBox.SelectedItem = recipeNode.BurnerItem;
+					AFuelSelectionBox.Items.Add(recipeNode.Fuel);
+					AFuelSelectionBox.SelectedItem = recipeNode.Fuel;
 				}
 				if (recipeNode.SelectedBeacon != null)
 				{
@@ -108,7 +108,7 @@ namespace Foreman
 				if (AModuleSelectionBox.Enabled)
 				{
 					AModuleSelectionBox.Items.Add("No Modules");
-					AModuleSelectionBox.Items.AddRange(currentAssembler.ValidModules.Intersect(recipe.ValidModules).ToArray());
+					AModuleSelectionBox.Items.AddRange(currentAssembler.Modules.Intersect(recipe.Modules).ToArray());
 					AModuleSelectionBox.Enabled = AModuleSelectionBox.Items.Count > 0;
 					if (currentAModule != null && AModuleSelectionBox.Items.Contains(currentAModule))
 						AModuleSelectionBox.SelectedItem = currentAModule;
@@ -121,7 +121,7 @@ namespace Foreman
 				AFuelSelectionBox.Enabled = currentAssembler.IsBurner;
 				if (AFuelSelectionBox.Enabled)
 				{
-					AFuelSelectionBox.Items.AddRange(currentAssembler.ValidFuels.ToArray());
+					AFuelSelectionBox.Items.AddRange(currentAssembler.Fuels.ToArray());
 					if (currentFuel != null && AFuelSelectionBox.Items.Contains(currentFuel))
 						AFuelSelectionBox.SelectedItem = currentFuel;
 					else if (AFuelSelectionBox.Items.Count > 0)
@@ -151,7 +151,7 @@ namespace Foreman
 				if (BModuleSelectionBox.Enabled)
 				{
 					BModuleSelectionBox.Items.Add("No Modules");
-					BModuleSelectionBox.Items.AddRange(currentBeacon.ValidModules.Intersect(recipe.ValidModules).ToArray());
+					BModuleSelectionBox.Items.AddRange(currentBeacon.ValidModules.Intersect(recipe.Modules).ToArray());
 					BModuleSelectionBox.Enabled = BModuleSelectionBox.Items.Count > 0;
 					if (currentBModule != null && BModuleSelectionBox.Items.Contains(currentBModule))
 						BModuleSelectionBox.SelectedItem = currentBModule;
@@ -168,32 +168,21 @@ namespace Foreman
 					recipeNode.SelectedBeacon != currentBeacon ||
 					recipeNode.BeaconModules.Count == 0 && currentBModule != null ||
 					recipeNode.BeaconModules.Count != 0 && recipeNode.BeaconModules[0] != currentBModule ||
-					recipeNode.BurnerItem != currentFuel)
+					recipeNode.Fuel != currentFuel)
 				{
-					recipeNode.SelectedAssembler = currentAssembler;
-					recipeNode.AssemblerModules.Clear();
+					recipeNode.SetAssembler(currentAssembler);
+					recipeNode.SetAssemblerModules(null);
 					if (currentAModule != null)
 						for (int i = 0; i < currentAssembler.ModuleSlots; i++)
-							recipeNode.AssemblerModules.Add(currentAModule);
-					recipeNode.SelectedBeacon = currentBeacon;
-					recipeNode.BeaconModules.Clear();
+							recipeNode.AddAssemblerModule(currentAModule);
+					recipeNode.SetBeacon(currentBeacon);
+					recipeNode.SetBeaconModules(null);
 					if (currentBModule != null)
 						for (int i = 0; i < currentBeacon.ModuleSlots; i++)
-							recipeNode.BeaconModules.Add(currentBModule);
+							recipeNode.AddBeaconModule((currentBModule));
 
 					if (!currentAssembler.IsBurner) currentFuel = null; //quick check to ensure that if we switch from a burner to a non-burner then the fuel is set to null
-					if (recipeNode.BurnerItem != currentFuel)
-					{
-						// a bit more convoluted -> we need to remove any connections to the burner / and/or burnt item from the graph (assuming the recipe doesnt already contain those items)
-						if (recipeNode.BurnerItem != null && !recipe.IngredientSet.ContainsKey(recipeNode.BurnerItem))
-							foreach (NodeLink link in recipeNode.InputLinks.Where(link => link.Item == recipeNode.BurnerItem).ToList())
-								link.Delete();
-						if (recipeNode.BurntItem != null && !recipe.ProductSet.ContainsKey(recipeNode.BurntItem))
-							foreach (NodeLink link in recipeNode.OutputLinks.Where(link => link.Item == recipeNode.BurntItem).ToList())
-								link.Delete();
-
-						recipeNode.BurnerItem = currentFuel;
-					}
+					recipeNode.SetFuel(currentFuel);
 
 					myGraphViewer.Graph.UpdateNodeValues();
 				}

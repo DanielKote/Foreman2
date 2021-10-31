@@ -22,17 +22,17 @@ namespace Foreman
 			switch(SelectionStyle)
 			{
 				case Style.Speed:
-					bestModule = assembler.ValidModules.Intersect(recipe.ValidModules).Where(m => m.Enabled).OrderBy(m => ((m.SpeedBonus * 1000) - m.ConsumptionBonus)).LastOrDefault();
+					bestModule = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled).OrderBy(m => ((m.SpeedBonus * 1000) - m.ConsumptionBonus)).LastOrDefault();
 					break;
 				case Style.Productivity:
-					bestModule = assembler.ValidModules.Intersect(recipe.ValidModules).Where(m => m.Enabled).OrderBy(m => ((m.ProductivityBonus * 1000) + m.SpeedBonus)).LastOrDefault();
+					bestModule = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled).OrderBy(m => ((m.ProductivityBonus * 1000) + m.SpeedBonus)).LastOrDefault();
 					break;
 				case Style.ProductivityOnly:
-					bestModule = assembler.ValidModules.Intersect(recipe.ValidModules).Where(m => m.Enabled && m.ProductivityBonus != 0).OrderBy(m => ((m.ProductivityBonus * 1000) + m.SpeedBonus)).LastOrDefault();
+					bestModule = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled && m.ProductivityBonus != 0).OrderBy(m => ((m.ProductivityBonus * 1000) + m.SpeedBonus)).LastOrDefault();
 					break;
 				case Style.Efficiency:
-					List<Module> speedModules = assembler.ValidModules.Intersect(recipe.ValidModules).Where(m => m.Enabled && m.SpeedBonus > 0).OrderBy(m => ((m.SpeedBonus * 1000) - m.ConsumptionBonus)).ToList();
-					List<Module> efficiencyModules = assembler.ValidModules.Intersect(recipe.ValidModules).Where(m => m.Enabled && m.ConsumptionBonus < 0).OrderBy(m => -((m.ConsumptionBonus * 1000) - m.SpeedBonus)).ToList(); //highest consumption is first! (so worst->best effectivity)
+					List<Module> speedModules = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled && m.SpeedBonus > 0).OrderBy(m => ((m.SpeedBonus * 1000) - m.ConsumptionBonus)).ToList();
+					List<Module> efficiencyModules = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled && m.ConsumptionBonus < 0).OrderBy(m => -((m.ConsumptionBonus * 1000) - m.SpeedBonus)).ToList(); //highest consumption is first! (so worst->best effectivity)
 
 					for(int si = assembler.ModuleSlots - 1; si >= 0; si--)
 					{
@@ -56,7 +56,7 @@ namespace Foreman
 					break;
 				case Style.EfficiencyOnly:
 					//slightly harder -> want to add efficiency modules up to the 80% limit
-					List<Module> moduleOptions = assembler.ValidModules.Intersect(recipe.ValidModules).Where(m => m.Enabled).OrderBy(m => ((m.ConsumptionBonus * 1000) - m.SpeedBonus)).ToList(); //note: lowest consumption is first!
+					List<Module> moduleOptions = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled).OrderBy(m => ((m.ConsumptionBonus * 1000) - m.SpeedBonus)).ToList(); //note: lowest consumption is first!
 					foreach(Module moduleOption in moduleOptions)
 					{
 						if (moduleOption.ConsumptionBonus * assembler.ModuleSlots <= -0.8f) //test for the 80% maximum efficiency gain limit (and use 'worst' module that gets it)

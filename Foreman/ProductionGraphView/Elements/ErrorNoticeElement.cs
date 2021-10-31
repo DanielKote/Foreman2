@@ -12,7 +12,7 @@ namespace Foreman
 	public class ErrorNoticeElement : GraphElement
 	{
 		private const int ErrorIconSize = 24;
-		private static readonly Bitmap errorIcon = IconCache.GetIcon(Path.Combine("Graphics", "ErrorIcon.png"), 32);
+		private static readonly Bitmap errorIcon = IconCache.GetIcon(Path.Combine("Graphics", "ErrorIcon.png"), 64);
 
 		public ErrorNoticeElement(ProductionGraphViewer graphViewer, BaseNodeElement parent) : base(graphViewer, parent)
 		{
@@ -36,16 +36,30 @@ namespace Foreman
 			if (!Visible)
 				return null;
 
+			List<string> text = null;
+			switch(((BaseNodeElement)myParent).DisplayedNode.State)
+			{
+				case NodeState.Error:
+					text = ((BaseNodeElement)myParent).DisplayedNode.GetErrors();
+					break;
+				case NodeState.Warning:
+					text = ((BaseNodeElement)myParent).DisplayedNode.GetWarnings();
+					break;
+				case NodeState.Clean:
+				default:
+					return null;
+			}
+			if (text == null || text.Count == 0)
+				return null;
+
 			List<TooltipInfo> tooltips = new List<TooltipInfo>();
 			TooltipInfo tti = new TooltipInfo();
 			tti.Direction = Direction.Up;
-			tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(0, Height/2)));
-			string errors = ((BaseNodeElement)myParent).DisplayedNode.GetErrors();
-
-			if (errors.EndsWith("\n"))
-				errors = errors.Substring(0, errors.Length - 1);
-			errors += "\nClick to auto-resolve.";
-			tti.Text += errors;
+			tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(0, Height / 2)));
+			tti.Text = "";
+			for (int i = 0; i < text.Count; i++)
+				tti.Text += text[i] + "\n";
+			tti.Text += "\nRight click for options.";
 			tooltips.Add(tti);
 
 			return tooltips;
@@ -53,8 +67,34 @@ namespace Foreman
 
 		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
 		{
-			((BaseNodeElement)myParent).DisplayedNode.AutoResolveErrors();
-		}
+			if (!Visible || button != MouseButtons.Right)
+				return;
 
+			RightClickMenu.MenuItems.Clear();
+
+			Dictionary<string, Action> resolutions = null;
+			switch (((BaseNodeElement)myParent).DisplayedNode.State)
+			{
+				case NodeState.Error:
+					resolutions = ((BaseNodeElement)myParent).DisplayedNode.GetErrorResolutions();
+					break;
+				case NodeState.Warning:
+					resolutions = ((BaseNodeElement)myParent).DisplayedNode.GetWarningResolutions();
+					break;
+				case NodeState.Clean:
+				default:
+					return;
+			}
+			if (resolutions.Count > 0)
+			{
+				foreach (KeyValuePair<string, Action> kvp in resolutions)
+					RightClickMenu.MenuItems.Add(new MenuItem(kvp.Key, new EventHandler((o, e) => { 
+						kvp.Value.Invoke();
+						((BaseNodeElement)myParent).Update();
+					})));
+
+				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
+			}
+		}
 	}
 }

@@ -31,15 +31,15 @@ namespace Foreman
 			switch (SelectionStyle)
 			{
 				case Style.Worst:
-					return recipe.ValidAssemblers.Where(a => (allowDisabled || a.Enabled)).OrderBy(a => (-(a.Speed * 1000000) - a.ModuleSlots)).LastOrDefault();
+					return recipe.Assemblers.Where(a => (allowDisabled || a.Enabled)).OrderBy(a => (-(a.Speed * 1000000) - a.ModuleSlots)).LastOrDefault();
 				case Style.WorstNonBurner:
-					return recipe.ValidAssemblers.Where(a => (allowDisabled || a.Enabled) && !a.IsBurner).OrderBy(a => (-(a.Speed * 1000000) - a.ModuleSlots)).LastOrDefault();
+					return recipe.Assemblers.Where(a => (allowDisabled || a.Enabled) && !a.IsBurner).OrderBy(a => (-(a.Speed * 1000000) - a.ModuleSlots)).LastOrDefault();
 				case Style.Best:
-					return recipe.ValidAssemblers.Where(a => (allowDisabled || a.Enabled)).OrderBy(a => ((a.Speed * 1000000) + a.ModuleSlots)).LastOrDefault();
+					return recipe.Assemblers.Where(a => (allowDisabled || a.Enabled)).OrderBy(a => ((a.Speed * 1000000) + a.ModuleSlots)).LastOrDefault();
 				case Style.BestNonBurner:
-					return recipe.ValidAssemblers.Where(a => (allowDisabled || a.Enabled) && !a.IsBurner).OrderBy(a => ((a.Speed * 1000000) + a.ModuleSlots)).LastOrDefault();
+					return recipe.Assemblers.Where(a => (allowDisabled || a.Enabled) && !a.IsBurner).OrderBy(a => ((a.Speed * 1000000) + a.ModuleSlots)).LastOrDefault();
 				case Style.MostModules:
-					return recipe.ValidAssemblers.Where(a => (allowDisabled || a.Enabled)).OrderBy(a => ((float)(a.ModuleSlots * 1000000) + a.Speed)).LastOrDefault();
+					return recipe.Assemblers.Where(a => (allowDisabled || a.Enabled)).OrderBy(a => ((float)(a.ModuleSlots * 1000000) + a.Speed)).LastOrDefault();
 			}
 			return null; //shouldnt happen
 		}

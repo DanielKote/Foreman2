@@ -9,6 +9,7 @@ namespace Foreman
 		string LFriendlyName { get; }
 		string FriendlyName { get; }
 
+		bool Available { get; }
 
 		Bitmap Icon { get; }
 		Color AverageColor { get; }
@@ -25,6 +26,8 @@ namespace Foreman
 		public string LFriendlyName { get; private set; }
 		public string FriendlyName { get; private set; }
 
+		public virtual bool Available { get; set; }
+
 		private string[] OrderCompareArray;
 
 		public DataObjectBasePrototype(DataCache dCache, string name, string friendlyName, string order)
@@ -33,6 +36,7 @@ namespace Foreman
 			Name = name;
 			FriendlyName = friendlyName;
 			LFriendlyName = friendlyName.ToLower();
+			Available = true;
 
 			Icon = DataCache.UnknownIcon;
 			AverageColor = Color.Black;

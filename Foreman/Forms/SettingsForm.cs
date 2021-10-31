@@ -41,6 +41,11 @@ namespace Foreman
 			}
 		}
 
+		private static readonly Color AvailableRecipeColor = Color.White;
+		private static readonly Color UnavailableRecipeColor = Color.Pink;
+		private static readonly Brush AvailableObjectBrush = Brushes.Black;
+		private static readonly Brush UnavailableObjectBrush = Brushes.DarkMagenta;
+
 		private SettingsFormOptions originalOptions;
 		public SettingsFormOptions CurrentOptions;
 
@@ -97,9 +102,18 @@ namespace Foreman
 				lvItem.Name = recipe.Name; //key
 				lvItem.Checked = true; //have to set this to true before (potentially) changing to false in order for the check boxes to appear
 				lvItem.Checked = recipe.Enabled;
+				lvItem.BackColor = recipe.Available ? AvailableRecipeColor : UnavailableRecipeColor;
 				unfilteredRecipeList.Add(lvItem);
 			}
-			unfilteredRecipeList.Sort((a, b) => ((Recipe)a.Tag).CompareTo((Recipe)b.Tag));
+			unfilteredRecipeList.Sort(delegate (ListViewItem a, ListViewItem b)
+			{
+				Recipe ra = (Recipe)a.Tag;
+				Recipe rb = (Recipe)b.Tag;
+
+				int availableDiff = ra.Available.CompareTo(rb.Available);
+				if (availableDiff != 0) return -availableDiff;
+				return ra.FriendlyName.CompareTo(rb.FriendlyName);
+			});
 
 			UpdateFilteredRecipeList();
 		}
@@ -125,43 +139,51 @@ namespace Foreman
 		private void UpdateAMM()
 		{
 			string filterString = FilterTextBox.Text.ToLower();
+			bool showUnavailables = ShowUnavailablesCheckBox.Checked;
 
 			AssemblerSelectionBox.BeginUpdate();
 			AssemblerSelectionBox.Items.Clear();
-			AssemblerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => !a.IsMiner && a.LFriendlyName.Contains(filterString)).ToArray());
-			AssemblerSelectionBox.Sorted = true;
+			AssemblerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => !a.IsMiner && a.LFriendlyName.Contains(filterString) && (showUnavailables || a.Available)).OrderBy(a => !a.Available).ThenBy(a => a.FriendlyName).ToArray());
 			AssemblerSelectionBox.DisplayMember = "FriendlyName";
 			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+			{
 				AssemblerSelectionBox.SetItemChecked(i, ((Assembler)AssemblerSelectionBox.Items[i]).Enabled);
+				AssemblerSelectionBox.ItemBrushes.Add(((Assembler)AssemblerSelectionBox.Items[i]).Available ? AvailableObjectBrush : UnavailableObjectBrush);
+			}
 			AssemblerSelectionBox.EndUpdate();
 
 			MinerSelectionBox.BeginUpdate();
 			MinerSelectionBox.Items.Clear();
-			MinerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => a.IsMiner && a.LFriendlyName.Contains(filterString)).ToArray());
-			MinerSelectionBox.Sorted = true;
+			MinerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => a.IsMiner && a.LFriendlyName.Contains(filterString) && (showUnavailables || a.Available)).OrderBy(a => !a.Available).ThenBy(a => a.FriendlyName).ToArray());
 			MinerSelectionBox.DisplayMember = "FriendlyName";
 			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+			{
 				MinerSelectionBox.SetItemChecked(i, ((Assembler)MinerSelectionBox.Items[i]).Enabled);
+				MinerSelectionBox.ItemBrushes.Add(((Assembler)MinerSelectionBox.Items[i]).Available ? AvailableObjectBrush : UnavailableObjectBrush);
+			}
 			MinerSelectionBox.EndUpdate();
 
 			ModuleSelectionBox.BeginUpdate();
 			ModuleSelectionBox.Items.Clear();
-			ModuleSelectionBox.Items.AddRange(CurrentOptions.DCache.Modules.Values.Where(m => m.LFriendlyName.Contains(filterString)).ToArray());
-			ModuleSelectionBox.Sorted = true;
+			ModuleSelectionBox.Items.AddRange(CurrentOptions.DCache.Modules.Values.Where(m => m.LFriendlyName.Contains(filterString) && (showUnavailables || m.Available)).OrderBy(m => !m.Available).ThenBy(m => m.FriendlyName).ToArray());
 			ModuleSelectionBox.DisplayMember = "FriendlyName";
 			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+			{
 				ModuleSelectionBox.SetItemChecked(i, ((Module)ModuleSelectionBox.Items[i]).Enabled);
+				ModuleSelectionBox.ItemBrushes.Add(((Module)ModuleSelectionBox.Items[i]).Available ? AvailableObjectBrush : UnavailableObjectBrush);
+			}
 			ModuleSelectionBox.EndUpdate();
 		}
 
 		private void UpdateFilteredRecipeList()
 		{
 			string filterString = FilterTextBox.Text.ToLower();
+			bool showUnavailables = ShowUnavailablesCheckBox.Checked;
 
 			filteredRecipeList.Clear();
 			foreach (ListViewItem lvItem in unfilteredRecipeList)
 			{
-				if (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString))
+				if ((showUnavailables || ((Recipe)lvItem.Tag).Available) && (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString)))
 					filteredRecipeList.Add(lvItem);
 			}
 
@@ -252,7 +274,7 @@ namespace Foreman
 			}
 		}
 
-		private void FilterTextBox_TextChanged(object sender, EventArgs e)
+		private void Filters_Changed(object sender, EventArgs e)
 		{
 			UpdateAMM();
 			UpdateFilteredRecipeList();
@@ -540,7 +562,7 @@ namespace Foreman
 					foreach (Assembler assembler in CurrentOptions.DCache.Assemblers.Values)
 					{
 						bool enabled = false;
-						foreach (Recipe recipe in assembler.AssociatedItem.ProductionRecipes)
+						foreach (Recipe recipe in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
 							enabled |= recipe.Enabled;
 						assembler.Enabled = enabled;
 					}

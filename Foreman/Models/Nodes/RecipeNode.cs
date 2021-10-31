@@ -10,17 +10,29 @@ namespace Foreman
 	{
 		Recipe BaseRecipe { get; }
 
-		Assembler SelectedAssembler { get; set; }
-		Beacon SelectedBeacon { get; set; }
+		Assembler SelectedAssembler { get;}
+		Beacon SelectedBeacon { get;}
 		float BeaconCount { get; set; }
 
-		List<Module> AssemblerModules { get; }
-		List<Module> BeaconModules { get; }
+		IReadOnlyList<Module> AssemblerModules { get; }
+		IReadOnlyList<Module> BeaconModules { get; }
 
-		Item BurnerItem { get; set; }
-		Item BurntItem { get; }
+		Item Fuel { get; }
+		Item FuelRemains { get; }
 
 		float GetBaseNumberOfAssemblers();
+
+		void SetAssembler(Assembler assembler);
+		void AddAssemblerModule(Module module);
+		void RemoveAssemblerModule(int index);
+		void SetAssemblerModules(IEnumerable<Module> modules);
+
+		void SetBeacon(Beacon beacon);
+		void AddBeaconModule(Module module);
+		void RemoveBeaconModule(int index);
+		void SetBeaconModules(IEnumerable<Module> modules);
+
+		void SetFuel(Item fuel);
 	}
 
 
@@ -28,41 +40,20 @@ namespace Foreman
 	{
 		public Recipe BaseRecipe { get; private set; }
 
-		public Assembler SelectedAssembler { get; set; }
-		public Beacon SelectedBeacon { get; set; }
+		public Assembler SelectedAssembler { get; private set; }
+		public Beacon SelectedBeacon { get; private set; }
 		public float BeaconCount { get; set; }
 
-		public List<Module> AssemblerModules { get; private set; }
-		public List<Module> BeaconModules { get; private set; }
+		private List<Module> assemblerModules;
+		private List<Module> beaconModules;
 
-		private Item burnerItem;
-		private Item burntOverrideItem; //returns as BurntItem if set (error import)
-		internal void SetBurntOverride(Item item) { burntOverrideItem = item; }
-		public Item BurntItem { get { return (burntOverrideItem != null)? burntOverrideItem : (BurnerItem != null && BurnerItem.BurnResult != null)? BurnerItem.BurnResult : null; } }
-		public Item BurnerItem
-		{
-			get
-			{
-				return burnerItem;
-			}
-			set
-			{
-				if (burnerItem != value)
-				{
-					//have to remove any links to the burner/burnt item (if they exist) unless the item is also part of the recipe
-					if (BurnerItem != null && !BaseRecipe.IngredientSet.ContainsKey(BurnerItem))
-						foreach (NodeLink link in InputLinks.Where(link => link.Item == BurnerItem).ToList())
-							link.Delete();
-					if (BurntItem != null && !BaseRecipe.ProductSet.ContainsKey(BurntItem))
-						foreach (NodeLink link in OutputLinks.Where(link => link.Item == BurntItem).ToList())
-							link.Delete();
+		public IReadOnlyList<Module> AssemblerModules { get { return assemblerModules; } }
+		public IReadOnlyList<Module> BeaconModules { get { return beaconModules; } }
 
-					burnerItem = value;
-					MyGraph.FuelSelector.UseFuel(value);
-					burntOverrideItem = null; //updating the burner item will naturally remove any override
-				}
-			}
-		}
+		public Item Fuel { get; private set; }
+		public Item FuelRemains { get { return (fuelRemainsOverride != null)? fuelRemainsOverride : (Fuel != null && Fuel.BurnResult != null)? Fuel.BurnResult : null; } }
+		internal void SetBurntOverride(Item item) { if(Fuel == null || Fuel.BurnResult != fuelRemainsOverride) fuelRemainsOverride = item; }
+		private Item fuelRemainsOverride; //returns as BurntItem if set (error import)
 
 		public override string DisplayName { get { return BaseRecipe.FriendlyName; } }
 
@@ -72,95 +63,303 @@ namespace Foreman
 
 			SelectedBeacon = null;
 			BeaconCount = 0;
-			BeaconModules = new List<Module>();
+			beaconModules = new List<Module>();
 
 			if (autoPopulate) //if not then this is an import -> all the values will be set by the import
 			{
-				SelectedAssembler = graph.AssemblerSelector.GetAssembler(baseRecipe);
-				AssemblerModules = graph.ModuleSelector.GetModules(SelectedAssembler, baseRecipe);
+				SelectedAssembler = MyGraph.AssemblerSelector.GetAssembler(BaseRecipe);
+				assemblerModules = MyGraph.ModuleSelector.GetModules(SelectedAssembler, BaseRecipe);
 				if (SelectedAssembler != null && SelectedAssembler.IsBurner)
-					burnerItem = MyGraph.FuelSelector.GetFuel(SelectedAssembler);
+					Fuel = MyGraph.FuelSelector.GetFuel(SelectedAssembler);
 				else
-					burnerItem = null;
+					Fuel = null;
 			}
 			else
 			{
 				SelectedAssembler = null;
-				AssemblerModules = new List<Module>();
-				burnerItem = null;
-				burntOverrideItem = null;
+				assemblerModules = new List<Module>();
+				Fuel = null;
+				fuelRemainsOverride = null;
 			}
 		}
 
-		public override bool IsValid { get {
-				if (BaseRecipe.IsMissing)
-					return false;
-				if (SelectedAssembler == null)
-					return false;
-				if (SelectedAssembler.IsMissing)
-					return false;
-				if (SelectedAssembler.IsBurner)
-				{
-					if (BurnerItem == null || !SelectedAssembler.ValidFuels.Contains(BurnerItem) || BurnerItem.IsMissing)
-						return false;
-					if (BurntItem != null && (BurnerItem == null || BurnerItem.BurnResult != BurntItem))
-						return false;
-				}
-				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null || AssemblerModules.Count > SelectedAssembler.ModuleSlots)
-					return false;
-				if (SelectedBeacon != null)
-					if (SelectedBeacon.IsMissing || BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null || BeaconModules.Count > SelectedBeacon.ModuleSlots)
-						return false;
-				return true;
-			}
-		}
-		public override string GetErrors()
+		public void SetAssembler(Assembler assembler)
 		{
-			string output = "";
+			SelectedAssembler = assembler;
 
-			if (BaseRecipe.IsMissing)
-				return string.Format("Recipe \"{0}\" doesnt exist in preset!\n", BaseRecipe.FriendlyName);
+			//check for invalid modules
+			for (int i = assemblerModules.Count - 1; i >= 0; i--)
+				if (assemblerModules[i].IsMissing || !SelectedAssembler.Modules.Contains(assemblerModules[i]) || !BaseRecipe.Modules.Contains(assemblerModules[i]))
+					assemblerModules.RemoveAt(i);
+			//check for too many modules
+			while (assemblerModules.Count > SelectedAssembler.ModuleSlots)
+				assemblerModules.RemoveAt(assemblerModules.Count - 1);
+			//check if any modules work (if none work, then turn off beacon)
+			if (SelectedAssembler.Modules.Count == 0 || BaseRecipe.Modules.Count == 0)
+				SetBeacon(null);
+			else //update beacon
+				SetBeacon(SelectedBeacon);
 
-			if (SelectedAssembler == null)
-				output += "No assembler exists for this recipe!\n";
+			UpdateState();
+		}
+
+		public void SetBeacon(Beacon beacon)
+		{
+			SelectedBeacon = beacon;
+
+			if (SelectedBeacon == null)
+			{
+				beaconModules.Clear();
+			}
 			else
 			{
-				if (SelectedAssembler.IsMissing)
-					output += string.Format("Assembler \"{0}\" doesnt exist in preset!\n", SelectedAssembler.FriendlyName);
+				//check for invalid modules
+				for (int i = beaconModules.Count - 1; i >= 0; i--)
+					if (beaconModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.ValidModules.Contains(beaconModules[i]))
+						beaconModules.RemoveAt(i);
+				//check for too many modules
+				while (beaconModules.Count > SelectedBeacon.ModuleSlots)
+					beaconModules.RemoveAt(beaconModules.Count - 1);
+			}
+			UpdateState();
+		}
 
+		public void AddAssemblerModule(Module module) { assemblerModules.Add(module); UpdateState(); }
+
+		public void RemoveAssemblerModule(int index) { if (index >= 0 && index < assemblerModules.Count) assemblerModules.RemoveAt(index); UpdateState(); }
+
+		public void SetAssemblerModules(IEnumerable<Module> modules)
+		{
+			assemblerModules.Clear();
+			if(modules != null)
+				foreach (Module module in modules)
+					assemblerModules.Add(module);
+			UpdateState();
+		}
+
+		public void AddBeaconModule(Module module) { beaconModules.Add(module); UpdateState(); }
+
+		public void RemoveBeaconModule(int index) { if (index >= 0 && index < beaconModules.Count) beaconModules.RemoveAt(index); UpdateState(); }
+
+		public void SetBeaconModules(IEnumerable<Module> modules)
+		{
+			beaconModules.Clear();
+			if(modules != null)
+				foreach (Module module in modules)
+					beaconModules.Add(module);
+			UpdateState();
+		}
+
+		public void SetFuel(Item fuel)
+		{
+			if (Fuel != fuel || fuelRemainsOverride != null)
+			{
+				//have to remove any links to the burner/burnt item (if they exist) unless the item is also part of the recipe
+				if (Fuel != null && !BaseRecipe.IngredientSet.ContainsKey(Fuel))
+					foreach (NodeLink link in InputLinks.Where(link => link.Item == Fuel).ToList())
+						link.Delete();
+				if (FuelRemains != null && !BaseRecipe.ProductSet.ContainsKey(FuelRemains))
+					foreach (NodeLink link in OutputLinks.Where(link => link.Item == FuelRemains).ToList())
+						link.Delete();
+
+				Fuel = fuel;
+				MyGraph.FuelSelector.UseFuel(fuel);
+				fuelRemainsOverride = null; //updating the fuel item will naturally remove any override
+				UpdateState();
+			}
+		}
+
+		public override void UpdateState() { State = GetUpdatedState(); }
+
+		private NodeState GetUpdatedState()
+		{
+			//error states:
+			if (BaseRecipe.IsMissing)
+				return NodeState.Error;
+			if (SelectedAssembler == null || SelectedAssembler.IsMissing)
+				return NodeState.Error;
+			if (SelectedAssembler.IsBurner && Fuel == null)
+				return NodeState.Error;
+			if (SelectedAssembler.IsBurner && Fuel != null && (Fuel.IsMissing || !SelectedAssembler.Fuels.Contains(Fuel) || Fuel.BurnResult != FuelRemains))
+				return NodeState.Error;
+			if (assemblerModules.FirstOrDefault(m => m.IsMissing) != null)
+				return NodeState.Error;
+			if (assemblerModules.Count > SelectedAssembler.ModuleSlots)
+				return NodeState.Error;
+			if (SelectedBeacon != null && SelectedBeacon.IsMissing)
+				return NodeState.Error;
+			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => m.IsMissing) != null)
+				return NodeState.Error;
+			if (SelectedBeacon != null && beaconModules.Count > SelectedBeacon.ModuleSlots)
+				return NodeState.Error;
+			if (!AllLinksValid)
+				return NodeState.Error;
+
+			//warning states
+			if (!BaseRecipe.Enabled)
+				return NodeState.Warning;
+			if (!SelectedAssembler.Enabled)
+				return NodeState.Warning;
+			if (Fuel != null && Fuel.ProductionRecipes.FirstOrDefault(r => !r.Enabled || !r.HasEnabledAssemblers) == null)
+				return NodeState.Warning;
+			if (assemblerModules.FirstOrDefault(m => !m.Enabled) != null)
+				return NodeState.Warning;
+			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Enabled) != null)
+				return NodeState.Warning;
+
+			return NodeState.Clean;
+		}
+
+		public override List<string> GetErrors()
+		{
+			List<string> output = new List<string>();
+
+			if (BaseRecipe.IsMissing)
+			{
+				output.Add(string.Format("> Recipe \"{0}\" doesnt exist in preset!", BaseRecipe.FriendlyName));
+				return output;
+			}
+
+			if (SelectedAssembler == null)
+				output.Add("> No assembler exists for this recipe!");
+			else
+			{
+				if (BaseRecipe.Assemblers.Count == 0)
+					output.Add("No valid assemblers exist for this recipe!");
+				if (SelectedAssembler.IsMissing)
+					output.Add(string.Format("> Assembler \"{0}\" doesnt exist in preset!", SelectedAssembler.FriendlyName));
 				if (SelectedAssembler.IsBurner)
 				{
-					if (BurnerItem == null)
-						output += "Burner Assembler has no fuel set!\n";
-					else if (!SelectedAssembler.ValidFuels.Contains(BurnerItem))
-						output += "Burner Assembler has an invalid fuel set!\n";
-					else if (BurnerItem.IsMissing)
-						output += "Burner Assembler's fuel doesnt exist in preset!\n";
+					if (Fuel == null && SelectedAssembler.Fuels.Count > 0) //if the assembler has no valid fuels then we will just have to give it a pass as a warning :/
+						output.Add("> Burner Assembler has no fuel set!");
+					else if (!SelectedAssembler.Fuels.Contains(Fuel))
+						output.Add("> Burner Assembler has an invalid fuel set!");
+					else if (Fuel.IsMissing)
+						output.Add("> Burner Assembler's fuel doesnt exist in preset!");
 
-					if (BurntItem != null && (BurnerItem == null || BurnerItem.BurnResult != BurntItem))
-						output += "Burning result doesnt match fuel's burn result!\n";
+					if (fuelRemainsOverride != null)
+						output.Add("> Burning result doesnt match fuel's burn result!");
 				}
 
 				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null)
-					output += "Some of the assembler modules dont exist in preset!\n";
+					output.Add("> Some of the assembler modules dont exist in preset!");
 
 				if (AssemblerModules.Count > SelectedAssembler.ModuleSlots)
-					output += string.Format("Assembler has too many modules ({0}/{1})!\n", AssemblerModules.Count, SelectedAssembler.ModuleSlots);
+					output.Add(string.Format("> Assembler has too many modules ({0}/{1})!", AssemblerModules.Count, SelectedAssembler.ModuleSlots));
 			}
 
 			if(SelectedBeacon != null)
 			{
 				if (SelectedBeacon.IsMissing)
-					output += string.Format("Beacon \"{0}\" doesnt exist in preset!\n", SelectedBeacon.FriendlyName);
+					output.Add(string.Format("> Beacon \"{0}\" doesnt exist in preset!", SelectedBeacon.FriendlyName));
 
 				if (BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null)
-					output += "Some of the beacon modules dont exist in preset!\n";
+					output.Add("> Some of the beacon modules dont exist in preset!");
 
 				if (BeaconModules.Count > SelectedBeacon.ModuleSlots)
-					output += "Beacon has too many modules!\n";
+					output.Add("> Beacon has too many modules!");
 			}
 
-			return string.IsNullOrEmpty(output)? null : output;
+			if (!AllLinksValid)
+				output.Add("> Some links are invalid!");
+
+			return output;
+		}
+
+		public override Dictionary<string, Action> GetErrorResolutions()
+		{
+			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+			if (BaseRecipe.IsMissing || BaseRecipe.Assemblers.Count == 0)
+				resolutions.Add("Delete node", new Action(() => { this.Delete(); }));
+			else
+			{
+				if (SelectedAssembler == null || SelectedAssembler.IsMissing)
+					resolutions.Add("Auto-select assembler", new Action(() => SetAssembler(MyGraph.AssemblerSelector.GetAssembler(BaseRecipe))));
+				else if (SelectedAssembler.IsBurner)
+				{
+					if ((Fuel == null && SelectedAssembler.Fuels.Count > 0) ||
+						!SelectedAssembler.Fuels.Contains(Fuel) ||
+						(Fuel != null && Fuel.IsMissing) ||
+						fuelRemainsOverride != null)
+						resolutions.Add("Auto-select fuel", new Action(() => SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler))));
+				}
+
+				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null || AssemblerModules.Count > SelectedAssembler.ModuleSlots)
+					resolutions.Add("Fix assembler modules", new Action(() => {
+						for (int i = AssemblerModules.Count - 1; i >= 0; i--) 
+							if (AssemblerModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.ValidModules.Contains(beaconModules[i])) 
+								RemoveAssemblerModule(i);
+						while (AssemblerModules.Count > SelectedAssembler.ModuleSlots)
+							RemoveAssemblerModule(AssemblerModules.Count - 1);
+					}));
+
+				if (SelectedBeacon != null)
+				{
+					if (SelectedBeacon.IsMissing)
+						resolutions.Add("Remove Beacon", new Action(() => SetBeacon(null)));
+
+					if (BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null || beaconModules.Count > SelectedBeacon.ModuleSlots)
+						resolutions.Add("Fix beacon modules", new Action(() => {
+							for (int i = BeaconModules.Count - 1; i >= 0; i--)
+								if (BeaconModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.ValidModules.Contains(beaconModules[i]))
+									RemoveBeaconModule(i);
+							while (BeaconModules.Count > SelectedBeacon.ModuleSlots)
+								RemoveBeaconModule(BeaconModules.Count - 1);
+						}));
+				}
+
+				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
+					resolutions.Add(kvp.Key, kvp.Value);
+			}
+
+		return resolutions;
+		}
+
+		public override List<string> GetWarnings()
+		{
+			List<string> output = new List<string>();
+
+			if (!BaseRecipe.Enabled)
+				output.Add("> Selected recipe is disabled.");
+			if (!SelectedAssembler.Enabled)
+			{
+				if (BaseRecipe.HasEnabledAssemblers)
+					output.Add("> Selected assembler is disabled.");
+				else
+					output.Add("> No enabled assemblers for this recipe.");
+			}
+			if (Fuel != null && Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) == null)
+			{
+				if (SelectedAssembler.Fuels.FirstOrDefault(fuel => fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null) != null)
+					output.Add("> Selected fuel cant be produced (recipe/assembler disabled).");
+				else
+					output.Add("> All fuels cant be produced (recipe/assembler disabled).");
+			}
+			if (Fuel == null && SelectedAssembler.Fuels.Count == 0)
+				output.Add("> No fuel available for burner assembler (no solution).");
+			if (assemblerModules.FirstOrDefault(m => !m.Enabled) != null)
+				output.Add("> Some selected assembler modules are disabled.");
+			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Enabled) != null)
+				output.Add("> Some selected beacon modules are disabled.");
+
+			return output;
+		}
+
+		public override Dictionary<string, Action> GetWarningResolutions()
+		{
+			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+
+			if (!SelectedAssembler.Enabled && BaseRecipe.HasEnabledAssemblers)
+				resolutions.Add("Switch to enabled assembler", new Action(() => SetAssembler(MyGraph.AssemblerSelector.GetAssembler(BaseRecipe))));
+			if (Fuel != null && Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) == null)
+				if (SelectedAssembler.Fuels.FirstOrDefault(fuel => fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null) != null)
+					resolutions.Add("Switch to valid fuel", new Action(() => SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler))));
+			if (assemblerModules.FirstOrDefault(m => !m.Enabled) != null)
+				resolutions.Add("Remove broken modules from assembler", new Action(() => { for (int i = AssemblerModules.Count - 1; i >= 0; i--) if (!AssemblerModules[i].Enabled) RemoveAssemblerModule(i); }));
+			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Enabled) != null)
+				resolutions.Add("Remove disabled modules from beacon", new Action(() => { for (int i = BeaconModules.Count - 1; i >= 0; i--) if (!BeaconModules[i].Enabled) RemoveBeaconModule(i); }));
+
+			return resolutions;
 		}
 
 		public override IEnumerable<Item> Inputs
@@ -169,8 +368,8 @@ namespace Foreman
 			{
 				foreach (Item item in BaseRecipe.IngredientList)
 					yield return item;
-				if (BurnerItem != null && !BaseRecipe.IngredientSet.ContainsKey(BurnerItem)) //provide the burner item if it isnt null or already part of recipe ingredients
-					yield return BurnerItem;
+				if (Fuel != null && !BaseRecipe.IngredientSet.ContainsKey(Fuel)) //provide the burner item if it isnt null or already part of recipe ingredients
+					yield return Fuel;
 			}
 		}
 		public override IEnumerable<Item> Outputs
@@ -179,8 +378,8 @@ namespace Foreman
 			{
 				foreach (Item item in BaseRecipe.ProductList)
 					yield return item;
-				if (BurntItem != null && !BaseRecipe.ProductSet.ContainsKey(BurntItem)) //provide the burnt remains item if it isnt null or already part of recipe products
-					yield return BurntItem;
+				if (FuelRemains != null && !BaseRecipe.ProductSet.ContainsKey(FuelRemains)) //provide the burnt remains item if it isnt null or already part of recipe products
+					yield return FuelRemains;
 			}
 		}
 
@@ -189,7 +388,7 @@ namespace Foreman
 
 		internal override double inputRateFor(Item item)
 		{
-			if (item != BurnerItem)
+			if (item != Fuel)
 				return BaseRecipe.IngredientSet[item];
 			else
 			{
@@ -198,13 +397,13 @@ namespace Foreman
 
 				float recipeRate = BaseRecipe.IngredientSet.ContainsKey(item) ? BaseRecipe.IngredientSet[item] : 0;
 				//burner rate = recipe time (modified by speed bonus & assembler) * assembler energy consumption (modified by consumption bonus and assembler) / fuel value of the item
-				float burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.EnergyEffectivity) / BurnerItem.FuelValue;
+				float burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.EnergyEffectivity) / Fuel.FuelValue;
 				return (float)Math.Round((recipeRate + burnerRate), RoundingDP);
 			}
 		}
 		internal override double outputRateFor(Item item) //Note to Foreman 1.0: YES! this is where all the productivity is taken care of! (not in the solver... why would you multiply the productivity while setting up the constraints and not during the ratios here???)
 		{
-			if (item != BurntItem)
+			if (item != FuelRemains)
 				return BaseRecipe.ProductSet[item];
 			else
 			{
@@ -215,7 +414,7 @@ namespace Foreman
 				//burner rate is much the same as above, just have to make sure we still use the Burner item!
 				float g = GetSpeedMultiplier();
 				float f = GetConsumptionMultiplier();
-				float burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.EnergyEffectivity) / BurnerItem.FuelValue;
+				float burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.EnergyEffectivity) / Fuel.FuelValue;
 				return (float)Math.Round((recipeRate + burnerRate), RoundingDP);
 			}
 		}
@@ -282,10 +481,10 @@ namespace Foreman
 			{
 				info.AddValue("Assembler", SelectedAssembler.Name);
 				info.AddValue("AssemblerModules", AssemblerModules.Select(m => m.Name));
-				if (BurnerItem != null)
-					info.AddValue("Fuel", BurnerItem.Name);
-				if (BurntItem != null)
-					info.AddValue("Burnt", BurntItem.Name);
+				if (Fuel != null)
+					info.AddValue("Fuel", Fuel.Name);
+				if (FuelRemains != null)
+					info.AddValue("Burnt", FuelRemains.Name);
 			}
 			if (SelectedBeacon != null)
 			{

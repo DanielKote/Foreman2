@@ -190,5 +190,17 @@ namespace Foreman.Properties {
                 this["ShowRecipeToolTip"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowUnavailable {
+            get {
+                return ((bool)(this["ShowUnavailable"]));
+            }
+            set {
+                this["ShowUnavailable"] = value;
+            }
+        }
     }
 }

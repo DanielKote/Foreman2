@@ -83,5 +83,26 @@ namespace Foreman
 				graphics.FillPath(brush, path);
 			}
 		}
+
+		public static void FillRoundRectTLFlag(int x, int y, int width, int height, int radius, Graphics graphics, Brush brush)
+		{
+			int radius2 = radius * 2;
+			int Left = x;
+			int Top = y;
+			int Bottom = y + height;
+			int Right = x + width;
+
+			using (GraphicsPath path = new GraphicsPath())
+			{
+				path.StartFigure();
+
+				path.AddArc(Left, Top, 2 * radius, 2 * radius, 180f, 90f);
+				path.AddLine(Right, Top, Left, Bottom);
+
+				path.CloseFigure();
+
+				graphics.FillPath(brush, path);
+			}
+		}
 	}
 }

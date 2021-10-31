@@ -53,7 +53,7 @@ namespace Foreman
 				//quantity
 				if (recipeNode.SelectedBeacon != null) // && recipeNode.BeaconCount > 0)
 				{
-					Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 6, 65, 18);
+					Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 6, 60, 18);
 					//graphics.DrawRectangle(devPen, textbox);
 
 					float beaconCount = recipeNode.BeaconCount;

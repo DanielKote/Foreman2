@@ -72,10 +72,17 @@ if ExportIcons then
 	output['items'] = {}
 	output['fluids'] = data.raw.fluid
 	output['groups'] = data.raw['item-group']
+	output['entities'] = {}
 
-	for _, section in ipairs({ 'item', 'capsule', 'module', 'ammo', 'gun', 'armor', 'tool', 'repair-tool', 'rail-planner', 'item-with-entity-data', 'item-with-inventory', 'item-with-label', 'item-with-tags', 'spider-vehicle', 'spidertron-remote' }) do
+	for _, section in ipairs({ 'ammo', 'armor', 'capsule', 'gun', 'item', 'item-with-entity-data', 'item-with-inventory', 'item-with-label', 'item-with-tags', 'mining-tool', 'module', 'rail-planner', 'repair-tool', 'selection-tool', 'spider-vehicle', 'spidertron-remote', 'tool', 'upgrade-item' }) do
 		for name, obj in pairs(data.raw[section]) do
 			output['items'][name] = obj
+		end
+	end
+
+	for _, section in ipairs({'assembling-machine', 'beacon', 'furnace', 'mining-drill', 'module', 'offshore-pump', 'rocket-silo'}) do
+		for name, obj in pairs(data.raw[section]) do
+			output['entities'][name] = obj
 		end
 	end
 
@@ -121,6 +128,17 @@ if ExportIcons then
 		ExportLine('{', 2)
 		ExportParameter('name', data.name, false, ',', 3)
 		ExportParameter('icon_name', "icon.i."..data.name, false, ',', 3)
+		ExportIcon(data.icon, data.icon_size, data.icons)
+		counter = counter - 1 if counter > 0 then ExportLine('},', 2) else ExportLine('}', 2) end
+	end
+	ExportLine('],', 1)
+
+	ExportLine('"entities": [', 1)
+	counter = 0 for _,_ in pairs(output.entities) do counter = counter + 1 end
+	for _, data in pairs(output.entities) do
+		ExportLine('{', 2)
+		ExportParameter('name', data.name, false, ',', 3)
+		ExportParameter('icon_name', "icon.e."..data.name, false, ',', 3)
 		ExportIcon(data.icon, data.icon_size, data.icons)
 		counter = counter - 1 if counter > 0 then ExportLine('},', 2) else ExportLine('}', 2) end
 	end

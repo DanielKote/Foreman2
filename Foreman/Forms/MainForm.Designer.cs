@@ -62,7 +62,7 @@
 			this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.ModuleDropDown = new System.Windows.Forms.ComboBox();
-			this.SimpleViewCheckBox = new System.Windows.Forms.CheckBox();
+			this.ShowUnavailableCheckBox = new System.Windows.Forms.CheckBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
@@ -98,7 +98,7 @@
 			this.MainToolbar.Controls.Add(this.ProductionGroupBox);
 			this.MainToolbar.Controls.Add(this.GridLinesGroupBox);
 			this.MainToolbar.Controls.Add(this.DefaultsGroupBox);
-			this.MainToolbar.Controls.Add(this.SimpleViewCheckBox);
+			this.MainToolbar.Controls.Add(this.ShowUnavailableCheckBox);
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(0, 0);
 			this.MainToolbar.Margin = new System.Windows.Forms.Padding(0);
@@ -507,17 +507,17 @@
 			this.ModuleDropDown.TabIndex = 1;
 			this.ModuleDropDown.SelectedIndexChanged += new System.EventHandler(this.ModuleDropDown_SelectedIndexChanged);
 			// 
-			// SimpleViewCheckBox
+			// ShowUnavailableCheckBox
 			// 
-			this.SimpleViewCheckBox.AutoSize = true;
-			this.SimpleViewCheckBox.Location = new System.Drawing.Point(956, 4);
-			this.SimpleViewCheckBox.Margin = new System.Windows.Forms.Padding(4);
-			this.SimpleViewCheckBox.Name = "SimpleViewCheckBox";
-			this.SimpleViewCheckBox.Size = new System.Drawing.Size(105, 21);
-			this.SimpleViewCheckBox.TabIndex = 0;
-			this.SimpleViewCheckBox.Text = "Simple View";
-			this.SimpleViewCheckBox.UseVisualStyleBackColor = true;
-			this.SimpleViewCheckBox.CheckedChanged += new System.EventHandler(this.SimpleViewCheckBox_CheckedChanged);
+			this.ShowUnavailableCheckBox.AutoSize = true;
+			this.ShowUnavailableCheckBox.Location = new System.Drawing.Point(956, 4);
+			this.ShowUnavailableCheckBox.Margin = new System.Windows.Forms.Padding(4);
+			this.ShowUnavailableCheckBox.Name = "ShowUnavailableCheckBox";
+			this.ShowUnavailableCheckBox.Size = new System.Drawing.Size(178, 21);
+			this.ShowUnavailableCheckBox.TabIndex = 0;
+			this.ShowUnavailableCheckBox.Text = "DEV: Show Unavailable";
+			this.ShowUnavailableCheckBox.UseVisualStyleBackColor = true;
+			this.ShowUnavailableCheckBox.CheckedChanged += new System.EventHandler(this.DEV_ShowUnavailableCheckBox_CheckChanged);
 			// 
 			// GraphViewer
 			// 
@@ -550,7 +550,7 @@
 			this.MinimumSize = new System.Drawing.Size(1000, 900);
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Foreman";
+			this.Text = "Foreman 2.0";
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.MainLayoutPanel.ResumeLayout(false);
 			this.MainLayoutPanel.PerformLayout();
@@ -592,7 +592,7 @@
         private System.Windows.Forms.GroupBox DefaultsGroupBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox ModuleDropDown;
-        private System.Windows.Forms.CheckBox SimpleViewCheckBox;
+        private System.Windows.Forms.CheckBox ShowUnavailableCheckBox;
         private ProductionGraphViewer GraphViewer;
         private System.Windows.Forms.Button AddItemButton;
         private System.Windows.Forms.Button AddRecipeButton;

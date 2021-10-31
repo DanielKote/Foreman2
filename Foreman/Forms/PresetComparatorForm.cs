@@ -37,6 +37,11 @@ namespace Foreman
 		private static readonly Color EqualBGColor = Color.White;
 		private static readonly Color CloseEnoughBGColor = Color.Khaki;
 		private static readonly Color DifferentGBColor = Color.Pink;
+		private static readonly Color AvailableTextColor = Color.Black;
+		private static readonly Color UnavailableTextColor = Color.DarkRed;
+		private static readonly Font AvailableTextFont = new Font(FontFamily.GenericSansSerif, 7.8f, FontStyle.Regular);
+		private static readonly Font UnavailableTextFont = new Font(FontFamily.GenericSansSerif, 7.8f, FontStyle.Italic);
+
 
 		public PresetComparatorForm()
 		{
@@ -134,7 +139,13 @@ namespace Foreman
 					else
 						outputLists[3].Add(kvp.Value);
 				}
-				for (int i = 0; i < 4; i++) outputLists[i].Sort(delegate (object a, object b) { return ((DataObjectBase)a).Name.CompareTo(((DataObjectBase)b).Name); });
+				for (int i = 0; i < 4; i++)
+					outputLists[i].Sort(delegate (object a, object b)
+					{
+						int availableDiff = ((DataObjectBase)a).Available.CompareTo(((DataObjectBase)b).Available);
+						if (availableDiff != 0) return -availableDiff;
+						return ((DataObjectBase)a).Name.CompareTo(((DataObjectBase)b).Name);
+					});
 			}
 
 			//step 1: load in left and right caches
@@ -208,6 +219,9 @@ namespace Foreman
 						lvItem.Text = (string)obj;
 						lvItem.Tag = lvItem.Text;
 						lvItem.Name = lvItem.Text;
+						lvItem.ForeColor = AvailableTextColor;
+						lvItem.Font = AvailableTextFont;
+
 						unfilteredSelectedTabLVIs[i].Add(lvItem);
 					}
 				}
@@ -225,6 +239,9 @@ namespace Foreman
 						}
 						else
 							lvItem.ImageIndex = 0;
+
+						lvItem.ForeColor = doBase.Available ? AvailableTextColor : UnavailableTextColor;
+						lvItem.Font = doBase.Available ? AvailableTextFont : UnavailableTextFont;
 
 						lvItem.Text = doBase.FriendlyName;
 						lvItem.Tag = doBase;
@@ -255,6 +272,7 @@ namespace Foreman
 						Recipe rRecipe = (Recipe)r.Tag;
 
 						similarInternals = (lRecipe.IngredientList.Count == rRecipe.IngredientList.Count) && (lRecipe.ProductList.Count == rRecipe.ProductList.Count);
+						similarInternals &= (lRecipe.Available == rRecipe.Available);
 						bool exactInternals = similarInternals;
 						float scale = rRecipe.Time / lRecipe.Time;
 						if (similarInternals)
@@ -309,6 +327,7 @@ namespace Foreman
 			string filter = FilterTextBox.Text.ToLower();
 			bool hideEqual = HideEqualObjectsCheckBox.Checked;
 			bool hideSimilar = HideSimilarObjectsCheckBox.Checked;
+			bool showUnavailable = ShowUnavailableCheckBox.Checked;
 
 			//complete filter for LeftOnly and RightOnly sets ([0] and [3])
 			for (int i = 0; i < 4; i += 3) //so... for i=0 and i=3 only (Left Only and Right Only)
@@ -316,8 +335,9 @@ namespace Foreman
 				filteredSelectedTabLVIs[i].Clear();
 
 				foreach (ListViewItem lvItem in unfilteredSelectedTabLVIs[i])
-					if (lvItem.Name.Contains(filter) || lvItem.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1)
-						filteredSelectedTabLVIs[i].Add(lvItem);
+					if (showUnavailable || !(lvItem.Tag is DataObjectBase dObj) || dObj.Available)
+						if (lvItem.Name.Contains(filter) || lvItem.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1)
+							filteredSelectedTabLVIs[i].Add(lvItem);
 			}
 
 			//complete filter for Left&Right sets (have to process at the same time, since if a name fits the filter in one (but not the other), both are still added to maintain parity)
@@ -328,14 +348,18 @@ namespace Foreman
 				ListViewItem leftLVI = (ListViewItem)unfilteredSelectedTabLVIs[1][j];
 				ListViewItem rightLVI = (ListViewItem)unfilteredSelectedTabLVIs[2][j];
 
-				if (!(hideEqual && leftLVI.BackColor == EqualBGColor) && !(hideSimilar && leftLVI.BackColor == CloseEnoughBGColor) && (
+				if (showUnavailable || !(leftLVI.Tag is DataObjectBase ldObj && rightLVI.Tag is DataObjectBase rdObj) || ldObj.Available || rdObj.Available)
+				{
+
+					if (!(hideEqual && leftLVI.BackColor == EqualBGColor) && !(hideSimilar && leftLVI.BackColor == CloseEnoughBGColor) && (
 					leftLVI.Name.Contains(filter) ||
 					//rightLVI.Name.Contains(filter) //name of [1][j] and [2][j] are the same, dont have to check twice
 					leftLVI.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1 ||
 					rightLVI.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1))
-				{
-					filteredSelectedTabLVIs[1].Add(leftLVI);
-					filteredSelectedTabLVIs[2].Add(rightLVI);
+					{
+						filteredSelectedTabLVIs[1].Add(leftLVI);
+						filteredSelectedTabLVIs[2].Add(rightLVI);
+					}
 				}
 			}
 
