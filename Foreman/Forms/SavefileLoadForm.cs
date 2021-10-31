@@ -86,6 +86,8 @@ namespace Foreman
 
 			var token = cts.Token;
 			DialogResult = await LoadSaveFile(token);
+			if (DialogResult == DialogResult.OK)
+				ProcessSaveData();
 			Close();
 
 #if DEBUG
@@ -187,6 +189,8 @@ namespace Foreman
 					foreach (var objJToken in export["recipes"].ToList())
 						SaveFileInfo.Recipes.Add((string)objJToken["name"], (bool)objJToken["enabled"]);
 
+					Properties.Settings.Default.LastSaveFileLocation = Path.GetDirectoryName(saveFilePath);
+					Properties.Settings.Default.Save();
 					return DialogResult.OK;
 				}
 				catch
@@ -199,6 +203,99 @@ namespace Foreman
 			});
 		}
 
+		private void ProcessSaveData()
+		{
+			int totalMods = DCache.IncludedMods.Count;
+			string missingMods = "\nMissing Mods: ";
+			string wrongVersionMods = "\nWrong Version Mods: ";
+			string newMods = "\nAdded Mods: ";
+
+			foreach (KeyValuePair<string, string> mod in DCache.IncludedMods)
+			{
+				if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
+					continue;
+
+				if (!SaveFileInfo.Mods.ContainsKey(mod.Key))
+					missingMods += mod.Key + ", ";
+				else if (SaveFileInfo.Mods[mod.Key] != mod.Value)
+					wrongVersionMods += mod.Key + ", ";
+			}
+			foreach (KeyValuePair<string, string> mod in SaveFileInfo.Mods)
+			{
+				if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
+					continue;
+
+				if (!DCache.IncludedMods.ContainsKey(mod.Key))
+					newMods += mod.Key + ", ";
+			}
+			missingMods = missingMods.Substring(0, missingMods.Length - 2);
+			if (missingMods == "\nMissing Mods") missingMods = "";
+			wrongVersionMods = wrongVersionMods.Substring(0, wrongVersionMods.Length - 2);
+			if (wrongVersionMods == "\nWrong Version Mods") wrongVersionMods = "";
+			newMods = newMods.Substring(0, newMods.Length - 2);
+			if (newMods == "\nAdded Mods") newMods = "";
+
+			if (missingMods != "" || wrongVersionMods != "" || newMods != "")
+				if (MessageBox.Show("selected save file mods do not match preset mods; out of {0} mods:" + missingMods + wrongVersionMods + newMods + "\nAre you sure you wish to use this save file?", "Save file mod inconsistencies found!", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+					return;
+
+
+			//NOTE! there is a bit of inconsistency here; realistically we should enable/disable technology and calculate the enabled recipes ourselves. However to allow the user to have all recipes that he has available in the save
+			//we will just ignore technology limitations and activate all recipes that were set as enabled in the save.
+			//for now, technology isnt used at all.
+			/*
+			foreach (Technology tech in CurrentOptions.DCache.Technologies.Values)
+			{
+				if (saveInfo.Technologies.ContainsKey(tech.Name))
+					tech.Enabled = saveInfo.Technologies[tech.Name];
+				else
+					tech.Enabled = false;
+			}*/
+
+			foreach (Recipe recipe in DCache.Recipes.Values)
+			{
+				if (recipe.Name.StartsWith("§§")) //these are the special recipes we added for 'mining / extraction / etc'. They will naturally not exist in the loaded save, so we just keep set them as enabled
+				{
+					recipe.Enabled = true;
+				}
+				else
+				{
+					if (SaveFileInfo.Recipes.ContainsKey(recipe.Name))
+						recipe.Enabled = SaveFileInfo.Recipes[recipe.Name];
+					else
+						recipe.Enabled = false;
+				}
+			}
+
+			//update enabled status of assemblers, beacons, and modules based on the enabled status of their items' production recipes
+			foreach (Assembler assembler in DCache.Assemblers.Values)
+			{
+				bool enabled = false;
+				foreach (IReadOnlyCollection<Recipe> recipes in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
+					foreach (Recipe recipe in recipes)
+						enabled |= recipe.Enabled;
+				assembler.Enabled = enabled;
+			}
+			DCache.PlayerAssembler.Enabled = true;
+
+			foreach (Beacon beacon in DCache.Beacons.Values)
+			{
+				bool enabled = false;
+				foreach (IReadOnlyCollection<Recipe> recipes in beacon.AssociatedItems.Select(item => item.ProductionRecipes))
+					foreach (Recipe recipe in recipes)
+						enabled |= recipe.Enabled;
+				beacon.Enabled = enabled;
+			}
+
+			foreach (Module module in DCache.Modules.Values)
+			{
+				bool enabled = false;
+				foreach (Recipe recipe in module.AssociatedItem.ProductionRecipes)
+					enabled |= recipe.Enabled;
+				module.Enabled = enabled;
+			}
+		}
+
 		private void CancellationButton_Click(object sender, EventArgs e)
 		{
 			cts.Cancel();
@@ -207,6 +304,4 @@ namespace Foreman
 			Close();
 		}
 	}
-
-
 }

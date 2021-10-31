@@ -20,12 +20,42 @@ namespace Foreman
 		[STAThread]
 		static void Main()
 		{
-			//test9(); return;
+			//test10(); return;
 
 			ErrorLogging.ClearLog();
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
+		}
+
+		public static void test10()
+		{
+			List<List<int>> technologies = new List<List<int>>();
+			technologies.Add(new List<int>(new int[] { 1, 2, 3 }));
+			technologies.Add(new List<int>(new int[] { 1, 2 }));
+			technologies.Add(new List<int>(new int[] { 1, 4 }));
+
+			List<List<int>> sciPackLists = new List<List<int>>();
+			foreach (List<int> tech in technologies)
+			{
+				bool exists = false;
+				foreach (List<int> sciPackList in sciPackLists.ToList())
+				{
+					if (!sciPackList.Except(tech).Any()) // sci pack lists already includes a list that is a subset of the technologies sci pack list (ex: already have A+B while tech's is A+B+C)
+						exists = true;
+					else if (!tech.Except(sciPackList).Any()) //technology sci pack list is a subset of an already included sci pack list. we will add thi to the list and delete the existing one (ex: have A+B while tech's is A -> need to remove A+B and include A)
+						sciPackLists.Remove(sciPackList);
+				}
+				if (!exists)
+					sciPackLists.Add(tech);
+			}
+
+			foreach(List<int> sciPackList in sciPackLists)
+			{
+				foreach (int sciPack in sciPackList)
+					Console.Write(sciPack + ", ");
+				Console.WriteLine();
+			}
 		}
 
 		public static void test9()

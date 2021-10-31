@@ -11,6 +11,7 @@ namespace Foreman
 
 		IReadOnlyCollection<Recipe> ProductionRecipes { get; }
 		IReadOnlyCollection<Recipe> ConsumptionRecipes { get; }
+		IReadOnlyCollection<Technology> ConsumptionTechnologies { get; }
 
 		bool IsMissing { get; }
 		bool IsFluid { get; }
@@ -33,6 +34,7 @@ namespace Foreman
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }
 		public IReadOnlyCollection<Recipe> ConsumptionRecipes { get { return consumptionRecipes; } }
+		public IReadOnlyCollection<Technology> ConsumptionTechnologies { get { return consumptionTechnologies; } }
 
 		public bool IsMissing { get; private set; }
 
@@ -51,6 +53,7 @@ namespace Foreman
 
 		internal HashSet<RecipePrototype> productionRecipes { get; private set; }
 		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
+		internal HashSet<TechnologyPrototype> consumptionTechnologies { get; private set; }
 		internal HashSet<EntityObjectBasePrototype> fuelsAssemblers { get; private set; }
 
 		public ItemPrototype(DataCache dCache, string name, string friendlyName, bool isfluid, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
@@ -60,6 +63,7 @@ namespace Foreman
 
 			productionRecipes = new HashSet<RecipePrototype>();
 			consumptionRecipes = new HashSet<RecipePrototype>();
+			consumptionTechnologies = new HashSet<TechnologyPrototype>();
 			fuelsAssemblers = new HashSet<EntityObjectBasePrototype>();
 
 			IsFluid = isfluid;

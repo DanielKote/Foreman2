@@ -63,6 +63,7 @@
 			this.RecipeListView = new System.Windows.Forms.ListView();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
+			this.SetEnabledFromSciencePacksButton = new System.Windows.Forms.Button();
 			this.PresetsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ImportPresetButton = new System.Windows.Forms.Button();
 			this.ComparePresetsButton = new System.Windows.Forms.Button();
@@ -95,6 +96,7 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.WarningArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.HighLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.label6 = new System.Windows.Forms.Label();
 			this.MediumLodRadioButton = new System.Windows.Forms.RadioButton();
@@ -104,10 +106,9 @@
 			this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.NodeCountForSimpleViewInput = new System.Windows.Forms.NumericUpDown();
+			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
-			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
-			this.WarningArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -272,15 +273,17 @@
 			this.EnabledObjectsTable.ColumnCount = 2;
 			this.EnabledObjectsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.EnabledObjectsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.EnabledObjectsTable.Controls.Add(this.ShowUnavailablesFilterCheckBox, 1, 2);
-			this.EnabledObjectsTable.Controls.Add(this.label4, 0, 1);
+			this.EnabledObjectsTable.Controls.Add(this.ShowUnavailablesFilterCheckBox, 1, 3);
+			this.EnabledObjectsTable.Controls.Add(this.label4, 0, 2);
 			this.EnabledObjectsTable.Controls.Add(this.LoadEnabledFromSaveButton, 0, 0);
-			this.EnabledObjectsTable.Controls.Add(this.EnabledObjectsTabControl, 0, 3);
-			this.EnabledObjectsTable.Controls.Add(this.FilterTextBox, 1, 1);
+			this.EnabledObjectsTable.Controls.Add(this.EnabledObjectsTabControl, 0, 4);
+			this.EnabledObjectsTable.Controls.Add(this.FilterTextBox, 1, 2);
+			this.EnabledObjectsTable.Controls.Add(this.SetEnabledFromSciencePacksButton, 0, 1);
 			this.EnabledObjectsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.EnabledObjectsTable.Location = new System.Drawing.Point(2, 18);
 			this.EnabledObjectsTable.Name = "EnabledObjectsTable";
-			this.EnabledObjectsTable.RowCount = 4;
+			this.EnabledObjectsTable.RowCount = 5;
+			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -293,7 +296,7 @@
 			this.ShowUnavailablesFilterCheckBox.AutoSize = true;
 			this.ShowUnavailablesFilterCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ShowUnavailablesFilterCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.ShowUnavailablesFilterCheckBox.Location = new System.Drawing.Point(43, 53);
+			this.ShowUnavailablesFilterCheckBox.Location = new System.Drawing.Point(43, 80);
 			this.ShowUnavailablesFilterCheckBox.Margin = new System.Windows.Forms.Padding(2);
 			this.ShowUnavailablesFilterCheckBox.Name = "ShowUnavailablesFilterCheckBox";
 			this.ShowUnavailablesFilterCheckBox.Size = new System.Drawing.Size(415, 17);
@@ -307,7 +310,7 @@
 			this.label4.AutoSize = true;
 			this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.label4.Location = new System.Drawing.Point(7, 27);
+			this.label4.Location = new System.Drawing.Point(7, 54);
 			this.label4.Margin = new System.Windows.Forms.Padding(7, 0, 2, 0);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(32, 24);
@@ -327,7 +330,7 @@
 			this.LoadEnabledFromSaveButton.Name = "LoadEnabledFromSaveButton";
 			this.LoadEnabledFromSaveButton.Size = new System.Drawing.Size(449, 23);
 			this.LoadEnabledFromSaveButton.TabIndex = 28;
-			this.LoadEnabledFromSaveButton.Text = "Load From Save";
+			this.LoadEnabledFromSaveButton.Text = "Load from save";
 			this.LoadEnabledFromSaveButton.UseVisualStyleBackColor = true;
 			this.LoadEnabledFromSaveButton.Click += new System.EventHandler(this.LoadEnabledFromSaveButton_Click);
 			// 
@@ -342,12 +345,12 @@
 			this.EnabledObjectsTabControl.Controls.Add(this.RecipesPage);
 			this.EnabledObjectsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.EnabledObjectsTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.EnabledObjectsTabControl.Location = new System.Drawing.Point(4, 76);
+			this.EnabledObjectsTabControl.Location = new System.Drawing.Point(4, 103);
 			this.EnabledObjectsTabControl.Margin = new System.Windows.Forms.Padding(4);
 			this.EnabledObjectsTabControl.Multiline = true;
 			this.EnabledObjectsTabControl.Name = "EnabledObjectsTabControl";
 			this.EnabledObjectsTabControl.SelectedIndex = 0;
-			this.EnabledObjectsTabControl.Size = new System.Drawing.Size(452, 382);
+			this.EnabledObjectsTabControl.Size = new System.Drawing.Size(452, 355);
 			this.EnabledObjectsTabControl.TabIndex = 27;
 			// 
 			// AssemblersPage
@@ -357,7 +360,7 @@
 			this.AssemblersPage.Location = new System.Drawing.Point(4, 22);
 			this.AssemblersPage.Margin = new System.Windows.Forms.Padding(2);
 			this.AssemblersPage.Name = "AssemblersPage";
-			this.AssemblersPage.Size = new System.Drawing.Size(444, 356);
+			this.AssemblersPage.Size = new System.Drawing.Size(444, 329);
 			this.AssemblersPage.TabIndex = 0;
 			this.AssemblersPage.Text = "Assemblers";
 			this.AssemblersPage.UseVisualStyleBackColor = true;
@@ -376,7 +379,7 @@
 			this.AssemblerListView.LabelWrap = false;
 			this.AssemblerListView.Location = new System.Drawing.Point(0, 0);
 			this.AssemblerListView.Name = "AssemblerListView";
-			this.AssemblerListView.Size = new System.Drawing.Size(444, 356);
+			this.AssemblerListView.Size = new System.Drawing.Size(444, 329);
 			this.AssemblerListView.SmallImageList = this.IconList;
 			this.AssemblerListView.TabIndex = 17;
 			this.AssemblerListView.UseCompatibleStateImageBehavior = false;
@@ -405,7 +408,7 @@
 			this.MinersPage.Location = new System.Drawing.Point(4, 22);
 			this.MinersPage.Margin = new System.Windows.Forms.Padding(2);
 			this.MinersPage.Name = "MinersPage";
-			this.MinersPage.Size = new System.Drawing.Size(444, 356);
+			this.MinersPage.Size = new System.Drawing.Size(444, 329);
 			this.MinersPage.TabIndex = 2;
 			this.MinersPage.Text = "Miners";
 			this.MinersPage.UseVisualStyleBackColor = true;
@@ -424,7 +427,7 @@
 			this.MinerListView.LabelWrap = false;
 			this.MinerListView.Location = new System.Drawing.Point(0, 0);
 			this.MinerListView.Name = "MinerListView";
-			this.MinerListView.Size = new System.Drawing.Size(444, 356);
+			this.MinerListView.Size = new System.Drawing.Size(444, 329);
 			this.MinerListView.SmallImageList = this.IconList;
 			this.MinerListView.TabIndex = 17;
 			this.MinerListView.UseCompatibleStateImageBehavior = false;
@@ -445,7 +448,7 @@
 			this.PowersPage.Controls.Add(this.PowerListView);
 			this.PowersPage.Location = new System.Drawing.Point(4, 22);
 			this.PowersPage.Name = "PowersPage";
-			this.PowersPage.Size = new System.Drawing.Size(444, 356);
+			this.PowersPage.Size = new System.Drawing.Size(444, 329);
 			this.PowersPage.TabIndex = 5;
 			this.PowersPage.Text = "Power";
 			this.PowersPage.UseVisualStyleBackColor = true;
@@ -464,7 +467,7 @@
 			this.PowerListView.LabelWrap = false;
 			this.PowerListView.Location = new System.Drawing.Point(0, 0);
 			this.PowerListView.Name = "PowerListView";
-			this.PowerListView.Size = new System.Drawing.Size(444, 356);
+			this.PowerListView.Size = new System.Drawing.Size(444, 329);
 			this.PowerListView.SmallImageList = this.IconList;
 			this.PowerListView.TabIndex = 18;
 			this.PowerListView.UseCompatibleStateImageBehavior = false;
@@ -485,7 +488,7 @@
 			this.BeaconsPage.Controls.Add(this.BeaconListView);
 			this.BeaconsPage.Location = new System.Drawing.Point(4, 22);
 			this.BeaconsPage.Name = "BeaconsPage";
-			this.BeaconsPage.Size = new System.Drawing.Size(444, 356);
+			this.BeaconsPage.Size = new System.Drawing.Size(444, 329);
 			this.BeaconsPage.TabIndex = 6;
 			this.BeaconsPage.Text = "Beacons";
 			this.BeaconsPage.UseVisualStyleBackColor = true;
@@ -504,7 +507,7 @@
 			this.BeaconListView.LabelWrap = false;
 			this.BeaconListView.Location = new System.Drawing.Point(0, 0);
 			this.BeaconListView.Name = "BeaconListView";
-			this.BeaconListView.Size = new System.Drawing.Size(444, 356);
+			this.BeaconListView.Size = new System.Drawing.Size(444, 329);
 			this.BeaconListView.SmallImageList = this.IconList;
 			this.BeaconListView.TabIndex = 19;
 			this.BeaconListView.UseCompatibleStateImageBehavior = false;
@@ -527,7 +530,7 @@
 			this.ModulesPage.Location = new System.Drawing.Point(4, 22);
 			this.ModulesPage.Margin = new System.Windows.Forms.Padding(2);
 			this.ModulesPage.Name = "ModulesPage";
-			this.ModulesPage.Size = new System.Drawing.Size(444, 356);
+			this.ModulesPage.Size = new System.Drawing.Size(444, 329);
 			this.ModulesPage.TabIndex = 3;
 			this.ModulesPage.Text = "Modules";
 			this.ModulesPage.UseVisualStyleBackColor = true;
@@ -546,7 +549,7 @@
 			this.ModuleListView.LabelWrap = false;
 			this.ModuleListView.Location = new System.Drawing.Point(0, 0);
 			this.ModuleListView.Name = "ModuleListView";
-			this.ModuleListView.Size = new System.Drawing.Size(444, 356);
+			this.ModuleListView.Size = new System.Drawing.Size(444, 329);
 			this.ModuleListView.SmallImageList = this.IconList;
 			this.ModuleListView.TabIndex = 17;
 			this.ModuleListView.UseCompatibleStateImageBehavior = false;
@@ -568,7 +571,7 @@
 			this.RecipesPage.Location = new System.Drawing.Point(4, 22);
 			this.RecipesPage.Margin = new System.Windows.Forms.Padding(2);
 			this.RecipesPage.Name = "RecipesPage";
-			this.RecipesPage.Size = new System.Drawing.Size(444, 356);
+			this.RecipesPage.Size = new System.Drawing.Size(444, 329);
 			this.RecipesPage.TabIndex = 4;
 			this.RecipesPage.Text = "Recipes";
 			this.RecipesPage.UseVisualStyleBackColor = true;
@@ -587,7 +590,7 @@
 			this.RecipeListView.LabelWrap = false;
 			this.RecipeListView.Location = new System.Drawing.Point(0, 0);
 			this.RecipeListView.Name = "RecipeListView";
-			this.RecipeListView.Size = new System.Drawing.Size(444, 356);
+			this.RecipeListView.Size = new System.Drawing.Size(444, 329);
 			this.RecipeListView.SmallImageList = this.IconList;
 			this.RecipeListView.TabIndex = 16;
 			this.RecipeListView.UseCompatibleStateImageBehavior = false;
@@ -607,12 +610,26 @@
 			// 
 			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.FilterTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.FilterTextBox.Location = new System.Drawing.Point(43, 29);
+			this.FilterTextBox.Location = new System.Drawing.Point(43, 56);
 			this.FilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 7, 2);
 			this.FilterTextBox.Name = "FilterTextBox";
 			this.FilterTextBox.Size = new System.Drawing.Size(410, 20);
 			this.FilterTextBox.TabIndex = 29;
 			this.FilterTextBox.TextChanged += new System.EventHandler(this.Filters_Changed);
+			// 
+			// SetEnabledFromSciencePacksButton
+			// 
+			this.EnabledObjectsTable.SetColumnSpan(this.SetEnabledFromSciencePacksButton, 2);
+			this.SetEnabledFromSciencePacksButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.SetEnabledFromSciencePacksButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.SetEnabledFromSciencePacksButton.Location = new System.Drawing.Point(4, 29);
+			this.SetEnabledFromSciencePacksButton.Margin = new System.Windows.Forms.Padding(4, 2, 7, 2);
+			this.SetEnabledFromSciencePacksButton.Name = "SetEnabledFromSciencePacksButton";
+			this.SetEnabledFromSciencePacksButton.Size = new System.Drawing.Size(449, 23);
+			this.SetEnabledFromSciencePacksButton.TabIndex = 32;
+			this.SetEnabledFromSciencePacksButton.Text = "Assign based on science packs";
+			this.SetEnabledFromSciencePacksButton.UseVisualStyleBackColor = true;
+			this.SetEnabledFromSciencePacksButton.Click += new System.EventHandler(this.SetEnabledFromSciencePacksButton_Click);
 			// 
 			// PresetsTable
 			// 
@@ -919,7 +936,6 @@
 			this.groupBox6.Size = new System.Drawing.Size(464, 107);
 			this.groupBox6.TabIndex = 2;
 			this.groupBox6.TabStop = false;
-			this.groupBox6.Text = "Time Unit Options:";
 			// 
 			// tableLayoutPanel3
 			// 
@@ -1071,6 +1087,17 @@
 			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 164);
 			this.NodeGraphicsTable.TabIndex = 28;
 			// 
+			// WarningArrowsCheckBox
+			// 
+			this.WarningArrowsCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.WarningArrowsCheckBox, 4);
+			this.WarningArrowsCheckBox.Location = new System.Drawing.Point(3, 144);
+			this.WarningArrowsCheckBox.Name = "WarningArrowsCheckBox";
+			this.WarningArrowsCheckBox.Size = new System.Drawing.Size(238, 17);
+			this.WarningArrowsCheckBox.TabIndex = 15;
+			this.WarningArrowsCheckBox.Text = "Display arrows pointing to any node warnings";
+			this.WarningArrowsCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// HighLodRadioButton
 			// 
 			this.HighLodRadioButton.AutoSize = true;
@@ -1183,6 +1210,17 @@
 			this.NodeCountForSimpleViewInput.Size = new System.Drawing.Size(97, 20);
 			this.NodeCountForSimpleViewInput.TabIndex = 13;
 			// 
+			// ErrorArrowsCheckBox
+			// 
+			this.ErrorArrowsCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.ErrorArrowsCheckBox, 4);
+			this.ErrorArrowsCheckBox.Location = new System.Drawing.Point(3, 121);
+			this.ErrorArrowsCheckBox.Name = "ErrorArrowsCheckBox";
+			this.ErrorArrowsCheckBox.Size = new System.Drawing.Size(222, 17);
+			this.ErrorArrowsCheckBox.TabIndex = 14;
+			this.ErrorArrowsCheckBox.Text = "Display arrows pointing to any node errors";
+			this.ErrorArrowsCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// FormButtonsTable
 			// 
 			this.FormButtonsTable.AutoSize = true;
@@ -1208,28 +1246,6 @@
 			this.RecipeToolTip.InitialDelay = 100000;
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
-			// 
-			// ErrorArrowsCheckBox
-			// 
-			this.ErrorArrowsCheckBox.AutoSize = true;
-			this.NodeGraphicsTable.SetColumnSpan(this.ErrorArrowsCheckBox, 4);
-			this.ErrorArrowsCheckBox.Location = new System.Drawing.Point(3, 121);
-			this.ErrorArrowsCheckBox.Name = "ErrorArrowsCheckBox";
-			this.ErrorArrowsCheckBox.Size = new System.Drawing.Size(222, 17);
-			this.ErrorArrowsCheckBox.TabIndex = 14;
-			this.ErrorArrowsCheckBox.Text = "Display arrows pointing to any node errors";
-			this.ErrorArrowsCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// WarningArrowsCheckBox
-			// 
-			this.WarningArrowsCheckBox.AutoSize = true;
-			this.NodeGraphicsTable.SetColumnSpan(this.WarningArrowsCheckBox, 4);
-			this.WarningArrowsCheckBox.Location = new System.Drawing.Point(3, 144);
-			this.WarningArrowsCheckBox.Name = "WarningArrowsCheckBox";
-			this.WarningArrowsCheckBox.Size = new System.Drawing.Size(238, 17);
-			this.WarningArrowsCheckBox.TabIndex = 15;
-			this.WarningArrowsCheckBox.Text = "Display arrows pointing to any node warnings";
-			this.WarningArrowsCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
@@ -1378,5 +1394,6 @@
 		private System.Windows.Forms.CheckBox LoadBarrelingCheckBox;
 		private System.Windows.Forms.CheckBox WarningArrowsCheckBox;
 		private System.Windows.Forms.CheckBox ErrorArrowsCheckBox;
+		private System.Windows.Forms.Button SetEnabledFromSciencePacksButton;
 	}
 }

@@ -488,88 +488,19 @@ namespace Foreman
 				form.Left = this.Left + 50;
 				form.Top = this.Top + 50;
 				DialogResult result = form.ShowDialog();
-				SaveFileInfo saveInfo = form.SaveFileInfo;
 
-				if (result == DialogResult.OK)
+				if(result == DialogResult.OK)
 				{
-					int totalMods = Options.DCache.IncludedMods.Count;
-					string missingMods = "\nMissing Mods: ";
-					string wrongVersionMods = "\nWrong Version Mods: ";
-					string newMods = "\nAdded Mods: ";
-
-					foreach (KeyValuePair<string, string> mod in Options.DCache.IncludedMods)
-					{
-						if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
-							continue;
-
-						if (!saveInfo.Mods.ContainsKey(mod.Key))
-							missingMods += mod.Key + ", ";
-						else if (saveInfo.Mods[mod.Key] != mod.Value)
-							wrongVersionMods += mod.Key + ", ";
-					}
-					foreach (KeyValuePair<string, string> mod in saveInfo.Mods)
-					{
-						if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
-							continue;
-
-						if (!Options.DCache.IncludedMods.ContainsKey(mod.Key))
-							newMods += mod.Key + ", ";
-					}
-					missingMods = missingMods.Substring(0, missingMods.Length - 2);
-					if (missingMods == "\nMissing Mods") missingMods = "";
-					wrongVersionMods = wrongVersionMods.Substring(0, wrongVersionMods.Length - 2);
-					if (wrongVersionMods == "\nWrong Version Mods") wrongVersionMods = "";
-					newMods = newMods.Substring(0, newMods.Length - 2);
-					if (newMods == "\nAdded Mods") newMods = "";
-
-					if (missingMods != "" || wrongVersionMods != "" || newMods != "")
-						if (MessageBox.Show("selected save file mods do not match preset mods; out of {0} mods:" + missingMods + wrongVersionMods + newMods + "\nAre you sure you wish to use this save file?", "Save file mod inconsistencies found!", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
-							return;
-
-
-					//NOTE! there is a bit of inconsistency here; realistically we should enable/disable technology and calculate the enabled recipes ourselves. However to allow the user to have all recipes that he has available in the save
-					//we will just ignore technology limitations and activate all recipes that were set as enabled in the save.
-					//for now, technology isnt used at all.
-					/*
-                    foreach (Technology tech in CurrentOptions.DCache.Technologies.Values)
-                    {
-                        if (saveInfo.Technologies.ContainsKey(tech.Name))
-                            tech.Enabled = saveInfo.Technologies[tech.Name];
-                        else
-                            tech.Enabled = false;
-                    }*/
-
-					foreach (Recipe recipe in Options.DCache.Recipes.Values)
-					{
-						if (recipe.Name.StartsWith("$r:")) //these are the special recipes we added for 'mining / extraction / etc'. They will naturally not exist in the loaded save, so we just keep set them as enabled
-						{
-							recipe.Enabled = true;
-						}
-						else
-						{
-							if (saveInfo.Recipes.ContainsKey(recipe.Name))
-								recipe.Enabled = saveInfo.Recipes[recipe.Name];
-							else
-								recipe.Enabled = false;
-						}
-					}
-
-					foreach (Assembler assembler in Options.DCache.Assemblers.Values)
-					{
-						bool enabled = false;
-						foreach (Recipe recipe in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
-							enabled |= recipe.Enabled;
-						assembler.Enabled = enabled;
-					}
-
-					foreach (Module module in Options.DCache.Modules.Values)
-					{
-						bool enabled = false;
-						foreach (Recipe recipe in module.AssociatedItem.ProductionRecipes)
-							enabled |= recipe.Enabled;
-						module.Enabled = enabled;
-					}
-
+					foreach (ListViewItem item in unfilteredAssemblerList)
+						item.Checked = ((Assembler)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredBeaconList)
+						item.Checked = ((Beacon)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredMinerList)
+						item.Checked = ((Assembler)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredModuleList)
+						item.Checked = ((Module)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredPowerList)
+						item.Checked = ((Assembler)item.Tag).Enabled;
 					foreach (ListViewItem item in unfilteredRecipeList)
 						item.Checked = ((Recipe)item.Tag).Enabled;
 
@@ -580,6 +511,36 @@ namespace Foreman
 					MessageBox.Show("Error while reading save file. Try running factorio, opening the save game, saving again, and retrying?");
 				}
 			}
+		}
+
+		private void SetEnabledFromSciencePacksButton_Click(object sender, EventArgs e)
+		{
+			using (SciencePacksLoadForm form = new SciencePacksLoadForm(Options.DCache))
+			{
+				form.StartPosition = FormStartPosition.Manual;
+				form.Left = this.Left + 50;
+				form.Top = this.Top + 50;
+				DialogResult result = form.ShowDialog();
+
+				if (result == DialogResult.OK)
+				{
+					foreach (ListViewItem item in unfilteredAssemblerList)
+						item.Checked = ((Assembler)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredBeaconList)
+						item.Checked = ((Beacon)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredMinerList)
+						item.Checked = ((Assembler)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredModuleList)
+						item.Checked = ((Module)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredPowerList)
+						item.Checked = ((Assembler)item.Tag).Enabled;
+					foreach (ListViewItem item in unfilteredRecipeList)
+						item.Checked = ((Recipe)item.Tag).Enabled;
+
+					UpdateFilteredLists();
+				}
+			}
+
 		}
 	}
 }

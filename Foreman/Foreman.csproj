@@ -199,6 +199,12 @@
     <Compile Include="Forms\PresetSelectionForm.Designer.cs">
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\SciencePacksLoadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SciencePacksLoadForm.Designer.cs">
+      <DependentUpon>SciencePacksLoadForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\TEST_FORM.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -234,7 +240,7 @@
     <Compile Include="DataCache\ErrorLogging.cs" />
     <Compile Include="DataCache\IconCacheProcessor.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
-    <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
+    <Compile Include="Controls\GraphicsStuff.cs" />
     <Compile Include="ProductionGraphView\Elements\GraphElement.cs" />
     <Compile Include="Models\Solver\GraphOptimisation.cs" />
     <Compile Include="Forms\ImageExportForm.cs">
@@ -300,6 +306,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PresetSelectionForm.resx">
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SciencePacksLoadForm.resx">
+      <DependentUpon>SciencePacksLoadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>

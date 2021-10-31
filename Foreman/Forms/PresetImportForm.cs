@@ -27,7 +27,7 @@ namespace Foreman
 			ImportStarted = false;
 			cts = new CancellationTokenSource();
 			InitializeComponent();
-
+			PresetNameTextBox.Focus();
 
 			FactorioLocationComboBox.Items.AddRange(FactorioPathsProcessor.GetFactorioInstallLocations().ToArray());
 			if (FactorioLocationComboBox.Items.Count > 0)

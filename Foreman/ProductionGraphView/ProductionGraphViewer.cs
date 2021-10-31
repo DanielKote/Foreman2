@@ -275,6 +275,7 @@ namespace Foreman
 			{
 				SubwindowOpen = false;
 				DisposeLinkDrag();
+				Graph.UpdateNodeStates();
 				Invalidate();
 			};
 

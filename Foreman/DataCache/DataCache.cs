@@ -24,7 +24,7 @@ namespace Foreman
 		//others: <name, object>
 
 		public IReadOnlyDictionary<string, string> IncludedMods { get { return includedMods; } }
-		//public IReadOnlyDictionary<string, Technology> Technologies { get { return technologies; } } //at the moment technology isnt actually used. All the links are set up (tech to recipe, tech to tech, recipe to tech, etc), but enabling/disabling technologies does not impact anything. This is due to (A) not having a technology screen and (B) to allow save file loading of enabled status to just load enabled recipes and not care about tech->recipe inconsistencies (if any)
+		public IReadOnlyDictionary<string, Technology> Technologies { get { return technologies; } }
 		public IReadOnlyDictionary<string, Group> Groups { get { return groups; } }
 		public IReadOnlyDictionary<string, Subgroup> Subgroups { get { return subgroups; } }
 		public IReadOnlyDictionary<string, Item> Items { get { return items; } }
@@ -32,6 +32,10 @@ namespace Foreman
 		public IReadOnlyDictionary<string, Assembler> Assemblers { get { return assemblers; } }
 		public IReadOnlyDictionary<string, Module> Modules { get { return modules; } }
 		public IReadOnlyDictionary<string, Beacon> Beacons { get { return beacons; } }
+		public IReadOnlyList<Item> SciencePacks { get { return sciencePacks; } }
+
+		public Assembler PlayerAssembler { get { return playerAssember; } }
+		public Technology StartingTech { get { return startingTech; } }
 
 		//missing objects are not linked properly and just have the minimal values necessary to function. They are just placeholders, and cant actually be added to graph except while importing. They are also not solved for.
 		public Subgroup MissingSubgroup { get { return missingSubgroup; } }
@@ -44,7 +48,7 @@ namespace Foreman
 		public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
 		private static Bitmap noBeaconIcon;
 		public static Bitmap NoBeaconIcon { get { if (noBeaconIcon == null) noBeaconIcon = IconCache.GetIcon(Path.Combine("Graphics", "NoBeacon.png"), 64); return noBeaconIcon; } }
-		//public Technology StartingTech { get { return startingTech; } }
+
 
 		private Dictionary<string, string> includedMods; //name : version
 		private Dictionary<string, Technology> technologies;
@@ -55,6 +59,7 @@ namespace Foreman
 		private Dictionary<string, Assembler> assemblers;
 		private Dictionary<string, Module> modules;
 		private Dictionary<string, Beacon> beacons;
+		private List<Item> sciencePacks;
 
 		private Dictionary<string, Item> missingItems;
 		private Dictionary<string, Assembler> missingAssemblers;
@@ -75,7 +80,7 @@ namespace Foreman
 
 		private Bitmap ElectricityIcon;
 
-		private AssemblerPrototype PlayerAssember; //for hand crafting. Because Fk automation, thats why.
+		private AssemblerPrototype playerAssember; //for hand crafting. Because Fk automation, thats why.
 
 		private SubgroupPrototype missingSubgroup;
 		private TechnologyPrototype startingTech;
@@ -84,6 +89,9 @@ namespace Foreman
 		private readonly bool UseRecipeBWLists;
 		private static readonly Regex[] recipeWhiteList = { new Regex("^empty-barrel$") }; //whitelist takes priority over blacklist
 		private static readonly Regex[] recipeBlackList = { new Regex("-barrel$"), new Regex("^deadlock-packrecipe-"), new Regex("^deadlock-unpackrecipe-"), new Regex("^deadlock-plastic-packaging$") };
+
+		private static readonly double MaxTemp = 10000000; //some mods set the temperature ranges as 'way too high' and expect factorio to handle it (it does). Since we prefer to show temperature ranges we will define any temp beyond these as no limit
+		private static readonly double MinTemp = -MaxTemp;
 
 		public DataCache(bool filterRecipes) //if true then the read recipes will be filtered by the white and black lists above. In most cases this is desirable (why bother with barreling, etc???), but if the user want to use them, then so be it.
 		{
@@ -98,6 +106,7 @@ namespace Foreman
 			assemblers = new Dictionary<string, Assembler>();
 			modules = new Dictionary<string, Module>();
 			beacons = new Dictionary<string, Beacon>();
+			sciencePacks = new List<Item>();
 
 			missingItems = new Dictionary<string, Item>();
 			missingAssemblers = new Dictionary<string, Assembler>();
@@ -110,7 +119,8 @@ namespace Foreman
 
 		private void GenerateHelperObjects()
 		{
-			startingTech = new TechnologyPrototype(this, "", "");
+			startingTech = new TechnologyPrototype(this, "§§t:starting_tech", "Starting Technology");
+			startingTech.Tier = 0;
 
 			extraFormanGroup = new GroupPrototype(this, "§§g:extra_group", "Resource Extraction\nPower Generation", "zzzzzzz1");
 			extraFormanGroup.SetIconAndColor(new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "ExtraGroupIcon.png"), 64), Color.Gray));
@@ -147,19 +157,16 @@ namespace Foreman
 			HeatRecipe.InternalOneWayAddProduct(HeatItem, 1);
 			HeatItem.productionRecipes.Add(HeatRecipe);
 			HeatRecipe.Time = 1;
-			HeatRecipe.myUnlockTechnologies.Add(startingTech);
-			startingTech.unlockedRecipes.Add(HeatRecipe);
 
 			BurnerRecipe = new RecipePrototype(this, "§§r:h:burner-electicity", "Burner Generator", energySubgroupEnergy, "2");
 			BurnerRecipe.SetIconAndColor(heatGeneratorIcon);
-			BurnerRecipe.myUnlockTechnologies.Add(startingTech);
-			startingTech.unlockedRecipes.Add(BurnerRecipe);
+			BurnerRecipe.Time = 1;
 
-			PlayerAssember = new AssemblerPrototype(this, "§§a:player-assembler", "Player", EntityType.Assembler, EnergySource.Void);
-			PlayerAssember.EnergyConsumption = 0;
-			PlayerAssember.EnergyDrain = 0;
-			PlayerAssember.EnergyProduction = 0;
-			PlayerAssember.SetIconAndColor(playerAssemblerIcon);
+			playerAssember = new AssemblerPrototype(this, "§§a:player-assembler", "Player", EntityType.Assembler, EnergySource.Void);
+			playerAssember.EnergyConsumption = 0;
+			playerAssember.EnergyDrain = 0;
+			playerAssember.EnergyProduction = 0;
+			playerAssember.SetIconAndColor(playerAssemblerIcon);
 
 			ElectricityIcon = IconCache.GetIcon(Path.Combine("Graphics", "ElectricityIcon.png"), 64);
 
@@ -193,6 +200,7 @@ namespace Foreman
 				items.Add(HeatItem.Name, HeatItem);
 				recipes.Add(HeatRecipe.Name, HeatRecipe);
 				recipes.Add(BurnerRecipe.Name, BurnerRecipe);
+				technologies.Add(StartingTech.Name, startingTech);
 
 				//process each section
 				foreach (var objJToken in jsonData["mods"].ToList())
@@ -235,9 +243,9 @@ namespace Foreman
 				foreach (SubgroupPrototype sg in subgroups.Values)
 					sg.SortIRs();
 
-				UpdateUnavailableStatus();
+				ProcessDataCleanup();
 #if DEBUG
-				//PrintAllAvailabilities();
+				//PrintDataCache();
 #endif
 
 				progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
@@ -526,6 +534,8 @@ namespace Foreman
 
 				double minTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["minimum_temperature"] != null) ? (double)ingredientJToken["minimum_temperature"] : double.NegativeInfinity;
 				double maxTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"] != null) ? (double)ingredientJToken["maximum_temperature"] : double.PositiveInfinity;
+				if (minTemp < MinTemp) minTemp = double.NegativeInfinity;
+				if (maxTemp > MaxTemp) maxTemp = double.PositiveInfinity;
 
 				if (amount != 0)
 				{
@@ -622,8 +632,9 @@ namespace Foreman
 				resourceCategories.Add(category, new List<RecipePrototype>());
 			resourceCategories[category].Add(recipe);
 
-			recipe.myUnlockTechnologies.Add(startingTech);
-			startingTech.unlockedRecipes.Add(recipe);
+			//resource recipe will be processed when adding to miners (each miner that can use this recipe will have its recipe's techs added to unlock tech of the resource recipe)
+			//recipe.myUnlockTechnologies.Add(startingTech);
+			//startingTech.unlockedRecipes.Add(recipe);
 
 			recipes.Add(recipe.Name, recipe);
 		}
@@ -649,6 +660,18 @@ namespace Foreman
 				}
 			}
 
+			foreach (var ingredientJToken in objJToken["research_unit_ingredients"].ToList())
+			{
+				string name = (string)ingredientJToken["name"];
+				double amount = (double)ingredientJToken["amount"];
+
+				if (amount != 0)
+				{
+					technology.InternalOneWayAddSciPack((ItemPrototype)items[name], amount);
+					((ItemPrototype)items[name]).consumptionTechnologies.Add(technology);
+				}
+			}
+
 			technologies.Add(technology.Name, technology);
 		}
 
@@ -663,12 +686,17 @@ namespace Foreman
 					((TechnologyPrototype)technologies[(string)prerequisite]).postTechs.Add(technology);
 				}
 			}
+			if(technology.prerequisites.Count == 0) //entire tech tree will stem from teh 'startingTech' node.
+			{
+				technology.prerequisites.Add(startingTech);
+				startingTech.postTechs.Add(technology);
+			}
 		}
 
 		private void ProcessCharacter(JToken objJtoken, Dictionary<string, List<RecipePrototype>> craftingCategories)
 		{
-			AssemblerAdditionalProcessing(objJtoken, PlayerAssember, craftingCategories);
-			assemblers.Add(PlayerAssember.Name, PlayerAssember);
+			AssemblerAdditionalProcessing(objJtoken, playerAssember, craftingCategories);
+			assemblers.Add(playerAssember.Name, playerAssember);
 		}
 
 		private void ProcessEntity(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories, Dictionary<string, List<RecipePrototype>> resourceCategories, Dictionary<string, List<ItemPrototype>> fuelCategories)
@@ -876,6 +904,26 @@ namespace Foreman
 					{
 						recipe.assemblers.Add(aEntity);
 						aEntity.recipes.Add(recipe);
+
+						if (aEntity.associatedItems.Count == 0)
+						{
+							recipe.myUnlockTechnologies.Add(startingTech);
+							startingTech.unlockedRecipes.Add(recipe);
+						}
+						else //add the recipe unlock to all recipes that can produce the items that can place this burner
+						{
+							foreach (Item placeItem in aEntity.associatedItems)
+							{
+								foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
+								{
+									foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
+									{
+										recipe.myUnlockTechnologies.Add(tech);
+										tech.unlockedRecipes.Add(recipe);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -908,8 +956,25 @@ namespace Foreman
 				recipe.InternalOneWayAddProduct(fluid, 60);
 				fluid.productionRecipes.Add(recipe);
 
-				recipe.myUnlockTechnologies.Add(startingTech);
-				startingTech.unlockedRecipes.Add(recipe);
+				if (aEntity.associatedItems.Count == 0)
+				{
+					recipe.myUnlockTechnologies.Add(startingTech);
+					startingTech.unlockedRecipes.Add(recipe);
+				}
+				else
+				{
+					foreach (Item placeItem in aEntity.associatedItems)
+					{
+						foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
+						{
+							foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
+							{
+								recipe.myUnlockTechnologies.Add(tech);
+								tech.unlockedRecipes.Add(recipe);
+							}
+						}
+					}
+				}
 
 				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
 				{
@@ -974,13 +1039,13 @@ namespace Foreman
 					recipe.myUnlockTechnologies.Add(startingTech);
 					startingTech.unlockedRecipes.Add(recipe);
 				}
-				else //add the recipe unlock to all recipes that can produce the items that can place this burner
+				else
 				{
-					foreach (ItemPrototype i in aEntity.associatedItems)
+					foreach (Item placeItem in aEntity.associatedItems)
 					{
-						foreach (RecipePrototype r in i.productionRecipes)
+						foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
 						{
-							foreach (TechnologyPrototype tech in r.myUnlockTechnologies)
+							foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
 							{
 								recipe.myUnlockTechnologies.Add(tech);
 								tech.unlockedRecipes.Add(recipe);
@@ -1016,6 +1081,9 @@ namespace Foreman
 			aEntity.OperationTemperature = (double)objJToken["full_power_temperature"];
 			double minTemp = (double)(objJToken["minimum_temperature"] ?? double.NaN);
 			double maxTemp = (double)(objJToken["maximum_temperature"] ?? double.NaN);
+			if (!double.IsNaN(minTemp) && minTemp < ingredient.DefaultTemperature) minTemp = ingredient.DefaultTemperature;
+			if (!double.IsNaN(maxTemp) && maxTemp > MaxTemp) maxTemp = double.NaN;
+
 			//actual energy production is a bit more complicated here (as it involves actual temperatures), but we will have to handle it in the graph (after all values have been calculated and we know the amounts and temperatures getting passed here, we can calc the energy produced)
 
 			RecipePrototype recipe;
@@ -1044,13 +1112,13 @@ namespace Foreman
 					recipe.myUnlockTechnologies.Add(startingTech);
 					startingTech.unlockedRecipes.Add(recipe);
 				}
-				else //add the recipe unlock to all recipes that can produce the items that can place this generator
+				else
 				{
-					foreach (ItemPrototype i in aEntity.associatedItems)
+					foreach (Item placeItem in aEntity.associatedItems)
 					{
-						foreach (RecipePrototype r in i.productionRecipes)
+						foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
 						{
-							foreach (TechnologyPrototype tech in r.myUnlockTechnologies)
+							foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
 							{
 								recipe.myUnlockTechnologies.Add(tech);
 								tech.unlockedRecipes.Add(recipe);
@@ -1080,6 +1148,27 @@ namespace Foreman
 		{
 			aEntity.recipes.Add(BurnerRecipe);
 			BurnerRecipe.assemblers.Add(aEntity);
+
+			if (aEntity.associatedItems.Count == 0)
+			{
+				BurnerRecipe.myUnlockTechnologies.Add(startingTech);
+				startingTech.unlockedRecipes.Add(BurnerRecipe);
+			}
+			else
+			{
+				foreach (Item placeItem in aEntity.associatedItems)
+				{
+					foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
+					{
+						foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
+						{
+							BurnerRecipe.myUnlockTechnologies.Add(tech);
+							tech.unlockedRecipes.Add(BurnerRecipe);
+						}
+					}
+				}
+			}
+
 			aEntity.Speed = 1f; //doesnt matter -> the recipe is empty.
 
 			return true;
@@ -1090,6 +1179,27 @@ namespace Foreman
 			aEntity.NeighbourBonus = objJToken["neighbour_bonus"] == null ? 0 : (double)objJToken["neighbour_bonus"];
 			aEntity.recipes.Add(HeatRecipe);
 			HeatRecipe.assemblers.Add(aEntity);
+
+			if (aEntity.associatedItems.Count == 0)
+			{
+				HeatRecipe.myUnlockTechnologies.Add(startingTech);
+				startingTech.unlockedRecipes.Add(HeatRecipe);
+			}
+			else
+			{
+				foreach (Item placeItem in aEntity.associatedItems)
+				{
+					foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
+					{
+						foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
+						{
+							HeatRecipe.myUnlockTechnologies.Add(tech);
+							tech.unlockedRecipes.Add(HeatRecipe);
+						}
+					}
+				}
+			}
+
 			aEntity.Speed = (aEntity.EnergyConsumption) / HeatItem.FuelValue; //the speed of producing 1MJ of energy as heat for this reactor
 
 			return true;
@@ -1097,18 +1207,19 @@ namespace Foreman
 
 		//------------------------------------------------------Finalization steps of LoadAllData (cleanup and cyclic checks)
 
-		private void UpdateUnavailableStatus()
+		private void ProcessDataCleanup()
 		{
 			//The data read by the dataCache (json preset) includes everything. We need to now process it such that any items/recipes that cant be used dont appear.
 			//thus any object that has Unavailable set to true should be ignored. We will leave the option to use them to the user, but in most cases its better without them
 
 			//quick function to depth-first search the tech tree to calculate the availability of the technology. Hashset used to keep track of visited tech and not have to re-check them.
-			HashSet<TechnologyPrototype> temp_unlockableTechSet = new HashSet<TechnologyPrototype>();
+			//NOTE: factorio ensures no cyclic, so we are guaranteed to have a directed acyclic graph (may be disconnected)
+			HashSet<TechnologyPrototype> unlockableTechSet = new HashSet<TechnologyPrototype>();
 			bool IsUnlockable(TechnologyPrototype tech)
 			{
 				if (!tech.Available)
 					return false;
-				else if (temp_unlockableTechSet.Contains(tech))
+				else if (unlockableTechSet.Contains(tech))
 					return true;
 				else if (tech.prerequisites.Count == 0)
 					return true;
@@ -1120,9 +1231,45 @@ namespace Foreman
 					tech.Available = available;
 
 					if (available)
-						temp_unlockableTechSet.Add(tech);
+						unlockableTechSet.Add(tech);
 					return available;
 				}
+			}
+
+			//very similar to above, but for processing the required sci packs of each technology. Basically some research only requires 1 sci pack, but to unlock it requires researching tech with many sci packs. Need to account for that
+			Dictionary<TechnologyPrototype, HashSet<Item>> techRequirements = new Dictionary<TechnologyPrototype, HashSet<Item>>();
+			HashSet<Item> sciPacks = new HashSet<Item>(); 
+			HashSet<Item> TechRequiredSciPacks(TechnologyPrototype tech)
+			{
+				if (techRequirements.ContainsKey(tech))
+					return techRequirements[tech];
+
+				HashSet<Item> requiredItems = new HashSet<Item>(tech.sciPackList);
+				foreach (TechnologyPrototype prereq in tech.prerequisites)
+					foreach (Item sciPack in TechRequiredSciPacks(prereq))
+						requiredItems.Add(sciPack);
+
+				foreach (Item sciPack in requiredItems)
+					sciPacks.Add(sciPack);
+				techRequirements.Add(tech, requiredItems);
+
+				return requiredItems;
+			}
+
+			//tech ordering - set each technology's 'tier' to be its furthest distance from the 'starting tech' node
+			HashSet<TechnologyPrototype> visitedTech = new HashSet<TechnologyPrototype>();
+			visitedTech.Add(startingTech); //tier 0, everything starts from here.
+			int GetTechnologyTier(TechnologyPrototype tech)
+			{
+				if (!visitedTech.Contains(tech))
+				{
+					int maxPrerequisiteTier = 0;
+					foreach (TechnologyPrototype prereq in tech.prerequisites)
+						maxPrerequisiteTier = Math.Max(maxPrerequisiteTier, GetTechnologyTier(prereq));
+					tech.Tier = maxPrerequisiteTier + 1;
+					visitedTech.Add(tech);
+				}
+				return tech.Tier;
 			}
 
 			//step 0: delete any recipe that has no assembler. This is the only type of deletion that we will do, as we MUST enforce the 'at least 1 assembler' per recipe. The only recipes with no assemblers linked are those added to 'missing' category, and those are handled separately.
@@ -1144,39 +1291,82 @@ namespace Foreman
 				Console.WriteLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
 			}
 
-			//step 1: update tech unlock status
+			//step 1: update tech unlock status & science packs (add a 0 cost pack to the tech if it has no such requirement but its prerequisites do), set tech tier
 			foreach (TechnologyPrototype tech in technologies.Values)
+			{
 				IsUnlockable(tech);
+				TechRequiredSciPacks(tech);
+				GetTechnologyTier(tech);
+				foreach (ItemPrototype sciPack in techRequirements[tech])
+					tech.InternalOneWayAddSciPack(sciPack, 0);
+			}
 
-			//step 2: update recipe unlock status
+			//step 2: calculate science pack tier (minimum tier of technology that unlocks the recipe for the given science pack). also make the sciencePacks list.
+			Dictionary<Item, int> sciencePackTiers = new Dictionary<Item, int>();
+			foreach(ItemPrototype sciPack in sciPacks)
+			{
+				int minTier = int.MaxValue; //NOTE: this also means that if a science pack has no recipe (EX: Space science pack), it will be listed at int max value tier (aka: sorted last). That is fine.
+				foreach (Recipe recipe in sciPack.productionRecipes)
+					foreach (Technology tech in recipe.MyUnlockTechnologies)
+						minTier = Math.Min(minTier, tech.Tier);
+				sciencePackTiers.Add(sciPack, minTier);
+				sciencePacks.Add(sciPack);
+			}
+
+			//step 3: update all science pack lists (main sciencePacks list, plus SciPackList of every technology)
+			sciencePacks.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]));
+			foreach(TechnologyPrototype tech in technologies.Values)
+				tech.sciPackList.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]));
+
+			//step 4: create science pack lists for each recipe (list of distinct min-pack sets -> ex: if recipe can be aquired through 4 techs with [ A+B, A+B, A+C, A+B+C ] science pack requirements, we will only include A+B and A+C
+			foreach(RecipePrototype recipe in recipes.Values)
+			{
+				List<List<Item>> sciPackLists = new List<List<Item>>();
+				foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
+				{
+					bool exists = false;
+					foreach (List<Item> sciPackList in sciPackLists.ToList())
+					{
+						if (!sciPackList.Except(tech.sciPackList).Any()) // sci pack lists already includes a list that is a subset of the technologies sci pack list (ex: already have A+B while tech's is A+B+C)
+							exists = true;
+						else if (!tech.sciPackList.Except(sciPackList).Any()) //technology sci pack list is a subset of an already included sci pack list. we will add thi to the list and delete the existing one (ex: have A+B while tech's is A -> need to remove A+B and include A)
+							sciPackLists.Remove(sciPackList);
+					}
+					if(!exists)
+						sciPackLists.Add(tech.sciPackList);
+				}
+				recipe.MyUnlockSciencePacks = sciPackLists;
+			}
+
+			//step 5: update recipe unlock status
 			foreach (RecipePrototype recipe in recipes.Values)
 				recipe.Available = recipe.myUnlockTechnologies.Any(t => t.Available);
 
-			//step 3: mark any recipe for barelling / crating as unavailable
+			//step 6: mark any recipe for barelling / crating as unavailable
 			if(UseRecipeBWLists)
 				foreach (RecipePrototype recipe in recipes.Values)
 					if (!recipeWhiteList.Any(white => white.IsMatch(recipe.Name)) && recipeBlackList.Any(black => black.IsMatch(recipe.Name))) //if we dont match a whitelist and match a blacklist...
 						recipe.Available = false;
 
-			//step 4: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
+			//step 7: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
 			foreach (RecipePrototype recipe in recipes.Values)
 				if (recipe.myUnlockTechnologies.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0 && !recipe.Name.StartsWith("§§"))) //§§ denotes foreman added recipes. ignored during this pass (but not during the assembler check pass)
 					recipe.Available = false;
 
-			//step 5 (loop) switch any recipe with no available assemblers to unavailable, switch any useless item to unavailable (no available recipe produces it, it isnt used by any available recipe / only by incineration recipes
+			//step 8 (loop) switch any recipe with no available assemblers to unavailable, switch any useless item to unavailable (no available recipe produces it, it isnt used by any available recipe / only by incineration recipes
 			bool clean = false;
 			while (!clean)
 			{
 				clean = true;
 
-				//5.1: mark any recipe with no available assemblers to unavailable.
+				//8.1: mark any recipe with no available assemblers to unavailable.
 				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available)))
 				{
 					recipe.Available = false;
 					clean = false;
 				}
 
-				//5.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
+				//8.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
 				//this will also update assembler availability status for those whose items become unavailable automatically.
 				//note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
 				foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available)))
@@ -1194,7 +1384,7 @@ namespace Foreman
 				}
 			}
 
-			//step 6: set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.
+			//step 9: set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.
 			foreach (RecipePrototype recipe in recipes.Values)
 				recipe.Enabled = recipe.Available;
 			foreach (AssemblerPrototype assembler in assemblers.Values)
@@ -1203,8 +1393,9 @@ namespace Foreman
 				module.Enabled = module.Available;
 			foreach (BeaconPrototype beacon in beacons.Values)
 				beacon.Enabled = beacon.Available;
+			playerAssember.Enabled = true; //its enabled, so it can theoretically be used, but it is set as 'unavailable' so a warning will be issued if you use it.
 
-			//step 7: clean up groups and subgroups (delete any subgroups that have no items/recipes, then delete any groups that have no subgroups)
+			//step 10: clean up groups and subgroups (delete any subgroups that have no items/recipes, then delete any groups that have no subgroups)
 			foreach (SubgroupPrototype subgroup in subgroups.Values.ToList())
 			{
 				if (subgroup.items.Count == 0 && subgroup.recipes.Count == 0)
@@ -1217,7 +1408,7 @@ namespace Foreman
 				if (group.subgroups.Count == 0)
 					groups.Remove(group.Name);
 
-			//step 8: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
+			//step 11: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
 			foreach (SubgroupPrototype subgroup in subgroups.Values)
 				if (!subgroup.items.Any(i => i.Available) && !subgroup.recipes.Any(r => r.Available))
 					subgroup.Available = false;
@@ -1225,7 +1416,7 @@ namespace Foreman
 				if (!group.subgroups.Any(sg => sg.Available))
 					group.Available = false;
 
-			//step 9: sort groups/subgroups
+			//step 12: sort groups/subgroups
 			foreach (GroupPrototype group in groups.Values)
 				group.SortSubgroups();
 			foreach (SubgroupPrototype sgroup in subgroups.Values)
@@ -1234,7 +1425,7 @@ namespace Foreman
 
 		//--------------------------------------------------------------------DEBUG PRINTING FUNCTIONS
 
-		private void PrintAllAvailabilities()
+		private void PrintDataCache()
 		{
 			Console.WriteLine("AVAILABLE: ----------------------------------------------------------------");
 			Console.WriteLine("Technologies:");
@@ -1286,6 +1477,34 @@ namespace Foreman
 			Console.WriteLine("Beacons:");
 			foreach (BeaconPrototype beacon in beacons.Values)
 				if (!beacon.Available) Console.WriteLine("    " + beacon);
+
+			Console.WriteLine("TECHNOLOGIES: ----------------------------------------------------------------");
+			Console.WriteLine("Technology tiers:");
+			foreach (TechnologyPrototype tech in technologies.Values.OrderBy(t => t.Tier))
+			{
+				Console.WriteLine("   T:" + tech.Tier.ToString("000") + " : " + tech.Name);
+				foreach (TechnologyPrototype prereq in tech.prerequisites)
+					Console.WriteLine("      > T:" + prereq.Tier.ToString("000" + " : " + prereq.Name));
+			}
+			Console.WriteLine("Science Pack order:");
+			foreach (Item sciPack in sciencePacks)
+				Console.WriteLine(sciPack.FriendlyName);
+
+			Console.WriteLine("RECIPES: ----------------------------------------------------------------");
+			foreach(RecipePrototype recipe in recipes.Values)
+			{
+				Console.WriteLine(recipe.Name);
+				foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
+					Console.WriteLine("  >" + tech.Tier.ToString("000") + ":" + tech.Name);
+				foreach(IReadOnlyList<Item> sciPackList in recipe.MyUnlockSciencePacks)
+				{
+					Console.Write("    >Science Packs Option: ");
+					foreach (Item sciPack in sciPackList)
+						Console.Write(sciPack.Name + ", ");
+					Console.WriteLine();
+				}
+			}
+
 		}
 	}
 }

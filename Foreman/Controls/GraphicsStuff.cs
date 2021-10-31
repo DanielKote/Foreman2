@@ -160,7 +160,11 @@ namespace Foreman
 			int height = 0;
 			int width = ((SectionWidth + 10) * recipes.Count) - 10;
 			foreach (Recipe recipe in recipes)
-				height = Math.Max(height, 110 + recipe.IngredientList.Count * 40 + recipe.ProductList.Count * 40);
+			{
+				height = Math.Max(height, 110 + 20 + recipe.IngredientList.Count * 40 + recipe.ProductList.Count * 40 + recipe.MyUnlockSciencePacks.Count * 30);
+			}
+
+
 
 			return new Size(width, height);
 		}
@@ -172,10 +176,12 @@ namespace Foreman
 
 			int maxIngredientCount = 0;
 			int maxProductCount = 0;
+			int maxSciencePackListsCount = 0;
 			foreach (Recipe recipe in recipes)
 			{
 				maxIngredientCount = Math.Max(maxIngredientCount, recipe.IngredientList.Count);
 				maxProductCount = Math.Max(maxProductCount, recipe.ProductList.Count);
+				maxSciencePackListsCount = Math.Max(maxSciencePackListsCount, recipe.MyUnlockSciencePacks.Count);
 			}
 
 			Rectangle textbox;
@@ -230,6 +236,22 @@ namespace Foreman
 						GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, recipes[r].GetProductFriendlyName(product), ItemFont, textbox);
 					}
 					yOffset += 40;
+				}
+
+				//unlock science packs
+				graphics.FillRectangle(DarkBackgroundBrush, new Rectangle(xOffset, yOffset, SectionWidth, 22));
+				yOffset += 2;
+				graphics.DrawString("Required Science Packs: ", SectionFont, TextBrush, 4 + xOffset, 0 + yOffset);
+				yOffset += 20;
+				for (int i = 0; i < maxSciencePackListsCount; i++)
+				{
+					if (i < recipes[r].MyUnlockSciencePacks.Count)
+					{
+						int iconSize = Math.Min(24, SectionWidth / (8 + recipes[r].MyUnlockSciencePacks[i].Count)); //ensure all science packs will fit (there should be space for 8, but knowing mods... this might not be enough)
+						for (int j = 0; j < recipes[r].MyUnlockSciencePacks[i].Count; j++)
+							graphics.DrawImage(recipes[r].MyUnlockSciencePacks[i][j].Icon, xOffset + 4 + (j * iconSize), 3 + yOffset, iconSize, iconSize);
+					}
+					yOffset += 30;
 				}
 
 				//time

@@ -27,6 +27,7 @@ namespace Foreman
 		IReadOnlyCollection<Module> Modules { get; }
 
 		IReadOnlyCollection<Technology> MyUnlockTechnologies { get; }
+		IReadOnlyList<IReadOnlyList<Item>> MyUnlockSciencePacks { get; }
 
 		string GetIngredientFriendlyName(Item item);
 		string GetProductFriendlyName(Item item);
@@ -52,6 +53,7 @@ namespace Foreman
 		public IReadOnlyCollection<Module> Modules { get { return modules; } }
 
 		public IReadOnlyCollection<Technology> MyUnlockTechnologies { get { return myUnlockTechnologies; } }
+		public IReadOnlyList<IReadOnlyList<Item>> MyUnlockSciencePacks { get; set; }
 
 		internal SubgroupPrototype mySubgroup;
 

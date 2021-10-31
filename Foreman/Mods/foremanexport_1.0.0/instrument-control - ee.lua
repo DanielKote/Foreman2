@@ -39,6 +39,15 @@ local function ExportResearch()
 			end
 		end
 
+		ttech['research_unit_ingredients'] = {}
+		for _, ingredient in pairs(tech.research_unit_ingredients) do
+			tingredient = {}
+			tingredient['name'] = ingredient.name
+			tingredient['amount'] = ingredient.amount
+			table.insert(ttech['research_unit_ingredients'], tingredient)
+		end
+		ttech['research_unit_count'] = tech.research_unit_count
+
 		ttech['lid'] = '$'..localindex
 		ExportLocalisedString(tech.localised_name, localindex)
 		localindex = localindex + 1

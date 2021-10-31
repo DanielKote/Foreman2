@@ -79,8 +79,8 @@ namespace Foreman
 				OutputTabs.Add(new ItemTabElement(item, LinkType.Output, base.graphViewer, this));
 		}
 
-		private void DisplayedNode_NodeValuesChanged(object sender, EventArgs e) { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
-		private void DisplayedNode_NodeStateChanged(object sender, EventArgs e) { NodeValuesRequireUpdate = true; graphViewer.Invalidate(); }
+		private void DisplayedNode_NodeStateChanged(object sender, EventArgs e) { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
+		private void DisplayedNode_NodeValuesChanged(object sender, EventArgs e) { NodeValuesRequireUpdate = true; graphViewer.Invalidate(); }
 
 		public virtual void UpdateState()
 		{
@@ -136,7 +136,7 @@ namespace Foreman
 			foreach (ReadOnlyNodeLink link in tab.Links)
 			{
 				Point diff = Point.Subtract(link.Supplier.Location, (Size)link.Consumer.Location);
-				total += Convert.ToInt32(Math.Atan2(tab.LinkType == LinkType.Input? diff.X : -diff.X, Math.Abs(diff.Y)) * 1000 + (diff.Y > 0? 1 : 0)); //x needs to be flipped depending on which endpoint we are calculating for. y is absoluted to take care of down connections. slight addition in case of up connection ensures that 2 equal connections will prioritize the up over the down.
+				total += Convert.ToInt32(Math.Atan2(tab.LinkType == LinkType.Input? diff.X : -diff.X, diff.Y) * 1000 + (diff.Y > 0? 1 : 0)); //x needs to be flipped depending on which endpoint we are calculating for. y is absoluted to take care of down connections. slight addition in case of up connection ensures that 2 equal connections will prioritize the up over the down.
 			}
 			return total;
 		}
