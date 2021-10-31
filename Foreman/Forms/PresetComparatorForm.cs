@@ -42,7 +42,6 @@ namespace Foreman
 		private static readonly Font AvailableTextFont = new Font(FontFamily.GenericSansSerif, 7.8f, FontStyle.Regular);
 		private static readonly Font UnavailableTextFont = new Font(FontFamily.GenericSansSerif, 7.8f, FontStyle.Italic);
 
-
 		public PresetComparatorForm()
 		{
 			Comparing = false;
@@ -201,8 +200,6 @@ namespace Foreman
 		{
 			unfilteredSelectedTabObjects = tabSet[ComparisonTabControl.SelectedIndex];
 			IconList.Images.Clear();
-			TextToolTip.RemoveAll();
-			RecipeToolTip.RemoveAll();
 			IconList.ImageSize = (ComparisonTabControl.SelectedIndex == 0 ? new Size(1, 1) : new Size(32, 32)); //0: mod list (no images)
 
 			if (DataCache.UnknownIcon != null)
@@ -449,9 +446,9 @@ namespace Foreman
 		private void ListView_StartHover(object sender, MouseEventArgs e)
 		{
 			ListViewItem lLVI = ((ListView)sender).GetItemAt(e.Location.X, e.Location.Y);
-			Point location = new Point(e.X + 15, e.Y);
 			if (lLVI != null)
 			{
+				Point location = new Point(e.X + 15, e.Y);
 				ListViewItem rLVI = null;
 				bool compareTypeTT = (sender == LeftListView || sender == RightListView);
 				if (compareTypeTT)
@@ -464,7 +461,6 @@ namespace Foreman
 				{
 					RecipeToolTip.SetRecipe(recipe, compareTypeTT ? (rLVI.Tag as Recipe) : null);
 					RecipeToolTip.Show((Control)sender, location);
-
 				}
 				else if (lLVI.Tag is Assembler assembler) //assembler or miner
 				{

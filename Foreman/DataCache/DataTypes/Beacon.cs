@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Foreman
@@ -19,6 +20,7 @@ namespace Foreman
 	{
 		public int ModuleSlots { get; set; }
 		public float Effectivity { get; set; }
+
 		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
 		public IReadOnlyCollection<Item> AssociatedItems { get { return associatedItems; } }
 

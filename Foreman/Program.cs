@@ -33,27 +33,65 @@ namespace Foreman
 			string[] efficincies = new string[] { "e1", "e2", "e3", "s1", "s2", "s3", "s1", "s2", "s3" };
 			string[] speeds = new string[] { "s1", "s2", "s3", "s1", "s2", "s3", "s1", "s2", "s3" };
 			string[] orderedOptions = efficincies.Concat(speeds).ToArray();
-			int moduleSize = 6;
+			int moduleSize = 16;
 
-			List<string[]> permutations = new List<string[]>();
-			string[] permu = new string[moduleSize];
-			AddItem(permu, 0, 0);
+			double expected = nCr(orderedOptions.Length + moduleSize - 1, moduleSize);
 
-			void AddItem(string[] permutation, int itemIndex, int startingIndex)
+			for (int i = 0; i < 20; i++)
+				Console.WriteLine(nCr(12 + i - 1, i));
+
+			if (expected < 1000000)
 			{
-				if (itemIndex == permutation.Length)
-					permutations.Add(permutation.ToArray());
-				else
+				List<string[]> permutations = new List<string[]>();
+				string[] permu = new string[moduleSize];
+				AddItem(permu, 0, 0);
+
+				void AddItem(string[] permutation, int itemIndex, int startingIndex)
 				{
-					for (int i = startingIndex; i < orderedOptions.Length; i++)
+					if (itemIndex == permutation.Length)
+						permutations.Add(permutation.ToArray());
+					else
 					{
-						permutation[itemIndex] = orderedOptions[i];
-						AddItem(permutation, itemIndex+1, i);
+						for (int i = startingIndex; i < orderedOptions.Length; i++)
+						{
+							permutation[itemIndex] = orderedOptions[i];
+							AddItem(permutation, itemIndex + 1, i);
+						}
 					}
 				}
+				Console.WriteLine(permutations.Count);
+			}
+			Console.WriteLine(expected);
+
+
+
+			double nCr(int n, int r)
+			{
+				// naive: return Factorial(n) / (Factorial(r) * Factorial(n - r));
+				return nPr(n, r) / Factorial(r);
 			}
 
-			Console.WriteLine(permutations.Count);
+			double nPr(int n, int r)
+			{
+				// naive: return Factorial(n) / Factorial(n - r);
+				return FactorialDivision(n, n - r);
+			}
+
+			double FactorialDivision(int topFactorial, int divisorFactorial)
+			{
+				double result = 1;
+				for (int i = topFactorial; i > divisorFactorial; i--)
+					result *= i;
+				return result;
+			}
+
+			double Factorial(double i)
+			{
+				if (i <= 1)
+					return 1;
+				return i * Factorial(i - 1);
+			}
+
 		}
 
 		public struct testStruct

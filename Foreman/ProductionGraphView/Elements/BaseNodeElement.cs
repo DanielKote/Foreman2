@@ -27,8 +27,11 @@ namespace Foreman
 		private static readonly Brush selectionOverlayBrush = new SolidBrush(Color.FromArgb(100, 100, 100, 200));
 
 		protected static readonly Brush TextBrush = Brushes.Black;
-		protected static readonly Font BaseFont = new Font(FontFamily.GenericSansSerif, 10);
-		protected static readonly Font TitleFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold);
+		protected static readonly Font BaseFont = new Font(FontFamily.GenericSansSerif, 10f);
+		protected static readonly Font TitleFont = new Font(FontFamily.GenericSansSerif, 9.2f, FontStyle.Bold);
+
+		protected static StringFormat TitleFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
+		protected static StringFormat TextFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
 
 		//most values are attempted to fit the grid (6 * 2^n) - ex: 72 = 6 * (4+8)
 		protected const int BaseSimpleHeight = 94; // 98 fits grid, -2 for border
@@ -219,7 +222,11 @@ namespace Foreman
 
 		protected virtual void MouseUpAction(Point graph_point, MouseButtons button)
 		{
-			if (button == MouseButtons.Right)
+			if (button == MouseButtons.Left)
+			{
+				graphViewer.EditNode(this);
+			}
+			else if (button == MouseButtons.Right)
 			{
 				RightClickMenu.MenuItems.Clear();
 				RightClickMenu.MenuItems.Add(new MenuItem("Delete node",

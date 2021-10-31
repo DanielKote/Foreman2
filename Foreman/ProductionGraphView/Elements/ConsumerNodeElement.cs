@@ -13,8 +13,6 @@ namespace Foreman
 		protected override Brush CleanBgBrush { get { return consumerBgBrush; } }
 		private static Brush consumerBgBrush = new SolidBrush(Color.FromArgb(249, 237, 195));
 
-		private static StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
-
 		public ConsumerNodeElement(ProductionGraphViewer graphViewer, BaseNode node) : base(graphViewer, node)
 		{
 			Width = MinWidth;
@@ -26,10 +24,13 @@ namespace Foreman
 		protected override void DetailsDraw(Graphics graphics, Point trans)
 		{
 			string text = DisplayedNode.DisplayName;
-			Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height/2) + 25, (Width - 10), (Height / 2) - 5);
+			Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + 5, Width - 10, 20);
+			Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 20, titleSlot.Width, (Height / 2) - 5);
 			//graphics.DrawRectangle(devPen, textSlot);
+			//graphics.DrawRectangle(devPen, titleSlot);
 
-			GraphicsStuff.DrawText(graphics, TextBrush, textFormat, text, BaseFont, textSlot);
+			graphics.DrawString(DisplayedNode.RateType == RateType.Auto? "Infinite Sink:" : "Required Output:", TitleFont, TextBrush, titleSlot, TitleFormat);
+			GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, text, BaseFont, textSlot);
 		}
 
 		protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive)
@@ -46,17 +47,6 @@ namespace Foreman
 			}
 
 			return tooltips;
-		}
-
-		protected override void MouseUpAction(Point graph_point, MouseButtons button)
-		{
-			if (button == MouseButtons.Left)
-			{
-				DevNodeOptionsPanel newPanel = new DevNodeOptionsPanel(DisplayedNode, graphViewer);
-				new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), graphViewer);
-			}
-			else
-				base.MouseUpAction(graph_point, button); //the standard menu
 		}
 	}
 }

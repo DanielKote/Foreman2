@@ -45,6 +45,8 @@ namespace Foreman
 			this.ShowUnavailable = Properties.Settings.Default.ShowUnavailable;
 
 			InitializeComponent();
+			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+
 			IRFlowPanel.Height = IRPanelRows * 35 + 12;
 
 			GroupButtonToolTip = new CustomToolTip();

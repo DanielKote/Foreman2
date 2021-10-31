@@ -30,7 +30,7 @@ namespace Foreman
 				{
 					form.StartPosition = FormStartPosition.Manual;
 					form.Left = this.Left + 150;
-					form.Top = this.Top + 100;
+					form.Top = this.Top + 200;
 					form.ShowDialog(); //LOAD FACTORIO DATA
 					GraphViewer.DCache = form.GetDataCache();
 					//gc collection is unnecessary - first data cache to be created.
@@ -71,7 +71,7 @@ namespace Foreman
 				UpdateControlValues();
 				GraphViewer.Focus();
 #if DEBUG
-				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false);
+				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
 				UpdateControlValues();
 #endif
 			}
@@ -149,7 +149,7 @@ namespace Foreman
 			try
 			{
 				if (Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
-					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false);
+					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false, true);
 				else if (Path.GetExtension(dialog.FileName).ToLower() == ".json")
 					GraphViewer.LoadFromOldJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
 				//NOTE: MainCache will update
@@ -212,35 +212,30 @@ namespace Foreman
 
 		private void SettingsButton_Click(object sender, EventArgs e)
 		{
-			bool reload = false;
-			do
+			SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions(GraphViewer.DCache);
+
+			oldOptions.Presets = GetValidPresetsList();
+			oldOptions.SelectedPreset = oldOptions.Presets[0];
+
+			using (SettingsForm form = new SettingsForm(oldOptions))
 			{
-				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions(GraphViewer.DCache);
+				form.StartPosition = FormStartPosition.Manual;
+				form.Left = this.Left + 50;
+				form.Top = this.Top + 50;
+				form.ShowDialog();
 
-				oldOptions.Presets = GetValidPresetsList();
-				oldOptions.SelectedPreset = oldOptions.Presets[0];
-
-				using (SettingsForm form = new SettingsForm(oldOptions))
+				if (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset) //different preset -> need to reload datacache
 				{
-					form.StartPosition = FormStartPosition.Manual;
-					form.Left = this.Left + 50;
-					form.Top = this.Top + 50;
-					form.ShowDialog();
-					reload = (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset); //if we changed the preset, then load up another settings form after processing
-
-					if (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset) //different preset -> need to reload datacache
-					{
-						Properties.Settings.Default.CurrentPresetName = form.CurrentOptions.SelectedPreset.Name;
-						List<Preset> validPresets = GetValidPresetsList();
-						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, true);
-						Properties.Settings.Default.Save();
-					}
-
-					GraphViewer.Graph.UpdateNodeStates();
-					GraphViewer.UpdateNodeVisuals();
-					UpdateControlValues();
+					Properties.Settings.Default.CurrentPresetName = form.CurrentOptions.SelectedPreset.Name;
+					List<Preset> validPresets = GetValidPresetsList();
+					GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
+					Properties.Settings.Default.Save();
 				}
-			} while (reload);
+
+				GraphViewer.Graph.UpdateNodeStates();
+				GraphViewer.UpdateNodeVisuals();
+				UpdateControlValues();
+			}
 		}
 
 		private void ExportImageButton_Click(object sender, EventArgs e)

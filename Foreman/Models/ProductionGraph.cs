@@ -33,6 +33,7 @@ namespace Foreman
 			public NewNodeCollection() { newNodes = new List<BaseNode>(); newLinks = new List<NodeLink>(); }
 		}
 
+		public const float MaxSetFlow = 10000000000; //10 billion should be enough for pretty much everything.
 		private const int XBorder = 200;
 		private const int YBorder = 100;
 

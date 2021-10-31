@@ -128,6 +128,18 @@
     <Compile Include="Controls\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\EditRecipePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\EditRecipePanel.Designer.cs">
+      <DependentUpon>EditRecipePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\EditFlowPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\EditFlowPanel.Designer.cs">
+      <DependentUpon>EditFlowPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DevNodeOptionsPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -141,7 +153,6 @@
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MouseHoverDetector.cs" />
-    <Compile Include="ProductionGraphView\RecipePainter.cs" />
     <Compile Include="Controls\RecipeToolTip.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -252,6 +263,12 @@
     </Compile>
     <Compile Include="ProductionGraphView\Elements\BaseNodeElement.cs" />
     <Compile Include="Models\Nodes\NodeLink.cs" />
+    <EmbeddedResource Include="Controls\EditRecipePanel.resx">
+      <DependentUpon>EditRecipePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\EditFlowPanel.resx">
+      <DependentUpon>EditFlowPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\DevNodeOptionsPanel.resx">
       <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
     </EmbeddedResource>

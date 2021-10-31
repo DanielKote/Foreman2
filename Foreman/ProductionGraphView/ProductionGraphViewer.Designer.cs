@@ -30,6 +30,7 @@
 			this.Size = new System.Drawing.Size(798, 321);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ProductionGraphViewer_KeyDown);
 			this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.ProductionGraphViewer_KeyUp);
+			this.Leave += new System.EventHandler(this.ProductionGraphViewer_Leave);
 			this.LostFocus += new System.EventHandler(this.ProductionGraphViewer_LostFocus);
 			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseDown);
 			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ProductionGraphViewer_MouseMove);

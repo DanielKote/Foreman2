@@ -72,6 +72,7 @@
 			this.PresetMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.SelectPresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.DeletePresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.RecipeToolTip = new Foreman.RecipeToolTip();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -596,6 +597,15 @@
 			this.DeletePresetMenuItem.Size = new System.Drawing.Size(166, 24);
 			this.DeletePresetMenuItem.Text = "Delete Preset";
 			// 
+			// RecipeToolTip
+			// 
+			this.RecipeToolTip.AutoPopDelay = 100000;
+			this.RecipeToolTip.BackColor = System.Drawing.Color.DimGray;
+			this.RecipeToolTip.ForeColor = System.Drawing.Color.White;
+			this.RecipeToolTip.InitialDelay = 100000;
+			this.RecipeToolTip.OwnerDraw = true;
+			this.RecipeToolTip.ReshowDelay = 100000;
+			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.ConfirmButton;
@@ -679,5 +689,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ImageList IconList;
 		private System.Windows.Forms.CheckBox ShowUnavailablesCheckBox;
+		private RecipeToolTip RecipeToolTip;
 	}
 }

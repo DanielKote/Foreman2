@@ -32,6 +32,7 @@ namespace Foreman
 		public LOD LevelOfDetail { get; set; }
 		public bool RecipeTooltipEnabled { get; set; }
 		public bool TooltipsEnabled { get; set; }
+		private bool SubwindowOpen; //used together with tooltip enabled -> if we open up an item/recipe/assembler window, this will halt tooltip show.
 		public bool DynamicLinkWidth = false;
 
 		public DataCache DCache { get; set; }
@@ -88,6 +89,7 @@ namespace Foreman
 			ViewScale = 1f;
 
 			TooltipsEnabled = true;
+			SubwindowOpen = false;
 
 			Graph = new ProductionGraph();
 			//Graph.ClearGraph()
@@ -144,7 +146,7 @@ namespace Foreman
 			return null;
 		}
 
-		//----------------------------------------------Adding new node functions (including link dragging)
+		//----------------------------------------------Adding new node functions (including link dragging) + Node edit
 
 		public void StartLinkDrag(BaseNodeElement startNode, LinkType linkType, Item item)
 		{
@@ -161,17 +163,21 @@ namespace Foreman
 
 		public void AddItem(Point drawOrigin, Point newLocation)
 		{
+			SubwindowOpen = true;
 			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
 			itemChooser.Show(selectedItem =>
 			{
 				if (selectedItem != null)
 					AddRecipe(drawOrigin, selectedItem, newLocation, NewNodeType.Disconnected);
+				else
+					SubwindowOpen = false;
 			});
 		}
 
 		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null)
 		{
-			if (nNodeType != NewNodeType.Disconnected && (originElement == null || baseItem == null)) //just in case check (should
+			SubwindowOpen = true;
+			if (nNodeType != NewNodeType.Disconnected && (originElement == null || baseItem == null))
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
 
 			if (Grid.ShowGrid)
@@ -228,6 +234,7 @@ namespace Foreman
 			{
 				DisposeLinkDrag();
 				Invalidate();
+				SubwindowOpen = false;
 			});
 		}
 
@@ -244,6 +251,28 @@ namespace Foreman
 				Graph.UpdateNodeStates();
 				Graph.UpdateNodeValues();
 			}
+		}
+
+		public void EditNode(BaseNodeElement bNodeElement)
+		{
+			SubwindowOpen = true;
+			Control editPanel;
+			if (bNodeElement is RecipeNodeElement rNodeElement)
+				editPanel = new EditRecipePanel(rNodeElement.DisplayedNode, this);
+			else
+				editPanel = new EditFlowPanel(bNodeElement.DisplayedNode, this);
+
+			//offset view if necessary to ensure entire window will be seen (with 25 pixels boundary). Only need to check the left (x) and up/down (y) since we must have clicked on a (visible) node to start the edit, so right(x) is guaranteed
+			Point screenOriginPoint = GraphToScreen(new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y));
+			screenOriginPoint = new Point(screenOriginPoint.X - editPanel.Width, screenOriginPoint.Y - (editPanel.Height / 2));
+			Point offset = new Point((int)(Math.Max(0, 25 - screenOriginPoint.X) / ViewScale), (int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.Y), this.Height - screenOriginPoint.Y - editPanel.Height - 25) / ViewScale));
+
+			ViewOffset = Point.Add(ViewOffset, (Size)offset);
+			UpdateGraphBounds();
+			Invalidate();
+
+			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y), this, true);
+			fttc.Closing += (s,e) => { SubwindowOpen = false; bNodeElement.Update(); this.Invalidate(); };
 		}
 
 		//----------------------------------------------Selection functions
@@ -378,8 +407,7 @@ namespace Foreman
 			graphics.ResetTransform();
 
 			//floating tooltips
-			if (TooltipsEnabled && currentDragOperation == DragOperation.None && !viewBeingDragged)
-				ToolTipRenderer.Paint(graphics);
+			ToolTipRenderer.Paint(graphics, TooltipsEnabled && !SubwindowOpen && currentDragOperation == DragOperation.None && !viewBeingDragged);
 			
 			//paused border
 			if (Graph != null && Graph.PauseUpdates) //graph null check is purely for design view
@@ -830,6 +858,16 @@ namespace Foreman
 				(int)(Height / ViewScale));
 		}
 
+		private void ProductionGraphViewer_Resize(object sender, EventArgs e)
+		{
+			ToolTipRenderer.ClearFloatingControls();
+		}
+
+		private void ProductionGraphViewer_Leave(object sender, EventArgs e)
+		{
+			ToolTipRenderer.ClearFloatingControls();
+		}
+
 		//----------------------------------------------Helper functions (point conversions, alignment, etc)
 
 		public Point ScreenToGraph(Point point)
@@ -880,7 +918,7 @@ namespace Foreman
 			// i mean - i already changed it 3 times to accomodate various things, and I havent even updated the assembler/modules for a given node yet!
 		}
 
-		public void LoadFromJson(JObject json, bool useFirstPreset, bool enableEverything = false)
+		public void LoadFromJson(JObject json, bool useFirstPreset, bool setEnablesFromJson)
 		{
 			//grab mod list
 			Dictionary<string, string> modSet = new Dictionary<string, string>();
@@ -960,8 +998,8 @@ namespace Foreman
 			using (DataLoadForm form = new DataLoadForm(chosenPreset))
 			{
 				form.StartPosition = FormStartPosition.Manual;
-				form.Left = this.Left + 150;
-				form.Top = this.Top + 100;
+				form.Left = ParentForm.Left + 150;
+				form.Top = ParentForm.Top + 200;
 				form.ShowDialog(); //LOAD FACTORIO DATA
 				DCache = form.GetDataCache();
 				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
@@ -981,7 +1019,7 @@ namespace Foreman
 			ViewScale = (float)json["ViewScale"];
 			
 			//update enabled statuses
-			if (!enableEverything)
+			if (setEnablesFromJson)
 			{
 				foreach (Beacon beacon in DCache.Beacons.Values)
 					beacon.Enabled = false;
@@ -1030,11 +1068,6 @@ namespace Foreman
 			rightClickMenu.Dispose();
 
 			base.Dispose(disposing);
-		}
-
-		private void ProductionGraphViewer_Resize(object sender, EventArgs e)
-		{
-			ToolTipRenderer.ClearFloatingControls();
 		}
 	}
 }

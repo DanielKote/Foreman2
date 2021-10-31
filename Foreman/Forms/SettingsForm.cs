@@ -68,6 +68,9 @@ namespace Foreman
 			SelectPresetMenuItem.Click += SelectPresetMenuItem_Click;
 			DeletePresetMenuItem.Click += DeletePresetMenuItem_Click;
 
+			MouseHoverDetector mhDetector = new MouseHoverDetector(100, 200);
+			mhDetector.Add(RecipeListView, RecipeListView_StartHover, RecipeListView_EndHover);
+
 			LoadRecipeList();
 			UpdateAMM();
 
@@ -184,11 +187,10 @@ namespace Foreman
 			bool showUnavailables = ShowUnavailablesCheckBox.Checked;
 
 			filteredRecipeList.Clear();
+
 			foreach (ListViewItem lvItem in unfilteredRecipeList)
-			{
 				if ((showUnavailables || ((Recipe)lvItem.Tag).Available) && (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString)))
 					filteredRecipeList.Add(lvItem);
-			}
 
 			RecipeListView.VirtualListSize = filteredRecipeList.Count;
 			RecipeListView.Invalidate();
@@ -424,6 +426,21 @@ namespace Foreman
 		private void RecipeListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
 		{
 			e.Item = filteredRecipeList[e.ItemIndex];
+		}
+
+		private void RecipeListView_StartHover(object sender, MouseEventArgs e)
+		{
+			ListViewItem lvi = ((ListView)sender).GetItemAt(e.Location.X, e.Location.Y);
+			Point location = new Point(e.X + 15, e.Y);
+			if (lvi != null)
+			{
+				RecipeToolTip.SetRecipe(lvi.Tag as Recipe);
+				RecipeToolTip.Show((Control)sender, location);
+			}
+		}
+		private void RecipeListView_EndHover(object sender, EventArgs e)
+		{
+			RecipeToolTip.Hide((Control)sender);
 		}
 
 		//CONFIRM / RELOAD / CANCEL------------------------------------------------------------------------------------------

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -67,7 +68,8 @@ namespace Foreman
 		private SubgroupPrototype missingSubgroup;
 		private TechnologyPrototype startingTech;
 
-		private const float defaultRecipeTime = 0.5f;
+		private static readonly Regex[] recipeWhiteList = { new Regex("^empty-barrel$") }; //whitelist takes priority over blacklist
+		private static readonly Regex[] recipeBlackList = { new Regex("-barrel$"), new Regex("^deadlock-packrecipe-"), new Regex("^deadlock-unpackrecipe-"), new Regex("^deadlock-plastic-packaging$") };
 
 		public DataCache()
 		{
@@ -81,15 +83,15 @@ namespace Foreman
 			modules = new Dictionary<string, Module>();
 			beacons = new Dictionary<string, Beacon>();
 
-			extractionGroup = new GroupPrototype(this, "$g:extraction_group", "Resource Extraction", "zzzzzzz");
+			extractionGroup = new GroupPrototype(this, "§§g:extraction_group", "Resource Extraction", "zzzzzzz");
 			extractionGroup.SetIconAndColor(new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "MiningIcon.png"), 64), Color.Gray));
-			extractionSubgroupItems = new SubgroupPrototype(this, "$sg:extraction_items", "1");
+			extractionSubgroupItems = new SubgroupPrototype(this, "§§sg:extraction_items", "1");
 			extractionSubgroupItems.myGroup = extractionGroup;
 			extractionGroup.subgroups.Add(extractionSubgroupItems);
-			extractionSubgroupFluids = new SubgroupPrototype(this, "$sg:extraction_fluids", "2");
+			extractionSubgroupFluids = new SubgroupPrototype(this, "§§sg:extraction_fluids", "2");
 			extractionSubgroupFluids.myGroup = extractionGroup;
 			extractionGroup.subgroups.Add(extractionSubgroupFluids);
-			extractionSubgroupFluidsOP = new SubgroupPrototype(this, "$sg:extraction_fluids_2", "3");
+			extractionSubgroupFluidsOP = new SubgroupPrototype(this, "§§sg:extraction_fluids_2", "3");
 			extractionSubgroupFluidsOP.myGroup = extractionGroup;
 			extractionGroup.subgroups.Add(extractionSubgroupFluidsOP);
 
@@ -99,8 +101,8 @@ namespace Foreman
 			missingBeacons = new Dictionary<string, Beacon>();
 			missingRecipes = new Dictionary<RecipeShort, Recipe>(new RecipeShortNaInPrComparer());
 
-			missingSubgroup = new SubgroupPrototype(this, "$MISSING-SG", "");
-			missingSubgroup.myGroup = new GroupPrototype(this, "$MISSING-G", "MISSING", "");
+			missingSubgroup = new SubgroupPrototype(this, "§§MISSING-SG", "");
+			missingSubgroup.myGroup = new GroupPrototype(this, "§§MISSING-G", "MISSING", "");
 
 			startingTech = new TechnologyPrototype(this, "", "");
 		}
@@ -111,6 +113,7 @@ namespace Foreman
 			Dictionary<string, List<RecipePrototype>> craftingCategories = new Dictionary<string, List<RecipePrototype>>();
 			Dictionary<string, List<RecipePrototype>> resourceCategories = new Dictionary<string, List<RecipePrototype>>();
 			Dictionary<string, List<ItemPrototype>> fuelCategories = new Dictionary<string, List<ItemPrototype>>();
+			fuelCategories.Add("§§fc:liquids", new List<ItemPrototype>()); //the liquid fuels category
 			Dictionary<Item, string> burnResults = new Dictionary<Item, string>();
 
 			JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
@@ -136,7 +139,7 @@ namespace Foreman
 				foreach (var objJToken in jsonData["items"].ToList())
 					ProcessItem(objJToken, iconCache, fuelCategories, burnResults);
 				foreach (var objJToken in jsonData["fluids"].ToList())
-					ProcessFluid(objJToken, iconCache);
+					ProcessFluid(objJToken, iconCache, fuelCategories);
 				foreach (ItemPrototype item in items.Values)
 					ProcessBurnItem(item, fuelCategories, burnResults); //link up any items with burn remains
 				foreach (var objJToken in jsonData["recipes"].ToList())
@@ -380,7 +383,7 @@ namespace Foreman
 				if (objJToken["products"].Count() == 0)
 					continue;
 
-				RecipeShort recipe = new RecipeShort("$r:"+(string)objJToken["name"]);
+				RecipeShort recipe = new RecipeShort("§§r:" + (string)objJToken["name"]);
 
 				foreach (var productJToken in objJToken["products"])
 				{
@@ -402,7 +405,7 @@ namespace Foreman
 			foreach(var objJToken in jsonData["offshorepumps"])
 			{
 				string fluidName = (string)objJToken["fluid"];
-				RecipeShort recipe = new RecipeShort("$r:" + fluidName);
+				RecipeShort recipe = new RecipeShort("§§r:" + fluidName);
 				recipe.Products.Add(fluidName, 60);
 
 				if (!presetRecipes.ContainsKey(recipe.Name))
@@ -502,7 +505,7 @@ namespace Foreman
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
-			if (objJToken["fuel_category"] != null)
+			if (objJToken["fuel_category"] != null && (float)objJToken["fuel_value"] > 0) //factorio eliminates any 0fuel value fuel from the list (checked)
 			{
 				item.FuelValue = (float)objJToken["fuel_value"];
 				if (!fuelCategories.ContainsKey((string)objJToken["fuel_category"]))
@@ -521,7 +524,7 @@ namespace Foreman
 				item.BurnResult = items[burnResults[item]];
 		}
 
-		private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+		private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories)
 		{
 			ItemPrototype item = new ItemPrototype(
 				this,
@@ -535,8 +538,12 @@ namespace Foreman
 				item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
 			item.DefaultTemperature = (double)objJToken["default_temperature"];
-			if (objJToken["fuel_value"] != null)
+			if (objJToken["fuel_value"] != null && (float)objJToken["fuel_value"] > 0)
+			{
 				item.FuelValue = (float)objJToken["fuel_value"];
+				fuelCategories["§§fc:liquids"].Add(item);
+
+			}
 
 			items.Add(item.Name, item);
 		}
@@ -550,7 +557,7 @@ namespace Foreman
 				(SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
 				(string)objJToken["order"]);
 
-			recipe.Time = (float)objJToken["energy"] > 0 ? (float)objJToken["energy"] : defaultRecipeTime;
+			recipe.Time = (float)objJToken["energy"];
 			if ((bool)objJToken["enabled"]) //due to the way the import of presets happens, enabled at this stage means the recipe is available without any research necessary (aka: available at start)
 			{
 				recipe.myUnlockTechnologies.Add(startingTech);
@@ -611,7 +618,7 @@ namespace Foreman
 
 			RecipePrototype recipe = new RecipePrototype(
 				this,
-				"$r:" + (string)objJToken["name"],
+				"§§r:" + (string)objJToken["name"],
 				(string)objJToken["localised_name"] + " Extraction",
 				(string)objJToken["products"][0]["type"] == "fluid" ? extractionSubgroupFluids : extractionSubgroupItems,
 				(string)objJToken["name"]);
@@ -863,11 +870,11 @@ namespace Foreman
 
 			//now to add an extra recipe that will be used to 'mine' this fluid
 			RecipePrototype recipe;
-			if (!recipes.ContainsKey("$r:" + fluid.Name))
+			if (!recipes.ContainsKey("§§r:" + fluid.Name))
 			{
 				recipe = new RecipePrototype(
 					this,
-					"$r:" + fluid.Name,
+					"§§r:" + fluid.Name,
 					fluid.FriendlyName + " Extraction",
 					extractionSubgroupFluidsOP,
 					fluid.Name);
@@ -882,7 +889,7 @@ namespace Foreman
 				recipes.Add(recipe.Name, recipe);
 			}
 			else
-				recipe = (RecipePrototype)recipes["$r:" + fluid.Name];
+				recipe = (RecipePrototype)recipes["§§r:" + fluid.Name];
 
 			recipe.assemblers.Add(assembler);
 			assembler.recipes.Add(recipe);
@@ -935,11 +942,11 @@ namespace Foreman
 				return;
 
 			AssemblerPrototype assembler = (AssemblerPrototype)assemblers[(string)objJToken["name"]];
-			assembler.EnergyConsumption = (float)objJToken["max_energy_usage"];
+			assembler.EnergyConsumption = (float)objJToken["max_energy_usage"]; //factorio-guaranteed to be >0
 			if (objJToken["fuel_type"] != null)
 			{
 				assembler.IsBurner = true;
-				assembler.EnergyEffectivity = (float)objJToken["fuel_effectivity"];
+				assembler.EnergyEffectivity = (float)objJToken["fuel_effectivity"]; //factorio-guaranteed to be >0
 
 				if ((string)objJToken["fuel_type"] == "item")
 				{
@@ -962,13 +969,14 @@ namespace Foreman
 					{
 						assembler.IsBurner = false;
 						assembler.EnergyEffectivity = 0;
-						return;
 					}
-
-					foreach (ItemPrototype fluid in items.Values.Where(i => i.IsFluid && i.FuelValue > 0))
+					else
 					{
-						assembler.fuels.Add(fluid);
-						fluid.fuelsAssemblers.Add(assembler);
+						foreach (ItemPrototype fluid in fuelCategories["§§fc:liquids"])
+						{
+							assembler.fuels.Add(fluid);
+							fluid.fuelsAssemblers.Add(assembler);
+						}
 					}
 				}
 			}
@@ -1020,6 +1028,7 @@ namespace Foreman
 
 				recipes.Remove(recipe.Name);
 				ErrorLogging.LogLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
+				Console.WriteLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
 			}
 
 			//step 1: update tech unlock status
@@ -1027,42 +1036,62 @@ namespace Foreman
 				IsUnlockable(tech);
 
 			//step 2: update recipe unlock status
-			foreach (TechnologyPrototype tech in technologies.Values)
-				foreach (RecipePrototype recipe in tech.unlockedRecipes)
-					recipe.Available |= tech.Available;
-			foreach (RecipePrototype recipe in startingTech.unlockedRecipes)
-				recipe.Available = true;
+			foreach(RecipePrototype recipe in recipes.Values)
+				recipe.Available = recipe.myUnlockTechnologies.FirstOrDefault(t => t.Available) != null;
 
 			//step 3: mark any recipe for barelling / crating as unavailable
 			foreach (RecipePrototype recipe in recipes.Values)
-				if (recipe.Name != "empty-barrel" && (recipe.Name.EndsWith("-barrel") || recipe.Name.StartsWith("deadlock-")))
+				if (recipeWhiteList.FirstOrDefault(white => white.IsMatch(recipe.Name)) == null && recipeBlackList.FirstOrDefault(black => black.IsMatch(recipe.Name)) != null) //if we dont match a whitelist and match a blacklist...
 					recipe.Available = false;
 
-			//step 4: mark any recipe with no unlocks, no vaild assemblers, and 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
-			foreach (RecipePrototype recipe in recipes.Values.ToList())
-				if (recipe.myUnlockTechnologies.Count == 0 || recipe.assemblers.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0))
+			//step 4: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
+			foreach (RecipePrototype recipe in recipes.Values)
+				if (recipe.myUnlockTechnologies.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0))
 					recipe.Available = false;
 
-			//step 5: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
-			//note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
-			foreach (ItemPrototype item in items.Values.ToList())
+			//step 5 (loop) switch any recipe with no available assemblers to unavailable, switch any useless item to unavailable (no available recipe produces it, it isnt used by any available recipe / only by incineration recipes
+			bool clean = false;
+			while(!clean)
 			{
-				if (item.productionRecipes.FirstOrDefault(r => r.Available) == null)
+				clean = true;
+
+				//5.1: mark any recipe with no available assemblers to unavailable.
+				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && r.Assemblers.FirstOrDefault(a => a.Available) == null))
+				{
+					recipe.Available = false;
+					clean = false;
+				}
+
+				//5.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
+				//this will also update assembler availability status for those whose items become unavailable automatically.
+				//note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
+				foreach (ItemPrototype item in items.Values.Where(i => i.Available && i.ProductionRecipes.FirstOrDefault(r => r.Available) == null))
 				{
 					bool useful = false;
 					foreach (RecipePrototype r in item.consumptionRecipes.Where(r => r.Available))
 						useful |= (r.ingredientList.Count > 1 || r.productList.Count != 0); //recipe with multiple items coming in or some ingredients coming out -> not an incineration type
-					if(!useful)
+					if (!useful)
 					{
 						item.Available = false;
+						clean = false;
 						foreach (RecipePrototype r in item.consumptionRecipes) //from above these recipes are all item->nothing
 							r.Available = false;
 					}
 				}
 			}
 
-			//step 6: clean up groups and subgroups (delete any subgroups that have no items/recipes, then delete any groups that have no subgroups)
-			foreach(SubgroupPrototype subgroup in subgroups.Values.ToList())
+			//step 6: set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.
+			foreach (RecipePrototype recipe in recipes.Values)
+				recipe.Enabled = recipe.Available;
+			foreach (AssemblerPrototype assembler in assemblers.Values)
+				assembler.Enabled = assembler.Available;
+			foreach (ModulePrototype module in modules.Values)
+				module.Enabled = module.Available;
+			foreach (BeaconPrototype beacon in beacons.Values)
+				beacon.Enabled = beacon.Available;
+
+			//step 7: clean up groups and subgroups (delete any subgroups that have no items/recipes, then delete any groups that have no subgroups)
+			foreach (SubgroupPrototype subgroup in subgroups.Values.ToList())
 			{
 				if (subgroup.items.Count == 0 && subgroup.recipes.Count == 0)
 				{
@@ -1074,7 +1103,7 @@ namespace Foreman
 				if (group.subgroups.Count == 0)
 					groups.Remove(group.Name);
 
-			//step 7: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
+			//step 8: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
 			foreach (SubgroupPrototype subgroup in subgroups.Values)
 				if (subgroup.items.FirstOrDefault(i => i.Available) == null && subgroup.recipes.FirstOrDefault(r => r.Available) == null)
 					subgroup.Available = false;
@@ -1082,7 +1111,7 @@ namespace Foreman
 				if (group.subgroups.FirstOrDefault(sg => sg.Available) == null)
 					group.Available = false;
 
-			//step 8: update all the 'available' sets where necessary (we actually make a separate set for these so we dont have to rely on 'where' calls every time)
+			//step 9: update all the 'available' sets where necessary (we actually make a separate set for these so we dont have to rely on 'where' calls every time)
 			foreach (TechnologyPrototype tech in technologies.Values)
 				tech.UpdateAvailabilities();
 			foreach (GroupPrototype group in groups.Values)
@@ -1095,16 +1124,6 @@ namespace Foreman
 				assembler.UpdateAvailabilities();
 			foreach (ModulePrototype module in modules.Values)
 				module.UpdateAvailabilities();
-
-			//step 9: finally, we set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.
-			foreach (RecipePrototype recipe in recipes.Values)
-				recipe.Enabled = recipe.Available;
-			foreach (AssemblerPrototype assembler in assemblers.Values)
-				assembler.Enabled = assembler.Available;
-			foreach (ModulePrototype module in modules.Values)
-				module.Enabled = module.Available;
-			foreach (BeaconPrototype beacon in beacons.Values)
-				beacon.Enabled = beacon.Available;
 		}
 
 		//--------------------------------------------------------------------DEBUG PRINTING FUNCTIONS

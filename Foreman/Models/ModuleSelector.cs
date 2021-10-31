@@ -37,17 +37,20 @@ namespace Foreman
 				case Style.Efficiency:
 					List<Module> speedModules = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled && m.SpeedBonus > 0).OrderByDescending(m => ((m.SpeedBonus * 1000) - m.ConsumptionBonus)).ToList(); //highest speed is first!
 					List<Module> efficiencyModules = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled && m.ConsumptionBonus < 0).OrderByDescending(m => ((m.ConsumptionBonus * 1000) + m.SpeedBonus)).ToList(); //highest consumption is first! (so worst->best effectivity)
-					List<Module> combinedModules = speedModules.Concat(efficiencyModules).ToList();
+					List<ModulePermutator.Permutation> modulePermutations = ModulePermutator.GetOptimalEfficiencyPermutations(speedModules, efficiencyModules, assembler.ModuleSlots);
 
 					//return best module permutation that has the lowest consumption (max -80%), and the highest speed.
-					List<ModulePermutator.Permutation> modulePermutations = ModulePermutator.GetModulePermutations(combinedModules, assembler.ModuleSlots);
-					return modulePermutations.OrderByDescending(p => p.ConsumptionBonus).ThenBy(p => p.SpeedBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.Where(m => m != null).ToList();
+					if(modulePermutations.Count > 0)
+						return modulePermutations.OrderByDescending(p => p.ConsumptionBonus).ThenBy(p => p.SpeedBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.Where(m => m != null).OrderBy(m => m.FriendlyName).ToList();
+					return moduleList; //empty
 				case Style.EfficiencyOnly:
-					List<Module> moduleOptions = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled).OrderByDescending(m => ((m.ConsumptionBonus * 1000) - m.SpeedBonus)).ToList();
+					List<Module> moduleOptions = assembler.Modules.Intersect(recipe.Modules).Where(m => m.Enabled && m.ConsumptionBonus < 0).OrderByDescending(m => ((m.ConsumptionBonus * 1000) - m.SpeedBonus)).ToList();
+					List<ModulePermutator.Permutation> modulePermutationsB = ModulePermutator.GetOptimalEfficiencyPermutations(new List<Module>(), moduleOptions, assembler.ModuleSlots);
 
 					//return best module permutation that has the lowest consumption (max -80%), and the lowest tier cost
-					List<ModulePermutator.Permutation> modulePermutationsB = ModulePermutator.GetModulePermutations(moduleOptions, assembler.ModuleSlots);
-					return modulePermutationsB.OrderByDescending(p => p.ConsumptionBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.Where(m => m != null).ToList();
+					if(modulePermutationsB.Count > 0)
+						return modulePermutationsB.OrderByDescending(p => p.ConsumptionBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.Where(m => m != null).OrderBy(m => m.FriendlyName).ToList();
+					return moduleList; //empty
 				case Style.None:
 				default:
 					break; //return the empty module list
@@ -109,29 +112,78 @@ namespace Foreman
 			}
 		}
 
-		public static List<Permutation> GetModulePermutations(List<Module> moduleOptions, int moduleSlots) //keep in mind that this can get quite large; with 462 permutations of 6 modules into 6 slots, 12,376 of 12 modules into 6 slots, and 100,947 of 18 modules into 6 slots.
+		public static List<Permutation> GetOptimalEfficiencyPermutations(List<Module> speedModules, List<Module> efficiencyModules, int moduleSlots) //the original approach of brute forcing things runs into a ceiling when using over 12 modules or 12 slots (I mean, its a combination -> factorials everywhere)
 		{
+			//doe by a 'smart' approach: fill in the set with i of one type speed and (module slot - i) of one type efficiency, then refine by changing 1 of the speeds to a different module and 1 of the efficiencies to a different module.
+			//so assume the ideal solution will be in the form (i - 1)* speedModule A + (1)* speedModuleB + (module slots - i - 1)* efficiencyModule A + (1) * efficiencyModuleB where speedModuleA and speedModuleB can be equal (same for efficiencyA and B)
 			List<Permutation> permutations = new List<Permutation>();
 			Module[] permutation = new Module[moduleSlots];
-			AddModule(0, 0);
-			return permutations;
 
-			void AddModule(int itemIndex, int startingIndex) //depth first insertion of modules brute forcing all options.
+
+			//permutation will be in the form [ 1 speedModuleB, n-1 amounts of speedModuleA, moduleslots-n-1 amounts of efficiencyModuleA, 1 efficiencyModuleB ] where n is between 1 and moduleslots - 1.
+			//thus 3 speed modules + 1 efficiency is valid. 1 speed module and 3 efficiency is valid. 4 speed only is not (neither is 4 efficiency)
+			//will do nothing if there isnt at least 3 slots
+			for (int sfA = 0; sfA < speedModules.Count; sfA++)
 			{
-				if (itemIndex == permutation.Length)
-					permutations.Add(new Permutation(permutation));
-				else
+				for (int efA = 0; efA < efficiencyModules.Count; efA++)
 				{
-					for (int i = startingIndex; i < moduleOptions.Count; i++)
+					for (int border = 1; border < moduleSlots; border++)
 					{
-						permutation[itemIndex] = moduleOptions[i];
-						AddModule(itemIndex + 1, i);
+						for (int i = 1; i < border; i++)
+							permutation[i] = speedModules[sfA];
+						for (int i = border; i < moduleSlots - 1; i++)
+							permutation[i] = efficiencyModules[efA];
+						for (int sfB = sfA; sfB < speedModules.Count; sfB++)
+						{
+							permutation[0] = speedModules[sfB];
+							for (int efB = efA; efB < efficiencyModules.Count; efB++)
+							{
+								permutation[moduleSlots - 1] = efficiencyModules[efB];
+								permutations.Add(new Permutation(permutation));
+							}
+						}
 					}
-					permutation[itemIndex] = null;
-					AddModule(itemIndex + 1, moduleOptions.Count); //the 'no module' option
 				}
 			}
 
+			//efficiency only permutations -> in the form of [n efficiency moduleA, x efficiency moduleB, moduleSlots-n-x null modules], with at least 1 of moduleA and 1 of moduleB
+			//will do nothing if there arent at least 2 slots
+			for (int efA = 0; efA < efficiencyModules.Count; efA++)
+			{
+				for (int efB = efA; efB < efficiencyModules.Count; efB++) //prevents double counts where A and B are switched (still double counts at A=B, but thats minor enough)
+				{
+					for (int n = 1; n < moduleSlots; n++)
+					{
+						for (int x = n + 1; x < moduleSlots; x++)
+						{
+							for (int i = 0; i < n; i++)
+								permutation[i] = efficiencyModules[efA];
+							for (int i = n; i < x; i++)
+								permutation[i] = efficiencyModules[efB];
+							for (int i = x; i < moduleSlots; i++)
+								permutation[i] = null;
+							permutations.Add(new Permutation(permutation));
+						}
+					}
+				}
+			}
+
+			//last efficiency only -> 0 or 1 modules
+			//at least 1 slot
+			for (int i = 0; i < moduleSlots; i++)
+				permutation[i] = null;
+			permutations.Add(new Permutation(permutation)); //no modules
+			foreach (Module module in efficiencyModules)
+			{
+				permutation[0] = module;
+				permutations.Add(new Permutation(permutation)); //1 module
+			}
+
+			//0 slots (empty permutation)
+			if (moduleSlots == 0)
+				permutations.Add(new Permutation(permutation));
+
+			return permutations;
 		}
 	}
 }

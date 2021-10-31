@@ -12,7 +12,7 @@ namespace Foreman
 	{
 		protected override Brush CleanBgBrush { get { return recipeBgBrush; } }
 		private static readonly Brush recipeBgBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
-		private static readonly Pen productivityPen = new Pen(new SolidBrush(Color.FromArgb(166, 0, 0)), 6);
+		private static readonly Pen productivityPen = new Pen(Brushes.DarkRed, 6);
 		private static readonly Pen productivityPlusPen = new Pen(productivityPen.Brush, 2);
 
 		private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
@@ -141,19 +141,6 @@ namespace Foreman
 			}
 
 			return tooltips;
-		}
-
-		protected override void MouseUpAction(Point graph_point, MouseButtons button)
-		{
-			if (button == MouseButtons.Left)
-			{
-				DevNodeOptionsPanel newPanel = new DevNodeOptionsPanel(DisplayedNode, graphViewer);
-				new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), graphViewer);
-			}
-			else
-			{
-				base.MouseUpAction(graph_point, button); //the standard menu (for now)
-			}
 		}
 	}
 }

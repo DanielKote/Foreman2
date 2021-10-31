@@ -19,6 +19,11 @@ namespace Foreman
 		private static readonly Point[] moduleLocations = new Point[] { new Point(ModuleSpacing, 0), new Point(ModuleSpacing, ModuleSpacing), new Point(ModuleSpacing, ModuleSpacing * 2), new Point(0, 0), new Point(0, ModuleSpacing), new Point(0, ModuleSpacing * 2) };
 		private static readonly Point moduleOffset = new Point(0, 5);
 
+		private static readonly Pen speedModulePen = new Pen(Brushes.DarkBlue, 3);
+		private static readonly Pen prodModulePen = new Pen(Brushes.DarkRed, 3);
+		private static readonly Pen effModulePen = new Pen(Brushes.DarkGreen, 3);
+		private static readonly Pen unknownModulePen = new Pen(Brushes.Black, 3);
+
 		private static readonly Font infoFont = new Font(FontFamily.GenericSansSerif, 5);
 		private static readonly Font counterBaseFont = new Font(FontFamily.GenericSansSerif, 14);
 		private static readonly Brush textBrush = Brushes.Black;
@@ -46,8 +51,27 @@ namespace Foreman
 			graphics.DrawImage(recipeNode.SelectedAssembler.Icon, trans.X + ModuleSpacing * 2 + 2, trans.Y, AssemblerIconSize, AssemblerIconSize);
 
 			//modules
-			for (int i = 0; i < moduleLocations.Length && i < recipeNode.AssemblerModules.Count; i++)
-				graphics.DrawImage(recipeNode.AssemblerModules[i].Icon, trans.X + moduleLocations[i].X + moduleOffset.X, trans.Y + moduleLocations[i].Y + moduleOffset.Y, ModuleIconSize, ModuleIconSize);
+			if (recipeNode.AssemblerModules.Count <= 6)
+			{
+				for (int i = 0; i < moduleLocations.Length && i < recipeNode.AssemblerModules.Count; i++)
+					graphics.DrawImage(recipeNode.AssemblerModules[i].Icon, trans.X + moduleLocations[i].X + moduleOffset.X, trans.Y + moduleLocations[i].Y + moduleOffset.Y, ModuleIconSize, ModuleIconSize);
+			}
+			else //resot to drawing circles for each module instead -> 5x6 set, so max 30 modules shown
+			{
+				for(int x = 0; x < 5; x++)
+				{
+					for (int y = 0; y < 6; y++)
+					{
+						if (recipeNode.AssemblerModules.Count > (x * 6) + y)
+						{
+							Pen marker = recipeNode.AssemblerModules[(x * 6) + y].ProductivityBonus > 0 ? prodModulePen :
+								recipeNode.AssemblerModules[(x * 6) + y].ConsumptionBonus < 0 ? effModulePen :
+								recipeNode.AssemblerModules[(x * 6) + y].SpeedBonus > 0 ? speedModulePen : unknownModulePen;
+							graphics.DrawEllipse(marker, trans.X + moduleOffset.X + 20 - (x * 7), trans.Y + moduleOffset.Y + (y * 7), 3, 3);
+						}
+					}
+				}
+			}
 
 			//assembler info + quantity
 			Rectangle textbox;
@@ -99,10 +123,20 @@ namespace Foreman
 			{
 				TooltipInfo tti = new TooltipInfo();
 				tti.Direction = Direction.Down;
-				tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(1 + (recipeNode.AssemblerModules.Count > 3 ? ModuleSpacing : 3 * ModuleSpacing / 2) - (Width / 2), -Height / 2)));
+				tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(1 + (recipeNode.AssemblerModules.Count > 3 ? recipeNode.AssemblerModules.Count > 6 ? ModuleSpacing * 3 / 2 : ModuleSpacing : ModuleSpacing * 3 / 2) - (Width / 2), -Height / 2)));
 				tti.Text = "Assembler Modules:";
+				
+				Dictionary<Module, int> moduleCounter = new Dictionary<Module, int>();
 				foreach (Module m in recipeNode.AssemblerModules)
-					tti.Text += "\n   " + m.FriendlyName;
+				{
+					if (moduleCounter.ContainsKey(m))
+						moduleCounter[m]++;
+					else
+						moduleCounter.Add(m, 1);
+				}
+
+				foreach(Module m in moduleCounter.Keys.OrderBy(m => m.FriendlyName))
+					tti.Text += string.Format("\n   {0} :{1}", moduleCounter[m], m.FriendlyName);
 				tooltips.Add(tti);
 			}
 			else //over assembler

@@ -19,7 +19,7 @@ namespace Foreman
 		private static readonly Brush textBrush = Brushes.White;
 		private static readonly StringFormat stringFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Near };
 
-		private HashSet<FloatingTooltipControl> floatingTooltipControls;
+		private Dictionary<FloatingTooltipControl, bool> floatingTooltipControls;
 
 		private ProductionGraphViewer parent;
 
@@ -27,31 +27,38 @@ namespace Foreman
 		{
 			parent = graphViewer;
 
-			floatingTooltipControls = new HashSet<FloatingTooltipControl>();
+			floatingTooltipControls = new Dictionary<FloatingTooltipControl, bool>();
 		}
 
-		public void AddToolTip(FloatingTooltipControl tt) { floatingTooltipControls.Add(tt); }
+		public void AddToolTip(FloatingTooltipControl tt, bool showOverride) { floatingTooltipControls.Add(tt, showOverride); }
 		public void RemoveToolTip(FloatingTooltipControl tt) { floatingTooltipControls.Remove(tt); }
 
 		public void ClearFloatingControls()
 		{
-			foreach (var control in floatingTooltipControls.ToArray())
+			foreach (var control in floatingTooltipControls.Keys.ToArray())
 				control.Dispose();
 		}
 
-		public void Paint(Graphics graphics)
+		public void Paint(Graphics graphics, bool paintAll)
 		{
-
-			foreach (var fttp in floatingTooltipControls)
-				DrawTooltip(parent.GraphToScreen(fttp.GraphLocation), fttp.Control.Size, fttp.Direction, graphics, null);
-
-			BaseNodeElement element = parent.GetNodeAtPoint(parent.ScreenToGraph(parent.PointToClient(Control.MousePosition)));
-			if (element != null)
+			if (paintAll)
 			{
-				foreach (TooltipInfo tti in element.GetToolTips(parent.ScreenToGraph(parent.PointToClient(Control.MousePosition))))
-					DrawTooltip(tti.ScreenLocation, tti.ScreenSize, tti.Direction, graphics, tti.Text, tti.CustomDraw);
-			}
+				foreach (FloatingTooltipControl fttp in floatingTooltipControls.Keys)
+					DrawTooltip(parent.GraphToScreen(fttp.GraphLocation), fttp.Control.Size, fttp.Direction, graphics, null);
 
+				BaseNodeElement element = parent.GetNodeAtPoint(parent.ScreenToGraph(parent.PointToClient(Control.MousePosition)));
+				if (element != null)
+				{
+					foreach (TooltipInfo tti in element.GetToolTips(parent.ScreenToGraph(parent.PointToClient(Control.MousePosition))))
+						DrawTooltip(tti.ScreenLocation, tti.ScreenSize, tti.Direction, graphics, tti.Text, tti.CustomDraw);
+				}
+			}
+			else
+			{
+				foreach (FloatingTooltipControl fttp in floatingTooltipControls.Where(kvp => kvp.Value).Select(kvp => kvp.Key))
+					DrawTooltip(parent.GraphToScreen(fttp.GraphLocation), fttp.Control.Size, fttp.Direction, graphics, null);
+
+			}
 		}
 
 		private void DrawTooltip(Point screenArrowPoint, Size size, Direction direction, Graphics graphics, String text = null, Action<Graphics, Point> customDraw = null)

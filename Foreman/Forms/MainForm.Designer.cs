@@ -150,7 +150,7 @@
 			this.ClearButton.Name = "ClearButton";
 			this.ClearButton.Size = new System.Drawing.Size(100, 28);
 			this.ClearButton.TabIndex = 6;
-			this.ClearButton.Text = "New";
+			this.ClearButton.Text = "Clear Graph";
 			this.ClearButton.UseVisualStyleBackColor = true;
 			this.ClearButton.Click += new System.EventHandler(this.ClearButton_Click);
 			// 

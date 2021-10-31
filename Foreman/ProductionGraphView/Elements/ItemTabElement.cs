@@ -56,36 +56,16 @@ namespace Foreman
 		public void UpdateValues(float consumeRate, float suppliedRate, bool isOversupplied)
 		{
 			borderPen = regularBorderPen;
-			text = FloatToString(consumeRate);
+			text = GraphicsStuff.FloatToString(consumeRate);
 
 			if (isOversupplied)
 			{
 				borderPen = oversuppliedBorderPen;
-				text += "\n" + FloatToString(suppliedRate);
+				text += "\n" + GraphicsStuff.FloatToString(suppliedRate);
 			}
 
 			int textHeight = (int)graphViewer.CreateGraphics().MeasureString(text, textFont).Height;
 			Height = iconSize + textHeight + border + 3;
-		}
-
-		private string FloatToString(float value)
-		{
-			string str;
-			if (value >= 100000)
-				str = value.ToString("0.00e0");
-			else if (value >= 10000)
-				str = value.ToString("0");
-			else if (value >= 100)
-				str = value.ToString("0.#");
-			else if (value >= 10)
-				str = value.ToString("0.##");
-			else if (value >= 0.1)
-				str = value.ToString("0.###");
-			else if (value != 0)
-				str = value.ToString("0.######");
-			else
-				str = "0";
-			return str;
 		}
 
 		protected override void Draw(Graphics graphics)
