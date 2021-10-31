@@ -9,7 +9,7 @@ namespace ForemanTest
     // A fluid interface for building up production graphs for testing. See references for usage.
     public class GraphBuilder
     {
-        public static Subgroup TestSubgroup = new Subgroup(null, "", "");
+        public static SubgroupPrototype TestSubgroup = new SubgroupPrototype(null, "", "");
 
 
         private static int counter = 0;
@@ -104,7 +104,7 @@ namespace ForemanTest
 
         public class SingletonNodeBuilder : ProductionNodeBuilder
         {
-            private Func<Item, ProductionGraph, ProductionNode> createFunction;
+            private Func<ItemPrototype, ProductionGraph, ProductionNode> createFunction;
 
             public SingletonNodeBuilder(Func<Item, ProductionGraph, ProductionNode> f)
             {
@@ -128,7 +128,7 @@ namespace ForemanTest
 
             internal override void Build(ProductionGraph graph)
             {
-                Built = this.createFunction(new Item(graph.DCache, itemName, "", false, TestSubgroup, ""), graph);
+                Built = this.createFunction(new ItemPrototype(graph.DCache, itemName, "", false, TestSubgroup, ""), graph);
 
                 if (target > 0)
                 {
@@ -163,12 +163,12 @@ namespace ForemanTest
                 if (name == null)
                     name = "recipe-" + GetSequence();
 
-                Recipe recipe = new Recipe(graph.DCache, name, "", TestSubgroup, "");
+                RecipePrototype recipe = new RecipePrototype(graph.DCache, name, "", TestSubgroup, "");
                 recipe.Time = duration;
                 foreach (KeyValuePair<string, float> kvp in inputs)
-                    recipe.AddIngredient(graph.DCache.Items[kvp.Key], kvp.Value);
+                    recipe.InternalOneWayAddIngredient(graph.DCache.Items[kvp.Key] as ItemPrototype, kvp.Value);
                 foreach (KeyValuePair<string, float> kvp in outputs)
-                    recipe.AddProduct(graph.DCache.Items[kvp.Key], kvp.Value);
+                    recipe.InternalOneWayAddProduct(graph.DCache.Items[kvp.Key] as ItemPrototype, kvp.Value);
 
                 Built = RecipeNode.Create(recipe, graph);
                 this.Built.ProductivityBonus = efficiency;
@@ -229,7 +229,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Suppliers(string itemName)
             {
-                return Graph.GetSuppliers(new Item(Graph.DCache, itemName, "", false, TestSubgroup, ""));
+                return Graph.GetSuppliers(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }
 
             public float ConsumedRate(string itemName)
@@ -239,7 +239,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Consumers(string itemName)
             {
-                return Graph.GetConsumers(new Item(Graph.DCache, itemName, "", false, TestSubgroup, ""));
+                return Graph.GetConsumers(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }
 
             public float RecipeRate(string name)
@@ -256,7 +256,7 @@ namespace ForemanTest
                    .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
                    .Select(x => (RecipeNode)x)
                    .First()
-                   .GetSuppliedRate(new Item(Graph.DCache, itemName, "", false, TestSubgroup, ""));
+                   .GetSuppliedRate(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }
         }
     }

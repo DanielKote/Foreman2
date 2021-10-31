@@ -14,30 +14,6 @@ namespace Foreman
 
 		public ModuleSelector NodeModules { get; set; }
 
-		internal Dictionary<MachinePermutation, int> GetAssemblers()
-		{
-			var assembler = Assembler;
-
-			if (assembler == null)
-			{
-				//assembler = PGViewer.DCache.Assemblers.Values
-				//	.Where(a => a.Enabled)
-				//	.Where(a => a.Categories.Contains(BaseRecipe.Category))
-				//	.OrderBy(a => -a.Speed)
-				//	.FirstOrDefault();
-			}
-
-			var ret = new Dictionary<MachinePermutation, int>();
-
-			if (assembler != null)
-			{
-				//var modules = NodeModules.For(BaseRecipe, assembler.ModuleSlots);
-				//var required = (int)Math.Ceiling(actualRate / assembler.GetRate(BaseRecipe.Time, (float)SpeedBonus, modules));
-				//ret.Add(new MachinePermutation(assembler, modules.ToList()), required);
-			}
-
-			return ret;
-		}
 
 		protected RecipeNode(Recipe baseRecipe, ProductionGraph graph)
 			: base(graph)
@@ -123,7 +99,7 @@ namespace Foreman
 
 		public override float ProductivityMultiplier()
 		{
-			var assemblerBonus = GetAssemblers().Keys.Sum(x => x.GetAssemblerProductivity());
+			var assemblerBonus = 0; // = GetAssemblers().Keys.Sum(x => x.GetAssemblerProductivity());
 			return (float)(1.0 + ProductivityBonus + assemblerBonus);
 		}
 	}

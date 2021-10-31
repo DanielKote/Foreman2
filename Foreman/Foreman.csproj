@@ -156,7 +156,6 @@
     <Compile Include="Models\PassthroughNode.cs" />
     <Compile Include="Models\RecipeNode.cs" />
     <Compile Include="Models\SupplierNode.cs" />
-    <Compile Include="ProductionGraphView\AssemblerBox.cs" />
     <Compile Include="DataCache\DataCache.cs" />
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
@@ -221,6 +220,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportPresetForm.resx">
       <DependentUpon>ImportPresetForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PresetSelectionForm.resx">
+      <DependentUpon>PresetSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>

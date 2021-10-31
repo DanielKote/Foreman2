@@ -3,7 +3,17 @@ using System.Collections.Generic;
 
 namespace Foreman
 {
-    public class Technology : DataObjectBase
+	public interface Technology : DataObjectBase
+    {
+		IReadOnlyCollection<Technology> Prerequisites { get; }
+		IReadOnlyCollection<Technology> PostTechs { get; }
+		IReadOnlyCollection<Recipe> UnlockedRecipes { get; }
+
+		bool Enabled { get; set; }
+		bool Locked { get; }
+	}
+
+	public class TechnologyPrototype : DataObjectBasePrototype, Technology
     {
         public IReadOnlyCollection<Technology> Prerequisites { get { return prerequisites; } }
 		public IReadOnlyCollection<Technology> PostTechs { get { return postTechs; } }
@@ -12,44 +22,18 @@ namespace Foreman
 		private bool enabled = false;
 		private bool locked = false;
 		public bool Enabled { get { return enabled; } set { enabled = value && !Locked; } }
-		public bool Locked { get { return locked; } set { locked = value; if (value) enabled = false; } } //cant be enabled if locked
+		public bool Locked { get { return locked; } internal set { locked = value; if (value) enabled = false; } } //cant be enabled if locked
 
-		private HashSet<Technology> prerequisites;
-		private HashSet<Technology> postTechs;
-		private HashSet<Recipe> unlockedRecipes;
+		internal HashSet<TechnologyPrototype> prerequisites { get; private set; }
+		internal HashSet<TechnologyPrototype> postTechs { get; private set; }
+		internal HashSet<RecipePrototype> unlockedRecipes { get; private set; }
 
-		public Technology(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName, "-")
+		public TechnologyPrototype(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName, "-")
 		{
-			prerequisites = new HashSet<Technology>();
-			postTechs = new HashSet<Technology>();
-			unlockedRecipes = new HashSet<Recipe>();
+			prerequisites = new HashSet<TechnologyPrototype>();
+			postTechs = new HashSet<TechnologyPrototype>();
+			unlockedRecipes = new HashSet<RecipePrototype>();
 		}
-
-		public void AddPrerequisite(Technology tech)
-        {
-			prerequisites.Add(tech);
-			tech.postTechs.Add(this);
-        }
-
-		internal void InternalOneWayRemovePrerequisite(Technology tech)
-        {
-			prerequisites.Remove(tech);
-        }
-
-		internal void InternalOneWayRemovePostTech(Technology tech)
-        {
-			postTechs.Remove(tech);
-        }
-
-		internal void InternalOneWayAddRecipe(Recipe recipe) //only called from Recipe
-        {
-			unlockedRecipes.Add(recipe);
-        }
-
-		internal void InternalOneWayRemoveRecipe(Recipe recipe) //only called from Recipe
-        {
-			unlockedRecipes.Remove(recipe);
-        }
 
 		public override int GetHashCode()
 		{
@@ -58,14 +42,14 @@ namespace Foreman
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is Technology))
+			if (!(obj is TechnologyPrototype))
 			{
 				return false;
 			}
-			return this == (Technology)obj;
+			return this == (TechnologyPrototype)obj;
 		}
 
-		public static bool operator ==(Technology item1, Technology item2)
+		public static bool operator ==(TechnologyPrototype item1, TechnologyPrototype item2)
 		{
 			if (System.Object.ReferenceEquals(item1, item2))
 			{
@@ -79,7 +63,7 @@ namespace Foreman
 			return item1.Name == item2.Name;
 		}
 
-		public static bool operator !=(Technology item1, Technology item2)
+		public static bool operator !=(TechnologyPrototype item1, TechnologyPrototype item2)
 		{
 			return !(item1 == item2);
 		}

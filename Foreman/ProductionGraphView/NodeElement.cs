@@ -51,7 +51,6 @@ namespace Foreman
 
 		public String text = "";
 		
-		private AssemblerBox assemblerBox;
 		private List<ItemTab> inputTabs = new List<ItemTab>();
 		private List<ItemTab> outputTabs = new List<ItemTab>();
 
@@ -122,9 +121,7 @@ namespace Foreman
 
 			if (DisplayedNode is RecipeNode || DisplayedNode is SupplierNode)
 			{
-				assemblerBox = new AssemblerBox(Parent);
-				SubElements.Add(assemblerBox); 
-				assemblerBox.Height = assemblerBox.Width = 128;
+				//assembler stuff
 			}
 
 			centreFormat.Alignment = centreFormat.LineAlignment = StringAlignment.Center;
@@ -202,38 +199,6 @@ namespace Foreman
 			}
 			Width = Math.Max(iconWidth, minTextWidth);
 			Height = baseHeight;
-
-			if (assemblerBox != null) //recipe box (update width&height if displaying assembler/miner, or just increase min width if not displaying assembler/miner) + update assembler list
-			{
-				if ((DisplayedNode is RecipeNode && Parent.ShowAssemblers)
-					|| (DisplayedNode is SupplierNode && Parent.ShowMiners))
-				{
-					if (DisplayedNode is RecipeNode  rNode)
-					{
-                        var assemblers = rNode.GetAssemblers();
-                        if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
-                            assemblers = assemblers.ToDictionary(p => p.Key, p => 0);
-						assemblerBox.AssemblerList = assemblers;
-					}
-					else if (DisplayedNode is SupplierNode sNode)
-						assemblerBox.AssemblerList = sNode.GetMinimumMiners();
-
-					assemblerBox.Update();
-					int assemblerBoxWidth = assemblerBox.Width + 20;
-					Width = Math.Max(Width, assemblerBoxWidth) + dWidth * 2;
-					Width -= Width % dWidth;
-
-					Height = baseWIconHeight;
-
-					assemblerBox.X = -assemblerBox.Width / 2 + 2;
-					assemblerBox.Y = -assemblerBox.Height / 2 + 2;
-				}
-				else
-				{
-					assemblerBox.AssemblerList.Clear();
-					assemblerBox.Update();
-				}
-			}
 
 			//final size confirms
 			if (Width % dWidth != 0)
@@ -367,11 +332,11 @@ namespace Foreman
 				if (DisplayedNode is RecipeNode rNode)
 				{
 					int prodCount = 0;
-					var assemblers = rNode.GetAssemblers();
-					foreach (MachinePermutation assembler in assemblers.Keys)
-						foreach (Module module in assembler.modules)
-							if (module.ProductivityBonus > 0)
-								graphics.DrawEllipse(productivityPen, trans.X - (Width / 2) - 2, trans.Y - (Height / 2) + 20 + prodCount++ * 10, 5, 5);
+					//var assemblers = rNode.GetAssemblers();
+					//foreach (MachinePermutation assembler in assemblers.Keys)
+					//	foreach (Module module in assembler.modules)
+					//		if (module.ProductivityBonus > 0)
+					//			graphics.DrawEllipse(productivityPen, trans.X - (Width / 2) - 2, trans.Y - (Height / 2) + 20 + prodCount++ * 10, 5, 5);
 				}
 
 				if (Selected)
@@ -530,7 +495,7 @@ namespace Foreman
 							fRange tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Output); //input type tab means output of connection link
 							if (tempRange.Ignore && DisplayedNode is PassthroughNode)
 								tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Input); //if there was no temp range on this side of this throughput node, try to just copy the other side
-							tti.Text = Item.GetTemperatureRangeFriendlyName(mousedTab.Item, tempRange);
+							tti.Text = mousedTab.Item.GetTemperatureRangeFriendlyName(tempRange);
                         }
 
 					    tti.Text += "\nDrag to create a new connection";
@@ -548,7 +513,7 @@ namespace Foreman
 							fRange tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Input); //output type tab means input of connection link
 							if (tempRange.Ignore && DisplayedNode is PassthroughNode)
 								tempRange = LinkElement.GetTemperatureRange(mousedTab.Item, this, LinkType.Output); //if there was no temp range on this side of this throughput node, try to just copy the other side
-							tti.Text = Item.GetTemperatureRangeFriendlyName(mousedTab.Item, tempRange);
+							tti.Text = mousedTab.Item.GetTemperatureRangeFriendlyName(tempRange);
 						}
 
 						tti.Text += "\nDrag to create a new connection";
@@ -579,6 +544,7 @@ namespace Foreman
 					}
 					if (Parent.ShowAssemblers)
 					{
+						/*
 						tti.Text += String.Format("\n\nAssemblers:");
 						foreach (var kvp in assemblerBox.AssemblerList)
 						{
@@ -587,7 +553,7 @@ namespace Foreman
 							{
 								tti.Text += String.Format("\n------{0}", Module.FriendlyName);
 							}
-						}
+						}*/
 					}
 
 					if (Parent.Graph.SelectedAmountType == AmountType.FixedAmount)
@@ -706,10 +672,6 @@ namespace Foreman
 			size10Font.Dispose();
 			centreFormat.Dispose();
 			backgroundBrush.Dispose();
-			if (assemblerBox != null)
-			{
-				assemblerBox.Dispose();
-			}
 			rightClickMenu.Dispose();
 			base.Dispose();
 		}

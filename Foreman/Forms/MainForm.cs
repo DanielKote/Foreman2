@@ -182,8 +182,8 @@ namespace Foreman
 				using (SettingsForm form = new SettingsForm(oldOptions))
 				{
 					form.StartPosition = FormStartPosition.Manual;
-					form.Left = this.Left + 250;
-					form.Top = this.Top + 25;
+					form.Left = this.Left + 150;
+					form.Top = this.Top + 100;
 					form.ShowDialog();
 					reload = (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset); //if we changed the preset, then load up another settings form after processing
 

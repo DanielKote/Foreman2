@@ -41,6 +41,7 @@
             this.AddItemButton = new System.Windows.Forms.Button();
             this.AddRecipeButton = new System.Windows.Forms.Button();
             this.ProductionGroupBox = new System.Windows.Forms.GroupBox();
+            this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
             this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
             this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
             this.RateButton = new System.Windows.Forms.RadioButton();
@@ -58,7 +59,6 @@
             this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
             this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
             this.GraphViewer = new Foreman.ProductionGraphViewer();
-            this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
             this.MainLayoutPanel.SuspendLayout();
             this.MainToolbar.SuspendLayout();
             this.ButtonsAFlowLayoutPanel.SuspendLayout();
@@ -115,22 +115,22 @@
             this.ButtonsAFlowLayoutPanel.Size = new System.Drawing.Size(104, 128);
             this.ButtonsAFlowLayoutPanel.TabIndex = 14;
             // 
-            // saveGraphButton
+            // SaveGraphButton
             // 
             this.SaveGraphButton.Location = new System.Drawing.Point(2, 2);
             this.SaveGraphButton.Margin = new System.Windows.Forms.Padding(2);
-            this.SaveGraphButton.Name = "saveGraphButton";
+            this.SaveGraphButton.Name = "SaveGraphButton";
             this.SaveGraphButton.Size = new System.Drawing.Size(100, 28);
             this.SaveGraphButton.TabIndex = 9;
             this.SaveGraphButton.Text = "Save";
             this.SaveGraphButton.UseVisualStyleBackColor = true;
             this.SaveGraphButton.Click += new System.EventHandler(this.SaveGraphButton_Click);
             // 
-            // loadGraphButton
+            // LoadGraphButton
             // 
             this.LoadGraphButton.Location = new System.Drawing.Point(2, 34);
             this.LoadGraphButton.Margin = new System.Windows.Forms.Padding(2);
-            this.LoadGraphButton.Name = "loadGraphButton";
+            this.LoadGraphButton.Name = "LoadGraphButton";
             this.LoadGraphButton.Size = new System.Drawing.Size(100, 28);
             this.LoadGraphButton.TabIndex = 10;
             this.LoadGraphButton.Text = "Load";
@@ -144,7 +144,7 @@
             this.ClearButton.Name = "ClearButton";
             this.ClearButton.Size = new System.Drawing.Size(100, 28);
             this.ClearButton.TabIndex = 6;
-            this.ClearButton.Text = "Clear Chart";
+            this.ClearButton.Text = "New";
             this.ClearButton.UseVisualStyleBackColor = true;
             this.ClearButton.Click += new System.EventHandler(this.ClearButton_Click);
             // 
@@ -237,6 +237,18 @@
             this.ProductionGroupBox.TabStop = false;
             this.ProductionGroupBox.Text = "Production properties:";
             // 
+            // DynamicLWCheckBox
+            // 
+            this.DynamicLWCheckBox.AutoSize = true;
+            this.DynamicLWCheckBox.Location = new System.Drawing.Point(12, 79);
+            this.DynamicLWCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
+            this.DynamicLWCheckBox.Size = new System.Drawing.Size(146, 21);
+            this.DynamicLWCheckBox.TabIndex = 4;
+            this.DynamicLWCheckBox.Text = "Dynamic link-width";
+            this.DynamicLWCheckBox.UseVisualStyleBackColor = true;
+            this.DynamicLWCheckBox.CheckedChanged += new System.EventHandler(this.DynamicLWCheckBox_CheckedChanged);
+            // 
             // PauseUpdatesCheckbox
             // 
             this.PauseUpdatesCheckbox.AutoSize = true;
@@ -250,7 +262,7 @@
             this.PauseUpdatesCheckbox.UseVisualStyleBackColor = true;
             this.PauseUpdatesCheckbox.CheckedChanged += new System.EventHandler(this.PauseUpdatesCheckbox_CheckedChanged);
             // 
-            // rateOptionsDropDown
+            // RateOptionsDropDown
             // 
             this.RateOptionsDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.RateOptionsDropDown.Enabled = false;
@@ -260,30 +272,30 @@
             "/min"});
             this.RateOptionsDropDown.Location = new System.Drawing.Point(148, 46);
             this.RateOptionsDropDown.Margin = new System.Windows.Forms.Padding(4);
-            this.RateOptionsDropDown.Name = "rateOptionsDropDown";
+            this.RateOptionsDropDown.Name = "RateOptionsDropDown";
             this.RateOptionsDropDown.Size = new System.Drawing.Size(53, 24);
             this.RateOptionsDropDown.TabIndex = 2;
             this.RateOptionsDropDown.SelectedIndexChanged += new System.EventHandler(this.RateOptionsDropDown_SelectedIndexChanged);
             // 
-            // rateButton
+            // RateButton
             // 
             this.RateButton.AutoSize = true;
             this.RateButton.Location = new System.Drawing.Point(12, 47);
             this.RateButton.Margin = new System.Windows.Forms.Padding(4);
-            this.RateButton.Name = "rateButton";
+            this.RateButton.Name = "RateButton";
             this.RateButton.Size = new System.Drawing.Size(139, 21);
             this.RateButton.TabIndex = 1;
             this.RateButton.Text = "Calculate as rate:";
             this.RateButton.UseVisualStyleBackColor = true;
             this.RateButton.CheckedChanged += new System.EventHandler(this.RateButton_CheckedChanged);
             // 
-            // fixedAmountButton
+            // FixedAmountButton
             // 
             this.FixedAmountButton.AutoSize = true;
             this.FixedAmountButton.Checked = true;
             this.FixedAmountButton.Location = new System.Drawing.Point(12, 22);
             this.FixedAmountButton.Margin = new System.Windows.Forms.Padding(4);
-            this.FixedAmountButton.Name = "fixedAmountButton";
+            this.FixedAmountButton.Name = "FixedAmountButton";
             this.FixedAmountButton.Size = new System.Drawing.Size(190, 21);
             this.FixedAmountButton.TabIndex = 0;
             this.FixedAmountButton.TabStop = true;
@@ -472,18 +484,6 @@
             this.GraphViewer.Size = new System.Drawing.Size(1174, 613);
             this.GraphViewer.TabIndex = 12;
             this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
-            // 
-            // DynamicLWCheckBox
-            // 
-            this.DynamicLWCheckBox.AutoSize = true;
-            this.DynamicLWCheckBox.Location = new System.Drawing.Point(12, 79);
-            this.DynamicLWCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
-            this.DynamicLWCheckBox.Size = new System.Drawing.Size(146, 21);
-            this.DynamicLWCheckBox.TabIndex = 4;
-            this.DynamicLWCheckBox.Text = "Dynamic link-width";
-            this.DynamicLWCheckBox.UseVisualStyleBackColor = true;
-            this.DynamicLWCheckBox.CheckedChanged += new System.EventHandler(this.DynamicLWCheckBox_CheckedChanged);
             // 
             // MainForm
             // 

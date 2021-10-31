@@ -922,7 +922,8 @@ namespace Foreman
 			//prepare list of used items & list of used recipes (with their inputs & outputs)
 			HashSet<string> includedItems = new HashSet<string>();
 			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
-			List<Recipe> includedMissingRecipes = new List<Recipe>(); //why wont this work with a hashset! I want a hashset!
+			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new MissingRecipeComparer()); //compares by name, ingredients, and products
+
 			foreach(ProductionNode node in Graph.Nodes)
             {
 				if (node is RecipeNode rnode)
@@ -942,18 +943,18 @@ namespace Foreman
 			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
 			
 			//write
+			info.AddValue("SavedPresetName", Graph.DCache.PresetName);
 			info.AddValue("AmountType", Graph.SelectedAmountType);
 			info.AddValue("Unit", Graph.SelectedUnit);
-			info.AddValue("SavedPresetName", Graph.DCache.PresetName);
 
+			info.AddValue("IncludedMods", Graph.DCache.IncludedMods.Select(m => m.Key + "|"+m.Value));
 			info.AddValue("IncludedItems", includedItems);
 			info.AddValue("IncludedRecipes", includedRecipeShorts);
-			info.AddValue("IncludedMods", Graph.DCache.IncludedMods.Select(m => m.Key + "|"+m.Value));
 
+			info.AddValue("HiddenRecipes", Graph.DCache.Recipes.Values.Where(r => r.Hidden).Select(r => r.Name));
 			info.AddValue("EnabledAssemblers", Graph.DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
 			info.AddValue("EnabledMiners", Graph.DCache.Miners.Values.Where(m => m.Enabled).Select(m => m.Name));
 			info.AddValue("EnabledModules", Graph.DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
-			info.AddValue("HiddenRecipes", Graph.DCache.Recipes.Values.Where(r => r.Hidden).Select(r => r.Name));
 
 			info.AddValue("Nodes", Graph.Nodes);
 			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
@@ -965,6 +966,9 @@ namespace Foreman
 			//need to convert it to the new format
 			//then:
 			//LoadFromJson(json);
+
+			//... i will do this last - after I make sure I wont change the format of the 'new' json save file structure any more.
+			// i mean - i already changed it 3 times to accomodate various things, and I havent even updated the assembler/modules for a given node yet!
         }
 
 		public void LoadFromJson(JObject json, bool useFirstPreset, bool enableEverything = false)
@@ -979,7 +983,7 @@ namespace Foreman
 
 			//grab recipe list
 			List<string> itemNames = json["IncludedItems"].Select(t => (string)t).ToList();
-			Dictionary<string, List<RecipeShort>> recipeShorts = RecipeShort.GetSetFromJson(json["IncludedRecipes"]);
+			List<RecipeShort> recipeShorts = RecipeShort.GetSetFromJson(json["IncludedRecipes"]);
 
 			//now - two options:
 			// a) we are told to use the first preset (basically, the selected preset) - so that is the only one added to the possible Presets
@@ -1019,18 +1023,19 @@ namespace Foreman
 					}
 
 					//show the menu to select the preferred preset
-					using (PresetSelectionForm form = new PresetSelectionForm())
+					using (PresetSelectionForm form = new PresetSelectionForm(presetErrors))
 					{
 						form.StartPosition = FormStartPosition.Manual;
-						form.Left = this.Left + 150;
-						form.Top = this.Top + 100;
-						form.ShowDialog();
+						form.Left = ParentForm.Left + 150;
+						form.Top = ParentForm.Top + 100;
 
+						if (form.ShowDialog() != DialogResult.OK || form.ChosenPreset == null) //null check is not necessary - if we get an ok dialogresult, we know it will be set
+							return;
 						chosenPreset = form.ChosenPreset;
-
-						return;
 					}
 				}
+				else if(chosenPreset.Name != Properties.Settings.Default.CurrentPresetName) //we had to switch the preset to a new one (without the user having to select a preset from a list)
+					MessageBox.Show(string.Format("Loaded graph uses a different Preset.\nPreset switched from \"{0}\" to \"{1}\"", Properties.Settings.Default.CurrentPresetName, chosenPreset.Name));
 			}
 
 			//clear graph
@@ -1078,7 +1083,7 @@ namespace Foreman
 			InsertJsonObjects(json, false);
 		}
 
-		public void InsertJsonObjects(JObject json, bool relativePlacement = false)
+		public void InsertJsonObjects(JObject json, bool relativePlacement = false) //this is used when loading a saved flowchart (ex: load chart, or change preset), along with when we paste a copied node collection (from this instance of foreman or a different one)
 		{
 			//match rate types
 			float multiplier = 1;
@@ -1090,60 +1095,9 @@ namespace Foreman
 					multiplier = 1 / 60;
             }
 
-			//check all items for existance
-			foreach (string iItem in json["IncludedItems"].Select(t => (string)t).ToList())
-				if (!Graph.DCache.Items.ContainsKey(iItem) && !Graph.DCache.MissingItems.ContainsKey(iItem)) //want to check for missing items too - in this case dont want duplicates
-					new Item(Graph.DCache, iItem, iItem, false, Graph.DCache.MissingSubgroup, "", true); //datacache will take care of it.
-
-			//check all recipes for compliance (and add the necessary recipes/items to the missing set)
-			//at the same time set up the recipeLinks (recipe ID -> recipe). we will use them to get the correct recipe to the nodes
-			Dictionary<string, List<RecipeShort>> includedRecipes = RecipeShort.GetSetFromJson(json["IncludedRecipes"]);
-			Dictionary<long, Recipe> recipeLinks = new Dictionary<long, Recipe>();
-			foreach (List<RecipeShort> recipeShortList in includedRecipes.Values)
-			{
-				foreach (RecipeShort iRecipe in recipeShortList)
-				{
-					Recipe recipe = null;
-
-					//recipe check #1 : does its name exist in database (note: we dont quite care about extra missing recipes here - so what if we have a couple identical ones? they will combine during save/load anyway)
-					bool recipeExists = Graph.DCache.Recipes.ContainsKey(iRecipe.Name);
-					//recipe check #2 : do the number of ingredients & products match?
-					recipeExists &= iRecipe.Ingredients.Count == Graph.DCache.Recipes[iRecipe.Name].IngredientList.Count;
-					recipeExists &= iRecipe.Products.Count == Graph.DCache.Recipes[iRecipe.Name].ProductList.Count;
-					//recipe check #3 : do the ingredients & products from the loaded data exist within the actual recipe?
-					if (recipeExists)
-					{
-						recipe = Graph.DCache.Recipes[iRecipe.Name];
-						//check #2 (from above) - dodnt care about amounts of each
-						foreach (string ingredient in iRecipe.Ingredients.Keys)
-							recipeExists &= Graph.DCache.Items.ContainsKey(ingredient) && recipe.IngredientSet.ContainsKey(Graph.DCache.Items[ingredient]);
-						foreach (string product in iRecipe.Products.Keys)
-							recipeExists &= Graph.DCache.Items.ContainsKey(product) && recipe.ProductSet.ContainsKey(Graph.DCache.Items[product]);
-					}
-
-					if (!recipeExists)
-					{
-						Recipe missingRecipe = new Recipe(Graph.DCache, iRecipe.Name, iRecipe.Name, Graph.DCache.MissingSubgroup, "", true);
-						foreach (var ingredient in iRecipe.Ingredients)
-						{
-							if (Graph.DCache.Items.ContainsKey(ingredient.Key))
-								missingRecipe.AddIngredient(Graph.DCache.Items[ingredient.Key], ingredient.Value);
-							else
-								missingRecipe.AddIngredient(Graph.DCache.MissingItems[ingredient.Key], ingredient.Value);
-						}
-						foreach (var product in iRecipe.Products)
-						{
-							if (Graph.DCache.Items.ContainsKey(product.Key))
-								missingRecipe.AddProduct(Graph.DCache.Items[product.Key], product.Value);
-							else
-								missingRecipe.AddProduct(Graph.DCache.MissingItems[product.Key], product.Value);
-						}
-						recipe = missingRecipe;
-					}
-
-					recipeLinks.Add(iRecipe.RecipeID, recipe);
-				}
-			}
+			//check compliance on all items and recipes (data-cache will take care of it) - this means add in any missing items/recipes and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
+			Graph.DCache.ProcessNewItemSet(json["IncludedItems"].Select(t => (string)t).ToList());
+			Dictionary<long, Recipe> recipeLinks = Graph.DCache.ProcessNewRecipeShorts(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
 
 			//load in the graph nodes
 			HashSet<int> failedNodes = new HashSet<int>(); //we will use these in the 'extreme' case of failure to create a node. Any links to such nodes will be ignored

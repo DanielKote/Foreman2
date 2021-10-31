@@ -7,58 +7,48 @@ using System.ComponentModel;
 
 namespace Foreman
 {
-	public class Resource : DataObjectBase
+	public interface Resource : DataObjectBase
+    {
+		IReadOnlyCollection<Item> ResultingItems { get; }
+		IReadOnlyCollection<Miner> ValidMiners { get; }
+		float Time { get; }
+	}
+
+	public interface Miner : ProductionEntity
+	{
+		IReadOnlyCollection<Resource> MineableResources { get; }
+		float MiningSpeed { get; }
+		Item AssociatedItem { get; }
+	}
+
+	public class ResourcePrototype : DataObjectBasePrototype, Resource
 	{
 		public IReadOnlyCollection<Item> ResultingItems { get { return resultingItems; } }
 		public IReadOnlyCollection<Miner> ValidMiners { get { return validMiners; } }
 
-		public string Category { get; set; }
+		public float Time { get; internal set;}
 
-		public float Time { get; set;}
+		internal HashSet<MinerPrototype> validMiners { get; private set; }
+		internal HashSet<ItemPrototype> resultingItems { get; private set; }
 
-		private HashSet<Miner> validMiners;
-		private HashSet<Item> resultingItems;
-
-		public Resource(DataCache dCache, string name) : base(dCache, name, name, "-")
+		public ResourcePrototype(DataCache dCache, string name) : base(dCache, name, name, "-")
 		{
-			validMiners = new HashSet<Miner>();
-			resultingItems = new HashSet<Item>();
+			validMiners = new HashSet<MinerPrototype>();
+			resultingItems = new HashSet<ItemPrototype>();
 		}
-
-		public void AddResult(Item item)
-        {
-			resultingItems.Add(item);
-			item.InternalOneWayAddMiningResource(this);
-		}
-
-		internal void InternalOneWayRemoveResult(Item item) //only from delete calls
-        {
-			resultingItems.Remove(item);
-			item.InternalOneWayRemoveMiningResource(this);
-        }
-
-		public void AddMiner(Miner miner)
-        {
-			validMiners.Add(miner);
-			miner.InternalOneWayAddResource(this);
-        }
-		internal void InternalOneWayRemoveMiner(Miner miner) //only from delete calls
-		{
-			validMiners.Remove(miner);
-        }
 	}
 
-	public class Miner : ProductionEntity
+	public class MinerPrototype : ProductionEntityPrototype, Miner
 	{
 		public IReadOnlyCollection<Resource> MineableResources { get { return mineableResources; } }
 		public float MiningSpeed { get; set; }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
-		private HashSet<Resource> mineableResources;
+		internal HashSet<ResourcePrototype> mineableResources;
 
-		public Miner(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName)
+		public MinerPrototype(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName)
 		{
-			mineableResources = new HashSet<Resource>();
+			mineableResources = new HashSet<ResourcePrototype>();
 			Enabled = true;
 		}
 
@@ -77,14 +67,5 @@ namespace Foreman
 
 			return (float)(1d / timeForOneItem);
 		}
-
-		internal void InternalOneWayAddResource(Resource resource) //only called from Resource
-        {
-			mineableResources.Add(resource);
-        }
-		internal void InternalOneWayRemoveResource(Resource resource) //only from delete calls
-		{
-			mineableResources.Remove(resource);
-        }
 	}
 }

@@ -4,76 +4,64 @@ using System.Drawing;
 
 namespace Foreman
 {
-	public class Item : DataObjectBase
+	public interface Item : DataObjectBase
 	{
-        public Subgroup MySubgroup { get; protected set; }
+		Subgroup MySubgroup { get; }
+
+		IReadOnlyCollection<Recipe> ProductionRecipes { get; }
+		IReadOnlyCollection<Recipe> ConsumptionRecipes { get; }
+		IReadOnlyCollection<Resource> MiningResources { get; }
+		bool IsMissingItem { get; }
+		bool IsFluid { get; }
+		bool IsTemperatureDependent { get; }
+		double DefaultTemperature { get; }
+
+		string GetTemperatureRangeFriendlyName(fRange tempRange);
+	}
+
+	public class ItemPrototype : DataObjectBasePrototype, Item
+	{
+        public Subgroup MySubgroup { get { return mySubgroup; } }
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }
 		public IReadOnlyCollection<Recipe> ConsumptionRecipes { get { return consumptionRecipes; } }
 		public IReadOnlyCollection<Resource> MiningResources { get { return miningResources; } }
 
-		private HashSet<Recipe> productionRecipes;
-		private HashSet<Recipe> consumptionRecipes;
-		private HashSet<Resource> miningResources;
+		internal SubgroupPrototype mySubgroup;
+
+		internal HashSet<RecipePrototype> productionRecipes { get; private set; }
+		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
+		internal HashSet<ResourcePrototype> miningResources { get; private set; }
 
 		public bool IsMissingItem { get; private set; }
 
 		public bool IsFluid { get; private set; }
-        public bool IsTemperatureDependent { get; set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
+        public bool IsTemperatureDependent { get; internal set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
+		public double DefaultTemperature { get; internal set; } //for liquids
 
-		public double Temperature { get; set; } //for liquids
-
-		public Item(DataCache dCache, string name, string friendlyName, bool isfluid, Subgroup subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
+		public ItemPrototype(DataCache dCache, string name, string friendlyName, bool isfluid, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
-			MySubgroup = subgroup;
-			MySubgroup.InternalOneWayAddItem(this);
-			productionRecipes = new HashSet<Recipe>();
-			consumptionRecipes = new HashSet<Recipe>();
-			miningResources = new HashSet<Resource>();
+			mySubgroup = subgroup;
+			subgroup.items.Add(this);
+
+			productionRecipes = new HashSet<RecipePrototype>();
+			consumptionRecipes = new HashSet<RecipePrototype>();
+			miningResources = new HashSet<ResourcePrototype>();
 
 			IsFluid = isfluid;
-            Temperature = 0;
+            DefaultTemperature = 0;
             IsTemperatureDependent = false;
 			IsMissingItem = isMissing;
-			if (isMissing)
-				myCache.MissingItems.Add(this.Name, this);
 		}
-
-		internal void InternalOneWayAddConsumptionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds an ingredient
-        {
-			consumptionRecipes.Add(recipe);
-        }
-		internal void InternalOneWayAddProductionRecipe(Recipe recipe) //should only be called from the Recipe class when it adds a product
-        {
-			productionRecipes.Add(recipe);
-        }
-		internal void InternalOneWayRemoveConsumptionRecipe(Recipe recipe) //only from delete calls
-		{
-			consumptionRecipes.Remove(recipe);
-		}
-		internal void InternalOneWayRemoveProductionRecipe(Recipe recipe) //only from delete calls
-		{
-			productionRecipes.Remove(recipe);
-		}
-
-		internal void InternalOneWayAddMiningResource(Resource resource) //should only be called from Resource class
-        {
-			miningResources.Add(resource);
-        }
-
-		internal void InternalOneWayRemoveMiningResource(Resource resource) //only from delete calls
-        {
-			miningResources.Remove(resource);
-        }
 
 		public override string ToString() { return String.Format("Item: {0}", Name); }
 
-		public static string GetTemperatureRangeFriendlyName(Item item, fRange tempRange)
+		public string GetTemperatureRangeFriendlyName(fRange tempRange)
         {
 			if (tempRange.Ignore)
-				return item.FriendlyName;
+				return this.FriendlyName;
 
-			string name = item.FriendlyName;
+			string name = this.FriendlyName;
 			bool includeMin = tempRange.Min >= float.MinValue; //== float.NegativeInfinity;
 			bool includeMax = tempRange.Max <= float.MaxValue; //== float.PositiveInfinity;
 

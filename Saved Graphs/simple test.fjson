@@ -1,0 +1,105 @@
+{
+  "AmountType": 0,
+  "Unit": 1,
+  "SavedPresetName": "Factorio 1.1 Vanilla",
+  "IncludedItems": [
+    "iron-plate",
+    "transport-belt",
+    "underground-belt",
+    "iron-gear-wheel",
+    "fast-underground-belt"
+  ],
+  "IncludedRecipes": [
+    {
+      "Name": "underground-belt",
+      "RecipeID": 44,
+      "isMissing": false,
+      "Ingredients": {
+        "iron-plate": 10.0,
+        "transport-belt": 5.0
+      },
+      "Products": {
+        "underground-belt": 2.0
+      }
+    },
+    {
+      "Name": "fast-underground-belt",
+      "RecipeID": 47,
+      "isMissing": false,
+      "Ingredients": {
+        "iron-gear-wheel": 40.0,
+        "underground-belt": 2.0
+      },
+      "Products": {
+        "fast-underground-belt": 2.0
+      }
+    }
+  ],
+  "IncludedMods": [
+    "core|1.0",
+    "base|1.1.41",
+    "foremanexport|1.0.0",
+    "z-barrelfix|1.1.1"
+  ],
+  "EnabledAssemblers": [
+    "stone-furnace",
+    "steel-furnace",
+    "electric-furnace",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "oil-refinery",
+    "chemical-plant",
+    "centrifuge",
+    "rocket-silo"
+  ],
+  "EnabledMiners": [
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "pumpjack",
+    "offshore-pump"
+  ],
+  "EnabledModules": [
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "effectivity-module",
+    "effectivity-module-2",
+    "effectivity-module-3",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3"
+  ],
+  "HiddenRecipes": [],
+  "Nodes": [
+    {
+      "NodeType": "Recipe",
+      "RecipeID": 44,
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    },
+    {
+      "NodeType": "Recipe",
+      "RecipeID": 47,
+      "SpeedBonus": 0.0,
+      "ProductivityBonus": 0.0,
+      "RateType": 0,
+      "ActualRate": 0.0,
+      "ModuleFilterType": "Most Productive"
+    }
+  ],
+  "NodeLinks": [
+    {
+      "Supplier": 0,
+      "Consumer": 1,
+      "Item": "underground-belt"
+    }
+  ],
+  "ElementLocations": [
+    "12, 96",
+    "-132, -72"
+  ]
+}

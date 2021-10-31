@@ -47,6 +47,8 @@ namespace Foreman
 
     public class DataCache
     {
+        public string PresetName { get; private set; }
+
         public IReadOnlyDictionary<string, string> IncludedMods { get { return includedMods; } }
         public IReadOnlyDictionary<string, Technology> Technologies { get { return technologies; } }
         public IReadOnlyDictionary<string, Group> Groups { get { return groups; } }
@@ -58,12 +60,11 @@ namespace Foreman
         public IReadOnlyDictionary<string, Resource> Resources { get { return resources; } }
         public IReadOnlyDictionary<string, Module> Modules { get { return modules; } }
 
-        public string PresetName { get; private set; }
+        public IReadOnlyCollection<Recipe> MissingRecipes { get { return missingRecipes; } }
+        public IReadOnlyDictionary<string, Item> MissingItems { get { return missingItems; } }
 
-        public HashSet<Recipe> MissingRecipes { get; private set; }
-        public Dictionary<string, Item> MissingItems { get; private set; }
-        public Subgroup MissingSubgroup { get; private set; }
-        public Technology StartingTech { get; private set; }
+        public Subgroup MissingSubgroup { get { return missingSubgroup; } }
+        public Technology StartingTech { get { return startingTech; } }
         public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
 
         private Dictionary<string, string> includedMods; //name : version
@@ -77,9 +78,15 @@ namespace Foreman
         private Dictionary<string, Resource> resources;
         private Dictionary<string, Module> modules;
 
-        private Dictionary<string, List<Recipe>> craftingCategories;
-        private Dictionary<string, List<Module>> moduleCategories;
-        private Dictionary<string, List<Resource>> resourceCategories;
+        private HashSet<Recipe> missingRecipes;
+        private Dictionary<string, Item> missingItems;
+
+        private SubgroupPrototype missingSubgroup;
+        private TechnologyPrototype startingTech;
+
+        private Dictionary<string, List<RecipePrototype>> craftingCategories;
+        private Dictionary<string, List<ModulePrototype>> moduleCategories;
+        private Dictionary<string, List<ResourcePrototype>> resourceCategories;
         private const float defaultRecipeTime = 0.5f;
 
         public DataCache()
@@ -95,16 +102,16 @@ namespace Foreman
             resources = new Dictionary<string, Resource>();
             modules = new Dictionary<string, Module>();
 
-            MissingItems = new Dictionary<string, Item>();
-            MissingRecipes = new HashSet<Recipe>();
-            MissingSubgroup = new Subgroup(this, "", "");
-            MissingSubgroup.SetGroup(new Group(this, "", "", ""));
+            missingItems = new Dictionary<string, Item>();
+            missingRecipes = new HashSet<Recipe>(new MissingRecipeComparer()); //deep compare that checks name, ingredients, and products
+            missingSubgroup = new SubgroupPrototype(this, "", "");
+            missingSubgroup.myGroup = new GroupPrototype(this, "", "", "");
 
-            StartingTech = new Technology(this, "", "");
+            startingTech = new TechnologyPrototype(this, "", "");
 
-            craftingCategories = new Dictionary<string, List<Recipe>>();
-            moduleCategories = new Dictionary<string, List<Module>>();
-            resourceCategories = new Dictionary<string, List<Resource>>();
+            craftingCategories = new Dictionary<string, List<RecipePrototype>>();
+            moduleCategories = new Dictionary<string, List<ModulePrototype>>();
+            resourceCategories = new Dictionary<string, List<ResourcePrototype>>();
         }
 
         public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
@@ -154,9 +161,9 @@ namespace Foreman
                 resourceCategories.Clear();
 
                 //sort
-                foreach (Group g in groups.Values)
+                foreach (GroupPrototype g in groups.Values)
                     g.SortSubgroups();
-                foreach (Subgroup sg in subgroups.Values)
+                foreach (SubgroupPrototype sg in subgroups.Values)
                     sg.SortIRs();
 
                 RemoveUnusableItems();
@@ -169,25 +176,63 @@ namespace Foreman
             });
         }
 
-        public void Clear()
+        public void ProcessNewItemSet(ICollection<string> itemNames) //will ensure that all items are now part of the data cache -> existing ones (regular and missing) are skipped, new ones are added to MissingItems
         {
-            includedMods.Clear();
-            technologies.Clear();
-            groups.Clear();
-            subgroups.Clear();
-            items.Clear();
-            recipes.Clear();
-            assemblers.Clear();
-            miners.Clear();
-            resources.Clear();
-            modules.Clear();
+            foreach (string iItem in itemNames)
+            {
+                if (!items.ContainsKey(iItem) && !missingItems.ContainsKey(iItem)) //want to check for missing items too - in this case dont want duplicates
+                {
+                    ItemPrototype missingItem = new ItemPrototype(this, iItem, iItem, false, missingSubgroup, "", true); //just assume it isnt a fluid. we dont honestly care (no temperatures)
+                    missingItems.Add(missingItem.Name, missingItem);
+                }
+            }
+        }
 
-            MissingItems.Clear();
-            MissingRecipes.Clear();
+        public Dictionary<long, Recipe> ProcessNewRecipeShorts(ICollection<RecipeShort> recipeShorts) //will ensure all recipes are now part of the data cache -> each one is checked against existing recipes (regular & missing), and if it doesnt exist are added to MissingRecipes. Returns a set of links of original recipeID (NOT! the noew recipeIDs) to the recipe
+        {
+            Dictionary<long, Recipe> recipeLinks = new Dictionary<long, Recipe>();
+            foreach (RecipeShort recipeShort in recipeShorts)
+            {
+                Recipe recipe = null;
 
-            craftingCategories.Clear();
-            moduleCategories.Clear();
-            resourceCategories.Clear();
+                //recipe check #1 : does its name exist in database (note: we dont quite care about extra missing recipes here - so what if we have a couple identical ones? they will combine during save/load anyway)
+                bool recipeExists = recipes.ContainsKey(recipeShort.Name);
+                //recipe check #2 : do the number of ingredients & products match?
+                recipeExists &= recipeShort.Ingredients.Count == recipes[recipeShort.Name].IngredientList.Count;
+                recipeExists &= recipeShort.Products.Count == recipes[recipeShort.Name].ProductList.Count;
+                //recipe check #3 : do the ingredients & products from the loaded data exist within the actual recipe?
+                if (recipeExists)
+                {
+                    recipe = recipes[recipeShort.Name];
+                    //check #2 (from above) - dodnt care about amounts of each
+                    foreach (string ingredient in recipeShort.Ingredients.Keys)
+                        recipeExists &= items.ContainsKey(ingredient) && recipe.IngredientSet.ContainsKey(items[ingredient]);
+                    foreach (string product in recipeShort.Products.Keys)
+                        recipeExists &= items.ContainsKey(product) && recipe.ProductSet.ContainsKey(items[product]);
+                }
+
+                if (!recipeExists)
+                {
+                    RecipePrototype missingRecipe = new RecipePrototype(this, recipeShort.Name, recipeShort.Name, missingSubgroup, "", true);
+                    foreach (var ingredient in recipeShort.Ingredients)
+                    {
+                        if (items.ContainsKey(ingredient.Key))
+                            missingRecipe.InternalOneWayAddIngredient((ItemPrototype)items[ingredient.Key], ingredient.Value);
+                        else
+                            missingRecipe.InternalOneWayAddIngredient((ItemPrototype)missingItems[ingredient.Key], ingredient.Value);
+                    }
+                    foreach (var product in recipeShort.Products)
+                    {
+                        if (items.ContainsKey(product.Key))
+                            missingRecipe.InternalOneWayAddProduct((ItemPrototype)items[product.Key], product.Value);
+                        else
+                            missingRecipe.InternalOneWayAddProduct((ItemPrototype)missingItems[product.Key], product.Value);
+                    }
+                    recipe = missingRecipe;
+                }
+                recipeLinks.Add(recipeShort.RecipeID, recipe);
+            }
+            return recipeLinks;
         }
 
         public static Dictionary<string,string> ReadModList(Preset preset)
@@ -204,14 +249,14 @@ namespace Foreman
             return mods;
         }
 
-        public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string,string> modList,  List<string> itemList, Dictionary<string, List<RecipeShort>> recipeShortSet)
+        public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string,string> modList,  List<string> itemList, List<RecipeShort> recipeShorts)
         {
 
             string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
             if (!File.Exists(presetPath))
                 return null;
 
-            //parse preset
+            //parse preset (note: this is preset data, so we are guaranteed to only have one name per item/recipe/mod/etc.)
             JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
             HashSet<string> presetItems = new HashSet<string>();
             Dictionary<string, RecipeShort> presetRecipes = new Dictionary<string, RecipeShort>();
@@ -246,7 +291,7 @@ namespace Foreman
                 presetRecipes.Add(recipe.Name, recipe);
             }
 
-            //compare to provided mod/item/recipe sets
+            //compare to provided mod/item/recipe sets (recipes have a chance of existing in multitudes - aka: missing recipes)
             PresetErrorPackage errors = new PresetErrorPackage();
             foreach(var mod in modList)
             {
@@ -262,20 +307,40 @@ namespace Foreman
             foreach (string itemName in itemList)
                 if (!presetItems.Contains(itemName))
                     errors.MissingItems.Add(itemName);
-            foreach (List<RecipeShort> recipeShortList in recipeShortSet.Values)
-            {
-                foreach (RecipeShort recipeS in recipeShortList)
-                {
-                    if (recipeS.isMissing)
-                        continue;
 
-                    if (!presetRecipes.ContainsKey(recipeS.Name))
-                        errors.MissingRecipes.Add(recipeS.Name);
-                    else if (!recipeS.Equals(presetRecipes[recipeS.Name]))
-                        errors.IncorrectRecipes.Add(recipeS.Name);
-                }
+            foreach (RecipeShort recipeS in recipeShorts)
+            {
+                if (recipeS.isMissing)
+                    continue;
+
+                if (!presetRecipes.ContainsKey(recipeS.Name))
+                    errors.MissingRecipes.Add(recipeS.Name);
+                else if (!recipeS.Equals(presetRecipes[recipeS.Name]))
+                    errors.IncorrectRecipes.Add(recipeS.Name);
             }
+
             return errors;
+        }
+
+        public void Clear()
+        {
+            includedMods.Clear();
+            technologies.Clear();
+            groups.Clear();
+            subgroups.Clear();
+            items.Clear();
+            recipes.Clear();
+            assemblers.Clear();
+            miners.Clear();
+            resources.Clear();
+            modules.Clear();
+
+            missingItems.Clear();
+            missingRecipes.Clear();
+
+            craftingCategories.Clear();
+            moduleCategories.Clear();
+            resourceCategories.Clear();
         }
 
         private void ProcessMod(JToken objJToken)
@@ -286,7 +351,7 @@ namespace Foreman
 
         private void ProcessSubgroup(JToken objJToken)
         {
-            Subgroup subgroup = new Subgroup(
+            SubgroupPrototype subgroup = new SubgroupPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["order"]);
@@ -296,7 +361,7 @@ namespace Foreman
 
         private void ProcessGroup(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Group group = new Group(
+            GroupPrototype group = new GroupPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"],
@@ -305,18 +370,21 @@ namespace Foreman
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
                 group.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
             foreach (var subgroupJToken in objJToken["subgroups"])
-                subgroups[(string)subgroupJToken].SetGroup(group);
+            {
+                ((SubgroupPrototype)subgroups[(string)subgroupJToken]).myGroup = group;
+                group.subgroups.Add((SubgroupPrototype)subgroups[(string)subgroupJToken]);
+            }
             groups.Add(group.Name, group);
         }
 
         private void ProcessItem(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Item item = new Item(
+            ItemPrototype item = new ItemPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"],
                 false, //item (not a fluid)
-                Subgroups[(string)objJToken["subgroup"]],
+                (SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
                 (string)objJToken["order"]);
 
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
@@ -326,15 +394,15 @@ namespace Foreman
 
         private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Item item = new Item(
+            ItemPrototype item = new ItemPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"],
                 true, //fluid
-                Subgroups[(string)objJToken["subgroup"]],
+                (SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
                 (string)objJToken["order"]);
 
-            item.Temperature = (double)objJToken["default_temperature"];
+            item.DefaultTemperature = (double)objJToken["default_temperature"];
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
                 item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
             items.Add(item.Name, item);
@@ -342,20 +410,25 @@ namespace Foreman
 
         private void ProcessResource(JToken objJToken)
         {
-            Resource resource = new Resource(
+            ResourcePrototype resource = new ResourcePrototype(
                 this,
                 (string)objJToken["name"]);
 
             resource.Time = (float)objJToken["mining_time"];
             foreach (var productJToken in objJToken["products"])
+            {
                 if (items.ContainsKey((string)productJToken["name"]))
-                    resource.AddResult(items[(string)productJToken["name"]]);
+                {
+                    resource.resultingItems.Add((ItemPrototype)items[(string)productJToken["name"]]);
+                    ((ItemPrototype)items[(string)productJToken["name"]]).miningResources.Add(resource);
+                }
+            }
             if (resource.ResultingItems.Count == 0)
                 return; //If the resource doesnt actually produce any products, just ignore it.
 
             string category = (string)objJToken["resource_category"];
             if (!resourceCategories.ContainsKey(category))
-                resourceCategories.Add(category, new List<Resource>());
+                resourceCategories.Add(category, new List<ResourcePrototype>());
             resourceCategories[category].Add(resource);
 
             resources.Add(resource.Name, resource);
@@ -363,7 +436,7 @@ namespace Foreman
 
         private void ProcessMiner(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Miner miner = new Miner(
+            MinerPrototype miner = new MinerPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
@@ -374,16 +447,23 @@ namespace Foreman
                 miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
             foreach (var categoryJToken in objJToken["resource_categories"])
-                if(resourceCategories.ContainsKey((string)categoryJToken))
-                    foreach (Resource resource in resourceCategories[(string)categoryJToken])
-                        resource.AddMiner(miner);
+            {
+                if (resourceCategories.ContainsKey((string)categoryJToken))
+                {
+                    foreach (ResourcePrototype resource in resourceCategories[(string)categoryJToken])
+                    {
+                        resource.validMiners.Add(miner);
+                        miner.mineableResources.Add(resource);
+                    }
+                }
+            }
 
             miners.Add(miner.Name, miner);
         }
 
         private void ProcessOffshorePump(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Miner miner = new Miner(
+            MinerPrototype miner = new MinerPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
@@ -396,38 +476,44 @@ namespace Foreman
             string fluidName = (string)objJToken["fluid"];
             if (!items.ContainsKey(fluidName))
                 return;
-            Item fluid = items[fluidName];
+            ItemPrototype fluid = (ItemPrototype)items[fluidName];
 
             //now to add an extra 'resource' if there isnt one with the type of fluid being pumped out here. Once we ensure there is one, we add this miner to it
             string rcName = "fer." + fluid.Name;
             if(!resources.ContainsKey(rcName))
             {
-                Resource extraResource = new Resource(this, rcName);
+                ResourcePrototype extraResource = new ResourcePrototype(this, rcName);
                 extraResource.Time = (1f/60); //'mining-speed' of 20, and time of 1/60s (every tick) leads to 1200 water per second. mods can set the mining/pumping-speed.
-                extraResource.AddResult(fluid);
+                extraResource.resultingItems.Add(fluid);
+                fluid.miningResources.Add(extraResource);
+
                 resources.Add(extraResource.Name, extraResource);
             }
 
-            resources[rcName].AddMiner(miner);
+            ((ResourcePrototype)resources[rcName]).validMiners.Add(miner);
+            miner.mineableResources.Add((ResourcePrototype)resources[rcName]);
             miners.Add(miner.Name, miner);
         }
 
         private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Recipe recipe = new Recipe(
+            RecipePrototype recipe = new RecipePrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"],
-                Subgroups[(string)objJToken["subgroup"]],
+                (SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
                 (string)objJToken["order"]);
 
             recipe.Time = (float)objJToken["energy"] > 0 ? (float)objJToken["energy"] : defaultRecipeTime;
-            if ((bool)objJToken["enabled"])
-                recipe.AddUnlockTechnology(StartingTech);
+            if ((bool)objJToken["enabled"]) //due to the way the import of presets happens, enabled at this stage means the recipe is available without any research necessary (aka: available at start)
+            {
+                recipe.myUnlockTechnologies.Add(startingTech);
+                startingTech.unlockedRecipes.Add(recipe);
+            }
 
             string category = (string)objJToken["category"];
             if (!craftingCategories.ContainsKey(category))
-                craftingCategories.Add(category, new List<Recipe>());
+                craftingCategories.Add(category, new List<RecipePrototype>());
             craftingCategories[category].Add(recipe);
 
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
@@ -443,12 +529,15 @@ namespace Foreman
                 if ((string)productJToken["type"] == "fluid" && productJToken["temperature"].Type != JTokenType.Null)
                 {
                     temperature = (float)productJToken["temperature"];
-                    if (items[name].Temperature != temperature)
-                        items[name].IsTemperatureDependent = true;
+                    if (((ItemPrototype)items[name]).DefaultTemperature != temperature)
+                        ((ItemPrototype)items[name]).IsTemperatureDependent = true;
                 }
 
                 if (amount != 0)
-                    recipe.AddProduct(Items[name], amount, temperature);
+                {
+                    recipe.InternalOneWayAddProduct((ItemPrototype)items[name], amount, temperature);
+                    ((ItemPrototype)items[name]).productionRecipes.Add(recipe);
+                }
             }
 
             foreach (var ingredientJToken in objJToken["ingredients"].ToList())
@@ -460,7 +549,10 @@ namespace Foreman
                 float maxTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"].Type != JTokenType.Null) ? (float)ingredientJToken["maximum_temperature"] : float.PositiveInfinity;
 
                 if (amount != 0)
-                    recipe.AddIngredient(Items[name], amount, minTemp, maxTemp);
+                {
+                    recipe.InternalOneWayAddIngredient((ItemPrototype)items[name], amount, minTemp, maxTemp);
+                    ((ItemPrototype)items[name]).consumptionRecipes.Add(recipe);
+                }
             }
 
             recipes.Add(recipe.Name, recipe);
@@ -468,7 +560,7 @@ namespace Foreman
 
         private void ProcessModule(JToken objJToken)
         {
-            Module module = new Module(
+            ModulePrototype module = new ModulePrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"],
@@ -476,16 +568,26 @@ namespace Foreman
                 (float)objJToken["module_effects_productivity"]);
 
             foreach (var recipe in objJToken["limitations"])
-                if(recipes.ContainsKey((string)recipe)) //only add if the recipe is in the list of recipes (if it isnt, means it was deleted either in data phase of LUA or during foreman export cleanup)
-                    recipes[(string)recipe].AddValidModule(module);
+            {
+                if (recipes.ContainsKey((string)recipe)) //only add if the recipe is in the list of recipes (if it isnt, means it was deleted either in data phase of LUA or during foreman export cleanup)
+                {
+                    ((RecipePrototype)recipes[(string)recipe]).validModules.Add(module);
+                    module.validRecipes.Add((RecipePrototype)recipes[(string)recipe]);
+                }
+            }
 
             if (objJToken["limitations"].Count() == 0) //means all recipes work
-                foreach (Recipe recipe in recipes.Values)
-                    recipe.AddValidModule(module);
+            {
+                foreach (RecipePrototype recipe in recipes.Values)
+                {
+                    recipe.validModules.Add(module);
+                    module.validRecipes.Add(recipe);
+                }
+            }
 
             string category = (string)objJToken["category"];
             if (!moduleCategories.ContainsKey(category))
-                moduleCategories.Add(category, new List<Module>());
+                moduleCategories.Add(category, new List<ModulePrototype>());
             moduleCategories[category].Add(module);
 
             modules.Add(module.Name, module);
@@ -493,7 +595,7 @@ namespace Foreman
 
         private void ProcessTechnology(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Technology technology = new Technology(
+            TechnologyPrototype technology = new TechnologyPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
@@ -502,23 +604,33 @@ namespace Foreman
                 technology.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
             foreach (var recipe in objJToken["recipes"])
+            {
                 if (recipes.ContainsKey((string)recipe))
-                    recipes[(string)recipe].AddUnlockTechnology(technology);
+                {
+                    ((RecipePrototype)recipes[(string)recipe]).myUnlockTechnologies.Add(technology);
+                    technology.unlockedRecipes.Add((RecipePrototype)recipes[(string)recipe]);
+                }
+            }
 
             technologies.Add(technology.Name, technology);
         }
 
         private void ProcessTechnologyP2(JToken objJToken)
         {
-            Technology technology = technologies[(string)objJToken["name"]];
+            TechnologyPrototype technology = (TechnologyPrototype)technologies[(string)objJToken["name"]];
             foreach (var prerequisite in objJToken["prerequisites"])
+            {
                 if (technologies.ContainsKey((string)prerequisite))
-                    technology.AddPrerequisite(technologies[(string)prerequisite]); //if it doesnt, it gets ignored in Factorio
+                {
+                    technology.prerequisites.Add((TechnologyPrototype)technologies[(string)prerequisite]);
+                    ((TechnologyPrototype)technologies[(string)prerequisite]).postTechs.Add(technology);
+                }
+            }
         }
 
         private void ProcessAssembler(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
-            Assembler assembler = new Assembler(
+            AssemblerPrototype assembler = new AssemblerPrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
@@ -530,14 +642,28 @@ namespace Foreman
                 assembler.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
             foreach (var categoryJToken in objJToken["crafting_categories"])
-                if(craftingCategories.ContainsKey((string)categoryJToken))
-                    foreach (Recipe recipe in craftingCategories[(string)categoryJToken])
-                        recipe.AddValidAssembler(assembler);
+            {
+                if (craftingCategories.ContainsKey((string)categoryJToken))
+                {
+                    foreach (RecipePrototype recipe in craftingCategories[(string)categoryJToken])
+                    {
+                        recipe.validAssemblers.Add(assembler);
+                        assembler.validRecipes.Add(recipe);
+                    }
+                }
+            }
 
             foreach (var effectJToken in objJToken["allowed_effects"])
-                if(moduleCategories.ContainsKey((string)effectJToken))
-                    foreach (Module module in moduleCategories[(string)effectJToken])
-                        assembler.AddValidModule(module);
+            {
+                if (moduleCategories.ContainsKey((string)effectJToken))
+                {
+                    foreach (ModulePrototype module in moduleCategories[(string)effectJToken])
+                    {
+                        module.validAssemblers.Add(assembler);
+                        assembler.validModules.Add(module);
+                    }
+                }
+            }
 
             assemblers.Add(assembler.Name, assembler);
         }
@@ -549,19 +675,19 @@ namespace Foreman
         //checking researchable tech, removing un-unlockable recipes, removing any items that dont appear in the clean recipe list, etc.
         private void RemoveUnusableItems()
         {
-            HashSet<Technology> temp_unlockableTechSet = new HashSet<Technology>();
-            bool IsUnlockable(Technology tech) //sets the locked parameter based on unlockability of it & its prerequisites. returns true if unlocked
+            HashSet<TechnologyPrototype> temp_unlockableTechSet = new HashSet<TechnologyPrototype>();
+            bool IsUnlockable(TechnologyPrototype tech) //sets the locked parameter based on unlockability of it & its prerequisites. returns true if unlocked
             {
                 if (tech.Locked)
                     return false;
                 else if (temp_unlockableTechSet.Contains(tech))
                     return true;
-                else if (tech.Prerequisites.Count == 0)
+                else if (tech.prerequisites.Count == 0)
                     return true;
                 else
                 {
                     bool available = true;
-                    foreach (Technology preTech in tech.Prerequisites)
+                    foreach (TechnologyPrototype preTech in tech.prerequisites)
                         available = available && IsUnlockable(preTech);
                     tech.Locked = !available;
 
@@ -573,33 +699,33 @@ namespace Foreman
 
             //step 1: calculate unlockable technologies (either already researched or recursive search to confirm all prerequisites are unlockable / researched)
             List<string> unavailableTech = new List<string>();
-            foreach (Technology tech in technologies.Values)
+            foreach (TechnologyPrototype tech in technologies.Values)
                 if (!IsUnlockable(tech))
                     unavailableTech.Add(tech.Name);
 
             //step 1.5: remove blocked tech (this will also delete some recipes that are no longer able to be unlocked)
             foreach (string techName in unavailableTech)
-                DeleteTechnology(technologies[techName]);
+                DeleteTechnology((TechnologyPrototype)technologies[techName]);
 
             //step 2: delete any recipes with no unlocks (those that had no unlocks in the beginning - those that were part of the removed tech were also removed)
             //step 2.1: also delete any recipes with no viable assembler
-            foreach (Recipe recipe in recipes.Values.ToList())
-                if (recipe.MyUnlockTechnologies.Count == 0 || recipe.ValidAssemblers.Count == 0)
+            foreach (RecipePrototype recipe in recipes.Values.ToList())
+                if (recipe.myUnlockTechnologies.Count == 0 || recipe.validAssemblers.Count == 0)
                     DeleteRecipe(recipe);
 
             //step 3: try and delete all items (can only delete if item isnt produced/consumed by any recipe, and isnt part of assemblers, miners, modules (that exist in this cache)
-            foreach (Item item in items.Values.ToList())
+            foreach (ItemPrototype item in items.Values.ToList())
                 TryDeleteItem(item); //soft delete
 
             //step 3.5: clean up those items which are kind of useless (those that are not produced anywhere, and are used in a single recipe that uses only them)
             //this is necessary to take care of those mods that add item destruction and allow for any item (read - all of them) to be destroyed.
-            foreach(Item item in items.Values.ToList())
+            foreach(ItemPrototype item in items.Values.ToList())
             {
-                if(item.ProductionRecipes.Count == 0)
+                if(item.productionRecipes.Count == 0)
                 {
                     bool useful = false;
-                    foreach (Recipe recipe in item.ConsumptionRecipes)
-                        useful |= (recipe.IngredientList.Count > 1 || recipe.ProductList.Count != 0); //recipe with multiple items coming in or some ingredients coming out -> not an incineration type
+                    foreach (RecipePrototype recipe in item.consumptionRecipes)
+                        useful |= (recipe.ingredientList.Count > 1 || recipe.productList.Count != 0); //recipe with multiple items coming in or some ingredients coming out -> not an incineration type
                     if (!useful)
                         TryDeleteItem(item, true); //hard delete.
                 }
@@ -608,15 +734,15 @@ namespace Foreman
             //step 4: clean up groups and subgroups (basically, clear the entire dictionary and for each recipe & item 'add' their subgroup & group into the dictionary.
             groups.Clear();
             subgroups.Clear();
-            foreach (Item item in Items.Values)
-                if (!subgroups.ContainsKey(item.MySubgroup.Name))
-                    subgroups.Add(item.MySubgroup.Name, item.MySubgroup);
-            foreach (Recipe recipe in recipes.Values)
-                if (!subgroups.ContainsKey(recipe.MySubgroup.Name))
-                    subgroups.Add(recipe.MySubgroup.Name, recipe.MySubgroup);
-            foreach (Subgroup subgroup in subgroups.Values)
-                if (!groups.ContainsKey(subgroup.MyGroup.Name))
-                    groups.Add(subgroup.MyGroup.Name, subgroup.MyGroup);
+            foreach (ItemPrototype item in Items.Values)
+                if (!subgroups.ContainsKey(item.mySubgroup.Name))
+                    subgroups.Add(item.mySubgroup.Name, item.mySubgroup);
+            foreach (RecipePrototype recipe in recipes.Values)
+                if (!subgroups.ContainsKey(recipe.mySubgroup.Name))
+                    subgroups.Add(recipe.mySubgroup.Name, recipe.mySubgroup);
+            foreach (SubgroupPrototype subgroup in subgroups.Values)
+                if (!groups.ContainsKey(subgroup.myGroup.Name))
+                    groups.Add(subgroup.myGroup.Name, subgroup.myGroup);
         }
 
         private void MarkCyclicRecipes()
@@ -627,139 +753,140 @@ namespace Foreman
             testGraph.CreateAllPossibleInputLinks();
             foreach (var scc in testGraph.GetStronglyConnectedComponents(true))
                 foreach (var node in scc)
-                    ((RecipeNode)node).BaseRecipe.IsCyclic = true;
+                    ((RecipePrototype)((RecipeNode)node).BaseRecipe).IsCyclic = true;
         }
 
-        private void DeleteTechnology(Technology technology)
+        private void DeleteTechnology(TechnologyPrototype technology)
         {
-            foreach (Technology tech in technology.Prerequisites)
-                tech.InternalOneWayRemovePostTech(technology);
-            foreach (Technology tech in technology.PostTechs)
-                tech.InternalOneWayRemovePrerequisite(technology);
-            foreach (Recipe recipe in technology.UnlockedRecipes)
+            foreach (TechnologyPrototype tech in technology.prerequisites)
+                tech.postTechs.Remove(technology);
+            foreach (TechnologyPrototype tech in technology.postTechs)
+                tech.prerequisites.Remove(technology);
+            foreach (RecipePrototype recipe in technology.unlockedRecipes)
             {
-                recipe.InternalOneWayRemoveUnlockTechnology(technology);
-                if (recipe.MyUnlockTechnologies.Count == 0)
+                recipe.myUnlockTechnologies.Remove(technology);
+                if (recipe.myUnlockTechnologies.Count == 0)
                     DeleteRecipe(recipe);
             }
             technologies.Remove(technology.Name);
             Console.WriteLine("Deleting technology: " + technology);
         }
-        private bool TryDeleteItem(Item item, bool forceDelete = false)
+        private bool TryDeleteItem(ItemPrototype item, bool forceDelete = false)
         {
             if(forceDelete) //remove it from every production & consumption recipe, remove recipe if it no longer has any ingredients & products, then proceed.
             {
-                Console.WriteLine("FORCEFUL DELETE! Deleting item: " + item);
-                foreach (Recipe r in item.ConsumptionRecipes)
+                foreach (RecipePrototype r in item.consumptionRecipes)
                 {
                     r.InternalOneWayDeleteIngredient(item);
-                    if (r.IngredientList.Count == 0 && r.ProductList.Count == 0)
+                    if (r.ingredientList.Count == 0 && r.productList.Count == 0)
                         DeleteRecipe(r);
                 }
-                foreach (Recipe r in item.ProductionRecipes)
+                foreach (RecipePrototype r in item.productionRecipes)
                 {
                     r.InternalOneWayDeleteProduct(item);
-                    if (r.IngredientList.Count == 0 && r.ProductList.Count == 0)
+                    if (r.ingredientList.Count == 0 && r.productList.Count == 0)
                         DeleteRecipe(r);
                 }
 
                 if (assemblers.ContainsKey(item.Name))
-                    DeleteAssembler(assemblers[item.Name]);
+                    DeleteAssembler((AssemblerPrototype)assemblers[item.Name]);
                 if (miners.ContainsKey(item.Name))
-                    DeleteMiner(miners[item.Name]);
+                    DeleteMiner((MinerPrototype)miners[item.Name]);
                 if (modules.ContainsKey(item.Name))
-                    DeleteModule(modules[item.Name]);
+                    DeleteModule((ModulePrototype)modules[item.Name]);
             }
 
             //can only delete an item if it has no production recipes, consumption recipes, module, assembler, or miner associated with it.
             if( forceDelete || (
-                item.ProductionRecipes.Count == 0 && 
-                item.ConsumptionRecipes.Count == 0 && 
+                item.productionRecipes.Count == 0 && 
+                item.consumptionRecipes.Count == 0 && 
                 !assemblers.ContainsKey(item.Name) &&
                 !miners.ContainsKey(item.Name) &&
                 !modules.ContainsKey(item.Name)))
             {
-                foreach (Resource resource in item.MiningResources)
+                foreach (ResourcePrototype resource in item.miningResources)
                 {
-                    resource.InternalOneWayRemoveResult(item);
-                    if (resource.ResultingItems.Count == 0)
+                    resource.resultingItems.Remove(item);
+                    if (resource.resultingItems.Count == 0)
                         DeleteResource(resource);
                 }
 
-                item.MySubgroup.InternalOneWayRemoveItem(item);
+                item.mySubgroup.items.Remove(item);
                 items.Remove(item.Name);
-                if(!forceDelete)
+                if(forceDelete)
+                    Console.WriteLine("FORCEFUL DELETE! Deleting item: " + item);
+                else
                     Console.WriteLine("Deleting item: " + item);
                 return true;
             }
             return false;
         }
-        private void DeleteRecipe(Recipe recipe)
+        private void DeleteRecipe(RecipePrototype recipe)
         {
-            foreach (Item item in recipe.IngredientList)
+            foreach (ItemPrototype item in recipe.ingredientList)
             {
-                item.InternalOneWayRemoveConsumptionRecipe(recipe);
+                item.consumptionRecipes.Remove(recipe);
                 TryDeleteItem(item);
             }
-            foreach (Item item in recipe.ProductList)
+            foreach (ItemPrototype item in recipe.productList)
             {
-                item.InternalOneWayRemoveProductionRecipe(recipe);
+                item.productionRecipes.Remove(recipe);
                 TryDeleteItem(item);
             }
-            foreach (Assembler assembler in recipe.ValidAssemblers)
-                assembler.InternalOneWayRemoveRecipe(recipe);
-            foreach (Module module in recipe.ValidModules)
-                module.InternalOneWayRemoveRecipe(recipe);
-            foreach (Technology tech in recipe.MyUnlockTechnologies)
-                tech.InternalOneWayRemoveRecipe(recipe);
+            foreach (AssemblerPrototype assembler in recipe.validAssemblers)
+                assembler.validRecipes.Remove(recipe);
+            foreach (ModulePrototype module in recipe.validModules)
+                module.validRecipes.Remove(recipe);
+            foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
+                tech.unlockedRecipes.Remove(recipe);
 
-            recipe.MySubgroup.InternalOneWayRemoveRecipe(recipe);
+            recipe.mySubgroup.recipes.Remove(recipe);
             recipes.Remove(recipe.Name);
             Console.WriteLine("Deleting recipe: " + recipe);
         }
-        private void DeleteAssembler(Assembler assembler)
+        private void DeleteAssembler(AssemblerPrototype assembler)
         {
-            foreach (Recipe recipe in assembler.ValidRecipes)
+            foreach (RecipePrototype recipe in assembler.validRecipes)
             {
-                recipe.InternalOneWayRemoveValidAssembler(assembler);
-                if (recipe.ValidAssemblers.Count == 0)
+                recipe.validAssemblers.Remove(assembler);
+                if (recipe.validAssemblers.Count == 0)
                     DeleteRecipe(recipe);
             }
-            foreach (Module module in assembler.ValidModules)
-                module.InternalOneWayRemoveAssembler(assembler);
+            foreach (ModulePrototype module in assembler.validModules)
+                module.validAssemblers.Remove(assembler);
             assemblers.Remove(assembler.Name);
-            TryDeleteItem(assembler.AssociatedItem);
+            TryDeleteItem(assembler.AssociatedItem as ItemPrototype);
             Console.WriteLine("Deleting assembler: " + assembler);
         }
-        private void DeleteMiner(Miner miner)
+        private void DeleteMiner(MinerPrototype miner)
         {
-            foreach (Resource resource in miner.MineableResources)
+            foreach (ResourcePrototype resource in miner.mineableResources)
             {
-                resource.InternalOneWayRemoveMiner(miner);
-                if (resource.ValidMiners.Count == 0)
+                resource.validMiners.Remove(miner);
+                if (resource.validMiners.Count == 0)
                     DeleteResource(resource);
             }
             miners.Remove(miner.Name);
-            TryDeleteItem(miner.AssociatedItem);
+            TryDeleteItem(miner.AssociatedItem as ItemPrototype);
             Console.WriteLine("Deleting miner: " + miner);
         }
-        private void DeleteResource(Resource resource)
+        private void DeleteResource(ResourcePrototype resource)
         {
-            foreach(Item item in resource.ResultingItems)
-                item.InternalOneWayRemoveMiningResource(resource);
-            foreach (Miner miner in resource.ValidMiners)
-                miner.InternalOneWayRemoveResource(resource);
+            foreach(ItemPrototype item in resource.resultingItems)
+                item.miningResources.Remove(resource);
+            foreach (MinerPrototype miner in resource.validMiners)
+                miner.mineableResources.Remove(resource);
             resources.Remove(resource.Name);
             Console.WriteLine("Deleting resource: " + resource);
         }
-        private void DeleteModule(Module module)
+        private void DeleteModule(ModulePrototype module)
         {
-            foreach (Recipe recipe in module.ValidRecipes)
-                recipe.InternalOneWayRemoveValidModule(module);
-            foreach (Assembler assembler in module.ValidAssemblers)
-                assembler.InternalOneWayRemoveValidModule(module);
+            foreach (RecipePrototype recipe in module.validRecipes)
+                recipe.validModules.Remove(module);
+            foreach (AssemblerPrototype assembler in module.validAssemblers)
+                assembler.validModules.Remove(module);
             modules.Remove(module.Name);
-            TryDeleteItem(module.AssociatedItem);
+            TryDeleteItem(module.AssociatedItem as ItemPrototype);
             Console.WriteLine("Deleting module: " + module.Name);
         }
     }

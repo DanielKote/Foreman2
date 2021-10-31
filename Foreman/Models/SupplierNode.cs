@@ -38,37 +38,6 @@ namespace Foreman
 			get { return SuppliedItem.FriendlyName; }
 		}
 
-		public Dictionary<MachinePermutation, int> GetMinimumMiners()
-		{
-			Dictionary<MachinePermutation, int> results = new Dictionary<MachinePermutation, int>();
-
-			if (SuppliedItem.MiningResources.Count == 0)
-				return results;
-
-			Resource resource = SuppliedItem.MiningResources.First();
-			List<MachinePermutation> allowedPermutations = new List<MachinePermutation>();
-			foreach (Miner miner in resource.ValidMiners.Where(m =>m.Enabled))
-			{
-				// TODO: Find correct recipe to pass in here. Needed to disallow productivity modules.
-				//allowedPermutations.AddRange(miner.GetAllPermutations(null));
-			}
-
-			List<MachinePermutation> sortedPermutations = allowedPermutations.OrderBy(p => p.GetMinerRate(resource)).ToList();
-
-			if (sortedPermutations.Any())
-			{
-				float requiredRate = GetSupplyRate(SuppliedItem);
-				MachinePermutation permutationToAdd = sortedPermutations.LastOrDefault(a => a.GetMinerRate(resource) < requiredRate);
-				if (permutationToAdd != null)
-				{
-					int numberToAdd = Convert.ToInt32(Math.Ceiling(requiredRate / permutationToAdd.GetMinerRate(resource)));
-					results.Add(permutationToAdd, numberToAdd);
-				}
-			}
-
-			return results;
-		}
-
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("NodeType", "Supply");

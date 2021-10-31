@@ -14,9 +14,15 @@ namespace Foreman
     {
         public Preset ChosenPreset;
 
-        public PresetSelectionForm()
+        private Dictionary<Preset, PresetErrorPackage> PresetErrors;
+
+        public PresetSelectionForm(Dictionary<Preset, PresetErrorPackage> presetErrors)
         {
+            PresetErrors = presetErrors;
             InitializeComponent();
+
+
+
         }
     }
 }

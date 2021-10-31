@@ -5,42 +5,40 @@ using System.Drawing;
 
 namespace Foreman
 {
-	public class Assembler : ProductionEntity
+	public interface Assembler : ProductionEntity
+	{
+		IReadOnlyCollection<Recipe> ValidRecipes { get; }
+		IReadOnlyCollection<Module> ValidModules { get; }
+		Item AssociatedItem { get; }
+	}
+
+	public interface Module : DataObjectBase
+	{
+		IReadOnlyCollection<Recipe> ValidRecipes { get; }
+		IReadOnlyCollection<Assembler> ValidAssemblers { get; }
+		Item AssociatedItem { get; }
+
+		float SpeedBonus { get; }
+		float ProductivityBonus { get; }
+		bool Enabled { get; set; }
+	}
+
+
+	public class AssemblerPrototype : ProductionEntityPrototype, Assembler
 	{
 		public IReadOnlyCollection<Recipe> ValidRecipes { get { return validRecipes; } }
 		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
-		private HashSet<Recipe> validRecipes;
-		private HashSet<Module> validModules;
+		internal HashSet<RecipePrototype> validRecipes;
+		internal HashSet<ModulePrototype> validModules;
 
-		public Assembler(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName)
+		public AssemblerPrototype(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName)
 		{
 			Enabled = true;
-			validRecipes = new HashSet<Recipe>();
-			validModules = new HashSet<Module>();
+			validRecipes = new HashSet<RecipePrototype>();
+			validModules = new HashSet<ModulePrototype>();
 		}
-
-		public void AddValidModule(Module module)
-        {
-			validModules.Add(module);
-			module.InternalOneWayAddAssembler(this);
-        }
-
-		internal void InternalOneWayRemoveValidModule(Module module) //only from delete calls
-        {
-			validModules.Remove(module);
-        }
-
-		internal void InternalOneWayAddRecipe(Recipe recipe) //should only be called from Recipe (when it adds an assembler)
-        {
-			validRecipes.Add(recipe);
-        }
-
-		internal void InternalOneWayRemoveRecipe(Recipe recipe) //only from delete calls
-        {
-			validRecipes.Remove(recipe);
-        }
 
 		public override string ToString()
 		{
@@ -62,7 +60,7 @@ namespace Foreman
 		}
 	}
 
-	public class Module : DataObjectBase
+	public class ModulePrototype : DataObjectBasePrototype, Module
 	{
 		public override Bitmap Icon { get { return myCache.Items[Name].Icon; } }
         public override Color AverageColor { get { return myCache.Items[Name].AverageColor; } }
@@ -77,36 +75,16 @@ namespace Foreman
 		public float SpeedBonus { get; private set; }
         public float ProductivityBonus { get; private set; }
 
-		private HashSet<Recipe> validRecipes;
-		private HashSet<Assembler> validAssemblers;
+		internal HashSet<RecipePrototype> validRecipes { get; private set; }
+		internal HashSet<AssemblerPrototype> validAssemblers { get; private set; }
 
-		public Module(DataCache dCache, string name, string friendlyName, float speedBonus, float productivityBonus) : base(dCache, name, friendlyName, "-")
+		public ModulePrototype(DataCache dCache, string name, string friendlyName, float speedBonus, float productivityBonus) : base(dCache, name, friendlyName, "-")
 		{
 			Enabled = true;
 			SpeedBonus = speedBonus;
 			ProductivityBonus = productivityBonus;
-			validRecipes = new HashSet<Recipe>();
-			validAssemblers = new HashSet<Assembler>();
+			validRecipes = new HashSet<RecipePrototype>();
+			validAssemblers = new HashSet<AssemblerPrototype>();
 		}
-
-		internal void InternalOneWayAddRecipe(Recipe recipe) //should only be called from Recipe (when it adds a valid module)
-        {
-			validRecipes.Add(recipe);
-        }
-
-		internal void InternalOneWayRemoveRecipe(Recipe recipe) //only from delete calls
-		{
-			validRecipes.Remove(recipe);
-        }
-
-		internal void InternalOneWayAddAssembler(Assembler assembler) //should only be called from Assembler (when it adds a valid module)
-        {
-			validAssemblers.Add(assembler);
-        }
-
-		internal void InternalOneWayRemoveAssembler(Assembler assembler) //only from delete calls
-		{
-			validAssemblers.Remove(assembler);
-        }
 	}
 }

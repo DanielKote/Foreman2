@@ -3,70 +3,51 @@ using System.Collections.Generic;
 
 namespace Foreman
 {
-    public class Group : DataObjectBase
+    public interface Group : DataObjectBase
+    {
+        IReadOnlyList<Subgroup> Subgroups { get; }
+    }
+
+    public interface Subgroup : DataObjectBase
+    {
+        Group MyGroup { get; }
+        IReadOnlyList<Recipe> Recipes { get; }
+        IReadOnlyList<Item> Items { get; }
+    }
+
+
+    public class GroupPrototype : DataObjectBasePrototype, Group
     {
         public IReadOnlyList<Subgroup> Subgroups { get { return subgroups; } }
 
-        private List<Subgroup> subgroups;
+        internal List<SubgroupPrototype> subgroups;
 
-        public Group(DataCache dCache, string name, string lname, string order) : base(dCache, name, lname, order)
+        public GroupPrototype(DataCache dCache, string name, string lname, string order) : base(dCache, name, lname, order)
         {
-            subgroups = new List<Subgroup>();
+            subgroups = new List<SubgroupPrototype>();
         }
 
         public void SortSubgroups() { subgroups.Sort(); } //sort them by their order string
-
-        internal void InternalOneWayAddSubgroup(Subgroup sgroup)
-        {
-            subgroups.Add(sgroup);
-        }
-
-        internal void InternalOneWayRemoveSubgroup(Subgroup sgroup)
-        {
-            subgroups.Remove(sgroup);
-        }
-
     }
 
-    public class Subgroup : DataObjectBase
+    public class SubgroupPrototype : DataObjectBasePrototype, Subgroup
     {
-        public Group MyGroup { get; private set; }
+        public Group MyGroup { get { return myGroup; } }
 
         public IReadOnlyList<Recipe> Recipes { get { return recipes; } }
         public IReadOnlyList<Item> Items { get { return items; } }
 
-        private List<Recipe> recipes;
-        private List<Item> items;
+        internal GroupPrototype myGroup;
 
-        public Subgroup(DataCache dCache, string name, string order) : base(dCache, name, name, order)
-        {
-            recipes = new List<Recipe>();
-            items = new List<Item>();
-        }
+        internal List<RecipePrototype> recipes;
+        internal List<ItemPrototype> items;
 
-        internal void SetGroup(Group myGroup)
+        public SubgroupPrototype(DataCache dCache, string name, string order) : base(dCache, name, name, order)
         {
-            MyGroup = myGroup;
-            MyGroup.InternalOneWayAddSubgroup(this);
+            recipes = new List<RecipePrototype>();
+            items = new List<ItemPrototype>();
         }
 
         public void SortIRs() { recipes.Sort(); items.Sort(); } //sort them by their order string
-
-        internal void InternalOneWayAddRecipe(Recipe recipe)
-        {
-            recipes.Add(recipe);
-        }
-        internal void InternalOneWayAddItem(Item item)
-        {
-            items.Add(item);
-        }
-        internal void InternalOneWayRemoveRecipe(Recipe recipe)
-        {
-            recipes.Remove(recipe);
-        }
-        internal void InternalOneWayRemoveItem(Item item)
-        {
-            items.Remove(item);
-        }
     }
 }
