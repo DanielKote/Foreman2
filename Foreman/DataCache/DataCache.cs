@@ -44,6 +44,8 @@ namespace Foreman
 		public IReadOnlyDictionary<RecipeShort, Recipe> MissingRecipes { get { return missingRecipes; } }
 
 		public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
+		private static Bitmap noBeaconIcon;
+		public static Bitmap NoBeaconIcon { get { if (noBeaconIcon == null) noBeaconIcon = IconCache.GetIcon(Path.Combine("Graphics", "NoBeacon.png"), 64); return noBeaconIcon; } }
 		//public Technology StartingTech { get { return startingTech; } }
 
 		private Dictionary<string, string> includedMods; //name : version
@@ -837,6 +839,9 @@ namespace Foreman
 
 			beacon.Effectivity = (float)objJToken["distribution_effectivity"];
 			beacon.ModuleSlots = (int)objJToken["module_inventory_size"];
+
+			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+				beacon.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
 			List<string> allowedEffectsList = objJToken["allowed_effects"].Select(token => (string)token).ToList();
 			bool[] allowedEffects = new bool[] {

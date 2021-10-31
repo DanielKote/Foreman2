@@ -30,18 +30,16 @@ namespace Foreman
 		private Pen borderPen;
 		private string text = "";
 
-		private ContextMenu rightClickMenu;
-
-		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, NodeElement node) //item tab is always to be owned by a node
+		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) //item tab is always to be owned by a node
 			: base(graphViewer, node)
 		{
-			rightClickMenu = new ContextMenu();
+			RightClickMenu = new ContextMenu();
 
 			this.Item = item;
 			this.LinkType = type;
 
 			borderPen = regularBorderPen;
-			int textHeight = (int)myGraphViewer.CreateGraphics().MeasureString("a", textFont).Height;
+			int textHeight = (int)base.graphViewer.CreateGraphics().MeasureString("a", textFont).Height;
 			Width = TabWidth;
 			Height = iconSize + textHeight + border + 3;
 			X = 0; Y = 0;
@@ -50,39 +48,49 @@ namespace Foreman
 		public Point GetConnectionPoint() //in graph coordinates
 		{
 			if (LinkType == LinkType.Input)
-				return ConvertToGraph(new Point(0, Height / 2));
+				return LocalToGraph(new Point(0, Height / 2));
 			else //if(LinkType == LinkType.Output)
-				return ConvertToGraph(new Point(0, -Height / 2));
+				return LocalToGraph(new Point(0, -Height / 2));
 		}
 
 		public void UpdateValues(float consumeRate, float suppliedRate, bool isOversupplied)
 		{
 			borderPen = regularBorderPen;
-			if (consumeRate >= 1000)
-				text = string.Format("{0:0}", consumeRate);
-			else if (consumeRate >= 100)
-				text = string.Format("{0:0.#}", consumeRate);
-			else
-				text = string.Format("{0:0.##}", consumeRate);
+			text = FloatToString(consumeRate);
 
 			if (isOversupplied)
 			{
 				borderPen = oversuppliedBorderPen;
-				if (suppliedRate >= 1000)
-					text += string.Format("\n({0:0})", suppliedRate);
-				else if (suppliedRate >= 100)
-					text += string.Format("\n({0:0.#})", suppliedRate);
-				else
-					text += string.Format("\n({0:0.##})", suppliedRate);
+				text += "\n" + FloatToString(suppliedRate);
 			}
 
-			int textHeight = (int)myGraphViewer.CreateGraphics().MeasureString(text, textFont).Height;
+			int textHeight = (int)graphViewer.CreateGraphics().MeasureString(text, textFont).Height;
 			Height = iconSize + textHeight + border + 3;
+		}
+
+		private string FloatToString(float value)
+		{
+			string str;
+			if (value >= 100000)
+				str = value.ToString("0.00e0");
+			else if (value >= 10000)
+				str = value.ToString("0");
+			else if (value >= 100)
+				str = value.ToString("0.#");
+			else if (value >= 10)
+				str = value.ToString("0.##");
+			else if (value >= 0.1)
+				str = value.ToString("0.###");
+			else if (value != 0)
+				str = value.ToString("0.######");
+			else
+				str = "0";
+			return str;
 		}
 
 		protected override void Draw(Graphics graphics)
 		{
-			Point trans = ConvertToGraph(new Point(0, 0));
+			Point trans = LocalToGraph(new Point(0, 0));
 
 			GraphicsStuff.FillRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, fillBrush);
 			GraphicsStuff.DrawRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, borderPen);
@@ -103,7 +111,7 @@ namespace Foreman
 		{
 			List<TooltipInfo> toolTips = new List<TooltipInfo>();
 			TooltipInfo tti = new TooltipInfo();
-			NodeElement parentNode = (NodeElement)myParent;
+			BaseNodeElement parentNode = (BaseNodeElement)myParent;
 
 			if (parentNode.DisplayedNode is RecipeNode rNode)
 				tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(Item);
@@ -118,7 +126,7 @@ namespace Foreman
 			}
 
 			tti.Direction = (LinkType == LinkType.Input) ? Direction.Up : Direction.Down;
-			tti.ScreenLocation = myGraphViewer.GraphToScreen(GetConnectionPoint());
+			tti.ScreenLocation = graphViewer.GraphToScreen(GetConnectionPoint());
 			toolTips.Add(tti);
 
 			TooltipInfo helpToolTipInfo = new TooltipInfo();
@@ -132,30 +140,27 @@ namespace Foreman
 
 		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
 		{
-			List<NodeLink> connections = new List<NodeLink>();
-			if (LinkType == LinkType.Input)
-				connections.AddRange(((NodeElement)myParent).DisplayedNode.InputLinks.Where(l => l.Item == Item));
-			else //if (LinkType == LinkType.Output)
-				connections.AddRange(((NodeElement)myParent).DisplayedNode.OutputLinks.Where(l => l.Item == Item));
+			if (button == MouseButtons.Right)
+			{
+				List<NodeLink> connections = new List<NodeLink>();
+				if (LinkType == LinkType.Input)
+					connections.AddRange(((BaseNodeElement)myParent).DisplayedNode.InputLinks.Where(l => l.Item == Item));
+				else //if (LinkType == LinkType.Output)
+					connections.AddRange(((BaseNodeElement)myParent).DisplayedNode.OutputLinks.Where(l => l.Item == Item));
 
 
-			rightClickMenu.MenuItems.Clear();
-			rightClickMenu.MenuItems.Add(new MenuItem("Delete connections",
-				new EventHandler((o, e) =>
-				{
-					foreach (NodeLink link in connections)
-						myGraphViewer.Graph.DeleteLink(link);
-					myGraphViewer.Graph.UpdateNodeValues();
-				}))
-			{ Enabled = connections.Count > 0 });
+				RightClickMenu.MenuItems.Clear();
+				RightClickMenu.MenuItems.Add(new MenuItem("Delete connections",
+					new EventHandler((o, e) =>
+					{
+						foreach (NodeLink link in connections)
+							graphViewer.Graph.DeleteLink(link);
+						graphViewer.Graph.UpdateNodeValues();
+					}))
+				{ Enabled = connections.Count > 0 });
 
-			rightClickMenu.Show(myGraphViewer, myGraphViewer.GraphToScreen(graph_point));
-		}
-
-		public override void Dispose()
-		{
-			rightClickMenu.Dispose();
-			base.Dispose();
+				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
+			}
 		}
 	}
 }

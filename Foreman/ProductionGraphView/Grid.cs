@@ -22,7 +22,7 @@ namespace Foreman
 			CurrentGridUnit = Properties.Settings.Default.MinorGridlines;
 		}
 
-		public void Paint(Graphics graphics, float viewScale, Rectangle visibleGraphBounds, NodeElement draggedNode = null)
+		public void Paint(Graphics graphics, float viewScale, Rectangle visibleGraphBounds, BaseNodeElement draggedNode = null)
 		{
 			if (ShowGrid)
 			{

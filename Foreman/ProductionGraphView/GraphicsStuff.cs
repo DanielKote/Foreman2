@@ -5,6 +5,39 @@ namespace Foreman
 {
 	public static class GraphicsStuff
 	{
+		public static int DrawText(Graphics graphics, Brush textBrush, StringFormat textFormat, string text, Font baseFont, Rectangle textbox, bool singleLine = false) //returns the width of the actually drawn text
+		{
+			float textLength = 0;
+			Font textFont = new Font(baseFont, baseFont.Style);
+			if (singleLine)
+			{
+				textLength = graphics.MeasureString(text, textFont).Width;
+				while (textLength > textbox.Width)
+				{
+					Font newNameFont = new Font(textFont.FontFamily, textFont.Size - 0.5f, textFont.Style);
+					textFont.Dispose();
+					textFont = newNameFont;
+					textLength = graphics.MeasureString(text, textFont).Width;
+				}
+			}
+			else
+			{
+				SizeF textSize = graphics.MeasureString(text, textFont, textbox.Width);
+				while (textSize.Height > textbox.Height)
+				{
+					Font newNameFont = new Font(textFont.FontFamily, textFont.Size - 0.5f, textFont.Style);
+					textFont.Dispose();
+					textFont = newNameFont;
+					textSize = graphics.MeasureString(text, textFont, textbox.Width);
+				}
+				textLength = textSize.Width;
+			}
+			graphics.DrawString(text, textFont, textBrush, textbox, textFormat);
+			textFont.Dispose();
+			return (int)textLength;
+		}
+
+
 		public static void DrawRoundRect(int x, int y, int width, int height, int radius, Graphics graphics, Pen pen)
 		{
 			int radius2 = radius * 2;

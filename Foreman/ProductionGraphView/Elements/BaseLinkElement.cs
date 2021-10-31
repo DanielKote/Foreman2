@@ -5,8 +5,8 @@ namespace Foreman
 {
 	public abstract class BaseLinkElement : GraphElement
 	{
-		public NodeElement SupplierElement { get; protected set; }
-		public NodeElement ConsumerElement { get; protected set; }
+		public BaseNodeElement SupplierElement { get; protected set; }
+		public BaseNodeElement ConsumerElement { get; protected set; }
 		public virtual Item Item { get; protected set; }
 
 		private Point pointM, pointN;
@@ -98,36 +98,37 @@ namespace Foreman
 				}
 			}
 		}
+		public override bool ContainsPoint(Point graph_point)
+		{
+			return false;
+		}
 
 		protected override void Draw(Graphics graphics)
 		{
-			if (Visible)
-			{
-				UpdateCurve();
+			UpdateCurve();
 
-				using (Pen pen = new Pen(Item.AverageColor, LinkWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
-				{
-					if (linkingUp)
-						graphics.DrawBeziers(pen, new Point[] {
-							pointN,
-							pointN2,
-							pointM2,
-							pointM,
-						});
-					else
-						graphics.DrawBeziers(pen, new Point[]{
-							pointN,
-							pointN2,
-							pointMidN,
-							pointMidA,
-							pointMidA,
-							pointMidB,
-							pointMidB,
-							pointMidM,
-							pointM2,
-							pointM
-						});
-				}
+			using (Pen pen = new Pen(Item.AverageColor, LinkWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
+			{
+				if (linkingUp)
+					graphics.DrawBeziers(pen, new Point[] {
+						pointN,
+						pointN2,
+						pointM2,
+						pointM,
+					});
+				else
+					graphics.DrawBeziers(pen, new Point[]{
+						pointN,
+						pointN2,
+						pointMidN,
+						pointMidA,
+						pointMidA,
+						pointMidB,
+						pointMidB,
+						pointMidM,
+						pointM2,
+						pointM
+					});
 			}
 		}
 	}

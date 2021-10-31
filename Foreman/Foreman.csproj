@@ -138,6 +138,7 @@
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MouseHoverDetector.cs" />
+    <Compile Include="Controls\RecipePainter.cs" />
     <Compile Include="Controls\RecipeToolTip.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -195,7 +196,14 @@
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="ProductionGraphView\Elements\AssemblerElement.cs" />
     <Compile Include="ProductionGraphView\Elements\BaseLinkElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\BeaconElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\ConsumerNodeElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\ErrorNoticeElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\PassthroughNodeElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\RecipeNodeElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\SupplierNodeElement.cs" />
     <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
     <Compile Include="ProductionGraphView\Elements\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
@@ -222,6 +230,7 @@
     <Compile Include="ProductionGraphView\Elements\LinkElement.cs" />
     <Compile Include="Models\Nodes\BaseNode.cs" />
     <Compile Include="Models\Nodes\Solver\ProductionSolver.cs" />
+    <Compile Include="ProductionGraphView\FloatingTooltipRenderer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\DataReloadForm.cs">
       <SubType>Form</SubType>
@@ -238,7 +247,7 @@
     <Compile Include="ProductionGraphView\ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionGraphView\Elements\NodeElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\BaseNodeElement.cs" />
     <Compile Include="Models\Nodes\NodeLink.cs" />
     <EmbeddedResource Include="Controls\DevNodeOptionsPanel.resx">
       <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
@@ -331,6 +340,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Graphics\ErrorIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\MiningIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

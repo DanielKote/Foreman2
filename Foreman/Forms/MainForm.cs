@@ -59,19 +59,34 @@ namespace Foreman
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
 				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
-				SimpleViewCheckBox.Checked = Properties.Settings.Default.SimpleView;
+				ShowNodeRecipeCheckBox.Checked = Properties.Settings.Default.ShowRecipeToolTip;
+
+				if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
+					Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
+				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
 
 				Properties.Settings.Default.Save();
 
 				UpdateControlValues();
 				GraphViewer.Focus();
+#if DEBUG
+				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false);
+				UpdateControlValues();
+#endif
 			}
 		}
 
-		private void UpdateControlValues()
+		public void UpdateControlValues()
 		{
 			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
-			SimpleViewCheckBox.Checked = GraphViewer.SimpleView;
+
+			if (Properties.Settings.Default.LevelOfDetail == (int)ProductionGraphViewer.LOD.Low)
+				LowLodRadioButton.Checked = true;
+			else if (Properties.Settings.Default.LevelOfDetail == (int)ProductionGraphViewer.LOD.Medium)
+				MediumLodRadioButton.Checked = true;
+			else
+				HighLodRadioButton.Checked = true;
+
 			GraphViewer.Invalidate();
 		}
 
@@ -82,6 +97,9 @@ namespace Foreman
 			SaveFileDialog dialog = new SaveFileDialog();
 			dialog.DefaultExt = ".fjson";
 			dialog.Filter = "Foreman files (*.fjson)|*.fjson|All files|*.*";
+			if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
+				Directory.CreateDirectory(Path.Combine(Application.StartupPath, "Saved Graphs"));
+			dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Saved Graphs");
 			dialog.AddExtension = true;
 			dialog.OverwritePrompt = true;
 			dialog.FileName = "Flowchart.fjson";
@@ -111,6 +129,9 @@ namespace Foreman
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
 			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
+			if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
+				Directory.CreateDirectory(Path.Combine(Application.StartupPath, "Saved Graphs"));
+			dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Saved Graphs");
 			dialog.CheckFileExists = true;
 			if (dialog.ShowDialog() != DialogResult.OK)
 				return;
@@ -206,6 +227,7 @@ namespace Foreman
 					}
 
 					GraphViewer.Invalidate();
+					UpdateControlValues();
 				}
 			} while (reload);
 		}
@@ -256,7 +278,10 @@ namespace Foreman
 		private void PauseUpdatesCheckbox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.Graph.PauseUpdates = PauseUpdatesCheckbox.Checked;
-			GraphViewer.Graph.UpdateNodeValues();
+			if (!GraphViewer.Graph.PauseUpdates)
+				GraphViewer.Graph.UpdateNodeValues();
+			else
+				GraphViewer.Invalidate();
 		}
 
 		//---------------------------------------------------------Gridlines
@@ -323,10 +348,7 @@ namespace Foreman
 
 		private void SimpleViewCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			GraphViewer.SimpleView = SimpleViewCheckBox.Checked;
-			Properties.Settings.Default.SimpleView = SimpleViewCheckBox.Checked;
-			Properties.Settings.Default.Save();
-			GraphViewer.Invalidate();
+
 		}
 
 		private void ModuleDropDown_SelectedIndexChanged(object sender, EventArgs e)
@@ -363,6 +385,21 @@ namespace Foreman
 				cp.ExStyle |= 0x02000000;
 				return cp;
 			}
+		}
+
+		private void ShowNodeRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			Properties.Settings.Default.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
+			GraphViewer.RecipeTooltipEnabled = ShowNodeRecipeCheckBox.Checked;
+			Properties.Settings.Default.Save();
+		}
+
+		private void LODRadioButton_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
+			Properties.Settings.Default.LevelOfDetail = (int)GraphViewer.LevelOfDetail;
+			Properties.Settings.Default.Save();
+			GraphViewer.UpdateNodeVisuals();
 		}
 	}
 

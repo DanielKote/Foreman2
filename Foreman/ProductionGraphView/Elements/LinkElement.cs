@@ -14,7 +14,7 @@ namespace Foreman
 		public ItemTabElement SupplierTab { get; protected set; }
 		public ItemTabElement ConsumerTab { get; protected set; }
 
-		public LinkElement(ProductionGraphViewer graphViewer, NodeLink displayedLink, NodeElement supplierElement, NodeElement consumerElement) : base(graphViewer)
+		public LinkElement(ProductionGraphViewer graphViewer, NodeLink displayedLink, BaseNodeElement supplierElement, BaseNodeElement consumerElement) : base(graphViewer)
 		{
 			if (supplierElement == null || consumerElement == null)
 				Trace.Fail("Link element being created with one of the connected elements being null!");

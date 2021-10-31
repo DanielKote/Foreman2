@@ -29,39 +29,45 @@ namespace Foreman
 		}
 
 		public virtual bool Visible { get; protected set; }
-		protected readonly ProductionGraphViewer myGraphViewer;
+		protected readonly ProductionGraphViewer graphViewer;
 		protected readonly GraphElement myParent;
+
+		protected ContextMenu RightClickMenu;
+
+		protected static readonly Pen devPen = new Pen(new SolidBrush(Color.OrangeRed), 1);
 
 		public GraphElement(ProductionGraphViewer graphViewer, GraphElement parent = null)
 		{
-			myGraphViewer = graphViewer;
+			this.graphViewer = graphViewer;
 			myParent = parent;
 			if (myParent != null)
 				parent.SubElements.Add(this);
+
+			RightClickMenu = new ContextMenu();
 
 			SubElements = new List<GraphElement>();
 			Visible = true;
 		}
 
-		public Point ConvertToLocal(Point graph_point) //converts the point (in graph coordinates) to the local (0,0 is the center of this element's bound) point
+		public Point GraphToLocal(Point graph_point) //converts the point (in graph coordinates) to the local (0,0 is the center of this element's bound) point
 		{
 			if (myParent == null) //owned by graphViewer
 				return Point.Subtract(graph_point, (Size)Location);
 			else //subelement of some element
-				return Point.Subtract(myParent.ConvertToLocal(graph_point), (Size)Location);
+				return Point.Subtract(myParent.GraphToLocal(graph_point), (Size)Location);
 		}
 
-		public Point ConvertToGraph(Point local_point)
+		public Point LocalToGraph(Point local_point)
 		{
 			if (myParent == null) //owned by graphViewer
 				return Point.Add(local_point, (Size)Location);
 			else //subelement of some element
-				return Point.Add(myParent.ConvertToGraph(local_point), (Size)Location);
+				return Point.Add(myParent.LocalToGraph(local_point), (Size)Location);
 		}
 
 		public bool IntersectsWithZone(Rectangle graph_zone, int xborder, int yborder)
 		{
-			Point local_graph_zone_origin = ConvertToLocal(graph_zone.Location);
+			Point local_graph_zone_origin = GraphToLocal(graph_zone.Location);
 			return (Width / 2) > local_graph_zone_origin.X - xborder &&
 					-(Width / 2) < local_graph_zone_origin.X + graph_zone.Width + xborder &&
 					 (Height / 2) > local_graph_zone_origin.Y - yborder &&
@@ -75,17 +81,22 @@ namespace Foreman
 
 		public virtual bool ContainsPoint(Point graph_point)
 		{
-			return Bounds.Contains(ConvertToLocal(graph_point));
+			if (!Visible)
+				return false;
+			return Bounds.Contains(GraphToLocal(graph_point));
 		}
 
 		public void Paint(Graphics graphics)
 		{
-			//call own draw operation
-			Draw(graphics);
+			if (Visible)
+			{
+				//call own draw operation
+				Draw(graphics);
 
-			//call paint operations (this function) for each of the sub-elements owned by this element (who will call their own draw and further paint operations on their own sub elements)
-			foreach (GraphElement element in SubElements)
-				element.Paint(graphics);
+				//call paint operations (this function) for each of the sub-elements owned by this element (who will call their own draw and further paint operations on their own sub elements)
+				foreach (GraphElement element in SubElements)
+					element.Paint(graphics);
+			}
 		}
 
 		protected abstract void Draw(Graphics graphics);
@@ -104,7 +115,9 @@ namespace Foreman
 			if (myParent != null)
 				myParent.SubElements.Remove(this);
 
-			myGraphViewer.Invalidate();
+			RightClickMenu.Dispose();
+
+			graphViewer.Invalidate();
 		}
 	}
 }

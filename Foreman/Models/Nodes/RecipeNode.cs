@@ -19,6 +19,8 @@ namespace Foreman
 
 		Item BurnerItem { get; set; }
 		Item BurntItem { get; }
+
+		float GetBaseNumberOfAssemblers();
 	}
 
 
@@ -90,7 +92,6 @@ namespace Foreman
 			}
 		}
 
-		public override string GetNameString() { return BaseRecipe.FriendlyName; }
 		public override bool IsValid { get {
 				if (BaseRecipe.IsMissing)
 					return false;
@@ -113,53 +114,53 @@ namespace Foreman
 				return true;
 			}
 		}
-		public override List<KeyValuePair<string, string>> GetErrors()
+		public override string GetErrors()
 		{
-			List<KeyValuePair<string, string>> output = new List<KeyValuePair<string, string>>();
+			string output = "";
 
 			if (BaseRecipe.IsMissing)
-				output.Add(new KeyValuePair<string, string>(string.Format("Recipe \"{0}\" doesnt exist in preset!", BaseRecipe.FriendlyName), "Delete this node."));
+				return string.Format("Recipe \"{0}\" doesnt exist in preset!\n", BaseRecipe.FriendlyName);
 
 			if (SelectedAssembler == null)
-				output.Add(new KeyValuePair<string, string>("No assembler exists for this recipe!", "Select assembler from list."));
+				output += "No assembler exists for this recipe!\n";
 			else
 			{
 				if (SelectedAssembler.IsMissing)
-					output.Add(new KeyValuePair<string, string>(string.Format("Assembler \"{0}\" doesnt exist in preset!", SelectedAssembler.FriendlyName), "Select valid assembler from list."));
+					output += string.Format("Assembler \"{0}\" doesnt exist in preset!\n", SelectedAssembler.FriendlyName);
 
 				if (SelectedAssembler.IsBurner)
 				{
 					if (BurnerItem == null)
-						output.Add(new KeyValuePair<string, string>("Burner Assembler has no fuel set!", "Select fuel for the assembler."));
+						output += "Burner Assembler has no fuel set!\n";
 					else if (!SelectedAssembler.ValidFuels.Contains(BurnerItem))
-						output.Add(new KeyValuePair<string, string>("Burner Assembler has an invalid fuel set!", "Select fuel for the assembler from list."));
+						output += "Burner Assembler has an invalid fuel set!\n";
 					else if (BurnerItem.IsMissing)
-						output.Add(new KeyValuePair<string, string>("Burner Assembler's fuel doesnt exist in preset!", "Select new fuel from list."));
+						output += "Burner Assembler's fuel doesnt exist in preset!\n";
 
 					if (BurntItem != null && (BurnerItem == null || BurnerItem.BurnResult != BurntItem))
-						output.Add(new KeyValuePair<string, string>("Burning result doesnt match fuel's burn result!", "Select new fuel from list."));
+						output += "Burning result doesnt match fuel's burn result!\n";
 				}
 
 				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null)
-					output.Add(new KeyValuePair<string, string>("Some of the assembler modules dont exist in preset!", "Remove invalid modules."));
+					output += "Some of the assembler modules dont exist in preset!\n";
 
 				if (AssemblerModules.Count > SelectedAssembler.ModuleSlots)
-					output.Add(new KeyValuePair<string, string>(string.Format("Assembler has too many modules ({0}/{1})!", AssemblerModules.Count, SelectedAssembler.ModuleSlots), "Remove some modules."));
+					output += string.Format("Assembler has too many modules ({0}/{1})!\n", AssemblerModules.Count, SelectedAssembler.ModuleSlots);
 			}
 
 			if(SelectedBeacon != null)
 			{
-				if(SelectedBeacon.IsMissing)
-					output.Add(new KeyValuePair<string, string>(string.Format("Beacon \"{0}\" doesnt exist in preset!", SelectedBeacon.FriendlyName), "Select alternate beacon from list."));
+				if (SelectedBeacon.IsMissing)
+					output += string.Format("Beacon \"{0}\" doesnt exist in preset!\n", SelectedBeacon.FriendlyName);
 
 				if (BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null)
-					output.Add(new KeyValuePair<string, string>("Some of the beacon modules dont exist in preset!", "Remove invalid modules."));
+					output += "Some of the beacon modules dont exist in preset!\n";
 
 				if (BeaconModules.Count > SelectedBeacon.ModuleSlots)
-					output.Add(new KeyValuePair<string, string>("Beacon has too many modules!", "Remove some modules."));
+					output += "Beacon has too many modules!\n";
 			}
 
-			return output;
+			return string.IsNullOrEmpty(output)? null : output;
 		}
 
 		public override IEnumerable<Item> Inputs
@@ -257,6 +258,13 @@ namespace Foreman
 			foreach (Module beaconModule in BeaconModules)
 				multiplier += beaconModule.PollutionBonus * SelectedBeacon.Effectivity * BeaconCount;
 			return multiplier;
+		}
+
+		public float GetBaseNumberOfAssemblers()
+		{
+			if (SelectedAssembler == null)
+				return 0;
+			return (float)Math.Round(ActualRate * (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())), RoundingDP);
 		}
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)

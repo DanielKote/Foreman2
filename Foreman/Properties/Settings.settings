@@ -29,8 +29,8 @@
     <Setting Name="RecipeNameOnlyFilter" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="SimpleView" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="LevelOfDetail" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="DefaultAssemblerOption" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -40,6 +40,9 @@
     </Setting>
     <Setting Name="LastSaveFileLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ShowRecipeToolTip" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

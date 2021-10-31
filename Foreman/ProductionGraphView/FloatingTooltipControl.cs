@@ -12,18 +12,21 @@ namespace Foreman
 
 	public struct TooltipInfo
 	{
-		public TooltipInfo(Point screenLocation, Size screenSize, Direction direction, String text)
+		public TooltipInfo(Point screenLocation, Size screenSize, Direction direction, string text, Action<Graphics, Point> customDraw)
 		{
 			ScreenLocation = screenLocation;
 			ScreenSize = screenSize;
 			Direction = direction;
 			Text = text;
+
+			CustomDraw = customDraw;
 		}
 
 		public Point ScreenLocation;
 		public Size ScreenSize;
 		public Direction Direction;
-		public String Text;
+		public string Text;
+		public Action<Graphics, Point> CustomDraw;
 	}
 
 	public class FloatingTooltipControl : IDisposable
@@ -41,9 +44,9 @@ namespace Foreman
 			GraphLocation = graphLocation;
 			GraphViewer = parent;
 
-			parent.floatingTooltipControls.Add(this);
+			parent.ToolTipRenderer.AddToolTip(this);
 			parent.Controls.Add(control);
-			Rectangle ttRect = parent.getTooltipScreenBounds(parent.GraphToScreen(graphLocation), control.Size, direction);
+			Rectangle ttRect = GraphViewer.ToolTipRenderer.getTooltipScreenBounds(parent.GraphToScreen(graphLocation), control.Size, direction);
 			control.Location = ttRect.Location;
 			control.Focus();
 		}
@@ -51,7 +54,7 @@ namespace Foreman
 		public void Dispose()
 		{
 			Control.Dispose();
-			GraphViewer.floatingTooltipControls.Remove(this);
+			GraphViewer.ToolTipRenderer.RemoveToolTip(this);
 			if (Closing != null)
 			{
 				Closing.Invoke(this, null);

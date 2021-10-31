@@ -102,8 +102,6 @@ namespace Foreman
 				string modsPath = "";
 				try
 				{
-
-
 					//get factorio path
 					string userDataPath = saveFilePath;
 					while (!string.IsNullOrEmpty(userDataPath) && Path.GetFileName(userDataPath).ToLower() != "saves")

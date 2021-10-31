@@ -19,28 +19,34 @@ namespace Foreman
 	{
 		public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
 		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
-		private static readonly float[] RateMultiplier = new float[] { 1 / 1, 1 / 60, 1 / 300, 1 / 600, 1 / 1800, 1 / 3600 }; //, 1/21600, 1/43200, 1/86400 };
-		public static float GetRateMultipler(RateUnit ru) { return RateMultiplier[(int)ru]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
+		private static readonly float[] RateMultiplier = new float[] { 1f / 1, 1f / 60, 1f / 300, 1f / 600, 1f / 1800, 1f / 3600 }; //, 1/21600, 1/43200, 1/86400 };
 
 		private enum DragOperation { None, Item, Selection }
 		public enum NewNodeType { Disconnected, Supplier, Consumer }
+		public enum LOD { Low, Medium, High } //low: only names. medium: assemblers, beacons, etc. high: include assembler percentages
 
 		public RateUnit SelectedRateUnit { get; set; }
+		public float GetRateMultipler()
+		{
+			return RateMultiplier[(int)SelectedRateUnit];
+		} //the amount of assemblers required will be multipled by the rate multipler when displaying.
 
-		public bool SimpleView { get; set; } //simple: show only the item/recipe names.
+		public LOD LevelOfDetail { get; set; }
+		public bool RecipeTooltipEnabled { get; set; }
 		public bool TooltipsEnabled { get; set; }
 		public bool DynamicLinkWidth = false;
 
 		public DataCache DCache { get; set; }
 		public ProductionGraph Graph { get; private set; }
 		public Grid Grid { get; private set; }
+		public FloatingTooltipRenderer ToolTipRenderer { get; private set; }
 
 		public GraphElement MouseDownElement { get; set; }
 
-		public IReadOnlyDictionary<BaseNode, NodeElement> NodeElementDictionary { get { return nodeElementDictionary; } }
+		public IReadOnlyDictionary<BaseNode, BaseNodeElement> NodeElementDictionary { get { return nodeElementDictionary; } }
 		public IReadOnlyDictionary<NodeLink, LinkElement> LinkElementDictionary { get { return linkElementDictionary; } }
 
-		public IReadOnlyCollection<NodeElement> SelectedNodes { get { return selectedNodes; } }
+		public IReadOnlyCollection<BaseNodeElement> SelectedNodes { get { return selectedNodes; } }
 
 		private const int minDragDiff = 30;
 		private const int minLinkWidth = 3;
@@ -48,10 +54,9 @@ namespace Foreman
 
 		private static readonly Pen pausedBorders = new Pen(Color.FromArgb(255, 80, 80), 5);
 		private static readonly Pen selectionPen = new Pen(Color.FromArgb(100, 100, 200), 2);
-		private readonly Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 
-		private Dictionary<BaseNode, NodeElement> nodeElementDictionary;
-		private List<NodeElement> nodeElements;
+		private Dictionary<BaseNode, BaseNodeElement> nodeElementDictionary;
+		private List<BaseNodeElement> nodeElements;
 		private Dictionary<NodeLink, LinkElement> linkElementDictionary;
 		private List<LinkElement> linkElements;
 		private DraggedLinkElement draggedLinkElement;
@@ -70,13 +75,10 @@ namespace Foreman
 		private Rectangle SelectionZone;
 		private Point SelectionZoneOriginPoint;
 
-		private HashSet<NodeElement> selectedNodes; //main list of selected nodes
-		private HashSet<NodeElement> currentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
+		private HashSet<BaseNodeElement> selectedNodes; //main list of selected nodes
+		private HashSet<BaseNodeElement> currentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
 
 		private ContextMenu rightClickMenu = new ContextMenu();
-		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
-
-		private StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
 
 		public ProductionGraphViewer()
 		{
@@ -99,13 +101,15 @@ namespace Foreman
 
 			Grid = new Grid();
 
-			nodeElementDictionary = new Dictionary<BaseNode, NodeElement>();
-			nodeElements = new List<NodeElement>();
+			ToolTipRenderer = new FloatingTooltipRenderer(this);
+
+			nodeElementDictionary = new Dictionary<BaseNode, BaseNodeElement>();
+			nodeElements = new List<BaseNodeElement>();
 			linkElementDictionary = new Dictionary<NodeLink, LinkElement>();
 			linkElements = new List<LinkElement>();
 
-			selectedNodes = new HashSet<NodeElement>();
-			currentSelectionNodes = new HashSet<NodeElement>();
+			selectedNodes = new HashSet<BaseNodeElement>();
+			currentSelectionNodes = new HashSet<BaseNodeElement>();
 
 			UpdateGraphBounds();
 			Invalidate();
@@ -113,7 +117,7 @@ namespace Foreman
 
 		public void ClearGraph()
 		{
-			foreach (NodeElement element in nodeElements)
+			foreach (BaseNodeElement element in nodeElements)
 				element.Dispose();
 			foreach (LinkElement element in linkElements)
 				element.Dispose();
@@ -127,7 +131,7 @@ namespace Foreman
 			Graph.ClearGraph();
 		}
 
-		public NodeElement GetNodeAtPoint(Point point) //returns first such node (in case of stacking)
+		public BaseNodeElement GetNodeAtPoint(Point point) //returns first such node (in case of stacking)
 		{
 			//done in a 2 stage process -> first we do a rough check on the node's location (if it is within the 500x300 zone centered on the given point, it goes to part 2)
 			//							-> then we do a full element.containsPoint check
@@ -144,7 +148,7 @@ namespace Foreman
 
 		//----------------------------------------------Adding new node functions (including link dragging)
 
-		public void StartLinkDrag(NodeElement startNode, LinkType linkType, Item item)
+		public void StartLinkDrag(BaseNodeElement startNode, LinkType linkType, Item item)
 		{
 			draggedLinkElement?.Dispose();
 			draggedLinkElement = new DraggedLinkElement(this, startNode, linkType, item);
@@ -167,7 +171,7 @@ namespace Foreman
 			});
 		}
 
-		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, NodeElement originElement = null)
+		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null)
 		{
 			if (nNodeType != NewNodeType.Disconnected && (originElement == null || baseItem == null)) //just in case check (should
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
@@ -235,7 +239,7 @@ namespace Foreman
 				proceed = (MessageBox.Show("You are deleting " + selectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
 			if (proceed)
 			{
-				foreach (NodeElement node in selectedNodes)
+				foreach (BaseNodeElement node in selectedNodes)
 					Graph.DeleteNode(node.DisplayedNode);
 				selectedNodes.Clear();
 				Graph.UpdateNodeValues();
@@ -246,33 +250,33 @@ namespace Foreman
 
 		private void UpdateSelection()
 		{
-			foreach (NodeElement element in nodeElements)
+			foreach (BaseNodeElement element in nodeElements)
 				element.Highlighted = false;
 
 			if ((Control.ModifierKeys & Keys.Alt) != 0) //remove zone
 			{
-				foreach (NodeElement selectedNode in selectedNodes)
+				foreach (BaseNodeElement selectedNode in selectedNodes)
 					selectedNode.Highlighted = true;
-				foreach (NodeElement newlySelectedNode in currentSelectionNodes)
+				foreach (BaseNodeElement newlySelectedNode in currentSelectionNodes)
 					newlySelectedNode.Highlighted = false;
 			}
 			else if ((Control.ModifierKeys & Keys.Control) != 0)  //add zone
 			{
-				foreach (NodeElement selectedNode in selectedNodes)
+				foreach (BaseNodeElement selectedNode in selectedNodes)
 					selectedNode.Highlighted = true;
-				foreach (NodeElement newlySelectedNode in currentSelectionNodes)
+				foreach (BaseNodeElement newlySelectedNode in currentSelectionNodes)
 					newlySelectedNode.Highlighted = true;
 			}
 			else //add zone (additive with ctrl or simple selection)
 			{
-				foreach (NodeElement newlySelectedNode in currentSelectionNodes)
+				foreach (BaseNodeElement newlySelectedNode in currentSelectionNodes)
 					newlySelectedNode.Highlighted = true;
 			}
 		}
 
 		private void ClearSelection()
 		{
-			foreach (NodeElement element in nodeElements)
+			foreach (BaseNodeElement element in nodeElements)
 				element.Highlighted = false;
 			selectedNodes.Clear();
 			currentSelectionNodes.Clear();
@@ -280,7 +284,7 @@ namespace Foreman
 
 		public void AlignSelected()
 		{
-			foreach (NodeElement ne in selectedNodes)
+			foreach (BaseNodeElement ne in selectedNodes)
 				ne.Location = Grid.AlignToGrid(ne.Location);
 			Invalidate();
 		}
@@ -293,8 +297,19 @@ namespace Foreman
 				yield return draggedLinkElement;
 			foreach (LinkElement element in linkElements)
 				yield return element;
-			foreach (NodeElement element in nodeElements)
+			foreach (BaseNodeElement element in nodeElements)
 				yield return element;
+		}
+
+		public void UpdateNodeVisuals()
+		{
+			try
+			{
+				foreach (BaseNodeElement node in nodeElements)
+					node.Update();
+			}
+			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
+			Invalidate();
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
@@ -320,7 +335,7 @@ namespace Foreman
 			selectionPen.Width = 2 / ViewScale;
 
 			//grid
-			Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as NodeElement : null);
+			Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as BaseNodeElement : null);
 
 			//process link element widths
 			if (DynamicLinkWidth)
@@ -364,132 +379,18 @@ namespace Foreman
 
 			//floating tooltips
 			if (TooltipsEnabled && currentDragOperation == DragOperation.None && !viewBeingDragged)
-			{
-				foreach (var fttp in floatingTooltipControls)
-					DrawTooltip(GraphToScreen(fttp.GraphLocation), fttp.Control.Size, fttp.Direction, graphics, null);
-
-				NodeElement element = GetNodeAtPoint(ScreenToGraph(PointToClient(Control.MousePosition)));
-				if (element != null)
-				{
-					foreach (TooltipInfo tti in element.GetToolTips(ScreenToGraph(PointToClient(Control.MousePosition))))
-						DrawTooltip(tti.ScreenLocation, tti.ScreenSize, tti.Direction, graphics, tti.Text);
-				}
-			}
-
+				ToolTipRenderer.Paint(graphics);
+			
 			//paused border
 			if (Graph != null && Graph.PauseUpdates) //graph null check is purely for design view
 				graphics.DrawRectangle(pausedBorders, 0, 0, Width - 3, Height - 3);
-		}
-
-		private void DrawTooltip(Point screenArrowPoint, Size size, Direction direction, Graphics graphics, String text = null)
-		{
-			if (text != null)
-			{
-				SizeF stringSize = graphics.MeasureString(text, size10Font);
-				size = new Size((int)stringSize.Width, (int)stringSize.Height);
-			}
-
-			int border = 2;
-			int arrowSize = 10;
-			Point arrowPoint1 = new Point();
-			Point arrowPoint2 = new Point();
-
-			stringFormat.LineAlignment = StringAlignment.Center;
-
-			switch (direction)
-			{
-				case Direction.Down:
-					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y - arrowSize);
-					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y - arrowSize);
-					stringFormat.Alignment = StringAlignment.Center;
-					break;
-				case Direction.Left:
-					arrowPoint1 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y - arrowSize / 2);
-					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize, screenArrowPoint.Y + arrowSize / 2);
-					stringFormat.Alignment = StringAlignment.Near;
-					break;
-				case Direction.Up:
-					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize / 2, screenArrowPoint.Y + arrowSize);
-					arrowPoint2 = new Point(screenArrowPoint.X + arrowSize / 2, screenArrowPoint.Y + arrowSize);
-					stringFormat.Alignment = StringAlignment.Center;
-					break;
-				case Direction.Right:
-					arrowPoint1 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y - arrowSize / 2);
-					arrowPoint2 = new Point(screenArrowPoint.X - arrowSize, screenArrowPoint.Y + arrowSize / 2);
-					stringFormat.Alignment = StringAlignment.Near;
-					break;
-			}
-
-			Rectangle rect = getTooltipScreenBounds(screenArrowPoint, size, direction);
-			Point[] points = new Point[] { screenArrowPoint, arrowPoint1, arrowPoint2 };
-
-			if (direction == Direction.None)
-			{
-				rect = new Rectangle(screenArrowPoint, size);
-				stringFormat.Alignment = StringAlignment.Center;
-			}
-
-			graphics.FillPolygon(Brushes.DarkGray, points);
-			GraphicsStuff.FillRoundRect(rect.X - border, rect.Y - border, rect.Width + border * 2, rect.Height + border * 2, 3, graphics, Brushes.DarkGray);
-
-			Point point;
-			if (stringFormat.Alignment == StringAlignment.Center)
-			{
-				point = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
-			}
-			else
-			{
-				point = new Point(rect.X, rect.Y + rect.Height / 2);
-			}
-			graphics.DrawString(text, size10Font, Brushes.White, point, stringFormat);
-
-		}
-
-		public Rectangle getTooltipScreenBounds(Point screenArrowPoint, Size screenSize, Direction direction)
-		{
-			Point centreOffset = new Point();
-			int arrowSize = 10;
-
-			switch (direction)
-			{
-				case Direction.Down:
-					centreOffset = new Point(0, -arrowSize - screenSize.Height / 2);
-					break;
-				case Direction.Left:
-					centreOffset = new Point(arrowSize + screenSize.Width / 2, 0);
-					break;
-				case Direction.Up:
-					centreOffset = new Point(0, arrowSize + screenSize.Height / 2);
-					break;
-				case Direction.Right:
-					centreOffset = new Point(-arrowSize - screenSize.Width / 2, 0);
-					break;
-			}
-			int X = (screenArrowPoint.X + centreOffset.X - screenSize.Width / 2);
-			int Y = (screenArrowPoint.Y + centreOffset.Y - screenSize.Height / 2);
-			int Width = screenSize.Width;
-			int Height = screenSize.Height;
-
-			return new Rectangle(X, Y, Width, Height);
-		}
-
-		public void ClearFloatingControls()
-		{
-			foreach (var control in floatingTooltipControls.ToArray())
-				control.Dispose();
 		}
 
 		//----------------------------------------------Production Graph events
 
 		private void Graph_NodeValuesUpdated(object sender, EventArgs e)
 		{
-			try
-			{
-				foreach (NodeElement node in nodeElements)
-					node.Update();
-			}
-			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
-			Invalidate();
+			UpdateNodeVisuals();
 		}
 
 		private void Graph_LinkDeleted(object sender, NodeLinkEventArgs e)
@@ -503,8 +404,8 @@ namespace Foreman
 
 		private void Graph_LinkAdded(object sender, NodeLinkEventArgs e)
 		{
-			NodeElement supplier = nodeElementDictionary[e.nodeLink.Supplier];
-			NodeElement consumer = nodeElementDictionary[e.nodeLink.Consumer];
+			BaseNodeElement supplier = nodeElementDictionary[e.nodeLink.Supplier];
+			BaseNodeElement consumer = nodeElementDictionary[e.nodeLink.Consumer];
 			LinkElement element = new LinkElement(this, e.nodeLink, supplier, consumer);
 			linkElementDictionary.Add(e.nodeLink, element);
 			linkElements.Add(element);
@@ -513,7 +414,7 @@ namespace Foreman
 
 		private void Graph_NodeDeleted(object sender, NodeEventArgs e)
 		{
-			NodeElement element = nodeElementDictionary[e.node];
+			BaseNodeElement element = nodeElementDictionary[e.node];
 			nodeElementDictionary.Remove(e.node);
 			nodeElements.Remove(element);
 			element.Dispose();
@@ -522,7 +423,18 @@ namespace Foreman
 
 		private void Graph_NodeAdded(object sender, NodeEventArgs e)
 		{
-			NodeElement element = new NodeElement(this, e.node);
+			BaseNodeElement element = null;
+			if (e.node is SupplierNode)
+				element = new SupplierNodeElement(this, e.node);
+			else if (e.node is ConsumerNode)
+				element = new ConsumerNodeElement(this, e.node);
+			else if (e.node is PassthroughNode)
+				element = new PassthroughNodeElement(this, e.node);
+			else if (e.node is RecipeNode)
+				element = new RecipeNodeElement(this, e.node);
+			else
+				Trace.Fail("Unexpected node type created in graph.");
+
 			nodeElementDictionary.Add(e.node, element);
 			nodeElements.Add(element);
 			Invalidate();
@@ -532,7 +444,7 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
-			ClearFloatingControls();
+			ToolTipRenderer.ClearFloatingControls();
 			ActiveControl = null; //helps panels like IRChooserPanel (for item/recipe choosing) close when we click on the graph
 
 			mouseDownStartScreenPoint = Control.MousePosition;
@@ -551,7 +463,7 @@ namespace Foreman
 				SelectionZone = new Rectangle();
 				if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0) //clear all selected nodes if we arent using modifier keys
 				{
-					foreach (NodeElement ne in selectedNodes)
+					foreach (BaseNodeElement ne in selectedNodes)
 						ne.Highlighted = false;
 					selectedNodes.Clear();
 				}
@@ -560,7 +472,7 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
 		{
-			ClearFloatingControls();
+			ToolTipRenderer.ClearFloatingControls();
 			Point graph_location = ScreenToGraph(e.Location);
 			GraphElement element = null;
 
@@ -603,7 +515,7 @@ namespace Foreman
 					{
 						if ((Control.ModifierKeys & Keys.Alt) != 0) //removal zone processing
 						{
-							foreach (NodeElement newlySelectedNode in currentSelectionNodes)
+							foreach (BaseNodeElement newlySelectedNode in currentSelectionNodes)
 								selectedNodes.Remove(newlySelectedNode);
 						}
 						else
@@ -611,13 +523,13 @@ namespace Foreman
 							if ((Control.ModifierKeys & Keys.Control) == 0) //if we arent using control, then we are just selecting
 								selectedNodes.Clear();
 
-							foreach (NodeElement newlySelectedNode in currentSelectionNodes)
+							foreach (BaseNodeElement newlySelectedNode in currentSelectionNodes)
 								selectedNodes.Add(newlySelectedNode);
 						}
 						currentSelectionNodes.Clear();
 					}
 					//this is a release of a left click (non-drag operation) -> modify selection if clicking on node & using modifier keys
-					else if (currentDragOperation == DragOperation.None && MouseDownElement is NodeElement clickedNode)
+					else if (currentDragOperation == DragOperation.None && MouseDownElement is BaseNodeElement clickedNode)
 					{
 						if ((Control.ModifierKeys & Keys.Alt) != 0) //remove
 						{
@@ -678,7 +590,7 @@ namespace Foreman
 						MouseDownElement.Dragged(graph_location);
 						Point endPoint = MouseDownElement.Location;
 						if (startPoint != endPoint)
-							foreach (NodeElement node in selectedNodes.Where(node => node != MouseDownElement))
+							foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
 								node.Location = new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y);
 					}
 					else //dragging single item
@@ -690,7 +602,7 @@ namespace Foreman
 				case DragOperation.Selection:
 					SelectionZone = new Rectangle(Math.Min(SelectionZoneOriginPoint.X, graph_location.X), Math.Min(SelectionZoneOriginPoint.Y, graph_location.Y), Math.Abs(SelectionZoneOriginPoint.X - graph_location.X), Math.Abs(SelectionZoneOriginPoint.Y - graph_location.Y));
 					currentSelectionNodes.Clear();
-					foreach (NodeElement element in nodeElements.Where(element => element.IntersectsWithZone(SelectionZone, -20, -20)))
+					foreach (BaseNodeElement element in nodeElements.Where(element => element.IntersectsWithZone(SelectionZone, -20, -20)))
 						currentSelectionNodes.Add(element);
 
 					UpdateSelection();
@@ -712,7 +624,7 @@ namespace Foreman
 			if (ContainsFocus && !this.Focused) //currently have a control created within this viewer active (ex: recipe chooser) -> dont want to scroll then
 				return;
 
-			ClearFloatingControls();
+			ToolTipRenderer.ClearFloatingControls();
 
 			Point oldZoomCenter = ScreenToGraph(e.Location);
 
@@ -751,7 +663,7 @@ namespace Foreman
 					Clipboard.SetText(stringBuilder.ToString());
 
 					if (e.KeyCode == Keys.X) //cut
-						foreach (NodeElement node in selectedNodes)
+						foreach (BaseNodeElement node in selectedNodes)
 							Graph.DeleteNode(node.DisplayedNode);
 				}
 				else if (e.KeyCode == Keys.V && (e.Modifiers & Keys.Control) == Keys.Control) //paste
@@ -786,7 +698,7 @@ namespace Foreman
 
 					//update the selection to be just the newly imported nodes
 					ClearSelection();
-					foreach (NodeElement newNodeElement in newNodeCollection.newNodes.Select(node => nodeElementDictionary[node]))
+					foreach (BaseNodeElement newNodeElement in newNodeCollection.newNodes.Select(node => nodeElementDictionary[node]))
 					{
 						selectedNodes.Add(newNodeElement);
 						newNodeElement.Highlighted = true;
@@ -847,25 +759,25 @@ namespace Foreman
 
 			if ((keyData & Keys.KeyCode) == Keys.Left)
 			{
-				foreach (NodeElement node in selectedNodes)
+				foreach (BaseNodeElement node in selectedNodes)
 					node.Location = new Point(node.X - moveUnit, node.Y);
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Right)
 			{
-				foreach (NodeElement node in selectedNodes)
+				foreach (BaseNodeElement node in selectedNodes)
 					node.Location = new Point(node.X + moveUnit, node.Y);
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Up)
 			{
-				foreach (NodeElement node in selectedNodes)
+				foreach (BaseNodeElement node in selectedNodes)
 					node.Location = new Point(node.X, node.Y - moveUnit);
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Down)
 			{
-				foreach (NodeElement node in selectedNodes)
+				foreach (BaseNodeElement node in selectedNodes)
 					node.Location = new Point(node.X, node.Y + moveUnit);
 				processed = true;
 			}
@@ -1068,7 +980,6 @@ namespace Foreman
 			string[] viewOffsetString = ((string)json["ViewOffset"]).Split(',');
 			ViewOffset = new Point(int.Parse(viewOffsetString[0]), int.Parse(viewOffsetString[1]));
 			ViewScale = (float)json["ViewScale"];
-
 			
 			//update enabled statuses
 			if (!enableEverything)
@@ -1105,16 +1016,20 @@ namespace Foreman
 		{
 			ClearGraph();
 
-			stringFormat.Dispose();
-			size10Font.Dispose();
 
 			if (disposing && (components != null))
 			{
 				components.Dispose();
 			}
+
 			rightClickMenu.Dispose();
 
 			base.Dispose(disposing);
+		}
+
+		private void ProductionGraphViewer_Resize(object sender, EventArgs e)
+		{
+			ToolTipRenderer.ClearFloatingControls();
 		}
 	}
 }

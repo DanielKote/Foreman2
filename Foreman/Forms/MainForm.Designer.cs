@@ -41,11 +41,13 @@
 			this.AddItemButton = new System.Windows.Forms.Button();
 			this.AddRecipeButton = new System.Windows.Forms.Button();
 			this.ProductionGroupBox = new System.Windows.Forms.GroupBox();
-			this.label4 = new System.Windows.Forms.Label();
+			this.HighLodRadioButton = new System.Windows.Forms.RadioButton();
+			this.MediumLodRadioButton = new System.Windows.Forms.RadioButton();
+			this.LowLodRadioButton = new System.Windows.Forms.RadioButton();
+			this.label6 = new System.Windows.Forms.Label();
+			this.ShowNodeRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
 			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
-			this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
-			this.SimpleViewCheckBox = new System.Windows.Forms.CheckBox();
 			this.GridLinesGroupBox = new System.Windows.Forms.GroupBox();
 			this.AlignSelectionButton = new System.Windows.Forms.Button();
 			this.GridlinesCheckbox = new System.Windows.Forms.CheckBox();
@@ -55,9 +57,12 @@
 			this.MinorGridlinesDropDown = new System.Windows.Forms.ComboBox();
 			this.DefaultsGroupBox = new System.Windows.Forms.GroupBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.label4 = new System.Windows.Forms.Label();
 			this.AssemblerDropDown = new System.Windows.Forms.ComboBox();
+			this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.ModuleDropDown = new System.Windows.Forms.ComboBox();
+			this.SimpleViewCheckBox = new System.Windows.Forms.CheckBox();
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MainToolbar.SuspendLayout();
@@ -93,6 +98,7 @@
 			this.MainToolbar.Controls.Add(this.ProductionGroupBox);
 			this.MainToolbar.Controls.Add(this.GridLinesGroupBox);
 			this.MainToolbar.Controls.Add(this.DefaultsGroupBox);
+			this.MainToolbar.Controls.Add(this.SimpleViewCheckBox);
 			this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainToolbar.Location = new System.Drawing.Point(0, 0);
 			this.MainToolbar.Margin = new System.Windows.Forms.Padding(0);
@@ -223,11 +229,13 @@
 			// ProductionGroupBox
 			// 
 			this.ProductionGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ProductionGroupBox.Controls.Add(this.label4);
+			this.ProductionGroupBox.Controls.Add(this.HighLodRadioButton);
+			this.ProductionGroupBox.Controls.Add(this.MediumLodRadioButton);
+			this.ProductionGroupBox.Controls.Add(this.LowLodRadioButton);
+			this.ProductionGroupBox.Controls.Add(this.label6);
+			this.ProductionGroupBox.Controls.Add(this.ShowNodeRecipeCheckBox);
 			this.ProductionGroupBox.Controls.Add(this.DynamicLWCheckBox);
 			this.ProductionGroupBox.Controls.Add(this.PauseUpdatesCheckbox);
-			this.ProductionGroupBox.Controls.Add(this.RateOptionsDropDown);
-			this.ProductionGroupBox.Controls.Add(this.SimpleViewCheckBox);
 			this.ProductionGroupBox.Location = new System.Drawing.Point(228, 4);
 			this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
 			this.ProductionGroupBox.Name = "ProductionGroupBox";
@@ -237,24 +245,71 @@
 			this.ProductionGroupBox.TabStop = false;
 			this.ProductionGroupBox.Text = "Graph Options:";
 			// 
-			// label4
+			// HighLodRadioButton
 			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(9, 26);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(79, 17);
-			this.label4.TabIndex = 5;
-			this.label4.Text = "Base Time:";
+			this.HighLodRadioButton.AutoSize = true;
+			this.HighLodRadioButton.Location = new System.Drawing.Point(150, 18);
+			this.HighLodRadioButton.Name = "HighLodRadioButton";
+			this.HighLodRadioButton.Size = new System.Drawing.Size(58, 21);
+			this.HighLodRadioButton.TabIndex = 10;
+			this.HighLodRadioButton.TabStop = true;
+			this.HighLodRadioButton.Text = "High";
+			this.HighLodRadioButton.UseVisualStyleBackColor = true;
+			this.HighLodRadioButton.CheckedChanged += new System.EventHandler(this.LODRadioButton_CheckedChanged);
+			// 
+			// MediumLodRadioButton
+			// 
+			this.MediumLodRadioButton.AutoSize = true;
+			this.MediumLodRadioButton.Location = new System.Drawing.Point(98, 18);
+			this.MediumLodRadioButton.Name = "MediumLodRadioButton";
+			this.MediumLodRadioButton.Size = new System.Drawing.Size(56, 21);
+			this.MediumLodRadioButton.TabIndex = 9;
+			this.MediumLodRadioButton.TabStop = true;
+			this.MediumLodRadioButton.Text = "Med";
+			this.MediumLodRadioButton.UseVisualStyleBackColor = true;
+			this.MediumLodRadioButton.CheckedChanged += new System.EventHandler(this.LODRadioButton_CheckedChanged);
+			// 
+			// LowLodRadioButton
+			// 
+			this.LowLodRadioButton.AutoSize = true;
+			this.LowLodRadioButton.Location = new System.Drawing.Point(47, 18);
+			this.LowLodRadioButton.Name = "LowLodRadioButton";
+			this.LowLodRadioButton.Size = new System.Drawing.Size(54, 21);
+			this.LowLodRadioButton.TabIndex = 8;
+			this.LowLodRadioButton.TabStop = true;
+			this.LowLodRadioButton.Text = "Low";
+			this.LowLodRadioButton.UseVisualStyleBackColor = true;
+			this.LowLodRadioButton.CheckedChanged += new System.EventHandler(this.LODRadioButton_CheckedChanged);
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(7, 20);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(41, 17);
+			this.label6.TabIndex = 7;
+			this.label6.Text = "LOD:";
+			// 
+			// ShowNodeRecipeCheckBox
+			// 
+			this.ShowNodeRecipeCheckBox.AutoSize = true;
+			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(8, 74);
+			this.ShowNodeRecipeCheckBox.Name = "ShowNodeRecipeCheckBox";
+			this.ShowNodeRecipeCheckBox.Size = new System.Drawing.Size(119, 21);
+			this.ShowNodeRecipeCheckBox.TabIndex = 6;
+			this.ShowNodeRecipeCheckBox.Text = "Show Recipes";
+			this.ShowNodeRecipeCheckBox.UseVisualStyleBackColor = true;
+			this.ShowNodeRecipeCheckBox.CheckedChanged += new System.EventHandler(this.ShowNodeRecipeCheckBox_CheckedChanged);
 			// 
 			// DynamicLWCheckBox
 			// 
 			this.DynamicLWCheckBox.AutoSize = true;
-			this.DynamicLWCheckBox.Location = new System.Drawing.Point(12, 52);
+			this.DynamicLWCheckBox.Location = new System.Drawing.Point(8, 47);
 			this.DynamicLWCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
 			this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
-			this.DynamicLWCheckBox.Size = new System.Drawing.Size(146, 21);
+			this.DynamicLWCheckBox.Size = new System.Drawing.Size(155, 21);
 			this.DynamicLWCheckBox.TabIndex = 4;
-			this.DynamicLWCheckBox.Text = "Dynamic link-width";
+			this.DynamicLWCheckBox.Text = "Dynamic Link-Width";
 			this.DynamicLWCheckBox.UseVisualStyleBackColor = true;
 			this.DynamicLWCheckBox.CheckedChanged += new System.EventHandler(this.DynamicLWCheckBox_CheckedChanged);
 			// 
@@ -262,7 +317,7 @@
 			// 
 			this.PauseUpdatesCheckbox.AutoSize = true;
 			this.PauseUpdatesCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(12, 99);
+			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(8, 98);
 			this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
 			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(188, 21);
@@ -270,29 +325,6 @@
 			this.PauseUpdatesCheckbox.Text = "Pause all calculations";
 			this.PauseUpdatesCheckbox.UseVisualStyleBackColor = true;
 			this.PauseUpdatesCheckbox.CheckedChanged += new System.EventHandler(this.PauseUpdatesCheckbox_CheckedChanged);
-			// 
-			// RateOptionsDropDown
-			// 
-			this.RateOptionsDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.RateOptionsDropDown.FormattingEnabled = true;
-			this.RateOptionsDropDown.Location = new System.Drawing.Point(100, 23);
-			this.RateOptionsDropDown.Margin = new System.Windows.Forms.Padding(4);
-			this.RateOptionsDropDown.Name = "RateOptionsDropDown";
-			this.RateOptionsDropDown.Size = new System.Drawing.Size(102, 24);
-			this.RateOptionsDropDown.TabIndex = 2;
-			this.RateOptionsDropDown.SelectedIndexChanged += new System.EventHandler(this.RateOptionsDropDown_SelectedIndexChanged);
-			// 
-			// SimpleViewCheckBox
-			// 
-			this.SimpleViewCheckBox.AutoSize = true;
-			this.SimpleViewCheckBox.Location = new System.Drawing.Point(12, 75);
-			this.SimpleViewCheckBox.Margin = new System.Windows.Forms.Padding(4);
-			this.SimpleViewCheckBox.Name = "SimpleViewCheckBox";
-			this.SimpleViewCheckBox.Size = new System.Drawing.Size(105, 21);
-			this.SimpleViewCheckBox.TabIndex = 0;
-			this.SimpleViewCheckBox.Text = "Simple View";
-			this.SimpleViewCheckBox.UseVisualStyleBackColor = true;
-			this.SimpleViewCheckBox.CheckedChanged += new System.EventHandler(this.SimpleViewCheckBox_CheckedChanged);
 			// 
 			// GridLinesGroupBox
 			// 
@@ -403,7 +435,9 @@
 			// 
 			this.DefaultsGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.DefaultsGroupBox.Controls.Add(this.label5);
+			this.DefaultsGroupBox.Controls.Add(this.label4);
 			this.DefaultsGroupBox.Controls.Add(this.AssemblerDropDown);
+			this.DefaultsGroupBox.Controls.Add(this.RateOptionsDropDown);
 			this.DefaultsGroupBox.Controls.Add(this.label1);
 			this.DefaultsGroupBox.Controls.Add(this.ModuleDropDown);
 			this.DefaultsGroupBox.Location = new System.Drawing.Point(705, 4);
@@ -418,26 +452,46 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(7, 25);
+			this.label5.Location = new System.Drawing.Point(7, 56);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(81, 17);
 			this.label5.TabIndex = 4;
 			this.label5.Text = "Assemblers";
 			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(7, 25);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(79, 17);
+			this.label4.TabIndex = 5;
+			this.label4.Text = "Base Time:";
+			// 
 			// AssemblerDropDown
 			// 
 			this.AssemblerDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.AssemblerDropDown.FormattingEnabled = true;
-			this.AssemblerDropDown.Location = new System.Drawing.Point(89, 23);
+			this.AssemblerDropDown.Location = new System.Drawing.Point(89, 53);
 			this.AssemblerDropDown.Name = "AssemblerDropDown";
 			this.AssemblerDropDown.Size = new System.Drawing.Size(147, 24);
 			this.AssemblerDropDown.TabIndex = 3;
 			this.AssemblerDropDown.SelectedIndexChanged += new System.EventHandler(this.AssemblerDropDown_SelectedIndexChanged);
 			// 
+			// RateOptionsDropDown
+			// 
+			this.RateOptionsDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.RateOptionsDropDown.FormattingEnabled = true;
+			this.RateOptionsDropDown.Location = new System.Drawing.Point(89, 22);
+			this.RateOptionsDropDown.Margin = new System.Windows.Forms.Padding(4);
+			this.RateOptionsDropDown.Name = "RateOptionsDropDown";
+			this.RateOptionsDropDown.Size = new System.Drawing.Size(146, 24);
+			this.RateOptionsDropDown.TabIndex = 2;
+			this.RateOptionsDropDown.SelectedIndexChanged += new System.EventHandler(this.RateOptionsDropDown_SelectedIndexChanged);
+			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(7, 56);
+			this.label1.Location = new System.Drawing.Point(7, 86);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(61, 17);
 			this.label1.TabIndex = 2;
@@ -447,11 +501,23 @@
 			// 
 			this.ModuleDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ModuleDropDown.FormattingEnabled = true;
-			this.ModuleDropDown.Location = new System.Drawing.Point(89, 53);
+			this.ModuleDropDown.Location = new System.Drawing.Point(89, 83);
 			this.ModuleDropDown.Name = "ModuleDropDown";
 			this.ModuleDropDown.Size = new System.Drawing.Size(147, 24);
 			this.ModuleDropDown.TabIndex = 1;
 			this.ModuleDropDown.SelectedIndexChanged += new System.EventHandler(this.ModuleDropDown_SelectedIndexChanged);
+			// 
+			// SimpleViewCheckBox
+			// 
+			this.SimpleViewCheckBox.AutoSize = true;
+			this.SimpleViewCheckBox.Location = new System.Drawing.Point(956, 4);
+			this.SimpleViewCheckBox.Margin = new System.Windows.Forms.Padding(4);
+			this.SimpleViewCheckBox.Name = "SimpleViewCheckBox";
+			this.SimpleViewCheckBox.Size = new System.Drawing.Size(105, 21);
+			this.SimpleViewCheckBox.TabIndex = 0;
+			this.SimpleViewCheckBox.Text = "Simple View";
+			this.SimpleViewCheckBox.UseVisualStyleBackColor = true;
+			this.SimpleViewCheckBox.CheckedChanged += new System.EventHandler(this.SimpleViewCheckBox_CheckedChanged);
 			// 
 			// GraphViewer
 			// 
@@ -460,12 +526,13 @@
 			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.GraphViewer.DCache = null;
 			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
 			this.GraphViewer.Location = new System.Drawing.Point(4, 136);
 			this.GraphViewer.Margin = new System.Windows.Forms.Padding(4, 0, 4, 4);
 			this.GraphViewer.MouseDownElement = null;
 			this.GraphViewer.Name = "GraphViewer";
+			this.GraphViewer.RecipeTooltipEnabled = false;
 			this.GraphViewer.SelectedRateUnit = Foreman.ProductionGraphViewer.RateUnit.Per1Sec;
-			this.GraphViewer.SimpleView = false;
 			this.GraphViewer.Size = new System.Drawing.Size(1174, 713);
 			this.GraphViewer.TabIndex = 12;
 			this.GraphViewer.TooltipsEnabled = true;
@@ -533,6 +600,11 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox AssemblerDropDown;
-    }
+		private System.Windows.Forms.CheckBox ShowNodeRecipeCheckBox;
+		private System.Windows.Forms.RadioButton HighLodRadioButton;
+		private System.Windows.Forms.RadioButton MediumLodRadioButton;
+		private System.Windows.Forms.RadioButton LowLodRadioButton;
+		private System.Windows.Forms.Label label6;
+	}
 }
 

@@ -26,13 +26,13 @@ namespace Foreman
 		float DesiredRate { get; set; }
 
 		bool IsValid { get; }
-		List<KeyValuePair<string,string>> GetErrors();
-		string GetNameString();
+		string GetErrors();
 
 		float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
 		float GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
 		float GetSuppliedRate(Item item); //actual rate an item is supplied to this node (sum of all links for a given item to this node)
 
+		bool IsOversupplied();
 		bool IsOversupplied(Item item); //true if GetConsumeRate < GetSuppliedRate
 		bool ManualRateNotMet(); //true if ActualRate < DesiredRate (and RateType is manual)
 
@@ -77,8 +77,7 @@ namespace Foreman
 		public virtual float GetConsumptionMultiplier() { return 1; }
 		public virtual float GetPollutionMultiplier() { return 1; }
 
-		public abstract List<KeyValuePair<string, string>> GetErrors();
-		public abstract string GetNameString();
+		public abstract string GetErrors();
 
 		public void Delete() { MyGraph.DeleteNode(this); }
 
@@ -98,6 +97,14 @@ namespace Foreman
 		public float GetSuppliedRate(Item item)
 		{
 			return (float)InputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
+		}
+
+		public bool IsOversupplied()
+		{
+			foreach (Item item in Inputs)
+				if (IsOversupplied(item))
+					return true;
+			return false;
 		}
 
 		public bool IsOversupplied(Item item)

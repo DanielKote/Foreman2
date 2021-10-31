@@ -133,13 +133,13 @@ namespace Foreman.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool SimpleView {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int LevelOfDetail {
             get {
-                return ((bool)(this["SimpleView"]));
+                return ((int)(this["LevelOfDetail"]));
             }
             set {
-                this["SimpleView"] = value;
+                this["LevelOfDetail"] = value;
             }
         }
         
@@ -176,6 +176,18 @@ namespace Foreman.Properties {
             }
             set {
                 this["LastSaveFileLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowRecipeToolTip {
+            get {
+                return ((bool)(this["ShowRecipeToolTip"]));
+            }
+            set {
+                this["ShowRecipeToolTip"] = value;
             }
         }
     }

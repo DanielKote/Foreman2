@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Foreman
 {
-	class DraggedLinkElement : BaseLinkElement
+	public class DraggedLinkElement : BaseLinkElement
 	{
 		public override Item Item { get; protected set; }
 		public LinkType StartConnectionType { get; private set; }
@@ -14,7 +14,7 @@ namespace Foreman
 
 		private bool dragEnded;
 
-		public DraggedLinkElement(ProductionGraphViewer graphViewer, NodeElement startNode, LinkType startConnectionType, Item item) : base(graphViewer)
+		public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item) : base(graphViewer)
 		{
 			if (startConnectionType == LinkType.Input)
 				ConsumerElement = startNode;
@@ -34,14 +34,14 @@ namespace Foreman
 			if (dragEnded)
 				return null; //no update
 
-			Point pointNUpdate = myGraphViewer.ScreenToGraph(myGraphViewer.PointToClient(Cursor.Position));
+			Point pointNUpdate = graphViewer.ScreenToGraph(graphViewer.PointToClient(Cursor.Position));
 			Point pointMUpdate = pointNUpdate;
 			newObjectLocation = pointNUpdate;
 
 			//only snap to grid if grid exists and its a free link (not linking 2 existing objects)
-			if ((SupplierElement == null || ConsumerElement == null) && myGraphViewer.Grid.ShowGrid && myGraphViewer.Grid.CurrentGridUnit > 0)
+			if ((SupplierElement == null || ConsumerElement == null) && graphViewer.Grid.ShowGrid && graphViewer.Grid.CurrentGridUnit > 0)
 			{
-				pointNUpdate = myGraphViewer.Grid.AlignToGrid(pointNUpdate);
+				pointNUpdate = graphViewer.Grid.AlignToGrid(pointNUpdate);
 				pointMUpdate = pointNUpdate;
 				newObjectLocation = pointNUpdate;
 			}
@@ -60,24 +60,24 @@ namespace Foreman
 
 			if (SupplierElement != null && ConsumerElement != null) //no nulls -> this is a 'link 2 nodes' operation
 			{
-				myGraphViewer.Graph.CreateLink(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
+				graphViewer.Graph.CreateLink(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
 
-				myGraphViewer.Graph.UpdateNodeValues();
-				myGraphViewer.UpdateGraphBounds();
-				myGraphViewer.Invalidate();
-				myGraphViewer.DisposeLinkDrag();
+				graphViewer.Graph.UpdateNodeValues();
+				graphViewer.UpdateGraphBounds();
+				graphViewer.Invalidate();
+				graphViewer.DisposeLinkDrag();
 			}
 			else //at least one null -> this is an 'add new recipe' operation
 			{
-				Point screenPoint = new Point(myGraphViewer.GraphToScreen(graph_point).X - 150, 15);
-				screenPoint.X = Math.Max(15, Math.Min(myGraphViewer.Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
+				Point screenPoint = new Point(graphViewer.GraphToScreen(graph_point).X - 150, 15);
+				screenPoint.X = Math.Max(15, Math.Min(graphViewer.Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
 
 				bool includeSuppliers = StartConnectionType == LinkType.Input && SupplierElement == null;
 				bool includeConsumers = StartConnectionType == LinkType.Output && ConsumerElement == null;
 				if (includeSuppliers)
-					myGraphViewer.AddRecipe(screenPoint, Item, Point.Add(newObjectLocation, new Size(0, myGraphViewer.SimpleView ? (NodeElement.baseHeight / 2) : (NodeElement.baseWIconHeight / 2))), ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
+					graphViewer.AddRecipe(screenPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
 				else if (includeConsumers)
-					myGraphViewer.AddRecipe(screenPoint, Item, Point.Add(newObjectLocation, new Size(0, myGraphViewer.SimpleView ? (-NodeElement.baseHeight / 2) : (-NodeElement.baseWIconHeight / 2))), ProductionGraphViewer.NewNodeType.Consumer, SupplierElement);
+					graphViewer.AddRecipe(screenPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Consumer, SupplierElement);
 				else
 					Trace.Fail("Both null dragged link!");
 			}
@@ -88,7 +88,7 @@ namespace Foreman
 			if (button == MouseButtons.Left)
 				EndDrag(graph_point);
 			else if (button == MouseButtons.Right) //cancel drag-link
-				myGraphViewer.DisposeLinkDrag();
+				graphViewer.DisposeLinkDrag();
 		}
 
 		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
@@ -102,7 +102,7 @@ namespace Foreman
 			if (dragEnded)
 				return;
 
-			NodeElement mousedElement = myGraphViewer.GetNodeAtPoint(graph_point);
+			BaseNodeElement mousedElement = graphViewer.GetNodeAtPoint(graph_point);
 			if (mousedElement != null)
 			{
 				if (StartConnectionType == LinkType.Input && mousedElement.DisplayedNode.Outputs.Contains(Item))
