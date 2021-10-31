@@ -12,7 +12,7 @@ namespace Foreman
 {
 	public partial class MainForm : Form
 	{
-		internal const string DefaultPreset = "_default (Factorio 1.1 Vanilla)";
+		internal const string DefaultPreset = "Factorio 1.1 Vanilla";
 
 		public MainForm()
 		{
@@ -32,6 +32,7 @@ namespace Foreman
 				{
 					form.ShowDialog(); //LOAD FACTORIO DATA
 					GraphViewer.Graph = new ProductionGraph(form.GetDataCache());
+					//gc collection is unnecessary - first data cache to be created.
 				}
 
 				ModuleDropDown.SelectedIndex = Properties.Settings.Default.DefaultModules;
@@ -140,7 +141,7 @@ namespace Foreman
 
 			if (!existingPresetFiles.Contains(Properties.Settings.Default.CurrentPresetName))
 			{
-				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to default (Factorio 1.1 Vanilla)");
+				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to the default preset (Factorio 1.1 Vanilla)");
 				Properties.Settings.Default.CurrentPresetName = DefaultPreset;
 			}
 			if (!existingPresetFiles.Contains(DefaultPreset))
@@ -187,13 +188,13 @@ namespace Foreman
 					form.Left = this.Left + 250;
 					form.Top = this.Top + 25;
 					form.ShowDialog();
-					reload = form.ReloadRequired;
+					reload = (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset); //if we changed the preset, then load up another settings form after processing
 
 					if (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset) //different preset -> need to reload datacache
 					{
 						Properties.Settings.Default.CurrentPresetName = form.CurrentOptions.SelectedPreset;
 						List<Preset> validPresets = GetValidPresetsList();
-						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true);
+						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, true);
 						Properties.Settings.Default.Save();
 					}
 					else //update the assemblers, miners, modules if we havent switched preset (if we have, then all are enabled)

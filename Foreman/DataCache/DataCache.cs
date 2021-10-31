@@ -66,7 +66,7 @@ namespace Foreman
 
         public Technology StartingTech { get; private set; }
 
-        public static Bitmap UnknownIcon { get { return IconProcessor.GetUnknownIcon(); } }
+        public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
 
         private Dictionary<string, string> includedMods; //name : version
         private Dictionary<string, Technology> technologies;
@@ -113,8 +113,9 @@ namespace Foreman
         public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress, CancellationToken ctoken)
         {
             Clear();
+
             JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
-            var iconCache = await IconProcessor.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, ctoken, 0, 90);
+            Dictionary<string, IconColorPair> iconCache = await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, ctoken, 0, 90);
             PresetName = preset.Name;
 
             await Task.Run(() =>
@@ -145,7 +146,7 @@ namespace Foreman
                     ProcessTechnology(objJToken, iconCache);
                 foreach (var objJToken in jsonData["technologies"].ToList())
                     ProcessTechnologyP2(objJToken); //required to properly link technology prerequisites
-                foreach (var objJToken in jsonData["crafting_machines"].ToList())
+                foreach (var objJToken in jsonData["assemblers"].ToList())
                     ProcessAssembler(objJToken, iconCache);
 
                 //remove these temporary dictionaries (no longer necessary)
@@ -257,7 +258,7 @@ namespace Foreman
             subgroups.Add(subgroup.Name, subgroup);
         }
 
-        private void ProcessGroup(JToken objJToken, Dictionary<int, IconColorPair> iconCache)
+        private void ProcessGroup(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             Group group = new Group(
                 this,
@@ -265,14 +266,14 @@ namespace Foreman
                 (string)objJToken["localised_name"],
                 (string)objJToken["order"]);
 
-            if (iconCache.ContainsKey((int)objJToken["icon_id"]))
-                group.SetIconAndColor(iconCache[(int)objJToken["icon_id"]]);
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                group.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
             foreach (var subgroupJToken in objJToken["subgroups"])
                 subgroups[(string)subgroupJToken].SetGroup(group);
             groups.Add(group.Name, group);
         }
 
-        private void ProcessItem(JToken objJToken, Dictionary<int, IconColorPair> iconCache)
+        private void ProcessItem(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             Item item = new Item(
                 this,
@@ -282,12 +283,12 @@ namespace Foreman
                 Subgroups[(string)objJToken["subgroup"]],
                 (string)objJToken["order"]);
 
-            if (iconCache.ContainsKey((int)objJToken["icon_id"]))
-                item.SetIconAndColor(iconCache[(int)objJToken["icon_id"]]);
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
             items.Add(item.Name, item);
         }
 
-        private void ProcessFluid(JToken objJToken, Dictionary<int, IconColorPair> iconCache)
+        private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             Item item = new Item(
                 this,
@@ -298,8 +299,8 @@ namespace Foreman
                 (string)objJToken["order"]);
 
             item.Temperature = (double)objJToken["default_temperature"];
-            if (iconCache.ContainsKey((int)objJToken["icon_id"]))
-                item.SetIconAndColor(iconCache[(int)objJToken["icon_id"]]);
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
             items.Add(item.Name, item);
         }
 
@@ -312,7 +313,10 @@ namespace Foreman
             resource.Time = (float)objJToken["mining_time"];
             resource.Hardness = 0.5f;
             foreach (var productJToken in objJToken["products"])
-                resource.AddResult(items[(string)productJToken["name"]]);
+                if (items.ContainsKey((string)productJToken["name"]))
+                    resource.AddResult(items[(string)productJToken["name"]]);
+            if (resource.ResultingItems.Count == 0)
+                return; //If the resource doesnt actually produce any products, just ignore it.
 
             string category = (string)objJToken["resource_category"];
             if (!resourceCategories.ContainsKey(category))
@@ -322,7 +326,7 @@ namespace Foreman
             resources.Add(resource.Name, resource);
         }
 
-        private void ProcessMiner(JToken objJToken, Dictionary<int, IconColorPair> iconCache)
+        private void ProcessMiner(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             Miner miner = new Miner(
                 this,
@@ -331,8 +335,8 @@ namespace Foreman
 
             miner.MiningPower = (float)objJToken["mining_speed"];
             miner.ModuleSlots = (int)objJToken["module_inventory_size"];
-            if (iconCache.ContainsKey((int)objJToken["icon_id"]))
-                miner.Icon = iconCache[(int)objJToken["icon_id"]].Icon;
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
             foreach (var categoryJToken in objJToken["resource_categories"])
                 if(resourceCategories.ContainsKey((string)categoryJToken))
@@ -342,7 +346,7 @@ namespace Foreman
             miners.Add(miner.Name, miner);
         }
 
-        private void ProcessRecipe(JToken objJToken, Dictionary<int, IconColorPair> iconCache)
+        private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             Recipe recipe = new Recipe(
                 this,
@@ -360,8 +364,10 @@ namespace Foreman
                 craftingCategories.Add(category, new List<Recipe>());
             craftingCategories[category].Add(recipe);
 
-            if (iconCache.ContainsKey((int)objJToken["icon_id"]))
-                recipe.SetIconAndColor(iconCache[(int)objJToken["icon_id"]]);
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                recipe.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+            else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
+                recipe.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
 
             foreach (var productJToken in objJToken["products"].ToList())
             {
@@ -386,11 +392,15 @@ namespace Foreman
 
                 float minTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["minimum_temperature"].Type != JTokenType.Null) ? (float)ingredientJToken["minimum_temperature"] : float.NegativeInfinity;
                 float maxTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"].Type != JTokenType.Null) ? (float)ingredientJToken["maximum_temperature"] : float.PositiveInfinity;
+
                 if (amount != 0)
                     recipe.AddIngredient(Items[name], amount, minTemp, maxTemp);
             }
 
             recipes.Add(recipe.Name, recipe);
+
+            if (recipe.Name.Contains("scrap"))
+                Console.WriteLine(recipe.Name);
         }
 
         private void ProcessModule(JToken objJToken)
@@ -403,9 +413,10 @@ namespace Foreman
                 (float)objJToken["module_effects_productivity"]);
 
             foreach (var recipe in objJToken["limitations"])
-                recipes[(string)recipe].AddValidModule(module);
+                if(recipes.ContainsKey((string)recipe)) //only add if the recipe is in the list of recipes (if it isnt, means it was deleted either in data phase of LUA or during foreman export cleanup)
+                    recipes[(string)recipe].AddValidModule(module);
 
-            if (module.ValidRecipes.Count == 0) //means all recipes work
+            if (objJToken["limitations"].Count() == 0) //means all recipes work
                 foreach (Recipe recipe in recipes.Values)
                     recipe.AddValidModule(module);
 
@@ -417,15 +428,15 @@ namespace Foreman
             modules.Add(module.Name, module);
         }
 
-        private void ProcessTechnology(JToken objJToken, Dictionary<int, IconColorPair> iconCache)
+        private void ProcessTechnology(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             Technology technology = new Technology(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
 
-            if (iconCache.ContainsKey((int)objJToken["icon_id"]))
-                technology.Icon = iconCache[(int)objJToken["icon_id"]].Icon;
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                technology.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
             foreach (var recipe in objJToken["recipes"])
                 if (recipes.ContainsKey((string)recipe))
@@ -442,7 +453,7 @@ namespace Foreman
                     technology.AddPrerequisite(technologies[(string)prerequisite]); //if it doesnt, it gets ignored in Factorio
         }
 
-        private void ProcessAssembler(JToken objJToken, Dictionary<int, IconColorPair> iconCache)
+        private void ProcessAssembler(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             Assembler assembler = new Assembler(
                 this,
@@ -452,8 +463,8 @@ namespace Foreman
             assembler.Speed = (float)objJToken["crafting_speed"];
             assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
 
-            if (iconCache.ContainsKey((int)objJToken["icon_id"]))
-                assembler.Icon = iconCache[(int)objJToken["icon_id"]].Icon;
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                assembler.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
             foreach (var categoryJToken in objJToken["crafting_categories"])
                 if(craftingCategories.ContainsKey((string)categoryJToken))
@@ -509,12 +520,12 @@ namespace Foreman
 
             //step 2: delete any recipes with no unlocks (those that had no unlocks in the beginning - those that were part of the removed tech were also removed)
             //step 2.1: also delete any recipes with no viable assembler
-            foreach (Recipe recipe in recipes.Values)
+            foreach (Recipe recipe in recipes.Values.ToList())
                 if (recipe.MyUnlockTechnologies.Count == 0 || recipe.ValidAssemblers.Count == 0)
                     DeleteRecipe(recipe);
 
             //step 3: try and delete all items (can only delete if item isnt produced/consumed by any recipe, and isnt part of assemblers, miners, modules (that exist in this cache)
-            foreach (Item item in items.Values)
+            foreach (Item item in items.Values.ToList())
                 TryDeleteItem(item);
 
             //step 4: clean up groups and subgroups (basically, clear the entire dictionary and for each recipe & item 'add' their subgroup & group into the dictionary.

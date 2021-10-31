@@ -22,17 +22,6 @@ namespace Foreman
 
 		public double Temperature { get; set; } //for liquids
 
-		public new Bitmap Icon
-        {
-			get
-			{
-				if (base.Icon == null)
-					base.Icon = DataCache.UnknownIcon;
-				return base.Icon;
-            }
-			set { base.Icon = value; }
-        }
-
 		public Item(DataCache dCache, string name, string friendlyName, bool isfluid, Subgroup subgroup, string order) : base(dCache, name, friendlyName, order)
 		{
 			MySubgroup = subgroup;

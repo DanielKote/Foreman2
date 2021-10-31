@@ -35,7 +35,7 @@ namespace Foreman
 
             // Set the Display text (Either a % amount or our custom text
             int percent = (int)(((double)this.Value / (double)this.Maximum) * 100);
-            string text = "(" + percent.ToString("00") + ") " + CustomText;
+            string text = "(" + percent.ToString() + "%) " + CustomText;
 
             using (Font f = new Font(FontFamily.GenericSerif, 10))
             {

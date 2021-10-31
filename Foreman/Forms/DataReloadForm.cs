@@ -33,7 +33,7 @@ namespace Foreman
             DateTime startTime = DateTime.Now;
             //ErrorLogging.LogLine("Init program.");
  #endif
-            var progressHandler = new Progress<KeyValuePair<int, string>>(value =>
+            var progress = new Progress<KeyValuePair<int, string>>(value =>
             {
                 if (value.Key > currentPercent)
                 {
@@ -45,8 +45,7 @@ namespace Foreman
                     currentText = value.Value;
                     Text = "Preparing Foreman: " + value.Value;
                 }
-            });
-            var progress = progressHandler as IProgress<KeyValuePair<int, string>>;
+            }) as IProgress<KeyValuePair<int, string>>;
             var token = cts.Token;
 
             createdDataCache = new DataCache();

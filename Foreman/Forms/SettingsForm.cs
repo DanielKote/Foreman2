@@ -73,13 +73,11 @@ namespace Foreman
 
         private SettingsFormOptions originalOptions;
         public SettingsFormOptions CurrentOptions;
-        public bool ReloadRequired;
 
         public SettingsForm(SettingsFormOptions options)
         {
             originalOptions = options;
             CurrentOptions = options.Clone();
-            ReloadRequired = false;
 
             InitializeComponent();
 
@@ -123,7 +121,9 @@ namespace Foreman
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
                 ModSelectionBox.SetItemChecked(i, true);
 
+            CurrentPresetLabel.Text = CurrentOptions.SelectedPreset;
             PresetsListBox.Items.AddRange(CurrentOptions.Presets.ToArray());
+            PresetsListBox.Items.RemoveAt(0); //0 is the currently active preset.
         }
 
         private void PresetsListBox_MouseDown(object sender, MouseEventArgs e)
@@ -192,7 +192,6 @@ namespace Foreman
             if (!selectedPreset.IsCurrentlySelected) //safety check - should always pass
             {
                 CurrentOptions.SelectedPreset = selectedPreset.Name;
-                ReloadRequired = true;
                 this.Close();
             }
         }
@@ -299,15 +298,22 @@ namespace Foreman
             using (ImportPresetForm form = new ImportPresetForm())
             {
                 form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 50;
-                form.Top = this.Top + 25;
-                form.ShowDialog();
+                form.Left = this.Left + 150;
+                form.Top = this.Top + 100;
+                DialogResult result = form.ShowDialog();
 
-                if(!string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
+                if(result == DialogResult.OK && !string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
                 {
+                    GC.Collect(); //we just added a new preset - this required the opening of (potentially) alot of zip files and processing of a ton of bitmaps that are now stuck in garbate. In large mod packs like A&B this could clear out 2GB+ of memory.
                     Preset newPreset = new Preset(form.NewPresetName, false, false);
                     CurrentOptions.Presets.Add(newPreset);
                     PresetsListBox.Items.Add(newPreset);
+
+                    if(MessageBox.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        CurrentOptions.SelectedPreset = newPreset.Name;
+                        this.Close();
+                    }
                 }
             }
         }

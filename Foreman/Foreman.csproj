@@ -130,6 +130,7 @@
     <Compile Include="Controls\IRChooserPanel.Designer.cs">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataCache\IconCache.cs" />
     <Compile Include="DataTypes\Assembler.cs" />
     <Compile Include="DataTypes\DataObjectBase.cs" />
     <Compile Include="DataTypes\Group.cs" />
@@ -160,7 +161,7 @@
     <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
     <Compile Include="ProductionGraphView\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
-    <Compile Include="DataCache\IconProcessor.cs" />
+    <Compile Include="DataCache\IconCacheProcessor.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
@@ -249,29 +250,29 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />
-    <None Include="Mod\foremanexport_0.1.1\info.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Mod\foremanexport_0.1.1\instrument-after-data.lua">
+    <None Include="Mod\foremanexport_1.0.0\info.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_0.1.1\instrument-control - ee.lua">
+    <None Include="Mod\foremanexport_1.0.0\instrument-after-data.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_0.1.1\instrument-control - en.lua">
+    <None Include="Mod\foremanexport_1.0.0\instrument-control - ee.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_0.1.1\instrument-control - ne.lua">
+    <None Include="Mod\foremanexport_1.0.0\instrument-control - en.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_0.1.1\instrument-control - nn.lua">
+    <None Include="Mod\foremanexport_1.0.0\instrument-control - ne.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Mod\foremanexport_1.0.0\instrument-control - nn.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <None Include="Presets\_default %28Factorio 1.1 Vanilla%29.dat">
+    <None Include="Presets\Factorio 1.1 Vanilla.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Presets\_default %28Factorio 1.1 Vanilla%29.json">
+    <None Include="Presets\Factorio 1.1 Vanilla.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />

@@ -53,6 +53,8 @@
             this.PresetMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SelectPresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.DeletePresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label1 = new System.Windows.Forms.Label();
+            this.CurrentPresetLabel = new System.Windows.Forms.Label();
             this.ModsGroupBox.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -247,6 +249,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.CurrentPresetLabel);
+            this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Controls.Add(this.ComparePresetsButton);
             this.groupBox3.Controls.Add(this.ImportPresetButton);
             this.groupBox3.Controls.Add(this.PresetsListBox);
@@ -286,9 +290,9 @@
             this.PresetsListBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             this.PresetsListBox.FormattingEnabled = true;
             this.PresetsListBox.ItemHeight = 16;
-            this.PresetsListBox.Location = new System.Drawing.Point(6, 24);
+            this.PresetsListBox.Location = new System.Drawing.Point(5, 49);
             this.PresetsListBox.Name = "PresetsListBox";
-            this.PresetsListBox.Size = new System.Drawing.Size(240, 484);
+            this.PresetsListBox.Size = new System.Drawing.Size(240, 452);
             this.PresetsListBox.TabIndex = 0;
             this.PresetsListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PresetsListBox_MouseDown);
             // 
@@ -333,6 +337,26 @@
             this.DeletePresetMenuItem.Size = new System.Drawing.Size(166, 24);
             this.DeletePresetMenuItem.Text = "Delete Preset";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold);
+            this.label1.Location = new System.Drawing.Point(6, 26);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(67, 17);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Current:";
+            // 
+            // CurrentPresetLabel
+            // 
+            this.CurrentPresetLabel.AutoSize = true;
+            this.CurrentPresetLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.CurrentPresetLabel.Location = new System.Drawing.Point(70, 26);
+            this.CurrentPresetLabel.Name = "CurrentPresetLabel";
+            this.CurrentPresetLabel.Size = new System.Drawing.Size(48, 17);
+            this.CurrentPresetLabel.TabIndex = 4;
+            this.CurrentPresetLabel.Text = "preset";
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -357,6 +381,7 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.PresetMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -387,5 +412,7 @@
         private System.Windows.Forms.ToolStripMenuItem SelectPresetMenuItem;
         private System.Windows.Forms.ToolStripMenuItem DeletePresetMenuItem;
         private System.Windows.Forms.Button ComparePresetsButton;
+        private System.Windows.Forms.Label CurrentPresetLabel;
+        private System.Windows.Forms.Label label1;
     }
 }

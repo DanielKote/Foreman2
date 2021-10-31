@@ -22,6 +22,7 @@ namespace Foreman
 			LFriendlyName = friendlyName.ToLower();
 
 			Order = order;
+			Icon = DataCache.UnknownIcon;
 			AverageColor = Color.Black;
         }
 
@@ -30,38 +31,20 @@ namespace Foreman
 		{
 			if(icon != null)
             {
-				this.icon = icon;
+				this.Icon = icon;
 
 				this.AverageColor = averageColor;
             }
 			else
             {
-				this.icon = DataCache.UnknownIcon;
+				this.Icon = DataCache.UnknownIcon;
 				this.AverageColor = averageColor;
             }
 		}
 
         private static readonly Color DefaultAverageColor = Color.Black;
         public virtual Color AverageColor { get; private set; }
-
-        private Bitmap icon;
-        public virtual Bitmap Icon
-		{
-			get { if (icon == null) Icon = null; return icon; } 
-			set
-			{
-				if (value != null)
-				{
-					icon = value;
-					AverageColor = IconProcessor.GetAverageColor(value);
-				}
-				else
-                {
-					icon = DataCache.UnknownIcon; //even if null
-					AverageColor = DefaultAverageColor;
-                }
-			}
-		}
+		public virtual Bitmap Icon { get; private set; }
 
 		public override bool Equals(object obj)
 		{

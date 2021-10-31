@@ -106,23 +106,6 @@ namespace Foreman
 
 		public bool Hidden { get; set; }
 
-
-		public new Bitmap Icon
-		{
-			get
-			{
-				if (base.Icon == null)
-				{
-					if (ProductSet.Count == 1)
-						base.Icon = ProductSet.Keys.First().Icon;
-					else
-						base.Icon = DataCache.UnknownIcon;
-				}
-				return base.Icon;
-			}
-			set { base.Icon = value; }
-		}
-
 		public Recipe(DataCache dCache, string name, string friendlyName, Subgroup subgroup, string order) : base(dCache, name, friendlyName, order)
 		{
 			MySubgroup = subgroup;

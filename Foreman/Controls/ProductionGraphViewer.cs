@@ -959,7 +959,7 @@ namespace Foreman
 			//LoadFromJson(json);
         }
 
-		public void LoadFromJson(JObject json, bool useFirstPreset)
+		public void LoadFromJson(JObject json, bool useFirstPreset, bool enableEverything = false)
 		{
 			//clear graph
 			Graph.Nodes.Clear();
@@ -994,10 +994,14 @@ namespace Foreman
 				if (savedWPreset != null)
                 {
 					var errors = DataCache.TestPreset(savedWPreset, modSet, itemNames, recipeShorts);
-					if (errors.ErrorCount == 0) //no errors found here. Continue
+					if (errors.ErrorCount == 0) //no errors found here. We will then use this exact preset and not search for a different one
 						chosenPreset = savedWPreset;
-					presetErrors.Add(savedWPreset, errors);
-					allPresets.Remove(savedWPreset);
+					else
+					{
+						//errors found. even though the name fits, but the preset seems to be the wrong one. Proceed with searching for best-fit
+						presetErrors.Add(savedWPreset, errors);
+						allPresets.Remove(savedWPreset);
+					}
                 }
 
 				//havent found the preset, or it returned some errors (not good) -> have to search for best fit (and leave the decision to user if we have multiple)
@@ -1017,35 +1021,38 @@ namespace Foreman
 			{
 				form.ShowDialog(); //LOAD FACTORIO DATA
 				Graph = new ProductionGraph(form.GetDataCache());
+				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size)
 			}
 
 			//set up graph options
 			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
 			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
 
-			//update enabled statuses
-			foreach (Assembler assembler in Graph.DCache.Assemblers.Values)
-				assembler.Enabled = false;
-			foreach (string name in json["EnabledAssemblers"].Select(t => (string)t).ToList())
-				if (Graph.DCache.Assemblers.ContainsKey(name))
-					Graph.DCache.Assemblers[name].Enabled = true;
+			if (!enableEverything)
+			{
+				//update enabled statuses
+				foreach (Assembler assembler in Graph.DCache.Assemblers.Values)
+					assembler.Enabled = false;
+				foreach (string name in json["EnabledAssemblers"].Select(t => (string)t).ToList())
+					if (Graph.DCache.Assemblers.ContainsKey(name))
+						Graph.DCache.Assemblers[name].Enabled = true;
 
-			foreach (Miner miner in Graph.DCache.Miners.Values)
-				miner.Enabled = false;
-			foreach (string name in json["EnabledMiners"].Select(t => (string)t).ToList())
-				if (Graph.DCache.Miners.ContainsKey(name))
-					Graph.DCache.Miners[name].Enabled = true;
+				foreach (Miner miner in Graph.DCache.Miners.Values)
+					miner.Enabled = false;
+				foreach (string name in json["EnabledMiners"].Select(t => (string)t).ToList())
+					if (Graph.DCache.Miners.ContainsKey(name))
+						Graph.DCache.Miners[name].Enabled = true;
 
-			foreach (Module module in Graph.DCache.Modules.Values)
-				module.Enabled = false;
-			foreach (string name in json["EnabledModules"].Select(t => (string)t).ToList())
-				if (Graph.DCache.Modules.ContainsKey(name))
-					Graph.DCache.Modules[name].Enabled = true;
+				foreach (Module module in Graph.DCache.Modules.Values)
+					module.Enabled = false;
+				foreach (string name in json["EnabledModules"].Select(t => (string)t).ToList())
+					if (Graph.DCache.Modules.ContainsKey(name))
+						Graph.DCache.Modules[name].Enabled = true;
 
-			foreach (string recipe in json["HiddenRecipes"].Select(t => (string)t).ToList())
-				if (Graph.DCache.Recipes.ContainsKey(recipe))
-					Graph.DCache.Recipes[recipe].Hidden = true;
-
+				foreach (string recipe in json["HiddenRecipes"].Select(t => (string)t).ToList())
+					if (Graph.DCache.Recipes.ContainsKey(recipe))
+						Graph.DCache.Recipes[recipe].Hidden = true;
+			}
 			//add all nodes
 			InsertJsonObjects(json, false);
 		}

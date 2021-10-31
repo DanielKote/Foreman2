@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Foreman
@@ -18,13 +19,33 @@ namespace Foreman
 		[STAThread]
 		static void Main()
 		{
-            //test2(); return;
+            //test4(); return;
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
 		}
 
+        static void test4()
+        {
+
+        }
+
+        static void test3()
+        {
+            string path = "D:/software/Factorios/foreman";
+            string folder = "test";
+            Console.WriteLine(Path.Combine(path, folder));
+            Console.WriteLine(Path.GetDirectoryName(Path.Combine(path, folder)));
+            Console.WriteLine(Path.GetFullPath(Path.Combine(path, folder)));
+
+            string fileName = "__base__/graphics/technology/speed-module-1.png";
+            string origin = fileName.Substring(0, fileName.IndexOf("__", 2) + 2);
+            string file = fileName.Substring(fileName.IndexOf("__", 2) + 3);
+            Console.WriteLine(origin);
+            Console.WriteLine(file);
+
+        }
 
         static void test2() //zip file image read test
         {
@@ -108,7 +129,7 @@ namespace Foreman
 
         static void test() //factorio console launch & data loading
         {
-            string factorioPath = Path.Combine(new string[] { "D:\\", "software", "Factorios", "foreman", "Factorio_1.1 - vanilla - foreman" });
+            string factorioPath = Path.GetFullPath("D:\\software\\Factorios\\Factorio_1.0.0 - krastorio");
             string modPath = Path.Combine(factorioPath, "mods");
 
             Directory.CreateDirectory(Path.Combine(modPath, "foremanexport_0.1.1"));
@@ -118,29 +139,42 @@ namespace Foreman
 
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            process.StartInfo.FileName = "D:\\software\\Factorios\\foreman\\Factorio_1.1 - vanilla - foreman\\bin\\x64\\factorio.exe";
+            process.StartInfo.FileName = Path.Combine(new string[] { factorioPath, "bin", "x64", "factorio.exe" });
 
-            process.StartInfo.Arguments = "--create temp-save.zip";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardInput = true;
-            process.Start();
-            while (!process.HasExited) { }
-            process.StartInfo.Arguments = "--instrument-mod foremanexport --benchmark temp-save.zip";
-            process.Start();
+
             string resultString = "";
+            process.StartInfo.Arguments = "--create temp-save.zip";
+            process.Start();
             while (!process.HasExited)
             {
                 resultString += process.StandardOutput.ReadToEnd();
+                Thread.Sleep(100);
             }
+            resultString += process.StandardOutput.ReadToEnd();
+            Console.WriteLine(resultString);
+
+
+            resultString = "";
+            process.StartInfo.Arguments = "--instrument-mod foremanexport --benchmark temp-save.zip";
+            process.Start();
+            while (!process.HasExited)
+            {
+                resultString += process.StandardOutput.ReadToEnd();
+                Thread.Sleep(100);
+            }
+            resultString += process.StandardOutput.ReadToEnd();
+
             if (File.Exists("temp-save.zip"))
                 File.Delete("temp-save.zip");
             if (Directory.Exists(Path.Combine(modPath, "foremanexport_0.1.1")))
                 Directory.Delete(Path.Combine(modPath, "foremanexport_0.1.1"), true);
 
-            //Console.WriteLine(resultString);
-            //return;
+            Console.WriteLine(resultString);
+            return;
 
             string iconString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P1>>>") + 23);
             iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>") - 2);
