@@ -169,11 +169,11 @@
     <Compile Include="DataCache\DataTypes\Technology.cs" />
     <Compile Include="DataCache\InfoPackageClasses.cs" />
     <Compile Include="DataCache\PresetProcessor.cs" />
-    <Compile Include="Forms\GraphInfoForm.cs">
+    <Compile Include="Forms\GraphSummaryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\GraphInfoForm.Designer.cs">
-      <DependentUpon>GraphInfoForm.cs</DependentUpon>
+    <Compile Include="Forms\GraphSummaryForm.Designer.cs">
+      <DependentUpon>GraphSummaryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\SavefileLoadForm.cs">
       <SubType>Form</SubType>
@@ -198,6 +198,12 @@
     </Compile>
     <Compile Include="Forms\PresetSelectionForm.Designer.cs">
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TEST_FORM.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TEST_FORM.Designer.cs">
+      <DependentUpon>TEST_FORM.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\AssemblerSelector.cs" />
     <Compile Include="Models\FuelSelector.cs" />
@@ -250,7 +256,9 @@
     <Compile Include="Models\Nodes\BaseNode.cs" />
     <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="ProductionGraphView\FloatingTooltipRenderer.cs" />
+    <Compile Include="ProductionGraphView\NodeCopyOptions.cs" />
     <Compile Include="ProductionGraphView\PointingArrowRenderer.cs" />
+    <Compile Include="VersionUpdater.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\DataReloadForm.cs">
       <SubType>Form</SubType>
@@ -278,8 +286,8 @@
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\GraphInfoForm.resx">
-      <DependentUpon>GraphInfoForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\GraphSummaryForm.resx">
+      <DependentUpon>GraphSummaryForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SavefileLoadForm.resx">
       <DependentUpon>SavefileLoadForm.cs</DependentUpon>
@@ -304,6 +312,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DataReloadForm.resx">
       <DependentUpon>DataReloadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TEST_FORM.resx">
+      <DependentUpon>TEST_FORM.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

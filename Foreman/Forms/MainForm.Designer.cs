@@ -40,9 +40,6 @@
 			this.ClearButton = new System.Windows.Forms.Button();
 			this.LoadGraphButton = new System.Windows.Forms.Button();
 			this.SaveGraphButton = new System.Windows.Forms.Button();
-			this.ProductionGroupBox = new System.Windows.Forms.GroupBox();
-			this.GraphOptionsTable = new System.Windows.Forms.TableLayoutPanel();
-			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.GridLinesGroupBox = new System.Windows.Forms.GroupBox();
 			this.GridlinesTable = new System.Windows.Forms.TableLayoutPanel();
 			this.AlignSelectionButton = new System.Windows.Forms.Button();
@@ -51,15 +48,19 @@
 			this.MajorGridlinesDropDown = new System.Windows.Forms.ComboBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
+			this.ProductionGroupBox = new System.Windows.Forms.GroupBox();
+			this.GraphOptionsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.label4 = new System.Windows.Forms.Label();
+			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
+			this.GraphSummaryButton = new System.Windows.Forms.Button();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MenuTable.SuspendLayout();
 			this.MenuButtonsTable.SuspendLayout();
-			this.ProductionGroupBox.SuspendLayout();
-			this.GraphOptionsTable.SuspendLayout();
 			this.GridLinesGroupBox.SuspendLayout();
 			this.GridlinesTable.SuspendLayout();
+			this.ProductionGroupBox.SuspendLayout();
+			this.GraphOptionsTable.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// MainLayoutPanel
@@ -90,9 +91,9 @@
 			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
 			this.GraphViewer.Location = new System.Drawing.Point(3, 124);
 			this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-			this.GraphViewer.NodeCountForSimpleView = 200;
 			this.GraphViewer.MouseDownElement = null;
 			this.GraphViewer.Name = "GraphViewer";
+			this.GraphViewer.NodeCountForSimpleView = 200;
 			this.GraphViewer.ShowRecipeToolTip = false;
 			this.GraphViewer.Size = new System.Drawing.Size(928, 634);
 			this.GraphViewer.TabIndex = 12;
@@ -262,54 +263,6 @@
 			this.SaveGraphButton.UseVisualStyleBackColor = true;
 			this.SaveGraphButton.Click += new System.EventHandler(this.SaveGraphButton_Click);
 			// 
-			// ProductionGroupBox
-			// 
-			this.ProductionGroupBox.AutoSize = true;
-			this.ProductionGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ProductionGroupBox.Controls.Add(this.GraphOptionsTable);
-			this.ProductionGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ProductionGroupBox.Location = new System.Drawing.Point(387, 3);
-			this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
-			this.ProductionGroupBox.Name = "ProductionGroupBox";
-			this.ProductionGroupBox.Padding = new System.Windows.Forms.Padding(0);
-			this.ProductionGroupBox.Size = new System.Drawing.Size(190, 110);
-			this.ProductionGroupBox.TabIndex = 4;
-			this.ProductionGroupBox.TabStop = false;
-			this.ProductionGroupBox.Text = "Graph Options:";
-			// 
-			// GraphOptionsTable
-			// 
-			this.GraphOptionsTable.AutoSize = true;
-			this.GraphOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.GraphOptionsTable.ColumnCount = 2;
-			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.GraphOptionsTable.Controls.Add(this.RateOptionsDropDown, 1, 0);
-			this.GraphOptionsTable.Controls.Add(this.label4, 0, 0);
-			this.GraphOptionsTable.Controls.Add(this.PauseUpdatesCheckbox, 0, 1);
-			this.GraphOptionsTable.Location = new System.Drawing.Point(3, 16);
-			this.GraphOptionsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.GraphOptionsTable.Name = "GraphOptionsTable";
-			this.GraphOptionsTable.RowCount = 2;
-			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.Size = new System.Drawing.Size(184, 50);
-			this.GraphOptionsTable.TabIndex = 2;
-			// 
-			// PauseUpdatesCheckbox
-			// 
-			this.PauseUpdatesCheckbox.AutoSize = true;
-			this.GraphOptionsTable.SetColumnSpan(this.PauseUpdatesCheckbox, 2);
-			this.PauseUpdatesCheckbox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.PauseUpdatesCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 30);
-			this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
-			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(178, 17);
-			this.PauseUpdatesCheckbox.TabIndex = 3;
-			this.PauseUpdatesCheckbox.Text = "Pause all calculations";
-			this.PauseUpdatesCheckbox.UseVisualStyleBackColor = true;
-			this.PauseUpdatesCheckbox.CheckedChanged += new System.EventHandler(this.PauseUpdatesCheckbox_CheckedChanged);
-			// 
 			// GridLinesGroupBox
 			// 
 			this.GridLinesGroupBox.AutoSize = true;
@@ -447,6 +400,42 @@
 			this.label2.Text = "Minor Gridlines:";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// ProductionGroupBox
+			// 
+			this.ProductionGroupBox.AutoSize = true;
+			this.ProductionGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.ProductionGroupBox.Controls.Add(this.GraphOptionsTable);
+			this.ProductionGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ProductionGroupBox.Location = new System.Drawing.Point(387, 3);
+			this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
+			this.ProductionGroupBox.Name = "ProductionGroupBox";
+			this.ProductionGroupBox.Padding = new System.Windows.Forms.Padding(0);
+			this.ProductionGroupBox.Size = new System.Drawing.Size(190, 110);
+			this.ProductionGroupBox.TabIndex = 4;
+			this.ProductionGroupBox.TabStop = false;
+			this.ProductionGroupBox.Text = "Graph Options:";
+			// 
+			// GraphOptionsTable
+			// 
+			this.GraphOptionsTable.AutoSize = true;
+			this.GraphOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.GraphOptionsTable.ColumnCount = 2;
+			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphOptionsTable.Controls.Add(this.RateOptionsDropDown, 1, 0);
+			this.GraphOptionsTable.Controls.Add(this.label4, 0, 0);
+			this.GraphOptionsTable.Controls.Add(this.PauseUpdatesCheckbox, 0, 2);
+			this.GraphOptionsTable.Controls.Add(this.GraphSummaryButton, 0, 1);
+			this.GraphOptionsTable.Location = new System.Drawing.Point(3, 16);
+			this.GraphOptionsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.GraphOptionsTable.Name = "GraphOptionsTable";
+			this.GraphOptionsTable.RowCount = 3;
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.Size = new System.Drawing.Size(184, 79);
+			this.GraphOptionsTable.TabIndex = 2;
+			// 
 			// RateOptionsDropDown
 			// 
 			this.RateOptionsDropDown.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -470,6 +459,32 @@
 			this.label4.Text = "Base Time:";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// PauseUpdatesCheckbox
+			// 
+			this.PauseUpdatesCheckbox.AutoSize = true;
+			this.GraphOptionsTable.SetColumnSpan(this.PauseUpdatesCheckbox, 2);
+			this.PauseUpdatesCheckbox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.PauseUpdatesCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 59);
+			this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
+			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(178, 17);
+			this.PauseUpdatesCheckbox.TabIndex = 3;
+			this.PauseUpdatesCheckbox.Text = "Pause all calculations";
+			this.PauseUpdatesCheckbox.UseVisualStyleBackColor = true;
+			this.PauseUpdatesCheckbox.CheckedChanged += new System.EventHandler(this.PauseUpdatesCheckbox_CheckedChanged);
+			// 
+			// GraphSummaryButton
+			// 
+			this.GraphOptionsTable.SetColumnSpan(this.GraphSummaryButton, 2);
+			this.GraphSummaryButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphSummaryButton.Location = new System.Drawing.Point(3, 30);
+			this.GraphSummaryButton.Name = "GraphSummaryButton";
+			this.GraphSummaryButton.Size = new System.Drawing.Size(178, 23);
+			this.GraphSummaryButton.TabIndex = 6;
+			this.GraphSummaryButton.Text = "Show Graph Summary";
+			this.GraphSummaryButton.UseVisualStyleBackColor = true;
+			this.GraphSummaryButton.Click += new System.EventHandler(this.GraphSummaryButton_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -489,14 +504,14 @@
 			this.MenuTable.PerformLayout();
 			this.MenuButtonsTable.ResumeLayout(false);
 			this.MenuButtonsTable.PerformLayout();
-			this.ProductionGroupBox.ResumeLayout(false);
-			this.ProductionGroupBox.PerformLayout();
-			this.GraphOptionsTable.ResumeLayout(false);
-			this.GraphOptionsTable.PerformLayout();
 			this.GridLinesGroupBox.ResumeLayout(false);
 			this.GridLinesGroupBox.PerformLayout();
 			this.GridlinesTable.ResumeLayout(false);
 			this.GridlinesTable.PerformLayout();
+			this.ProductionGroupBox.ResumeLayout(false);
+			this.ProductionGroupBox.PerformLayout();
+			this.GraphOptionsTable.ResumeLayout(false);
+			this.GraphOptionsTable.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -527,6 +542,7 @@
 		private System.Windows.Forms.TableLayoutPanel MenuButtonsTable;
 		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
 		private System.Windows.Forms.TableLayoutPanel GridlinesTable;
+		private System.Windows.Forms.Button GraphSummaryButton;
 	}
 }
 

@@ -298,8 +298,8 @@ namespace Foreman
 
 		private void UpdateAssemblerInfo()
 		{
-			AssemblerRateLabel.Text = string.Format("# of {0}:", GetEntityTypeName(nodeData.SelectedAssembler.EntityType, true));
-			AssemblerTitle.Text = string.Format("{0}: {1}", GetEntityTypeName(nodeData.SelectedAssembler.EntityType, false), nodeData.SelectedAssembler.FriendlyName);
+			AssemblerRateLabel.Text = string.Format("# of {0}:", nodeData.SelectedAssembler.GetEntityTypeName(true));
+			AssemblerTitle.Text = string.Format("{0}: {1}", nodeData.SelectedAssembler.GetEntityTypeName(false), nodeData.SelectedAssembler.FriendlyName);
 			SelectedAssemblerIcon.Image = nodeData.SelectedAssembler.Icon;
 
 			AssemblerEnergyPercentLabel.Text = nodeData.GetConsumptionMultiplier().ToString("P0");
@@ -404,38 +404,6 @@ namespace Foreman
 			int decimals = MathDecimals.GetDecimals(nud.Value);
 			decimals = Math.Min(decimals, max);
 			nud.DecimalPlaces = decimals;
-		}
-
-		private string GetEntityTypeName(EntityType type, bool plural)
-		{
-			if (plural)
-			{
-				switch (type)
-				{
-					case EntityType.Assembler: return "Assemblers";
-					case EntityType.Beacon: return "Beacons";
-					case EntityType.Boiler: return "Boilers";
-					case EntityType.BurnerGenerator: return "Generators";
-					case EntityType.Generator: return "Generators";
-					case EntityType.Miner: return "Miners";
-					case EntityType.Reactor: return "Reactors";
-					default: return "";
-				}
-			}
-			else
-			{
-				switch (type)
-				{
-					case EntityType.Assembler: return "Assembler";
-					case EntityType.Beacon: return "Beacon";
-					case EntityType.Boiler: return "Boiler";
-					case EntityType.BurnerGenerator: return "Generator";
-					case EntityType.Generator: return "Generator";
-					case EntityType.Miner: return "Miner";
-					case EntityType.Reactor: return "Reactor";
-					default: return "";
-				}
-			}
 		}
 
 		//------------------------------------------------------------------------------------------------------Button clicks

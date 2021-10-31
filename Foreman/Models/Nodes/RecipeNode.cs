@@ -68,10 +68,8 @@ namespace Foreman
 		private double beaconsConst;
 		public double BeaconsConst { get { return beaconsConst; } set { if (beaconsConst != value) { beaconsConst = value; OnNodeValuesChanged(); } } }
 
-		private List<Module> assemblerModules;
-		private List<Module> beaconModules;
-		public IReadOnlyList<Module> AssemblerModules { get { return assemblerModules.ToList(); } }
-		public IReadOnlyList<Module> BeaconModules { get { return beaconModules.ToList(); } }
+		public List<Module> AssemblerModules { get; private set; }
+		public List<Module> BeaconModules { get; private set; }
 
 		public double DesiredAssemblerCount { get; set; }
 		public double ActualAssemblerCount { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier()); } }
@@ -105,8 +103,8 @@ namespace Foreman
 			controller = RecipeNodeController.GetController(this);
 			ReadOnlyNode = new ReadOnlyRecipeNode(this);
 
-			beaconModules = new List<Module>();
-			assemblerModules = new List<Module>();
+			AssemblerModules = new List<Module>();
+			BeaconModules = new List<Module>();
 
 			SelectedAssembler = recipe.Assemblers.First(); //everything here works under the assumption that assember isnt null.
 			SelectedBeacon = null;
@@ -212,18 +210,6 @@ namespace Foreman
 			return NodeState.Clean;
 
 		}
-
-		//------------------------------------------------------------------------ module list functions
-
-		public void ClearAssemblerModules() { assemblerModules.Clear(); UpdateState(); }
-		public void AddAssemblerModule(Module module) { assemblerModules.Add(module); UpdateState(); }
-		public void AddAssemblerModules(IEnumerable<Module> modules) { assemblerModules.AddRange(modules); UpdateState(); }
-		public void RemoveAssemblerModuleAt(int index) { if(index >= 0 && index < assemblerModules.Count) { assemblerModules.RemoveAt(index); UpdateState(); } }
-
-		public void ClearBeaconModules() { beaconModules.Clear(); UpdateState(); }
-		public void AddBeaconModule(Module module) { beaconModules.Add(module); UpdateState(); }
-		public void AddBeaconModules(IEnumerable<Module> modules) { beaconModules.AddRange(modules); UpdateState(); }
-		public void RemoveBeaconModuleAt(int index) { if (index >= 0 && index < beaconModules.Count) { beaconModules.RemoveAt(index); UpdateState(); } }
 
 		//------------------------------------------------------------------------ multipliers (speed/productivity/consumption/pollution) & rates
 
@@ -750,15 +736,17 @@ namespace Foreman
 			//check for invalid modules
 			for (int i = MyNode.AssemblerModules.Count - 1; i >= 0; i--)
 				if (MyNode.AssemblerModules[i].IsMissing || !MyNode.SelectedAssembler.Modules.Contains(MyNode.AssemblerModules[i]) || !MyNode.BaseRecipe.Modules.Contains(MyNode.AssemblerModules[i]))
-					MyNode.RemoveAssemblerModuleAt(i);
+					MyNode.AssemblerModules.RemoveAt(i);
 			//check for too many modules
 			while (MyNode.AssemblerModules.Count > MyNode.SelectedAssembler.ModuleSlots)
-				MyNode.RemoveAssemblerModuleAt(MyNode.AssemblerModules.Count - 1);
+				MyNode.AssemblerModules.RemoveAt(MyNode.AssemblerModules.Count - 1);
 			//check if any modules work (if none work, then turn off beacon)
 			if (MyNode.SelectedAssembler.Modules.Count == 0 || MyNode.BaseRecipe.Modules.Count == 0)
 				SetBeacon(null);
 			else //update beacon
 				SetBeacon(MyNode.SelectedBeacon);
+
+			MyNode.UpdateState();
 		}
 
 		public void AutoSetAssembler()
@@ -801,7 +789,7 @@ namespace Foreman
 
 			if (MyNode.SelectedBeacon == null)
 			{
-				MyNode.ClearBeaconModules();
+				MyNode.BeaconModules.Clear();
 				MyNode.BeaconCount = 0;
 				MyNode.BeaconsPerAssembler = 0;
 				MyNode.BeaconsConst = 0;
@@ -811,59 +799,89 @@ namespace Foreman
 				//check for invalid modules
 				for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
 					if (MyNode.BeaconModules[i].IsMissing || !MyNode.SelectedAssembler.Modules.Contains(MyNode.BeaconModules[i]) || !MyNode.BaseRecipe.Modules.Contains(MyNode.BeaconModules[i]) || !MyNode.SelectedBeacon.Modules.Contains(MyNode.BeaconModules[i]))
-						MyNode.RemoveBeaconModuleAt(i);
+						MyNode.BeaconModules.RemoveAt(i);
 				//check for too many modules
 				while (MyNode.BeaconModules.Count > MyNode.SelectedBeacon.ModuleSlots)
-					MyNode.RemoveBeaconModuleAt(MyNode.BeaconModules.Count - 1);
+					MyNode.BeaconModules.RemoveAt(MyNode.BeaconModules.Count - 1);
 			}
+
+			MyNode.UpdateState();
 		}
 
 		public void AddAssemblerModule(Module module)
 		{
-			MyNode.AddAssemblerModule(module);
+			MyNode.AssemblerModules.Add(module);
+			MyNode.UpdateState();
 		}
 
 		public void RemoveAssemblerModule(int index)
 		{
 			if (index >= 0 && index < MyNode.AssemblerModules.Count)
-				MyNode.RemoveAssemblerModuleAt(index);
+				MyNode.AssemblerModules.RemoveAt(index);
+			MyNode.UpdateState();
 		}
 
-		public void SetAssemblerModules(IEnumerable<Module> modules)
+		public void SetAssemblerModules(IEnumerable<Module> modules, bool filterModules)
 		{
-			MyNode.ClearAssemblerModules();
+			MyNode.AssemblerModules.Clear();
 			if (modules != null)
-				MyNode.AddAssemblerModules(modules);
+			{ 
+				if(filterModules)
+				{
+					HashSet<Module> acceptableModules = new HashSet<Module>(MyNode.BaseRecipe.Modules.Intersect(MyNode.SelectedAssembler.Modules));
+					foreach (Module m in modules)
+						if (MyNode.AssemblerModules.Count < MyNode.SelectedAssembler.ModuleSlots && acceptableModules.Contains(m))
+							MyNode.AssemblerModules.Add(m);
+				}
+				else
+					MyNode.AssemblerModules.AddRange(modules);
+			}
+			MyNode.UpdateState();
 		}
 
 		public void AutoSetAssemblerModules()
 		{
-			MyNode.ClearAssemblerModules();
-			MyNode.AddAssemblerModules(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, MyNode.BaseRecipe));
+			MyNode.AssemblerModules.Clear();
+			MyNode.AssemblerModules.AddRange(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, MyNode.BaseRecipe));
+			MyNode.UpdateState();
 		}
 
 		public void AutoSetAssemblerModules(ModuleSelector.Style style)
 		{
-			MyNode.ClearAssemblerModules();
-			MyNode.AddAssemblerModules(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, MyNode.BaseRecipe, style));
+			MyNode.AssemblerModules.Clear();
+			MyNode.AssemblerModules.AddRange(MyNode.MyGraph.ModuleSelector.GetModules(MyNode.SelectedAssembler, MyNode.BaseRecipe, style));
+			MyNode.UpdateState();
 		}
 
 		public void AddBeaconModule(Module module)
 		{
-			MyNode.AddBeaconModule(module);
+			MyNode.BeaconModules.Add(module);
+			MyNode.UpdateState();
 		}
 
 		public void RemoveBeaconModule(int index)
 		{
 			if (index >= 0 && index < MyNode.BeaconModules.Count)
-				MyNode.RemoveBeaconModuleAt(index);
+				MyNode.BeaconModules.RemoveAt(index);
+			MyNode.UpdateState();
 		}
 
-		public void SetBeaconModules(IEnumerable<Module> modules)
+		public void SetBeaconModules(IEnumerable<Module> modules, bool filterModules)
 		{
-			MyNode.ClearBeaconModules();
+			MyNode.BeaconModules.Clear();
 			if (modules != null)
-				MyNode.AddBeaconModules(modules);
+			{
+				if (filterModules)
+				{
+					HashSet<Module> acceptableModules = new HashSet<Module>(MyNode.BaseRecipe.Modules.Intersect(MyNode.SelectedAssembler.Modules).Intersect(MyNode.SelectedBeacon.Modules));
+					foreach (Module m in modules)
+						if (MyNode.BeaconModules.Count < MyNode.SelectedBeacon.ModuleSlots && acceptableModules.Contains(m))
+							MyNode.BeaconModules.Add(m);
+				}
+				else
+					MyNode.BeaconModules.AddRange(modules);
+			}
+			MyNode.UpdateState();
 		}
 	}
 }

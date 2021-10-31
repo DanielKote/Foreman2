@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman.Forms
+namespace Foreman
 {
-	public partial class GraphInfoForm : Form
+	public partial class GraphSummaryForm : Form
 	{
-		public GraphInfoForm()
+		public GraphSummaryForm()
 		{
 			InitializeComponent();
 		}

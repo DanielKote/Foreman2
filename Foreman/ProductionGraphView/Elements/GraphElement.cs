@@ -32,7 +32,7 @@ namespace Foreman
 		protected readonly ProductionGraphViewer graphViewer;
 		protected readonly GraphElement myParent;
 
-		protected ContextMenu RightClickMenu;
+		protected ContextMenuStrip RightClickMenu;
 
 		protected static readonly Pen devPen = new Pen(new SolidBrush(Color.OrangeRed), 1);
 
@@ -43,7 +43,19 @@ namespace Foreman
 			if (myParent != null)
 				parent.SubElements.Add(this);
 
-			RightClickMenu = new ContextMenu();
+			RightClickMenu = new ContextMenuStrip();
+			RightClickMenu.ShowItemToolTips = false;
+			RightClickMenu.ShowImageMargin = false;
+			RightClickMenu.Closing += (o, e) =>
+			{
+				if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+					e.Cancel = true; //we will handle closing from item clicking within the items themselves
+				else
+				{
+					RightClickMenu.Items.Clear();
+					RightClickMenu.ShowCheckMargin = false;
+				}
+			};
 
 			SubElements = new List<GraphElement>();
 			Visible = true;

@@ -1,7 +1,7 @@
 ﻿
-namespace Foreman.Forms
+namespace Foreman
 {
-	partial class GraphInfoForm
+	partial class GraphSummaryForm
 	{
 		/// <summary>
 		/// Required designer variable.

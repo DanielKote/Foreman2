@@ -18,6 +18,7 @@ namespace Foreman
 		IReadOnlyCollection<Item> AssociatedItems { get; }
 
 		EntityType EntityType { get; }
+		string GetEntityTypeName(bool plural);
 		EnergySource EnergySource { get; }
 		bool IsBurner { get; }
 
@@ -97,5 +98,38 @@ namespace Foreman
 
 			return EnergyConsumption * ConsumptionEffectivity / fuel.FuelValue;
 		}
+
+		public string GetEntityTypeName(bool plural)
+		{
+			if (plural)
+			{
+				switch (EntityType)
+				{
+					case EntityType.Assembler: return "Assemblers";
+					case EntityType.Beacon: return "Beacons";
+					case EntityType.Boiler: return "Boilers";
+					case EntityType.BurnerGenerator: return "Generators";
+					case EntityType.Generator: return "Generators";
+					case EntityType.Miner: return "Miners";
+					case EntityType.Reactor: return "Reactors";
+					default: return "";
+				}
+			}
+			else
+			{
+				switch (EntityType)
+				{
+					case EntityType.Assembler: return "Assembler";
+					case EntityType.Beacon: return "Beacon";
+					case EntityType.Boiler: return "Boiler";
+					case EntityType.BurnerGenerator: return "Generator";
+					case EntityType.Generator: return "Generator";
+					case EntityType.Miner: return "Miner";
+					case EntityType.Reactor: return "Reactor";
+					default: return "";
+				}
+			}
+		}
+
 	}
 }

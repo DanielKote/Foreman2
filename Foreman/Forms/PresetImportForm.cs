@@ -95,7 +95,13 @@ namespace Foreman
 			}
 
 			List<Preset> existingPresets = MainForm.GetValidPresetsList();
-			if (existingPresets.Any(p => p.Name.ToLower() == NewPresetName.ToLower()))
+			if(NewPresetName.ToLower() == MainForm.DefaultPreset.ToLower())
+			{
+				MessageBox.Show("Cant overwrite default preset!", "", MessageBoxButtons.OK);
+				CleanupFailedImport();
+				return;
+			}
+			else if (existingPresets.Any(p => p.Name.ToLower() == NewPresetName.ToLower()))
 			{
 				if (MessageBox.Show("This preset name is already in use. Do you wish to overwrite?", "Confirm Overwrite", MessageBoxButtons.YesNo) != DialogResult.Yes)
 				{

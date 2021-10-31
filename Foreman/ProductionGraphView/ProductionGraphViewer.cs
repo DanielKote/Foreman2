@@ -392,12 +392,13 @@ namespace Foreman
 			}
 		}
 
-		private void ClearSelection()
+		public void ClearSelection()
 		{
 			foreach (BaseNodeElement element in nodeElements)
 				element.Highlighted = false;
 			selectedNodes.Clear();
 			currentSelectionNodes.Clear();
+			Invalidate();
 		}
 
 		public void AlignSelected()
@@ -598,13 +599,7 @@ namespace Foreman
 		{
 			ToolTipRenderer.ClearFloatingControls();
 			Point graph_location = ScreenToGraph(e.Location);
-			GraphElement element = null;
-
-			if (!viewBeingDragged && currentDragOperation != DragOperation.Selection) //dont care about mouse up operations on elements if we were dragging view or selection
-			{
-				element = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(graph_location);
-				element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
-			}
+			GraphElement element = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(graph_location);
 
 			switch (e.Button)
 			{
@@ -629,6 +624,8 @@ namespace Foreman
 							})));
 						rightClickMenu.Show(this, e.Location);
 					}
+					else if(currentDragOperation != DragOperation.Selection)
+						element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
 					break;
 				case MouseButtons.Middle:
 					viewBeingDragged = false;
@@ -673,7 +670,14 @@ namespace Foreman
 							MouseDownElement = null;
 							Invalidate();
 						}
+						else if (!viewBeingDragged) //left click without modifier keys -> pass click to node
+						{
+							clickedNode.MouseUp(graph_location, e.Button, false);
+						}
 					}
+					else if (!viewBeingDragged)
+						element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
+
 
 					currentDragOperation = DragOperation.None;
 					MouseDownElement = null;
@@ -786,14 +790,16 @@ namespace Foreman
 				if ((e.KeyCode == Keys.C || e.KeyCode == Keys.X) && (e.Modifiers & Keys.Control) == Keys.Control) //copy or cut
 				{
 					StringBuilder stringBuilder = new StringBuilder();
-					JsonSerializer serialiser = JsonSerializer.Create();
-					serialiser.Formatting = Formatting.None;
 					var writer = new JsonTextWriter(new StringWriter(stringBuilder));
 
 					Graph.SerializeNodeIdSet = new HashSet<int>();
 					foreach (BaseNodeElement selectedNode in selectedNodes)
 						Graph.SerializeNodeIdSet.Add(selectedNode.DisplayedNode.NodeID);
+
+					JsonSerializer serialiser = JsonSerializer.Create();
+					serialiser.Formatting = Formatting.None;
 					serialiser.Serialize(writer, Graph);
+
 					Graph.SerializeNodeIdSet.Clear();
 					Graph.SerializeNodeIdSet = null;
 
@@ -994,7 +1000,8 @@ namespace Foreman
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			//preset options
-			info.AddValue("Version:", Properties.Settings.Default.ForemanVersion);
+			info.AddValue("Version", Properties.Settings.Default.ForemanVersion);
+			info.AddValue("Object", "ProductionGraphViewer");
 			info.AddValue("SavedPresetName", DCache.PresetName);
 			info.AddValue("IncludedMods", DCache.IncludedMods.Select(m => m.Key + "|" + m.Value));
 
@@ -1018,18 +1025,15 @@ namespace Foreman
 			info.AddValue("ProductionGraph", Graph);
 		}
 
-		public void LoadFromOldJson(JObject json)
-		{
-			//need to convert it to the new format
-			//then:
-			//LoadFromJson(json);
-
-			//... i will do this last - after I make sure I wont change the format of the 'new' json save file structure any more.
-			// i mean - i already changed it 3 times to accomodate various things, and I havent even updated the assembler/modules for a given node yet!
-		}
-
 		public async Task LoadFromJson(JObject json, bool useFirstPreset, bool setEnablesFromJson)
 		{
+			if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraphViewer")
+			{
+				json = VersionUpdater.UpdateSave(json);
+				if (json == null) //update failed
+					return;
+			}
+
 			//grab mod list
 			Dictionary<string, string> modSet = new Dictionary<string, string>();
 			foreach (string str in json["IncludedMods"].Select(t => (string)t).ToList())

@@ -233,7 +233,7 @@ namespace Foreman
 			{
 				if (subelement != null)
 					subelement.MouseUp(graph_point, button, false);
-				if (errorNotice.ContainsPoint(graph_point))
+				else if (errorNotice.ContainsPoint(graph_point))
 					errorNotice.MouseUp(graph_point, button, false);
 				else
 					MouseUpAction(graph_point, button);
@@ -248,25 +248,38 @@ namespace Foreman
 			}
 			else if (button == MouseButtons.Right)
 			{
-				RightClickMenu.MenuItems.Clear();
-				RightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Delete node", null,
 						new EventHandler((o, e) =>
 						{
+							RightClickMenu.Close();
 							graphViewer.Graph.DeleteNode(DisplayedNode);
 							graphViewer.Graph.UpdateNodeValues();
 						})));
 				if (graphViewer.SelectedNodes.Count > 2 && graphViewer.SelectedNodes.Contains(this))
 				{
-					RightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
+					RightClickMenu.Items.Add(new ToolStripMenuItem("Delete selected nodes", null,
 						new EventHandler((o, e) =>
 						{
+							RightClickMenu.Close();
 							graphViewer.TryDeleteSelectedNodes();
-						}))
-					{ });
+						})));
 				}
+				if(graphViewer.SelectedNodes.Count > 0)
+				{
+					RightClickMenu.Items.Add(new ToolStripMenuItem("Clear selection", null,
+						new EventHandler((o, e) =>
+						{
+							RightClickMenu.Close();
+							graphViewer.ClearSelection();
+						})));
+				}
+
+				AddRClickMenuOptions(graphViewer.SelectedNodes.Count == 0 || graphViewer.SelectedNodes.Contains(this));
 				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
 			}
 		}
+
+		protected virtual void AddRClickMenuOptions(bool nodeInSelection) { }
 
 		public override void Dragged(Point graph_point)
 		{

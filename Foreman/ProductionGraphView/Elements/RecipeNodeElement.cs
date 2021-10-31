@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,12 @@ namespace Foreman
 		private string RecipeName { get { return DisplayedNode.BaseRecipe.FriendlyName; } }
 
 		private new readonly ReadOnlyRecipeNode DisplayedNode;
+
+		private static bool OptionsCopyAssemblerDefault = true;
+		private static bool OptionsCopyFuelDefault = true;
+		private static bool OptionsCopyModulesDefault = true;
+		private static bool OptionsCopyBeaconDefault = true;
+		private static bool OptionsCopyBeaconModulesDefault = true;
 
 		public RecipeNodeElement(ProductionGraphViewer graphViewer, ReadOnlyRecipeNode node) : base(graphViewer, node)
 		{
@@ -123,6 +131,145 @@ namespace Foreman
 			}
 		}
 
+		protected override void AddRClickMenuOptions(bool nodeInSelection)
+		{
+			if (nodeInSelection)
+			{
+				List<ReadOnlyRecipeNode> rNodes = new List<ReadOnlyRecipeNode>(graphViewer.SelectedNodes.Where(ne => ne is RecipeNodeElement).Select(ne => (ReadOnlyRecipeNode)ne.DisplayedNode));
+				if (!rNodes.Contains(this.DisplayedNode))
+					rNodes.Add((ReadOnlyRecipeNode)this.DisplayedNode);
+
+				RightClickMenu.Items.Add(new ToolStripSeparator());
+
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Apply default assembler(s)", null,
+					new EventHandler((o, e) =>
+					{
+						RightClickMenu.Close();
+						foreach (ReadOnlyRecipeNode rNode in rNodes)
+							((RecipeNodeController)graphViewer.Graph.RequestNodeController(rNode)).AutoSetAssembler();
+					})));
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Apply default modules", null,
+					new EventHandler((o, e) =>
+					{
+						RightClickMenu.Close();
+						foreach (ReadOnlyRecipeNode rNode in rNodes)
+							((RecipeNodeController)graphViewer.Graph.RequestNodeController(rNode)).AutoSetAssemblerModules();
+					})));
+				if (rNodes.Any(rn => rn.AssemblerModules.Count > 0))
+					RightClickMenu.Items.Add(new ToolStripMenuItem("Remove modules", null,
+						new EventHandler((o, e) =>
+						{
+							RightClickMenu.Close();
+							foreach (ReadOnlyRecipeNode rNode in rNodes)
+								((RecipeNodeController)graphViewer.Graph.RequestNodeController(rNode)).SetAssemblerModules(null, false);
+						})));
+				if (rNodes.Any(rn => rn.SelectedBeacon != null))
+					RightClickMenu.Items.Add(new ToolStripMenuItem("Remove beacons", null,
+						new EventHandler((o, e) =>
+						{
+							RightClickMenu.Close();
+							foreach (ReadOnlyRecipeNode rNode in rNodes)
+								((RecipeNodeController)graphViewer.Graph.RequestNodeController(rNode)).SetBeacon(null);
+						})));
+
+				RightClickMenu.Items.Add(new ToolStripSeparator());
+				NodeCopyOptions copiedOptions = NodeCopyOptions.GetNodeCopyOptions(Clipboard.GetText(), graphViewer.DCache);
+				if (copiedOptions != null)
+				{
+					bool canPasteAssembler = rNodes.Any(rn => rn.BaseRecipe.Assemblers.Contains(copiedOptions.Assembler));
+					bool canPasteFuel = copiedOptions.Fuel != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Assemblers.Any(a => a.Fuels.Contains(copiedOptions.Fuel))));
+					bool canPasteModules = copiedOptions.AssemblerModules.Count > 0 && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Modules.Count > 0 && rn.SelectedAssembler.Modules.Count > 0 && rn.SelectedAssembler.ModuleSlots > 0));
+					bool canPasteBeacon = copiedOptions.Beacon != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Modules.Count > 0 && rn.SelectedAssembler.Modules.Count > 0));
+
+					if (canPasteAssembler || canPasteFuel || canPasteModules || canPasteBeacon)
+					{
+						RightClickMenu.ShowCheckMargin = true;
+
+						ToolStripMenuItem assemblerCheck = new ToolStripMenuItem(copiedOptions.Assembler.GetEntityTypeName(false)) { CheckOnClick = true, Checked = canPasteAssembler && OptionsCopyAssemblerDefault, Enabled = canPasteAssembler, Tag = "CheckBox" };
+						ToolStripMenuItem fuelCheck = new ToolStripMenuItem("Fuel") { CheckOnClick = true, Checked = canPasteFuel && OptionsCopyFuelDefault, Enabled = canPasteFuel, Tag = "CheckBox" };
+						ToolStripMenuItem modulesCheck = new ToolStripMenuItem("Modules") { CheckOnClick = true, Checked = canPasteModules && OptionsCopyModulesDefault, Enabled = canPasteModules, Tag = "CheckBox" };
+						ToolStripMenuItem beaconCheck = new ToolStripMenuItem("Beacon") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
+						ToolStripMenuItem beaconModuleCheck = new ToolStripMenuItem("Beacon Modules") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconModulesDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
+
+						if (canPasteAssembler) RightClickMenu.Items.Add(assemblerCheck);
+						if (canPasteFuel) RightClickMenu.Items.Add(fuelCheck);
+						if (canPasteModules) RightClickMenu.Items.Add(modulesCheck);
+						if (canPasteBeacon) RightClickMenu.Items.Add(beaconCheck);
+						if (canPasteBeacon) RightClickMenu.Items.Add(beaconModuleCheck);
+						RightClickMenu.Items.Add(new ToolStripSeparator());
+						RightClickMenu.Items.Add(new ToolStripMenuItem("Paste selected options", null,
+							new EventHandler((o, e) =>
+							{
+								RightClickMenu.Close();
+								if (canPasteAssembler) OptionsCopyAssemblerDefault = assemblerCheck.Checked;
+								if (canPasteFuel) OptionsCopyFuelDefault = fuelCheck.Checked;
+								if (canPasteModules) OptionsCopyModulesDefault = modulesCheck.Checked;
+								if (canPasteBeacon) OptionsCopyBeaconDefault = beaconCheck.Checked;
+								if (canPasteBeacon) OptionsCopyBeaconModulesDefault = beaconCheck.Checked;
+
+								foreach (ReadOnlyRecipeNode rNode in rNodes)
+								{
+									RecipeNodeController controller = (RecipeNodeController)graphViewer.Graph.RequestNodeController(rNode);
+
+									bool assemblerFilter = !assemblerCheck.Checked; //if we do copy assembler, then all the other options are copied only if the assembler is. If we do not copy assembler, then paste options to everyone
+								if (assemblerCheck.Checked && rNode.BaseRecipe.Assemblers.Contains(copiedOptions.Assembler)) //assembler fits the given recipe
+								{
+										controller.SetAssembler(copiedOptions.Assembler);
+										assemblerFilter = true;
+										if (rNode.SelectedAssembler.EntityType == EntityType.Reactor)
+											controller.SetNeighbourCount(copiedOptions.NeighbourCount);
+									}
+
+									if (fuelCheck.Checked && rNode.SelectedAssembler.Fuels.Contains(copiedOptions.Fuel)) //fuel fits the given recipe node
+									controller.SetFuel(copiedOptions.Fuel);
+
+									if (modulesCheck.Checked)
+									{
+										HashSet<Module> acceptableAssemblerModules = new HashSet<Module>(rNode.BaseRecipe.Modules.Intersect(rNode.SelectedAssembler.Modules));
+										if (!copiedOptions.AssemblerModules.Any(module => !acceptableAssemblerModules.Contains(module))) //all modules we copied can be added to the selected recipe/assembler
+										controller.SetAssemblerModules(copiedOptions.AssemblerModules, true);
+									}
+
+									if (beaconCheck.Checked && rNode.BaseRecipe.Modules.Intersect(rNode.SelectedAssembler.Modules).Count() > 0)
+									{
+										controller.SetBeacon(copiedOptions.Beacon);
+										controller.SetBeaconCount(copiedOptions.BeaconCount);
+										controller.SetBeaconsCont(copiedOptions.BeaconsConst);
+										controller.SetBeaconsPerAssembler(copiedOptions.BeaconsPerAssembler);
+									}
+
+									if (beaconModuleCheck.Checked && rNode.SelectedBeacon != null)
+									{
+										HashSet<Module> acceptableBeaconModules = new HashSet<Module>(rNode.BaseRecipe.Modules.Intersect(rNode.SelectedAssembler.Modules).Intersect(rNode.SelectedBeacon.Modules));
+										if (!copiedOptions.BeaconModules.Any(module => !acceptableBeaconModules.Contains(module)))
+											controller.SetBeaconModules(copiedOptions.BeaconModules, true);
+									}
+								}
+							})));
+
+						RightClickMenu.Items.Add(new ToolStripSeparator());
+					}
+				}
+			}
+			else
+				RightClickMenu.Items.Add(new ToolStripSeparator());
+
+			RightClickMenu.Items.Add(new ToolStripMenuItem("Copy this assembler's options", null,
+				new EventHandler((o, e) =>
+				{
+					RightClickMenu.Close();
+					StringBuilder stringBuilder = new StringBuilder();
+					var writer = new JsonTextWriter(new StringWriter(stringBuilder));
+
+					JsonSerializer serialiser = JsonSerializer.Create();
+					serialiser.Formatting = Formatting.None;
+					serialiser.Serialize(writer, new NodeCopyOptions(DisplayedNode as ReadOnlyRecipeNode));
+
+					Clipboard.SetText(stringBuilder.ToString());
+
+				})));
+		}
+
 		protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive)
 		{
 			List<TooltipInfo> tooltips = new List<TooltipInfo>();
@@ -141,7 +288,7 @@ namespace Foreman
 			if (exclusive)
 			{
 				TooltipInfo helpToolTipInfo = new TooltipInfo();
-				helpToolTipInfo.Text = "Left click on this node to edit how fast it runs.\nRight click for options.";
+				helpToolTipInfo.Text = string.Format("Left click on this node to edit its {0}, modules, beacon, etc.\nRight click for options.", DisplayedNode.SelectedAssembler.GetEntityTypeName(false).ToLower());
 				helpToolTipInfo.Direction = Direction.None;
 				helpToolTipInfo.ScreenLocation = new Point(10, 10);
 				tooltips.Add(helpToolTipInfo);

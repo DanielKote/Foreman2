@@ -291,28 +291,101 @@ namespace Foreman
 			NodeValuesUpdated?.Invoke(this, EventArgs.Empty); //called even if no changes have been made in order to re-draw the graph (since something required a node value update - link deletion? node addition? whatever)
 		}
 
+		//----------------------------------------------Save/Load JSON functions
+
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			//collect the set of nodes and links to be saved (either entire set, or only that which is bound by the specified serialized node list)
+			HashSet<BaseNode> includedNodes = nodes;
+			HashSet<NodeLink> includedLinks = nodeLinks;
+			if (SerializeNodeIdSet != null)
+			{
+				includedNodes = new HashSet<BaseNode>(nodes.Where(node => SerializeNodeIdSet.Contains(node.NodeID)));
+				includedLinks = new HashSet<NodeLink>();
+				foreach (NodeLink link in nodeLinks)
+					if (includedNodes.Contains(link.ConsumerNode) && includedNodes.Contains(link.SupplierNode))
+						includedLinks.Add(link);
+			}
+
+			//prepare list of items/assemblers/modules/beacons/recipes that are part of the saved set. Recipes have to include a missing component due to the possibility of different recipes having same name (ex: regular iron.recipe, missing iron.recipe, missing iron.recipe #2)
+			HashSet<string> includedItems = new HashSet<string>();
+			HashSet<string> includedAssemblers = new HashSet<string>();
+			HashSet<string> includedModules = new HashSet<string>();
+			HashSet<string> includedBeacons = new HashSet<string>();
+
+			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
+			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new RecipeNaInPrComparer()); //compares by name, ingredients, and products (not amounts, just items)
+
+			foreach (BaseNode node in includedNodes)
+			{
+				if (node is RecipeNode rnode)
+				{
+					if (rnode.BaseRecipe.IsMissing)
+						includedMissingRecipes.Add(rnode.BaseRecipe);
+					else
+						includedRecipes.Add(rnode.BaseRecipe);
+
+					if (rnode.SelectedAssembler != null)
+						includedAssemblers.Add(rnode.SelectedAssembler.Name);
+					if (rnode.SelectedBeacon != null)
+						includedBeacons.Add(rnode.SelectedBeacon.Name);
+					foreach (Module module in rnode.AssemblerModules)
+						includedModules.Add(module.Name);
+					foreach (Module module in rnode.BeaconModules)
+						includedModules.Add(module.Name);
+				}
+
+				//these will process all inputs/outputs -> so fuel/burnt items are included automatically!
+				foreach (Item input in node.Inputs)
+					includedItems.Add(input.Name);
+				foreach (Item output in node.Outputs)
+					includedItems.Add(output.Name);
+			}
+			List<RecipeShort> includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
+			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
+
+			//serialize
+			info.AddValue("Version", Properties.Settings.Default.ForemanVersion);
+			info.AddValue("Object", "ProductionGraph");
+			info.AddValue("IncludedItems", includedItems);
+			info.AddValue("IncludedRecipes", includedRecipeShorts);
+			info.AddValue("IncludedAssemblers", includedAssemblers);
+			info.AddValue("IncludedModules", includedModules);
+			info.AddValue("IncludedBeacons", includedBeacons);
+
+			info.AddValue("Nodes", includedNodes);
+			info.AddValue("NodeLinks", includedLinks);
+		}
+
 		public NewNodeCollection InsertNodesFromJson(DataCache cache, JToken json) //cache is necessary since we will possibly be adding to mssing items/recipes
 		{
+			if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraph")
+			{
+				json = VersionUpdater.UpdateGraph(json);
+				if (json == null) //update failed
+					return new NewNodeCollection();
+			}
+
 			NewNodeCollection newNodeCollection = new NewNodeCollection();
 			Dictionary<int, ReadOnlyBaseNode> oldNodeIndices = new Dictionary<int, ReadOnlyBaseNode>(); //the links between the node index (as imported) and the newly created node (which will now have a different index). Used to link up nodes
 
-			//check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
-			cache.ProcessImportedItemsSet(json["IncludedItems"].Select(t => (string)t));
-			cache.ProcessImportedAssemblersSet(json["IncludedAssemblers"].Select(t => (string)t));
-			cache.ProcessImportedModulesSet(json["IncludedModules"].Select(t => (string)t));
-			cache.ProcessImportedBeaconsSet(json["IncludedBeacons"].Select(t => (string)t));
-			Dictionary<long, Recipe> recipeLinks = cache.ProcessImportedRecipesSet(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
-
-			//add in all the graph nodes
-			foreach (JToken nodeJToken in json["Nodes"].ToList())
+			try
 			{
-				BaseNode newNode = null;
-				string[] locationString = ((string)nodeJToken["Location"]).Split(',');
-				Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
-				string itemName; //just an early define
+				//check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
+				cache.ProcessImportedItemsSet(json["IncludedItems"].Select(t => (string)t));
+				cache.ProcessImportedAssemblersSet(json["IncludedAssemblers"].Select(t => (string)t));
+				cache.ProcessImportedModulesSet(json["IncludedModules"].Select(t => (string)t));
+				cache.ProcessImportedBeaconsSet(json["IncludedBeacons"].Select(t => (string)t));
+				Dictionary<long, Recipe> recipeLinks = cache.ProcessImportedRecipesSet(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
 
-				try
+				//add in all the graph nodes
+				foreach (JToken nodeJToken in json["Nodes"].ToList())
 				{
+					BaseNode newNode = null;
+					string[] locationString = ((string)nodeJToken["Location"]).Split(',');
+					Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
+					string itemName; //just an early define
+
 					switch ((NodeType)(int)nodeJToken["NodeType"])
 					{
 						case NodeType.Consumer:
@@ -408,7 +481,7 @@ namespace Foreman
 							})];
 							break;
 						default:
-							throw new Exception();
+							throw new Exception(); //we will catch it right away and delete all nodes added in thus far. Error was most likely in json read, in which case we count it as a corrupt json and not import anything.
 					}
 
 					newNode.RateType = (RateType)(int)nodeJToken["RateType"];
@@ -422,94 +495,30 @@ namespace Foreman
 
 					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode.ReadOnlyNode);
 				}
-				catch //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
+
+				//link the new nodes
+				foreach (JToken nodeLinkJToken in json["NodeLinks"].ToList())
 				{
-					DeleteNodes(newNodeCollection.newNodes);
-					newNodeCollection.newNodes.Clear();
-					return newNodeCollection;
+					ReadOnlyBaseNode supplier = oldNodeIndices[(int)nodeLinkJToken["SupplierID"]];
+					ReadOnlyBaseNode consumer = oldNodeIndices[(int)nodeLinkJToken["ConsumerID"]];
+					Item item;
+
+					string itemName = (string)nodeLinkJToken["Item"];
+					if (cache.Items.ContainsKey(itemName))
+						item = cache.Items[itemName];
+					else
+						item = cache.MissingItems[itemName];
+
+					if (LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
+						newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
 				}
 			}
-
-			//link the new nodes
-			foreach (JToken nodeLinkJToken in json["NodeLinks"].ToList())
+			catch //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
 			{
-				ReadOnlyBaseNode supplier = oldNodeIndices[(int)nodeLinkJToken["SupplierID"]];
-				ReadOnlyBaseNode consumer = oldNodeIndices[(int)nodeLinkJToken["ConsumerID"]];
-				Item item;
-
-				string itemName = (string)nodeLinkJToken["Item"];
-				if (cache.Items.ContainsKey(itemName))
-					item = cache.Items[itemName];
-				else
-					item = cache.MissingItems[itemName];
-
-				if (LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
-					newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
+				DeleteNodes(newNodeCollection.newNodes);
+				return new NewNodeCollection();
 			}
 			return newNodeCollection;
-		}
-
-		public void GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			//collect the set of nodes and links to be saved (either entire set, or only that which is bound by the specified serialized node list)
-			HashSet<BaseNode> includedNodes = nodes;
-			HashSet<NodeLink> includedLinks = nodeLinks;
-			if (SerializeNodeIdSet != null)
-			{
-				includedNodes = new HashSet<BaseNode>(nodes.Where(node => SerializeNodeIdSet.Contains(node.NodeID)));
-				includedLinks = new HashSet<NodeLink>();
-				foreach (NodeLink link in nodeLinks)
-					if (includedNodes.Contains(link.ConsumerNode) && includedNodes.Contains(link.SupplierNode))
-						includedLinks.Add(link);
-			}
-
-			//prepare list of items/assemblers/modules/beacons/recipes that are part of the saved set. Recipes have to include a missing component due to the possibility of different recipes having same name (ex: regular iron.recipe, missing iron.recipe, missing iron.recipe #2)
-			HashSet<string> includedItems = new HashSet<string>();
-			HashSet<string> includedAssemblers = new HashSet<string>();
-			HashSet<string> includedModules = new HashSet<string>();
-			HashSet<string> includedBeacons = new HashSet<string>();
-
-			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
-			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new RecipeNaInPrComparer()); //compares by name, ingredients, and products (not amounts, just items)
-
-			foreach (BaseNode node in includedNodes)
-			{
-				if (node is RecipeNode rnode)
-				{
-					if (rnode.BaseRecipe.IsMissing)
-						includedMissingRecipes.Add(rnode.BaseRecipe);
-					else
-						includedRecipes.Add(rnode.BaseRecipe);
-
-					if (rnode.SelectedAssembler != null)
-						includedAssemblers.Add(rnode.SelectedAssembler.Name);
-					if (rnode.SelectedBeacon != null)
-						includedBeacons.Add(rnode.SelectedBeacon.Name);
-					foreach (Module module in rnode.AssemblerModules)
-						includedModules.Add(module.Name);
-					foreach (Module module in rnode.BeaconModules)
-						includedModules.Add(module.Name);
-				}
-
-				//these will process all inputs/outputs -> so fuel/burnt items are included automatically!
-				foreach (Item input in node.Inputs)
-					includedItems.Add(input.Name);
-				foreach (Item output in node.Outputs)
-					includedItems.Add(output.Name);
-			}
-			List<RecipeShort> includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
-			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
-
-			//serialize
-			info.AddValue("Version:", Properties.Settings.Default.ForemanVersion);
-			info.AddValue("IncludedItems", includedItems);
-			info.AddValue("IncludedRecipes", includedRecipeShorts);
-			info.AddValue("IncludedAssemblers", includedAssemblers);
-			info.AddValue("IncludedModules", includedModules);
-			info.AddValue("IncludedBeacons", includedBeacons);
-
-			info.AddValue("Nodes", includedNodes);
-			info.AddValue("NodeLinks", includedLinks);
 		}
 	}
 }

@@ -123,11 +123,7 @@ namespace Foreman
 
 			try
 			{
-				if (Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
-					await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false, true);
-				else if (Path.GetExtension(dialog.FileName).ToLower() == ".json")
-					GraphViewer.LoadFromOldJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
-				//NOTE: MainCache will update
+				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false, true);
 			}
 			catch (Exception exception)
 			{
@@ -290,6 +286,18 @@ namespace Foreman
 				GraphViewer.Graph.UpdateNodeValues();
 			else
 				GraphViewer.Invalidate();
+		}
+
+		private void GraphSummaryButton_Click(object sender, EventArgs e)
+		{
+			using (GraphSummaryForm form = new GraphSummaryForm())
+			{
+				form.StartPosition = FormStartPosition.Manual;
+				form.Left = this.Left + 50;
+				form.Top = this.Top + 50;
+				form.ShowDialog();
+
+			}
 		}
 
 		//---------------------------------------------------------Gridlines

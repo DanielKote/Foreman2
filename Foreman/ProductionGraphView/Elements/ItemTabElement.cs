@@ -35,8 +35,6 @@ namespace Foreman
 
 		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) : base(graphViewer, node)
 		{
-			RightClickMenu = new ContextMenu();
-
 			DisplayedNode = node.DisplayedNode;
 			this.Item = item;
 			this.LinkType = type;
@@ -139,11 +137,10 @@ namespace Foreman
 				else //if (LinkType == LinkType.Output)
 					connections.AddRange(DisplayedNode.OutputLinks.Where(l => l.Item == Item));
 
-
-				RightClickMenu.MenuItems.Clear();
-				RightClickMenu.MenuItems.Add(new MenuItem("Delete connections",
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Delete connections", null,
 					new EventHandler((o, e) =>
 					{
+						RightClickMenu.Close();
 						foreach (ReadOnlyNodeLink link in connections)
 							graphViewer.Graph.DeleteLink(link);
 						graphViewer.Graph.UpdateNodeValues();

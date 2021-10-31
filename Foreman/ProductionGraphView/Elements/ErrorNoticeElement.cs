@@ -105,12 +105,13 @@ namespace Foreman
 			}
 			else if (button == MouseButtons.Right)
 			{
-				RightClickMenu.MenuItems.Clear();
+				RightClickMenu.Items.Clear();
 				if (resolutions.Count > 0)
 				{
 					foreach (KeyValuePair<string, Action> kvp in resolutions)
-						RightClickMenu.MenuItems.Add(new MenuItem(kvp.Key, new EventHandler((o, e) =>
+						RightClickMenu.Items.Add(new ToolStripMenuItem(kvp.Key, null, new EventHandler((o, e) =>
 						{
+							RightClickMenu.Close();
 							kvp.Value.Invoke();
 							graphViewer.Graph.UpdateNodeValues();
 						})));
