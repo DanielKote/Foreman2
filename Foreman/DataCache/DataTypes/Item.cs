@@ -14,18 +14,12 @@ namespace Foreman
 		IReadOnlyCollection<Technology> ConsumptionTechnologies { get; }
 
 		bool IsMissing { get; }
-		bool IsFluid { get; }
-		bool IsTemperatureDependent { get; }
-		double DefaultTemperature { get; }
-		double SpecificHeatCapacity { get; }
 
 		double FuelValue { get; }
 		double PollutionMultiplier { get; }
 		Item BurnResult { get; }
 		Item FuelOrigin { get; }
 		IReadOnlyCollection<EntityObjectBase> FuelsEntities { get; }
-
-		string GetTemperatureRangeFriendlyName(fRange tempRange);
 	}
 
 	public class ItemPrototype : DataObjectBasePrototype, Item
@@ -38,25 +32,20 @@ namespace Foreman
 
 		public bool IsMissing { get; private set; }
 
-		public bool IsFluid { get; private set; }
-		public bool IsTemperatureDependent { get; internal set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
-		public double DefaultTemperature { get; internal set; } //for liquids
-		public double SpecificHeatCapacity { get; internal set; } //also liquids
-
 		public double FuelValue { get; internal set; }
 		public double PollutionMultiplier { get; internal set; }
 		public Item BurnResult { get; internal set; }
 		public Item FuelOrigin { get; internal set; }
-		public IReadOnlyCollection<EntityObjectBase> FuelsEntities { get { return fuelsAssemblers; } }
+		public IReadOnlyCollection<EntityObjectBase> FuelsEntities { get { return fuelsEntities; } }
 
 		internal SubgroupPrototype mySubgroup;
 
 		internal HashSet<RecipePrototype> productionRecipes { get; private set; }
 		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
 		internal HashSet<TechnologyPrototype> consumptionTechnologies { get; private set; }
-		internal HashSet<EntityObjectBasePrototype> fuelsAssemblers { get; private set; }
+		internal HashSet<EntityObjectBasePrototype> fuelsEntities { get; private set; }
 
-		public ItemPrototype(DataCache dCache, string name, string friendlyName, bool isfluid, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
+		public ItemPrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
 			mySubgroup = subgroup;
 			subgroup.items.Add(this);
@@ -64,37 +53,11 @@ namespace Foreman
 			productionRecipes = new HashSet<RecipePrototype>();
 			consumptionRecipes = new HashSet<RecipePrototype>();
 			consumptionTechnologies = new HashSet<TechnologyPrototype>();
-			fuelsAssemblers = new HashSet<EntityObjectBasePrototype>();
+			fuelsEntities = new HashSet<EntityObjectBasePrototype>();
 
-			IsFluid = isfluid;
-			DefaultTemperature = 0;
 			FuelValue = 1f; //useful for preventing overlow issues when using missing items / non-fuel items (loading with wrong mods / importing from alt mod group can cause this)
 			PollutionMultiplier = 1f;
-			IsTemperatureDependent = false;
 			IsMissing = isMissing;
-		}
-
-		public string GetTemperatureRangeFriendlyName(fRange tempRange)
-		{
-			if (tempRange.Ignore)
-				return this.FriendlyName;
-
-			string name = this.FriendlyName;
-			bool includeMin = tempRange.Min >= double.MinValue;
-			bool includeMax = tempRange.Max <= double.MaxValue;
-
-			if (tempRange.Min == tempRange.Max)
-				name += string.Format(" ({0}°c)", tempRange.Min.ToString("0"));
-			else if (includeMin && includeMax)
-				name += string.Format(" ({0}-{1}°c)", tempRange.Min.ToString("0"), tempRange.Max.ToString("0"));
-			else if (includeMin)
-				name += string.Format(" (min {0}°c)", tempRange.Min.ToString("0"));
-			else if (includeMax)
-				name += string.Format(" (max {0}°c)", tempRange.Max.ToString("0"));
-			else
-				name += "(any°)";
-
-			return name;
 		}
 
 		public override string ToString() { return string.Format("Item: {0}", Name); }

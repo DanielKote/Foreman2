@@ -264,6 +264,7 @@ local function ExportEntities()
 			end
 
 			--fluid boxes for input/output of boiler & generator need to be processed (almost guaranteed to be 'steam' and 'water', but... tests have shown that we can heat up whatever we want)
+			--additinally we want count of fluid boxes in/out (for checking recipe validity)
 			if entity.type == 'boiler' then
 				tentity['target_temperature'] = entity.target_temperature
 
@@ -276,12 +277,8 @@ local function ExportEntities()
 			elseif entity.type == 'generator' then
 				tentity['full_power_temperature'] = entity.maximum_temperature
 
-				if entity.fluidbox_prototypes[1].minimum_temperature ~= nil then
-					tentity['minimum_temperature'] = entity.fluidbox_prototypes[1].minimum_temperature
-				end
-				if entity.fluidbox_prototypes[1].maximum_temperature ~= nil then
-					tentity['maximum_temperature'] = entity.fluidbox_prototypes[1].maximum_temperature
-				end
+				tentity['minimum_temperature'] = entity.fluidbox_prototypes[1].minimum_temperature
+				tentity['maximum_temperature'] = entity.fluidbox_prototypes[1].maximum_temperature
 				if entity.fluidbox_prototypes[1].filter ~= nil then
 					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
 				end
@@ -292,16 +289,16 @@ local function ExportEntities()
 				ioPipeFilters = {}
 				outPipes = 0
 				outPipeFilters = {}
-				-- i will ignore temperature limitations for this.
+				-- i will ignore temperature limitations for this. (this is for recipe checks)
 
 				for _, fbox in pairs(entity.fluidbox_prototypes) do
-					if fbox.production_type == "input" then
+					if fbox.production_type == 'input' then
 						inPipes = inPipes + 1
 						if fbox.filter ~= nil then table.insert(inPipeFilters, fbox.filter.name) end
-					elseif fbox.production_type == "output" then
+					elseif fbox.production_type == 'output' then
 						outPipes = outPipes + 1
 						if fbox.filter ~= nil then table.insert(outPipeFilters, fbox.filter.name) end
-					elseif fbox.production_type == "input-output" then
+					elseif fbox.production_type == 'input-output' then
 						ioPipes = ioPipes + 1
 						if fbox.filter ~= nil then table.insert(ioPipeFilters, fbox.filter.name) end
 					end
@@ -310,8 +307,8 @@ local function ExportEntities()
 				tentity['in_pipe_filters'] = inPipeFilters
 				tentity['out_pipes'] = outPipes
 				tentity['out_pipe_filters'] = outPipeFilters
-				tentity['in_out_pipes'] = ioPipes
-				tentity['in__out_pipe_filters'] = ioPipeFilters
+				tentity['io_pipes'] = ioPipes
+				tentity['io_pipe_filters'] = ioPipeFilters
 			end
 
 			tentity['max_energy_usage'] = (entity.max_energy_usage == nil) and 0 or entity.max_energy_usage
@@ -333,6 +330,13 @@ local function ExportEntities()
 				tentity['fuel_effectivity'] = entity.fluid_energy_source_prototype.effectivity
 				tentity['pollution'] = entity.fluid_energy_source_prototype.emissions
 				tentity['burns_fluid'] = entity.fluid_energy_source_prototype.burns_fluid
+
+				--fluid limitations from fluid box:
+				if entity.fluid_energy_source_prototype.fluid_box.filter ~= nil then
+					tentity['fuel_filter'] = entity.fluid_energy_source_prototype.fluid_box.filter.name
+				end
+				tentity['minimum_fuel_temperature'] = entity.fluid_energy_source_prototype.fluid_box.minimum_temperature -- nil is accepted
+				tentity['maximum_fuel_temperature'] = entity.fluid_energy_source_prototype.fluid_box.maximum_temperature --nil is accepted
 
 			elseif entity.electric_energy_source_prototype then
 				tentity['fuel_type'] = 'electricity'

@@ -185,11 +185,11 @@ namespace Foreman
 		{
 			SubgroupPrototype sg = new SubgroupPrototype(null, "sg", "-");
 
-			ItemPrototype i1 = new ItemPrototype(null, "i1", "i1", false, sg, "-");
-			ItemPrototype i2 = new ItemPrototype(null, "i2", "i2", false, sg, "-");
-			ItemPrototype i3 = new ItemPrototype(null, "i3", "i3", false, sg, "-");
-			ItemPrototype i4 = new ItemPrototype(null, "i4", "i4", false, sg, "-");
-			ItemPrototype i5 = new ItemPrototype(null, "i5", "i5", false, sg, "-");
+			ItemPrototype i1 = new ItemPrototype(null, "i1", "i1", sg, "-");
+			ItemPrototype i2 = new ItemPrototype(null, "i2", "i2", sg, "-");
+			ItemPrototype i3 = new ItemPrototype(null, "i3", "i3", sg, "-");
+			ItemPrototype i4 = new ItemPrototype(null, "i4", "i4", sg, "-");
+			ItemPrototype i5 = new ItemPrototype(null, "i5", "i5", sg, "-");
 
 
 			RecipePrototype a = new RecipePrototype(null, "a", "a", sg, "-");

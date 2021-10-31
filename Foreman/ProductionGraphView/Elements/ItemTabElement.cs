@@ -102,20 +102,20 @@ namespace Foreman
 
 			if (parentNode.DisplayedNode is ReadOnlyRecipeNode rNode)
 			{
-				if(LinkType == LinkType.Input)
+				if (LinkType == LinkType.Input)
 					tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(Item);
 				else //if(LinkType == LinkType.Output)
 					tti.Text = rNode.BaseRecipe.GetProductFriendlyName(Item);
 			}
-			else if (!Item.IsTemperatureDependent)
-				tti.Text = Item.FriendlyName;
-			else
+			else if ((Item is Fluid fluid) && fluid.IsTemperatureDependent)
 			{
-				fRange tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, (LinkType == LinkType.Input) ? LinkType.Output : LinkType.Input); //input type tab means output of connection link and vice versa
+				fRange tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.DisplayedNode, (LinkType == LinkType.Input) ? LinkType.Output : LinkType.Input, true); //input type tab means output of connection link and vice versa
 				if (tempRange.Ignore && DisplayedNode is ReadOnlyPassthroughNode)
-					tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType); //if there was no temp range on this side of this throughput node, try to just copy the other side
-				tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
+					tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.DisplayedNode, LinkType, true); //if there was no temp range on this side of this throughput node, try to just copy the other side
+				tti.Text = fluid.GetTemperatureRangeFriendlyName(tempRange);
 			}
+			else
+				tti.Text = Item.FriendlyName;
 
 			tti.Direction = (LinkType == LinkType.Input) ? Direction.Up : Direction.Down;
 			tti.ScreenLocation = graphViewer.GraphToScreen(GetConnectionPoint());

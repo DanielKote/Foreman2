@@ -175,16 +175,9 @@ namespace Foreman
 				resolutions.Add("Delete invalid links", new Action(() =>
 				{
 					foreach (NodeLink invalidLink in MyNode.InputLinks.Where(l => !l.IsValid).ToList())
-					{
 						MyNode.MyGraph.DeleteLink(invalidLink.ReadOnlyLink);
-						invalidLink.SupplierNode.UpdateState();
-					}
 					foreach (NodeLink invalidLink in MyNode.OutputLinks.Where(l => !l.IsValid).ToList())
-					{
 						MyNode.MyGraph.DeleteLink(invalidLink.ReadOnlyLink);
-						invalidLink.ConsumerNode.UpdateState();
-					}
-					MyNode.UpdateState();
 				}));
 			}
 			return resolutions;

@@ -177,12 +177,12 @@ namespace Foreman
 				newLocation = Grid.AlignToGrid(newLocation);
 
 			fRange tempRange = new fRange(0, 0, true);
-			if (baseItem != null && baseItem.IsTemperatureDependent)
+			if (baseItem != null && baseItem is Fluid fluid && fluid.IsTemperatureDependent)
 			{
 				if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
-					tempRange = LinkChecker.GetTemperatureRange(baseItem, originElement.DisplayedNode, LinkType.Output);
+					tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Output, true);
 				else if (nNodeType == NewNodeType.Supplier) //need to check all nodes up to recipes for range of temperatures being consumed (guaranteed to be in a SINGLE [] range)
-					tempRange = LinkChecker.GetTemperatureRange(baseItem, originElement.DisplayedNode, LinkType.Input);
+					tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Input, true);
 			}
 
 			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
@@ -459,7 +459,7 @@ namespace Foreman
 				double fluidMax = 0;
 				foreach (LinkElement element in linkElements)
 				{
-					if (element.Item.IsFluid && !element.Item.Name.StartsWith("§§")) //§§ is the foreman added special items (currently just §§heat). ignore them
+					if (element.Item is Fluid && !element.Item.Name.StartsWith("§§")) //§§ is the foreman added special items (currently just §§heat). ignore them
 						fluidMax = Math.Max(fluidMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
 					else
 						itemMax = Math.Max(itemMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
@@ -469,7 +469,7 @@ namespace Foreman
 
 				foreach (LinkElement element in linkElements)
 				{
-					if (element.Item.IsFluid)
+					if (element.Item is Fluid)
 						element.LinkWidth = (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / fluidMax)), maxLinkWidth);
 					else
 						element.LinkWidth = (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / itemMax)), maxLinkWidth);

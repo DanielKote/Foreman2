@@ -41,6 +41,7 @@ namespace Foreman
 			BeaconIsUnavailable = 0b_0000_1000_0000_0000,
 			BModuleIsDisabled = 0b_0001_0000_0000_0000,
 			BModuleIsUnavailable = 0b_0010_0000_0000_0000,
+			TemeratureFluidBurnerInvalidLinks = 0b_0100_0000_0000_0000,
 		}
 		public Errors ErrorSet { get; private set; }
 		public Warnings WarningSet { get; private set; }
@@ -206,6 +207,9 @@ namespace Foreman
 			if (BeaconModules.Any(m => !m.Available))
 				WarningSet |= Warnings.BModuleIsUnavailable;
 
+			if (SelectedAssembler.IsTemperatureFluidBurner && !LinkChecker.GetTemperatureRange(Fuel as Fluid, ReadOnlyNode, LinkType.Output, false).IsPoint())
+				WarningSet |= Warnings.TemeratureFluidBurnerInvalidLinks;
+
 			if (WarningSet != Warnings.Clean)
 				return NodeState.Warning;
 			return NodeState.Clean;
@@ -263,16 +267,16 @@ namespace Foreman
 		{
 			if (item != Fuel)
 				return BaseRecipe.IngredientSet[item];
-			else
+			else if (!BaseRecipe.IsMissing && !SelectedAssembler.IsMissing)
 			{
-				if (!SelectedAssembler.IsMissing && !SelectedAssembler.IsBurner)
+				if (!SelectedAssembler.IsBurner)
 					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was not a burner!", item));
-
-				double recipeRate = BaseRecipe.IngredientSet.ContainsKey(item) ? BaseRecipe.IngredientSet[item] : 0;
-				//burner rate = recipe time (modified by speed bonus & assembler) * assembler energy consumption (modified by consumption bonus and assembler) / fuel value of the item
-				double burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.ConsumptionEffectivity) / Fuel.FuelValue;
-				return recipeRate + burnerRate;
+				else if (!SelectedAssembler.Fuels.Contains(item))
+					return 0.1; //fuel cant be used, so default. Same idea as before -> loading a graph with wrong fuel options. Node will be marked as error anyway, this is purely for solver.
+				return (BaseRecipe.IngredientSet.ContainsKey(item) ? BaseRecipe.IngredientSet[item] : 0) + inputRateForFuel();
 			}
+			else
+				return 0.1; //catch case for loading a graph with wrong fuel options
 		}
 		internal override double outputRateFor(Item item) //Note to Foreman 1.0: YES! this is where all the productivity is taken care of! (not in the solver... why would you multiply the productivity while setting up the constraints and not during the ratios here???)
 		{
@@ -287,13 +291,20 @@ namespace Foreman
 			{
 				if (SelectedAssembler == null || !SelectedAssembler.IsBurner)
 					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
-
-				double recipeRate = BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] * GetProductivityMultiplier() : 0;
-				//burner rate is much the same as above (without the productivity), just have to make sure we still use the Burner item!
-				double burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.ConsumptionEffectivity) / Fuel.FuelValue;
-				return recipeRate + burnerRate;
+				return (BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] * GetProductivityMultiplier() : 0) + inputRateForFuel();
 			}
 		}
+
+		internal double inputRateForFuel()
+		{
+			double temperature = double.NaN;
+			if (SelectedAssembler.IsTemperatureFluidBurner)
+				temperature = LinkChecker.GetTemperatureRange(Fuel as Fluid, ReadOnlyNode, LinkType.Output, false).Min;
+
+			//burner rate = recipe time (modified by speed bonus & assembler) * fuel consumption rate of assembler (modified by fuel, temperature, and consumption modifier)
+			return (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * SelectedAssembler.GetBaseFuelConsumptionRate(Fuel, temperature) * GetConsumptionMultiplier();
+		}
+
 		internal double GetMaxIORatio()
 		{
 			double maxValue = 0;
@@ -442,6 +453,8 @@ namespace Foreman
 				if ((WarningSet & RecipeNode.Warnings.FuelIsUncraftable) != 0)
 					output.Add("> Selected fuel cant be produced.");
 			}
+			if ((WarningSet & RecipeNode.Warnings.TemeratureFluidBurnerInvalidLinks) != 0)
+				output.Add("> Temperature based fuel uses multiple incoming temperatures (fuel use # might be wrong).");
 
 			//modules & beacon modules
 			if ((WarningSet & RecipeNode.Warnings.AModuleIsDisabled) != 0)
@@ -467,7 +480,7 @@ namespace Foreman
 			if (SelectedAssembler.EntityType == EntityType.Generator)
 			{
 				//minimum temperature accepted by generator is the largest of either the default temperature (at which point the power generation is 0 and it actually doesnt consume anything), or the set min temp
-				Item fluidBase = BaseRecipe.IngredientList[0]; //generators have 1 input & 0 output. only input is the fluid being consumed.
+				Fluid fluidBase = (Fluid)BaseRecipe.IngredientList[0]; //generators have 1 input & 0 output. only input is the fluid being consumed.
 				return Math.Max(fluidBase.DefaultTemperature + 0.1, BaseRecipe.IngredientTemperatureMap[fluidBase].Min);
 			}
 			Trace.Fail("Cant ask for minimum generator temperature for a non-generator!");
@@ -522,7 +535,7 @@ namespace Foreman
 
 		public double GetGeneratorEffectivity()
 		{
-			Item fluid = MyNode.BaseRecipe.IngredientList[0];
+			Fluid fluid = (Fluid)MyNode.BaseRecipe.IngredientList[0];
 			return Math.Min((GetGeneratorAverageTemperature() - fluid.DefaultTemperature) / (MyNode.SelectedAssembler.OperationTemperature - fluid.DefaultTemperature), 1);
 		}
 
@@ -574,8 +587,7 @@ namespace Foreman
 		{
 			if (MyNode.Fuel == null)
 				return 0;
-			return (MyNode.MyGraph.GetRateMultipler() * BaseRecipe.Time * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier() * MyNode.ActualRatePerSec) /
-				(MyNode.SelectedAssembler.Speed * MyNode.GetSpeedMultiplier() * MyNode.SelectedAssembler.ConsumptionEffectivity * MyNode.Fuel.FuelValue);
+			return MyNode.MyGraph.GetRateMultipler() * MyNode.inputRateForFuel();
 		}
 
 		public double GetTotalAssemblerElectricalConsumption() // J/time unit
@@ -706,6 +718,13 @@ namespace Foreman
 					if (!MyNode.BeaconModules[i].Enabled || !MyNode.BeaconModules[i].Available)
 						RemoveBeaconModule(i);
 			}));
+
+			if ((WarningSet & RecipeNode.Warnings.TemeratureFluidBurnerInvalidLinks) != 0)
+				resolutions.Add("Remove fuel links", new Action(() =>
+				{
+					foreach (NodeLink fuelLink in MyNode.InputLinks.Where(l => l.Item == MyNode.Fuel).ToList())
+						MyNode.MyGraph.DeleteLink(fuelLink.ReadOnlyLink);
+				}));
 
 			return resolutions;
 		}

@@ -31,7 +31,7 @@ namespace Foreman
 			controller = NodeLinkController.GetController(this);
 			ReadOnlyLink = new ReadOnlyNodeLink(this);
 
-			IsValid = Item.IsFluid ? LinkChecker.IsValidTemperatureConnection(Item, SupplierNode.ReadOnlyNode, ConsumerNode.ReadOnlyNode) : LinkChecker.IsPossibleConnection(Item, SupplierNode.ReadOnlyNode, ConsumerNode.ReadOnlyNode); //only need to check once -> item & recipe temperatures cant change.
+			IsValid = LinkChecker.IsPossibleConnection(Item, SupplierNode.ReadOnlyNode, ConsumerNode.ReadOnlyNode); //only need to check once -> item & recipe temperatures cant change.
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)

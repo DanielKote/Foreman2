@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Foreman
@@ -21,23 +22,27 @@ namespace Foreman
 		string GetEntityTypeName(bool plural);
 		EnergySource EnergySource { get; }
 		bool IsBurner { get; }
+		bool IsTemperatureFluidBurner { get; }
+		fRange FluidFuelTemperatureRange { get; } 
+
+		double GetBaseFuelConsumptionRate(Item fuel, double temperature = double.NaN);
 
 		bool IsMissing { get; }
 
 		double Speed { get; }
 
 		int ModuleSlots { get; }
-		double NeighbourBonus { get; }
 
 		double EnergyDrain { get; }
 		double EnergyConsumption { get; }
 		double EnergyProduction { get; }
 		double ConsumptionEffectivity { get; }
+		double Pollution { get; }
 
 		//steam generators
 		double OperationTemperature { get; }
-
-		double Pollution { get; }
+		//reactors
+		double NeighbourBonus { get; }
 	}
 
 	internal class EntityObjectBasePrototype : DataObjectBasePrototype, EntityObjectBase
@@ -56,6 +61,8 @@ namespace Foreman
 		public EnergySource EnergySource { get; internal set; }
 		public bool IsMissing { get; internal set; }
 		public bool IsBurner { get { return (EnergySource == EnergySource.Burner || EnergySource == EnergySource.FluidBurner || EnergySource == EnergySource.Heat); } }
+		public bool IsTemperatureFluidBurner { get; set; }
+		public fRange FluidFuelTemperatureRange { get; set; }
 
 		public double Speed { get; internal set; }
 
@@ -89,16 +96,22 @@ namespace Foreman
 			EnergyProduction = 0;
 			ConsumptionEffectivity = 1f;
 			OperationTemperature = double.MaxValue;
+			FluidFuelTemperatureRange = new fRange(double.MinValue, double.MaxValue);
 
 			Pollution = 0;
 		}
 
-		public double GetFuelConsumptionRate(Item fuel)
+		public double GetBaseFuelConsumptionRate(Item fuel, double temperature = double.NaN)
 		{
-			if ((EnergySource != EnergySource.Burner && EnergySource != EnergySource.FluidBurner) || !fuels.Contains(fuel) || fuel.FuelValue <= 0)
-				return 0;
-
-			return EnergyConsumption * ConsumptionEffectivity / fuel.FuelValue;
+			if ((EnergySource != EnergySource.Burner && EnergySource != EnergySource.FluidBurner && EnergySource != EnergySource.Heat))
+				Trace.Fail(string.Format("Cant ask for fuel consumption rate on a non-burner! {0}", this));
+			else if (!fuels.Contains(fuel))
+				Trace.Fail(string.Format("Invalid fuel! {0} for entity {1}", fuel, this));
+			else if (!IsTemperatureFluidBurner)
+				return EnergyConsumption / (fuel.FuelValue * ConsumptionEffectivity);
+			else if (!double.IsNaN(temperature) && (fuel is Fluid fluidFuel) && (temperature > fluidFuel.DefaultTemperature) && (fluidFuel.SpecificHeatCapacity > 0)) //temperature burn of liquid
+				return EnergyConsumption / ((temperature - fluidFuel.DefaultTemperature) * fluidFuel.SpecificHeatCapacity * ConsumptionEffectivity);
+			return 0.01; // we cant have a 0 consumption rate as that would mess with the solver.
 		}
 
 		public string GetEntityTypeName(bool plural)

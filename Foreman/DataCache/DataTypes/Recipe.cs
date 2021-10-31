@@ -101,23 +101,16 @@ namespace Foreman
 
 		public string GetIngredientFriendlyName(Item item)
 		{
-			if (!IngredientSet.ContainsKey(item))
-				return item.FriendlyName;
-			if (!item.IsTemperatureDependent)
-				return item.FriendlyName;
-			return item.GetTemperatureRangeFriendlyName(IngredientTemperatureMap[item]);
+			if (IngredientSet.ContainsKey(item) && (item is Fluid fluid) && fluid.IsTemperatureDependent)
+				return fluid.GetTemperatureRangeFriendlyName(IngredientTemperatureMap[item]);
+			return item.FriendlyName;
 		}
 
 		public string GetProductFriendlyName(Item item)
 		{
-			if (!ProductSet.ContainsKey(item))
-				return item.FriendlyName;
-
-			string name = item.FriendlyName;
-			if (item.IsTemperatureDependent)
-				name += string.Format(" ({0}°c)", ProductTemperatureMap[item].ToString("0"));
-
-			return name;
+			if (productSet.ContainsKey(item) && (item is Fluid fluid) && (fluid.IsTemperatureDependent || fluid.DefaultTemperature != ProductTemperatureMap[item]))
+				return fluid.GetTemperatureFriendlyName(productTemperatureMap[item]);
+			return item.FriendlyName;
 		}
 
 		public bool TestIngredientConnection(Recipe provider, Item ingredient) //checks if the temperature that the ingredient is coming out at fits within the range of temperatures required for this recipe
@@ -128,7 +121,7 @@ namespace Foreman
 			return IngredientTemperatureMap[ingredient].Contains(provider.ProductTemperatureMap[ingredient]);
 		}
 
-		public void InternalOneWayAddIngredient(ItemPrototype item, double quantity, double minTemp = double.NegativeInfinity, double maxTemp = double.PositiveInfinity)
+		public void InternalOneWayAddIngredient(ItemPrototype item, double quantity, double minTemp = double.NaN, double maxTemp = double.NaN)
 		{
 			if (IngredientSet.ContainsKey(item))
 				ingredientSet[item] += quantity;
@@ -136,6 +129,9 @@ namespace Foreman
 			{
 				ingredientSet.Add(item, quantity);
 				ingredientList.Add(item);
+
+				minTemp = (item is Fluid && double.IsNaN(minTemp) ? double.NegativeInfinity : minTemp);
+				maxTemp = (item is Fluid && double.IsNaN(maxTemp) ? double.PositiveInfinity : maxTemp);
 				ingredientTemperatureMap.Add(item, new fRange(minTemp, maxTemp));
 			}
 		}
@@ -155,7 +151,9 @@ namespace Foreman
 			{
 				productSet.Add(item, quantity);
 				productList.Add(item);
-				productTemperatureMap.Add(item, double.IsNaN(temperature)? item.DefaultTemperature : temperature);
+
+				temperature = (item is Fluid fluid && temperature == double.NaN) ? fluid.DefaultTemperature : temperature;
+				productTemperatureMap.Add(item, temperature);
 			}
 		}
 
@@ -209,8 +207,8 @@ namespace Foreman
 		public bool Ignore;
 
 		public fRange(double min, double max, bool ignore = false) { Min = min; Max = max; Ignore = ignore; }
-		public bool Contains(double value) { return Ignore || (value >= Min && value <= Max); }
-		public bool Contains(fRange range) { return Ignore || (this.Min <= range.Min && this.Max >= range.Max); }
-		public bool IsContainedIn(fRange range) { return Ignore || (range.Min <= this.Min && range.Max >= this.Max); } //Ignore counts only for this! not for the provided range
+		public bool Contains(double value) { return Ignore || double.IsNaN(value) || ((double.IsNaN(Min) || value >= Min) && (double.IsNaN(Max) || value <= Max)); }
+		public bool Contains(fRange range) { return Ignore || range.Ignore || ((double.IsNaN(this.Min) || double.IsNaN(range.Min) || this.Min <= range.Min) && (double.IsNaN(this.Max) || double.IsNaN(range.Max) || this.Max >= range.Max)); }
+		public bool IsPoint() { return Ignore || Min == Max; } //true if the range is a single point (min is max, and we arent ignoring it)
 	}
 }

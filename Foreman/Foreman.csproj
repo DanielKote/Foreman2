@@ -158,6 +158,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DataCache\DataTypes\EntityObjectBase.cs" />
+    <Compile Include="DataCache\DataTypes\Fluid.cs" />
     <Compile Include="DataCache\DataTypes\RecipeShort.cs" />
     <Compile Include="DataCache\FactorioPathsProcessor.cs" />
     <Compile Include="DataCache\IconCache.cs" />
@@ -386,6 +387,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Graphics\BurnerGeneratorIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\ElectricityIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -393,9 +397,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\ExtraGroupIcon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graphics\HeatEGeneration.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\HeatIcon.png">

@@ -149,9 +149,9 @@ namespace Foreman
 			extraFormanGroup.subgroups.Add(energySubgroupEnergy);
 
 			IconColorPair heatIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "HeatIcon.png"), 64), Color.DarkRed);
-			IconColorPair heatGeneratorIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "HeatEGeneration.png"), 64), Color.DarkRed);
+			IconColorPair burnerGeneratorIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "BurnerGeneratorIcon.png"), 64), Color.DarkRed);
 			IconColorPair playerAssemblerIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "PlayerAssembler.png"), 64), Color.Gray);
-			HeatItem = new ItemPrototype(this, "§§i:heat", "Heat (1MJ)", false, new SubgroupPrototype(this, "-", "-"), "-"); //we dont want heat to appear as an item in the lists, so just give it a blank subgroup.
+			HeatItem = new ItemPrototype(this, "§§i:heat", "Heat (1MJ)", new SubgroupPrototype(this, "-", "-"), "-"); //we dont want heat to appear as an item in the lists, so just give it a blank subgroup.
 			HeatItem.SetIconAndColor(heatIcon);
 			HeatItem.FuelValue = 1000000; //1MJ - nice amount
 
@@ -162,7 +162,7 @@ namespace Foreman
 			HeatRecipe.Time = 1;
 
 			BurnerRecipe = new RecipePrototype(this, "§§r:h:burner-electicity", "Burner Generator", energySubgroupEnergy, "2");
-			BurnerRecipe.SetIconAndColor(heatGeneratorIcon);
+			BurnerRecipe.SetIconAndColor(burnerGeneratorIcon);
 			BurnerRecipe.Time = 1;
 
 			playerAssember = new AssemblerPrototype(this, "§§a:player-assembler", "Player", EntityType.Assembler, EnergySource.Void);
@@ -317,7 +317,7 @@ namespace Foreman
 			{
 				if (!items.ContainsKey(iItem) && !missingItems.ContainsKey(iItem)) //want to check for missing items too - in this case dont want duplicates
 				{
-					ItemPrototype missingItem = new ItemPrototype(this, iItem, iItem, false, missingSubgroup, "", true); //just assume it isnt a fluid. we dont honestly care (no temperatures)
+					ItemPrototype missingItem = new ItemPrototype(this, iItem, iItem, missingSubgroup, "", true); //just assume it isnt a fluid. we dont honestly care (no temperatures)
 					missingItems.Add(missingItem.Name, missingItem);
 				}
 			}
@@ -462,7 +462,6 @@ namespace Foreman
 				this,
 				(string)objJToken["name"],
 				(string)objJToken["localised_name"],
-				false, //item (not a fluid)
 				(SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
 				(string)objJToken["order"]);
 
@@ -495,11 +494,10 @@ namespace Foreman
 
 		private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories)
 		{
-			ItemPrototype item = new ItemPrototype(
+			FluidPrototype item = new FluidPrototype(
 				this,
 				(string)objJToken["name"],
 				(string)objJToken["localised_name"],
-				true, //fluid
 				(SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
 				(string)objJToken["order"]);
 
@@ -551,11 +549,11 @@ namespace Foreman
 				double amount = (double)productJToken["amount"];
 				if (amount != 0)
 				{
-					double temperature = product.DefaultTemperature;
-					if ((string)productJToken["type"] == "fluid" && productJToken["temperature"] != null)
-						temperature = (double)productJToken["temperature"];
+					if ((string)productJToken["type"] == "fluid")
+						recipe.InternalOneWayAddProduct(product, amount, productJToken["temperature"] == null ? ((FluidPrototype)product).DefaultTemperature : (double)productJToken["temperature"]);
+					else
+						recipe.InternalOneWayAddProduct(product, amount);
 
-					recipe.InternalOneWayAddProduct(product, amount, temperature);
 					product.productionRecipes.Add(recipe);
 				}
 			}
@@ -869,7 +867,7 @@ namespace Foreman
 							foreach (ItemPrototype item in fuelCategories[(string)categoryJToken])
 							{
 								entity.fuels.Add(item);
-								item.fuelsAssemblers.Add(entity);
+								item.fuelsEntities.Add(entity);
 							}
 						}
 					}
@@ -878,14 +876,37 @@ namespace Foreman
 				case EnergySource.FluidBurner:
 					entity.EnergyDrain = 0;
 					entity.EnergyConsumption = (double)objJToken["max_energy_usage"] * 60f; //in seconds
-					if ((bool)objJToken["burns_fluid"] == false) //this entity burns the fluid and calculates power based on fluid temperature. So.... I will just say it isnt a burner. FK THAT! (is this a leftover from old factorio with steam turbines burning any fluid?)
-						entity.EnergySource = EnergySource.Void;
-					else
+					
+					entity.IsTemperatureFluidBurner = !(bool)objJToken["burns_fluid"];
+					entity.FluidFuelTemperatureRange = new fRange(objJToken["minimum_fuel_temperature"] == null ? double.NegativeInfinity : (double)objJToken["minimum_fuel_temperature"], objJToken["maximum_fuel_temperature"] == null ? double.PositiveInfinity : (double)objJToken["maximum_fuel_temperature"]);
+					string fuelFilter = objJToken["fuel_filter"] == null ? null : (string)objJToken["fuel_filter"];
+
+					if (objJToken["fuel_filter"] != null)
 					{
+						ItemPrototype fuel = (ItemPrototype)items[(string)objJToken["fuel_filter"]];
+						if (entity.IsTemperatureFluidBurner || fuelCategories["§§fc:liquids"].Contains(fuel))
+						{
+							entity.fuels.Add(fuel);
+							fuel.fuelsEntities.Add(entity);
+						}
+						//else
+						//	; //there is no valid fuel for this entity. Realistically this means it cant be used. It will thus have an error when placed (no fuel selected -> due to no fuel existing)
+					}
+					else if(!entity.IsTemperatureFluidBurner)
+					{
+						//add in all liquid fuels
 						foreach (ItemPrototype fluid in fuelCategories["§§fc:liquids"])
 						{
 							entity.fuels.Add(fluid);
-							fluid.fuelsAssemblers.Add(entity);
+							fluid.fuelsEntities.Add(entity);
+						}
+					}
+					else //ok, this is a bit of a FK U, but this basically means this entity can burn any fluid, and burns it as a temperature range. This is how the old steam generators worked (where you could feed in hot sulfuric acid and it would just burn through it no problem). If you want to use it, fine. Here you go.
+					{
+						foreach(FluidPrototype fluid in items.Values.Where(i => i is Fluid))
+						{
+							entity.fuels.Add(fluid);
+							fluid.fuelsEntities.Add(entity);
 						}
 					}
 					break;
@@ -894,7 +915,7 @@ namespace Foreman
 					entity.EnergyDrain = 0;
 					entity.EnergyConsumption = (double)objJToken["max_energy_usage"] * 60f; //in seconds
 					entity.fuels.Add(HeatItem);
-					HeatItem.fuelsAssemblers.Add(entity);
+					HeatItem.fuelsEntities.Add(entity);
 					break;
 
 				case EnergySource.Electric:
@@ -998,7 +1019,7 @@ namespace Foreman
 		{
 			if (objJToken["fluid_ingredient"] == null || objJToken["fluid_product"] == null)
 				return false;
-			ItemPrototype ingredient = (ItemPrototype)items[(string)objJToken["fluid_ingredient"]];
+			FluidPrototype ingredient = (FluidPrototype)items[(string)objJToken["fluid_ingredient"]];
 			ItemPrototype product = (ItemPrototype)items[(string)objJToken["fluid_product"]];
 
 			//boiler is a ingredient to product conversion with product coming out at the  target_temperature *C at a rate based on energy efficiency & energy use to bring the INGREDIENT to the given temperature (basically ingredient goes from default temp to target temp, then shifts to product). we will add an extra recipe for this
@@ -1057,7 +1078,7 @@ namespace Foreman
 		{
 			if (objJToken["fluid_ingredient"] == null)
 				return false;
-			ItemPrototype ingredient = (ItemPrototype)items[(string)objJToken["fluid_ingredient"]];
+			FluidPrototype ingredient = (FluidPrototype)items[(string)objJToken["fluid_ingredient"]];
 
 			aEntity.Speed = (double)objJToken["fluid_usage_per_tick"];
 			aEntity.OperationTemperature = (double)objJToken["full_power_temperature"];
@@ -1162,7 +1183,7 @@ namespace Foreman
 
 			int inCount = 0; //unfiltered
 			int outCount = 0; //unfiltered
-			foreach(Item inFluid in recipe.ingredientList.Where(i => i.IsFluid))
+			foreach(Fluid inFluid in recipe.ingredientList.Where(i => i is Fluid))
 			{
 				if (inPipeFilters.Contains(inFluid.Name))
 				{
@@ -1177,7 +1198,7 @@ namespace Foreman
 				else
 					inCount++;
 			}
-			foreach (Item outFluid in recipe.productList.Where(i => i.IsFluid))
+			foreach (Fluid outFluid in recipe.productList.Where(i => i is Fluid))
 			{
 				if (outPipeFilters.Contains(outFluid.Name))
 				{
@@ -1443,7 +1464,7 @@ namespace Foreman
 		private void UpdateFluidTemperatureDependencies()
 		{
 			//step 9: update the temperature dependent status of items (fluids)
-			foreach (ItemPrototype fluid in items.Values.Where(i => i.IsFluid))
+			foreach (FluidPrototype fluid in items.Values.Where(i => i is Fluid))
 			{
 				fRange productionRange = new fRange(double.MaxValue, double.MinValue);
 				fRange consumptionRange = new fRange(double.MinValue, double.MaxValue); //a bit different -> the min value is the LARGEST minimum of each consumption recipe, and the max value is the SMALLEST max of each consumption recipe
@@ -1553,7 +1574,7 @@ namespace Foreman
 			}
 
 			Console.WriteLine("TEMPERATURE DEPENDENT FLUIDS: ----------------------------------------------------------------");
-			foreach (ItemPrototype fluid in items.Values.Where(i => i.IsFluid && i.IsTemperatureDependent))
+			foreach (ItemPrototype fluid in items.Values.Where(i => i is Fluid f && f.IsTemperatureDependent))
 			{
 				Console.WriteLine(fluid.Name);
 				HashSet<double> productionTemps = new HashSet<double>();

@@ -111,7 +111,7 @@ namespace Foreman
 				//if we have found a possible connection above (both supplier & consumer are no longer null), but the item temperature check fails, break connection
 				if (SupplierElement != null &&
 					ConsumerElement != null &&
-					!LinkChecker.IsValidTemperatureConnection(Item, SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode))
+					!LinkChecker.IsPossibleConnection(Item, SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode))
 				{
 					if (StartConnectionType == LinkType.Input)
 						SupplierElement = null;

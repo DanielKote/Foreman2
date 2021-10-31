@@ -170,6 +170,9 @@ namespace Foreman
 			NodeLink link = new NodeLink(this, supplierNode, consumerNode, item);
 			supplierNode.OutputLinks.Add(link);
 			consumerNode.InputLinks.Add(link);
+			LinkChangeUpdateImpactedNodeStates(link, LinkType.Input);
+			LinkChangeUpdateImpactedNodeStates(link, LinkType.Output);
+
 			nodeLinks.Add(link);
 			roToLink.Add(link.ReadOnlyLink, link);
 			LinkAdded?.Invoke(this, new NodeLinkEventArgs(link.ReadOnlyLink));
@@ -205,6 +208,8 @@ namespace Foreman
 			NodeLink nodeLink = roToLink[link];
 			nodeLink.ConsumerNode.InputLinks.Remove(nodeLink);
 			nodeLink.SupplierNode.OutputLinks.Remove(nodeLink);
+			LinkChangeUpdateImpactedNodeStates(nodeLink, LinkType.Input);
+			LinkChangeUpdateImpactedNodeStates(nodeLink, LinkType.Output);
 
 			nodeLinks.Remove(nodeLink);
 			roToLink.Remove(link);
@@ -284,6 +289,35 @@ namespace Foreman
 				catch (OverflowException) { } //overflow can theoretically be possible for extremely unbalanced recipes, but with the limit of double and the artificial limit set on max throughput this should never happen.
 			}
 			NodeValuesUpdated?.Invoke(this, EventArgs.Empty); //called even if no changes have been made in order to re-draw the graph (since something required a node value update - link deletion? node addition? whatever)
+		}
+
+		private void LinkChangeUpdateImpactedNodeStates(NodeLink link, LinkType direction) //helper function to update all the impacted nodes after addition/removal of a given link. Basically we want to update any node connected to this link through passthrough nodes (or directly).
+		{
+			HashSet<NodeLink> visitedLinks = new HashSet<NodeLink>(); //to prevent a loop
+			void Internal_UpdateLinkedNodes(NodeLink ilink)
+			{
+				if (visitedLinks.Contains(ilink))
+					return;
+				visitedLinks.Add(ilink);
+
+				if (direction == LinkType.Output)
+				{
+					ilink.ConsumerNode.UpdateState();
+					if (ilink.ConsumerNode is PassthroughNode)
+						foreach (NodeLink secondaryLink in ilink.ConsumerNode.OutputLinks)
+							Internal_UpdateLinkedNodes(secondaryLink);
+				}
+				else
+				{
+					ilink.SupplierNode.UpdateState();
+					if (ilink.SupplierNode is PassthroughNode)
+						foreach (NodeLink secondaryLink in ilink.SupplierNode.InputLinks)
+							Internal_UpdateLinkedNodes(secondaryLink);
+
+				}
+			}
+
+			Internal_UpdateLinkedNodes(link);
 		}
 
 		//----------------------------------------------Save/Load JSON functions
