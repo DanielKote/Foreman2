@@ -17,12 +17,16 @@ namespace Foreman
 			public Preset SelectedPreset;
 
 			public ProductionGraphViewer.LOD LevelOfDetail;
+			public int NodeCountForSimpleView;
 			public bool DynamicLinkWidth;
 			public bool ShowRecipeToolTip;
 			public bool LockedRecipeEditPanelPosition;
+
 			public AssemblerSelector.Style DefaultAssemblerStyle;
 			public ModuleSelector.Style DefaultModuleStyle;
+			
 			public bool DEV_ShowUnavailableItems;
+
 
 			public SettingsFormOptions(DataCache cache)
 			{
@@ -91,8 +95,11 @@ namespace Foreman
 
 			//settings
 			DynamicLWCheckBox.Checked = Options.DynamicLinkWidth;
+			NodeCountForSimpleViewInput.Maximum = Math.Max(NodeCountForSimpleViewInput.Maximum, options.NodeCountForSimpleView);
+			NodeCountForSimpleViewInput.Value = options.NodeCountForSimpleView;
 			ShowNodeRecipeCheckBox.Checked = Options.ShowRecipeToolTip;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
+
 			switch(Options.LevelOfDetail)
 			{
 				case ProductionGraphViewer.LOD.Low:
@@ -402,6 +409,7 @@ namespace Foreman
 		private void UpdateSettings()
 		{
 			Options.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
+			Options.NodeCountForSimpleView = (int)NodeCountForSimpleViewInput.Value;
 			Options.DynamicLinkWidth = DynamicLWCheckBox.Checked;
 			Options.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
 			Options.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;

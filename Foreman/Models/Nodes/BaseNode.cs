@@ -10,120 +10,70 @@ namespace Foreman
 	public enum RateType { Auto, Manual };
 	public enum NodeState { Clean, Warning, Error }
 
-	public interface BaseNode : ISerializable
-	{
-		string DisplayName { get; }
-		int NodeID { get; }
-		Point Location { get; set; }
-
-		IEnumerable<Item> Inputs { get; }
-		IEnumerable<Item> Outputs { get; }
-
-		IReadOnlyList<NodeLink> InputLinks { get; }
-		IReadOnlyList<NodeLink> OutputLinks { get; }
-
-		RateType RateType { get; set; }
-		double ActualRate { get; }
-		double DesiredRate { get; set; }
-
-		NodeState State { get; }
-		bool SolverError { get; } //if true then the solver came out with an infinity or something similar when trying to solve. Most likely solution is a cyclic recipe situation. Still - we need to display this
-		void UpdateState();
-
-		List<string> GetErrors();
-		List<string> GetWarnings();
-		Dictionary<string, Action> GetErrorResolutions(); //<resolution title : action that will happen if this resolution is picked> ex: <"delete node", Action(will delete this node)>
-		Dictionary<string, Action> GetWarningResolutions();
-
-		double GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
-		double GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
-		double GetSuppliedRate(Item item); //actual rate an item is supplied to this node (sum of all links for a given item to this node)
-
-		bool IsOversupplied();
-		bool IsOversupplied(Item item); //true if GetConsumeRate < GetSuppliedRate
-		bool ManualRateNotMet(); //true if ActualRate < DesiredRate (and RateType is manual)
-
-		double GetSpeedMultiplier();
-		double GetProductivityMultiplier();
-		double GetConsumptionMultiplier();
-		double GetPollutionMultiplier();
-
-		void Delete();
-
-	}
-
 	[Serializable]
-	public abstract partial class BaseNodePrototype : BaseNode
+	public abstract partial class BaseNode
 	{
-		protected static readonly int RoundingDP = 4;
-		protected ProductionGraph MyGraph;
+		public abstract BaseNodeController Controller { get; }
+		public ReadOnlyBaseNode ReadOnlyNode { get; protected set; }
+		public readonly ProductionGraph MyGraph;
+		public readonly int NodeID;
 
-		public int NodeID { get; private set; }
 		public Point Location { get; set; }
-		public RateType RateType { get; set; }
 
-		public abstract string DisplayName { get; }
+		public RateType RateType { get; set; }
+		public double ActualRatePerSec { get; private set; }
+		public virtual double DesiredRatePerSec { get; set; }
+		public double ActualRate { get { return ActualRatePerSec * MyGraph.GetRateMultipler(); } }
+		public double DesiredRate { get { return ActualRatePerSec * MyGraph.GetRateMultipler(); } }
+
 		public abstract IEnumerable<Item> Inputs { get; }
 		public abstract IEnumerable<Item> Outputs { get; }
 
-		public IReadOnlyList<NodeLink> InputLinks { get { return inputLinks; } }
-		public IReadOnlyList<NodeLink> OutputLinks { get { return outputLinks; } }
-
-		public double ActualRate { get; protected set; } // The rate the solver calculated is appropriate for this node.
-		public virtual double DesiredRate { get; set; } // If the rateType is manual, this field contains the rate the user desires. If the node is a recipe node, then this is read only -> use DesiredAssemblers instead
-
-		internal List<NodeLinkPrototype> inputLinks { get; private set; }
-		internal List<NodeLinkPrototype> outputLinks { get; private set; }
-
-		public abstract double GetConsumeRate(Item item); //calculated rate a given item is consumed by this node
-		public abstract double GetSupplyRate(Item item); //calculated rate a given item is supplied by this node
-
-		public virtual double GetSpeedMultiplier() { return 1; }
-		public virtual double GetProductivityMultiplier() { return 1; }
-		public virtual double GetConsumptionMultiplier() { return 1; }
-		public virtual double GetPollutionMultiplier() { return 1; }
+		public List<NodeLink> InputLinks { get; private set; }
+		public List<NodeLink> OutputLinks { get; private set; }
 
 		public NodeState State { get; protected set; }
-		public bool SolverError { get; protected set; }
-		public abstract void UpdateState();
 
-		public abstract List<string> GetErrors();
-		public abstract List<string> GetWarnings();
-		public abstract Dictionary<string, Action> GetErrorResolutions();
-		public abstract Dictionary<string, Action> GetWarningResolutions();
+		public event EventHandler<EventArgs> NodeStateChanged;
 
-		protected bool AllLinksValid { get { return (inputLinks.Count(l => !l.IsValid) + outputLinks.Count(l => !l.IsValid) == 0); } }
-		protected Dictionary<string, Action> GetInvalidConnectionResolutions()
+		internal BaseNode(ProductionGraph graph, int nodeID)
 		{
-			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-			if (!AllLinksValid)
-			{
-				resolutions.Add("Delete invalid links", new Action(() =>
-				{
-					foreach (NodeLinkPrototype invalidLink in InputLinks.Where(l => l.IsValid))
-						invalidLink.Delete();
-					foreach (NodeLinkPrototype invalidLink in outputLinks.Where(l => l.IsValid))
-						invalidLink.Delete();
-				}));
-			}
-			return resolutions;
-		}
-
-		public void Delete() { MyGraph.DeleteNode(this); }
-
-		protected BaseNodePrototype(ProductionGraph graph, int nodeID)
-		{
-			RateType = RateType.Auto;
 			MyGraph = graph;
 			NodeID = nodeID;
-			Location = new Point(0, 0);
-			SolverError = false;
 
-			inputLinks = new List<NodeLinkPrototype>();
-			outputLinks = new List<NodeLinkPrototype>();
+			RateType = RateType.Auto;
+			DesiredRatePerSec = 0;
+			Location = new Point(0, 0);
+
+			InputLinks = new List<NodeLink>();
+			OutputLinks = new List<NodeLink>();
+
+			MyGraph.GraphOptionsChanged += Graph_OnOptionsChanged;
+			UpdateState();
 		}
 
-		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
+		public bool AllLinksValid { get { return (InputLinks.Count(l => !l.IsValid) + OutputLinks.Count(l => !l.IsValid) == 0); } }
+
+		public virtual bool UpdateState()
+		{
+			if (State == NodeState.Clean && !AllLinksValid)
+			{
+				State = NodeState.Error;
+				return true;
+			}
+			return false;
+		}
+
+		private void Graph_OnOptionsChanged(object graph, EventArgs e)
+		{
+			if (UpdateState())
+				OnNodeStateChanged();
+		}
+
+		protected virtual void OnNodeStateChanged() { NodeStateChanged?.Invoke(this, EventArgs.Empty); }
+
+		public abstract double GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
+		public abstract double GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
 
 		public double GetSuppliedRate(Item item)
 		{
@@ -154,7 +104,103 @@ namespace Foreman
 
 		public bool ManualRateNotMet()
 		{
-			return (RateType == RateType.Manual) && Math.Abs(ActualRate - DesiredRate) > 0.0001;
+			return (RateType == RateType.Manual) && Math.Abs(ActualRatePerSec - DesiredRatePerSec) > 0.0001;
 		}
+
+		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
+	}
+
+	public class ReadOnlyBaseNode
+	{
+		public int NodeID { get { return MyNode.NodeID; } }
+		public Point Location { get { return MyNode.Location; } }
+		public IEnumerable<Item> Inputs { get { return MyNode.Inputs; } }
+		public IEnumerable<Item> Outputs { get { return MyNode.Outputs; } }
+
+		public IEnumerable<ReadOnlyNodeLink> InputLinks { get { foreach (NodeLink nodeLink in MyNode.InputLinks) yield return nodeLink.ReadOnlyLink; } }
+		public IEnumerable<ReadOnlyNodeLink> OutputLinks { get { foreach (NodeLink nodeLink in MyNode.OutputLinks) yield return nodeLink.ReadOnlyLink; } }
+
+		public RateType RateType { get { return MyNode.RateType; } }
+		public double ActualRate { get { return MyNode.ActualRate; } }
+		public double DesiredRate { get { return MyNode.DesiredRate; } }
+		public NodeState State { get { return MyNode.State; } }
+
+		public double GetConsumeRate(Item item) => MyNode.GetConsumeRate(item);
+		public double GetSupplyRate(Item item) => MyNode.GetSupplyRate(item);
+		public double GetSuppliedRate(Item item) => MyNode.GetSuppliedRate(item);
+		public bool IsOversupplied() => MyNode.IsOversupplied();
+		public bool IsOversupplied(Item item) => MyNode.IsOversupplied(item);
+		public bool ManualRateNotMet() => MyNode.ManualRateNotMet();
+
+		private readonly BaseNode MyNode;
+
+		public event EventHandler<EventArgs> NodeStateChanged;
+
+		public ReadOnlyBaseNode(BaseNode node)
+		{
+			MyNode = node;
+			MyNode.NodeStateChanged += Node_NodeStateChanged;
+		}
+
+		private void Node_NodeStateChanged(object sender, EventArgs e)
+		{
+			NodeStateChanged?.Invoke(this, EventArgs.Empty);
+		}
+
+		public override string ToString() { return "RO: " + MyNode.ToString(); }
+	}
+
+
+	public abstract class BaseNodeController
+	{
+		public int NodeID { get { return MyNode.NodeID; } }
+		public Point Location { get { return MyNode.Location; } set { if (MyNode.Location != value) { MyNode.Location = value; } } }
+
+		public IEnumerable<Item> Inputs { get { return MyNode.Inputs; } }
+		public IEnumerable<Item> Outputs { get { return MyNode.Inputs; } }
+
+		public IEnumerable<NodeLinkController> InputLinks { get { foreach (NodeLink link in MyNode.InputLinks) yield return link.Controller; } }
+		public IEnumerable<NodeLinkController> OutputLinks { get { foreach (NodeLink link in MyNode.OutputLinks) yield return link.Controller; } }
+
+		public RateType RateType { get { return MyNode.RateType; } set { if (MyNode.RateType != value) { MyNode.RateType = value; } } }
+
+		public event EventHandler<EventArgs> NodeStateChanged;
+
+		private readonly BaseNode MyNode;
+
+		protected BaseNodeController(BaseNode myNode)
+		{
+			MyNode = myNode;
+			MyNode.NodeStateChanged += MyNode_NodeStateChanged;
+		}
+
+		private void MyNode_NodeStateChanged(object sender, EventArgs e)
+		{
+			NodeStateChanged?.Invoke(this, EventArgs.Empty);
+		}
+
+		public abstract List<string> GetErrors();
+		public abstract List<string> GetWarnings();
+		public abstract Dictionary<string, Action> GetErrorResolutions();
+		public abstract Dictionary<string, Action> GetWarningResolutions();
+
+		protected Dictionary<string, Action> GetInvalidConnectionResolutions()
+		{
+			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+			if (!MyNode.AllLinksValid)
+			{
+				resolutions.Add("Delete invalid links", new Action(() =>
+				{
+					foreach (NodeLinkController invalidLink in InputLinks.Where(l => l.IsValid))
+						invalidLink.Delete();
+					foreach (NodeLinkController invalidLink in OutputLinks.Where(l => l.IsValid))
+						invalidLink.Delete();
+				}));
+			}
+			return resolutions;
+		}
+
+		public void Delete() { MyNode.MyGraph.DeleteNode(MyNode.ReadOnlyNode); }
+		public override string ToString() { return "C: " + MyNode.ToString(); }
 	}
 }

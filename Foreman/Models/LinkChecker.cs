@@ -6,12 +6,12 @@ namespace Foreman
 {
 	static class LinkChecker
 	{
-		public static bool IsPossibleConnection(Item item, BaseNode supplier, BaseNode consumer)
+		public static bool IsPossibleConnection(Item item, ReadOnlyBaseNode supplier, ReadOnlyBaseNode consumer)
 		{
 			return supplier.Outputs.Contains(item) && consumer.Inputs.Contains(item);
 		}
 
-		public static bool IsValidTemperatureConnection(Item item, BaseNode supplier, BaseNode consumer)
+		public static bool IsValidTemperatureConnection(Item item, ReadOnlyBaseNode supplier, ReadOnlyBaseNode consumer)
 		{
 			if (!IsPossibleConnection(item, supplier, consumer))
 				return false;
@@ -26,7 +26,7 @@ namespace Foreman
 			return consumerTempRange.Contains(supplierTempRange);
 		}
 
-		public static fRange GetTemperatureRange(Item item, BaseNode node, LinkType direction)
+		public static fRange GetTemperatureRange(Item item, ReadOnlyBaseNode node, LinkType direction)
 		{
 			//LinkType.Input : means we have a bunch of nodes ABOVE consuming the items, and we are connecting them to a single source
 			//					SO: we need to check all directly-up connected recipes for min&max temp consumption. minTemp is set to be the maximum minTemp of each consumer, and maxTemp is set to be the minimum maxTemp of each consumer
@@ -40,25 +40,25 @@ namespace Foreman
 			double maxTemp = (direction == LinkType.Input) ? double.PositiveInfinity : double.NegativeInfinity;
 
 			bool gotOne = false;
-			Queue<BaseNode> neQueue = new Queue<BaseNode>(); //RecipeNode or PassthroughNodes
-			if (node is RecipeNode || node is PassthroughNode)
+			Queue<ReadOnlyBaseNode> neQueue = new Queue<ReadOnlyBaseNode>(); //RecipeNode or PassthroughNodes
+			if (node is ReadOnlyRecipeNode || node is ReadOnlyPassthroughNode)
 				neQueue.Enqueue(node);
 			while (neQueue.Count > 0)
 			{
-				BaseNode cNode = neQueue.Dequeue();
-				if (cNode is PassthroughNode)
+				ReadOnlyBaseNode cNode = neQueue.Dequeue();
+				if (cNode is ReadOnlyPassthroughNode)
 				{
 					if (direction == LinkType.Input)
-						foreach (NodeLink link in cNode.OutputLinks.Where(n => n.Consumer is RecipeNode || n.Consumer is PassthroughNode))
+						foreach (ReadOnlyNodeLink link in cNode.OutputLinks.Where(n => n.Consumer is ReadOnlyRecipeNode || n.Consumer is ReadOnlyPassthroughNode))
 							neQueue.Enqueue(link.Consumer);
 					else //if(direction == LinkType.Output)
-						foreach (NodeLink link in cNode.InputLinks.Where(n => n.Supplier is RecipeNode || n.Supplier is PassthroughNode))
+						foreach (ReadOnlyNodeLink link in cNode.InputLinks.Where(n => n.Supplier is ReadOnlyRecipeNode || n.Supplier is ReadOnlyPassthroughNode))
 							neQueue.Enqueue(link.Supplier);
 				}
 				else //RecipeNode
 				{
 					gotOne = true;
-					Recipe recipe = ((RecipeNode)cNode).BaseRecipe;
+					Recipe recipe = ((ReadOnlyRecipeNode)cNode).BaseRecipe;
 					if (direction == LinkType.Input && recipe.IngredientSet.ContainsKey(item)) //have to check for ingredient inclusion due to fuel/fuel-remains
 					{
 						minTemp = Math.Max(minTemp, recipe.IngredientTemperatureMap[item].Min);

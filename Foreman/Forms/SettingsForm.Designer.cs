@@ -94,15 +94,19 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
-			this.ShowNodeRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.HighLodRadioButton = new System.Windows.Forms.RadioButton();
-			this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.MediumLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.LowLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.RecipeEditPanelPositionLockCheckBox = new System.Windows.Forms.CheckBox();
+			this.ShowNodeRecipeCheckBox = new System.Windows.Forms.CheckBox();
+			this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
+			this.label8 = new System.Windows.Forms.Label();
+			this.NodeCountForSimpleViewInput = new System.Windows.Forms.NumericUpDown();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
+			this.ScaleAssemblerCountCheckBox = new System.Windows.Forms.CheckBox();
+			this.ScaleItemFlowCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -127,10 +131,12 @@
 			this.groupBox7.SuspendLayout();
 			this.AdvancedOptionsTable.SuspendLayout();
 			this.groupBox6.SuspendLayout();
+			this.tableLayoutPanel3.SuspendLayout();
 			this.groupBox5.SuspendLayout();
 			this.DefaultsTable.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.NodeGraphicsTable.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.NodeCountForSimpleViewInput)).BeginInit();
 			this.FormButtonsTable.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -897,25 +903,28 @@
 			this.groupBox6.Controls.Add(this.tableLayoutPanel3);
 			this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox6.Location = new System.Drawing.Point(3, 215);
+			this.groupBox6.Location = new System.Drawing.Point(3, 241);
 			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(464, 222);
+			this.groupBox6.Size = new System.Drawing.Size(464, 196);
 			this.groupBox6.TabIndex = 2;
 			this.groupBox6.TabStop = false;
+			this.groupBox6.Text = "Time Unit Options:";
 			// 
 			// tableLayoutPanel3
 			// 
 			this.tableLayoutPanel3.ColumnCount = 2;
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32.3913F));
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 67.6087F));
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel3.Controls.Add(this.ScaleAssemblerCountCheckBox, 0, 0);
+			this.tableLayoutPanel3.Controls.Add(this.ScaleItemFlowCheckBox, 0, 1);
 			this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
 			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
 			this.tableLayoutPanel3.RowCount = 2;
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 203);
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 177);
 			this.tableLayoutPanel3.TabIndex = 1;
 			// 
 			// groupBox5
@@ -925,7 +934,7 @@
 			this.groupBox5.Controls.Add(this.DefaultsTable);
 			this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox5.Location = new System.Drawing.Point(3, 120);
+			this.groupBox5.Location = new System.Drawing.Point(3, 146);
 			this.groupBox5.Name = "groupBox5";
 			this.groupBox5.Size = new System.Drawing.Size(464, 89);
 			this.groupBox5.TabIndex = 1;
@@ -1011,7 +1020,7 @@
 			this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(464, 111);
+			this.groupBox3.Size = new System.Drawing.Size(464, 137);
 			this.groupBox3.TabIndex = 0;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Node Graphics:";
@@ -1026,13 +1035,15 @@
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.NodeGraphicsTable.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 2);
 			this.NodeGraphicsTable.Controls.Add(this.HighLodRadioButton, 3, 0);
-			this.NodeGraphicsTable.Controls.Add(this.DynamicLWCheckBox, 0, 1);
 			this.NodeGraphicsTable.Controls.Add(this.label6, 0, 0);
 			this.NodeGraphicsTable.Controls.Add(this.MediumLodRadioButton, 2, 0);
 			this.NodeGraphicsTable.Controls.Add(this.LowLodRadioButton, 1, 0);
-			this.NodeGraphicsTable.Controls.Add(this.RecipeEditPanelPositionLockCheckBox, 0, 3);
+			this.NodeGraphicsTable.Controls.Add(this.RecipeEditPanelPositionLockCheckBox, 0, 4);
+			this.NodeGraphicsTable.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 3);
+			this.NodeGraphicsTable.Controls.Add(this.DynamicLWCheckBox, 0, 2);
+			this.NodeGraphicsTable.Controls.Add(this.label8, 0, 1);
+			this.NodeGraphicsTable.Controls.Add(this.NodeCountForSimpleViewInput, 1, 1);
 			this.NodeGraphicsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.NodeGraphicsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.NodeGraphicsTable.Location = new System.Drawing.Point(3, 16);
@@ -1044,44 +1055,20 @@
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 92);
+			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 118);
 			this.NodeGraphicsTable.TabIndex = 28;
-			// 
-			// ShowNodeRecipeCheckBox
-			// 
-			this.ShowNodeRecipeCheckBox.AutoSize = true;
-			this.NodeGraphicsTable.SetColumnSpan(this.ShowNodeRecipeCheckBox, 4);
-			this.ShowNodeRecipeCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 49);
-			this.ShowNodeRecipeCheckBox.Name = "ShowNodeRecipeCheckBox";
-			this.ShowNodeRecipeCheckBox.Size = new System.Drawing.Size(232, 17);
-			this.ShowNodeRecipeCheckBox.TabIndex = 6;
-			this.ShowNodeRecipeCheckBox.Text = "Show Recipes";
-			this.ShowNodeRecipeCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// HighLodRadioButton
 			// 
 			this.HighLodRadioButton.AutoSize = true;
 			this.HighLodRadioButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.HighLodRadioButton.Location = new System.Drawing.Point(188, 3);
+			this.HighLodRadioButton.Location = new System.Drawing.Point(299, 3);
 			this.HighLodRadioButton.Name = "HighLodRadioButton";
 			this.HighLodRadioButton.Size = new System.Drawing.Size(47, 17);
 			this.HighLodRadioButton.TabIndex = 10;
 			this.HighLodRadioButton.TabStop = true;
 			this.HighLodRadioButton.Text = "High";
 			this.HighLodRadioButton.UseVisualStyleBackColor = true;
-			// 
-			// DynamicLWCheckBox
-			// 
-			this.DynamicLWCheckBox.AutoSize = true;
-			this.NodeGraphicsTable.SetColumnSpan(this.DynamicLWCheckBox, 4);
-			this.DynamicLWCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 26);
-			this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
-			this.DynamicLWCheckBox.Size = new System.Drawing.Size(232, 17);
-			this.DynamicLWCheckBox.TabIndex = 4;
-			this.DynamicLWCheckBox.Text = "Dynamic Link-Width";
-			this.DynamicLWCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// label6
 			// 
@@ -1090,7 +1077,7 @@
 			this.label6.Location = new System.Drawing.Point(3, 3);
 			this.label6.Margin = new System.Windows.Forms.Padding(3);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(76, 17);
+			this.label6.Size = new System.Drawing.Size(187, 17);
 			this.label6.TabIndex = 7;
 			this.label6.Text = "Level of detail:";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1099,7 +1086,7 @@
 			// 
 			this.MediumLodRadioButton.AutoSize = true;
 			this.MediumLodRadioButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.MediumLodRadioButton.Location = new System.Drawing.Point(136, 3);
+			this.MediumLodRadioButton.Location = new System.Drawing.Point(247, 3);
 			this.MediumLodRadioButton.Name = "MediumLodRadioButton";
 			this.MediumLodRadioButton.Size = new System.Drawing.Size(46, 17);
 			this.MediumLodRadioButton.TabIndex = 9;
@@ -1111,7 +1098,7 @@
 			// 
 			this.LowLodRadioButton.AutoSize = true;
 			this.LowLodRadioButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.LowLodRadioButton.Location = new System.Drawing.Point(85, 3);
+			this.LowLodRadioButton.Location = new System.Drawing.Point(196, 3);
 			this.LowLodRadioButton.Name = "LowLodRadioButton";
 			this.LowLodRadioButton.Size = new System.Drawing.Size(45, 17);
 			this.LowLodRadioButton.TabIndex = 8;
@@ -1123,13 +1110,65 @@
 			// 
 			this.RecipeEditPanelPositionLockCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.RecipeEditPanelPositionLockCheckBox, 4);
-			this.RecipeEditPanelPositionLockCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 72);
+			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 98);
 			this.RecipeEditPanelPositionLockCheckBox.Name = "RecipeEditPanelPositionLockCheckBox";
-			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(232, 17);
+			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(191, 17);
 			this.RecipeEditPanelPositionLockCheckBox.TabIndex = 11;
-			this.RecipeEditPanelPositionLockCheckBox.Text = "Lock Recipe Editor to TL corner";
+			this.RecipeEditPanelPositionLockCheckBox.Text = "Lock recipe editor to top left corner";
 			this.RecipeEditPanelPositionLockCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// ShowNodeRecipeCheckBox
+			// 
+			this.ShowNodeRecipeCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.ShowNodeRecipeCheckBox, 4);
+			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 75);
+			this.ShowNodeRecipeCheckBox.Name = "ShowNodeRecipeCheckBox";
+			this.ShowNodeRecipeCheckBox.Size = new System.Drawing.Size(119, 17);
+			this.ShowNodeRecipeCheckBox.TabIndex = 6;
+			this.ShowNodeRecipeCheckBox.Text = "Show recipe tool tip";
+			this.ShowNodeRecipeCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// DynamicLWCheckBox
+			// 
+			this.DynamicLWCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.DynamicLWCheckBox, 4);
+			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 52);
+			this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
+			this.DynamicLWCheckBox.Size = new System.Drawing.Size(114, 17);
+			this.DynamicLWCheckBox.TabIndex = 4;
+			this.DynamicLWCheckBox.Text = "Dynamic link-width";
+			this.DynamicLWCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label8.Location = new System.Drawing.Point(3, 26);
+			this.label8.Margin = new System.Windows.Forms.Padding(3);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(187, 20);
+			this.label8.TabIndex = 12;
+			this.label8.Text = "Maximum number of graphical objects:";
+			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// NodeCountForSimpleViewInput
+			// 
+			this.NodeGraphicsTable.SetColumnSpan(this.NodeCountForSimpleViewInput, 2);
+			this.NodeCountForSimpleViewInput.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.NodeCountForSimpleViewInput.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+			this.NodeCountForSimpleViewInput.Location = new System.Drawing.Point(196, 26);
+			this.NodeCountForSimpleViewInput.Maximum = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
+			this.NodeCountForSimpleViewInput.Name = "NodeCountForSimpleViewInput";
+			this.NodeCountForSimpleViewInput.Size = new System.Drawing.Size(97, 20);
+			this.NodeCountForSimpleViewInput.TabIndex = 13;
 			// 
 			// FormButtonsTable
 			// 
@@ -1156,6 +1195,26 @@
 			this.RecipeToolTip.InitialDelay = 100000;
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
+			// 
+			// ScaleAssemblerCountCheckBox
+			// 
+			this.ScaleAssemblerCountCheckBox.AutoSize = true;
+			this.ScaleAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 3);
+			this.ScaleAssemblerCountCheckBox.Name = "ScaleAssemblerCountCheckBox";
+			this.ScaleAssemblerCountCheckBox.Size = new System.Drawing.Size(212, 17);
+			this.ScaleAssemblerCountCheckBox.TabIndex = 0;
+			this.ScaleAssemblerCountCheckBox.Text = "Scale fixed factory numbers by time unit";
+			this.ScaleAssemblerCountCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// ScaleItemFlowCheckBox
+			// 
+			this.ScaleItemFlowCheckBox.AutoSize = true;
+			this.ScaleItemFlowCheckBox.Location = new System.Drawing.Point(3, 26);
+			this.ScaleItemFlowCheckBox.Name = "ScaleItemFlowCheckBox";
+			this.ScaleItemFlowCheckBox.Size = new System.Drawing.Size(234, 17);
+			this.ScaleItemFlowCheckBox.TabIndex = 1;
+			this.ScaleItemFlowCheckBox.Text = "Scale fixed item/fluid throughput by time unit";
+			this.ScaleItemFlowCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
@@ -1209,6 +1268,8 @@
 			this.AdvancedOptionsTable.ResumeLayout(false);
 			this.AdvancedOptionsTable.PerformLayout();
 			this.groupBox6.ResumeLayout(false);
+			this.tableLayoutPanel3.ResumeLayout(false);
+			this.tableLayoutPanel3.PerformLayout();
 			this.groupBox5.ResumeLayout(false);
 			this.groupBox5.PerformLayout();
 			this.DefaultsTable.ResumeLayout(false);
@@ -1217,6 +1278,7 @@
 			this.groupBox3.PerformLayout();
 			this.NodeGraphicsTable.ResumeLayout(false);
 			this.NodeGraphicsTable.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.NodeCountForSimpleViewInput)).EndInit();
 			this.FormButtonsTable.ResumeLayout(false);
 			this.FormButtonsTable.PerformLayout();
 			this.ResumeLayout(false);
@@ -1298,5 +1360,9 @@
 		private System.Windows.Forms.RadioButton LowLodRadioButton;
 		private System.Windows.Forms.CheckBox RecipeEditPanelPositionLockCheckBox;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.NumericUpDown NodeCountForSimpleViewInput;
+		private System.Windows.Forms.CheckBox ScaleAssemblerCountCheckBox;
+		private System.Windows.Forms.CheckBox ScaleItemFlowCheckBox;
 	}
 }

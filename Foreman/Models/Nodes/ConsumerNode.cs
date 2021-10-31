@@ -6,40 +6,88 @@ using System.Runtime.Serialization;
 
 namespace Foreman
 {
-	public interface ConsumerNode : BaseNode
+	public class ConsumerNode : BaseNode
 	{
-		Item ConsumedItem { get; }
-	}
+		private readonly BaseNodeController controller;
+		public override BaseNodeController Controller { get{ return controller; } }
 
-	public class ConsumerNodePrototype : BaseNodePrototype, ConsumerNode
-	{
-		public Item ConsumedItem { get; private set; }
+		public readonly Item ConsumedItem;
 
-		public override string DisplayName { get { return ConsumedItem.FriendlyName; } }
 		public override IEnumerable<Item> Inputs { get { yield return ConsumedItem; } }
 		public override IEnumerable<Item> Outputs { get { return new Item[0]; } }
 
-		public ConsumerNodePrototype(ProductionGraph graph, int nodeID, Item item) : base(graph, nodeID)
+		public ConsumerNode(ProductionGraph graph, int nodeID, Item item) : base(graph, nodeID)
 		{
 			ConsumedItem = item;
-			RateType = RateType.Manual;
-			ActualRate = 1f;
+			controller = ConsumerNodeController.GetController(this);
+			ReadOnlyNode = new ReadOnlyConsumerNode(this);
 		}
 
-		public override double GetConsumeRate(Item item) { return (double)Math.Round(ActualRate, RoundingDP); }
+		public override bool UpdateState()
+		{
+			NodeState oldState = State;
+			State = (ConsumedItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean;
+			base.UpdateState();
+			if (oldState != State)
+			{
+				OnNodeStateChanged();
+				return true;
+			}
+			return false;
+		}
+
+		public override double GetConsumeRate(Item item) { return ActualRate; }
 		public override double GetSupplyRate(Item item) { throw new ArgumentException("Consumer does not supply! nothing should be asking for the supply rate"); }
 
-		internal override double inputRateFor(Item item) { return 1; }
+		internal override double inputRateFor(Item item) { return MyGraph.GetRateMultipler(); }
 		internal override double outputRateFor(Item item) { throw new ArgumentException("Consumer should not have outputs!"); }
 
-		public override void UpdateState() { State = (ConsumedItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean; }
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("NodeType", NodeType.Consumer);
+			info.AddValue("NodeID", NodeID);
+			info.AddValue("Location", Location);
+			info.AddValue("Item", ConsumedItem.Name);
+			info.AddValue("RateType", RateType);
+			info.AddValue("ActualRate", ActualRatePerSec);
+			if (RateType == RateType.Manual)
+				info.AddValue("DesiredRate", DesiredRatePerSec);
+		}
+
+		public override string ToString() { return string.Format("Consumption node for: {0}", ConsumedItem.Name); }
+	}
+
+	public class ReadOnlyConsumerNode : ReadOnlyBaseNode
+	{
+		public Item ConsumedItem { get { return MyNode.ConsumedItem; } }
+
+		private readonly ConsumerNode MyNode;
+
+		public ReadOnlyConsumerNode(ConsumerNode node) : base(node) { MyNode = node; }
+
+	}
+
+	public class ConsumerNodeController : BaseNodeController
+	{
+		public Item ConsumedItem { get { return MyNode.ConsumedItem; } }
+
+		private readonly ConsumerNode MyNode;
+
+		protected ConsumerNodeController(ConsumerNode myNode) : base(myNode) { MyNode = myNode; }
+
+		public static ConsumerNodeController GetController(ConsumerNode node)
+		{
+			if (node.Controller != null)
+				return (ConsumerNodeController)node.Controller;
+			return new ConsumerNodeController(node);
+		}
 
 		public override List<string> GetErrors()
 		{
 			List<string> errors = new List<string>();
 			if (ConsumedItem.IsMissing)
 				errors.Add(string.Format("> Item \"{0}\" doesnt exist in preset!", ConsumedItem.FriendlyName));
-			else if (!AllLinksValid)
+			else if (!MyNode.AllLinksValid)
 				errors.Add("> Some links are invalid!");
 			return errors;
 		}
@@ -57,19 +105,5 @@ namespace Foreman
 
 		public override List<string> GetWarnings() { Trace.Fail("Consumer node never has the warning state!"); return null; }
 		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Consumer node never has the warning state!"); return null; }
-
-		public override void GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			info.AddValue("NodeType", NodeType.Consumer);
-			info.AddValue("NodeID", NodeID);
-			info.AddValue("Location", Location);
-			info.AddValue("Item", ConsumedItem.Name);
-			info.AddValue("RateType", RateType);
-			info.AddValue("ActualRate", ActualRate);
-			if (RateType == RateType.Manual)
-				info.AddValue("DesiredRate", DesiredRate);
-		}
-
-		public override string ToString() { return string.Format("Consumption node for: {0}", ConsumedItem.Name); }
 	}
 }

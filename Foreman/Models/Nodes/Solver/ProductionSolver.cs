@@ -255,7 +255,7 @@ namespace Foreman
 
 		private Variable variableFor(NodeLink inputLink, EndpointType type)
 		{
-			return variableFor(Tuple.Create(inputLink, type), makeName("link", type, inputLink.Consumer.DisplayName, inputLink.Item.FriendlyName));
+			return variableFor(Tuple.Create(inputLink, type), makeName("link", type, inputLink.Consumer.ToString(), inputLink.Item.FriendlyName));
 		}
 
 		private string makeName(params object[] components)
@@ -265,10 +265,10 @@ namespace Foreman
 
 		private Variable variableFor(BaseNode node, RateType type = RateType.ACTUAL)
 		{
-			return variableFor(Tuple.Create(node, type), makeName("node", type, node.DisplayName));
+			return variableFor(Tuple.Create(node, type), makeName("node", type, node.ToString()));
 		}
 
-		private Variable variableFor(object key, String name)
+		private Variable variableFor(object key, string name)
 		{
 			if (allVariables.ContainsKey(key))
 			{

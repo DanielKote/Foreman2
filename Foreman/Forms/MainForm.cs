@@ -54,6 +54,10 @@ namespace Foreman
 					Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
 				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
 
+				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
+
+				RateOptionsDropDown.Items.AddRange(ProductionGraphViewer.RateUnitNames);
+				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
 				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
@@ -186,6 +190,7 @@ namespace Foreman
 			options.SelectedPreset = options.Presets[0];
 
 			options.LevelOfDetail = GraphViewer.LevelOfDetail;
+			options.NodeCountForSimpleView = GraphViewer.NodeCountForSimpleView;
 			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
 			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
@@ -200,7 +205,7 @@ namespace Foreman
 				form.Top = this.Top + 50;
 				form.ShowDialog();
 
-				if (options.SelectedPreset != form.Options.SelectedPreset) //different preset -> need to reload datacache
+				if (form.Options.SelectedPreset != options.Presets[0]) //different preset -> need to reload datacache
 				{
 					Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset.Name;
 					List<Preset> validPresets = GetValidPresetsList();
@@ -209,6 +214,8 @@ namespace Foreman
 
 				GraphViewer.LevelOfDetail = options.LevelOfDetail;
 				Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
+				GraphViewer.NodeCountForSimpleView = options.NodeCountForSimpleView;
+				Properties.Settings.Default.NodeCountForSimpleView = options.NodeCountForSimpleView;
 				GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
 				Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
 				GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;

@@ -8,21 +8,21 @@ using System.Linq;
 
 namespace Foreman
 {
-	public static partial class GraphOptimisations
+	public partial class ProductionGraph
 	{
-		private static int updateCounter = 0;
-		public static void FindOptimalGraphToSatisfyFixedNodes(this ProductionGraph graph)
+		private int updateCounter = 0;
+		public void OptimizeGraphNodeValues()
 		{
-			foreach (BaseNodePrototype node in graph.Nodes.Where(n => n.RateType == RateType.Auto))
+			foreach (BaseNode node in Nodes.Where(n => n.RateType == RateType.Auto))
 				node.ResetSolvedRate();
 
-			foreach (var nodeGroup in graph.GetConnectedComponents())
+			foreach (var nodeGroup in GetConnectedComponents())
 				OptimiseNodeGroup(nodeGroup);
 
 			Debug.WriteLine("UPDATE #" + updateCounter++);
 		}
 
-		private static void OptimiseNodeGroup(IEnumerable<BaseNode> nodeGroup)
+		private void OptimiseNodeGroup(IEnumerable<BaseNode> nodeGroup)
 		{
 			double maxRatio = 1;
 			foreach (RecipeNode node in nodeGroup.Where(n => n is RecipeNode))
@@ -30,13 +30,13 @@ namespace Foreman
 
 			ProductionSolver solver = new ProductionSolver(maxRatio);
 
-			foreach (BaseNodePrototype node in nodeGroup)
+			foreach (BaseNode node in nodeGroup)
 				node.AddConstraints(solver);
 
 			var solution = solver.Solve();
 
 #if VERBOSEDEBUG
-            Debug.WriteLine(solver.ToString());
+        Debug.WriteLine(solver.ToString());
 #endif
 
 			// TODO: Handle BIG NUMBERS
@@ -53,12 +53,12 @@ namespace Foreman
 				Console.WriteLine(solver.ToString());
 			}
 
-			foreach (BaseNodePrototype node in nodeGroup)
+			foreach (BaseNode node in nodeGroup)
 			{
-				node.SetSolvedRate(solution?.ActualRate(node) ?? 0, false);
-				foreach (NodeLinkPrototype link in node.outputLinks)
+				node.SetSolvedRate(solution?.ActualRate(node) ?? 0);
+				foreach (NodeLink link in node.OutputLinks)
 					link.Throughput = solution?.Throughput(link) ?? 0;
-				foreach (NodeLinkPrototype link in node.inputLinks)
+				foreach (NodeLink link in node.InputLinks)
 					link.Throughput = solution?.Throughput(link) ?? 0;
 
 			}
@@ -67,17 +67,16 @@ namespace Foreman
 
 	// Using partial classes here to group all the constraints related code into this file so it's
 	// easy to understand as a whole.
-	public abstract partial class BaseNodePrototype
+	public abstract partial class BaseNode
 	{
 		internal void ResetSolvedRate()
 		{
-			ActualRate = 0;
+			ActualRatePerSec = 0;
 		}
 
-		internal virtual void SetSolvedRate(double rate, bool error)
+		internal virtual void SetSolvedRate(double rate)
 		{
-			SolverError = error;
-			ActualRate = rate;
+			ActualRatePerSec = rate;
 		}
 
 		internal void AddConstraints(ProductionSolver solver)
@@ -85,7 +84,7 @@ namespace Foreman
 			solver.AddNode(this);
 
 			if (RateType == RateType.Manual)
-				solver.AddTarget(this, DesiredRate);
+				solver.AddTarget(this, DesiredRatePerSec);
 
 			foreach (var itemInputs in InputLinks.GroupBy(x => x.Item))
 			{

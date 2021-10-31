@@ -8,7 +8,7 @@ namespace Foreman
 	public class AssemblerSelector
 	{
 		public enum Style { Worst, WorstNonBurner, WorstBurner, Best, BestNonBurner, BestBurner, MostModules }
-		public static readonly string[] StyleNames = new string[] { "Worst", "Worst non-Burer", "Worst Burner", "Best", "Best non-Burner", "Best Burner", "Most Modules" };
+		public static readonly string[] StyleNames = new string[] { "Worst", "Worst Non-Burner", "Worst Burner", "Best", "Best Non-Burner", "Best Burner", "Most Modules" };
 
 		public Style DefaultSelectionStyle { get; set; }
 

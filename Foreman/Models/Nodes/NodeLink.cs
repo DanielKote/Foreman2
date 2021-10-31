@@ -4,51 +4,80 @@ using System.Runtime.Serialization;
 
 namespace Foreman
 {
-	public interface NodeLink : ISerializable
-	{
-		BaseNode Supplier { get; }
-		BaseNode Consumer { get; }
-		Item Item { get; }
-		double Throughput { get; }
-		bool IsValid { get; }
-
-		void Delete();
-	}
-
-
 	[Serializable]
-	public class NodeLinkPrototype : NodeLink
+	public class NodeLink
 	{
-		protected ProductionGraph MyGraph;
+		private readonly NodeLinkController controller;
+		public NodeLinkController Controller { get { return controller; } }
+		public ReadOnlyNodeLink ReadOnlyLink { get; protected set; }
 
-		public BaseNode Supplier { get { return supplier; } }
-		public BaseNode Consumer { get { return consumer; } }
 		public Item Item { get; private set; }
-		public double Throughput { get; set; }
+		public double Throughput { get; internal set; }
 		public bool IsValid { get; private set; }
 
-		internal BaseNodePrototype supplier;
-		internal BaseNodePrototype consumer;
+		public readonly ProductionGraph MyGraph;
 
-		internal NodeLinkPrototype(ProductionGraph myGraph, BaseNodePrototype supplier, BaseNodePrototype consumer, Item item)
+		public readonly BaseNode SupplierNode;
+		public readonly BaseNode ConsumerNode;
+
+		internal NodeLink(ProductionGraph myGraph, BaseNode supplier, BaseNode consumer, Item item)
 		{
-			this.MyGraph = myGraph;
-			this.supplier = supplier;
-			this.consumer = consumer;
+			MyGraph = myGraph;
+			SupplierNode = supplier;
+			ConsumerNode = consumer;
 			Item = item;
 
-			IsValid = item.IsFluid ? LinkChecker.IsValidTemperatureConnection(Item, supplier, consumer) : LinkChecker.IsPossibleConnection(Item, supplier, consumer); //only need to check once -> item & recipe temperatures cant change.
-		}
+			controller = NodeLinkController.GetController(this);
+			ReadOnlyLink = new ReadOnlyNodeLink(this);
 
-		public void Delete() { MyGraph.DeleteLink(this); }
+			IsValid = Item.IsFluid ? LinkChecker.IsValidTemperatureConnection(Item, SupplierNode.ReadOnlyNode, ConsumerNode.ReadOnlyNode) : LinkChecker.IsPossibleConnection(Item, SupplierNode.ReadOnlyNode, ConsumerNode.ReadOnlyNode); //only need to check once -> item & recipe temperatures cant change.
+		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("SupplierID", supplier.NodeID);
-			info.AddValue("ConsumerID", consumer.NodeID);
+			info.AddValue("SupplierID", SupplierNode.NodeID);
+			info.AddValue("ConsumerID", ConsumerNode.NodeID);
 			info.AddValue("Item", Item.Name);
 		}
 
-		public override string ToString() { return string.Format("NodeLink for {0} connecting {1} -> {2}", Item.Name, supplier.NodeID, consumer.NodeID); }
+		public override string ToString() { return string.Format("NodeLink for {0} connecting {1} -> {2}", Item.Name, SupplierNode.NodeID, ConsumerNode.NodeID); }
+	}
+
+	public class ReadOnlyNodeLink
+	{
+		public ReadOnlyBaseNode Supplier { get { return MyLink.ConsumerNode.ReadOnlyNode; } }
+		public ReadOnlyBaseNode Consumer { get { return MyLink.ConsumerNode.ReadOnlyNode; } }
+		public Item Item { get { return MyLink.Item; } }
+		public double Throughput { get { return MyLink.Throughput; } }
+		public bool IsValid { get { return MyLink.IsValid; } }
+
+		private readonly NodeLink MyLink;
+
+		public ReadOnlyNodeLink(NodeLink link) { MyLink = link; }
+
+		public override string ToString() { return "RO: " + MyLink.ToString(); }
+	}
+
+	public class NodeLinkController
+	{
+		public ReadOnlyBaseNode Supplier { get; }
+		public ReadOnlyBaseNode Consumer { get; }
+		public Item Item { get; }
+		public double Throughput { get; }
+		public bool IsValid { get; }
+
+		private readonly NodeLink MyLink;
+
+		protected NodeLinkController(NodeLink link) { MyLink = link; }
+
+		public static NodeLinkController GetController(NodeLink link)
+		{
+			if (link.Controller != null)
+				return (NodeLinkController)link.Controller;
+			return new NodeLinkController(link);
+		}
+
+		public void Delete() { MyLink.MyGraph.DeleteLink(MyLink.ReadOnlyLink); }
+		public override string ToString() { return "C: " + MyLink.ToString(); }
 	}
 }

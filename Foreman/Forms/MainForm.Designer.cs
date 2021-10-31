@@ -90,7 +90,7 @@
 			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
 			this.GraphViewer.Location = new System.Drawing.Point(3, 124);
 			this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-			this.GraphViewer.MaxDetailedObjects = 200;
+			this.GraphViewer.NodeCountForSimpleView = 200;
 			this.GraphViewer.MouseDownElement = null;
 			this.GraphViewer.Name = "GraphViewer";
 			this.GraphViewer.SelectedRateUnit = Foreman.ProductionGraphViewer.RateUnit.Per1Sec;

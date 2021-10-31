@@ -14,24 +14,32 @@ namespace Foreman
 
 	public class NodeEventArgs : EventArgs
 	{
-		public BaseNode node;
-		public NodeEventArgs(BaseNode node) { this.node = node; }
+		public ReadOnlyBaseNode node;
+		public NodeEventArgs(ReadOnlyBaseNode node) { this.node = node; }
 	}
 	public class NodeLinkEventArgs : EventArgs
 	{
-		public NodeLink nodeLink;
-		public NodeLinkEventArgs(NodeLink nodeLink) { this.nodeLink = nodeLink; }
+		public ReadOnlyNodeLink nodeLink;
+		public NodeLinkEventArgs(ReadOnlyNodeLink nodeLink) { this.nodeLink = nodeLink; }
 	}
 
 	[Serializable]
-	public class ProductionGraph : ISerializable
+	public partial class ProductionGraph : ISerializable
 	{
 		public class NewNodeCollection
 		{
-			public List<BaseNode> newNodes { get; private set; }
-			public List<NodeLink> newLinks { get; private set; }
-			public NewNodeCollection() { newNodes = new List<BaseNode>(); newLinks = new List<NodeLink>(); }
+			public List<ReadOnlyBaseNode> newNodes { get; private set; }
+			public List<ReadOnlyNodeLink> newLinks { get; private set; }
+			public NewNodeCollection() { newNodes = new List<ReadOnlyBaseNode>(); newLinks = new List<ReadOnlyNodeLink>(); }
 		}
+
+		public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
+		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
+		private static readonly float[] RateMultiplier = new float[] { 1f, 60f, 300f, 600f, 1800f, 3600f }; //, 21600f, 43200f, 86400f };
+
+		public RateUnit SelectedRateUnit { get; set; }
+		public float GetRateMultipler() { return RateMultiplier[(int)SelectedRateUnit]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
+		public string GetRateName() { return RateUnitNames[(int)SelectedRateUnit]; }
 
 		public const double MaxSetFlow = 10000000000000; //10 trillion should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
 		private const int XBorder = 200;
@@ -43,15 +51,17 @@ namespace Foreman
 		public ModuleSelector ModuleSelector { get; private set; }
 		public FuelSelector FuelSelector { get; private set; }
 
-		public IReadOnlyCollection<BaseNode> Nodes { get { return nodes; } }
-		public IReadOnlyCollection<NodeLink> NodeLinks { get { return nodeLinks; } }
-		public List<BaseNode> SerializeNodeList { get; set; } //if this isnt null then the serialized production graph will only contain these nodes (and links between them)
+		public IEnumerable<ReadOnlyBaseNode> Nodes { get { return nodes.Select(node => node.ReadOnlyNode); } }
+		public IEnumerable<ReadOnlyNodeLink> NodeLinks { get { return nodeLinks.Select(link => link.ReadOnlyLink); } }
+		public HashSet<int> SerializeNodeIdSet { get; set; } //if this isnt null then the serialized production graph will only contain these nodes (and links between them)
 
 		public event EventHandler<NodeEventArgs> NodeAdded;
 		public event EventHandler<NodeEventArgs> NodeDeleted;
 		public event EventHandler<NodeLinkEventArgs> LinkAdded;
 		public event EventHandler<NodeLinkEventArgs> LinkDeleted;
 		public event EventHandler<EventArgs> NodeValuesUpdated;
+
+		public event EventHandler<EventArgs> GraphOptionsChanged;
 
 		public Rectangle Bounds
 		{
@@ -76,14 +86,18 @@ namespace Foreman
 			}
 		}
 
-		private HashSet<BaseNodePrototype> nodes;
-		private HashSet<NodeLinkPrototype> nodeLinks;
+		private HashSet<BaseNode> nodes;
+		private HashSet<NodeLink> nodeLinks;
+		private Dictionary<ReadOnlyBaseNode, BaseNode> roToNode;
+		private Dictionary<ReadOnlyNodeLink, NodeLink> roToLink;
 		private int lastNodeID;
 
 		public ProductionGraph()
 		{
-			nodes = new HashSet<BaseNodePrototype>();
-			nodeLinks = new HashSet<NodeLinkPrototype>();
+			nodes = new HashSet<BaseNode>();
+			nodeLinks = new HashSet<NodeLink>();
+			roToNode = new Dictionary<ReadOnlyBaseNode, BaseNode>();
+			roToLink = new Dictionary<ReadOnlyNodeLink, NodeLink>();
 			lastNodeID = 0;
 
 			AssemblerSelector = new AssemblerSelector();
@@ -91,90 +105,121 @@ namespace Foreman
 			FuelSelector = new FuelSelector();
 		}
 
-		public ConsumerNode CreateConsumerNode(Item item, Point location)
+		public BaseNodeController RequestNodeController(ReadOnlyBaseNode node) { if(roToNode.ContainsKey(node)) return roToNode[node].Controller; return null; }
+
+		public ReadOnlyConsumerNode CreateConsumerNode(Item item, Point location)
 		{
-			ConsumerNodePrototype node = new ConsumerNodePrototype(this, lastNodeID++, item);
+			ConsumerNode node = new ConsumerNode(this, lastNodeID++, item);
 			node.Location = location;
 			nodes.Add(node);
-			NodeAdded?.Invoke(this, new NodeEventArgs(node));
-			return node;
+			roToNode.Add(node.ReadOnlyNode, node);
+			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
+			return (ReadOnlyConsumerNode)node.ReadOnlyNode;
 		}
 
-		public SupplierNode CreateSupplierNode(Item item, Point location)
+		public ReadOnlySupplierNode CreateSupplierNode(Item item, Point location)
 		{
-			SupplierNodePrototype node = new SupplierNodePrototype(this, lastNodeID++, item);
+			SupplierNode node = new SupplierNode(this, lastNodeID++, item);
 			node.Location = location;
 			nodes.Add(node);
-			NodeAdded?.Invoke(this, new NodeEventArgs(node));
-			return node;
+			roToNode.Add(node.ReadOnlyNode, node);
+			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
+			return (ReadOnlySupplierNode)node.ReadOnlyNode;
 		}
 
-		public PassthroughNode CreatePassthroughNode(Item item, Point location)
+		public ReadOnlyPassthroughNode CreatePassthroughNode(Item item, Point location)
 		{
-			PassthroughNodePrototype node = new PassthroughNodePrototype(this, lastNodeID++, item);
+			PassthroughNode node = new PassthroughNode(this, lastNodeID++, item);
 			node.Location = location;
 			nodes.Add(node);
-			NodeAdded?.Invoke(this, new NodeEventArgs(node));
-			return node;
+			roToNode.Add(node.ReadOnlyNode, node);
+			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
+			return (ReadOnlyPassthroughNode)node.ReadOnlyNode;
 		}
 
-		public RecipeNode CreateRecipeNode(Recipe recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
-		private RecipeNode CreateRecipeNode(Recipe recipe, Point location, Action<RecipeNodePrototype> nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
+		public ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
+		private ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location, Action<RecipeNode> nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
 		{
-			RecipeNodePrototype node = new RecipeNodePrototype(this, lastNodeID++, recipe, nodeSetupAction == null);
+			RecipeNode node = new RecipeNode(this, lastNodeID++, recipe);
 			node.Location = location;
 			nodes.Add(node);
+			roToNode.Add(node.ReadOnlyNode, node);
 			nodeSetupAction?.Invoke(node);
-			NodeAdded?.Invoke(this, new NodeEventArgs(node));
-			return node;
+			if(nodeSetupAction == null)
+			{
+				RecipeNodeController rnController = (RecipeNodeController)node.Controller;
+				rnController.AutoSetAssembler();
+				rnController.AutoSetAssemblerModules();
+			}
+			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
+			return (ReadOnlyRecipeNode)node.ReadOnlyNode;
 		}
 
-		public NodeLink CreateLink(BaseNode supplier, BaseNode consumer, Item item)
+		public ReadOnlyNodeLink CreateLink(ReadOnlyBaseNode supplier, ReadOnlyBaseNode consumer, Item item)
 		{
-			BaseNodePrototype supplierP = (BaseNodePrototype)supplier;
-			BaseNodePrototype consumerP = (BaseNodePrototype)consumer;
+			if (!roToNode.ContainsKey(supplier) || !roToNode.ContainsKey(consumer) || !supplier.Outputs.Contains(item) || !consumer.Inputs.Contains(item))
+				Trace.Fail(string.Format("Node link creation called with invalid parameters! consumer:{0}. supplier:{1}. item:{2}.", consumer.ToString(), supplier.ToString(), item.ToString()));
 			if (supplier.OutputLinks.Any(l => l.Item == item && l.Consumer == consumer)) //check for an already existing connection
 				return null;
 
-			NodeLinkPrototype link = new NodeLinkPrototype(this, supplierP, consumerP, item);
-			supplierP.outputLinks.Add(link);
-			consumerP.inputLinks.Add(link);
+			BaseNode supplierNode = roToNode[supplier];
+			BaseNode consumerNode = roToNode[consumer];
+
+			NodeLink link = new NodeLink(this, supplierNode, consumerNode, item);
+			supplierNode.OutputLinks.Add(link);
+			consumerNode.InputLinks.Add(link);
 			nodeLinks.Add(link);
-			LinkAdded?.Invoke(this, new NodeLinkEventArgs(link));
-			return link;
+			roToLink.Add(link.ReadOnlyLink, link);
+			LinkAdded?.Invoke(this, new NodeLinkEventArgs(link.ReadOnlyLink));
+			return link.ReadOnlyLink;
 		}
 
-		public void DeleteNode(BaseNode node)
+		public void DeleteNode(ReadOnlyBaseNode node)
 		{
-			foreach (NodeLinkPrototype link in node.InputLinks.ToList())
+			if (!roToNode.ContainsKey(node))
+				Trace.Fail(string.Format("Node deletion called on a node ({0}) that isnt part of the graph!", node.ToString()));
+
+			foreach (ReadOnlyNodeLink link in node.InputLinks.ToList())
 				DeleteLink(link);
-			foreach (NodeLinkPrototype link in node.OutputLinks.ToList())
+			foreach (ReadOnlyNodeLink link in node.OutputLinks.ToList())
 				DeleteLink(link);
 
-			nodes.Remove((BaseNodePrototype)node);
+			nodes.Remove(roToNode[node]);
+			roToNode.Remove(node);
 			NodeDeleted?.Invoke(this, new NodeEventArgs(node));
 		}
 
-		public void DeleteNodes(IEnumerable<BaseNode> nodes)
+		public void DeleteNodes(IEnumerable<ReadOnlyBaseNode> nodes)
 		{
-			foreach (BaseNode node in nodes)
+			foreach (ReadOnlyBaseNode node in nodes)
 				DeleteNode(node);
 		}
 
-		public void DeleteLink(NodeLink link)
+		public void DeleteLink(ReadOnlyNodeLink link)
 		{
-			NodeLinkPrototype linkP = (NodeLinkPrototype)link;
-			linkP.consumer.inputLinks.Remove(linkP);
-			linkP.supplier.outputLinks.Remove(linkP);
-			nodeLinks.Remove(linkP);
+			if (!roToLink.ContainsKey(link) || !roToNode.ContainsKey(link.Consumer) || !roToNode.ContainsKey(link.Supplier))
+				Trace.Fail(string.Format("Link deletion called with a link ({0}) that isnt part of the graph, or whose node(s) ({1}), ({2}) is/are not part of the graph!", link.ToString(), link.Consumer.ToString(), link.Supplier.ToString()));
+
+			NodeLink nodeLink = roToLink[link];
+			nodeLink.ConsumerNode.InputLinks.Remove(nodeLink);
+			nodeLink.SupplierNode.OutputLinks.Remove(nodeLink);
+
+			nodeLinks.Remove(nodeLink);
+			roToLink.Remove(link);
 			LinkDeleted?.Invoke(this, new NodeLinkEventArgs(link));
 		}
 
-		public void ClearGraph()
+		public void ClearGraph(bool thorough = false)
 		{
+			if(thorough)
+				foreach (BaseNode node in nodes)
+					DeleteNode(node.ReadOnlyNode);
+
 			nodes.Clear();
 			nodeLinks.Clear();
-			SerializeNodeList = null;
+			roToNode.Clear();
+			roToLink.Clear();
+			SerializeNodeIdSet = null;
 			lastNodeID = 0;
 		}
 
@@ -184,41 +229,41 @@ namespace Foreman
 				node.UpdateState();
 		}
 
-		public IEnumerable<BaseNode> GetSuppliers(Item item)
+		public IEnumerable<ReadOnlyBaseNode> GetSuppliers(Item item)
 		{
-			foreach (BaseNode node in Nodes)
+			foreach (ReadOnlyBaseNode node in Nodes)
 				if (node.Outputs.Contains(item))
 					yield return node;
 		}
 
-		public IEnumerable<BaseNode> GetConsumers(Item item)
+		public IEnumerable<ReadOnlyBaseNode> GetConsumers(Item item)
 		{
-			foreach (BaseNode node in Nodes)
+			foreach (ReadOnlyBaseNode node in Nodes)
 				if (node.Inputs.Contains(item))
 					yield return node;
 		}
 
-		public IEnumerable<IEnumerable<BaseNode>> GetConnectedComponents() //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving
+		public IEnumerable<IEnumerable<ReadOnlyBaseNode>> GetConnectedComponents() //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving
 		{
-			HashSet<BaseNode> unvisitedNodes = new HashSet<BaseNode>(Nodes);
+			HashSet<ReadOnlyBaseNode> unvisitedNodes = new HashSet<ReadOnlyBaseNode>(Nodes);
 
-			List<HashSet<BaseNode>> connectedComponents = new List<HashSet<BaseNode>>();
+			List<HashSet<ReadOnlyBaseNode>> connectedComponents = new List<HashSet<ReadOnlyBaseNode>>();
 
 			while (unvisitedNodes.Any())
 			{
-				connectedComponents.Add(new HashSet<BaseNode>());
-				HashSet<BaseNode> toVisitNext = new HashSet<BaseNode>();
+				connectedComponents.Add(new HashSet<ReadOnlyBaseNode>());
+				HashSet<ReadOnlyBaseNode> toVisitNext = new HashSet<ReadOnlyBaseNode>();
 				toVisitNext.Add(unvisitedNodes.First());
 
 				while (toVisitNext.Any())
 				{
-					BaseNode currentNode = toVisitNext.First();
+					ReadOnlyBaseNode currentNode = toVisitNext.First();
 
-					foreach (NodeLink link in currentNode.InputLinks)
+					foreach (ReadOnlyNodeLink link in currentNode.InputLinks)
 						if (unvisitedNodes.Contains(link.Supplier))
 							toVisitNext.Add(link.Supplier);
 
-					foreach (NodeLink link in currentNode.OutputLinks)
+					foreach (ReadOnlyNodeLink link in currentNode.OutputLinks)
 						if (unvisitedNodes.Contains(link.Consumer))
 							toVisitNext.Add(link.Consumer);
 
@@ -235,7 +280,7 @@ namespace Foreman
 		{
 			if (!PauseUpdates)
 			{
-				try { this.FindOptimalGraphToSatisfyFixedNodes(); }
+				try { OptimizeGraphNodeValues(); }
 				catch (OverflowException) { }
 				//If the numbers here are so big they're causing an overflow, there's not much I can do about it. It's already pretty clear in the UI that the values are unusable.
 				//At least this way it doesn't crash...
@@ -246,7 +291,7 @@ namespace Foreman
 		public NewNodeCollection InsertNodesFromJson(DataCache cache, JToken json) //cache is necessary since we will possibly be adding to mssing items/recipes
 		{
 			NewNodeCollection newNodeCollection = new NewNodeCollection();
-			Dictionary<int, BaseNode> oldNodeIndices = new Dictionary<int, BaseNode>(); //the links between the node index (as imported) and the newly created node (which will now have a different index). Used to link up nodes
+			Dictionary<int, ReadOnlyBaseNode> oldNodeIndices = new Dictionary<int, ReadOnlyBaseNode>(); //the links between the node index (as imported) and the newly created node (which will now have a different index). Used to link up nodes
 
 			//check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
 			cache.ProcessImportedItemsSet(json["IncludedItems"].Select(t => (string)t));
@@ -258,7 +303,7 @@ namespace Foreman
 			//add in all the graph nodes
 			foreach (JToken nodeJToken in json["Nodes"].ToList())
 			{
-				BaseNodePrototype newNode = null;
+				BaseNode newNode = null;
 				string[] locationString = ((string)nodeJToken["Location"]).Split(',');
 				Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
 				string itemName; //just an early define
@@ -270,58 +315,59 @@ namespace Foreman
 						case NodeType.Consumer:
 							itemName = (string)nodeJToken["Item"];
 							if (cache.Items.ContainsKey(itemName))
-								newNode = (BaseNodePrototype)CreateConsumerNode(cache.Items[itemName], location);
+								newNode = roToNode[CreateConsumerNode(cache.Items[itemName], location)];
 							else
-								newNode = (BaseNodePrototype)CreateConsumerNode(cache.MissingItems[itemName], location);
-							newNodeCollection.newNodes.Add(newNode);
+								newNode = roToNode[CreateConsumerNode(cache.MissingItems[itemName], location)];
+							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Supplier:
 							itemName = (string)nodeJToken["Item"];
 							if (cache.Items.ContainsKey(itemName))
-								newNode = (BaseNodePrototype)CreateSupplierNode(cache.Items[itemName], location);
+								newNode = roToNode[CreateSupplierNode(cache.Items[itemName], location)];
 							else
-								newNode = (BaseNodePrototype)CreateSupplierNode(cache.MissingItems[itemName], location);
-							newNodeCollection.newNodes.Add(newNode);
+								newNode = roToNode[CreateSupplierNode(cache.MissingItems[itemName], location)];
+							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Passthrough:
 							itemName = (string)nodeJToken["Item"];
 							if (cache.Items.ContainsKey(itemName))
-								newNode = (BaseNodePrototype)CreatePassthroughNode(cache.Items[itemName], location);
+								newNode = roToNode[CreatePassthroughNode(cache.Items[itemName], location)];
 							else
-								newNode = (BaseNodePrototype)CreatePassthroughNode(cache.MissingItems[itemName], location);
-							newNodeCollection.newNodes.Add(newNode);
+								newNode = roToNode[CreatePassthroughNode(cache.MissingItems[itemName], location)];
+							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Recipe:
 							long recipeID = (long)nodeJToken["RecipeID"];
-							newNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location, (rNode) =>
+							newNode = roToNode[CreateRecipeNode(recipeLinks[recipeID], location, (rNode) =>
 							{
-								newNodeCollection.newNodes.Add(rNode);
+								newNodeCollection.newNodes.Add(rNode.ReadOnlyNode);
+								RecipeNodeController rNodeController = (RecipeNodeController)rNode.Controller;
 
 								rNode.NeighbourCount = (double)nodeJToken["Neighbours"];
 
 								string assemblerName = (string)nodeJToken["Assembler"];
 								if (cache.Assemblers.ContainsKey(assemblerName))
-									rNode.SetAssembler(cache.Assemblers[assemblerName]);
+									rNodeController.SetAssembler(cache.Assemblers[assemblerName]);
 								else
-									rNode.SetAssembler(cache.MissingAssemblers[assemblerName]);
+									rNodeController.SetAssembler(cache.MissingAssemblers[assemblerName]);
 
 								foreach (string moduleName in nodeJToken["AssemblerModules"].Select(t => (string)t).ToList())
 								{
 									if (cache.Modules.ContainsKey(moduleName))
-										rNode.AddAssemblerModule(cache.Modules[moduleName]);
+										rNodeController.AddAssemblerModule(cache.Modules[moduleName]);
 									else
-										rNode.AddAssemblerModule(cache.MissingModules[moduleName]);
+										rNodeController.AddAssemblerModule(cache.MissingModules[moduleName]);
 								}
 
 								if (nodeJToken["Fuel"] != null)
 								{
 									if (cache.Items.ContainsKey((string)nodeJToken["Fuel"]))
-										rNode.SetFuel(cache.Items[(string)nodeJToken["Fuel"]]);
+										rNodeController.SetFuel(cache.Items[(string)nodeJToken["Fuel"]]);
 									else
-										rNode.SetFuel(cache.MissingItems[(string)nodeJToken["Fuel"]]);
+										rNodeController.SetFuel(cache.MissingItems[(string)nodeJToken["Fuel"]]);
 								}
 								else if (rNode.SelectedAssembler.IsBurner) //and fuel is null :/
-									rNode.SetFuel(FuelSelector.GetFuel(rNode.SelectedAssembler));
+									rNodeController.SetFuel(FuelSelector.GetFuel(rNode.SelectedAssembler));
 
 								if (nodeJToken["Burnt"] != null)
 								{
@@ -338,23 +384,23 @@ namespace Foreman
 								{
 									string beaconName = (string)nodeJToken["Beacon"];
 									if (cache.Beacons.ContainsKey(beaconName))
-										rNode.SetBeacon(cache.Beacons[beaconName]);
+										rNodeController.SetBeacon(cache.Beacons[beaconName]);
 									else
-										rNode.SetBeacon(cache.MissingBeacons[beaconName]);
+										rNodeController.SetBeacon(cache.MissingBeacons[beaconName]);
 
 									foreach (string moduleName in nodeJToken["BeaconModules"].Select(t => (string)t).ToList())
 									{
 										if (cache.Modules.ContainsKey(moduleName))
-											rNode.AddBeaconModule(cache.Modules[moduleName]);
+											rNodeController.AddBeaconModule(cache.Modules[moduleName]);
 										else
-											rNode.AddBeaconModule(cache.MissingModules[moduleName]);
+											rNodeController.AddBeaconModule(cache.MissingModules[moduleName]);
 									}
 
 									rNode.BeaconCount = (double)nodeJToken["BeaconCount"];
 									rNode.BeaconsPerAssembler = (double)nodeJToken["BeaconsPerAssembler"];
 									rNode.BeaconsConst = (double)nodeJToken["BeaconsConst"];
 								}
-							});
+							})];
 							break;
 						default:
 							throw new Exception();
@@ -366,15 +412,14 @@ namespace Foreman
 						if (newNode is RecipeNode rnewNode)
 							rnewNode.DesiredAssemblerCount = (double)nodeJToken["DesiredAssemblers"];
 						else
-							newNode.DesiredRate = (double)nodeJToken["DesiredRate"];
+							newNode.DesiredRatePerSec = (double)nodeJToken["DesiredRate"];
 					}
 
-					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode);
+					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode.ReadOnlyNode);
 				}
 				catch //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
 				{
-					foreach (BaseNodePrototype node in newNodeCollection.newNodes)
-						node.Delete();
+					DeleteNodes(newNodeCollection.newNodes);
 					newNodeCollection.newNodes.Clear();
 					return newNodeCollection;
 				}
@@ -383,8 +428,8 @@ namespace Foreman
 			//link the new nodes
 			foreach (JToken nodeLinkJToken in json["NodeLinks"].ToList())
 			{
-				BaseNode supplier = oldNodeIndices[(int)nodeLinkJToken["SupplierID"]];
-				BaseNode consumer = oldNodeIndices[(int)nodeLinkJToken["ConsumerID"]];
+				ReadOnlyBaseNode supplier = oldNodeIndices[(int)nodeLinkJToken["SupplierID"]];
+				ReadOnlyBaseNode consumer = oldNodeIndices[(int)nodeLinkJToken["ConsumerID"]];
 				Item item;
 
 				string itemName = (string)nodeLinkJToken["Item"];
@@ -402,19 +447,15 @@ namespace Foreman
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			//collect the set of nodes and links to be saved (either entire set, or only that which is bound by the specified serialized node list)
-			IEnumerable<BaseNode> includedNodes = nodes;
-			IEnumerable<NodeLink> includedLinks = nodeLinks;
-			if (SerializeNodeList != null)
+			HashSet<BaseNode> includedNodes = nodes;
+			HashSet<NodeLink> includedLinks = nodeLinks;
+			if (SerializeNodeIdSet != null)
 			{
-				HashSet<BaseNode> nodeSet = new HashSet<BaseNode>();
-				foreach (BaseNode node in SerializeNodeList.Where(n => nodes.Contains(n)))
-					nodeSet.Add(node);
-				HashSet<NodeLink> linkSet = new HashSet<NodeLink>();
+				includedNodes = new HashSet<BaseNode>(nodes.Where(node => SerializeNodeIdSet.Contains(node.NodeID)));
+				includedLinks = new HashSet<NodeLink>();
 				foreach (NodeLink link in nodeLinks)
-					if (nodeSet.Contains(link.Consumer) && nodeSet.Contains(link.Supplier))
-						linkSet.Add(link);
-				includedNodes = nodeSet;
-				includedLinks = linkSet;
+					if (includedNodes.Contains(link.ConsumerNode) && includedNodes.Contains(link.SupplierNode))
+						includedLinks.Add(link);
 			}
 
 			//prepare list of items/assemblers/modules/beacons/recipes that are part of the saved set. Recipes have to include a missing component due to the possibility of different recipes having same name (ex: regular iron.recipe, missing iron.recipe, missing iron.recipe #2)
@@ -426,8 +467,7 @@ namespace Foreman
 			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
 			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new RecipeNaInPrComparer()); //compares by name, ingredients, and products (not amounts, just items)
 
-
-			foreach (BaseNode node in Nodes)
+			foreach (BaseNode node in includedNodes)
 			{
 				if (node is RecipeNode rnode)
 				{

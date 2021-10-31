@@ -214,5 +214,17 @@ namespace Foreman.Properties {
                 this["LockedRecipeEditorPosition"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int NodeCountForSimpleView {
+            get {
+                return ((int)(this["NodeCountForSimpleView"]));
+            }
+            set {
+                this["NodeCountForSimpleView"] = value;
+            }
+        }
     }
 }

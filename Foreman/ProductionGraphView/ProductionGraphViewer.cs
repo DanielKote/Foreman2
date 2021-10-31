@@ -19,19 +19,12 @@ namespace Foreman
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
-		public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
-		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
-		private static readonly float[] RateMultiplier = new float[] { 1f, 60f, 300f, 600f, 1800f, 3600f }; //, 21600f, 43200f, 86400f };
 
 		private enum DragOperation { None, Item, Selection }
 		public enum LOD { Low, Medium, High } //low: only names. medium: assemblers, beacons, etc. high: include assembler percentages
 
-		public RateUnit SelectedRateUnit { get; set; }
-		public float GetRateMultipler() { return RateMultiplier[(int)SelectedRateUnit]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
-		public string GetRateName() { return RateUnitNames[(int)SelectedRateUnit]; }
-
 		public LOD LevelOfDetail { get; set; }
-		public int MaxDetailedObjects { get; set; } //if the number of elements to draw is over this amount then the drawing functions will switch to simple view draws (mostly for FPS during zoomed out views)
+		public int NodeCountForSimpleView { get; set; } //if the number of elements to draw is over this amount then the drawing functions will switch to simple view draws (mostly for FPS during zoomed out views)
 		public bool ShowRecipeToolTip { get; set; }
 		public bool TooltipsEnabled { get; set; }
 		private bool SubwindowOpen; //used together with tooltip enabled -> if we open up an item/recipe/assembler window, this will halt tooltip show.
@@ -90,7 +83,7 @@ namespace Foreman
 
 			ViewOffset = new Point(Width / -2, Height / -2);
 			ViewScale = 1f;
-			MaxDetailedObjects = 200;
+			NodeCountForSimpleView = 200;
 
 			TooltipsEnabled = true;
 			SubwindowOpen = false;
@@ -483,7 +476,7 @@ namespace Foreman
 			//all elements (nodes & lines)
 			int visibleElements = GetPaintingOrder().Count(e => e.Visible && e is BaseNodeElement);
 			foreach (GraphElement element in GetPaintingOrder())
-				element.Paint(graphics, visibleElements > MaxDetailedObjects || ViewScale < 0.2); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
+				element.Paint(graphics, visibleElements > NodeCountForSimpleView || ViewScale < 0.2); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
 
 			//selection zone
 			if (currentDragOperation == DragOperation.Selection)
@@ -780,11 +773,12 @@ namespace Foreman
 					serialiser.Formatting = Formatting.None;
 					var writer = new JsonTextWriter(new StringWriter(stringBuilder));
 
-					Graph.SerializeNodeList = new List<BaseNode>();
-					Graph.SerializeNodeList.AddRange(selectedNodes.Select(node => node.DisplayedNode)); //set the list of nodes we will serialize
+					Graph.SerializeNodeIdSet = new HashSet<int>();
+					foreach (BaseNodeElement selectedNode in selectedNodes)
+						Graph.SerializeNodeIdSet.Add(selectedNode.ID);
 					serialiser.Serialize(writer, Graph);
-					Graph.SerializeNodeList.Clear();
-					Graph.SerializeNodeList = null;
+					Graph.SerializeNodeIdSet.Clear();
+					Graph.SerializeNodeIdSet = null;
 
 					Clipboard.SetText(stringBuilder.ToString());
 
@@ -807,7 +801,7 @@ namespace Foreman
 					//update the locations of the new nodes to be centered around the mouse position (as opposed to wherever they were before)
 					long xAve = 0;
 					long yAve = 0;
-					foreach (BaseNode newNode in newNodeCollection.newNodes)
+					foreach (ReadOnlyBaseNode newNode in newNodeCollection.newNodes)
 					{
 						xAve += newNode.Location.X;
 						yAve += newNode.Location.Y;
@@ -819,8 +813,8 @@ namespace Foreman
 					Point importCenter = new Point((int)xAve, (int)yAve);
 					Point mousePos = ScreenToGraph(PointToClient(Cursor.Position));
 					Size offset = (Size)Grid.AlignToGrid(Point.Subtract(mousePos, (Size)importCenter));
-					foreach (BaseNode newNode in newNodeCollection.newNodes)
-						newNode.Location = Point.Add(newNode.Location, offset);
+					foreach (ReadOnlyBaseNode newNode in newNodeCollection.newNodes)
+						Graph.RequestNodeController(newNode).Location = Point.Add(newNode.Location, offset);
 
 					//update the selection to be just the newly imported nodes
 					ClearSelection();
@@ -987,7 +981,7 @@ namespace Foreman
 			info.AddValue("IncludedMods", DCache.IncludedMods.Select(m => m.Key + "|" + m.Value));
 
 			//graph viewer options
-			info.AddValue("Unit", SelectedRateUnit);
+			info.AddValue("Unit", Graph.SelectedRateUnit);
 			info.AddValue("ViewOffset", ViewOffset);
 			info.AddValue("ViewScale", ViewScale);
 
@@ -1105,7 +1099,7 @@ namespace Foreman
 			}
 
 			//set up graph options
-			SelectedRateUnit = (RateUnit)(int)json["Unit"];
+			Graph.SelectedRateUnit = (ProductionGraph.RateUnit)(int)json["Unit"];
 			Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)(int)json["AssemblerSelectorStyle"];
 			Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)(int)json["ModuleSelectorStyle"];
 			foreach (string fuelType in json["FuelPriorityList"].Select(t => (string)t))

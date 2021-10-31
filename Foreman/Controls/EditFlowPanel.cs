@@ -6,7 +6,7 @@ namespace Foreman
 	public partial class EditFlowPanel : UserControl
 	{
 		private ProductionGraphViewer myGraphViewer;
-		private BaseNode baseNode;
+		private BaseNode BaseNode;
 
 		public EditFlowPanel(BaseNode baseNode, ProductionGraphViewer graphViewer)
 		{
@@ -14,21 +14,35 @@ namespace Foreman
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			FixedFlowInput.Maximum = (decimal)ProductionGraph.MaxSetFlow;
 
-			this.baseNode = baseNode;
+			this.BaseNode = baseNode;
 			myGraphViewer = graphViewer;
 			RateLabel.Text = string.Format("Item Flowrate (per {0})", myGraphViewer.GetRateName());
-			FixedFlowInput.Value = Math.Round((decimal)baseNode.DesiredRate, 4);
-			UpdateFixedFlowInputDecimals(FixedFlowInput);
 
-			AutoOption.Checked = (this.baseNode.RateType == RateType.Auto);
-			FixedFlowInput.Enabled = (this.baseNode.RateType != RateType.Auto);
+			InitializeRates();
+		}
+
+		private void InitializeRates()
+		{
+			if (BaseNode.RateType == RateType.Auto)
+			{
+				AutoOption.Checked = true;
+				FixedFlowInput.Enabled = false;
+				FixedFlowInput.Value = Math.Min(FixedFlowInput.Maximum, (decimal)BaseNode.ActualRate);
+			}
+			else
+			{
+				FixedOption.Checked = true;
+				FixedFlowInput.Enabled = true;
+				FixedFlowInput.Value = Math.Min(FixedFlowInput.Maximum, (decimal)BaseNode.DesiredRate);
+			}
+			UpdateFixedFlowInputDecimals(FixedFlowInput);
 		}
 
 		private void SetFixedRate()
 		{
-			if (baseNode.DesiredRate != (double)FixedFlowInput.Value)
+			if (BaseNode.DesiredRate != (double)FixedFlowInput.Value)
 			{
-				baseNode.DesiredRate = (double)FixedFlowInput.Value;
+				BaseNode.DesiredRate = (double)FixedFlowInput.Value;
 				myGraphViewer.Graph.UpdateNodeValues();
 			}
 			UpdateFixedFlowInputDecimals(FixedFlowInput);
@@ -46,9 +60,9 @@ namespace Foreman
 			FixedFlowInput.Enabled = FixedOption.Checked;
 			RateType updatedRateType = (FixedOption.Checked) ? RateType.Manual : RateType.Auto;
 
-			if (baseNode.RateType != updatedRateType)
+			if (BaseNode.RateType != updatedRateType)
 			{
-				baseNode.RateType = updatedRateType;
+				BaseNode.RateType = updatedRateType;
 				myGraphViewer.Graph.UpdateNodeValues();
 			}
 		}

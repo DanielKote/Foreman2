@@ -79,6 +79,7 @@ namespace Foreman
 
 		private SubgroupPrototype missingSubgroup;
 		private TechnologyPrototype startingTech;
+		private AssemblerPrototype missingAssembler; //missing recipes will have this set as their one and only assembler.
 
 		private static readonly Regex[] recipeWhiteList = { new Regex("^empty-barrel$") }; //whitelist takes priority over blacklist
 		private static readonly Regex[] recipeBlackList = { new Regex("-barrel$"), new Regex("^deadlock-packrecipe-"), new Regex("^deadlock-unpackrecipe-"), new Regex("^deadlock-plastic-packaging$") };
@@ -161,6 +162,8 @@ namespace Foreman
 
 			missingSubgroup = new SubgroupPrototype(this, "§§MISSING-SG", "");
 			missingSubgroup.myGroup = new GroupPrototype(this, "§§MISSING-G", "MISSING", "");
+
+			missingAssembler = new AssemblerPrototype(this, "§§a:MISSING-A", "missing assembler", EntityType.Assembler, EnergySource.Void, true);
 		}
 
 		public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress, bool loadIcons = true)
@@ -357,6 +360,9 @@ namespace Foreman
 							else
 								missingRecipe.InternalOneWayAddProduct((ItemPrototype)missingItems[product.Key], product.Value);
 						}
+						missingRecipe.assemblers.Add(missingAssembler);
+						missingAssembler.recipes.Add(missingRecipe);
+
 						missingRecipes.Add(recipeShort, missingRecipe);
 						recipe = missingRecipe;
 					}
