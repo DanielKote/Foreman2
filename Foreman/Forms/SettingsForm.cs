@@ -14,6 +14,9 @@ namespace Foreman
     {
         public class SettingsFormOptions
         {
+            public Dictionary<Assembler, bool> Assemblers;
+            public Dictionary<Miner, bool> Miners;
+            public Dictionary<Module, bool> Modules;
             public Dictionary<Mod, bool> Mods;
 
             public List<Language> LanguageOptions;
@@ -28,6 +31,9 @@ namespace Foreman
 
             public SettingsFormOptions()
             {
+                Assemblers = new Dictionary<Assembler, bool>();
+                Miners = new Dictionary<Miner, bool>();
+                Modules = new Dictionary<Module, bool>();
                 Mods = new Dictionary<Mod, bool>();
                 LanguageOptions = new List<Language>();
             }
@@ -35,6 +41,12 @@ namespace Foreman
             public SettingsFormOptions Clone()
             {
                 SettingsFormOptions clone = new SettingsFormOptions();
+                foreach (KeyValuePair<Assembler, bool> kvp in Assemblers)
+                    clone.Assemblers.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<Miner, bool> kvp in Miners)
+                    clone.Miners.Add(kvp.Key, kvp.Value);
+                foreach (KeyValuePair<Module, bool> kvp in Modules)
+                    clone.Modules.Add(kvp.Key, kvp.Value);
                 foreach (KeyValuePair<Mod, bool> kvp in Mods)
                     clone.Mods.Add(kvp.Key, kvp.Value);
                 foreach (Language language in LanguageOptions)
@@ -50,7 +62,7 @@ namespace Foreman
                 return clone;
             }
 
-            public bool Equals(SettingsFormOptions other)
+            public bool Equals(SettingsFormOptions other, bool ignoreAssemblersMinersModules = true)
             {
                 bool same =
                     (other.selectedLanguage == this.selectedLanguage) &&
@@ -60,6 +72,18 @@ namespace Foreman
                     (other.NormalDifficulty == this.NormalDifficulty) &&
                     (other.UseSaveFileData == this.UseSaveFileData);
 
+                if (!ignoreAssemblersMinersModules)
+                {
+                    if (same)
+                        foreach (KeyValuePair<Assembler, bool> kvp in Assemblers)
+                            same = same && other.Assemblers.Contains(kvp) && (kvp.Value == other.Assemblers[kvp.Key]);
+                    if (same)
+                        foreach (KeyValuePair<Miner, bool> kvp in Miners)
+                            same = same && other.Miners.Contains(kvp) && (kvp.Value == other.Miners[kvp.Key]);
+                    if (same)
+                        foreach (KeyValuePair<Module, bool> kvp in Modules)
+                            same = same && other.Modules.Contains(kvp) && (kvp.Value == other.Modules[kvp.Key]);
+                }
                 if (same)
                     foreach (KeyValuePair<Mod, bool> kvp in Mods)
                         same = same && other.Mods.Contains(kvp) && (kvp.Value == other.Mods[kvp.Key]);
@@ -95,13 +119,46 @@ namespace Foreman
             LanguageDropDown.Items.AddRange(CurrentOptions.LanguageOptions.ToArray());
             LanguageDropDown.SelectedItem = CurrentOptions.selectedLanguage;
 
+            AssemblerSelectionBox.Items.AddRange(CurrentOptions.Assemblers.Keys.ToArray());
+            AssemblerSelectionBox.Sorted = true;
+            AssemblerSelectionBox.DisplayMember = "FriendlyName";
+            for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+            {
+                if (CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[i]])
+                {
+                    AssemblerSelectionBox.SetItemChecked(i, true);
+                }
+            }
+
+            MinerSelectionBox.Items.AddRange(CurrentOptions.Miners.Keys.ToArray());
+            MinerSelectionBox.Sorted = true;
+            MinerSelectionBox.DisplayMember = "FriendlyName";
+            for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+            {
+                if (CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]])
+                {
+                    MinerSelectionBox.SetItemChecked(i, true);
+                }
+            }
+
+            ModuleSelectionBox.Items.AddRange(CurrentOptions.Modules.Keys.ToArray());
+            ModuleSelectionBox.Sorted = true;
+            ModuleSelectionBox.DisplayMember = "FriendlyName";
+            for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+            {
+                if (CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[i]])
+                {
+                    ModuleSelectionBox.SetItemChecked(i, true);
+                }
+            }
+
             ModSelectionBox.Items.AddRange(CurrentOptions.Mods.Keys.ToArray());
             ModSelectionBox.Sorted = true;
             ModSelectionBox.DisplayMember = "name";
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
             {
                 Mod mod = (Mod)ModSelectionBox.Items[i];
-                if(CurrentOptions.Mods[mod])
+                if (CurrentOptions.Mods[mod])
                     ModSelectionBox.SetItemChecked(i, true);
 
                 foreach (ModDependency dep in mod.parsedDependencies)
@@ -121,7 +178,7 @@ namespace Foreman
                         break;
                     }
                 }
-			}
+            }
 
             UseSaveFileDataCheckBox.Checked = CurrentOptions.UseSaveFileData;
 
@@ -166,9 +223,75 @@ namespace Foreman
             }
         }
 
+        //ASSEMBLER------------------------------------------------------------------------------------------
+        private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
+        }
+        private void AssemblerSelectionAllButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+            {
+                AssemblerSelectionBox.SetItemChecked(i, true);
+                CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[i]] = true;
+            }
+        }
+        private void AssemblerSelectionNoneButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+            {
+                AssemblerSelectionBox.SetItemChecked(i, false);
+                CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[i]] = false;
+            }
+        }
+
+        //MINER------------------------------------------------------------------------------------------
+        private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
+        }
+        private void MinerSelectionAllButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+            {
+                MinerSelectionBox.SetItemChecked(i, true);
+                CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]] = true;
+            }
+        }
+        private void MinerSelectionNoneButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+            {
+                MinerSelectionBox.SetItemChecked(i, false);
+                CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]] = false;
+            }
+        }
+
+        //MODULE------------------------------------------------------------------------------------------
+        private void ModuleSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
+        }
+        private void ModuleSelectionAllButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+            {
+                ModuleSelectionBox.SetItemChecked(i, true);
+                CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[i]] = true;
+            }
+        }
+        private void ModuleSelectionNoneButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+            {
+                ModuleSelectionBox.SetItemChecked(i, false);
+                CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[i]] = false;
+            }
+        }
+
         //MODS------------------------------------------------------------------------------------------
         private void ModSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
-		{
+        {
             if (modListEnabled)
             {
                 Mod mod = (Mod)ModSelectionBox.Items[e.Index];
@@ -204,7 +327,7 @@ namespace Foreman
             {
                 e.NewValue = e.CurrentValue;
             }
-		}
+        }
         private void ModSelectionAllButton_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < ModSelectionBox.Items.Count; i++)
@@ -286,6 +409,11 @@ namespace Foreman
             CurrentOptions.selectedLanguage = (LanguageDropDown.SelectedItem as Language);
         }
 
+        private void UseSaveFileDataCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            CurrentOptions.UseSaveFileData = UseSaveFileDataCheckBox.Checked;
+        }
+
         //FOLDER LOCATIONS------------------------------------------------------------------------------------------
         private void InstallLocationBrowseButton_Click(object sender, EventArgs e)
         {
@@ -328,7 +456,7 @@ namespace Foreman
         }
         private void UserDataLocationTextBox_TextChanged(object sender, EventArgs e)
         {
-            if(UserDataLocationTextBox.Enabled)
+            if (UserDataLocationTextBox.Enabled)
                 CurrentOptions.UserDataLocation = UserDataLocationTextBox.Text;
         }
 
@@ -359,20 +487,20 @@ namespace Foreman
             UserDataLocationTextBox.Enabled = !IgnoreUserDataLocationCheckBox.Checked;
             UserDataLocationBrowseButton.Enabled = !IgnoreUserDataLocationCheckBox.Checked;
 
-            if(IgnoreUserDataLocationCheckBox.Checked)
+            if (IgnoreUserDataLocationCheckBox.Checked)
                 UserDataLocationTextBox.Text = "";
             else
                 UserDataLocationTextBox.Text = CurrentOptions.UserDataLocation;
         }
 
+        private void AutomaticLocationSearchButton_Click(object sender, EventArgs e)
+        {
+            //should search for obvious locations to see if we can find the factorio install
+        }
+
         private void NormalDifficultyRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             CurrentOptions.NormalDifficulty = NormalDifficultyRadioButton.Checked;
-        }
-
-        private void UseSaveFileDataCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            CurrentOptions.UseSaveFileData = UseSaveFileDataCheckBox.Checked;
         }
     }
 }

@@ -222,5 +222,17 @@ namespace Foreman.Properties {
                 this["IgnoreAssemblerStatus"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DynamicLineWidth {
+            get {
+                return ((bool)(this["DynamicLineWidth"]));
+            }
+            set {
+                this["DynamicLineWidth"] = value;
+            }
+        }
     }
 }

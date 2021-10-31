@@ -6,7 +6,7 @@ namespace Foreman
 {
     public abstract class DataObjectBase : IComparable<DataObjectBase>
     {
-		internal string[] localeCategories;
+		protected string[] localeCategories;
         public string Name { get; private set; }
         public string LName { get; set; }
 		public string Order { get; private set; }
@@ -26,9 +26,11 @@ namespace Foreman
 					{
 						string calcName = "";
 
-						foreach (String category in localeCategories)
+						foreach (string category in localeCategories)
 						{
-							string[] SplitName = Name.Split('\f');
+							if (category == "recipe-name")
+								Console.WriteLine("!");
+							string[] SplitName = Name.Split('\n'); //internally we use '\n' to add futher to the original name (as in the case with different temperature fluids)
 							if (DataCache.LocaleFiles.ContainsKey(category) && DataCache.LocaleFiles[category].ContainsKey(SplitName[0]))
 							{
 								if (DataCache.LocaleFiles[category][SplitName[0]].Contains("__"))
@@ -39,6 +41,8 @@ namespace Foreman
 									calcName += " (" + SplitName + "*)";
 							}
 						}
+						if (calcName == "")
+							Console.WriteLine(Name);
 						friendlyName = calcName;
 					}
 					else
@@ -117,6 +121,12 @@ namespace Foreman
 		}
 
 		public override int GetHashCode() { return Name.GetHashCode(); }
-		public int CompareTo(DataObjectBase other) { return Order.CompareTo(other.Order); }
+		public int CompareTo(DataObjectBase other)
+        {
+			int orderCompare = Order.CompareTo(other.Order);
+			if (orderCompare == 0)
+				return FriendlyName.CompareTo(other.FriendlyName);
+			return orderCompare;
+        }
 	}
 }

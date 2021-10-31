@@ -196,6 +196,8 @@ namespace Foreman
                 foreach (Assembler assembler in Assemblers.Values)
                     usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category);
                 recipe.HasEnabledAssemblers = usable;
+                if (!usable)
+                    Console.WriteLine(recipe);
             }
         }
 

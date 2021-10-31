@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -10,28 +11,34 @@ namespace Foreman
     public abstract partial class IRChooserPanel : UserControl
     {
         private static readonly Color SelectedGroupButtonBGColor = Color.FromArgb(255,255,180,100);
-        internal static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 40, 40, 40);
-        internal static readonly Color IRButtonHiddenColor = Color.FromArgb(255, 100, 0, 0);
-        internal static readonly Color IRButtonNoAssemblerColor = Color.FromArgb(255, 80, 80, 0);
+        protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 60, 60, 60);
+        protected static readonly Color IRButtonHiddenColor = Color.FromArgb(255, 120, 0, 0);
+        protected static readonly Color IRButtonNoAssemblerColor = Color.FromArgb(255, 100, 100, 0);
 
-        internal const int IRPanelColumns = 10;
-        internal const int IRPanelRows = 8; //8 = 294 height of IRPanel; 10 = 364 height //keep in mind that 8x10 is better for smoother scrolling
+        protected const int IRPanelColumns = 10;
+        protected const int IRPanelRows = 8; //8 = 294 height of IRPanel; 10 = 364 height //keep in mind that 8x10 is better for smoother scrolling
         private NFButton[,] IRButtons = new NFButton[IRPanelRows, IRPanelColumns];
         private List<NFButton> GroupButtons = new List<NFButton>();
         private Dictionary<Group, NFButton> GroupButtonLinks = new Dictionary<Group, NFButton>();
         private List<KeyValuePair<DataObjectBase, Color>[]> filteredIRRowsList = new List<KeyValuePair<DataObjectBase, Color>[]>(); //updated on every filter command & group selection. Represents the full set of items/recipes in the IRFlowPanel (the visible ones will come from this set based on scrolling), with each array being size 10 (#buttons/line). bool (value) is the 'use BW icon'
-        internal int CurrentRow { get; private set; } //used to ensure we dont update twice when filtering or group change (once due to update request, second due to setting scroll bar value to 0)
+        protected int CurrentRow { get; private set; } //used to ensure we dont update twice when filtering or group change (once due to update request, second due to setting scroll bar value to 0)
 
-        internal List<Group> SortedGroups;
-        internal Group SelectedGroup; //provides some continuity between selections - if you last selected from the intermediates group for example, adding another recipe will select that group as the starting group
+        protected List<Group> SortedGroups;
+        protected Group SelectedGroup; //provides some continuity between selections - if you last selected from the intermediates group for example, adding another recipe will select that group as the starting group
         private static Group StartingGroup;
-        internal ProductionGraphViewer PGViewer;
+        protected ProductionGraphViewer PGViewer;
 
-        public IRChooserPanel(ProductionGraphViewer parent)
+        protected abstract ToolTip IRButtonToolTip { get; }
+
+        protected abstract List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList();
+        protected abstract void IRButton_MouseUp(object sender, MouseEventArgs e);
+        //protected abstract void IRButton_Hover(object sender, EventArgs e);
+
+        public IRChooserPanel(ProductionGraphViewer parent, Point originPoint)
         {
+            this.DoubleBuffered = true;
             InitializeComponent();
-            IRFlowPanel.Height = IRPanelRows * 35 + 4; //both need to be set to this in order to size it appropriately
-            IRPanelScrollBar.Height = IRPanelRows * 35 + 8;
+            IRFlowPanel.Height = IRPanelRows * 35 + 12;
 
             IRPanelScrollBar.Minimum = 0;
             IRPanelScrollBar.Maximum = 0;
@@ -49,7 +56,7 @@ namespace Foreman
 
             PGViewer = parent;
             parent.Controls.Add(this);
-            this.Location = new Point(10,10);
+            this.Location = originPoint;
             this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             this.BringToFront();
             parent.PerformLayout();
@@ -57,20 +64,8 @@ namespace Foreman
             //set up the event handlers last so as not to cause unexpected calls when setting checked status ob checkboxes
             ShowHiddenCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
             IgnoreAssemblerCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
-        }
 
-        private void IRFlowPanel_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Delta < 0 && IRPanelScrollBar.Value <= (IRPanelScrollBar.Maximum - IRPanelScrollBar.LargeChange))
-            {
-                IRPanelScrollBar.Value++;
-                UpdateIRButtons(IRPanelScrollBar.Value, true);
-            }
-            else if (e.Delta > 0 && IRPanelScrollBar.Value > 0)
-            {
-                IRPanelScrollBar.Value--;
-                UpdateIRButtons(IRPanelScrollBar.Value, true);
-            }
+            FilterTextBox.Focus();
         }
 
         private void InitializeIRButtons()
@@ -90,7 +85,7 @@ namespace Foreman
                 button.Click += new EventHandler(GroupButton_Click);
                 button.Margin = new Padding(0);
                 button.Size = new Size(64, 64);
-                button.Image = group.Icon;
+                button.Image = new Bitmap(group.Icon, 50, 50);
                 button.Tag = group;
                 GroupButtons.Add(button);
                 GroupButtonLinks.Add(group, button);
@@ -119,9 +114,9 @@ namespace Foreman
                     button.Tag = null;
                     button.Enabled = false;
 
-                    //button.Click += new EventHandler(IRButton_Click);
                     button.MouseUp += new MouseEventHandler(IRButton_MouseUp);
-                    //button.MouseHover += new EventHandler(IRButton_Hover);
+                    button.MouseHover += new EventHandler(IRButton_MouseHover);
+                    button.MouseLeave += new EventHandler(IRButton_MouseLeave);
                     IRButtons[row, column] = button;
                 }
             }
@@ -129,6 +124,58 @@ namespace Foreman
             IRFlowPanel.Controls.AddRange(IRButtons.Cast<Button>().ToArray());
             IRFlowPanel.ResumeLayout();
 
+        }
+
+        private int upD = 0;
+        protected void UpdateIRButtons(int startRow = 0, bool scrollOnly = false) //if scroll only, then we dont need to update the filtered set, just use what is there
+        {
+            Console.WriteLine("Chooser Panel UPDATE: " + upD++);
+            if (IRFlowPanel.Visible)
+            {
+
+                //if we are actually changing the filtered list, then update it (through the GetSubgroupList)
+                if (!scrollOnly)
+                {
+                    filteredIRRowsList.Clear();
+                    int currentRow = 0;
+                    foreach (List<KeyValuePair<DataObjectBase, Color>> sgList in GetSubgroupList().Where(n => n.Count > 0))
+                    {
+                        filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
+                        int currentColumn = 0;
+                        foreach (KeyValuePair<DataObjectBase, Color> kvp in sgList)
+                        {
+                            if (currentColumn == IRPanelColumns)
+                            {
+                                filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
+                                currentColumn = 0;
+                                currentRow++;
+                            }
+                            filteredIRRowsList[currentRow][currentColumn] = kvp;
+                            currentColumn++;
+                        }
+                        currentRow++;
+                    }
+                    IRPanelScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
+                    IRPanelScrollBar.Enabled = IRPanelScrollBar.Maximum >= IRPanelScrollBar.LargeChange;
+                }
+                CurrentRow = startRow;
+                IRPanelScrollBar.Value = startRow;
+
+                //update all the buttons to be based off of the filteredIRSet
+                IRFlowPanel.SuspendLayout();
+                IRFlowPanel.Visible = false;
+                IRButtonToolTip.RemoveAll();
+                IRFlowPanel.Controls.Clear();
+                for (int row = 0; row < IRPanelRows; row++)
+                    for (int column = 0; column < IRPanelColumns; column++)
+                        SetIRButton(
+                            (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Key : null,
+                            (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Value : Color.DimGray,
+                            row, column); //if we are beyond the bounds of the filtered rows, each button is set to null (disabled)
+                IRFlowPanel.Controls.AddRange(IRButtons.Cast<Button>().ToArray());
+                IRFlowPanel.Visible = true;
+                IRFlowPanel.ResumeLayout();
+            }
         }
 
         private void SetIRButton(DataObjectBase irObject, Color bgColor, int row, int column)
@@ -143,6 +190,7 @@ namespace Foreman
                 b.BackgroundImage = irObject.Icon;
                 b.Tag = irObject;
                 b.Enabled = true;
+                IRButtonToolTip.SetToolTip(b, string.IsNullOrEmpty(irObject.FriendlyName)? "-": irObject.FriendlyName);
             }
             else
             {
@@ -156,70 +204,7 @@ namespace Foreman
             }
         }
 
-        private int upD = 0;
-        internal void UpdateIRButtons(int startRow = 0, bool scrollOnly = false) //if scroll only, then we dont need to update the filtered set, just use what is there
-        {
-            Console.WriteLine("Chooser Panel UPDATE: " + upD++);
-
-            //if we are actually changing the filtered list, then update it (through the GetSubgroupList)
-            if (!scrollOnly)
-            {
-                filteredIRRowsList.Clear();
-                int currentRow = 0;
-                foreach (List<KeyValuePair<DataObjectBase, Color>> sgList in GetSubgroupList().Where(n => n.Count > 0))
-                {
-                    filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
-                    int currentColumn = 0;
-                    foreach (KeyValuePair<DataObjectBase, Color> kvp in sgList)
-                    {
-                        if (currentColumn == IRPanelColumns)
-                        {
-                            filteredIRRowsList.Add(new KeyValuePair<DataObjectBase, Color>[10]);
-                            currentColumn = 0;
-                            currentRow++;
-                        }
-                        filteredIRRowsList[currentRow][currentColumn] = kvp;
-                        currentColumn++;
-                    }
-                    currentRow++;
-                }
-                IRPanelScrollBar.Maximum = Math.Max(0, filteredIRRowsList.Count - 1);
-                IRPanelScrollBar.Enabled = IRPanelScrollBar.Maximum >= IRPanelScrollBar.LargeChange;
-            }
-            CurrentRow = startRow;
-            IRPanelScrollBar.Value = startRow;
-
-            //update all the buttons to be based off of the filteredIRSet
-            IRFlowPanel.SuspendLayout();
-            IRFlowPanel.Visible = false;
-            IRFlowPanel.Controls.Clear();
-            for (int row = 0; row < IRPanelRows; row++)
-                for (int column = 0; column < IRPanelColumns; column++)
-                    SetIRButton(
-                        (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Key : null,
-                        (row + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[row + startRow][column].Value : Color.DimGray,
-                        row, column); //if we are beyond the bounds of the filtered rows, each button is set to null (disabled)
-            IRFlowPanel.Controls.AddRange(IRButtons.Cast<Button>().ToArray());
-            IRFlowPanel.Visible = true;
-            IRFlowPanel.ResumeLayout();
-        }
-
-
-        bool exitScriptDone = false;
-        internal void Exit()
-        {
-            if (!exitScriptDone)
-            {
-                exitScriptDone = true;
-
-                Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-                Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-                Properties.Settings.Default.Save();
-                Dispose();
-            }
-        }
-
-        internal void SetSelectedGroup(Group sGroup, bool causeUpdate = true)
+        protected void SetSelectedGroup(Group sGroup, bool causeUpdate = true)
         {
             if (sGroup == null || !SortedGroups.Contains(sGroup)) //want to select the starting group, then update all buttons (including a possibility of group change)
             {
@@ -227,6 +212,8 @@ namespace Foreman
                 StartingGroup = sGroup;
                 SelectedGroup = sGroup;
                 UpdateIRButtons();
+                //foreach (NFButton groupButton in GroupButtons)
+                //    groupButton.BackColor = (groupButton.Tag as Group == SelectedGroup) ? SelectedGroupButtonBGColor : Color.DimGray;
             }
             else
             {
@@ -242,11 +229,7 @@ namespace Foreman
             }
         }
 
-        internal void UpdateGroupButton(Group group, bool enabled) { GroupButtonLinks[group].Enabled = enabled; }
-
-        internal abstract List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList();
-        internal abstract void IRButton_MouseUp(object sender, MouseEventArgs e);
-        //internal abstract void IRButton_Hover(object sender, EventArgs e);
+        protected void UpdateGroupButton(Group group, bool enabled) { GroupButtonLinks[group].Enabled = enabled; }
 
         private void GroupButton_Click(object sender, EventArgs e)
         {
@@ -255,10 +238,13 @@ namespace Foreman
 
         private void IRChooserPanel_Leave(object sender, EventArgs e)
         {
-            Exit();
+            Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+            Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+            Properties.Settings.Default.Save();
+            Dispose();
         }
 
-        internal void FilterCheckBox_CheckedChanged(object sender, EventArgs e)
+        protected void FilterCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             UpdateIRButtons();
         }
@@ -273,12 +259,30 @@ namespace Foreman
             if (e.NewValue != CurrentRow)
                 UpdateIRButtons(e.NewValue, true);
         }
-    }
 
-    public class NFButton : Button
-    {
-        public NFButton() : base() { this.SetStyle(ControlStyles.Selectable, false); }
-        protected override bool ShowFocusCues {  get { return false; } }
+        private void IRFlowPanel_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (e.Delta < 0 && IRPanelScrollBar.Value <= (IRPanelScrollBar.Maximum - IRPanelScrollBar.LargeChange))
+            {
+                IRPanelScrollBar.Value++;
+                UpdateIRButtons(IRPanelScrollBar.Value, true);
+            }
+            else if (e.Delta > 0 && IRPanelScrollBar.Value > 0)
+            {
+                IRPanelScrollBar.Value--;
+                UpdateIRButtons(IRPanelScrollBar.Value, true);
+            }
+        }
+
+        internal virtual void IRButton_MouseHover(object sender, EventArgs e)
+        {
+            Control control = sender as Control;
+            IRButtonToolTip.Show(IRButtonToolTip.GetToolTip(control), control, new Point(control.Width, 10));
+        }
+        private void IRButton_MouseLeave(object sender, EventArgs e)
+        {
+            IRButtonToolTip.Hide(sender as Control);
+        }
     }
 
     public class ItemChooserPanel : IRChooserPanel
@@ -286,12 +290,15 @@ namespace Foreman
         public Action<Item> CallbackMethod; //returns the selected item
         public void Show(Action<Item> callback) { CallbackMethod = callback; }
 
-        public ItemChooserPanel(ProductionGraphViewer parent) : base(parent)
+        private ToolTip iToolTip = new ItemToolTip();
+        protected override ToolTip IRButtonToolTip { get { return iToolTip; } }
+
+        public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint) : base(parent, originPoint)
         {
             SetSelectedGroup(null);
         }
 
-        internal override List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList()
+        protected override List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList()
         {
             //step 1: calculate the visible items within each group (used to disable any group button with 0 items, plus shift the selected group if it contains 0 items)
             string filterString = FilterTextBox.Text.ToLower();
@@ -331,7 +338,7 @@ namespace Foreman
 
             //step 2: select working group (currently selected group, or if it has 0 items then the first group with >0 items to the left, then the first group with >0 items to the right, then itself)
             Group alternateGroup = null;
-            if(filteredItemCount[SelectedGroup] == 0)
+            if (filteredItemCount[SelectedGroup] == 0)
             {
                 int selectedGroupIndex = 0;
                 for (int i = 0; i < SortedGroups.Count; i++)
@@ -340,26 +347,28 @@ namespace Foreman
                 for (int i = selectedGroupIndex; i >= 0; i--)
                     if (filteredItemCount[SortedGroups[i]] > 0)
                         alternateGroup = SortedGroups[i];
-                if(alternateGroup == null)
-                    for(int i = selectedGroupIndex; i < SortedGroups.Count; i++)
+                if (alternateGroup == null)
+                    for (int i = selectedGroupIndex; i < SortedGroups.Count; i++)
                         if (filteredItemCount[SortedGroups[i]] > 0)
                             alternateGroup = SortedGroups[i];
                 if (alternateGroup == null)
                     alternateGroup = SelectedGroup;
-
-                SetSelectedGroup(alternateGroup, false);
             }
+            SetSelectedGroup(alternateGroup == null? SelectedGroup : alternateGroup, false);
 
             //now the base class will take care of setting up the buttons based on the filtered items
             return filteredItems[SelectedGroup];
         }
 
-        internal override void IRButton_MouseUp(object sender, MouseEventArgs e)
+        protected override void IRButton_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
+                Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+                Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+                Properties.Settings.Default.Save();
                 CallbackMethod((sender as NFButton).Tag as Item);
-                Exit();
+                Dispose();
             }
         }
     }
@@ -367,40 +376,58 @@ namespace Foreman
     public class RecipeChooserPanel : IRChooserPanel
     {
         public Action<ProductionNode> CallbackMethod; //returns the created production node (or null if not created)
-        internal Item KeyItem;
         public void Show(Action<ProductionNode> callback) { CallbackMethod = callback; }
+        protected Item KeyItem;
 
-        public RecipeChooserPanel(ProductionGraphViewer parent, Item item, bool includeSuppliers, bool includeConsumers) : base(parent)
+        private ToolTip rToolTip = new RecipeToolTip();
+        protected override ToolTip IRButtonToolTip { get { return rToolTip; } }
+
+        public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, Item item, bool includeSuppliers, bool includeConsumers) : base(parent, originPoint)
         {
+            AsIngredientCheckBox.Checked = includeConsumers;
+            AsProductCheckBox.Checked = includeSuppliers;
+            ShowHiddenCheckBox.Text = "Show Disabled";
+
             AddConsumerButton.Click += new EventHandler(AddConsumerButton_Click);
             AddPassthroughButton.Click += new EventHandler(AddPassthroughButton_Click);
             AddSupplyButton.Click += new EventHandler(AddSupplyButton_Click);
+            AsIngredientCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
+            AsProductCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 
             KeyItem = item;
-            if (KeyItem != null)
-                ItemIconPanel.BackgroundImage = KeyItem.Icon;
-
-            if (includeConsumers || includeSuppliers)
+            if (KeyItem == null)
             {
-                IgnoreAssemblerCheckBox.Visible = true;
+                OtherNodeOptionsTableLayoutPanel.Visible = false;
+            }
+            else
+            {
                 ItemIconPanel.Visible = true;
-                if (includeSuppliers && includeConsumers)
+                ItemIconPanel.BackgroundImage = KeyItem.Icon;
+                OtherNodeOptionsTableLayoutPanel.Visible = true;
+                AddConsumerButton.Visible = includeConsumers;
+                AddSupplyButton.Visible = includeSuppliers;
+                if (!(includeConsumers && KeyItem.ConsumptionRecipes.Count > 0) && !(includeSuppliers && KeyItem.ProductionRecipes.Count > 0))
+                {
+                    GroupFlowPanel.Visible = false;
+                    IRFlowPanel.Visible = false;
+                    IRPanelScrollBar.Visible = false;
+                    FilterTextBox.Visible = false;
+                    FilterLabel.Visible = false;
+                    ShowHiddenCheckBox.Visible = false;
+                    IgnoreAssemblerCheckBox.Visible = false;
+                    ItemIconPanel.Location = new Point(4, 4);
+
+                }
+                else if(includeConsumers && includeSuppliers)
                 {
                     AsIngredientCheckBox.Visible = true;
                     AsProductCheckBox.Visible = true;
                 }
             }
-            AsIngredientCheckBox.Checked = includeConsumers;
-            AsProductCheckBox.Checked = includeSuppliers;
-            ShowHiddenCheckBox.Text = "Show Disabled";
-
-            AsIngredientCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
-            AsProductCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
-
             SetSelectedGroup(null);
         }
 
-        internal override List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList()
+        protected override List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList()
         {
             //step 1: calculate the visible recipes for each group (those that pass filter & hidden status)
             string filterString = FilterTextBox.Text.ToLower();
@@ -421,8 +448,8 @@ namespace Foreman
                     foreach (Recipe recipe in sgroup.Recipes.Where(n => 
                         n.LFriendlyName.Contains(filterString) && (
                             ignoreItem || 
-                            (includeConsumers && n.Ingredients.ContainsKey(KeyItem)) ||
-                            (includeSuppliers && n.Results.ContainsKey(KeyItem)) ) ))
+                            (includeConsumers && n.IngredientsSet.ContainsKey(KeyItem)) ||
+                            (includeSuppliers && n.ResultsSet.ContainsKey(KeyItem)) ) ))
                     {
                         if ((!recipe.Hidden || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus))
                         {
@@ -455,21 +482,23 @@ namespace Foreman
                             alternateGroup = SortedGroups[i];
                 if (alternateGroup == null)
                     alternateGroup = SelectedGroup;
-
-                SetSelectedGroup(alternateGroup, false);
             }
+            SetSelectedGroup(alternateGroup == null? SelectedGroup : alternateGroup, false);
 
             //now the base class will take care of setting up the buttons based on the filtered recipes
             return filteredRecipes[SelectedGroup];
         }
 
-        internal override void IRButton_MouseUp(object sender, MouseEventArgs e)
+        protected override void IRButton_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left) //select recipe
             {
                 Recipe selectedRecipe = (sender as NFButton).Tag as Recipe;
+                Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+                Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+                Properties.Settings.Default.Save();
+                Dispose();
                 CallbackMethod(RecipeNode.Create(selectedRecipe, PGViewer.Graph));
-                Exit();
             }
             else if(e.Button == MouseButtons.Right) //flip hidden status of recipe
             {
@@ -481,20 +510,166 @@ namespace Foreman
 
         private void AddSupplyButton_Click(object sender, EventArgs e)
         {
-            CallbackMethod(SupplyNode.Create(KeyItem, PGViewer.Graph));
-            Exit();
+            SupplyNode newNode = SupplyNode.Create(KeyItem, PGViewer.Graph);
+            newNode.rateType = RateType.Auto;
+            Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+            Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+            Properties.Settings.Default.Save();
+            CallbackMethod(newNode);
+            Dispose();
         }
 
         private void AddPassthroughButton_Click(object sender, EventArgs e)
         {
-            CallbackMethod(PassthroughNode.Create(KeyItem, PGViewer.Graph));
-            Exit();
+            PassthroughNode newNode = PassthroughNode.Create(KeyItem, PGViewer.Graph);
+            newNode.rateType = RateType.Auto;
+            Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+            Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+            Properties.Settings.Default.Save();
+            CallbackMethod(newNode);
+            Dispose();
         }
 
         private void AddConsumerButton_Click(object sender, EventArgs e)
         {
-            CallbackMethod(ConsumerNode.Create(KeyItem, PGViewer.Graph));
-            Exit();
+            ConsumerNode newNode = ConsumerNode.Create(KeyItem, PGViewer.Graph);
+            newNode.rateType = RateType.Auto;
+            Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+            Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+            Properties.Settings.Default.Save();
+            CallbackMethod(newNode);
+            Dispose();
+        }
+
+        internal override void IRButton_MouseHover(object sender, EventArgs e)
+        {
+            Control control = sender as Control;
+
+            int yoffset = -control.Location.Y + 16 + Math.Max(-100, Math.Min(0, 348 - RecipeToolTip.GetRecipeToolTipHeight((control as Button).Tag as Recipe)));
+            IRButtonToolTip.Show(IRButtonToolTip.GetToolTip(control), control, new Point(control.Width, yoffset));
+        }
+    }
+
+    public class NFButton : Button
+    {
+        public NFButton() : base() { this.SetStyle(ControlStyles.Selectable, false); }
+        protected override bool ShowFocusCues { get { return false; } }
+    }
+
+    public class ItemToolTip : ToolTip
+    {
+        private static readonly Color BackgroundColor = Color.FromArgb(65, 65, 65);
+
+        public ItemToolTip()
+        {
+            this.AutoPopDelay = 100000;
+            this.InitialDelay = 100000;
+            this.ReshowDelay =  100000;
+
+            this.OwnerDraw = true;
+            this.BackColor = BackgroundColor;
+            this.ForeColor = Color.White;
+            this.Draw += new DrawToolTipEventHandler(ItemToolTip_Draw);
+        }
+
+        private void ItemToolTip_Draw(object sender, DrawToolTipEventArgs e)
+        {
+            e.DrawBackground();
+            e.Graphics.DrawRectangle(new Pen(new SolidBrush(Color.Black), 2), e.Bounds);
+            e.DrawText();
+        }
+
+    }
+
+    public class RecipeToolTip : ToolTip
+    {
+        private static readonly Brush BackgroundBrush = new SolidBrush(Color.FromArgb(65,65,65));
+        private static readonly Brush DarkBackgroundBrush = new SolidBrush(Color.FromArgb(255, 40, 40, 40));
+        private static readonly Brush TextBrush = new SolidBrush(Color.White);
+        private static readonly Pen BorderPen = new Pen(new SolidBrush(Color.Black), 2);
+        private static readonly Font RecipeFont = new Font(FontFamily.GenericSansSerif, 8f, FontStyle.Bold);
+        private static readonly Font SmallRecipeFont = new Font(FontFamily.GenericSansSerif, 6f, FontStyle.Bold);
+        private static readonly Font ItemFont = new Font(FontFamily.GenericSansSerif, 7.8f);
+        private static readonly Font SmallItemFont = new Font(FontFamily.GenericSansSerif, 6f);
+        private static readonly Font QuantityFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+        private static readonly Font SectionFont = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+
+        public RecipeToolTip()
+        {
+            this.AutoPopDelay = 100000;
+            this.InitialDelay = 100000;
+            this.ReshowDelay = 100000;
+
+            this.OwnerDraw = true;
+            this.BackColor = Color.DimGray;
+            this.ForeColor = Color.White;
+            this.Popup += new PopupEventHandler(this.OnPopup);
+            this.Draw += new DrawToolTipEventHandler(this.OnDraw);
+        }
+
+        private void OnPopup(object sender, PopupEventArgs e)
+        {
+            Recipe recipe = (e.AssociatedControl as Button).Tag as Recipe;
+            e.ToolTipSize = new Size(250, GetRecipeToolTipHeight(recipe));
+          
+        }
+
+        private void OnDraw(object sender, DrawToolTipEventArgs e)
+        {
+            using (Graphics g = e.Graphics)
+            {
+                Recipe recipe = (e.AssociatedControl as Button).Tag as Recipe;
+
+                g.FillRectangle(BackgroundBrush, e.Bounds);
+
+                //Title
+                int yOffset = 0;
+                g.FillRectangle(DarkBackgroundBrush, new Rectangle(0, yOffset, e.Bounds.Width, 40));
+                g.DrawImage(recipe.Icon, 4, 4 + yOffset, 32, 32);
+                Font recipeFont = (g.MeasureString(recipe.FriendlyName, RecipeFont).Width > e.Bounds.Width - 50) ? SmallRecipeFont : RecipeFont;
+                g.DrawString(recipe.FriendlyName, recipeFont, TextBrush, new Point(42, 12 + yOffset));
+
+                //Ingredient list:
+                yOffset += 44;
+                g.FillRectangle(DarkBackgroundBrush, new Rectangle(0, yOffset, e.Bounds.Width, 20));
+                yOffset += 2;
+                g.DrawString("Ingredients:", SectionFont, TextBrush, 4, 0 + yOffset);
+                yOffset += 20;
+                foreach (Item ingredient in recipe.IngredientsList)
+                {
+                    g.DrawImage(ingredient.Icon, 14, 4 + yOffset, 32, 32);
+                    Font itemFont = (g.MeasureString(ingredient.FriendlyName, RecipeFont).Width > e.Bounds.Width - 50) ? SmallItemFont : ItemFont;
+                    g.DrawString(ingredient.FriendlyName, itemFont, TextBrush, new Point(52, 2 + yOffset));
+                    g.DrawString(recipe.IngredientsSet[ingredient].ToString("0.##") + "x", QuantityFont, TextBrush, new Point(52, 20 + yOffset));
+                    yOffset += 40;
+                }
+
+                //Results list:
+                g.FillRectangle(DarkBackgroundBrush, new Rectangle(0, yOffset, e.Bounds.Width, 20));
+                yOffset += 2;
+                g.DrawString("Products:", SectionFont, TextBrush, 4, 0 + yOffset);
+                yOffset += 20;
+                foreach (Item result in recipe.ResultsList)
+                {
+                    g.DrawImage(result.Icon, 14, 4 + yOffset, 32, 32);
+                    Font itemFont = (g.MeasureString(result.FriendlyName, RecipeFont).Width > e.Bounds.Width - 50) ? SmallItemFont : ItemFont;
+                    g.DrawString(result.FriendlyName, itemFont, TextBrush, new Point(52, 2 + yOffset));
+                    g.DrawString(recipe.ResultsSet[result].ToString("0.##") + "x", QuantityFont, TextBrush, new Point(52, 20 + yOffset));
+                    yOffset += 40;
+                }
+
+                //time
+                g.FillRectangle(DarkBackgroundBrush, new Rectangle(0, yOffset, e.Bounds.Width, 20));
+                yOffset += 2;
+                g.DrawString("Crafting Time: " + recipe.Time.ToString("0.##") + " s", SectionFont, TextBrush, 4, 0 + yOffset);
+
+                g.DrawRectangle(BorderPen, e.Bounds);
+            }
+        }
+
+        public static int GetRecipeToolTipHeight(Recipe recipe)
+        {
+            return 108 + recipe.IngredientsList.Count * 40 + recipe.ResultsList.Count * 40;
         }
     }
 }

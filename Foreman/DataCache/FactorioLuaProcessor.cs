@@ -44,24 +44,11 @@ namespace Foreman
 
         private const float defaultRecipeTime = 0.5f;
 
-        public Dictionary<string, Item> GetItems() { return Items; }
-        public Dictionary<string, Recipe> GetRecipes() { return Recipes; }
-        public Dictionary<string, Assembler> GetAssemblers() { return Assemblers; }
-        public Dictionary<string, Miner> GetMiners() { return Miners; }
-        public Dictionary<string, Resource> GetResources() { return Resources; }
-        public Dictionary<string, Module> GetModules() { return Modules; }
-
         public Dictionary<string, Exception> GetFileExceptions() { return FailedFiles; }
         public Dictionary<string, Exception> GetPathExceptions() { return FailedPaths; }
 
         public FactorioLuaProcessor()
         {
-            Items = new Dictionary<string, Item>();
-            Recipes = new Dictionary<string, Recipe>();
-            Assemblers = new Dictionary<string, Assembler>();
-            Miners = new Dictionary<string, Miner>();
-            Resources = new Dictionary<string, Resource>();
-            Modules = new Dictionary<string, Module>();
             FailedFiles = new Dictionary<string, Exception>();
             FailedPaths = new Dictionary<string, Exception>();
         }
@@ -456,7 +443,7 @@ namespace Foreman
             {
                 return;
             }
-            Item newItem = new Item(name, "", null, "");
+            Item newItem = new Item(name, "", false, null, "");
             newItem.SetIconAndColor(GetIconAndColor(values));
 
             if (!Items.ContainsKey(name))
@@ -511,9 +498,9 @@ namespace Foreman
                 Recipe newRecipe = new Recipe(name, "", null, "");
                 newRecipe.Time = (time == 0.0f) ? defaultRecipeTime : time;
                 foreach (KeyValuePair<Item, float> kvp in ingredients)
-                    newRecipe.Ingredients.Add(kvp.Key, kvp.Value);
+                    newRecipe.AddIngredient(kvp.Key, kvp.Value);
                 foreach (KeyValuePair<Item, float> kvp in results)
-                    newRecipe.Results.Add(kvp.Key, kvp.Value);
+                    newRecipe.AddResult(kvp.Key, kvp.Value);
 
                 newRecipe.Category = GetLuaValueOrDefault<string>(values, "category", true, "crafting");
                 // Skip barreling recipes from Bobs/Angels
@@ -523,11 +510,6 @@ namespace Foreman
                         return;
                 }
                 newRecipe.SetIconAndColor(GetIconAndColor(values));
-
-                foreach (Item result in results.Keys)
-                    result.ProductionRecipes.Add(newRecipe);
-                foreach (Item ingredient in ingredients.Keys)
-                    ingredient.ConsumptionRecipes.Add(newRecipe);
 
                 Recipes.Add(newRecipe.Name, newRecipe);
             }
@@ -715,7 +697,7 @@ namespace Foreman
             Item newItem;
             if (!Items.ContainsKey(itemName))
             {
-                Items.Add(itemName, newItem = new Item(itemName, "", null, ""));
+                Items.Add(itemName, newItem = new Item(itemName, "", false, null, ""));
             }
             else
             {

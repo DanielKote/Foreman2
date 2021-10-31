@@ -18,7 +18,7 @@ namespace Foreman
 
     public class Subgroup : DataObjectBase
     {
-        public Group MyGroup { get; internal set; }
+        public Group MyGroup { get; protected set; }
 
         public List<Recipe> Recipes { get; private set; }
         public List<Item> Items { get; private set; }

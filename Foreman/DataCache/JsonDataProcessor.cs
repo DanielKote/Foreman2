@@ -234,14 +234,14 @@ namespace Foreman
 
         private void ProcessItem(JToken objJToken)
         {
-            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
+            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], false, Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
             item.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
             Items.Add(item.Name, item);
         }
 
         private void ProcessFluid(JToken objJToken)
         {
-            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
+            Item item = new Item((string)objJToken["name"], (string)objJToken["localised_name"], true, Subgroups[(string)objJToken["subgroup"]], (string)objJToken["order"]);
             item.Temperature = (double)objJToken["default_temperature"];
             item.SetIconAndColor(ProcessIcon(objJToken["icon_info"], 32));
             Items.Add(item.Name, item);
@@ -267,46 +267,37 @@ namespace Foreman
 
                 string name = (string)productJToken["name"];
 
-                if((string)productJToken["type"] == "item" || productJToken["temperature"].Type == JTokenType.Null || Items[name].Temperature == (double)productJToken["temperature"])
+                float amount = (float)productJToken["amount"];
+                if (amount != 0)
                 {
-                    if (recipe.Results.ContainsKey(Items[name])) //base name double check
-                        recipe.Results[Items[name]] += (float)productJToken["amount"];
-                    else
+                    if ((string)productJToken["type"] == "item" || productJToken["temperature"].Type == JTokenType.Null || Items[name].Temperature == (double)productJToken["temperature"])
                     {
-                        recipe.Results.Add(Items[name], (float)productJToken["amount"]);
-                        Items[name].ProductionRecipes.Add(recipe);
+                        recipe.AddResult(Items[name], amount);
                     }
-                }
-                else //this is a fluid with a specified temperature different from the default fluid temperature
-                {
-                    double temp = (double)productJToken["temperature"];
-                    string fluidName = name + String.Format("\n{0:N2}", temp);
-                    if (Items.ContainsKey(fluidName))
+                    else //this is a fluid with a specified temperature different from the default fluid temperature
                     {
-                        //the new fluid has already been 'created' by a previous recipe
-                        if (recipe.Results.ContainsKey(Items[fluidName]))
-                            recipe.Results[Items[fluidName]] += (float)productJToken["amount"];
-                        else if ((float)productJToken["amount"] != 0)
+                        double temp = (double)productJToken["temperature"];
+                        string fluidName = name + String.Format("\n{0:N2}", temp);
+                        if (Items.ContainsKey(fluidName))
                         {
-                            recipe.Results.Add(Items[fluidName], (float)productJToken["amount"]);
-                            Items[fluidName].ProductionRecipes.Add(recipe);
+                            //the new fluid has already been 'created' by a previous recipe
+                            recipe.AddResult(Items[fluidName], amount);
                         }
-                    }
-                    else
-                    {
-                        //we have to add the new fluid
-                        if (!FluidDuplicants.ContainsKey(name))
-                            FluidDuplicants[name] = new List<string>();
-                        FluidDuplicants[name].Add(fluidName);
+                        else
+                        {
+                            //we have to add the new fluid
+                            if (!FluidDuplicants.ContainsKey(name))
+                                FluidDuplicants[name] = new List<string>();
+                            FluidDuplicants[name].Add(fluidName);
 
-                        Item defaultFluid = Items[name];
-                        Item newFluid = new Item(fluidName, defaultFluid.LName + " (" + temp + "*)", defaultFluid.MySubgroup, defaultFluid.Order+temp);
-                        newFluid.Temperature = temp;
-                        newFluid.Icon = defaultFluid.Icon;
+                            Item defaultFluid = Items[name];
+                            Item newFluid = new Item(fluidName, defaultFluid.LName + " (" + temp + "°)", true, defaultFluid.MySubgroup, defaultFluid.Order + temp);
+                            newFluid.Temperature = temp;
+                            newFluid.Icon = defaultFluid.Icon;
 
-                        Items.Add(newFluid.Name, newFluid);
-                        recipe.Results.Add(Items[newFluid.Name], (float)productJToken["amount"]);
-                        newFluid.ProductionRecipes.Add(recipe);
+                            Items.Add(newFluid.Name, newFluid);
+                            recipe.AddResult(newFluid, amount);
+                        }
                     }
                 }
             }
@@ -317,65 +308,61 @@ namespace Foreman
             recipes.Add(Recipes[(string)objJToken["name"]]);
             foreach (var ingredientJToken in objJToken["ingredients"].ToList())
             {
-                if ((float)ingredientJToken["amount"] == 0)
-                    continue;
 
                 string name = (string)ingredientJToken["name"];
                 double minTemp = (ingredientJToken["minimum_temperature"] == null || ingredientJToken["minimum_temperature"].Type == JTokenType.Null) ? double.MinValue : (double)ingredientJToken["minimum_temperature"];
                 double maxTemp = (ingredientJToken["maximum_temperature"] == null || ingredientJToken["maximum_temperature"].Type == JTokenType.Null) ? double.MaxValue : (double)ingredientJToken["maximum_temperature"];
+                float amount = (float)ingredientJToken["amount"];
 
-                Item defaultIngredient = Items[name];
-                List<Item> validIngredients = new List<Item>();
-                if ((string)ingredientJToken["type"] == "item" || defaultIngredient.Temperature >= minTemp && defaultIngredient.Temperature <= maxTemp)
-                    validIngredients.Add(defaultIngredient);
-                if (FluidDuplicants.ContainsKey(name)) //have to check for any duplicants and possibly create alternate recipes
+                if (amount != 0)
                 {
-                    foreach (string altName in FluidDuplicants[name])
+                    Item defaultIngredient = Items[name];
+                    List<Item> validIngredients = new List<Item>();
+                    if ((string)ingredientJToken["type"] == "item" || defaultIngredient.Temperature >= minTemp && defaultIngredient.Temperature <= maxTemp)
+                        validIngredients.Add(defaultIngredient);
+                    if (FluidDuplicants.ContainsKey(name)) //have to check for any duplicants and possibly create alternate recipes
                     {
-                        Item altIngredient = Items[altName];
-                        if (altIngredient.Temperature >= minTemp && altIngredient.Temperature <= maxTemp)
-                            validIngredients.Add(altIngredient);
-                    }
-                }
-
-                //increase the number of recipes if necessary (each one beyond the first valid ingredient)
-                int baseRecipeCount = recipes.Count();
-                for (int i = 1; i < validIngredients.Count; i++)
-                {
-                    if (!RecipeDuplicants.ContainsKey(recipes[0].Name))
-                        RecipeDuplicants[recipes[0].Name] = new List<string>();
-
-                    for (int j = 0; j < baseRecipeCount; j++)
-                    {
-                        Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1), recipes[j].LName, recipes[0].MySubgroup, recipes[0].Order+(i * baseRecipeCount + j + 1));
-                        newRecipe.Category = recipes[j].Category;
-                        newRecipe.Hidden = recipes[j].Hidden;
-                        newRecipe.Time = recipes[j].Time;
-                        newRecipe.Icon = recipes[j].Icon;
-
-                        foreach (KeyValuePair<Item, float> kvp in recipes[j].Ingredients)
-                            newRecipe.Ingredients.Add(kvp.Key, kvp.Value);
-                        foreach (KeyValuePair<Item, float> kvp in recipes[j].Results)
-                            newRecipe.Results.Add(kvp.Key, kvp.Value);
-
-                        recipes.Add(newRecipe);
-                        Recipes.Add(newRecipe.Name, newRecipe);
-                        RecipeDuplicants[recipes[0].Name].Add(newRecipe.Name);
-                    }
-                }
-
-                //process each ingredient
-                for (int i = 0; i < validIngredients.Count; i++)
-                {
-                    for (int j = 0; j < baseRecipeCount; j++)
-                    {
-                        Recipe crecipe = recipes[i * baseRecipeCount + j];
-                        if (crecipe.Ingredients.ContainsKey(validIngredients[i]))
-                            crecipe.Ingredients[validIngredients[i]] += (float)ingredientJToken["amount"];
-                        else
+                        foreach (string altName in FluidDuplicants[name])
                         {
-                            crecipe.Ingredients.Add(validIngredients[i], (float)ingredientJToken["amount"]);
-                            validIngredients[i].ConsumptionRecipes.Add(crecipe);
+                            Item altIngredient = Items[altName];
+                            if (altIngredient.Temperature >= minTemp && altIngredient.Temperature <= maxTemp)
+                                validIngredients.Add(altIngredient);
+                        }
+                    }
+
+                    //increase the number of recipes if necessary (each one beyond the first valid ingredient)
+                    int baseRecipeCount = recipes.Count();
+                    for (int i = 1; i < validIngredients.Count; i++)
+                    {
+                        if (!RecipeDuplicants.ContainsKey(recipes[0].Name))
+                            RecipeDuplicants[recipes[0].Name] = new List<string>();
+
+                        for (int j = 0; j < baseRecipeCount; j++)
+                        {
+                            Recipe newRecipe = new Recipe(recipes[0].Name + String.Format("\n{0}", i * baseRecipeCount + j + 1), recipes[j].LName, recipes[0].MySubgroup, recipes[0].Order + (i * baseRecipeCount + j + 1));
+                            newRecipe.Category = recipes[j].Category;
+                            newRecipe.Hidden = recipes[j].Hidden;
+                            newRecipe.Time = recipes[j].Time;
+                            newRecipe.Icon = recipes[j].Icon;
+
+                            foreach (KeyValuePair<Item, float> kvp in recipes[j].IngredientsSet)
+                                newRecipe.AddIngredient(kvp.Key, kvp.Value);
+                            foreach (KeyValuePair<Item, float> kvp in recipes[j].ResultsSet)
+                                newRecipe.AddResult(kvp.Key, kvp.Value);
+
+                            recipes.Add(newRecipe);
+                            Recipes.Add(newRecipe.Name, newRecipe);
+                            RecipeDuplicants[recipes[0].Name].Add(newRecipe.Name);
+                        }
+                    }
+
+                    //process each ingredient
+                    for (int i = 0; i < validIngredients.Count; i++)
+                    {
+                        for (int j = 0; j < baseRecipeCount; j++)
+                        {
+                            Recipe crecipe = recipes[i * baseRecipeCount + j];
+                            crecipe.AddIngredient(validIngredients[i], amount);
                         }
                     }
                 }
@@ -457,21 +444,21 @@ namespace Foreman
             foreach(KeyValuePair<string, List<string>> kvp in FluidDuplicants)
             {
                 Item defaultFluid = Items[kvp.Key];
-                defaultFluid.LName += " (" + defaultFluid.Temperature + "*)";
+                defaultFluid.LName += " (" + defaultFluid.Temperature + "°)";
                 List<Item> altFluids = new List<Item>();
                 foreach (string altNames in kvp.Value)
                     altFluids.Add(Items[altNames]);
 
                 bool defaultIsProduced = false;
                 foreach(Recipe recipe in Recipes.Values)
-                    foreach (Item fluid in recipe.Results.Keys)
+                    foreach (Item fluid in recipe.ResultsSet.Keys)
                         defaultIsProduced |= (fluid == defaultFluid);
 
                 if(!defaultIsProduced) //nothing produces it, have to check if every consumer has an alternative
                 {
                     List<Recipe> defaultUseRecipes = new List<Recipe>();
                     foreach (Recipe recipe in Recipes.Values)
-                        foreach (Item item in recipe.Ingredients.Keys)
+                        foreach (Item item in recipe.IngredientsSet.Keys)
                             if (item == defaultFluid)
                                 defaultUseRecipes.Add(recipe);
 
@@ -483,7 +470,7 @@ namespace Foreman
                         {
                             foreach(string altRecipeName in RecipeDuplicants[recipe.Name])
                                 foreach (Item altFluid in altFluids)
-                                    canUseAltFluid |= Recipes[altRecipeName].Ingredients.ContainsKey(altFluid);
+                                    canUseAltFluid |= Recipes[altRecipeName].IngredientsSet.ContainsKey(altFluid);
                         }
                         if (!canUseAltFluid)
                             defaultIsUnnecessary = false;
@@ -556,9 +543,9 @@ namespace Foreman
             HashSet<Item> unusableItems = new HashSet<Item>(Items.Values);
             foreach (Recipe recipe in Recipes.Values)
             {
-                foreach (Item item in recipe.Ingredients.Keys)
+                foreach (Item item in recipe.IngredientsSet.Keys)
                     unusableItems.Remove(item);
-                foreach (Item item in recipe.Results.Keys)
+                foreach (Item item in recipe.ResultsSet.Keys)
                     unusableItems.Remove(item);
             }
             //step 3.5: remove blocked items

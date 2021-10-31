@@ -531,12 +531,12 @@ namespace Foreman
 					tti.Text += String.Format("Recipe: {0}", (DisplayedNode as RecipeNode).BaseRecipe.FriendlyName);
 					tti.Text += String.Format("\n--Base Time: {0}s", (DisplayedNode as RecipeNode).BaseRecipe.Time);
 					tti.Text += String.Format("\n--Base Ingredients:");
-					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.Ingredients)
+					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.IngredientsSet)
 					{
 						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
 					}
 					tti.Text += String.Format("\n--Base Results:");
-					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.Results)
+					foreach (var kvp in (DisplayedNode as RecipeNode).BaseRecipe.ResultsSet)
 					{
 						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
 					}

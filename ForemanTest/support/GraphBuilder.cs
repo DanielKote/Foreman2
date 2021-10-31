@@ -127,7 +127,7 @@ namespace ForemanTest
 
             internal override void Build(ProductionGraph graph)
             {
-                Built = this.createFunction(new Item(itemName, "", TestSubgroup, ""), graph);
+                Built = this.createFunction(new Item(itemName, "", false, TestSubgroup, ""), graph);
 
                 if (target > 0)
                 {
@@ -165,9 +165,9 @@ namespace ForemanTest
                 Recipe recipe = new Recipe(name, "", TestSubgroup, "");
                 recipe.Time = duration;
                 foreach (KeyValuePair<string, float> kvp in inputs)
-                    recipe.Ingredients.Add(DataCache.Items[kvp.Key], kvp.Value);
+                    recipe.AddIngredient(DataCache.Items[kvp.Key], kvp.Value);
                 foreach (KeyValuePair<string, float> kvp in outputs)
-                    recipe.Results.Add(DataCache.Items[kvp.Key], kvp.Value);
+                    recipe.AddResult(DataCache.Items[kvp.Key], kvp.Value);
 
                 Built = RecipeNode.Create(recipe, graph);
                 this.Built.ProductivityBonus = efficiency;
@@ -228,7 +228,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Suppliers(string itemName)
             {
-                return Graph.GetSuppliers(new Item(itemName, "", TestSubgroup, ""));
+                return Graph.GetSuppliers(new Item(itemName, "", false, TestSubgroup, ""));
             }
 
             public float ConsumedRate(string itemName)
@@ -238,7 +238,7 @@ namespace ForemanTest
 
             private IEnumerable<ProductionNode> Consumers(string itemName)
             {
-                return Graph.GetConsumers(new Item(itemName, "", TestSubgroup, ""));
+                return Graph.GetConsumers(new Item(itemName, "", false, TestSubgroup, ""));
             }
 
             public float RecipeRate(string name)
@@ -255,7 +255,7 @@ namespace ForemanTest
                    .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
                    .Select(x => (RecipeNode)x)
                    .First()
-                   .GetSuppliedRate(new Item(itemName, "", TestSubgroup, ""));
+                   .GetSuppliedRate(new Item(itemName, "", false, TestSubgroup, ""));
             }
         }
     }

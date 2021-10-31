@@ -164,7 +164,7 @@ namespace Foreman
 		{
 			get
 			{
-				foreach (Item item in BaseRecipe.Ingredients.Keys)
+				foreach (Item item in BaseRecipe.IngredientsSet.Keys)
 				{
 					yield return item;
 				}
@@ -175,7 +175,7 @@ namespace Foreman
 		{
 			get
 			{
-				foreach (Item item in BaseRecipe.Results.Keys)
+				foreach (Item item in BaseRecipe.ResultsSet.Keys)
 				{
 					yield return item;
 				}
@@ -217,26 +217,26 @@ namespace Foreman
 
 		public override float GetConsumeRate(Item item)
         {
-			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.Ingredients.ContainsKey(item))
+			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.IngredientsSet.ContainsKey(item))
 				return 0f;
-			return (float)Math.Round(BaseRecipe.Ingredients[item] * actualRate, RoundingDP);
+			return (float)Math.Round(BaseRecipe.IngredientsSet[item] * actualRate, RoundingDP);
         }
 
         public override float GetSupplyRate(Item item)
         {
-			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.Results.ContainsKey(item))
+			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.ResultsSet.ContainsKey(item))
 				return 0f;
-			return (float)Math.Round(BaseRecipe.Results[item] * actualRate * ProductivityMultiplier(), RoundingDP);
+			return (float)Math.Round(BaseRecipe.ResultsSet[item] * actualRate * ProductivityMultiplier(), RoundingDP);
         }
 
         internal override double outputRateFor(Item item)
         {
-			return BaseRecipe.Results[item];
+			return BaseRecipe.ResultsSet[item];
         }
 
         internal override double inputRateFor(Item item)
         {
-			return BaseRecipe.Ingredients[item];
+			return BaseRecipe.IngredientsSet[item];
         }
 
         public override float ProductivityMultiplier()

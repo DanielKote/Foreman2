@@ -183,31 +183,15 @@ namespace Foreman
 			}
 			else //at least one null
 			{
+				Point originPoint = new Point(Parent.GraphToScreen(location).X - 150, 15);
+				originPoint.X = Math.Max(15, Math.Min(Parent.Width - 650, originPoint.X));
+
 				bool includeSuppliers = StartConnectionType == LinkType.Input && SupplierElement == null;
 				bool includeConsumers = StartConnectionType == LinkType.Output && ConsumerElement == null;
-				if (includeSuppliers || includeConsumers)
-				{
-					var chooserPanel = new ChooserPanel(Item, includeSuppliers, includeConsumers, Parent);
-
-					chooserPanel.Show(c =>
-					{
-						if (c != null)
-						{
-							NodeElement newElement = new NodeElement(c, Parent);
-							newElement.Location = newObjectLocation;
-							newElement.Update();
-
-							NodeLink newLink = NodeLink.Create(SupplierElement != null? SupplierElement.DisplayedNode : newElement.DisplayedNode, ConsumerElement != null? ConsumerElement.DisplayedNode : newElement.DisplayedNode, this.Item);
-							new LinkElement(Parent, newLink, SupplierElement != null? SupplierElement : newElement, ConsumerElement != null? ConsumerElement : newElement);
-
-							Parent.Graph.UpdateNodeValues();
-							Parent.AddRemoveElements();
-							Parent.UpdateNodes();
-							Parent.UpdateGraphBounds();
-							Parent.Invalidate();
-						}
-					});
-				}
+				if (includeSuppliers)
+					Parent.AddRecipe(originPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
+				else if (includeConsumers)
+					Parent.AddRecipe(originPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Consumer, SupplierElement);
 			}
 			Dispose();
 		}
@@ -218,9 +202,7 @@ namespace Foreman
 			{
 				case MouseButtons.Left:
 					if (DragType == DragType.MouseUp)
-					{
 						EndDrag(location);
-					}
 					break;
 
 				case MouseButtons.Right:
@@ -235,9 +217,7 @@ namespace Foreman
 			{
 				case MouseButtons.Left:
 					if (DragType == DragType.MouseDown)
-					{
 						EndDrag(location);
-					}
 					break;
 			}
 		}
@@ -251,28 +231,20 @@ namespace Foreman
 				if (StartConnectionType == LinkType.Input)
 				{
 					if (mousedElement.DisplayedNode.Outputs.Contains(Item))
-					{
 						SupplierElement = mousedElement;
-					}
 				}
 				else
 				{
 					if (mousedElement.DisplayedNode.Inputs.Contains(Item))
-					{
 						ConsumerElement = mousedElement;
-					}
 				}
 			}
 			else
 			{
 				if (StartConnectionType == LinkType.Input)
-				{
 					SupplierElement = null;
-				}
 				else
-				{
 					ConsumerElement = null;
-				}
 			}
 		}
 	}

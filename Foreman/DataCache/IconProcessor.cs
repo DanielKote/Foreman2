@@ -248,7 +248,7 @@ namespace Foreman
             }
             icon.UnlockBits(iconData);
 
-            return Color.FromArgb(totalPixel[0], totalPixel[1], totalPixel[2], totalPixel[3]);
+            return Color.FromArgb(255, totalPixel[1], totalPixel[2], totalPixel[3]);
         }
 
         private const int iconBorder = 1; //border is drawn on a new layer as 

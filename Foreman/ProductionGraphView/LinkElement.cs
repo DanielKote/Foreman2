@@ -19,7 +19,7 @@ namespace Foreman
 		private Point pointN, pointN2;
 		private Point pointMidM, pointMidA, pointMidB, pointMidN;
 		private bool linkingUp;
-		private bool directLine;
+		public float LinkWidth { get; set; }
 
 		public Rectangle CalculatedBounds { get; private set; }
 
@@ -62,6 +62,7 @@ namespace Foreman
 			ConsumerElement = consumerElement;
 			SupplierTab = supplierElement.GetOutputLineItemTab(Item);
 			ConsumerTab = consumerElement.GetInputLineItemTab(Item);
+			LinkWidth = 3f;
 			UpdateCurve();
 		}
 
@@ -88,14 +89,9 @@ namespace Foreman
 				linkingUp = (pointN.Y > pointM.Y);
 				if (linkingUp)
 				{
-					//connecting up
-					directLine = (pointN.X == pointM.X || (Math.Abs(pointN.X - pointM.X) + Math.Abs(pointN.Y - pointM.Y) < 40));
-
-					if (!directLine)
-					{
-						pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 20));
-						pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 20));
-					}
+					//directLine = (pointN.X == pointM.X || (Math.Abs(pointN.X - pointM.X) + Math.Abs(pointN.Y - pointM.Y) < 40)); //just in case we want to draw it as a straight
+					pointN2 = new Point(pointN.X, pointN.Y - Math.Max((int)((pointN.Y - pointM.Y) / 2), 20));
+					pointM2 = new Point(pointM.X, pointM.Y + Math.Max((int)((pointN.Y - pointM.Y) / 2), 20));
 
 					CalculatedBounds = new Rectangle(
 						Math.Min(pointM.X, pointN.X),
@@ -134,25 +130,32 @@ namespace Foreman
 			{
 				UpdateCurve();
 
-				if (linkingUp)
+				using (Pen pen = new Pen(Item.AverageColor, LinkWidth))
 				{
-					//connecting up
-					using (Pen pen = new Pen(Item.AverageColor, 3f))
-					{
-						if (directLine)
-							graphics.DrawLine(pen, PT(pointM, trans), PT(pointN, trans));
-						else
-							graphics.DrawBezier(pen, PT(pointN,trans), PT(pointN2,trans), PT(pointM2, trans), PT(pointM,trans));
-					}
-				}
-				else
-				{
-					using (Pen pen = new Pen(Item.AverageColor, 3f))
-					{
-						graphics.DrawBezier(pen, PT(pointN, trans), PT(pointN2, trans), PT(pointMidN, trans), PT(pointMidA, trans));
-						graphics.DrawLine(pen, PT(pointMidA, trans), PT(pointMidB, trans));
-						graphics.DrawBezier(pen, PT(pointMidB, trans), PT(pointMidM, trans), PT(pointM2, trans), PT(pointM, trans));
-					}
+					if (linkingUp)
+						graphics.DrawBeziers(pen, new Point[] {
+							PT(PT(pointN,trans), 0, 10),
+							PT(PT(pointN,trans), 0, 10),
+							PT(pointN,trans),
+							PT(pointN,trans),
+							PT(pointN2,trans),
+							PT(pointM2, trans),
+							PT(pointM,trans),
+							PT(pointM,trans),
+							PT(PT(pointM,trans), 0, -10),
+							PT(PT(pointM,trans), 0, -10) });
+					else
+						graphics.DrawBeziers(pen, new Point[]{
+							PT(pointN, trans),
+							PT(pointN2, trans),
+							PT(pointMidN, trans),
+							PT(pointMidA, trans),
+							PT(pointMidA, trans),
+							PT(pointMidB, trans),
+							PT(pointMidB, trans),
+							PT(pointMidM, trans),
+							PT(pointM2, trans),
+							PT(pointM, trans) });
 				}
 			}
 		}

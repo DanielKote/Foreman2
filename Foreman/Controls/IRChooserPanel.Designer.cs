@@ -31,28 +31,23 @@ namespace Foreman
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.GroupFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.BaseGroupButton = new System.Windows.Forms.Button();
             this.IRFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.BaseIRUsedButton = new System.Windows.Forms.Button();
-            this.BaseIREmptyButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.ItemIconPanel = new System.Windows.Forms.Panel();
             this.IgnoreAssemblerCheckBox = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.FilterLabel = new System.Windows.Forms.Label();
             this.AsProductCheckBox = new System.Windows.Forms.CheckBox();
             this.AsIngredientCheckBox = new System.Windows.Forms.CheckBox();
             this.ShowHiddenCheckBox = new System.Windows.Forms.CheckBox();
             this.FilterTextBox = new System.Windows.Forms.TextBox();
             this.IRPanelScrollBar = new System.Windows.Forms.VScrollBar();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.OtherNodeOptionsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.AddSupplyButton = new System.Windows.Forms.Button();
             this.AddPassthroughButton = new System.Windows.Forms.Button();
             this.AddConsumerButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
-            this.GroupFlowPanel.SuspendLayout();
-            this.IRFlowPanel.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.OtherNodeOptionsTableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -67,7 +62,7 @@ namespace Foreman
             this.tableLayoutPanel1.Controls.Add(this.IRFlowPanel, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.IRPanelScrollBar, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.OtherNodeOptionsTableLayoutPanel, 0, 3);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -76,7 +71,7 @@ namespace Foreman
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(394, 500);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(394, 420);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // GroupFlowPanel
@@ -85,71 +80,22 @@ namespace Foreman
             this.GroupFlowPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.GroupFlowPanel.BackColor = System.Drawing.Color.DimGray;
             this.tableLayoutPanel1.SetColumnSpan(this.GroupFlowPanel, 2);
-            this.GroupFlowPanel.Controls.Add(this.BaseGroupButton);
             this.GroupFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GroupFlowPanel.Location = new System.Drawing.Point(3, 99);
             this.GroupFlowPanel.Name = "GroupFlowPanel";
             this.GroupFlowPanel.Padding = new System.Windows.Forms.Padding(2);
-            this.GroupFlowPanel.Size = new System.Drawing.Size(388, 68);
+            this.GroupFlowPanel.Size = new System.Drawing.Size(388, 4);
             this.GroupFlowPanel.TabIndex = 0;
-            // 
-            // BaseGroupButton
-            // 
-            this.BaseGroupButton.BackColor = System.Drawing.Color.Gray;
-            this.BaseGroupButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.BaseGroupButton.FlatAppearance.BorderSize = 2;
-            this.BaseGroupButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BaseGroupButton.Location = new System.Drawing.Point(2, 2);
-            this.BaseGroupButton.Margin = new System.Windows.Forms.Padding(0);
-            this.BaseGroupButton.Name = "BaseGroupButton";
-            this.BaseGroupButton.Size = new System.Drawing.Size(64, 64);
-            this.BaseGroupButton.TabIndex = 1;
-            this.BaseGroupButton.TabStop = false;
-            this.BaseGroupButton.UseVisualStyleBackColor = false;
-            this.BaseGroupButton.Visible = false;
             // 
             // IRFlowPanel
             // 
             this.IRFlowPanel.BackColor = System.Drawing.Color.DimGray;
-            this.IRFlowPanel.Controls.Add(this.BaseIRUsedButton);
-            this.IRFlowPanel.Controls.Add(this.BaseIREmptyButton);
-            this.IRFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.IRFlowPanel.Location = new System.Drawing.Point(3, 173);
+            this.IRFlowPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.IRFlowPanel.Location = new System.Drawing.Point(3, 109);
             this.IRFlowPanel.Name = "IRFlowPanel";
             this.IRFlowPanel.Padding = new System.Windows.Forms.Padding(2);
-            this.IRFlowPanel.Size = new System.Drawing.Size(364, 294);
+            this.IRFlowPanel.Size = new System.Drawing.Size(364, 278);
             this.IRFlowPanel.TabIndex = 1;
-            // 
-            // BaseIRUsedButton
-            // 
-            this.BaseIRUsedButton.BackColor = System.Drawing.Color.Gray;
-            this.BaseIRUsedButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.BaseIRUsedButton.FlatAppearance.BorderSize = 2;
-            this.BaseIRUsedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BaseIRUsedButton.Location = new System.Drawing.Point(3, 3);
-            this.BaseIRUsedButton.Margin = new System.Windows.Forms.Padding(1);
-            this.BaseIRUsedButton.Name = "BaseIRUsedButton";
-            this.BaseIRUsedButton.Size = new System.Drawing.Size(34, 34);
-            this.BaseIRUsedButton.TabIndex = 0;
-            this.BaseIRUsedButton.TabStop = false;
-            this.BaseIRUsedButton.UseVisualStyleBackColor = false;
-            this.BaseIRUsedButton.Visible = false;
-            // 
-            // BaseIREmptyButton
-            // 
-            this.BaseIREmptyButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.BaseIREmptyButton.Enabled = false;
-            this.BaseIREmptyButton.FlatAppearance.BorderSize = 2;
-            this.BaseIREmptyButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BaseIREmptyButton.ForeColor = System.Drawing.Color.Gray;
-            this.BaseIREmptyButton.Location = new System.Drawing.Point(50, 14);
-            this.BaseIREmptyButton.Margin = new System.Windows.Forms.Padding(12);
-            this.BaseIREmptyButton.Name = "BaseIREmptyButton";
-            this.BaseIREmptyButton.Size = new System.Drawing.Size(12, 12);
-            this.BaseIREmptyButton.TabIndex = 10;
-            this.BaseIREmptyButton.TabStop = false;
-            this.BaseIREmptyButton.UseVisualStyleBackColor = false;
-            this.BaseIREmptyButton.Visible = false;
             // 
             // panel1
             // 
@@ -158,7 +104,7 @@ namespace Foreman
             this.tableLayoutPanel1.SetColumnSpan(this.panel1, 2);
             this.panel1.Controls.Add(this.ItemIconPanel);
             this.panel1.Controls.Add(this.IgnoreAssemblerCheckBox);
-            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.FilterLabel);
             this.panel1.Controls.Add(this.AsProductCheckBox);
             this.panel1.Controls.Add(this.AsIngredientCheckBox);
             this.panel1.Controls.Add(this.ShowHiddenCheckBox);
@@ -189,16 +135,15 @@ namespace Foreman
             this.IgnoreAssemblerCheckBox.TabIndex = 2;
             this.IgnoreAssemblerCheckBox.Text = "Ignore Assembler Status";
             this.IgnoreAssemblerCheckBox.UseVisualStyleBackColor = true;
-            this.IgnoreAssemblerCheckBox.Visible = false;
             // 
-            // label1
+            // FilterLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 5);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(52, 20);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Filter:";
+            this.FilterLabel.AutoSize = true;
+            this.FilterLabel.Location = new System.Drawing.Point(3, 5);
+            this.FilterLabel.Name = "FilterLabel";
+            this.FilterLabel.Size = new System.Drawing.Size(52, 20);
+            this.FilterLabel.TabIndex = 4;
+            this.FilterLabel.Text = "Filter:";
             // 
             // AsProductCheckBox
             // 
@@ -249,32 +194,32 @@ namespace Foreman
             // IRPanelScrollBar
             // 
             this.IRPanelScrollBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.IRPanelScrollBar.Location = new System.Drawing.Point(370, 173);
+            this.IRPanelScrollBar.Location = new System.Drawing.Point(370, 109);
             this.IRPanelScrollBar.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.IRPanelScrollBar.Name = "IRPanelScrollBar";
-            this.IRPanelScrollBar.Size = new System.Drawing.Size(21, 294);
+            this.IRPanelScrollBar.Size = new System.Drawing.Size(21, 278);
             this.IRPanelScrollBar.TabIndex = 3;
             this.IRPanelScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.IRPanelScrollBar_Scroll);
             // 
-            // tableLayoutPanel2
+            // OtherNodeOptionsTableLayoutPanel
             // 
-            this.tableLayoutPanel2.ColumnCount = 3;
-            this.tableLayoutPanel1.SetColumnSpan(this.tableLayoutPanel2, 2);
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
-            this.tableLayoutPanel2.Controls.Add(this.AddSupplyButton, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.AddPassthroughButton, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.AddConsumerButton, 2, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 470);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(394, 30);
-            this.tableLayoutPanel2.TabIndex = 4;
-            this.tableLayoutPanel2.Visible = false;
+            this.OtherNodeOptionsTableLayoutPanel.ColumnCount = 3;
+            this.tableLayoutPanel1.SetColumnSpan(this.OtherNodeOptionsTableLayoutPanel, 2);
+            this.OtherNodeOptionsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
+            this.OtherNodeOptionsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
+            this.OtherNodeOptionsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
+            this.OtherNodeOptionsTableLayoutPanel.Controls.Add(this.AddSupplyButton, 0, 0);
+            this.OtherNodeOptionsTableLayoutPanel.Controls.Add(this.AddPassthroughButton, 1, 0);
+            this.OtherNodeOptionsTableLayoutPanel.Controls.Add(this.AddConsumerButton, 2, 0);
+            this.OtherNodeOptionsTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.OtherNodeOptionsTableLayoutPanel.Location = new System.Drawing.Point(0, 390);
+            this.OtherNodeOptionsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.OtherNodeOptionsTableLayoutPanel.Name = "OtherNodeOptionsTableLayoutPanel";
+            this.OtherNodeOptionsTableLayoutPanel.RowCount = 1;
+            this.OtherNodeOptionsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.OtherNodeOptionsTableLayoutPanel.Size = new System.Drawing.Size(394, 30);
+            this.OtherNodeOptionsTableLayoutPanel.TabIndex = 4;
+            this.OtherNodeOptionsTableLayoutPanel.Visible = false;
             // 
             // AddSupplyButton
             // 
@@ -315,16 +260,15 @@ namespace Foreman
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.Black;
             this.Controls.Add(this.tableLayoutPanel1);
+            this.DoubleBuffered = true;
             this.Name = "IRChooserPanel";
-            this.Size = new System.Drawing.Size(394, 500);
+            this.Size = new System.Drawing.Size(394, 420);
             this.Leave += new System.EventHandler(this.IRChooserPanel_Leave);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.GroupFlowPanel.ResumeLayout(false);
-            this.IRFlowPanel.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
+            this.OtherNodeOptionsTableLayoutPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -333,23 +277,20 @@ namespace Foreman
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        internal System.Windows.Forms.FlowLayoutPanel IRFlowPanel;
-        internal System.Windows.Forms.FlowLayoutPanel GroupFlowPanel;
+        protected System.Windows.Forms.FlowLayoutPanel IRFlowPanel;
+        protected System.Windows.Forms.FlowLayoutPanel GroupFlowPanel;
         private System.Windows.Forms.Panel panel1;
-        internal System.Windows.Forms.VScrollBar IRPanelScrollBar;
-        private System.Windows.Forms.Label label1;
-        internal System.Windows.Forms.CheckBox AsProductCheckBox;
-        internal System.Windows.Forms.CheckBox AsIngredientCheckBox;
-        internal System.Windows.Forms.CheckBox ShowHiddenCheckBox;
-        internal System.Windows.Forms.TextBox FilterTextBox;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        internal System.Windows.Forms.Button AddSupplyButton;
-        internal System.Windows.Forms.Button AddPassthroughButton;
-        internal System.Windows.Forms.Button AddConsumerButton;
-        internal System.Windows.Forms.CheckBox IgnoreAssemblerCheckBox;
-        internal System.Windows.Forms.Panel ItemIconPanel;
-        private System.Windows.Forms.Button BaseGroupButton;
-        private System.Windows.Forms.Button BaseIRUsedButton;
-        private System.Windows.Forms.Button BaseIREmptyButton;
+        protected System.Windows.Forms.VScrollBar IRPanelScrollBar;
+        protected System.Windows.Forms.CheckBox AsProductCheckBox;
+        protected System.Windows.Forms.CheckBox AsIngredientCheckBox;
+        protected System.Windows.Forms.CheckBox ShowHiddenCheckBox;
+        protected System.Windows.Forms.TextBox FilterTextBox;
+        protected System.Windows.Forms.Button AddSupplyButton;
+        protected System.Windows.Forms.Button AddPassthroughButton;
+        protected System.Windows.Forms.Button AddConsumerButton;
+        protected System.Windows.Forms.CheckBox IgnoreAssemblerCheckBox;
+        protected System.Windows.Forms.Panel ItemIconPanel;
+        protected System.Windows.Forms.TableLayoutPanel OtherNodeOptionsTableLayoutPanel;
+        protected System.Windows.Forms.Label FilterLabel;
     }
 }

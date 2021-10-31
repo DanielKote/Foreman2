@@ -18,10 +18,10 @@ namespace Foreman
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
 		private enum DragOperation { None, Item, Selection, Processed }
+		public enum NewNodeType { Disconnected, Supplier, Consumer }
 
 		public HashSet<GraphElement> Elements = new HashSet<GraphElement>();
 		public ProductionGraph Graph = new ProductionGraph();
-		private List<Item> Demands = new List<Item>();
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
@@ -34,6 +34,7 @@ namespace Foreman
 		private Point mouseDownStartScreenPoint;
 		private DragOperation currentDragOperation = DragOperation.None;
 		private bool viewBeingDragged = false; //separate from dragOperation due to being able to drag view at all stages of dragOperation
+		private const int minDragDiff = 30;
 
 		public int CurrentGridUnit = 0;
 		public int CurrentMajorGridUnit = 0;
@@ -55,18 +56,16 @@ namespace Foreman
 		private Pen selectionPen = new Pen(Color.FromArgb(100, 100, 200), 2);
 
 		private readonly Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
+
 		public bool ShowAssemblers = false;
 		public bool ShowMiners = false;
-		public bool ShowInserters = true;
-		StringFormat stringFormat = new StringFormat();
-		public GhostNodeElement GhostDragElement = null;
+
+		public bool DynamicLinkWidth = false;
+		private const int minLinkWidth = 3;
+		private const int maxLinkWidth = 50;
+
 		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
-
-		private const int minDragDiff = 30;
-
-		private Rectangle visibleGraphBounds;
-
-		private ContextMenu rightClickMenu = new ContextMenu();
+		StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
 
 		public Rectangle GraphBounds
 		{
@@ -95,15 +94,14 @@ namespace Foreman
 					return new Rectangle(0, 0, 0, 0);
 			}
 		}
+		private Rectangle visibleGraphBounds;
+
+		private ContextMenu rightClickMenu = new ContextMenu();
 
 		public ProductionGraphViewer()
 		{
 			InitializeComponent();
 			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
-			DragOver += new DragEventHandler(HandleItemDragging);
-			DragDrop += new DragEventHandler(HandleItemDropping);
-			DragEnter += new DragEventHandler(HandleDragEntering);
-			DragLeave += new EventHandler(HandleDragLeaving);
 			Resize += new EventHandler(ProductionGraphViewer_Resized);
 			ViewOffset = new Point(Width / -2, Height / -2);
 
@@ -113,6 +111,54 @@ namespace Foreman
 			UpdateGraphBounds();
 			Invalidate();
 		}
+
+		//----------------------------------------------Node functions
+
+		public void AddItem(Point drawOrigin, Point newLocation)
+		{
+			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
+			itemChooser.Show(selectedItem => {
+				if (selectedItem != null)
+					AddRecipe(drawOrigin, selectedItem, newLocation, NewNodeType.Disconnected);
+			});
+		}
+
+		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType , NodeElement originElement = null)
+		{
+			if (nNodeType != NewNodeType.Disconnected && originElement == null) //just in case check (should
+				Trace.Fail("Origin element not provided for a new (linked) node");
+
+			if (ShowGrid)
+				newLocation = new Point(AlignToGrid(newLocation.X), AlignToGrid(newLocation.Y));
+
+			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
+			recipeChooser.Show(newProductionNode =>
+			{
+				if(newProductionNode != null)
+                {
+					NodeElement newElement = new NodeElement(newProductionNode, this);
+					newElement.Update();
+					newElement.Location = newLocation;
+
+					if(nNodeType == NewNodeType.Consumer)
+                    {
+						NodeLink newLink = NodeLink.Create(originElement.DisplayedNode, newElement.DisplayedNode, baseItem);
+						new LinkElement(this, newLink, originElement, newElement);
+					}
+					else if(nNodeType == NewNodeType.Supplier)
+                    {
+						NodeLink newLink = NodeLink.Create(newElement.DisplayedNode, originElement.DisplayedNode, baseItem);
+						new LinkElement(this, newLink, newElement, originElement);
+					}
+				}
+
+				Graph.UpdateNodeValues();
+				AddRemoveElements();
+				UpdateNodes();
+				UpdateGraphBounds();
+				Invalidate();
+			});
+        }
 
 		public void UpdateNodes()
 		{
@@ -187,6 +233,96 @@ namespace Foreman
 			return Elements.OfType<NodeElement>().FirstOrDefault(e => e.DisplayedNode == node);
 		}
 
+		public IEnumerable<GraphElement> GetElementsAtPoint(Point point)
+		{
+			foreach (GraphElement element in GetPaintingOrder().Reverse())
+				if (element.ContainsPoint(Point.Add(point, new Size(-element.X, -element.Y))))
+					yield return element;
+		}
+
+		public void DeleteNode(NodeElement node)
+		{
+			if (node != null)
+			{
+				foreach (NodeLink link in node.DisplayedNode.InputLinks.ToList().Union(node.DisplayedNode.OutputLinks.ToList()))
+				{
+					Elements.RemoveWhere(le => le is LinkElement && (le as LinkElement).DisplayedLink == link);
+				}
+				Elements.Remove(node);
+				node.DisplayedNode.Destroy();
+				Graph.UpdateNodeValues();
+				UpdateNodes();
+				Invalidate();
+			}
+		}
+
+		public void TryDeleteSelectedNodes()
+		{
+			bool proceed = true;
+			if (SelectedNodes.Count > 10)
+				proceed = (MessageBox.Show("You are deleting " + SelectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
+			if (proceed)
+			{
+				foreach (NodeElement node in SelectedNodes)
+					DeleteNode(node);
+				SelectedNodes.Clear();
+			}
+		}
+
+		private void UpdateSelection()
+		{
+			if ((Control.ModifierKeys & Keys.Alt) != 0) //remove zone
+			{
+				foreach (NodeElement selectedNode in SelectedNodes)
+					selectedNode.Selected = true;
+				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+					newlySelectedNode.Selected = false;
+			}
+			else if ((Control.ModifierKeys & Keys.Control) != 0)  //add zone
+			{
+				foreach (NodeElement selectedNode in SelectedNodes)
+					selectedNode.Selected = true;
+				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+					newlySelectedNode.Selected = true;
+			}
+			else //add zone (additive with ctrl or simple selection)
+			{
+				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
+					newlySelectedNode.Selected = true;
+			}
+		}
+
+		public void AlignSelected()
+		{
+			foreach (NodeElement ne in SelectedNodes)
+			{
+				ne.X = AlignToGrid(ne.X);
+				ne.Y = AlignToGrid(ne.Y);
+			}
+			Invalidate();
+		}
+
+		public void OpenNodeMenu(NodeElement node)
+		{
+			rightClickMenu.MenuItems.Clear();
+			rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+				new EventHandler((o, e) =>
+				{
+					DeleteNode(node);
+				})));
+			if (SelectedNodes.Count > 2 && SelectedNodes.Contains(node))
+			{
+				rightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
+				new EventHandler((o, e) =>
+				{
+					TryDeleteSelectedNodes();
+				})));
+			}
+			rightClickMenu.Show(Parent, Point.Add(Control.MousePosition, new Size(0, -20)));
+		}
+
+		//----------------------------------------------Paint functions
+
 		public IEnumerable<GraphElement> GetPaintingOrder()
 		{
 			foreach (LinkElement element in Elements.OfType<LinkElement>())
@@ -194,8 +330,6 @@ namespace Foreman
 			foreach (NodeElement element in Elements.OfType<NodeElement>())
 				yield return element;
 			foreach (DraggedLinkElement element in Elements.OfType<DraggedLinkElement>())
-				yield return element;
-			foreach (GhostNodeElement element in Elements.OfType<GhostNodeElement>())
 				yield return element;
 		}
 
@@ -278,9 +412,28 @@ namespace Foreman
 				graphics.DrawLine(lockedAxisPen, visibleGraphBounds.X, yaxis, visibleGraphBounds.X + visibleGraphBounds.Width, yaxis);
 			}
 
+			//process link element widths
+			if (DynamicLinkWidth)
+			{
+				float max = 0;
+				foreach (LinkElement element in Elements.OfType<LinkElement>())
+					max = Math.Max(max, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
+				if (max > 0)
+					foreach (LinkElement element in Elements.OfType<LinkElement>())
+						element.LinkWidth = minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / max) / (element.Item.IsFluid ? 10 : 1);
+				else
+					foreach (LinkElement element in Elements.OfType<LinkElement>())
+						element.LinkWidth = minLinkWidth;
+			}
+			else
+			{
+				foreach (LinkElement element in Elements.OfType<LinkElement>())
+					element.LinkWidth = minLinkWidth;
+			}
+
 			//all elements (nodes & lines)
 			foreach (GraphElement element in GetPaintingOrder())
-				element.Paint(graphics, new Point(element.X, element.Y));
+			element.Paint(graphics, new Point(element.X, element.Y));
 
 			//selection zone
 			if(currentDragOperation == DragOperation.Selection)
@@ -400,17 +553,7 @@ namespace Foreman
 			return new Rectangle(X, Y, Width, Height);
 		}
 
-		public IEnumerable<GraphElement> GetElementsAtPoint(Point point)
-		{
-			foreach (GraphElement element in GetPaintingOrder().Reverse<GraphElement>())
-				if (element.ContainsPoint(Point.Add(point, new Size(-element.X, -element.Y))))
-					yield return element;
-		}
-
-		private void ProductionGraphViewer_LostFocus(object sender, EventArgs e)
-        {
-			Invalidate();
-		}
+		//----------------------------------------------Mouse & keyboard event functions
 
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
@@ -596,42 +739,9 @@ namespace Foreman
 			Invalidate();
 		}
 
-		private void UpdateSelection()
-		{
-			if ((Control.ModifierKeys & Keys.Alt) != 0) //remove zone
-			{
-				foreach (NodeElement selectedNode in SelectedNodes)
-					selectedNode.Selected = true;
-				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-					newlySelectedNode.Selected = false;
-			}
-			else if ((Control.ModifierKeys & Keys.Control) != 0)  //add zone
-			{
-				foreach (NodeElement selectedNode in SelectedNodes)
-					selectedNode.Selected = true;
-				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-					newlySelectedNode.Selected = true;
-			}
-			else //add zone (additive with ctrl or simple selection)
-			{
-				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-					newlySelectedNode.Selected = true;
-			}
-		}
-
-		public void AlignSelected()
-        {
-			foreach(NodeElement ne in SelectedNodes)
-            {
-				ne.X = AlignToGrid(ne.X);
-				ne.Y = AlignToGrid(ne.Y);
-            }
-			Invalidate();
-        }
-
 		void ProductionGraphViewer_MouseWheel(object sender, MouseEventArgs e)
 		{
-			if (!this.Focused)
+			if (ContainsFocus && !this.Focused) //currently have a control created within this viewer active (ex: recipe chooser) -> dont want to scroll then
 				return;
 
 			ClearFloatingControls();
@@ -725,17 +835,53 @@ namespace Foreman
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
+		public void ClearFloatingControls()
+		{
+			foreach (var control in floatingTooltipControls.ToArray())
+				control.Dispose();
+		}
+
+		//----------------------------------------------Viewpoint event functions
+
 		void ProductionGraphViewer_Resized(object sender, EventArgs e)
         {
 			UpdateGraphBounds();
 			Invalidate();
         }
 
-		public void ClearFloatingControls()
+		private void ProductionGraphViewer_LostFocus(object sender, EventArgs e)
 		{
-			foreach (var control in floatingTooltipControls.ToArray())
-				control.Dispose();
+			Invalidate();
 		}
+
+		public void UpdateGraphBounds(bool limitView = true)
+		{
+			if (limitView)
+			{
+				Rectangle bounds = GraphBounds;
+				Point screenCentre = ScreenToGraph(Width / 2, Height / 2);
+				if (bounds.Width == 0 || bounds.Height == 0)
+				{
+					ViewOffset.X = 0;
+					ViewOffset.Y = 0;
+				}
+				else
+				{
+					if (screenCentre.X < bounds.X) { ViewOffset.X -= bounds.X - screenCentre.X; }
+					if (screenCentre.Y < bounds.Y) { ViewOffset.Y -= bounds.Y - screenCentre.Y; }
+					if (screenCentre.X > bounds.X + bounds.Width) { ViewOffset.X -= bounds.X + bounds.Width - screenCentre.X; }
+					if (screenCentre.Y > bounds.Y + bounds.Height) { ViewOffset.Y -= bounds.Y + bounds.Height - screenCentre.Y; }
+				}
+			}
+
+			visibleGraphBounds = new Rectangle(
+				(int)(-Width / (2 * ViewScale) - ViewOffset.X),
+				(int)(-Height / (2 * ViewScale) - ViewOffset.Y),
+				(int)(Width / ViewScale),
+				(int)(Height / ViewScale));
+		}
+
+		//----------------------------------------------Helper functions (point conversions, alignment, etc)
 
 		public Point DesktopToGraph(Point point)
 		{
@@ -767,171 +913,6 @@ namespace Foreman
 			return new Point(Convert.ToInt32(((X + ViewOffset.X) * ViewScale) + Width / 2), Convert.ToInt32(((Y + ViewOffset.Y) * ViewScale) + Height / 2));
 		}
 
-		public void DeleteNode(NodeElement node)
-		{
-			if (node != null)
-			{
-				foreach (NodeLink link in node.DisplayedNode.InputLinks.ToList().Union(node.DisplayedNode.OutputLinks.ToList()))
-				{
-					Elements.RemoveWhere(le => le is LinkElement && (le as LinkElement).DisplayedLink == link);
-				}
-				Elements.Remove(node);
-				node.DisplayedNode.Destroy();
-				Graph.UpdateNodeValues();
-				UpdateNodes();
-				Invalidate();
-			}
-		}
-		public void TryDeleteSelectedNodes()
-		{
-			bool proceed = true;
-			if (SelectedNodes.Count > 10)
-				proceed = (MessageBox.Show("You are deleting " + SelectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
-			if (proceed)
-			{
-				foreach (NodeElement node in SelectedNodes)
-					DeleteNode(node);
-				SelectedNodes.Clear();
-			}
-		}
-
-		public void UpdateGraphBounds(bool limitView = true)
-		{
-			if (limitView)
-			{
-				Rectangle bounds = GraphBounds;
-				Point screenCentre = ScreenToGraph(Width / 2, Height / 2);
-				if (bounds.Width == 0 || bounds.Height == 0)
-				{
-					ViewOffset.X = 0;
-					ViewOffset.Y = 0;
-				}
-				else
-				{
-					if (screenCentre.X < bounds.X) { ViewOffset.X -= bounds.X - screenCentre.X; }
-					if (screenCentre.Y < bounds.Y) { ViewOffset.Y -= bounds.Y - screenCentre.Y; }
-					if (screenCentre.X > bounds.X + bounds.Width) { ViewOffset.X -= bounds.X + bounds.Width - screenCentre.X; }
-					if (screenCentre.Y > bounds.Y + bounds.Height) { ViewOffset.Y -= bounds.Y + bounds.Height - screenCentre.Y; }
-				}
-			}
-
-			visibleGraphBounds = new Rectangle(
-				(int)(-Width / (2 * ViewScale) - ViewOffset.X),
-				(int)(-Height / (2 * ViewScale) - ViewOffset.Y),
-				(int)(Width / ViewScale),
-				(int)(Height / ViewScale));
-		}
-
-		void HandleDragEntering(object sender, DragEventArgs e)
-		{
-			if (e.Data.GetDataPresent(typeof(Item)) || e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
-			{
-				e.Effect = DragDropEffects.All;
-			}
-		}
-
-		void HandleItemDragging(object sender, DragEventArgs e)
-		{
-			if (e.Data.GetDataPresent(typeof(Item)))
-			{
-				if (GhostDragElement == null)
-				{
-					GhostDragElement = new GhostNodeElement(this);
-					GhostDragElement.Item = e.Data.GetData(typeof(Item)) as Item;
-				}
-
-				GhostDragElement.Location = DesktopToGraph(e.X, e.Y);
-			} else if (e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
-			{
-				if (GhostDragElement == null)
-				{
-					GhostDragElement = new GhostNodeElement(this);
-					GhostDragElement.Recipes = e.Data.GetData(typeof(HashSet<Recipe>)) as HashSet<Recipe>;
-				}
-
-				GhostDragElement.Location = DesktopToGraph(e.X, e.Y);
-			}
-
-			Invalidate();
-		}
-
-		void HandleItemDropping(object sender, DragEventArgs e)
-		{
-			if (GhostDragElement != null)
-			{
-				if (e.Data.GetDataPresent(typeof(Item)))
-				{
-					Item item = GhostDragElement.Item;
-					Point location = GhostDragElement.Location;
-
-					if (true)
-					{
-						RecipeChooserPanel rpanel = new RecipeChooserPanel(this, item, true, true);
-						rpanel.Show(c =>
-						{
-							Console.WriteLine(c);
-						});
-
-					}
-					else
-					{
-
-						ItemChooserPanel ipanel = new ItemChooserPanel(this);
-						ipanel.Show(c =>
-						{
-							Console.WriteLine(c);
-						});
-					}
-
-					return;
-
-					var chooserPanel = new ChooserPanel(item, true, true, this);
-
-					chooserPanel.Show(c =>
-					{
-						if (c != null)
-						{
-							NodeElement newElement = new NodeElement(c, this);
-							//Graph.UpdateNodeValues(); // no need - its a disconnected node!
-							newElement.Update();
-							if (ShowGrid)
-							{
-								location.X = AlignToGrid(location.X);
-								location.Y = AlignToGrid(location.Y);
-							}
-							newElement.Location = location;
-						}
-					});
-				}
-				else if (e.Data.GetDataPresent(typeof(HashSet<Recipe>)))
-				{
-					foreach (Recipe recipe in GhostDragElement.Recipes)
-					{
-						NodeElement newElement = new NodeElement(RecipeNode.Create(recipe, Graph), this);
-						Graph.UpdateNodeValues();
-						newElement.Update();
-						Point location = GhostDragElement.Location;
-						if (ShowGrid)
-						{
-							location.X = AlignToGrid(location.X);
-							location.Y = AlignToGrid(location.Y);
-						}
-						newElement.Location = location;
-					}
-				}
-
-				GhostDragElement.Dispose();
-			}
-		}
-
-		void HandleDragLeaving(object sender, EventArgs e)
-		{
-			if (GhostDragElement != null)
-			{
-				GhostDragElement.Dispose();
-			}
-		}
-
 		public int AlignToGrid(int original)
 		{
 			if (CurrentGridUnit < 1)
@@ -942,24 +923,7 @@ namespace Foreman
 			return original;
 		}
 
-		public void OpenNodeMenu(NodeElement node)
-		{
-			rightClickMenu.MenuItems.Clear();
-			rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-				new EventHandler((o, e) =>
-				{
-					DeleteNode(node);
-				})));
-			if (SelectedNodes.Count > 2 && SelectedNodes.Contains(node))
-			{
-				rightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
-				new EventHandler((o, e) =>
-				{
-					TryDeleteSelectedNodes();
-				})));
-			}
-			rightClickMenu.Show(Parent, Point.Add(Control.MousePosition, new Size(0, -20)));
-		}
+		//----------------------------------------------Save/Load JSON functions
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
@@ -987,7 +951,7 @@ namespace Foreman
 			info.AddValue("EnabledMiners", DataCache.Miners.Values.Where(m => m.Enabled).Select<Miner, String>(m => m.Name));
 			info.AddValue("EnabledModules", DataCache.Modules.Values.Where(m => m.Enabled).Select<Module, String>(m => m.Name));
 			info.AddValue("EnabledMods", DataCache.Mods.Where(m => m.Enabled).Select<Mod, String>(m => m.Name));
-			info.AddValue("EnabledRecipes", DataCache.Recipes.Values.Where(r => !r.Hidden).Select<Recipe, String>(r => r.Name));
+			info.AddValue("HiddenRecipes", DataCache.Recipes.Values.Where(r => r.Hidden).Select<Recipe, String>(r => r.Name));
 			info.AddValue("Nodes", Graph.Nodes);
 			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
 			info.AddValue("ElementLocations", Graph.Nodes.Select(n => GetElementForNode(n).Location).ToList());
@@ -1022,6 +986,10 @@ namespace Foreman
 			using (DataReloadForm form = new DataReloadForm())
 				form.ShowDialog();
 
+			foreach (string recipe in json["HiddenRecipes"].Select(t => (string)t).ToList())
+				if (DataCache.Recipes.ContainsKey(recipe))
+					DataCache.Recipes[recipe].Hidden = true;
+
 			InsertJsonObjects(json, false);
 		}
 
@@ -1038,8 +1006,7 @@ namespace Foreman
 				{
 					if (!DataCache.Items.ContainsKey(iItem))
 					{
-						Item missingItem = new Item(iItem, iItem, DataCache.MissingSubgroup, "");
-						missingItem.IsMissingItem = true;
+						Item missingItem = new Item(iItem, iItem, false, DataCache.MissingSubgroup, "");
 						DataCache.MissingItems.Add(missingItem.Name, missingItem);
 					}
 				}
@@ -1062,9 +1029,9 @@ namespace Foreman
 						Recipe recipe = DataCache.Recipes[recipeName];
 						//check #2 (from above)
 						foreach (string ingredient in ingredients)
-							recipeExists &= DataCache.Items.ContainsKey(ingredient) && recipe.Ingredients.ContainsKey(DataCache.Items[ingredient]);
+							recipeExists &= DataCache.Items.ContainsKey(ingredient) && recipe.IngredientsSet.ContainsKey(DataCache.Items[ingredient]);
 						foreach (string result in results)
-							recipeExists &= DataCache.Items.ContainsKey(result) && recipe.Results.ContainsKey(DataCache.Items[result]);
+							recipeExists &= DataCache.Items.ContainsKey(result) && recipe.ResultsSet.ContainsKey(DataCache.Items[result]);
 					}
 					if (!recipeExists)
 					{
@@ -1076,16 +1043,16 @@ namespace Foreman
 							foreach (string ingredient in ingredients)
 							{
 								if (DataCache.Items.ContainsKey(ingredient))
-									missingRecipe.Ingredients.Add(DataCache.Items[ingredient], 1);
+									missingRecipe.AddIngredient(DataCache.Items[ingredient], 1);
 								else
-									missingRecipe.Ingredients.Add(DataCache.MissingItems[ingredient], 1);
+									missingRecipe.AddIngredient(DataCache.MissingItems[ingredient], 1);
 							}
 							foreach (string result in results)
 							{
 								if (DataCache.Items.ContainsKey(result))
-									missingRecipe.Results.Add(DataCache.Items[result], 1);
+									missingRecipe.AddResult(DataCache.Items[result], 1);
 								else
-									missingRecipe.Results.Add(DataCache.MissingItems[result], 1);
+									missingRecipe.AddResult(DataCache.MissingItems[result], 1);
 							}
 
 							DataCache.MissingRecipes.Add(recipeName, missingRecipe);

@@ -14,8 +14,8 @@ namespace Foreman
 		public RecipeShort(Recipe recipe)
 		{
 			Name = recipe.Name;
-			Ingredients = recipe.Ingredients.Keys.Select(item => item.Name).ToList();
-			Results = recipe.Results.Keys.Select(item => item.Name).ToList();
+			Ingredients = recipe.IngredientsSet.Keys.Select(item => item.Name).ToList();
+			Results = recipe.ResultsSet.Keys.Select(item => item.Name).ToList();
 		}
 	}
 
@@ -23,12 +23,21 @@ namespace Foreman
 	{
 		public static string[] recipeLocaleCategories = { "recipe-name" };
 
-		public Subgroup MySubgroup { get; internal set; }
+		public Subgroup MySubgroup { get; protected set; }
 
 		public float Time { get; set; }
 		public string Category { get; set; }
-		public Dictionary<Item, float> Results { get; private set; }
-		public Dictionary<Item, float> Ingredients { get; private set; }
+
+		public IReadOnlyDictionary<Item, float> ResultsSet { get { return resultsSet; } }
+		public IReadOnlyDictionary<Item, float> IngredientsSet { get { return ingredientsSet; } }
+		public IReadOnlyList<Item> ResultsList { get { return resultsList; } }
+		public IReadOnlyList<Item> IngredientsList { get { return ingredientsList; } }
+
+		private Dictionary<Item, float> resultsSet;
+		private List<Item> resultsList;
+		private Dictionary<Item, float> ingredientsSet;
+		private List<Item> ingredientsList;
+
 		public bool IsAvailableAtStart { get; set; }
 		public bool IsCyclic { get; set; }
 		public bool IsMissingRecipe { get { return DataCache.MissingRecipes.ContainsKey(Name); } }
@@ -43,8 +52,8 @@ namespace Foreman
 			{
 				if (base.Icon == null)
 				{
-					if (Results.Count == 1)
-						base.Icon = Results.Keys.First().Icon;
+					if (ResultsSet.Count == 1)
+						base.Icon = ResultsSet.Keys.First().Icon;
 					else
 						base.Icon = DataCache.UnknownIcon;
 				}
@@ -61,13 +70,59 @@ namespace Foreman
 			MySubgroup.Recipes.Add(this);
 
 			this.Time = 0.5f;
-			this.Ingredients = new Dictionary<Item, float>();
-			this.Results = new Dictionary<Item, float>();
+			this.ingredientsSet = new Dictionary<Item, float>();
+			this.resultsSet = new Dictionary<Item, float>();
+			this.ingredientsList = new List<Item>();
+			this.resultsList = new List<Item>();
 			this.HasEnabledAssemblers = false;
 
 			this.Hidden = false;
 			this.IsAvailableAtStart = false;
 			this.IsCyclic = false;
+		}
+
+		public void AddIngredient(Item item, float quantity)
+        {
+			if (ingredientsSet.ContainsKey(item))
+				ingredientsSet[item] += quantity;
+			else
+            {
+				ingredientsSet.Add(item, quantity);
+				ingredientsList.Add(item);
+				item.InternalAddConsumptionRecipe(this);
+            }
+        }
+
+		public bool DeleteIngredient(Item item)
+        {
+			if (!ingredientsSet.ContainsKey(item))
+				return false;
+			ingredientsSet.Remove(item);
+			ingredientsList.Remove(item);
+			item.InternalRemoveConsumptionRecipe(this);
+			return true;
+        }
+
+		public void AddResult(Item item, float quantity)
+		{
+			if (resultsSet.ContainsKey(item))
+				resultsSet[item] += quantity;
+			else
+			{
+				resultsSet.Add(item, quantity);
+				resultsList.Add(item);
+				item.InternalAddProductionRecipe(this);
+			}
+		}
+
+		public bool DeleteResult(Item item)
+		{
+			if (!resultsSet.ContainsKey(item))
+				return false;
+			resultsSet.Remove(item);
+			resultsList.Remove(item);
+			item.InternalRemoveProductionRecipe(this);
+			return true;
 		}
 
 		public override string ToString() { return String.Format("Recipe: {0}", Name); }
