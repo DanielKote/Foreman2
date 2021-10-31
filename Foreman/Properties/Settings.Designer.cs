@@ -130,5 +130,17 @@ namespace Foreman.Properties {
                 this["RecipeNameOnlyFilter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SimpleView {
+            get {
+                return ((bool)(this["SimpleView"]));
+            }
+            set {
+                this["SimpleView"] = value;
+            }
+        }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Specialized;
 using System.Drawing;
 
 namespace Foreman
@@ -43,6 +41,7 @@ namespace Foreman
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
+				SimpleViewCheckBox.Checked = Properties.Settings.Default.SimpleView;
 				UpdateControlValues();
 			}
         }
@@ -120,8 +119,7 @@ namespace Foreman
 
 		private void ClearButton_Click(object sender, EventArgs e)
 		{
-			GraphViewer.Graph.ClearGraph();
-			GraphViewer.Elements.Clear();
+			GraphViewer.ClearGraph();
 			GraphViewer.Invalidate();
 		}
 
@@ -222,13 +220,13 @@ namespace Foreman
 
 		private void AddRecipeButton_Click(object sender, EventArgs e)
 		{
-			Point location = GraphViewer.ScreenToGraph(new Point(this.Width / 2, this.Height / 2));
+			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 			GraphViewer.AddRecipe(new Point(15, 15), null, location, ProductionGraphViewer.NewNodeType.Disconnected);
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
-			Point location = GraphViewer.ScreenToGraph(new Point(this.Width / 2, this.Height / 2));
+			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 			GraphViewer.AddItem(new Point(15,15), location);
 		}
 
@@ -298,9 +296,9 @@ namespace Foreman
 			if (MinorGridlinesDropDown.SelectedIndex > 0)
 				updatedGridUnit = 6 * (int)(Math.Pow(2, MinorGridlinesDropDown.SelectedIndex - 1));
 
-			if(GraphViewer.CurrentGridUnit != updatedGridUnit)
+			if(GraphViewer.Grid.CurrentGridUnit != updatedGridUnit)
             {
-				GraphViewer.CurrentGridUnit = updatedGridUnit;
+				GraphViewer.Grid.CurrentGridUnit = updatedGridUnit;
 				GraphViewer.Invalidate();
             }
 
@@ -314,9 +312,9 @@ namespace Foreman
 			if (MajorGridlinesDropDown.SelectedIndex > 0)
 				updatedGridUnit = 6 * (int)(Math.Pow(2, MajorGridlinesDropDown.SelectedIndex - 1));
 
-			if (GraphViewer.CurrentMajorGridUnit != updatedGridUnit)
+			if (GraphViewer.Grid.CurrentMajorGridUnit != updatedGridUnit)
 			{
-				GraphViewer.CurrentMajorGridUnit = updatedGridUnit;
+				GraphViewer.Grid.CurrentMajorGridUnit = updatedGridUnit;
 				GraphViewer.Invalidate();
 			}
 
@@ -326,9 +324,9 @@ namespace Foreman
 
 		private void GridlinesCheckbox_CheckedChanged(object sender, EventArgs e)
 		{
-			if (GraphViewer.ShowGrid != GridlinesCheckbox.Checked)
+			if (GraphViewer.Grid.ShowGrid != GridlinesCheckbox.Checked)
 			{
-				GraphViewer.ShowGrid = GridlinesCheckbox.Checked;
+				GraphViewer.Grid.ShowGrid = GridlinesCheckbox.Checked;
 				GraphViewer.Invalidate();
 			}
 
@@ -345,8 +343,8 @@ namespace Foreman
 		{
 			if (e.KeyCode == Keys.Space)
 			{
-				GraphViewer.ShowGrid = !GraphViewer.ShowGrid;
-				GridlinesCheckbox.Checked = GraphViewer.ShowGrid;
+				GraphViewer.Grid.ShowGrid = !GraphViewer.Grid.ShowGrid;
+				GridlinesCheckbox.Checked = GraphViewer.Grid.ShowGrid;
 			}
 		}
 
@@ -355,6 +353,8 @@ namespace Foreman
 		private void SimpleViewCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.SimpleView = SimpleViewCheckBox.Checked;
+			Properties.Settings.Default.SimpleView = SimpleViewCheckBox.Checked;
+			Properties.Settings.Default.Save();
 			GraphViewer.Invalidate();
         }
 

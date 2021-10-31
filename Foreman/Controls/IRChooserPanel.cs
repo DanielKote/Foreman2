@@ -268,8 +268,11 @@ namespace Foreman
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.RecipeNameOnlyFilter = RecipeNameOnlyFilterCheckBox.Checked;
             Properties.Settings.Default.Save();
+            QuittingScripts();
             Dispose();
         }
+
+        protected virtual void QuittingScripts() { }
 
         protected void FilterCheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -316,7 +319,8 @@ namespace Foreman
     public class ItemChooserPanel : IRChooserPanel
     {
         public Action<Item> CallbackMethod; //returns the selected item
-        public void Show(Action<Item> callback) { CallbackMethod = callback; }
+        public Action EndAction;
+        public void Show(Action<Item> callback, Action endAction = null) { CallbackMethod = callback; EndAction = endAction; }
 
         private ToolTip iToolTip = new CustomToolTip();
         protected override ToolTip IRButtonToolTip { get { return iToolTip; } }
@@ -324,8 +328,6 @@ namespace Foreman
         public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint) : base(parent, originPoint)
         {
             SetSelectedGroup(null);
-
-
         }
 
         protected override List<Group> GetSortedGroups()
@@ -416,12 +418,18 @@ namespace Foreman
                 Dispose();
             }
         }
+
+        protected override void QuittingScripts()
+        {
+            EndAction?.Invoke();
+        }
     }
 
     public class RecipeChooserPanel : IRChooserPanel
     {
         public Action<NodeType, Recipe> CallbackMethod; //returns the selected node type and the selected recipe (or null if not a recipe node)
-        public void Show(Action<NodeType, Recipe> callback) { CallbackMethod = callback; }
+        public Action EndAction; //calls when the panel closes
+        public void Show(Action<NodeType, Recipe> callback, Action endAction = null) { CallbackMethod = callback; EndAction = endAction; }
         protected Item KeyItem;
         protected fRange KeyItemTempRange;
 
@@ -577,7 +585,9 @@ namespace Foreman
                 Properties.Settings.Default.Save();
                 Recipe selectedRecipe = (Recipe)((Button)sender).Tag;
                 CallbackMethod(NodeType.Recipe, selectedRecipe);
-                Dispose();
+
+                if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
+                    Dispose();
             }
             else if(e.Button == MouseButtons.Right) //flip hidden status of recipe
             {
@@ -593,7 +603,9 @@ namespace Foreman
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.Save();
             CallbackMethod(NodeType.Supplier, null);
-            Dispose();
+
+            if((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
+                Dispose();
         }
 
         private void AddConsumerButton_Click(object sender, EventArgs e)
@@ -602,7 +614,9 @@ namespace Foreman
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.Save();
             CallbackMethod(NodeType.Consumer, null);
-            Dispose();
+
+            if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
+                Dispose();
         }
 
         private void AddPassthroughButton_Click(object sender, EventArgs e)
@@ -611,7 +625,9 @@ namespace Foreman
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.Save();
             CallbackMethod(NodeType.Passthrough, null);
-            Dispose();
+
+            if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
+                Dispose();
         }
 
         internal override void IRButton_MouseHover(object sender, EventArgs e)
@@ -622,6 +638,11 @@ namespace Foreman
 
             (IRButtonToolTip as RecipeToolTip).SetRecipe((Recipe)((Button)sender).Tag);
             (IRButtonToolTip as RecipeToolTip).Show(control, new Point(control.Width, yoffset));
+        }
+
+        protected override void QuittingScripts()
+        {
+            EndAction?.Invoke();
         }
     }
 

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Drawing;
-using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Foreman
 {
 	public class ItemTab : GraphElement
 	{
+		public static int TabWidth { get { return iconSize + border * 3; } } //I just use these two to get a decent aproximation as to how far to space new nodes when bulk-added
+		public static int TabBorder { get { return border; } }
+
 		public LinkType LinkType;
 		public Item Item { get; private set; }
 
@@ -34,16 +36,29 @@ namespace Foreman
 		private Pen borderPen;
 		private string text = "";
 
-		public ItemTab(Item item, LinkType type, ProductionGraphViewer parent)
-			: base(parent)
+		private ContextMenu rightClickMenu;
+
+		public ItemTab(Item item, LinkType type, ProductionGraphViewer graphViewer, NodeElement node ) //item tab is always to be owned by a node
+			: base(graphViewer, node)
 		{
+			rightClickMenu = new ContextMenu();
+
 			this.Item = item;
 			this.LinkType = type;
+
 			borderPen = regularBorderPen;
 			int textHeight = (int)myGraphViewer.CreateGraphics().MeasureString("a", textFont).Height;
-			Width = iconSize + border * 3;
+			Width = TabWidth;
 			Height = iconSize + textHeight + border + 3;
 			X = 0; Y = 0;
+		}
+
+		public Point GetConnectionPoint() //in graph coordinates
+        {
+			if (LinkType == LinkType.Input)
+				return ConvertToGraph(new Point(0, Height / 2));
+			else //if(LinkType == LinkType.Output)
+				return ConvertToGraph(new Point(0, -Height / 2));
 		}
 
 		public void UpdateValues(float consumeRate, float suppliedRate, bool isOversupplied)
@@ -82,8 +97,10 @@ namespace Foreman
 			Height = iconSize + textHeight + border + 3;
 		}
 
-		protected override void Draw(Graphics graphics, Point trans)
+		protected override void Draw(Graphics graphics)
 		{
+			Point trans = ConvertToGraph(new Point(0, 0));
+
 			GraphicsStuff.FillRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, fillBrush);
 			GraphicsStuff.DrawRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, borderPen);
 
@@ -97,6 +114,81 @@ namespace Foreman
 				graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y - ((textHeight + border - Bounds.Height) / 2)), centreFormat);
 				graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y - (Bounds.Height / 2) + (int)(border * 1.5), iconSize, iconSize);
 			}
+		}
+
+        public override List<TooltipInfo> GetToolTips(Point graph_point)
+        {
+			List<TooltipInfo> toolTips = new List<TooltipInfo>();
+			TooltipInfo tti = new TooltipInfo();
+			NodeElement parentNode = (NodeElement)myParent;
+
+			if (LinkType == LinkType.Input)
+			{
+				if (parentNode.DisplayedNode is RecipeNode rNode)
+					tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(Item);
+				else if (!Item.IsTemperatureDependent)
+					tti.Text = Item.FriendlyName;
+				else
+				{
+					fRange tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Output); //input type tab means output of connection link
+					if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
+						tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Input); //if there was no temp range on this side of this throughput node, try to just copy the other side
+					tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
+				}
+
+				tti.Text += "\nDrag to create a new connection";
+				tti.Direction = Direction.Up;
+				tti.ScreenLocation = myGraphViewer.GraphToScreen(GetConnectionPoint());
+			}
+			else //if(mousedTab.Type == LinkType.Output)
+			{
+				if (parentNode.DisplayedNode is RecipeNode rNode)
+					tti.Text = rNode.BaseRecipe.GetProductFriendlyName(Item);
+				else if (!Item.IsTemperatureDependent)
+					tti.Text = Item.FriendlyName;
+				else
+				{
+					fRange tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Input); //output type tab means input of connection link
+					if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
+						tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Output); //if there was no temp range on this side of this throughput node, try to just copy the other side
+					tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
+				}
+
+				tti.Text += "\nDrag to create a new connection";
+				tti.Direction = Direction.Down;
+				tti.ScreenLocation = myGraphViewer.GraphToScreen(GetConnectionPoint());
+			}
+
+			toolTips.Add(tti);
+			return toolTips;
+		}
+
+		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
+		{
+			List<NodeLink> connections = new List<NodeLink>();
+			if (LinkType == LinkType.Input)
+				connections.AddRange(((NodeElement)myParent).DisplayedNode.InputLinks.Where(l => l.Item == Item));
+			else //if (LinkType == LinkType.Output)
+				connections.AddRange(((NodeElement)myParent).DisplayedNode.OutputLinks.Where(l => l.Item == Item));
+
+
+			rightClickMenu.MenuItems.Clear();
+			rightClickMenu.MenuItems.Add(new MenuItem("Delete connections",
+				new EventHandler((o, e) =>
+				{
+					foreach (NodeLink link in connections)
+						myGraphViewer.Graph.DeleteLink(link);
+					myGraphViewer.Graph.UpdateNodeValues();
+				}))
+			{ Enabled = connections.Count > 0 });
+
+			rightClickMenu.Show(myGraphViewer, myGraphViewer.GraphToScreen(graph_point));
+		}
+
+		public override void Dispose()
+		{
+			rightClickMenu.Dispose();
+			base.Dispose();
 		}
 	}
 }

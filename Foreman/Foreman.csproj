@@ -175,6 +175,7 @@
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProductionGraphView\BaseLinkElement.cs" />
     <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
     <Compile Include="ProductionGraphView\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
@@ -189,6 +190,7 @@
     <Compile Include="Forms\ImageExportForm.Designer.cs">
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProductionGraphView\Grid.cs" />
     <Compile Include="ProductionGraphView\ItemTab.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>

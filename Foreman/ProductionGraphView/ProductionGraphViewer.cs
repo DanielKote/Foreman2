@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using System.IO;
 
 namespace Foreman
 {
@@ -21,82 +16,92 @@ namespace Foreman
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
-
 		private enum DragOperation { None, Item, Selection, Processed }
 		public enum NewNodeType { Disconnected, Supplier, Consumer }
 
 		public AmountType SelectedAmountType { get; set; }
 		public RateUnit SelectedRateUnit { get; set; }
 
-		public HashSet<GraphElement> Elements = new HashSet<GraphElement>();
-		public ProductionGraph Graph;
-		private Point lastMouseDragPoint;
-		public Point ViewOffset;
-		public float ViewScale = 1f;
+		public bool SimpleView { get; set; } //simple: show only the item/recipe names.
+		public bool TooltipsEnabled { get; set; }
+		public bool DynamicLinkWidth = false;
+
+		public DataCache DCache { get; set; }
+		public ProductionGraph Graph { get; private set; }
+		public Grid Grid { get; private set; }
+
+		public IReadOnlyDictionary<BaseNode, NodeElement> NodeElementDictionary { get { return nodeElementDictionary; } }
+		public IReadOnlyDictionary<NodeLink, LinkElement> LinkElementDictionary { get { return linkElementDictionary; } }
+
+		public IReadOnlyCollection<NodeElement> SelectedNodes { get { return selectedNodes; } }
+
+		private const int minDragDiff = 30;
+		private const int minLinkWidth = 3;
+		private const int maxLinkWidth = 35;
+
+		private static readonly Pen pausedBorders = new Pen(Color.FromArgb(255, 80, 80), 5);
+		private static readonly Pen selectionPen = new Pen(Color.FromArgb(100, 100, 200), 2);
+		private readonly Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
+
+		private Dictionary<BaseNode, NodeElement> nodeElementDictionary;
+		private List<NodeElement> nodeElements;
+		private Dictionary<NodeLink, LinkElement> linkElementDictionary;
+		private List<LinkElement> linkElements;
+		private DraggedLinkElement draggedLinkElement;
+
+		private Point mouseDownStartScreenPoint;
 		private GraphElement mouseDownElement;
 		public GraphElement MouseDownElement
 		{
 			get { return mouseDownElement; }
 			set { mouseDownStartScreenPoint = Control.MousePosition; mouseDownElement = value; }
 		}
-		private Point mouseDownStartScreenPoint;
-		private DragOperation currentDragOperation = DragOperation.None;
+
+		private Point ViewDragOriginPoint;
 		private bool viewBeingDragged = false; //separate from dragOperation due to being able to drag view at all stages of dragOperation
-		private const int minDragDiff = 30;
 
-		public int CurrentGridUnit = 0;
-		public int CurrentMajorGridUnit = 0;
-		public bool ShowGrid = false;
-		public bool LockDragToAxis = false;
-		public Rectangle SelectionZone;
-		public Point SelectionZoneOriginPoint;
+		private DragOperation currentDragOperation = DragOperation.None;
 
-        public IReadOnlyCollection<NodeElement> SelectedNodes { get { return selectedNodes; } }
+		private Point ViewOffset;
+		private float ViewScale = 1f;
+		private Rectangle visibleGraphBounds;
+
+		private Rectangle SelectionZone;
+		private Point SelectionZoneOriginPoint;
+
 		private HashSet<NodeElement> selectedNodes; //main list of selected nodes
 		private HashSet<NodeElement> CurrentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
 
-		private Pen gridPen = new Pen(Color.FromArgb(220, 220, 220), 1);
-		private Pen gridMPen = new Pen(Color.FromArgb(180, 180, 180), 1);
-		private Brush gridBrush = new SolidBrush(Color.FromArgb(230, 230, 230));
-		private Pen zeroAxisPen = new Pen(Color.FromArgb(140, 140, 140), 2);
-		private Pen lockedAxisPen = new Pen(Color.FromArgb(180, 80, 80), 4);
-		private Pen pausedBorders = new Pen(Color.FromArgb(255, 80, 80), 5);
-		private Brush backgroundBrush = new SolidBrush(Color.White);
-		private Pen selectionPen = new Pen(Color.FromArgb(100, 100, 200), 2);
-
-		private readonly Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
-
-		public bool SimpleView { get; set; } //simple: show only the item/recipe names.
-
-		public bool DynamicLinkWidth = false;
-		private const int minLinkWidth = 3;
-		private const int maxLinkWidth = 40;
-
-		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
-		StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
-
-		public DataCache DCache;
-
-		private Rectangle visibleGraphBounds;
-
 		private ContextMenu rightClickMenu = new ContextMenu();
+		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
+
+		StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
 
 		public ProductionGraphViewer()
 		{
 			InitializeComponent();
 			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
 			Resize += new EventHandler(ProductionGraphViewer_Resized);
-			
+
 			ViewOffset = new Point(Width / -2, Height / -2);
 			ViewScale = 1f;
 
+			TooltipsEnabled = true;
+
 			Graph = new ProductionGraph();
-            //Graph.ClearGraph()
-            Graph.NodeAdded += Graph_NodeAdded;
-            Graph.NodeDeleted += Graph_NodeDeleted;
-            Graph.LinkAdded += Graph_LinkAdded;
-            Graph.LinkDeleted += Graph_LinkDeleted;
-            Graph.NodeValuesUpdated += Graph_NodeValuesUpdated;
+			//Graph.ClearGraph()
+			Graph.NodeAdded += Graph_NodeAdded;
+			Graph.NodeDeleted += Graph_NodeDeleted;
+			Graph.LinkAdded += Graph_LinkAdded;
+			Graph.LinkDeleted += Graph_LinkDeleted;
+			Graph.NodeValuesUpdated += Graph_NodeValuesUpdated;
+
+			Grid = new Grid();
+
+			nodeElementDictionary = new Dictionary<BaseNode, NodeElement>();
+			nodeElements = new List<NodeElement>();
+			linkElementDictionary = new Dictionary<NodeLink, LinkElement>();
+			linkElements = new List<LinkElement>();
 
 			selectedNodes = new HashSet<NodeElement>();
 			CurrentSelectionNodes = new HashSet<NodeElement>();
@@ -105,48 +110,53 @@ namespace Foreman
 			Invalidate();
 		}
 
-        private void Graph_NodeValuesUpdated(object sender, EventArgs e)
-        {
-			try
+		public void ClearGraph()
+		{
+			foreach (NodeElement element in nodeElements)
+				element.Dispose();
+			foreach (LinkElement element in linkElements)
+				element.Dispose();
+			draggedLinkElement?.Dispose();
+			nodeElements.Clear();
+			nodeElementDictionary.Clear();
+			linkElements.Clear();
+			linkElementDictionary.Clear();
+			selectedNodes.Clear();
+			CurrentSelectionNodes.Clear();
+			Graph.ClearGraph();
+		}
+
+		public NodeElement GetNodeAtPoint(Point point) //returns first such node (in case of stacking)
+		{
+			//done in a 2 stage process -> first we do a rough check on the node's location (if it is within the 500x300 zone centered on the given point, it goes to part 2)
+			//							-> then we do a full element.containsPoint check
+
+			Rectangle initialCheckZone = new Rectangle(point.X - 250, point.Y - 150, 500, 300);
+			for (int i = nodeElements.Count - 1; i >= 0; i--)
 			{
-				foreach (NodeElement node in Elements.OfType<NodeElement>().ToList())
-					node.Update();
+				if (initialCheckZone.Contains(nodeElements[i].Location))
+					if (nodeElements[i].ContainsPoint(point))
+						return nodeElements[i];
 			}
-			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
-			Invalidate();
+			return null;
 		}
 
-        private void Graph_LinkDeleted(object sender, NodeLinkEventArgs e)
+		//----------------------------------------------Adding new node functions (including link dragging)
+
+		public void StartLinkDrag(NodeElement startNode, LinkType linkType, Item item)
+		{
+			draggedLinkElement?.Dispose();
+			draggedLinkElement = new DraggedLinkElement(this, startNode, linkType, item);
+			MouseDownElement = draggedLinkElement;
+		}
+
+		public void DisposeLinkDrag()
         {
-			LinkElement deletedElement = Elements.OfType<LinkElement>().FirstOrDefault(l => l.DisplayedLink == e.nodeLink);
-			Elements.Remove(deletedElement);
-			Invalidate();
+			draggedLinkElement?.Dispose();
+			draggedLinkElement = null;
         }
 
-        private void Graph_LinkAdded(object sender, NodeLinkEventArgs e)
-        {
-			NodeElement supplier = Elements.OfType<NodeElement>().FirstOrDefault(n => n.DisplayedNode == e.nodeLink.Supplier);
-			NodeElement consumer = Elements.OfType<NodeElement>().FirstOrDefault(n => n.DisplayedNode == e.nodeLink.Consumer);
-			Elements.Add(new LinkElement(this, e.nodeLink, supplier, consumer));
-			Invalidate();
-        }
-
-        private void Graph_NodeDeleted(object sender, NodeEventArgs e)
-        {
-			NodeElement deletedElement = Elements.OfType<NodeElement>().FirstOrDefault(l => l.DisplayedNode == e.node);
-			Elements.Remove(deletedElement);
-			Invalidate();
-		}
-
-        private void Graph_NodeAdded(object sender, NodeEventArgs e)
-        {
-			Elements.Add(new NodeElement(this, e.node));
-			Invalidate();
-		}
-
-        //----------------------------------------------Adding new node functions
-
-        public void AddItem(Point drawOrigin, Point newLocation)
+		public void AddItem(Point drawOrigin, Point newLocation)
 		{
 			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
 			itemChooser.Show(selectedItem => {
@@ -160,8 +170,8 @@ namespace Foreman
 			if (nNodeType != NewNodeType.Disconnected && (originElement == null || baseItem == null)) //just in case check (should
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
 
-			if (ShowGrid)
-				newLocation = new Point(AlignToGrid(newLocation.X), AlignToGrid(newLocation.Y));
+			if (Grid.ShowGrid)
+				newLocation = Grid.AlignToGrid(newLocation);
 
 			fRange tempRange = new fRange(0,0, true);
 			if (baseItem != null && baseItem.IsTemperatureDependent)
@@ -174,9 +184,10 @@ namespace Foreman
 
 			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
 			BaseNode newNode = null;
+			int lastRecipeWidth = 0;
 			recipeChooser.Show((nodeType, recipe) =>
 			{
-				switch(nodeType)
+				switch (nodeType)
                 {
 					case NodeType.Consumer:
 						newNode = Graph.CreateConsumerNode(baseItem, newLocation);
@@ -192,26 +203,29 @@ namespace Foreman
 						break;
                 }
 
+				//this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
+				//should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
+				int offsetDistance = lastRecipeWidth / 2;
+				lastRecipeWidth = 50 + Math.Max(newNode.Inputs.Count(), newNode.Outputs.Count()) * (ItemTab.TabWidth + ItemTab.TabBorder);
+				if (offsetDistance > 0)
+					offsetDistance += lastRecipeWidth / 2;
+				newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y));
+				newNode.Location = newLocation;
+				Invalidate();
+
 				if (nNodeType == NewNodeType.Consumer)
 					Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
 				else if (nNodeType == NewNodeType.Supplier)
 					Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
 
 				Graph.UpdateNodeValues();
+			}, () =>
+			{
+				draggedLinkElement?.Dispose();
+				draggedLinkElement = null;
+				Invalidate();
 			});
         }
-
-		public NodeElement GetElementForNode(BaseNode node)
-		{
-			return Elements.OfType<NodeElement>().FirstOrDefault(e => e.DisplayedNode == node);
-		}
-
-		public IEnumerable<GraphElement> GetElementsAtPoint(Point point)
-		{
-			foreach (GraphElement element in GetPaintingOrder().Reverse())
-				if (element.ContainsPoint(point))
-					yield return element;
-		}
 
 		public void TryDeleteSelectedNodes()
 		{
@@ -227,45 +241,50 @@ namespace Foreman
 			}
 		}
 
+		//----------------------------------------------Selection functions
+
 		private void UpdateSelection()
 		{
+			foreach (NodeElement element in nodeElements)
+				element.Highlighted = false;
+
 			if ((Control.ModifierKeys & Keys.Alt) != 0) //remove zone
 			{
 				foreach (NodeElement selectedNode in selectedNodes)
-					selectedNode.Selected = true;
+					selectedNode.Highlighted = true;
 				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-					newlySelectedNode.Selected = false;
+					newlySelectedNode.Highlighted = false;
 			}
 			else if ((Control.ModifierKeys & Keys.Control) != 0)  //add zone
 			{
 				foreach (NodeElement selectedNode in selectedNodes)
-					selectedNode.Selected = true;
+					selectedNode.Highlighted = true;
 				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-					newlySelectedNode.Selected = true;
+					newlySelectedNode.Highlighted = true;
 			}
 			else //add zone (additive with ctrl or simple selection)
 			{
 				foreach (NodeElement newlySelectedNode in CurrentSelectionNodes)
-					newlySelectedNode.Selected = true;
+					newlySelectedNode.Highlighted = true;
 			}
 		}
 
 		public void AlignSelected()
 		{
 			foreach (NodeElement ne in selectedNodes)
-				ne.Location = new Point(AlignToGrid(ne.X), AlignToGrid(ne.Y));
+				ne.Location = Grid.AlignToGrid(ne.Location);
 			Invalidate();
 		}
 
 		//----------------------------------------------Paint functions
 
-		public IEnumerable<GraphElement> GetPaintingOrder()
+		protected IEnumerable<GraphElement> GetPaintingOrder()
 		{
-			foreach (LinkElement element in Elements.OfType<LinkElement>())
+			if(draggedLinkElement != null)
+				yield return draggedLinkElement;
+			foreach (LinkElement element in linkElements)
 				yield return element;
-			foreach (NodeElement element in Elements.OfType<NodeElement>())
-				yield return element;
-			foreach (DraggedLinkElement element in Elements.OfType<DraggedLinkElement>())
+			foreach (NodeElement element in nodeElements)
 				yield return element;
 		}
 
@@ -273,9 +292,7 @@ namespace Foreman
 		{
 			//update visibility of all elements
 			foreach (GraphElement element in GetPaintingOrder())
-			{
-				element.UpdateVisibility(visibleGraphBounds, 0, 30); //give 30 border for elements to account for item boxes
-			}
+				element.UpdateVisibility(visibleGraphBounds);
 
 			//proceed with the paint operations
 			base.OnPaint(e);
@@ -291,85 +308,33 @@ namespace Foreman
 
 		public new void Paint(Graphics graphics)
 		{
-			gridPen.Width = 1 / ViewScale;
-			gridMPen.Width = 1 / ViewScale;
-			zeroAxisPen.Width = 2 / ViewScale;
-			lockedAxisPen.Width = 3 / ViewScale;
 			selectionPen.Width = 2 / ViewScale;
 
-			//background
-			graphics.FillRectangle(backgroundBrush, visibleGraphBounds);
-
-			if (ShowGrid)
-			{
-				//minor grid
-				if (CurrentGridUnit > 0)
-				{
-					if ((visibleGraphBounds.Width > CurrentGridUnit) && (Bounds.Height / (visibleGraphBounds.Width / CurrentGridUnit)) > 1)
-					{
-						for (int ix = visibleGraphBounds.X - (visibleGraphBounds.X % CurrentGridUnit); ix < visibleGraphBounds.X + visibleGraphBounds.Width; ix += CurrentGridUnit)
-							graphics.DrawLine(gridPen, ix, visibleGraphBounds.Y, ix, visibleGraphBounds.Y + visibleGraphBounds.Height);
-
-						for (int iy = visibleGraphBounds.Y - (visibleGraphBounds.Y % CurrentGridUnit); iy < visibleGraphBounds.Y + visibleGraphBounds.Height; iy += CurrentGridUnit)
-							graphics.DrawLine(gridPen, visibleGraphBounds.X, iy, visibleGraphBounds.X + visibleGraphBounds.Width, iy);
-					}
-					else
-						graphics.FillRectangle(gridBrush, visibleGraphBounds);
-				}
-
-				//major grid
-				if (CurrentMajorGridUnit > CurrentGridUnit)
-				{
-					if ((visibleGraphBounds.Width > CurrentMajorGridUnit) && (Bounds.Height / (visibleGraphBounds.Width / CurrentMajorGridUnit)) > 2)
-					{
-						for (int ix = visibleGraphBounds.X - (visibleGraphBounds.X % CurrentMajorGridUnit); ix < visibleGraphBounds.X + visibleGraphBounds.Width; ix += CurrentMajorGridUnit)
-							graphics.DrawLine(gridMPen, ix, visibleGraphBounds.Y, ix, visibleGraphBounds.Y + visibleGraphBounds.Height);
-
-						for (int iy = visibleGraphBounds.Y - (visibleGraphBounds.Y % CurrentMajorGridUnit); iy < visibleGraphBounds.Y + visibleGraphBounds.Height; iy += CurrentMajorGridUnit)
-							graphics.DrawLine(gridMPen, visibleGraphBounds.X, iy, visibleGraphBounds.X + visibleGraphBounds.Width, iy);
-					}
-				}
-
-				//zero axis
-				graphics.DrawLine(zeroAxisPen, 0, visibleGraphBounds.Y, 0, visibleGraphBounds.Y + visibleGraphBounds.Height);
-				graphics.DrawLine(zeroAxisPen, visibleGraphBounds.X, 0, visibleGraphBounds.X + visibleGraphBounds.Width, 0);
-			}
-
-			//drag axis
-			if(LockDragToAxis && currentDragOperation == DragOperation.Item)
-            {
-                NodeElement draggedNode = MouseDownElement as NodeElement;
-                int xaxis = draggedNode.DragOrigin.X;
-                int yaxis = draggedNode.DragOrigin.Y;
-                xaxis = AlignToGrid(xaxis);
-                yaxis = AlignToGrid(yaxis);
-
-				graphics.DrawLine(lockedAxisPen, xaxis, visibleGraphBounds.Y, xaxis, visibleGraphBounds.Y + visibleGraphBounds.Height);
-				graphics.DrawLine(lockedAxisPen, visibleGraphBounds.X, yaxis, visibleGraphBounds.X + visibleGraphBounds.Width, yaxis);
-			}
+			//grid
+			Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? mouseDownElement as NodeElement : null);
 
 			//process link element widths
 			if (DynamicLinkWidth)
 			{
 				float max = 0;
-				foreach (LinkElement element in Elements.OfType<LinkElement>())
+				foreach (LinkElement element in linkElements)
 					max = Math.Max(max, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
 				if (max > 0)
-					foreach (LinkElement element in Elements.OfType<LinkElement>())
+					foreach (LinkElement element in linkElements)
 						element.LinkWidth = minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / max) / (element.Item.IsFluid ? 10 : 1);
 				else
-					foreach (LinkElement element in Elements.OfType<LinkElement>())
+					foreach (LinkElement element in linkElements)
 						element.LinkWidth = minLinkWidth;
 			}
 			else
 			{
-				foreach (LinkElement element in Elements.OfType<LinkElement>())
+				foreach (LinkElement element in linkElements)
 					element.LinkWidth = minLinkWidth;
 			}
 
 			//all elements (nodes & lines)
 			foreach (GraphElement element in GetPaintingOrder())
-			element.Paint(graphics, new Point(0,0));
+				element.Paint(graphics);
 
 			//selection zone
 			if(currentDragOperation == DragOperation.Selection)
@@ -379,15 +344,15 @@ namespace Foreman
 			graphics.ResetTransform();
 
 			//floating tooltips
-			if (currentDragOperation == DragOperation.None && !viewBeingDragged)
+			if (TooltipsEnabled && currentDragOperation == DragOperation.None && !viewBeingDragged)
 			{
 				foreach (var fttp in floatingTooltipControls)
 					DrawTooltip(GraphToScreen(fttp.GraphLocation), fttp.Control.Size, fttp.Direction, graphics, null);
 
-				var element = GetElementsAtPoint(ScreenToGraph(PointToClient(Control.MousePosition))).FirstOrDefault();
+				NodeElement element = GetNodeAtPoint(ScreenToGraph(PointToClient(Control.MousePosition)));
 				if (element != null)
 				{
-					foreach (TooltipInfo tti in element.GetToolTips(Point.Subtract(ScreenToGraph(PointToClient(Control.MousePosition)), (Size)element.Location)))
+					foreach (TooltipInfo tti in element.GetToolTips(ScreenToGraph(PointToClient(Control.MousePosition))))
 						DrawTooltip(tti.ScreenLocation, tti.ScreenSize, tti.Direction, graphics, tti.Text);
 				}
 			}
@@ -489,39 +454,87 @@ namespace Foreman
 			return new Rectangle(X, Y, Width, Height);
 		}
 
-		//----------------------------------------------Mouse & keyboard event functions
+		public void ClearFloatingControls()
+		{
+			foreach (var control in floatingTooltipControls.ToArray())
+				control.Dispose();
+		}
+
+		//----------------------------------------------Production Graph events
+
+		private void Graph_NodeValuesUpdated(object sender, EventArgs e)
+		{
+			try
+			{
+				foreach (NodeElement node in nodeElements)
+					node.Update();
+			}
+			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
+			Invalidate();
+		}
+
+		private void Graph_LinkDeleted(object sender, NodeLinkEventArgs e)
+		{
+			LinkElement element = linkElementDictionary[e.nodeLink];
+			linkElementDictionary.Remove(e.nodeLink);
+			linkElements.Remove(element);
+			element.Dispose();
+			Invalidate();
+		}
+
+		private void Graph_LinkAdded(object sender, NodeLinkEventArgs e)
+		{
+			NodeElement supplier = nodeElementDictionary[e.nodeLink.Supplier];
+			NodeElement consumer = nodeElementDictionary[e.nodeLink.Consumer];
+			LinkElement element = new LinkElement(this, e.nodeLink, supplier, consumer);
+			linkElementDictionary.Add(e.nodeLink, element);
+			linkElements.Add(element);
+			Invalidate();
+		}
+
+		private void Graph_NodeDeleted(object sender, NodeEventArgs e)
+		{
+			NodeElement element = nodeElementDictionary[e.node];
+			nodeElementDictionary.Remove(e.node);
+			nodeElements.Remove(element);
+			element.Dispose();
+			Invalidate();
+		}
+
+		private void Graph_NodeAdded(object sender, NodeEventArgs e)
+		{
+			NodeElement element = new NodeElement(this, e.node);
+			nodeElementDictionary.Add(e.node, element);
+			nodeElements.Add(element);
+			Invalidate();
+		}
+
+		//----------------------------------------------Mouse events
 
 		private void ProductionGraphViewer_MouseDown(object sender, MouseEventArgs e)
 		{
 			ClearFloatingControls();
+			ActiveControl = null; //helps panels like IRChooserPanel (for item/recipe choosing) close when we click on the graph
 
-			Focus();
-			ActiveControl = null;
+			Point graph_location = ScreenToGraph(e.Location);
 
-			var clickedElement = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
-			if (clickedElement != null)
-			{
-				clickedElement.MouseDown(Point.Subtract(ScreenToGraph(e.Location), (Size)clickedElement.Location), e.Button);
-			}
+			GraphElement clickedElement = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(ScreenToGraph(e.Location));
+			clickedElement?.MouseDown(graph_location, e.Button);
 
-			if (e.Button == MouseButtons.Middle || (e.Button == MouseButtons.Right && clickedElement == null))
+			if (e.Button == MouseButtons.Middle || (e.Button == MouseButtons.Right && clickedElement == null)) //scrolling - middle button always, right if not clicking on element
 			{
 				viewBeingDragged = true;
-				lastMouseDragPoint = new Point(e.X, e.Y);
+				ViewDragOriginPoint = graph_location;
 			}
-
-			if (e.Button == MouseButtons.Left)
+			else if (e.Button == MouseButtons.Left && clickedElement == null) //selection
             {
-				if (clickedElement == null)
+				SelectionZoneOriginPoint = graph_location;
+				SelectionZone = new Rectangle();
+				if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0) //clear all selected nodes if we arent using modifier keys
 				{
-					SelectionZoneOriginPoint = ScreenToGraph(e.Location);
-					SelectionZone = new Rectangle();
-					if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0) //clear all selected nodes if we arent using modifier keys
-					{
-						foreach (NodeElement ne in selectedNodes)
-							ne.Selected = false;
-						selectedNodes.Clear();
-					}
+					foreach (NodeElement ne in selectedNodes)
+						ne.Highlighted = false;
+					selectedNodes.Clear();
 				}
             }
 		}
@@ -529,16 +542,12 @@ namespace Foreman
 		private void ProductionGraphViewer_MouseUp(object sender, MouseEventArgs e)
 		{
 			ClearFloatingControls();
-
-			Focus();
+			Point graph_location = ScreenToGraph(e.Location);
 
 			if (!viewBeingDragged && currentDragOperation != DragOperation.Selection) //dont care about mouse up operations on elements if we were dragging view or selection
 			{
-				GraphElement element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
-				if (element != null)
-				{
-					element.MouseUp(Point.Subtract(ScreenToGraph(e.Location), (Size)element.Location), e.Button, (currentDragOperation == DragOperation.Item));
-				}
+				GraphElement element = (GraphElement)draggedLinkElement?? GetNodeAtPoint(graph_location);
+				element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
 			}
 
 			switch (e.Button)
@@ -572,18 +581,18 @@ namespace Foreman
 						if ((Control.ModifierKeys & Keys.Alt) != 0) //remove
 						{
 							selectedNodes.Remove(clickedNode);
-							clickedNode.Selected = false;
+							clickedNode.Highlighted = false;
 							MouseDownElement = null;
 							Invalidate();
 						}
 						else if ((Control.ModifierKeys & Keys.Control) != 0) //add if unselected, remove if selected
 						{
-							if (clickedNode.Selected)
+							if (clickedNode.Highlighted)
 								selectedNodes.Remove(clickedNode);
 							else
 								selectedNodes.Add(clickedNode);
 
-							clickedNode.Selected = !clickedNode.Selected;
+							clickedNode.Highlighted = !clickedNode.Highlighted;
 							MouseDownElement = null;
 							Invalidate();
 						}
@@ -597,16 +606,13 @@ namespace Foreman
 
         private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
-			LockDragToAxis = (Control.ModifierKeys & Keys.Shift) != 0;
+			Grid.LockDragToAxis = (Control.ModifierKeys & Keys.Shift) != 0;
+			Point graph_location = ScreenToGraph(e.Location);
 
 			if (currentDragOperation != DragOperation.Selection) //dont care about element mouse move operations during selection operation
 			{
-
-				var element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
-				if (element != null)
-				{
-					element.MouseMoved(Point.Subtract(ScreenToGraph(e.Location), (Size)element.Location));
-				}
+				GraphElement element = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(graph_location);
+				element?.MouseMoved(graph_location);
 			}
 
 			switch(currentDragOperation)
@@ -616,9 +622,9 @@ namespace Foreman
 					if (dragDiff.X * dragDiff.X + dragDiff.Y * dragDiff.Y > minDragDiff)
 					{
 						if (MouseDownElement != null) //there is an item under the mouse during drag
-								currentDragOperation = DragOperation.Item;
+							currentDragOperation = DragOperation.Item;
 						else if ((Control.MouseButtons & MouseButtons.Left) != 0)
-								currentDragOperation = DragOperation.Selection;
+							currentDragOperation = DragOperation.Selection;
 					}
 					break;
 
@@ -626,33 +632,24 @@ namespace Foreman
 					if (selectedNodes.Contains(MouseDownElement)) //dragging a group
 					{
 						Point startPoint = MouseDownElement.Location;
-						MouseDownElement.Dragged(Point.Subtract(ScreenToGraph(e.Location), (Size)MouseDownElement.Location));
+						MouseDownElement.Dragged(graph_location);
 						Point endPoint = MouseDownElement.Location;
 						if (startPoint != endPoint)
-							foreach(NodeElement node in selectedNodes)
-								if (node != MouseDownElement)
-									node.Location = new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.X - startPoint.Y);
+							foreach(NodeElement node in selectedNodes.Where(node => node != MouseDownElement))
+								node.Location = new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y);
 					}
 					else //dragging single item
 					{
-						MouseDownElement.Dragged(Point.Subtract(ScreenToGraph(e.Location), (Size)MouseDownElement.Location));
+						MouseDownElement.Dragged(graph_location);
 					}
 					break;
 
 				case DragOperation.Selection:
-					Point graphPoint = ScreenToGraph(e.Location);
-					SelectionZone = new Rectangle(Math.Min(SelectionZoneOriginPoint.X, graphPoint.X), Math.Min(SelectionZoneOriginPoint.Y, graphPoint.Y), Math.Abs(SelectionZoneOriginPoint.X - graphPoint.X), Math.Abs(SelectionZoneOriginPoint.Y - graphPoint.Y));
+					SelectionZone = new Rectangle(Math.Min(SelectionZoneOriginPoint.X, graph_location.X), Math.Min(SelectionZoneOriginPoint.Y, graph_location.Y), Math.Abs(SelectionZoneOriginPoint.X - graph_location.X), Math.Abs(SelectionZoneOriginPoint.Y - graph_location.Y));
 					CurrentSelectionNodes.Clear();
-					foreach (GraphElement ge in Elements)
-					{
-						if (ge is NodeElement ne)
-						{
-							ne.Selected = false;
+					foreach(NodeElement element in nodeElements.Where(element => element.IntersectsWithZone(SelectionZone, -20, -20)))
+						CurrentSelectionNodes.Add(element);
 
-							if (ne.IntersectsWithZone(SelectionZone, -20, -20))
-								CurrentSelectionNodes.Add(ne);
-						}
-					}
 					UpdateSelection();
 					break;
             }
@@ -660,30 +657,27 @@ namespace Foreman
 			//dragging view (can happen during any drag operation)
 			if (viewBeingDragged)
 			{
-				ViewOffset = new Point(ViewOffset.X + (int)((e.X - lastMouseDragPoint.X) / ViewScale), ViewOffset.Y + (int)((e.Y - lastMouseDragPoint.Y) / ViewScale));
+				ViewOffset = Point.Add(ViewOffset, (Size)Point.Subtract(graph_location, (Size)ViewDragOriginPoint));// new Point(ViewOffset.X + (int)((graph_location.X - lastMouseDragPoint.X) / ViewScale), ViewOffset.Y + (int)((graph_location.Y - lastMouseDragPoint.Y) / ViewScale));
 				UpdateGraphBounds(MouseDownElement == null); //only hard limit the graph bounds if we arent dragging an object
-				lastMouseDragPoint = e.Location;
 			}
 
 			Invalidate();
 		}
 
-		void ProductionGraphViewer_MouseWheel(object sender, MouseEventArgs e)
+		private void ProductionGraphViewer_MouseWheel(object sender, MouseEventArgs e)
 		{
 			if (ContainsFocus && !this.Focused) //currently have a control created within this viewer active (ex: recipe chooser) -> dont want to scroll then
 				return;
 
 			ClearFloatingControls();
+
 			Point oldZoomCenter = ScreenToGraph(e.Location);
 
 			if (e.Delta > 0)
-			{
 				ViewScale *= 1.1f;
-			}
 			else
-			{
 				ViewScale /= 1.1f;
-			}
+
 			ViewScale = Math.Max(ViewScale, 0.01f);
 			ViewScale = Math.Min(ViewScale, 5f);
 
@@ -694,19 +688,14 @@ namespace Foreman
 			Invalidate();
 		}
 
-		void ProductionGraphViewer_MouseEnter(object sender, EventArgs e)
-		{
-			Invalidate();
-		}
-
-		void ProductionGraphViewer_KeyDown(object sender, KeyEventArgs e)
+		private void ProductionGraphViewer_KeyDown(object sender, KeyEventArgs e)
         {
 			if(currentDragOperation == DragOperation.Selection) //possible changes to selection type
 				UpdateSelection();
 			Invalidate();
         }
 
-		void ProductionGraphViewer_KeyUp(object sender, KeyEventArgs e)
+		private void ProductionGraphViewer_KeyUp(object sender, KeyEventArgs e)
 		{
 			if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
 				UpdateSelection();
@@ -723,19 +712,17 @@ namespace Foreman
 			}
 		}
 
-		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		//----------------------------------------------Keyboard events
+
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData) //arrow keys to move the current selection
 		{
 			bool processed = false;
-			int moveUnit = (CurrentGridUnit > 0) ? CurrentGridUnit : 6;
+			int moveUnit = (Grid.CurrentGridUnit > 0) ? Grid.CurrentGridUnit : 6;
 			if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) //large move
-				moveUnit = (CurrentMajorGridUnit > CurrentGridUnit) ? CurrentMajorGridUnit : moveUnit * 4;
+				moveUnit = (Grid.CurrentMajorGridUnit > Grid.CurrentGridUnit) ? Grid.CurrentMajorGridUnit : moveUnit * 4;
 
 			if ((keyData & Keys.KeyCode) == Keys.Left)
 			{
-				Console.WriteLine((int)(keyData));
-				Console.WriteLine((int)(keyData & Keys.Left));
-				Console.WriteLine((int)(Keys.Left));
-
 				foreach (NodeElement node in selectedNodes)
 					node.Location = new Point(node.X - moveUnit, node.Y);
 				processed = true;
@@ -759,20 +746,15 @@ namespace Foreman
 				processed = true;
 			}
 
+			Invalidate();
 			if (processed)
 				return true;
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
-		public void ClearFloatingControls()
-		{
-			foreach (var control in floatingTooltipControls.ToArray())
-				control.Dispose();
-		}
+		//----------------------------------------------Viewpoint events
 
-		//----------------------------------------------Viewpoint event functions
-
-		void ProductionGraphViewer_Resized(object sender, EventArgs e)
+		private void ProductionGraphViewer_Resized(object sender, EventArgs e)
         {
 			UpdateGraphBounds();
 			Invalidate();
@@ -788,7 +770,7 @@ namespace Foreman
 			if (limitView)
 			{
 				Rectangle bounds = Graph.Bounds;
-				Point screenCentre = ScreenToGraph(Width / 2, Height / 2);
+				Point screenCentre = ScreenToGraph( new Point(Width / 2, Height / 2));
 				if (bounds.Width == 0 || bounds.Height == 0)
 				{
 					ViewOffset.X = 0;
@@ -812,44 +794,14 @@ namespace Foreman
 
 		//----------------------------------------------Helper functions (point conversions, alignment, etc)
 
-		public Point DesktopToGraph(Point point)
-		{
-			return ScreenToGraph(PointToClient(point));
-		}
-
-		public Point DesktopToGraph(int X, int Y)
-		{
-			return DesktopToGraph(new Point(X, Y));
-		}
-
 		public Point ScreenToGraph(Point point)
 		{
-			return ScreenToGraph(point.X, point.Y);
-		}
-
-		public Point ScreenToGraph(int X, int Y)
-		{
-			return new Point(Convert.ToInt32(((X - Width / 2) / ViewScale) - ViewOffset.X), Convert.ToInt32(((Y - Height / 2) / ViewScale) - ViewOffset.Y));
+			return new Point(Convert.ToInt32(((point.X - Width / 2) / ViewScale) - ViewOffset.X), Convert.ToInt32(((point.Y - Height / 2) / ViewScale) - ViewOffset.Y));
 		}
 
 		public Point GraphToScreen(Point point)
 		{
-			return GraphToScreen(point.X, point.Y);
-		}
-
-		public Point GraphToScreen(int X, int Y)
-		{
-			return new Point(Convert.ToInt32(((X + ViewOffset.X) * ViewScale) + Width / 2), Convert.ToInt32(((Y + ViewOffset.Y) * ViewScale) + Height / 2));
-		}
-
-		public int AlignToGrid(int original)
-		{
-			if (CurrentGridUnit < 1)
-				return original;
-
-			original += Math.Sign(original) * CurrentGridUnit / 2;
-			original -= original % CurrentGridUnit;
-			return original;
+			return new Point(Convert.ToInt32(((point.X + ViewOffset.X) * ViewScale) + Width / 2), Convert.ToInt32(((point.Y + ViewOffset.Y) * ViewScale) + Height / 2));
 		}
 
 		//----------------------------------------------Save/Load JSON functions
@@ -953,7 +905,7 @@ namespace Foreman
 			}
 
 			//clear graph
-			Elements.Clear();
+			ClearGraph();
 
 			//load new preset
 			using (DataLoadForm form = new DataLoadForm(chosenPreset))
@@ -963,7 +915,6 @@ namespace Foreman
 				form.Top = this.Top + 100;
 				form.ShowDialog(); //LOAD FACTORIO DATA
 				DCache = form.GetDataCache();
-				Graph = new ProductionGraph();
 				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
 			}
 
@@ -1011,14 +962,10 @@ namespace Foreman
 		//Stolen from the designer file
 		protected override void Dispose(bool disposing)
 		{
+			ClearGraph();
+
 			stringFormat.Dispose();
 			size10Font.Dispose();
-
-			foreach (var element in Elements.ToList())
-			{
-				element.Dispose();
-			}
-
 
 			if (disposing && (components != null))
 			{

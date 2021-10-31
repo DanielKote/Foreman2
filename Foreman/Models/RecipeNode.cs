@@ -68,7 +68,7 @@ namespace Foreman
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("NodeType", NodeType.Recipe);
-			info.AddValue("NodeID:", NodeID);
+			info.AddValue("NodeID", NodeID);
 			info.AddValue("Location", Location);
 			info.AddValue("RecipeID", BaseRecipe.RecipeID);
 			info.AddValue("RateType", RateType);

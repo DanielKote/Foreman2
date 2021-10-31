@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -11,17 +9,20 @@ namespace Foreman
 	{
 		public HashSet<GraphElement> SubElements { get; private set; }
 
-		//bounds assumes 0,0 is the center of this element. X,Y (or location) is the difference between this origin and the parent element origin.
-		//NOTE: any coordinate with "parent_" assumes parent coordinate system (this element's center is X,Y in parent coordinate system).
-		//		anything with "local_" assumes current element's coordinate system (this element's center is 0,0 in local coordinate system).
+		//bounds assumes 0,0 is the center of this element. X,Y (or location) is the difference between this origin and the parent element origin (NOT! the graph origin! -> this means that moving the parent element will not change the x,y of the child elements)
+		//to simplify things, most point transformations make use of ConvertToLocal funtion which goes through the entire element-subelement ownership to convert a graph point to local coordinates (for in-class use).
+		//so any calls OUTSIDE a GraphElement assumes graph origin (0,0 is the center of the graph)
+		//and any work inside is usually done with local origin (0,0 is the center of the element)
+		//ex: mouse clicked at 10,10 on the graph. the first node (offset -5,-5) will get a call mouseClick(10,10) which will internally be converted to local coordinate (15,15).
+		//		a pass of that mouse click to its sub node (offset -5,-5 further from the parent node) will get a call mouseClick(10,10), which will internally be converted to local coordinate (20,20)
 		public Rectangle Bounds { get { return new Rectangle(-Width / 2, -Height / 2, Width, Height); } }
 		public virtual int Width { get; set; }
 		public virtual int Height { get; set; }
 		public Size Size { get { return new Size(Width, Height); } set { Width = value.Width; Height = value.Height; } }
+
 		public virtual int X { get; set; }
 		public virtual int Y { get; set; }
-
-		public virtual Point Location
+		public virtual Point Location //relative to parent element
 		{
 			get { return new Point(X, Y); }
 			set { X = value.X; Y = value.Y; }
@@ -29,57 +30,78 @@ namespace Foreman
 
 		public virtual bool Visible { get; protected set; }
 		protected readonly ProductionGraphViewer myGraphViewer;
+		protected readonly GraphElement myParent;
 
-		public GraphElement(ProductionGraphViewer parent)
+		public GraphElement(ProductionGraphViewer graphViewer, GraphElement parent = null)
 		{
-			myGraphViewer = parent;
-			myGraphViewer.Elements.Add(this);
+			myGraphViewer = graphViewer;
+			myParent = parent;
+			if (myParent != null)
+				parent.SubElements.Add(this);
+
 			SubElements = new HashSet<GraphElement>();
 			Visible = true;
 		}
 
-		public bool IntersectsWithZone(Rectangle parent_zone, int xborder, int yborder)
+		public Point ConvertToLocal(Point graph_point) //converts the point (in graph coordinates) to the local (0,0 is the center of this element's bound) point
         {
-			return  X + (Width / 2) > parent_zone.X - xborder &&
-					X - (Width / 2) < parent_zone.X + parent_zone.Width + xborder &&
-					Y + (Height / 2) > parent_zone.Y - yborder &&
-					Y - (Height / 2) < parent_zone.Y + parent_zone.Height + yborder;
-		}
-
-		public virtual void UpdateVisibility(Rectangle parent_zone, int xborder, int yborder)
-        {
-			Visible = IntersectsWithZone(parent_zone, xborder, yborder);
+			if (myParent == null) //owned by graphViewer
+				return Point.Subtract(graph_point, (Size)Location);
+			else //subelement of some element
+				return Point.Subtract(myParent.ConvertToLocal(graph_point), (Size)Location);
         }
 
-		public virtual bool ContainsPoint(Point parent_point)
-		{
-			return Bounds.Contains(Point.Subtract(parent_point, (Size)Location));
+		public Point ConvertToGraph(Point local_point)
+        {
+			if (myParent == null) //owned by graphViewer
+				return Point.Add(local_point, (Size)Location);
+			else //subelement of some element
+				return Point.Add(myParent.ConvertToGraph(local_point), (Size)Location);
 		}
 
-		public void Paint(Graphics graphics, Point parent_transform)
-		{
-			Point local_transform = Point.Add(parent_transform, (Size)Location); //update transform to this element's coordinate system.
+		public bool IntersectsWithZone(Rectangle graph_zone, int xborder, int yborder)
+        {
+			Point local_graph_zone_origin = ConvertToLocal(graph_zone.Location);
+			return   (Width / 2) > local_graph_zone_origin.X - xborder &&
+					-(Width / 2) < local_graph_zone_origin.X + graph_zone.Width + xborder &&
+					 (Height / 2) > local_graph_zone_origin.Y - yborder &&
+					-(Height / 2) < local_graph_zone_origin.Y + graph_zone.Height + yborder;
+		}
 
+		public virtual void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0)
+        {
+			Visible = IntersectsWithZone(graph_zone, xborder, yborder);
+        }
+
+		public virtual bool ContainsPoint(Point graph_point)
+		{
+			return Bounds.Contains(ConvertToLocal(graph_point));
+		}
+
+		public void Paint(Graphics graphics)
+		{
 			//call own draw operation
-			Draw(graphics, local_transform);
+			Draw(graphics);
 
 			//call paint operations (this function) for each of the sub-elements owned by this element (who will call their own draw and further paint operations on their own sub elements)
 			foreach (GraphElement element in SubElements)
-				element.Paint(graphics, local_transform); //local_transform is then parent_transform for our sub-elements
+				element.Paint(graphics);
 		}
 
-		protected abstract void Draw(Graphics graphics, Point local_transform);
+		protected abstract void Draw(Graphics graphics);
 
-		//location is local (0,0 is this element center)
-		public virtual List<TooltipInfo> GetToolTips(Point local_point) { return new List<TooltipInfo>(); }
-		public virtual void MouseMoved(Point local_point) { }
-		public virtual void MouseDown(Point local_point, MouseButtons button) { }
-		public virtual void MouseUp(Point local_point, MouseButtons button, bool wasDragged) { }
-		public virtual void Dragged(Point local_point) { }
+		public virtual List<TooltipInfo> GetToolTips(Point graph_point) { return new List<TooltipInfo>(); }
+		public virtual void MouseMoved(Point graph_point) { }
+		public virtual void MouseDown(Point graph_point, MouseButtons button) { }
+		public virtual void MouseUp(Point graph_point, MouseButtons button, bool wasDragged) { }
+		public virtual void Dragged(Point graph_point) { }
 
 		public virtual void Dispose()
 		{
-			myGraphViewer.Elements.Remove(this);
+			foreach (GraphElement element in SubElements)
+				element.Dispose();
+			SubElements.Clear();
+
 			myGraphViewer.Invalidate();
 		}
 	}

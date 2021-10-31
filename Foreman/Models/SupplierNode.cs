@@ -32,7 +32,7 @@ namespace Foreman
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("NodeType", NodeType.Supplier);
-			info.AddValue("NodeID:", NodeID);
+			info.AddValue("NodeID", NodeID);
 			info.AddValue("Location", Location);
 			info.AddValue("Item", SuppliedItem.Name);
 			info.AddValue("RateType", RateType);

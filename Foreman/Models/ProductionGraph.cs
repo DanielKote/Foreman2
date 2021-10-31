@@ -125,22 +125,18 @@ namespace Foreman
 			NodeLinkPrototype link = new NodeLinkPrototype(supplierP, consumerP, item);
 			supplierP.outputLinks.Add(link);
 			consumerP.inputLinks.Add(link);
+			nodeLinks.Add(link);
 			LinkAdded?.Invoke(this, new NodeLinkEventArgs(link));
 			return link;
 		}
 
 		public void DeleteNode(BaseNode node)
         {
-			foreach (NodeLinkPrototype link in node.InputLinks)
-			{
-				link.supplier.outputLinks.Remove(link);
-				nodeLinks.Remove(link);
-			}
-			foreach (NodeLinkPrototype link in node.OutputLinks)
-			{
-				link.consumer.inputLinks.Remove(link);
-				nodeLinks.Remove(link);
-			}
+			foreach (NodeLinkPrototype link in node.InputLinks.ToList())
+				DeleteLink(link);
+			foreach (NodeLinkPrototype link in node.OutputLinks.ToList())
+				DeleteLink(link);
+
 			nodes.Remove((BaseNodePrototype)node);
 			NodeDeleted?.Invoke(this, new NodeEventArgs(node));
 		}
@@ -240,7 +236,7 @@ namespace Foreman
 			foreach (JToken nodeJToken in json["Nodes"].ToList())
 			{
 				BaseNodePrototype newNode = null;
-				string[] locationString = ((string)json["Location"]).Split(',');
+				string[] locationString = ((string)nodeJToken["Location"]).Split(',');
 				Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
 				string itemName; //just an early define
 
