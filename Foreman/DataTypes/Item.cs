@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace Foreman
 {
-	public class Item : DataObjectBase, IComparable<Item>
+	public class Item : DataObjectBase
 	{
 		public static string[] itemLocaleCategories = { "item-name", "fluid-name", "entity-name", "equipment-name" };
 
@@ -33,6 +33,5 @@ namespace Foreman
 		}
 
 		public override string ToString() { return String.Format("Item: {0}", Name); }
-		public int CompareTo(Item other) { return base.CompareTo(other); }
 	}
 }

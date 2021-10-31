@@ -269,8 +269,8 @@ namespace Foreman
 			if(LockDragToAxis && currentDragOperation == DragOperation.Item)
             {
                 NodeElement draggedNode = MouseDownElement as NodeElement;
-                int xaxis = draggedNode.DragOrigin.X + draggedNode.Width / 2;
-                int yaxis = draggedNode.DragOrigin.Y + draggedNode.Height / 2;
+                int xaxis = draggedNode.DragOrigin.X;
+                int yaxis = draggedNode.DragOrigin.Y;
                 xaxis = AlignToGrid(xaxis);
                 yaxis = AlignToGrid(yaxis);
 
@@ -928,7 +928,13 @@ namespace Foreman
 						NodeElement newElement = new NodeElement(RecipeNode.Create(recipe, Graph), this);
 						Graph.UpdateNodeValues();
 						newElement.Update();
-						newElement.Location = GhostDragElement.Location;
+						Point location = GhostDragElement.Location;
+						if (ShowGrid)
+						{
+							location.X = AlignToGrid(location.X);
+							location.Y = AlignToGrid(location.Y);
+						}
+						newElement.Location = location;
 					}
 				}
 
@@ -1034,19 +1040,6 @@ namespace Foreman
 			using (DataReloadForm form = new DataReloadForm())
 				form.ShowDialog();
 
-			//update recipe enabled & check if they have at least one assembler (Enabled & HasEnabledAssemblers properties)
-			foreach (Recipe recipe in DataCache.Recipes.Values)
-				recipe.Enabled = false;
-			foreach (string recipe in json["EnabledRecipes"].Select(t => (string)t).ToList())
-				if (DataCache.Recipes.ContainsKey(recipe))
-					DataCache.Recipes[recipe].Enabled = true;
-			foreach (Recipe recipe in DataCache.Recipes.Values)
-			{
-				bool usable = false;
-				foreach (Assembler assembler in DataCache.Assemblers.Values)
-					usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category) && recipe.Ingredients.Count <= assembler.MaxIngredients;
-				recipe.HasEnabledAssemblers = usable;
-			}
 			InsertJsonObjects(json, false);
 		}
 

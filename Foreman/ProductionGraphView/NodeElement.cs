@@ -631,27 +631,21 @@ namespace Foreman
 				int xtemp = X;
 				int ytemp = Y;
 
+				xtemp += location.X - MouseDownOffsetX;
+				ytemp += location.Y - MouseDownOffsetY;
 				//lock to grid if it is set & is visible
 				if(Parent.ShowGrid)
                 {
-					xtemp += location.X;
 					xtemp = Parent.AlignToGrid(xtemp);
-
-					ytemp += location.Y;
 					ytemp = Parent.AlignToGrid(ytemp);
-                }
-				else
-                {
-					xtemp += location.X - MouseDownOffsetX;
-					ytemp += location.Y - MouseDownOffsetY;
                 }
 
                 if (Parent.LockDragToAxis)
                 {
                     if (Math.Abs(DragOrigin.X - xtemp) > Math.Abs(DragOrigin.Y - ytemp))
-                        ytemp = Parent.AlignToGrid(DragOrigin.Y + Height / 2) - Height / 2;
+                        ytemp = Parent.AlignToGrid(DragOrigin.Y);
                     else
-                        xtemp = Parent.AlignToGrid(DragOrigin.X + Width / 2) - Width / 2;
+                        xtemp = Parent.AlignToGrid(DragOrigin.X);
                 }
                 else if (!StickyDragOrigin)
                     DragOrigin = new Point(X, Y);

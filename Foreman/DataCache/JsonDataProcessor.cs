@@ -129,7 +129,6 @@ namespace Foreman
 
             ProcessDuplicates(); //checks if the 'default' item should be removed (ex: nothing creates it and everything that consumes it also consumes a variation of it)
 
-
             foreach (string s in Settings.Default.EnabledAssemblers)
                 if (Assemblers.ContainsKey(s))
                     Assemblers[s].Enabled = true;
@@ -340,7 +339,6 @@ namespace Foreman
             Assembler assembler = new Assembler((string)objJToken["name"]);
             assembler.LName = (string)objJToken["localised_name"];
             assembler.Speed = (float)objJToken["crafting_speed"];
-            assembler.MaxIngredients = (int)objJToken["ingredient_count"];
             assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
             assembler.Icon = ProcessIcon(objJToken["icon_info"]).Icon;
 
@@ -474,20 +472,27 @@ namespace Foreman
                 Technologies.Remove(techName);
 
             //step 2: calculate unlockable recipes (those unlocked at start, or unlocked via unlockable tech)
-            HashSet<Recipe> ununlockableRecipes = new HashSet<Recipe>(Recipes.Values);
+            HashSet<Recipe> unusableRecipes = new HashSet<Recipe>(Recipes.Values);
             foreach (Technology tech in Technologies.Values)
                 foreach (Recipe recipe in tech.Recipes)
-                    ununlockableRecipes.Remove(recipe);
-            //step 2.5: remove blocked recipe (those not part of a tech or unlocked at start), including any alt-recipes of it (due to fluid temps)
-            foreach (Recipe recipe in ununlockableRecipes)
+                    if(!recipe.IsAvailableAtStart && !recipe.Name.Contains("\n"))// "\n" in name represents that this is a duplicate recipe made specifically for fluid temperatures. Ignore
+                        unusableRecipes.Remove(recipe);
+            //step 2.1: also remove any recipes that dont have ANY assembler that fits
+            foreach (Recipe recipe in Recipes.Values)
             {
-                if (!recipe.IsAvailableAtStart && !recipe.Name.Contains("\n")) // "\n" in name represents that this is a duplicate recipe made specifically for fluid temperatures. Ignore
-                {
-                    Recipes.Remove(recipe.Name);
-                    if (RecipeDuplicants.ContainsKey(recipe.Name))
-                        foreach (string altRecipe in RecipeDuplicants[recipe.Name])
-                            Recipes.Remove(altRecipe);
-                }
+                bool usable = false;
+                foreach (Assembler assembler in Assemblers.Values)
+                    usable |= assembler.Categories.Contains(recipe.Category);
+                if (!usable)
+                    unusableRecipes.Remove(recipe);
+            }
+            //step 2.5: remove blocked recipe (those not part of a tech or unlocked at start), including any alt-recipes of it (due to fluid temps)
+            foreach (Recipe recipe in unusableRecipes)
+            {
+                Recipes.Remove(recipe.Name);
+                if (RecipeDuplicants.ContainsKey(recipe.Name))
+                    foreach (string altRecipe in RecipeDuplicants[recipe.Name])
+                        Recipes.Remove(altRecipe);
             }
 
             //step 3: calculate unlockable items (ingredient/product of unlockable recipes -> dont care about anything that isnt part of a recipe)

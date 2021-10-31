@@ -200,8 +200,7 @@ namespace Foreman
 
 			var allowedAssemblers = DataCache.Assemblers.Values
 				.Where(a => a.Enabled)
-				.Where(a => a.Categories.Contains(recipe.Category))
-				.Where(a => a.MaxIngredients >= recipe.Ingredients.Count);
+				.Where(a => a.Categories.Contains(recipe.Category));
 			foreach (var assembler in allowedAssemblers.OrderBy(a => a.FriendlyName))
 			{
 				var item = DataCache.Items.Values.SingleOrDefault(i => i.Name == assembler.Name);

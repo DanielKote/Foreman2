@@ -148,7 +148,7 @@ namespace Foreman
                 progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes"));
                 MarkCyclicRecipes();
                 progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
-                CheckRecipesAssemblerStatus();
+                UpdateRecipesAssemblerStatus();
                 ReportErrors();
             });
 
@@ -176,14 +176,14 @@ namespace Foreman
             failedPathDirectories.Clear();
         }
 
-        public static void CheckRecipesAssemblerStatus()
+        public static void UpdateRecipesAssemblerStatus()
         {
             //very quick update on recipes to check for valid assemblers (if they have none, then they are so marked)
             foreach (Recipe recipe in Recipes.Values)
             {
                 bool usable = false;
                 foreach (Assembler assembler in Assemblers.Values)
-                    usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category) && recipe.Ingredients.Count <= assembler.MaxIngredients;
+                    usable |= assembler.Enabled && assembler.Categories.Contains(recipe.Category);
                 recipe.HasEnabledAssemblers = usable;
             }
         }

@@ -19,7 +19,7 @@ namespace Foreman
 		}
 	}
 
-	public class Recipe : DataObjectBase, IComparable<Recipe>
+	public class Recipe : DataObjectBase
 	{
 		public static string[] recipeLocaleCategories = { "recipe-name" };
 
@@ -65,6 +65,5 @@ namespace Foreman
 		}
 
 		public override string ToString() { return String.Format("Recipe: {0}", Name); }
-		public int CompareTo(Recipe other) { return base.CompareTo(other); }
 	}
 }

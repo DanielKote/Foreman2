@@ -135,6 +135,7 @@
     <Compile Include="Forms\DirectoryChooserForm.designer.cs">
       <DependentUpon>DirectoryChooserForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="ProductionGraphView\AssemblerBox.cs" />
     <Compile Include="Controls\CheckboxListWithErrors.cs">
       <SubType>Component</SubType>

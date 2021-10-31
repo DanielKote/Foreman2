@@ -732,7 +732,6 @@ namespace Foreman
                 newAssembler.Icon = GetIconAndColor(values).Icon;
 
                 // 0.17 compat, ingredient_count no longer required
-                newAssembler.MaxIngredients = GetLuaValueOrDefault<int>(values, "ingredient_count", true, 10);
                 newAssembler.ModuleSlots = GetLuaValueOrDefault<int>(values, "module_slots", true, 0);
                 if (newAssembler.ModuleSlots == 0)
                 {
@@ -781,7 +780,6 @@ namespace Foreman
                 Assembler newFurnace = new Assembler(name);
 
                 newFurnace.Icon = GetIconAndColor(values).Icon;
-                newFurnace.MaxIngredients = 1;
                 newFurnace.ModuleSlots = GetLuaValueOrDefault<int>(values, "module_slots", true, 0);
                 if (newFurnace.ModuleSlots == 0)
                 {

@@ -94,7 +94,6 @@ namespace Foreman
 	public class Assembler : ProductionEntity
 	{
 		public List<String> Categories { get; private set; }
-		public int MaxIngredients { get; set; }
 		public List<string> AllowedEffects { get; private set; }
 
 		public Assembler(String name)

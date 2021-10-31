@@ -166,7 +166,6 @@ namespace Foreman
 					enabledRecipeListChanged |= (control is RecipeChooserControl rcControl && rcControl.RecipeOriginallyEnabled != rcControl.DisplayedRecipe.Enabled);
 				if (enabledRecipeListChanged && ParentForm is MainForm mForm)
 				{
-					mForm.ItemListRequiresUpdate = true;
 					mForm.UpdateVisibleItemList();
 				}
 

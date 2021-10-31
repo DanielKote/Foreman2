@@ -510,7 +510,6 @@
             this.ListTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.ListTabControl.TabIndex = 17;
             this.ListTabControl.SelectedIndexChanged += new System.EventHandler(this.ListTabControl_SelectedIndexChanged);
-            this.ListTabControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListTabControl_KeyDown);
             // 
             // ItemTabPage
             // 
@@ -573,8 +572,9 @@
             this.ItemListView.TabIndex = 15;
             this.ItemListView.UseCompatibleStateImageBehavior = false;
             this.ItemListView.View = System.Windows.Forms.View.Details;
+            this.ItemListView.VirtualMode = true;
             this.ItemListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.ItemListView_ItemDrag);
-            this.ItemListView.SelectedIndexChanged += new System.EventHandler(this.ItemListView_SelectedIndexChanged);
+            this.ItemListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.ItemListView_RetrieveVirtualItem);
             this.ItemListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ItemListView_MouseDoubleClick);
             // 
             // h_Name
@@ -673,9 +673,13 @@
             this.RecipeListView.TabIndex = 15;
             this.RecipeListView.UseCompatibleStateImageBehavior = false;
             this.RecipeListView.View = System.Windows.Forms.View.Details;
-            this.RecipeListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.RecipeListView_ItemChecked);
+            this.RecipeListView.VirtualMode = true;
             this.RecipeListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.RecipeListView_ItemDrag);
+            this.RecipeListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.RecipeListView_RetrieveVirtualItem);
             this.RecipeListView.SelectedIndexChanged += new System.EventHandler(this.RecipeListView_SelectedIndexChanged);
+            this.RecipeListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RecipeListView_KeyDown);
+            this.RecipeListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.RecipeListView_MouseClick);
+            this.RecipeListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.RecipeListView_MouseDoubleClick);
             // 
             // columnHeader1
             // 

@@ -18,13 +18,20 @@ namespace Foreman
 		private bool MinerSelectionBoxItemUpdating = false;
 		private bool ModuleSelectionBoxItemUpdating = false;
 
-		//RequiresUpdate bools are used to only update the lists when they have been changed (instead of every time the view switches to them)
-		public bool ItemListRequiresUpdate = false;
-		public bool RecipeListRequiresUpdate = false;
-
 		//unfiltered sets are filled directly from data cache and contain the full list - those displayed are just filtered (saves on not having to make ListViewItems every time)
+		//to simplify things they have been sorted: alphabetically a->z by LFriendlyName (which is the lowercase FriendlyName).
 		private List<ListViewItem> unfilteredItemList;
 		private List<ListViewItem> unfilteredRecipeList;
+		//filtered lists are used to actually display the items to the listboxes, and as such have been filtered & sorted (and will include the hidden versions, IF they are to be shown)
+		//filtered sets are used when drawing the items to decide if they should be b&w / darker (disabled/hidden, but we need to show them)
+		//NOTE: items are hidden when they are not part of any visible recipe. recipes are hidden when they have no valid assembler
+		private List<ListViewItem> filteredItemList;
+		private List<ListViewItem> filteredRecipeList;
+		private HashSet<ListViewItem> filteredHiddenItemSet;
+		private HashSet<ListViewItem> filteredHiddenRecipeSet;
+
+		private static readonly Color NormalBackground = Color.White;
+		private static readonly Color HiddenBackground = Color.FromArgb(255, 255, 170, 170);
 
 		public MainForm()
 		{
@@ -38,6 +45,10 @@ namespace Foreman
 			DataCache.DataLoaded += DataCache_DataLoaded;
 			unfilteredItemList = new List<ListViewItem>();
 			unfilteredRecipeList = new List<ListViewItem>();
+			filteredItemList = new List<ListViewItem>();
+			filteredRecipeList = new List<ListViewItem>();
+			filteredHiddenItemSet = new HashSet<ListViewItem>();
+			filteredHiddenRecipeSet = new HashSet<ListViewItem>();
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
@@ -155,77 +166,6 @@ namespace Foreman
 			UpdateControlValues();
         }
 
-        public void UpdateVisibleItemList()
-		{
-			if (ItemListRequiresUpdate || true)
-			{
-				DataCache.CheckRecipesAssemblerStatus();
-
-				//very quick filter for only items used by the currently active recipes:
-				HashSet<Item> availableItems = new HashSet<Item>();
-				if (!Properties.Settings.Default.ShowHiddenItems) //dont care if we are showing all
-				{
-					foreach (Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled && n.HasEnabledAssemblers))
-					{
-						foreach (Item item in recipe.Ingredients.Keys)
-							availableItems.Add(item);
-						foreach (Item item in recipe.Results.Keys)
-							availableItems.Add(item);
-					}
-				}
-				string filterString = (ItemFilterTextBox.Text).ToLower();
-
-				ItemListView.Items.Clear();
-				ItemListView.Items.AddRange(unfilteredItemList.Where(n => (Properties.Settings.Default.ShowHiddenItems || availableItems.Contains(n.Tag as Item)) && n.Text.ToLower().Contains(filterString)).ToArray());
-				ItemListView.Sorting = SortOrder.Ascending;
-				ItemListView.Sort();
-				ItemListRequiresUpdate = false;
-			}
-		}
-
-		public void UpdateVisibleRecipeList()
-		{
-			if (RecipeListRequiresUpdate || true)
-			{
-				DataCache.CheckRecipesAssemblerStatus();
-				string filterString = (RecipeFilterTextBox.Text).ToLower();
-
-				RecipeListView.Sorting = SortOrder.None;
-				RecipeListView.Items.Clear();
-
-				Recipe recipe;
-				List<ListViewItem> temp = new List<ListViewItem>();
-				foreach(ListViewItem lvi in unfilteredRecipeList)
-                {
-					recipe = lvi.Tag as Recipe;
-					if ((Properties.Settings.Default.ShowDisabledRecipes || (recipe.Enabled && recipe.HasEnabledAssemblers)) && lvi.Text.ToLower().Contains(filterString))
-						temp.Add(lvi);
-                }
-				temp.Sort((a,b) => ((Recipe)a.Tag).CompareTo((Recipe)b.Tag));
-
-				RecipeListView.Items.AddRange(temp.ToArray());
-				//RecipeListView.Items.AddRange(unfilteredRecipeList.Where(n => (Properties.Settings.Default.ShowDisabledRecipes || ((n.Tag as Recipe).Enabled && (n.Tag as Recipe).HasEnabledAssemblers)) && n.Text.ToLower().Contains(filterString)).ToArray());
-				//RecipeListView.Sorting = SortOrder.Ascending;
-				RecipeListView.Sort();
-				RecipeListRequiresUpdate = false;
-			}
-		}
-
-		public void UpdateEDCheckLists()
-		{
-			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
-				if (((Assembler)AssemblerSelectionBox.Items[i]).Enabled)
-					AssemblerSelectionBox.SetItemChecked(i, true);
-
-			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
-				if (((Miner)MinerSelectionBox.Items[i]).Enabled)
-					MinerSelectionBox.SetItemChecked(i, true);
-
-			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
-				if (((Module)ModuleSelectionBox.Items[i]).Enabled)
-					ModuleSelectionBox.SetItemChecked(i, true);
-		}
-
 		private void DataCache_DataLoaded(object _, EventArgs e)
 		{
 			AssemblerSelectionBox.Items.Clear();
@@ -260,7 +200,6 @@ namespace Foreman
 				lvItem.Name = recipe.Name; //key
 				lvItem.Checked = recipe.Enabled;
 				unfilteredRecipeList.Add(lvItem);
-
 			}
 
 			foreach (Item item in DataCache.Items.Values)
@@ -280,6 +219,179 @@ namespace Foreman
 				lvItem.Name = item.Name; //key
 				unfilteredItemList.Add(lvItem);
 			}
+
+			unfilteredRecipeList.Sort((a, b) => ((Recipe)a.Tag).CompareTo((Recipe)b.Tag));
+			unfilteredItemList.Sort((a, b) => ((Item)a.Tag).CompareTo((Item)b.Tag));
+		}
+
+		public void UpdateVisibleItemList()
+		{
+			//very quick filter for only items used by the currently active recipes:
+			DataCache.UpdateRecipesAssemblerStatus();
+			HashSet<Item> availableItems = new HashSet<Item>();
+			foreach (Recipe recipe in DataCache.Recipes.Values.Where(n => n.Enabled && n.HasEnabledAssemblers))
+			{
+				foreach (Item item in recipe.Ingredients.Keys)
+					availableItems.Add(item);
+				foreach (Item item in recipe.Results.Keys)
+					availableItems.Add(item);
+			}
+			string filterString = (ItemFilterTextBox.Text).ToLower();
+
+			filteredItemList.Clear();
+			filteredHiddenItemSet.Clear();
+			foreach (ListViewItem lvItem in unfilteredItemList)
+			{
+				if (availableItems.Contains(lvItem.Tag as Item) && lvItem.Text.ToLower().Contains(filterString))
+				{
+					filteredItemList.Add(lvItem);
+					lvItem.BackColor = NormalBackground;
+				}
+			}
+			if (Properties.Settings.Default.ShowHiddenItems) //if we are to show hidden items, we will place them under the visible items, seperately sorted by alpha (due to the way we add them here)
+			{
+				foreach (ListViewItem lvItem in unfilteredItemList)
+				{
+					if (!availableItems.Contains(lvItem.Tag as Item) && lvItem.Text.ToLower().Contains(filterString))
+					{
+						filteredItemList.Add(lvItem);
+						filteredHiddenItemSet.Add(lvItem);
+						lvItem.BackColor = HiddenBackground;
+					}
+				}
+			}
+			ItemListView.VirtualListSize = filteredItemList.Count;
+			ItemListView.Invalidate();
+		}
+
+		public void UpdateVisibleRecipeList()
+		{
+			DataCache.UpdateRecipesAssemblerStatus();
+			string filterString = (RecipeFilterTextBox.Text).ToLower();
+
+			filteredRecipeList.Clear();
+			filteredHiddenRecipeSet.Clear();
+			foreach (ListViewItem lvItem in unfilteredRecipeList)
+			{
+				if ((lvItem.Tag as Recipe).HasEnabledAssemblers && lvItem.Text.ToLower().Contains(filterString))
+				{
+					filteredRecipeList.Add(lvItem);
+					lvItem.BackColor = NormalBackground;
+				}
+			}
+			if (Properties.Settings.Default.ShowDisabledRecipes) //if we are to show disabled recipes, we will place them under the visible recipes, seperately sorted by alpha (due to the way we add them here)
+			{
+				foreach (ListViewItem lvItem in unfilteredRecipeList)
+				{
+					if (!(lvItem.Tag as Recipe).HasEnabledAssemblers && lvItem.Text.ToLower().Contains(filterString))
+					{
+						filteredRecipeList.Add(lvItem);
+						filteredHiddenRecipeSet.Add(lvItem);
+						lvItem.BackColor = HiddenBackground;
+					}
+				}
+			}
+			RecipeListView.VirtualListSize = filteredRecipeList.Count;
+			RecipeListView.Invalidate();
+		}
+
+		public void UpdateEDCheckLists()
+		{
+			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+				if (((Assembler)AssemblerSelectionBox.Items[i]).Enabled)
+					AssemblerSelectionBox.SetItemChecked(i, true);
+
+			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+				if (((Miner)MinerSelectionBox.Items[i]).Enabled)
+					MinerSelectionBox.SetItemChecked(i, true);
+
+			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+				if (((Module)ModuleSelectionBox.Items[i]).Enabled)
+					ModuleSelectionBox.SetItemChecked(i, true);
+		}
+
+		private void ItemListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+		{
+			e.Item = filteredItemList[e.ItemIndex];
+		}
+
+		private void RecipeListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+		{
+			e.Item = filteredRecipeList[e.ItemIndex];
+		}
+
+		private void RecipeListView_MouseClick(object sender, MouseEventArgs e)
+		{
+			ListViewItem lvi = RecipeListView.GetItemAt(e.X, e.Y);
+			if (lvi != null && e.X < (lvi.Bounds.Left + 16))
+			{
+				if (lvi.Selected) //check all selected
+				{
+					bool setCheck = !lvi.Checked;
+					foreach (int index in RecipeListView.SelectedIndices)
+					{
+						lvi = filteredRecipeList[index];
+						lvi.Checked = setCheck;
+						(lvi.Tag as Recipe).Enabled = lvi.Checked;
+					}
+				}
+				else
+				{
+					lvi.Checked = !lvi.Checked;
+					(lvi.Tag as Recipe).Enabled = lvi.Checked;
+				}
+				RecipeListView.Invalidate();
+				GraphViewer.Invalidate();
+				//filtered item list does need to update, but since we are updating it any time we switch to it (and it isnt visible), we might as well ignore it
+			}
+		}
+
+		private void RecipeListView_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			ListViewItem lvi = RecipeListView.GetItemAt(e.X, e.Y);
+			if (lvi != null && e.X < (lvi.Bounds.Left + 16))
+			{
+				if (lvi.Selected) //check all selected
+				{
+					bool setCheck = lvi.Checked;
+					foreach (int index in RecipeListView.SelectedIndices)
+					{
+						lvi = filteredRecipeList[index];
+						lvi.Checked = setCheck;
+						(lvi.Tag as Recipe).Enabled = lvi.Checked;
+					}
+				}
+				else
+				{
+					//lvi.Checked = lvi.Checked;
+					(lvi.Tag as Recipe).Enabled = lvi.Checked;
+				}
+				RecipeListView.Invalidate();
+				GraphViewer.Invalidate();
+				//filtered item list does need to update, but since we are updating it any time we switch to it (and it isnt visible), we might as well ignore it
+			}
+		}
+
+		private void RecipeListView_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (RecipeListView.SelectedIndices.Count == 0)
+				AddRecipeButton.Enabled = false;
+			else if (RecipeListView.SelectedIndices.Count == 1)
+			{
+				AddRecipeButton.Enabled = true;
+				AddRecipeButton.Text = "Add Recipe";
+			}
+			else
+			{
+				AddRecipeButton.Enabled = true;
+				AddRecipeButton.Text = "Add Recipes";
+			}
+		}
+
+		private void RecipeListView_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.A && (e.Modifiers & Keys.Control) != 0)
+				NativeMethods.SelectAllItems(RecipeListView);
 		}
 
 		public void UpdateRecipeListItemCheckmark(Recipe recipe)
@@ -287,6 +399,7 @@ namespace Foreman
 			string rliKey = recipe.Name;
 			if (RecipeListView.Items.ContainsKey(rliKey))
 				RecipeListView.Items[rliKey].Checked = recipe.Enabled;
+			RecipeListView.Invalidate();
         }
 
 		private void ItemFilterTextBox_TextChanged(object sender, EventArgs e)
@@ -336,62 +449,60 @@ namespace Foreman
 				AddRecipeButton.PerformClick();
 			}
 		}
+
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
-			foreach (ListViewItem lvItem in ItemListView.SelectedItems)
+			Item item = filteredItemList[ItemListView.SelectedIndices[0]].Tag as Item;
+			NodeElement newElement = null;
+
+			var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
+			var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
+
+			var optionList = new List<ChooserControl>();
+
+			optionList.Add(itemOutputOption);
+
+			foreach (Recipe recipe in item.ProductionRecipes)
+				if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
+					optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+
+			optionList.Add(itemSupplyOption);
+
+			foreach (Recipe recipe in item.ConsumptionRecipes)
+				if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
+					optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
+
+
+			var chooserPanel = new ChooserPanel(optionList, GraphViewer, ChooserPanel.RecipeIconSize);
+
+			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
+			if (GraphViewer.ShowGrid)
 			{
-				Item item = (Item)lvItem.Tag;
-				NodeElement newElement = null;
-
-				var itemSupplyOption = new ItemChooserControl(item, "Create infinite supply node", item.FriendlyName);
-				var itemOutputOption = new ItemChooserControl(item, "Create output node", item.FriendlyName);
-
-				var optionList = new List<ChooserControl>();
-
-				optionList.Add(itemOutputOption);
-
-				foreach (Recipe recipe in item.ProductionRecipes)
-					if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-
-				optionList.Add(itemSupplyOption);
-
-				foreach (Recipe recipe in item.ConsumptionRecipes)
-					if (Properties.Settings.Default.ShowDisabledRecipes || recipe.Enabled && recipe.HasEnabledAssemblers)
-						optionList.Add(new RecipeChooserControl(recipe, String.Format("Create '{0}' recipe node", recipe.FriendlyName), recipe.FriendlyName));
-
-
-				var chooserPanel = new ChooserPanel(optionList, GraphViewer, ChooserPanel.RecipeIconSize);
-
-				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-				if (GraphViewer.ShowGrid)
-				{
-					location.X = GraphViewer.AlignToGrid(location.X);
-					location.Y = GraphViewer.AlignToGrid(location.Y);
-				}
-
-				chooserPanel.Show(c =>
-				{
-					if (c != null)
-					{
-						if (c == itemSupplyOption)
-						{
-							newElement = new NodeElement(SupplyNode.Create(item, GraphViewer.Graph), GraphViewer);
-						}
-						else if (c is RecipeChooserControl)
-						{
-							newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, GraphViewer.Graph), GraphViewer);
-						}
-						else if (c == itemOutputOption)
-						{
-							newElement = new NodeElement(ConsumerNode.Create(item, GraphViewer.Graph), GraphViewer);
-						}
-
-						newElement.Update();
-						newElement.Location = location;
-					}
-				});
+				location.X = GraphViewer.AlignToGrid(location.X);
+				location.Y = GraphViewer.AlignToGrid(location.Y);
 			}
+
+			chooserPanel.Show(c =>
+			{
+				if (c != null)
+				{
+					if (c == itemSupplyOption)
+					{
+						newElement = new NodeElement(SupplyNode.Create(item, GraphViewer.Graph), GraphViewer);
+					}
+					else if (c is RecipeChooserControl)
+					{
+						newElement = new NodeElement(RecipeNode.Create((c as RecipeChooserControl).DisplayedRecipe, GraphViewer.Graph), GraphViewer);
+					}
+					else if (c == itemOutputOption)
+					{
+						newElement = new NodeElement(ConsumerNode.Create(item, GraphViewer.Graph), GraphViewer);
+					}
+
+					newElement.Update();
+					newElement.Location = location;
+				}
+			});
 
 			GraphViewer.Graph.UpdateNodeValues();
 		}
@@ -467,25 +578,7 @@ namespace Foreman
 			GraphViewer.UpdateNodes();
 		}
 
-		private void ItemListView_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (ItemListView.SelectedItems.Count == 0)
-			{
-				AddItemButton.Enabled = false;
-			}
-			else if (ItemListView.SelectedItems.Count == 1)
-			{
-				AddItemButton.Enabled = true;
-				AddItemButton.Text = "Add Item";
-			}
-			else if (ItemListView.SelectedItems.Count > 1) //disabled now
-			{
-				AddItemButton.Enabled = true;
-				AddItemButton.Text = "Add Items";
-			}
-		}
-
-		private void ItemListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void ItemListView_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
 			AddItemButton.PerformClick();
 		}
@@ -493,10 +586,7 @@ namespace Foreman
 		private void ItemListView_ItemDrag(object sender, ItemDragEventArgs e)
 		{
 			HashSet<Item> draggedItems = new HashSet<Item>();
-			foreach (ListViewItem item in ItemListView.SelectedItems)
-			{
-				draggedItems.Add((Item)item.Tag);
-			}
+			draggedItems.Add(filteredItemList[ItemListView.SelectedIndices[0]].Tag as Item);
 			DoDragDrop(draggedItems, DragDropEffects.All);
 		}
 
@@ -674,30 +764,20 @@ namespace Foreman
             AssemblerDisplayCheckBox.Checked = GraphViewer.ShowAssemblers;
 			MinerDisplayCheckBox.Checked = GraphViewer.ShowMiners;
 
-			ItemListRequiresUpdate = true;
-			RecipeListRequiresUpdate = true;
 			UpdateEDCheckLists();
-			DataCache.CheckRecipesAssemblerStatus();
 			UpdateVisibleRecipeList();
 			UpdateVisibleItemList();
 
 			GraphViewer.Invalidate();
 		}
 
-		private void RecipeListView_ItemChecked(object sender, ItemCheckedEventArgs e)
-		{
-			((Recipe)e.Item.Tag).Enabled = e.Item.Checked;
-			ItemListRequiresUpdate = true;
-			GraphViewer.Invalidate();
-		}
-
 		private void AddRecipeButton_Click(object sender, EventArgs e)
 		{
-			foreach (ListViewItem lvItem in RecipeListView.SelectedItems)
+			foreach (int index in RecipeListView.SelectedIndices)
 			{				
 				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 
-				NodeElement newElement = new NodeElement(RecipeNode.Create((Recipe)lvItem.Tag, GraphViewer.Graph), GraphViewer);
+				NodeElement newElement = new NodeElement(RecipeNode.Create(filteredRecipeList[index].Tag as Recipe, GraphViewer.Graph), GraphViewer);
 				newElement.Update();
 				newElement.Location = location;
 			}
@@ -708,29 +788,9 @@ namespace Foreman
 		private void RecipeListView_ItemDrag(object sender, ItemDragEventArgs e)
 		{
 			HashSet<Recipe> draggedRecipes = new HashSet<Recipe>();
-			foreach (ListViewItem recipe in RecipeListView.SelectedItems)
-			{
-				draggedRecipes.Add((Recipe)recipe.Tag);
-			}
+			foreach (int index in RecipeListView.SelectedIndices)
+				draggedRecipes.Add(filteredRecipeList[index].Tag as Recipe);
 			DoDragDrop(draggedRecipes, DragDropEffects.All);
-		}
-
-		private void RecipeListView_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (RecipeListView.SelectedItems.Count == 0)
-			{
-				AddRecipeButton.Enabled = false;
-			}
-			else if (RecipeListView.SelectedItems.Count == 1)
-			{
-				AddRecipeButton.Enabled = true;
-				AddRecipeButton.Text = "Add Recipe";
-			}
-			else if (RecipeListView.SelectedItems.Count > 1)
-			{
-				AddRecipeButton.Enabled = true;
-				AddRecipeButton.Text = "Add Recipes";
-			}
 		}
 
         private void MinorGridlinesDropDown_SelectedIndexChanged(object sender, EventArgs e)
@@ -830,14 +890,6 @@ namespace Foreman
 			GraphViewer.Invalidate();
 		}
 
-        private void ListTabControl_KeyDown(object sender, KeyEventArgs e)
-        {
-			if (ListTabControl.SelectedIndex == 1) //recipes tab
-				if (e.KeyCode == Keys.A && (e.Modifiers & Keys.Control) != 0)
-					foreach (ListViewItem item in RecipeListView.Items)
-						item.Selected = true;
-        }
-
         private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
 			if (!AssemblerSelectionBoxItemUpdating)
@@ -849,10 +901,6 @@ namespace Foreman
 				else
 					Properties.Settings.Default.EnabledAssemblers.Remove(assembler.Name);
 				Properties.Settings.Default.Save();
-				RecipeListRequiresUpdate = true;
-				ItemListRequiresUpdate = true;
-
-				DataCache.CheckRecipesAssemblerStatus();
 				GraphViewer.Invalidate();
 			}
 		}
@@ -860,6 +908,7 @@ namespace Foreman
 		private void AssemblerSelectionBoxAllButton_Click(object sender, EventArgs e)
         {
 			AssemblerSelectionBoxItemUpdating = true;
+
 			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
 				AssemblerSelectionBox.SetItemChecked(i, true);
 			Properties.Settings.Default.EnabledAssemblers.Clear();
@@ -869,17 +918,16 @@ namespace Foreman
 				Properties.Settings.Default.EnabledAssemblers.Add(assembler.Name);
             }
 			Properties.Settings.Default.Save();
-			DataCache.CheckRecipesAssemblerStatus();
+			DataCache.UpdateRecipesAssemblerStatus();
 			GraphViewer.Invalidate();
 
-			RecipeListRequiresUpdate = true;
-			ItemListRequiresUpdate = true;
 			AssemblerSelectionBoxItemUpdating = false;
 		}
 
 		private void AssemblerSelectionBoxNoneButton_Click(object sender, EventArgs e)
         {
 			AssemblerSelectionBoxItemUpdating = true;
+	
 			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
 				AssemblerSelectionBox.SetItemChecked(i, false);
 
@@ -889,11 +937,9 @@ namespace Foreman
 				assembler.Enabled = false;
 			}
 			Properties.Settings.Default.Save();
-			DataCache.CheckRecipesAssemblerStatus();
+			DataCache.UpdateRecipesAssemblerStatus();
 			GraphViewer.Invalidate();
 
-			RecipeListRequiresUpdate = true;
-			ItemListRequiresUpdate = true;
 			AssemblerSelectionBoxItemUpdating = false;
 		}
 
@@ -908,17 +954,15 @@ namespace Foreman
 				else
 					Properties.Settings.Default.EnabledMiners.Remove(miner.Name);
 				Properties.Settings.Default.Save();
-				DataCache.CheckRecipesAssemblerStatus();
+				DataCache.UpdateRecipesAssemblerStatus();
 				GraphViewer.Invalidate();
-
-				RecipeListRequiresUpdate = true;
-				ItemListRequiresUpdate = true;
 			}
 		}
 
         private void MinerSelectionBoxAllButton_Click(object sender, EventArgs e)
         {
 			MinerSelectionBoxItemUpdating = true;
+
 			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
 				MinerSelectionBox.SetItemChecked(i, true);
 			Properties.Settings.Default.EnabledMiners.Clear();
@@ -928,17 +972,16 @@ namespace Foreman
 				Properties.Settings.Default.EnabledMiners.Add(miner.Name);
 			}
 			Properties.Settings.Default.Save();
-			DataCache.CheckRecipesAssemblerStatus();
+			DataCache.UpdateRecipesAssemblerStatus();
 			GraphViewer.Invalidate();
 
-			RecipeListRequiresUpdate = true;
-			ItemListRequiresUpdate = true;
 			MinerSelectionBoxItemUpdating = false;
 		}
 
 		private void MinerSelectionBoxNoneButton_Click(object sender, EventArgs e)
         {
 			MinerSelectionBoxItemUpdating = true;
+
 			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
 				MinerSelectionBox.SetItemChecked(i, false);
 			Properties.Settings.Default.EnabledMiners.Clear();
@@ -947,11 +990,9 @@ namespace Foreman
 				miner.Enabled = false;
 			}
 			Properties.Settings.Default.Save();
-			DataCache.CheckRecipesAssemblerStatus();
+			DataCache.UpdateRecipesAssemblerStatus();
 			GraphViewer.Invalidate();
 
-			RecipeListRequiresUpdate = true;
-			ItemListRequiresUpdate = true;
 			MinerSelectionBoxItemUpdating = false;
 		}
 
@@ -998,6 +1039,19 @@ namespace Foreman
 			ModuleSelectionBoxItemUpdating = false;
 		}
 
+		private void ShowHiddenItemsCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			Properties.Settings.Default.ShowHiddenItems = ShowHiddenItemsCheckBox.Checked;
+			Properties.Settings.Default.Save();
+			UpdateVisibleItemList();
+		}
+
+		private void ShowDisabledRecipesCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			Properties.Settings.Default.ShowDisabledRecipes = ShowDisabledRecipesCheckBox.Checked;
+			Properties.Settings.Default.Save();
+			UpdateVisibleRecipeList();
+		}
 
 		public static void SetDoubleBuffered(System.Windows.Forms.Control c)
 		{
@@ -1019,20 +1073,5 @@ namespace Foreman
 			}
 		}
 
-        private void ShowHiddenItemsCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-			Properties.Settings.Default.ShowHiddenItems = ShowHiddenItemsCheckBox.Checked;
-			Properties.Settings.Default.Save();
-			ItemListRequiresUpdate = true;
-			UpdateVisibleItemList();
-        }
-
-        private void ShowDisabledRecipesCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-			Properties.Settings.Default.ShowDisabledRecipes = ShowDisabledRecipesCheckBox.Checked;
-			Properties.Settings.Default.Save();
-			RecipeListRequiresUpdate = true;
-			UpdateVisibleRecipeList();
-        }
     }
 }

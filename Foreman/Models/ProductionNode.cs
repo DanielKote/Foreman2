@@ -138,7 +138,6 @@ namespace Foreman
                 assembler = DataCache.Assemblers.Values
                     .Where(a => a.Enabled)
                     .Where(a => a.Categories.Contains(BaseRecipe.Category))
-                    .Where(a => a.MaxIngredients >= BaseRecipe.Ingredients.Count)
                     .OrderBy(a => -a.Speed)
                     .FirstOrDefault();
 			}
