@@ -33,6 +33,7 @@ namespace Foreman
 		public IReadOnlyDictionary<string, Module> Modules { get { return modules; } }
 		public IReadOnlyDictionary<string, Beacon> Beacons { get { return beacons; } }
 		public IReadOnlyList<Item> SciencePacks { get { return sciencePacks; } }
+		public IReadOnlyDictionary<Item, ICollection<Item>> SciencePackPrerequisites { get { return sciencePackPrerequisites; } }
 
 		public Assembler PlayerAssembler { get { return playerAssember; } }
 		public Technology StartingTech { get { return startingTech; } }
@@ -60,6 +61,7 @@ namespace Foreman
 		private Dictionary<string, Module> modules;
 		private Dictionary<string, Beacon> beacons;
 		private List<Item> sciencePacks;
+		private Dictionary<Item, ICollection<Item>> sciencePackPrerequisites;
 
 		private Dictionary<string, Item> missingItems;
 		private Dictionary<string, Assembler> missingAssemblers;
@@ -107,6 +109,7 @@ namespace Foreman
 			modules = new Dictionary<string, Module>();
 			beacons = new Dictionary<string, Beacon>();
 			sciencePacks = new List<Item>();
+			sciencePackPrerequisites = new Dictionary<Item, ICollection<Item>>();
 
 			missingItems = new Dictionary<string, Item>();
 			missingAssemblers = new Dictionary<string, Assembler>();
@@ -243,9 +246,43 @@ namespace Foreman
 				foreach (SubgroupPrototype sg in subgroups.Values)
 					sg.SortIRs();
 
-				ProcessDataCleanup();
+				//The data read by the dataCache (json preset) includes everything. We need to now process it such that any items/recipes that cant be used dont appear.
+				//thus any object that has Unavailable set to true should be ignored. We will leave the option to use them to the user, but in most cases its better without them
+
+
+				//delete any recipe that has no assembler. This is the only type of deletion that we will do, as we MUST enforce the 'at least 1 assembler' per recipe. The only recipes with no assemblers linked are those added to 'missing' category, and those are handled separately.
+				//note that even hand crafting has been handled: there is a player assembler that has been added. So the only recipes removed here are those that literally can not be crafted.
+				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Assemblers.Count == 0).ToList())
+				{
+					foreach (ItemPrototype ingredient in recipe.ingredientList)
+						ingredient.consumptionRecipes.Remove(recipe);
+					foreach (ItemPrototype product in recipe.productList)
+						product.productionRecipes.Remove(recipe);
+					foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
+						tech.unlockedRecipes.Remove(recipe);
+					foreach (ModulePrototype module in recipe.modules)
+						module.recipes.Remove(recipe);
+					recipe.mySubgroup.recipes.Remove(recipe);
+
+					recipes.Remove(recipe.Name);
+					ErrorLogging.LogLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
+					Console.WriteLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
+				}
+
+				//calculate the science packs for each technology (based on both their listed science packs, the science packs of their prerequisites, and the science packs required to research the science packs)
+				ProcessSciencePacks();
+
+				//calculate the availability of various recipes and entities (based on their unlock technologies + entity place objects' unlock technologies)
+				ProcessAvailableStatuses();
+
+				//delete any groups/subgroups without any items/recipes within them, and sort by order
+				CleanupGroups();
+
+				//check each fluid to see if all production recipe temperatures can fit within all consumption recipe ranges. if not, then the item / fluid is set to be 'temperature dependent' and requires further processing when checking link validity.
+				UpdateFluidTemperatureDependencies();
+
 #if DEBUG
-				PrintDataCache();
+				//PrintDataCache();
 #endif
 
 				progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
@@ -1167,11 +1204,8 @@ namespace Foreman
 
 		//------------------------------------------------------Finalization steps of LoadAllData (cleanup and cyclic checks)
 
-		private void ProcessDataCleanup()
+		private void ProcessSciencePacks()
 		{
-			//The data read by the dataCache (json preset) includes everything. We need to now process it such that any items/recipes that cant be used dont appear.
-			//thus any object that has Unavailable set to true should be ignored. We will leave the option to use them to the user, but in most cases its better without them
-
 			//quick function to depth-first search the tech tree to calculate the availability of the technology. Hashset used to keep track of visited tech and not have to re-check them.
 			//NOTE: factorio ensures no cyclic, so we are guaranteed to have a directed acyclic graph (may be disconnected)
 			HashSet<TechnologyPrototype> unlockableTechSet = new HashSet<TechnologyPrototype>();
@@ -1198,7 +1232,7 @@ namespace Foreman
 
 			//very similar to above, but for processing the required sci packs of each technology. Basically some research only requires 1 sci pack, but to unlock it requires researching tech with many sci packs. Need to account for that
 			Dictionary<TechnologyPrototype, HashSet<Item>> techRequirements = new Dictionary<TechnologyPrototype, HashSet<Item>>();
-			HashSet<Item> sciPacks = new HashSet<Item>(); 
+			HashSet<Item> sciPacks = new HashSet<Item>();
 			HashSet<Item> TechRequiredSciPacks(TechnologyPrototype tech)
 			{
 				if (techRequirements.ContainsKey(tech))
@@ -1231,23 +1265,26 @@ namespace Foreman
 				return tech.Tier;
 			}
 
-			//step 0: delete any recipe that has no assembler. This is the only type of deletion that we will do, as we MUST enforce the 'at least 1 assembler' per recipe. The only recipes with no assemblers linked are those added to 'missing' category, and those are handled separately.
-			//this means that any pure-hand-crafting recipe is removed. sorry.
-			foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Assemblers.Count == 0).ToList())
+			//science pack processing - DF again where we want to calculate which science packs are required to get to the given science pack
+			HashSet<Item> visitedPacks = new HashSet<Item>();
+			void UpdateSciencePackPrerequisites(Item sciPack)
 			{
-				foreach (ItemPrototype ingredient in recipe.ingredientList)
-					ingredient.consumptionRecipes.Remove(recipe);
-				foreach (ItemPrototype product in recipe.productList)
-					product.productionRecipes.Remove(recipe);
-				foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
-					tech.unlockedRecipes.Remove(recipe);
-				foreach (ModulePrototype module in recipe.modules)
-					module.recipes.Remove(recipe);
-				recipe.mySubgroup.recipes.Remove(recipe);
+				if (visitedPacks.Contains(sciPack))
+					return;
 
-				recipes.Remove(recipe.Name);
-				ErrorLogging.LogLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
-				Console.WriteLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
+				HashSet<Item> prerequisites = new HashSet<Item>(sciPack.ProductionRecipes.FirstOrDefault()?.MyUnlockTechnologies.FirstOrDefault()?.SciPackList ?? new Item[0]);
+				foreach (Recipe r in sciPack.ProductionRecipes)
+					foreach (Technology t in r.MyUnlockTechnologies)
+						prerequisites.IntersectWith(t.SciPackList);
+
+				//prerequisites now contains all the immediate required sci packs. we will not Update their prerequisites via this function, then add their prerequisites to our own set before finalizing it.
+				foreach (Item prereq in prerequisites.ToList())
+				{
+					UpdateSciencePackPrerequisites(prereq);
+					prerequisites.UnionWith(sciencePackPrerequisites[prereq]);
+				}
+				sciencePackPrerequisites.Add(sciPack, prerequisites);
+				visitedPacks.Add(sciPack);
 			}
 
 			//step 1: update tech unlock status & science packs (add a 0 cost pack to the tech if it has no such requirement but its prerequisites do), set tech tier
@@ -1260,11 +1297,22 @@ namespace Foreman
 					tech.InternalOneWayAddSciPack(sciPack, 0);
 			}
 
-			//step 2: calculate science pack tier (minimum tier of technology that unlocks the recipe for the given science pack). also make the sciencePacks list.
+			//step 2: further sci pack processing -> for every available science pack we want to build a list of science packs necessary to aquire it. In a situation with multiple (non-equal) research paths (ex: 3 can be aquired through either pack 1&2 or pack 1 alone), take the intersect (1 in this case). These will be added to the sci pack requirement lists
+			foreach (Item sciPack in sciPacks)
+				UpdateSciencePackPrerequisites(sciPack);
+
+
+			//step 2.5: update the technology science packs to account for the science pack prerequisites
+			foreach (TechnologyPrototype tech in technologies.Values)
+				foreach (Item sciPack in tech.SciPackList.ToList())
+					foreach (ItemPrototype reqSciPack in sciencePackPrerequisites[sciPack])
+						tech.InternalOneWayAddSciPack(reqSciPack, 0);
+
+			//step 3: calculate science pack tier (minimum tier of technology that unlocks the recipe for the given science pack). also make the sciencePacks list.
 			Dictionary<Item, int> sciencePackTiers = new Dictionary<Item, int>();
-			foreach(ItemPrototype sciPack in sciPacks)
+			foreach (ItemPrototype sciPack in sciPacks)
 			{
-				int minTier = int.MaxValue; 
+				int minTier = int.MaxValue;
 				foreach (Recipe recipe in sciPack.productionRecipes)
 					foreach (Technology tech in recipe.MyUnlockTechnologies)
 						minTier = Math.Min(minTier, tech.Tier);
@@ -1274,13 +1322,13 @@ namespace Foreman
 				sciencePacks.Add(sciPack);
 			}
 
-			//step 3: update all science pack lists (main sciencePacks list, plus SciPackList of every technology)
-			sciencePacks.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]));
-			foreach(TechnologyPrototype tech in technologies.Values)
-				tech.sciPackList.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]));
+			//step 4: update all science pack lists (main sciencePacks list, plus SciPackList of every technology). Sorting is done by A: if science pack B has science pack A as a prerequisite (in sciPackRequiredPacks), then B goes after A. If neither has the other as a prerequisite, then compare by sciencePack tiers
+			sciencePacks.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]) + (sciencePackPrerequisites[s1].Contains(s2) ? 1000 : sciencePackPrerequisites[s2].Contains(s1) ? -1000 : 0));
+			foreach (TechnologyPrototype tech in technologies.Values)
+				tech.sciPackList.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]) + (sciencePackPrerequisites[s1].Contains(s2) ? 1000 : sciencePackPrerequisites[s2].Contains(s1) ? -1000 : 0));
 
-			//step 4: create science pack lists for each recipe (list of distinct min-pack sets -> ex: if recipe can be aquired through 4 techs with [ A+B, A+B, A+C, A+B+C ] science pack requirements, we will only include A+B and A+C
-			foreach(RecipePrototype recipe in recipes.Values)
+			//step 5: create science pack lists for each recipe (list of distinct min-pack sets -> ex: if recipe can be aquired through 4 techs with [ A+B, A+B, A+C, A+B+C ] science pack requirements, we will only include A+B and A+C
+			foreach (RecipePrototype recipe in recipes.Values)
 			{
 				List<List<Item>> sciPackLists = new List<List<Item>>();
 				foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
@@ -1293,41 +1341,45 @@ namespace Foreman
 						else if (!tech.sciPackList.Except(sciPackList).Any()) //technology sci pack list is a subset of an already included sci pack list. we will add thi to the list and delete the existing one (ex: have A+B while tech's is A -> need to remove A+B and include A)
 							sciPackLists.Remove(sciPackList);
 					}
-					if(!exists)
+					if (!exists)
 						sciPackLists.Add(tech.sciPackList);
 				}
 				recipe.MyUnlockSciencePacks = sciPackLists;
 			}
+		}
 
-			//step 5: update recipe unlock status
+
+		private void ProcessAvailableStatuses()
+		{
+			//step 1: update recipe unlock status
 			foreach (RecipePrototype recipe in recipes.Values)
 				recipe.Available = recipe.myUnlockTechnologies.Any(t => t.Available);
 
-			//step 6: mark any recipe for barelling / crating as unavailable
+			//step 2: mark any recipe for barelling / crating as unavailable
 			if(UseRecipeBWLists)
 				foreach (RecipePrototype recipe in recipes.Values)
 					if (!recipeWhiteList.Any(white => white.IsMatch(recipe.Name)) && recipeBlackList.Any(black => black.IsMatch(recipe.Name))) //if we dont match a whitelist and match a blacklist...
 						recipe.Available = false;
 
-			//step 7: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
+			//step 3: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
 			foreach (RecipePrototype recipe in recipes.Values)
 				if (recipe.myUnlockTechnologies.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0 && !recipe.Name.StartsWith("§§"))) //§§ denotes foreman added recipes. ignored during this pass (but not during the assembler check pass)
 					recipe.Available = false;
 
-			//step 8 (loop) switch any recipe with no available assemblers to unavailable, switch any useless item to unavailable (no available recipe produces it, it isnt used by any available recipe / only by incineration recipes
+			//step 4 (loop) switch any recipe with no available assemblers to unavailable, switch any useless item to unavailable (no available recipe produces it, it isnt used by any available recipe / only by incineration recipes
 			bool clean = false;
 			while (!clean)
 			{
 				clean = true;
 
-				//8.1: mark any recipe with no available assemblers to unavailable.
+				//4.1: mark any recipe with no available assemblers to unavailable.
 				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available)))
 				{
 					recipe.Available = false;
 					clean = false;
 				}
 
-				//8.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
+				//4.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
 				//this will also update assembler availability status for those whose items become unavailable automatically.
 				//note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
 				foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available)))
@@ -1345,7 +1397,7 @@ namespace Foreman
 				}
 			}
 
-			//step 9: set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.
+			//step 5: set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.
 			foreach (RecipePrototype recipe in recipes.Values)
 				recipe.Enabled = recipe.Available;
 			foreach (AssemblerPrototype assembler in assemblers.Values)
@@ -1355,8 +1407,11 @@ namespace Foreman
 			foreach (BeaconPrototype beacon in beacons.Values)
 				beacon.Enabled = beacon.Available;
 			playerAssember.Enabled = true; //its enabled, so it can theoretically be used, but it is set as 'unavailable' so a warning will be issued if you use it.
+		}
 
-			//step 10: clean up groups and subgroups (delete any subgroups that have no items/recipes, then delete any groups that have no subgroups)
+		private void CleanupGroups()
+		{
+			//step 6: clean up groups and subgroups (delete any subgroups that have no items/recipes, then delete any groups that have no subgroups)
 			foreach (SubgroupPrototype subgroup in subgroups.Values.ToList())
 			{
 				if (subgroup.items.Count == 0 && subgroup.recipes.Count == 0)
@@ -1369,7 +1424,7 @@ namespace Foreman
 				if (group.subgroups.Count == 0)
 					groups.Remove(group.Name);
 
-			//step 11: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
+			//step 7: update subgroups and groups to set them to unavailable if they only contain unavailable items/recipes
 			foreach (SubgroupPrototype subgroup in subgroups.Values)
 				if (!subgroup.items.Any(i => i.Available) && !subgroup.recipes.Any(r => r.Available))
 					subgroup.Available = false;
@@ -1377,19 +1432,23 @@ namespace Foreman
 				if (!group.subgroups.Any(sg => sg.Available))
 					group.Available = false;
 
-			//step 12: sort groups/subgroups
+			//step 8: sort groups/subgroups
 			foreach (GroupPrototype group in groups.Values)
 				group.SortSubgroups();
 			foreach (SubgroupPrototype sgroup in subgroups.Values)
 				sgroup.SortIRs();
 
-			//step 13: update the temperature dependent status of items (fluids)
-			foreach(ItemPrototype fluid in items.Values.Where(i => i.IsFluid))
+		}
+
+		private void UpdateFluidTemperatureDependencies()
+		{
+			//step 9: update the temperature dependent status of items (fluids)
+			foreach (ItemPrototype fluid in items.Values.Where(i => i.IsFluid))
 			{
 				fRange productionRange = new fRange(double.MaxValue, double.MinValue);
 				fRange consumptionRange = new fRange(double.MinValue, double.MaxValue); //a bit different -> the min value is the LARGEST minimum of each consumption recipe, and the max value is the SMALLEST max of each consumption recipe
 
-				foreach(Recipe recipe in fluid.productionRecipes)
+				foreach (Recipe recipe in fluid.productionRecipes)
 				{
 					productionRange.Min = Math.Min(productionRange.Min, recipe.ProductTemperatureMap[fluid]);
 					productionRange.Max = Math.Max(productionRange.Max, recipe.ProductTemperatureMap[fluid]);
@@ -1469,7 +1528,14 @@ namespace Foreman
 			}
 			Console.WriteLine("Science Pack order:");
 			foreach (Item sciPack in sciencePacks)
-				Console.WriteLine(sciPack.FriendlyName);
+				Console.WriteLine("   >" + sciPack.FriendlyName);
+			Console.WriteLine("Science Pack prerequisites:");
+			foreach (Item sciPack in sciencePacks)
+			{
+				Console.WriteLine("   >" + sciPack);
+				foreach (Item i in sciencePackPrerequisites[sciPack])
+					Console.WriteLine("      >" + i);
+			}
 
 			Console.WriteLine("RECIPES: ----------------------------------------------------------------");
 			foreach(RecipePrototype recipe in recipes.Values)

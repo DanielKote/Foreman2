@@ -30,7 +30,7 @@ namespace Foreman
 		public IReadOnlyCollection<Assembler> Assemblers { get { return assemblers; } }
 		public IReadOnlyCollection<Beacon> Beacons { get { return beacons; } }
 		public IReadOnlyCollection<Recipe> AvailableRecipes { get; private set; }
-		public Item AssociatedItem { get { return myCache.Items[Name]; } }
+		public Item AssociatedItem { get { return Owner.Items[Name]; } }
 
 		public double SpeedBonus { get; set; }
 		public double ProductivityBonus { get; set; }

@@ -5,6 +5,8 @@ namespace Foreman
 {
 	public interface DataObjectBase : IComparable<DataObjectBase>
 	{
+		DataCache Owner { get; }
+
 		string Name { get; }
 		string LFriendlyName { get; }
 		string FriendlyName { get; }
@@ -21,7 +23,7 @@ namespace Foreman
 	{
 		private static readonly char[] orderSeparators = { '[', ']' };
 
-		protected DataCache myCache { get; private set; }
+		public DataCache Owner { get; private set; }
 
 		public string Name { get; private set; }
 		public string LFriendlyName { get; private set; }
@@ -34,7 +36,7 @@ namespace Foreman
 
 		public DataObjectBasePrototype(DataCache dCache, string name, string friendlyName, string order)
 		{
-			myCache = dCache;
+			Owner = dCache;
 			Name = name;
 			FriendlyName = friendlyName;
 			LFriendlyName = friendlyName.ToLower();

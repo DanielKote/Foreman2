@@ -256,10 +256,10 @@ namespace Foreman
 						int sciPackSize = 24;
 						if(Properties.Settings.Default.AbbreviateSciPacks) //dont show the science pack if it is a prerequisite of another science pack (that we show)
 						{
-							List<Item> filteredSciPacks = new List<Item>();
-							foreach(Item pack in sciPacks)
-								if (!sciPacks.Any(p => p.ProductionRecipes.Any(pr => pr.MyUnlockSciencePacks.Any(sps => sps.Contains(pack)))))
-									filteredSciPacks.Add(pack);
+							List<Item> filteredSciPacks = new List<Item>(sciPacks);
+							foreach (Item sciPack in sciPacks)
+								foreach (Item prereq in recipes[r].Owner.SciencePackPrerequisites[sciPack])
+									filteredSciPacks.Remove(prereq);
 							sciPacks = filteredSciPacks;
 							sciPackSize = 32;
 						}
