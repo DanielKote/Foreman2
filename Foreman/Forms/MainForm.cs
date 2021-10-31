@@ -80,6 +80,15 @@ namespace Foreman
 		public void UpdateControlValues()
 		{
 			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
+			Properties.Settings.Default.DefaultRateUnit = RateOptionsDropDown.SelectedIndex;
+
+			ModuleDropDown.SelectedIndex = (int)GraphViewer.Graph.ModuleSelector.SelectionStyle;
+			Properties.Settings.Default.DefaultModuleOption = ModuleDropDown.SelectedIndex;
+
+			AssemblerDropDown.SelectedIndex = (int)GraphViewer.Graph.AssemblerSelector.SelectionStyle;
+			Properties.Settings.Default.DefaultAssemblerOption = AssemblerDropDown.SelectedIndex;
+
+			Properties.Settings.Default.Save();
 
 			if (Properties.Settings.Default.LevelOfDetail == (int)ProductionGraphViewer.LOD.Low)
 				LowLodRadioButton.Checked = true;
@@ -227,6 +236,7 @@ namespace Foreman
 						Properties.Settings.Default.Save();
 					}
 
+					GraphViewer.Graph.UpdateNodeStates();
 					GraphViewer.UpdateNodeVisuals();
 					UpdateControlValues();
 				}

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -19,12 +20,66 @@ namespace Foreman
 		[STAThread]
 		static void Main()
 		{
-			//test4(); return;
+			//test6(); return;
 
 			ErrorLogging.ClearLog();
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
+		}
+
+		public static void test6()
+		{
+			string[] efficincies = new string[] { "e1", "e2", "e3", "s1", "s2", "s3", "s1", "s2", "s3" };
+			string[] speeds = new string[] { "s1", "s2", "s3", "s1", "s2", "s3", "s1", "s2", "s3" };
+			string[] orderedOptions = efficincies.Concat(speeds).ToArray();
+			int moduleSize = 6;
+
+			List<string[]> permutations = new List<string[]>();
+			string[] permu = new string[moduleSize];
+			AddItem(permu, 0, 0);
+
+			void AddItem(string[] permutation, int itemIndex, int startingIndex)
+			{
+				if (itemIndex == permutation.Length)
+					permutations.Add(permutation.ToArray());
+				else
+				{
+					for (int i = startingIndex; i < orderedOptions.Length; i++)
+					{
+						permutation[itemIndex] = orderedOptions[i];
+						AddItem(permutation, itemIndex+1, i);
+					}
+				}
+			}
+
+			Console.WriteLine(permutations.Count);
+		}
+
+		public struct testStruct
+		{
+			public bool available;
+			public bool enabled;
+			public string name;
+
+			public testStruct(bool av, bool en, string na) { available = av; enabled = en; name = na; }
+		}
+
+		static void test5()
+		{
+
+
+			List<testStruct> testList = new List<testStruct>();
+			testList.Add(new testStruct(true, true, "a1"));
+			testList.Add(new testStruct(false, true, "b1"));
+			testList.Add(new testStruct(true, false, "c1"));
+			testList.Add(new testStruct(false, false, "d1"));
+			testList.Add(new testStruct(true, true, "a2"));
+			testList.Add(new testStruct(false, true, "b2"));
+			testList.Add(new testStruct(true, false, "c2"));
+			testList.Add(new testStruct(false, false, "d2"));
+			foreach (testStruct ts in testList.OrderByDescending(t => t.available).ThenByDescending(t => t.enabled).ThenBy(t => t.name))
+				Console.WriteLine(ts.available + ", " + ts.enabled + ", " + ts.name);
 		}
 
 		static void test4()

@@ -18,6 +18,8 @@ namespace Foreman
 		float ConsumptionBonus { get; }
 		float PollutionBonus { get; }
 
+		int Tier { get; }
+
 		bool IsMissing { get; }
 		bool Enabled { get; set; }
 	}
@@ -34,6 +36,8 @@ namespace Foreman
 		public float ProductivityBonus { get; set; }
 		public float ConsumptionBonus { get; set; }
 		public float PollutionBonus { get; set; }
+
+		public int Tier { get; set; }
 
 		public bool Enabled { get; set; }
 

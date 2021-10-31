@@ -66,16 +66,23 @@ namespace Foreman
 
 			//quantity
 			//graphics.DrawRectangle(devPen, textbox);
-			float assemblerCount = recipeNode.GetBaseNumberOfAssemblers() * graphViewer.GetRateMultipler();
 			string text = "x";
-			if (assemblerCount >= 1000)
-				text += assemblerCount.ToString("0.##e0");
-			else if (assemblerCount >= 0.1)
-				text += assemblerCount.ToString("0.#");
-			else if (assemblerCount != 0)
-				text += "<0.1";
+			if (recipeNode.SelectedAssembler.IsMissing)
+			{
+				text += "---";
+			}
 			else
-				text += "0";
+			{
+				float assemblerCount = recipeNode.GetBaseNumberOfAssemblers() * graphViewer.GetRateMultipler();
+				if (assemblerCount >= 1000)
+					text += assemblerCount.ToString("0.##e0");
+				else if (assemblerCount >= 0.1)
+					text += assemblerCount.ToString("0.#");
+				else if (assemblerCount != 0)
+					text += "<0.1";
+				else
+					text += "0";
+			}
 
 			GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
 		}

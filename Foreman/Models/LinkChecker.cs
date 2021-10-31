@@ -15,6 +15,8 @@ namespace Foreman
 		{
 			if (!IsPossibleConnection(item, supplier, consumer))
 				return false;
+			if (!item.IsFluid)
+				return true;
 
 			fRange supplierTempRange = GetTemperatureRange(item, supplier, LinkType.Output);
 			fRange consumerTempRange = GetTemperatureRange(item, consumer, LinkType.Input);
@@ -57,12 +59,12 @@ namespace Foreman
 				{
 					gotOne = true;
 					Recipe recipe = ((RecipeNode)cNode).BaseRecipe;
-					if (direction == LinkType.Input)
+					if (direction == LinkType.Input && recipe.IngredientSet.ContainsKey(item)) //have to check for ingredient inclusion due to fuel/fuel-remains
 					{
 						minTemp = Math.Max(minTemp, recipe.IngredientTemperatureMap[item].Min);
 						maxTemp = Math.Min(maxTemp, recipe.IngredientTemperatureMap[item].Max);
 					}
-					else //if(direction == LinkType.Output)
+					else if(direction == LinkType.Output && recipe.ProductSet.ContainsKey(item))
 					{
 						minTemp = Math.Min(minTemp, recipe.ProductTemperatureMap[item]);
 						maxTemp = Math.Max(maxTemp, recipe.ProductTemperatureMap[item]);

@@ -117,11 +117,13 @@ namespace Foreman
 			return node;
 		}
 
-		public RecipeNode CreateRecipeNode(Recipe recipe, Point location, bool autoPopulate)
+		public RecipeNode CreateRecipeNode(Recipe recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
+		private RecipeNode CreateRecipeNode(Recipe recipe, Point location, Action<RecipeNodePrototype> nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
 		{
-			RecipeNodePrototype node = new RecipeNodePrototype(this, lastNodeID++, recipe, autoPopulate);
+			RecipeNodePrototype node = new RecipeNodePrototype(this, lastNodeID++, recipe, nodeSetupAction == null);
 			node.Location = location;
 			nodes.Add(node);
+			nodeSetupAction?.Invoke(node);
 			NodeAdded?.Invoke(this, new NodeEventArgs(node));
 			return node;
 		}
@@ -173,6 +175,12 @@ namespace Foreman
 			nodeLinks.Clear();
 			SerializeNodeList = null;
 			lastNodeID = 0;
+		}
+
+		public void UpdateNodeStates()
+		{
+			foreach (BaseNode node in nodes)
+				node.UpdateState();
 		}
 
 		public IEnumerable<BaseNode> GetSuppliers(Item item)
@@ -254,101 +262,113 @@ namespace Foreman
 				Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
 				string itemName; //just an early define
 
-				switch ((NodeType)(int)nodeJToken["NodeType"])
+				try
 				{
-					case NodeType.Consumer:
-						itemName = (string)nodeJToken["Item"];
-						if (cache.Items.ContainsKey(itemName))
-							newNode = (BaseNodePrototype)CreateConsumerNode(cache.Items[itemName], location);
-						else
-							newNode = (BaseNodePrototype)CreateConsumerNode(cache.MissingItems[itemName], location);
-						break;
-					case NodeType.Supplier:
-						itemName = (string)nodeJToken["Item"];
-						if (cache.Items.ContainsKey(itemName))
-							newNode = (BaseNodePrototype)CreateSupplierNode(cache.Items[itemName], location);
-						else
-							newNode = (BaseNodePrototype)CreateSupplierNode(cache.MissingItems[itemName], location);
-						break;
-					case NodeType.Passthrough:
-						itemName = (string)nodeJToken["Item"];
-						if (cache.Items.ContainsKey(itemName))
-							newNode = (BaseNodePrototype)CreatePassthroughNode(cache.Items[itemName], location);
-						else
-							newNode = (BaseNodePrototype)CreatePassthroughNode(cache.MissingItems[itemName], location);
-						break;
-					case NodeType.Recipe:
-						long recipeID = (long)nodeJToken["RecipeID"];
-						RecipeNodePrototype recipeNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location, false);
-
-						if (nodeJToken["Assembler"] == null) //kind of an obvious one - if this happens then something is QuiteWrong(tm)
-							Trace.Fail("Attempt at inserting a recipe node with a null assembler!");
-
-						string assemblerName = (string)nodeJToken["Assembler"];
-						if (cache.Assemblers.ContainsKey(assemblerName))
-							recipeNode.SetAssembler(cache.Assemblers[assemblerName]);
-						else
-							recipeNode.SetAssembler(cache.MissingAssemblers[assemblerName]);
-
-						foreach (string moduleName in nodeJToken["AssemblerModules"].Select(t => (string)t).ToList())
-						{
-							if (cache.Modules.ContainsKey(moduleName))
-								recipeNode.AddAssemblerModule(cache.Modules[moduleName]);
+					switch ((NodeType)(int)nodeJToken["NodeType"])
+					{
+						case NodeType.Consumer:
+							itemName = (string)nodeJToken["Item"];
+							if (cache.Items.ContainsKey(itemName))
+								newNode = (BaseNodePrototype)CreateConsumerNode(cache.Items[itemName], location);
 							else
-								recipeNode.AddAssemblerModule(cache.MissingModules[moduleName]);
-						}
-
-						if (nodeJToken["Fuel"] != null)
-						{
-							if (cache.Items.ContainsKey((string)nodeJToken["Fuel"]))
-								recipeNode.SetFuel(cache.Items[(string)nodeJToken["Fuel"]]);
+								newNode = (BaseNodePrototype)CreateConsumerNode(cache.MissingItems[itemName], location);
+							newNodeCollection.newNodes.Add(newNode);
+							break;
+						case NodeType.Supplier:
+							itemName = (string)nodeJToken["Item"];
+							if (cache.Items.ContainsKey(itemName))
+								newNode = (BaseNodePrototype)CreateSupplierNode(cache.Items[itemName], location);
 							else
-								recipeNode.SetFuel(cache.MissingItems[(string)nodeJToken["Fuel"]]);
-						}
-						else if (recipeNode.SelectedAssembler.IsBurner) //and fuel is null :/
-							recipeNode.SetFuel(FuelSelector.GetFuel(recipeNode.SelectedAssembler));
-
-						if(nodeJToken["Burnt"] != null)
-						{
-							Item burntItem;
-							if (cache.Items.ContainsKey((string)nodeJToken["Burnt"]))
-								burntItem = cache.Items[(string)nodeJToken["Burnt"]];
+								newNode = (BaseNodePrototype)CreateSupplierNode(cache.MissingItems[itemName], location);
+							newNodeCollection.newNodes.Add(newNode);
+							break;
+						case NodeType.Passthrough:
+							itemName = (string)nodeJToken["Item"];
+							if (cache.Items.ContainsKey(itemName))
+								newNode = (BaseNodePrototype)CreatePassthroughNode(cache.Items[itemName], location);
 							else
-								burntItem = cache.MissingItems[(string)nodeJToken["Burnt"]];
-							if (recipeNode.FuelRemains != burntItem)
-								recipeNode.SetBurntOverride(burntItem);
-						}
+								newNode = (BaseNodePrototype)CreatePassthroughNode(cache.MissingItems[itemName], location);
+							newNodeCollection.newNodes.Add(newNode);
+							break;
+						case NodeType.Recipe:
+							long recipeID = (long)nodeJToken["RecipeID"];
+							newNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location, (rNode) => {
+								newNodeCollection.newNodes.Add(rNode);
 
-						if (nodeJToken["Beacon"] != null)
-						{
-							string beaconName = (string)nodeJToken["Beacon"];
-							if (cache.Beacons.ContainsKey(beaconName))
-								recipeNode.SetBeacon(cache.Beacons[beaconName]);
-							else
-								recipeNode.SetBeacon(cache.MissingBeacons[beaconName]);
+								if (nodeJToken["Assembler"] == null) //kind of an obvious one - if this happens then something is QuiteWrong(tm)
+									Trace.Fail("Attempt at inserting a recipe node with a null assembler!");
 
-							foreach (string moduleName in nodeJToken["BeaconModules"].Select(t => (string)t).ToList())
-							{
-								if (cache.Modules.ContainsKey(moduleName))
-									recipeNode.AddBeaconModule(cache.Modules[moduleName]);
+								string assemblerName = (string)nodeJToken["Assembler"];
+								if (cache.Assemblers.ContainsKey(assemblerName))
+									rNode.SetAssembler(cache.Assemblers[assemblerName]);
 								else
-									recipeNode.AddBeaconModule(cache.MissingModules[moduleName]);
-							}
-							recipeNode.BeaconCount = (float)nodeJToken["BeaconCount"];
-						}
-						newNode = recipeNode;
-						break;
-					default:
-						Trace.Fail("Unknown node type: " + nodeJToken["NodeType"]);
-						break;
+									rNode.SetAssembler(cache.MissingAssemblers[assemblerName]);
+
+								foreach (string moduleName in nodeJToken["AssemblerModules"].Select(t => (string)t).ToList())
+								{
+									if (cache.Modules.ContainsKey(moduleName))
+										rNode.AddAssemblerModule(cache.Modules[moduleName]);
+									else
+										rNode.AddAssemblerModule(cache.MissingModules[moduleName]);
+								}
+
+								if (nodeJToken["Fuel"] != null)
+								{
+									if (cache.Items.ContainsKey((string)nodeJToken["Fuel"]))
+										rNode.SetFuel(cache.Items[(string)nodeJToken["Fuel"]]);
+									else
+										rNode.SetFuel(cache.MissingItems[(string)nodeJToken["Fuel"]]);
+								}
+								else if (rNode.SelectedAssembler.IsBurner) //and fuel is null :/
+									rNode.SetFuel(FuelSelector.GetFuel(rNode.SelectedAssembler));
+
+								if (nodeJToken["Burnt"] != null)
+								{
+									Item burntItem;
+									if (cache.Items.ContainsKey((string)nodeJToken["Burnt"]))
+										burntItem = cache.Items[(string)nodeJToken["Burnt"]];
+									else
+										burntItem = cache.MissingItems[(string)nodeJToken["Burnt"]];
+									if (rNode.FuelRemains != burntItem)
+										rNode.SetBurntOverride(burntItem);
+								}
+
+								if (nodeJToken["Beacon"] != null)
+								{
+									string beaconName = (string)nodeJToken["Beacon"];
+									if (cache.Beacons.ContainsKey(beaconName))
+										rNode.SetBeacon(cache.Beacons[beaconName]);
+									else
+										rNode.SetBeacon(cache.MissingBeacons[beaconName]);
+
+									foreach (string moduleName in nodeJToken["BeaconModules"].Select(t => (string)t).ToList())
+									{
+										if (cache.Modules.ContainsKey(moduleName))
+											rNode.AddBeaconModule(cache.Modules[moduleName]);
+										else
+											rNode.AddBeaconModule(cache.MissingModules[moduleName]);
+									}
+									rNode.BeaconCount = (float)nodeJToken["BeaconCount"];
+								}
+							});
+							break;
+						default:
+							throw new Exception();
+					}
+
+					newNode.RateType = (RateType)(int)nodeJToken["RateType"];
+					if (newNode.RateType == RateType.Manual)
+						newNode.DesiredRate = (float)nodeJToken["DesiredRate"];
+
+					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode);
 				}
-
-				newNode.RateType = (RateType)(int)nodeJToken["RateType"];
-				if (newNode.RateType == RateType.Manual)
-					newNode.DesiredRate = (float)nodeJToken["DesiredRate"];
-
-				oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode);
-				newNodeCollection.newNodes.Add(newNode);
+				catch //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
+				{
+					foreach (BaseNodePrototype node in newNodeCollection.newNodes)
+						node.Delete();
+					newNodeCollection.newNodes.Clear();
+					return newNodeCollection;
+				}
 			}
 
 			//link the new nodes
@@ -364,8 +384,8 @@ namespace Foreman
 				else
 					item = cache.MissingItems[itemName];
 
-				//if(LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
-				newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
+				if(LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
+					newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
 			}
 			return newNodeCollection;
 		}

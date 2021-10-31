@@ -13,7 +13,6 @@ namespace Foreman
 		float Time { get; set; }
 		long RecipeID { get; }
 		bool IsMissing { get; }
-		bool HasEnabledAssemblers { get; }
 		bool Enabled { get; set; }
 
 		IReadOnlyDictionary<Item, float> ProductSet { get; }
@@ -70,7 +69,6 @@ namespace Foreman
 		internal HashSet<TechnologyPrototype> myUnlockTechnologies { get; private set; }
 
 		public bool IsMissing { get; private set; }
-		public bool HasEnabledAssemblers { get { return assemblers.FirstOrDefault(a => a.Enabled) != null; } }
 
 		public bool Enabled { get; set; }
 

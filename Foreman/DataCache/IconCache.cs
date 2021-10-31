@@ -100,6 +100,5 @@ namespace Foreman
 			});
 			return iconCache;
 		}
-
 	}
 }

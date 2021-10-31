@@ -26,10 +26,8 @@ namespace Foreman
 		public enum LOD { Low, Medium, High } //low: only names. medium: assemblers, beacons, etc. high: include assembler percentages
 
 		public RateUnit SelectedRateUnit { get; set; }
-		public float GetRateMultipler()
-		{
-			return RateMultiplier[(int)SelectedRateUnit];
-		} //the amount of assemblers required will be multipled by the rate multipler when displaying.
+		public float GetRateMultipler() { return RateMultiplier[(int)SelectedRateUnit]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
+		public string GetRateName() { return RateUnitNames[(int)SelectedRateUnit]; }
 
 		public LOD LevelOfDetail { get; set; }
 		public bool RecipeTooltipEnabled { get; set; }
@@ -205,7 +203,7 @@ namespace Foreman
 						newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
 						break;
 					case NodeType.Recipe:
-						newNode = Graph.CreateRecipeNode(recipe, newLocation, true);
+						newNode = Graph.CreateRecipeNode(recipe, newLocation);
 						break;
 				}
 
@@ -224,6 +222,7 @@ namespace Foreman
 				else if (nNodeType == NewNodeType.Supplier)
 					Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
 
+				Graph.UpdateNodeStates();
 				Graph.UpdateNodeValues();
 			}, () =>
 			{
@@ -242,6 +241,7 @@ namespace Foreman
 				foreach (BaseNodeElement node in selectedNodes)
 					Graph.DeleteNode(node.DisplayedNode);
 				selectedNodes.Clear();
+				Graph.UpdateNodeStates();
 				Graph.UpdateNodeValues();
 			}
 		}
@@ -306,10 +306,7 @@ namespace Foreman
 			try
 			{
 				foreach (BaseNodeElement node in nodeElements)
-				{
-					node.DisplayedNode.UpdateState();
 					node.Update();
-				}
 			}
 			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
 			Invalidate();
@@ -792,8 +789,6 @@ namespace Foreman
 			}
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
-
-
 
 		//----------------------------------------------Viewpoint events
 

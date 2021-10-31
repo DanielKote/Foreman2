@@ -20,12 +20,17 @@ namespace Foreman
 		Item Fuel { get; }
 		Item FuelRemains { get; }
 
+		//both of these work with the base time unit (1:1, in this case meaning 1sec) -> so when getting/setting the values they need to be multiplied/divided by the rate conversion factor (ex: by 60 if in minutes)
 		float GetBaseNumberOfAssemblers();
+		void SetBaseNumberOfAssemblers(float num); //can be used to set the 'rate' of the recipe based on # of assemblers instead of the 'number of recipe results?' that setting the ActualRate would do.
 
 		void SetAssembler(Assembler assembler);
+		void AutoSetAssembler();
+
 		void AddAssemblerModule(Module module);
 		void RemoveAssemblerModule(int index);
 		void SetAssemblerModules(IEnumerable<Module> modules);
+		void AutoSetAssemblerModules();
 
 		void SetBeacon(Beacon beacon);
 		void AddBeaconModule(Module module);
@@ -33,6 +38,7 @@ namespace Foreman
 		void SetBeaconModules(IEnumerable<Module> modules);
 
 		void SetFuel(Item fuel);
+		void AutoSetFuel();
 	}
 
 
@@ -52,7 +58,7 @@ namespace Foreman
 
 		public Item Fuel { get; private set; }
 		public Item FuelRemains { get { return (fuelRemainsOverride != null)? fuelRemainsOverride : (Fuel != null && Fuel.BurnResult != null)? Fuel.BurnResult : null; } }
-		internal void SetBurntOverride(Item item) { if(Fuel == null || Fuel.BurnResult != fuelRemainsOverride) fuelRemainsOverride = item; }
+		internal void SetBurntOverride(Item item){ if(Fuel == null || Fuel.BurnResult != item) fuelRemainsOverride = item; }
 		private Item fuelRemainsOverride; //returns as BurntItem if set (error import)
 
 		public override string DisplayName { get { return BaseRecipe.FriendlyName; } }
@@ -62,24 +68,19 @@ namespace Foreman
 			BaseRecipe = baseRecipe;
 
 			SelectedBeacon = null;
+			SelectedAssembler = null;
 			BeaconCount = 0;
 			beaconModules = new List<Module>();
+			assemblerModules = new List<Module>();
 
 			if (autoPopulate) //if not then this is an import -> all the values will be set by the import
 			{
-				SelectedAssembler = MyGraph.AssemblerSelector.GetAssembler(BaseRecipe);
-				assemblerModules = MyGraph.ModuleSelector.GetModules(SelectedAssembler, BaseRecipe);
-				if (SelectedAssembler != null && SelectedAssembler.IsBurner)
-					Fuel = MyGraph.FuelSelector.GetFuel(SelectedAssembler);
-				else
-					Fuel = null;
+				AutoSetAssembler();
+				AutoSetAssemblerModules();
 			}
 			else
 			{
-				SelectedAssembler = null;
-				assemblerModules = new List<Module>();
-				Fuel = null;
-				fuelRemainsOverride = null;
+				SetFuel(null);
 			}
 		}
 
@@ -101,6 +102,12 @@ namespace Foreman
 				SetBeacon(SelectedBeacon);
 
 			UpdateState();
+		}
+
+		public void AutoSetAssembler()
+		{
+			SetAssembler(MyGraph.AssemblerSelector.GetAssembler(BaseRecipe));
+			SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler));
 		}
 
 		public void SetBeacon(Beacon beacon)
@@ -137,6 +144,12 @@ namespace Foreman
 			UpdateState();
 		}
 
+		public void AutoSetAssemblerModules()
+		{
+			assemblerModules = MyGraph.ModuleSelector.GetModules(SelectedAssembler, BaseRecipe);
+			UpdateState();
+		}
+
 		public void AddBeaconModule(Module module) { beaconModules.Add(module); UpdateState(); }
 
 		public void RemoveBeaconModule(int index) { if (index >= 0 && index < beaconModules.Count) beaconModules.RemoveAt(index); UpdateState(); }
@@ -169,6 +182,11 @@ namespace Foreman
 			}
 		}
 
+		public void AutoSetFuel()
+		{
+			SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler));
+		}
+
 		public override void UpdateState() { State = GetUpdatedState(); }
 
 		private NodeState GetUpdatedState()
@@ -195,16 +213,16 @@ namespace Foreman
 			if (!AllLinksValid)
 				return NodeState.Error;
 
-			//warning states
-			if (!BaseRecipe.Enabled)
+			//warning states (either not enabled or not available both throw up warnings)
+			if (!BaseRecipe.Enabled || !BaseRecipe.Available)
 				return NodeState.Warning;
-			if (!SelectedAssembler.Enabled)
+			if (!SelectedAssembler.Enabled || !SelectedAssembler.Available)
 				return NodeState.Warning;
-			if (Fuel != null && Fuel.ProductionRecipes.FirstOrDefault(r => !r.Enabled || !r.HasEnabledAssemblers) == null)
+			if (Fuel != null && (!Fuel.Available || Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) == null))
 				return NodeState.Warning;
-			if (assemblerModules.FirstOrDefault(m => !m.Enabled) != null)
+			if (assemblerModules.FirstOrDefault(m => !m.Enabled || !m.Available) != null)
 				return NodeState.Warning;
-			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Enabled) != null)
+			if (SelectedBeacon != null && (!SelectedBeacon.Available || !SelectedBeacon.Enabled || (beaconModules.FirstOrDefault(m => !m.Enabled || !m.Available) != null)))
 				return NodeState.Warning;
 
 			return NodeState.Clean;
@@ -274,20 +292,21 @@ namespace Foreman
 			else
 			{
 				if (SelectedAssembler == null || SelectedAssembler.IsMissing)
-					resolutions.Add("Auto-select assembler", new Action(() => SetAssembler(MyGraph.AssemblerSelector.GetAssembler(BaseRecipe))));
+					resolutions.Add("Auto-select assembler", new Action(() => AutoSetAssembler()));
 				else if (SelectedAssembler.IsBurner)
 				{
 					if ((Fuel == null && SelectedAssembler.Fuels.Count > 0) ||
 						!SelectedAssembler.Fuels.Contains(Fuel) ||
-						(Fuel != null && Fuel.IsMissing) ||
-						fuelRemainsOverride != null)
-						resolutions.Add("Auto-select fuel", new Action(() => SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler))));
+						(Fuel != null && Fuel.IsMissing))
+						resolutions.Add("Auto-select fuel", new Action(() => AutoSetFuel()));
+					if (fuelRemainsOverride != null)
+						resolutions.Add("Update burn result", new Action(() => SetFuel(Fuel)));
 				}
 
 				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null || AssemblerModules.Count > SelectedAssembler.ModuleSlots)
 					resolutions.Add("Fix assembler modules", new Action(() => {
 						for (int i = AssemblerModules.Count - 1; i >= 0; i--) 
-							if (AssemblerModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.ValidModules.Contains(beaconModules[i])) 
+							if (AssemblerModules[i].IsMissing || !SelectedAssembler.Modules.Contains(assemblerModules[i]) || !BaseRecipe.Modules.Contains(assemblerModules[i])) 
 								RemoveAssemblerModule(i);
 						while (AssemblerModules.Count > SelectedAssembler.ModuleSlots)
 							RemoveAssemblerModule(AssemblerModules.Count - 1);
@@ -319,28 +338,46 @@ namespace Foreman
 		{
 			List<string> output = new List<string>();
 
+			//recipe
 			if (!BaseRecipe.Enabled)
-				output.Add("> Selected recipe is disabled.");
+				output.Add("X> Selected recipe is disabled.");
+			if (!BaseRecipe.Available)
+				output.Add("X> Selected recipe is uncraftable.");
+
+			//assembler
 			if (!SelectedAssembler.Enabled)
 			{
-				if (BaseRecipe.HasEnabledAssemblers)
+				if (BaseRecipe.Assemblers.FirstOrDefault(a => a.Enabled) != null)
 					output.Add("> Selected assembler is disabled.");
 				else
-					output.Add("> No enabled assemblers for this recipe.");
+					output.Add("X> No enabled assemblers for this recipe.");
 			}
-			if (Fuel != null && Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) == null)
+			if (!SelectedAssembler.Available)
+				output.Add("X> Selected assembler is uncraftable.");
+
+			//fuel
+			if(Fuel != null)
 			{
-				if (SelectedAssembler.Fuels.FirstOrDefault(fuel => fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null) != null)
-					output.Add("> Selected fuel cant be produced (recipe/assembler disabled).");
-				else
-					output.Add("> All fuels cant be produced (recipe/assembler disabled).");
+				if (!Fuel.Available)
+					output.Add("X> Selected fuel is uncraftable");
+				else if (Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) == null)
+				{
+					if (SelectedAssembler.Fuels.FirstOrDefault(fuel => fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) != null)
+						output.Add("> Selected fuel cant be produced (recipe/assembler disabled).");
+					else
+						output.Add("X> All fuels cant be produced (recipes/assemblers disabled).");
+				}
 			}
-			if (Fuel == null && SelectedAssembler.Fuels.Count == 0)
-				output.Add("> No fuel available for burner assembler (no solution).");
+
 			if (assemblerModules.FirstOrDefault(m => !m.Enabled) != null)
 				output.Add("> Some selected assembler modules are disabled.");
+			if (assemblerModules.FirstOrDefault(m => !m.Available) != null)
+				output.Add("> Some selected assembler modules are uncraftable.");
+
 			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Enabled) != null)
 				output.Add("> Some selected beacon modules are disabled.");
+			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Available) != null)
+				output.Add("> Some selected beacon modules are uncraftable.");
 
 			return output;
 		}
@@ -349,15 +386,25 @@ namespace Foreman
 		{
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
 
-			if (!SelectedAssembler.Enabled && BaseRecipe.HasEnabledAssemblers)
-				resolutions.Add("Switch to enabled assembler", new Action(() => SetAssembler(MyGraph.AssemblerSelector.GetAssembler(BaseRecipe))));
-			if (Fuel != null && Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) == null)
-				if (SelectedAssembler.Fuels.FirstOrDefault(fuel => fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null) != null)
-					resolutions.Add("Switch to valid fuel", new Action(() => SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler))));
+			if (!SelectedAssembler.Enabled && BaseRecipe.Assemblers.FirstOrDefault(a => a.Enabled) != null)
+				resolutions.Add("Switch to enabled assembler", new Action(() => AutoSetAssembler()));
+			if (Fuel != null && Fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) == null)
+				if (SelectedAssembler.Fuels.FirstOrDefault(fuel => fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) != null)
+					resolutions.Add("Switch to valid fuel", new Action(() => AutoSetFuel()));
 			if (assemblerModules.FirstOrDefault(m => !m.Enabled) != null)
-				resolutions.Add("Remove broken modules from assembler", new Action(() => { for (int i = AssemblerModules.Count - 1; i >= 0; i--) if (!AssemblerModules[i].Enabled) RemoveAssemblerModule(i); }));
+				resolutions.Add("Remove disabled modules from assembler", new Action(() => {
+					for (int i = AssemblerModules.Count - 1; i >= 0; i--)
+						if (!AssemblerModules[i].Enabled)
+							RemoveAssemblerModule(i);
+					UpdateState();
+				}));
 			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Enabled) != null)
-				resolutions.Add("Remove disabled modules from beacon", new Action(() => { for (int i = BeaconModules.Count - 1; i >= 0; i--) if (!BeaconModules[i].Enabled) RemoveBeaconModule(i); }));
+				resolutions.Add("Remove disabled modules from beacon", new Action(() => {
+					for (int i = BeaconModules.Count - 1; i >= 0; i--)
+						if (!BeaconModules[i].Enabled)
+							RemoveBeaconModule(i);
+					UpdateState();
+				}));
 
 			return resolutions;
 		}
@@ -392,7 +439,7 @@ namespace Foreman
 				return BaseRecipe.IngredientSet[item];
 			else
 			{
-				if (SelectedAssembler == null || !SelectedAssembler.IsBurner)
+				if (SelectedAssembler == null || (!SelectedAssembler.IsMissing && !SelectedAssembler.IsBurner))
 					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
 
 				float recipeRate = BaseRecipe.IngredientSet.ContainsKey(item) ? BaseRecipe.IngredientSet[item] : 0;
@@ -464,6 +511,13 @@ namespace Foreman
 			if (SelectedAssembler == null)
 				return 0;
 			return (float)Math.Round(ActualRate * (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())), RoundingDP);
+		}
+
+		public void SetBaseNumberOfAssemblers(float num)
+		{
+			if (SelectedAssembler == null)
+				return;
+			DesiredRate = (float)Math.Round(num * SelectedAssembler.Speed * GetSpeedMultiplier() / BaseRecipe.Time, RoundingDP);
 		}
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)

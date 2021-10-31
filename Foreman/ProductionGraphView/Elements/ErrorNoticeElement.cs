@@ -57,9 +57,14 @@ namespace Foreman
 			tti.Direction = Direction.Up;
 			tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(0, Height / 2)));
 			tti.Text = "";
+			bool solutionsAvailable = false;
 			for (int i = 0; i < text.Count; i++)
+			{
 				tti.Text += text[i] + "\n";
-			tti.Text += "\nRight click for options.";
+				solutionsAvailable |= text[i].StartsWith(">"); //we use > as the start of something solvable, and ?> as the start of 'no solution'
+			}
+			if(solutionsAvailable)
+				tti.Text += "\nLeft click to autoresolve.\nRight click for options.";
 			tooltips.Add(tti);
 
 			return tooltips;
@@ -67,10 +72,8 @@ namespace Foreman
 
 		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
 		{
-			if (!Visible || button != MouseButtons.Right)
+			if (!Visible)
 				return;
-
-			RightClickMenu.MenuItems.Clear();
 
 			Dictionary<string, Action> resolutions = null;
 			switch (((BaseNodeElement)myParent).DisplayedNode.State)
@@ -85,15 +88,27 @@ namespace Foreman
 				default:
 					return;
 			}
-			if (resolutions.Count > 0)
-			{
-				foreach (KeyValuePair<string, Action> kvp in resolutions)
-					RightClickMenu.MenuItems.Add(new MenuItem(kvp.Key, new EventHandler((o, e) => { 
-						kvp.Value.Invoke();
-						((BaseNodeElement)myParent).Update();
-					})));
 
-				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
+			if (button == MouseButtons.Left)
+			{
+				foreach (Action resolution in resolutions.Values)
+					resolution.Invoke();
+				((BaseNodeElement)myParent).Update();
+			}
+			else if (button == MouseButtons.Right)
+			{
+				RightClickMenu.MenuItems.Clear();
+				if (resolutions.Count > 0)
+				{
+					foreach (KeyValuePair<string, Action> kvp in resolutions)
+						RightClickMenu.MenuItems.Add(new MenuItem(kvp.Key, new EventHandler((o, e) =>
+						{
+							kvp.Value.Invoke();
+							((BaseNodeElement)myParent).Update();
+						})));
+
+					RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
+				}
 			}
 		}
 	}

@@ -62,6 +62,14 @@ namespace Foreman
 			Enabled = true;
 			IsMissing = isMissing;
 
+			//just some base defaults -> helps prevent overflow errors during solving if the assembler is a missing entity
+			Speed = 1f;
+			BaseProductivityBonus = 0;
+			ModuleSlots = 0;
+			IsBurner = false;
+			EnergyConsumption = 1000;
+			EnergyEffectivity = 1;
+
 			recipes = new HashSet<RecipePrototype>();
 			modules = new HashSet<ModulePrototype>();
 			fuels = new HashSet<ItemPrototype>();

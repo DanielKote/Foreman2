@@ -37,7 +37,7 @@ namespace Foreman
 			this.consumer = consumer;
 			Item = item;
 
-			IsValid = LinkChecker.IsValidTemperatureConnection(Item, supplier, consumer); //only need to check once -> item & recipe temperatures cant change.
+			IsValid = item.IsFluid? LinkChecker.IsValidTemperatureConnection(Item, supplier, consumer) : LinkChecker.IsPossibleConnection(Item, supplier, consumer); //only need to check once -> item & recipe temperatures cant change.
 		}
 
 		public void Delete() { MyGraph.DeleteLink(this); }

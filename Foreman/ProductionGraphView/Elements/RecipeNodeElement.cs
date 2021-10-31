@@ -22,20 +22,33 @@ namespace Foreman
 
 		public RecipeNodeElement(ProductionGraphViewer graphViewer, BaseNode node) : base(graphViewer, node)
 		{
-			Width = MinWidth;
-			base.Height = (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low)? BaseSimpleHeight : BaseRecipeHeight;
-
 			assembler = new AssemblerElement(graphViewer, this);
-			assembler.Location = new Point(-30, -12);
 			assembler.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 
 			beacon = new BeaconElement(graphViewer, this);
-			beacon.Location = new Point(-18, 22);
 			beacon.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+
+			Update();
 		}
 
 		public override void Update()
 		{
+			if (InputTabs.Count == 0 && OutputTabs.Count != 0)
+			{
+				assembler.Location = new Point(-30, -2);
+				beacon.Location = new Point(-18, 32);
+			}
+			else if (OutputTabs.Count == 0 && InputTabs.Count != 0)
+			{
+				assembler.Location = new Point(-30, -22);
+				beacon.Location = new Point(-18, 12);
+			}
+			else
+			{
+				assembler.Location = new Point(-30, -12);
+				beacon.Location = new Point(-18, 22);
+			}
+
 			assembler.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 			beacon.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 

@@ -34,19 +34,13 @@ namespace Foreman
 				return null;
 
 			//check for valid fuel in order from highest standards to lowest
-			Item fuel = fuelPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(assembler) && item.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null);
-			if (fuel == null)
-				fuel = assembler.Fuels.FirstOrDefault(i => i.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.HasEnabledAssemblers) != null);
-			if(fuel == null)
-				fuel = fuelPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(assembler) && item.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null);
-			if(fuel == null)
-				fuel = assembler.Fuels.FirstOrDefault(i => i.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null);
-			if(fuel == null)
-				fuel = fuelPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(assembler) && item.ProductionRecipes.Count > 0);
-			if(fuel == null)
-				fuel = assembler.Fuels.FirstOrDefault(i => i.ProductionRecipes.Count > 0);
-			if(fuel == null)
-				fuel = assembler.Fuels.FirstOrDefault();
+			Item fuel = assembler.Fuels.OrderBy(item => item.Available)
+				.ThenBy(item => item.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null)
+				.ThenBy(item => item.ProductionRecipes.FirstOrDefault(r => r.Available) != null)
+				.ThenBy(item => item.ProductionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null)
+				.ThenBy(item => item.ProductionRecipes.Count > 0)
+				.ThenBy(item => fuelPriority.IndexOf(item))
+				.LastOrDefault();
 
 			if (fuel != null)
 				UseFuel(fuel);

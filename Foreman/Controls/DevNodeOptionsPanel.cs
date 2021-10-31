@@ -19,6 +19,8 @@ namespace Foreman
 
 			this.baseNode = baseNode;
 			myGraphViewer = graphViewer;
+			RateGroup.Text = string.Format("Item Flowrate (per {0})", myGraphViewer.GetRateName());
+			fixedTextBox.Text = Convert.ToString(baseNode.DesiredRate);
 
 			if (this.baseNode.RateType == RateType.Auto)
 			{
@@ -31,12 +33,11 @@ namespace Foreman
 				fixedTextBox.Enabled = true;
 			}
 
-			float amountToShow = baseNode.DesiredRate;
-
-			fixedTextBox.Text = Convert.ToString(amountToShow);
-
 			if (baseNode is RecipeNode recipeNode) //check for valid assembler count is not necessary (data cache deletes any recipes with 0 assemblers), but just in case
 			{
+				RateGroup.Text = "Number of assemblers:";
+				fixedTextBox.Text = Convert.ToString(recipeNode.GetBaseNumberOfAssemblers() * myGraphViewer.GetRateMultipler());
+
 				updateInProgress = true;
 				Recipe recipe = recipeNode.BaseRecipe;
 
@@ -94,7 +95,7 @@ namespace Foreman
 				Beacon currentBeacon = BeaconSelectionBox.SelectedItem as Beacon;
 				Module currentBModule = BModuleSelectionBox.SelectedItem as Module;
 
-				if (!currentAssembler.Enabled)
+				if (currentAssembler == null || !currentAssembler.Enabled)
 					return;
 				updateInProgress = true;
 
@@ -102,6 +103,9 @@ namespace Foreman
 				AFuelSelectionBox.Items.Clear();
 				BeaconSelectionBox.Items.Clear();
 				BModuleSelectionBox.Items.Clear();
+
+				//update the assembler
+				recipeNode.SetAssembler(currentAssembler);
 
 				//fill in the module options
 				AModuleSelectionBox.Enabled = (currentAssembler.ModuleSlots > 0);
@@ -117,6 +121,11 @@ namespace Foreman
 
 					currentAModule = AModuleSelectionBox.SelectedItem as Module;
 				}
+				recipeNode.SetAssemblerModules(null);
+				if (currentAModule != null)
+					for (int i = 0; i < currentAssembler.ModuleSlots; i++)
+						recipeNode.AddAssemblerModule(currentAModule);
+
 				//fuel
 				AFuelSelectionBox.Enabled = currentAssembler.IsBurner;
 				if (AFuelSelectionBox.Enabled)
@@ -125,10 +134,16 @@ namespace Foreman
 					if (currentFuel != null && AFuelSelectionBox.Items.Contains(currentFuel))
 						AFuelSelectionBox.SelectedItem = currentFuel;
 					else if (AFuelSelectionBox.Items.Count > 0)
-						AFuelSelectionBox.SelectedIndex = 0;
+					{
+						recipeNode.AutoSetFuel();
+						AFuelSelectionBox.SelectedIndex = AFuelSelectionBox.Items.IndexOf(recipeNode.Fuel);
+					}
 
 					currentFuel = AFuelSelectionBox.SelectedItem as Item;
 				}
+				if (!currentAssembler.IsBurner) currentFuel = null; //quick check to ensure that if we switch from a burner to a non-burner then the fuel is set to null
+				recipeNode.SetFuel(currentFuel);
+
 
 				//beacons
 				BeaconGroup.Enabled = currentAssembler.ModuleSlots > 0;
@@ -145,6 +160,8 @@ namespace Foreman
 					currentBeacon = BeaconSelectionBox.SelectedItem as Beacon;
 					BeaconCounter.Enabled = (BeaconSelectionBox.Items.Count > 0);
 				}
+				recipeNode.SetBeacon(currentBeacon);
+
 
 				//beacon modules
 				BModuleSelectionBox.Enabled = (currentBeacon != null && currentBeacon.ModuleSlots > 0);
@@ -160,49 +177,33 @@ namespace Foreman
 
 					currentBModule = BModuleSelectionBox.SelectedItem as Module;
 				}
+				recipeNode.SetBeaconModules(null);
+				if (currentBModule != null)
+					for (int i = 0; i < currentBeacon.ModuleSlots; i++)
+						recipeNode.AddBeaconModule((currentBModule));
 
-				//update recipe node with new values, and if any changes have been noticed -> update graph
-				if (recipeNode.SelectedAssembler != currentAssembler ||
-					recipeNode.AssemblerModules.Count == 0 && currentAModule != null ||
-					recipeNode.AssemblerModules.Count != 0 && recipeNode.AssemblerModules[0] != currentAModule ||
-					recipeNode.SelectedBeacon != currentBeacon ||
-					recipeNode.BeaconModules.Count == 0 && currentBModule != null ||
-					recipeNode.BeaconModules.Count != 0 && recipeNode.BeaconModules[0] != currentBModule ||
-					recipeNode.Fuel != currentFuel)
-				{
-					recipeNode.SetAssembler(currentAssembler);
-					recipeNode.SetAssemblerModules(null);
-					if (currentAModule != null)
-						for (int i = 0; i < currentAssembler.ModuleSlots; i++)
-							recipeNode.AddAssemblerModule(currentAModule);
-					recipeNode.SetBeacon(currentBeacon);
-					recipeNode.SetBeaconModules(null);
-					if (currentBModule != null)
-						for (int i = 0; i < currentBeacon.ModuleSlots; i++)
-							recipeNode.AddBeaconModule((currentBModule));
-
-					if (!currentAssembler.IsBurner) currentFuel = null; //quick check to ensure that if we switch from a burner to a non-burner then the fuel is set to null
-					recipeNode.SetFuel(currentFuel);
-
-					myGraphViewer.Graph.UpdateNodeValues();
-				}
+				myGraphViewer.Graph.UpdateNodeValues();
 				updateInProgress = false;
 			}
+
+			if (baseNode is RecipeNode rNode)
+				fixedTextBox.Text = Convert.ToString(rNode.GetBaseNumberOfAssemblers() * myGraphViewer.GetRateMultipler());
+			else
+				fixedTextBox.Text = Convert.ToString(baseNode.DesiredRate);
 		}
 
-		private void updateValues()
+		private void SetFixedRate()
 		{
 			if (float.TryParse(fixedTextBox.Text, out float newAmount))
 			{
-				if (baseNode.DesiredRate != newAmount)
-				{
+				if (baseNode is RecipeNode rNode)
+					rNode.SetBaseNumberOfAssemblers(newAmount / myGraphViewer.GetRateMultipler());
+				else
 					baseNode.DesiredRate = newAmount;
-					myGraphViewer.Graph.UpdateNodeValues();
-				}
+
+				myGraphViewer.Graph.UpdateNodeValues();
 			}
 		}
-
-		//------------------------------------------------------------------------------------------rate option panel events
 
 		private void fixedOption_CheckedChanged(object sender, EventArgs e)
 		{
@@ -218,13 +219,13 @@ namespace Foreman
 
 		private void fixedTextBox_LostFocus(object sender, EventArgs e)
 		{
-			updateValues();
+			SetFixedRate();
 		}
 
 		private void KeyPressed(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.Enter)
-				updateValues();
+				SetFixedRate();
 		}
 
 		//------------------------------------------------------------------------------------------assembler panel events

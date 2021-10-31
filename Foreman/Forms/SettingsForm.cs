@@ -143,6 +143,7 @@ namespace Foreman
 
 			AssemblerSelectionBox.BeginUpdate();
 			AssemblerSelectionBox.Items.Clear();
+			AssemblerSelectionBox.ItemBrushes.Clear();
 			AssemblerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => !a.IsMiner && a.LFriendlyName.Contains(filterString) && (showUnavailables || a.Available)).OrderBy(a => !a.Available).ThenBy(a => a.FriendlyName).ToArray());
 			AssemblerSelectionBox.DisplayMember = "FriendlyName";
 			for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
@@ -154,6 +155,7 @@ namespace Foreman
 
 			MinerSelectionBox.BeginUpdate();
 			MinerSelectionBox.Items.Clear();
+			MinerSelectionBox.ItemBrushes.Clear();
 			MinerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => a.IsMiner && a.LFriendlyName.Contains(filterString) && (showUnavailables || a.Available)).OrderBy(a => !a.Available).ThenBy(a => a.FriendlyName).ToArray());
 			MinerSelectionBox.DisplayMember = "FriendlyName";
 			for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
@@ -165,6 +167,7 @@ namespace Foreman
 
 			ModuleSelectionBox.BeginUpdate();
 			ModuleSelectionBox.Items.Clear();
+			ModuleSelectionBox.ItemBrushes.Clear();
 			ModuleSelectionBox.Items.AddRange(CurrentOptions.DCache.Modules.Values.Where(m => m.LFriendlyName.Contains(filterString) && (showUnavailables || m.Available)).OrderBy(m => !m.Available).ThenBy(m => m.FriendlyName).ToArray());
 			ModuleSelectionBox.DisplayMember = "FriendlyName";
 			for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)

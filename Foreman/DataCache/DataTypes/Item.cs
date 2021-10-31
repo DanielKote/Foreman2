@@ -63,7 +63,7 @@ namespace Foreman
 
 			IsFluid = isfluid;
 			DefaultTemperature = 0;
-			FuelValue = 0;
+			FuelValue = 1; //useful for preventing overlow issues when using missing items / non-fuel items (loading with wrong mods / importing from alt mod group can cause this)
 			IsTemperatureDependent = false;
 			IsMissing = isMissing;
 		}

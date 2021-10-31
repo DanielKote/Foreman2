@@ -181,7 +181,7 @@ namespace Foreman
 
 				UpdateUnavailableStatus();
 #if DEBUG
-				PrintAllAvailabilities();
+				//PrintAllAvailabilities();
 #endif
 
 				progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
@@ -372,6 +372,41 @@ namespace Foreman
 						recipe.Products.Add(productName, (float)productJToken["amount"]);
 				}
 				presetRecipes.Add(recipe.Name, recipe);
+			}
+
+			//have to process mining & offshore pumps (since we convert them to recipes as well)
+			foreach(var objJToken in jsonData["resources"])
+			{
+				if (objJToken["products"].Count() == 0)
+					continue;
+
+				RecipeShort recipe = new RecipeShort("$r:"+(string)objJToken["name"]);
+
+				foreach (var productJToken in objJToken["products"])
+				{
+					string productName = (string)productJToken["name"];
+					if (recipe.Products.ContainsKey(productName))
+						recipe.Products[productName] += (float)productJToken["amount"];
+					else
+						recipe.Products.Add(productName, (float)productJToken["amount"]);
+				}
+				if (recipe.Products.Count == 0)
+					continue;
+
+				if (objJToken["required_fluid"] != null && (float)objJToken["fluid_amount"] != 0)
+					recipe.Ingredients.Add((string)objJToken["required_fluid"], (float)objJToken["fluid_amount"]);
+
+				presetRecipes.Add(recipe.Name, recipe);
+			}
+
+			foreach(var objJToken in jsonData["offshorepumps"])
+			{
+				string fluidName = (string)objJToken["fluid"];
+				RecipeShort recipe = new RecipeShort("$r:" + fluidName);
+				recipe.Products.Add(fluidName, 60);
+
+				if (!presetRecipes.ContainsKey(recipe.Name))
+					presetRecipes.Add(recipe.Name, recipe);
 			}
 
 			//compare to provided mod/item/recipe sets (recipes have a chance of existing in multitudes - aka: missing recipes)
@@ -594,7 +629,7 @@ namespace Foreman
 			if (recipe.productList.Count == 0)
 				return;
 
-			if (objJToken["required_fluid"] != null)
+			if (objJToken["required_fluid"] != null && (float)objJToken["fluid_amount"] != 0)
 			{
 				ItemPrototype reqLiquid = (ItemPrototype)items[(string)objJToken["required_fluid"]];
 				recipe.InternalOneWayAddIngredient(reqLiquid, (float)objJToken["fluid_amount"]);
@@ -630,6 +665,7 @@ namespace Foreman
 			module.ProductivityBonus = (float)objJToken["module_effects_productivity"];
 			module.ConsumptionBonus = (float)objJToken["module_effects_consumption"];
 			module.PollutionBonus = (float)objJToken["module_effects_pollution"];
+			module.Tier = (int)objJToken["tier"];
 
 			foreach (var recipe in objJToken["limitations"])
 			{
@@ -966,6 +1002,24 @@ namespace Foreman
 						temp_unlockableTechSet.Add(tech);
 					return available;
 				}
+			}
+
+			//step 0: delete any recipe that has no assembler. This is the only type of deletion that we will do, as we MUST enforce the 'at least 1 assembler' per recipe. The only recipes with no assemblers linked are those added to 'missing' category, and those are handled separately.
+			//this means that any pure-hand-crafting recipe is removed. sorry.
+			foreach(RecipePrototype recipe in recipes.Values.Where(r => r.Assemblers.Count == 0).ToList())
+			{
+				foreach (ItemPrototype ingredient in recipe.ingredientList)
+					ingredient.consumptionRecipes.Remove(recipe);
+				foreach (ItemPrototype product in recipe.productList)
+					product.productionRecipes.Remove(recipe);
+				foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
+					tech.unlockedRecipes.Remove(recipe);
+				foreach (ModulePrototype module in recipe.modules)
+					module.recipes.Remove(recipe);
+				recipe.mySubgroup.recipes.Remove(recipe);
+
+				recipes.Remove(recipe.Name);
+				ErrorLogging.LogLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
 			}
 
 			//step 1: update tech unlock status

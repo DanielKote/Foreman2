@@ -359,18 +359,18 @@ namespace Foreman
 					foreach (Item item in sgroup.Items.Where(n => ((ShowUnavailable || n.Available) && (n.LFriendlyName.Contains(filterString) || n.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))))
 					{
 						bool visible = (ShowUnavailable || item.Available) && (ShowUnavailable?
-							(item.ConsumptionRecipes.FirstOrDefault(n => n.Enabled) != null) ||
-							(item.ProductionRecipes.FirstOrDefault(n => n.Enabled) != null)
+							(item.ConsumptionRecipes.FirstOrDefault(r => r.Enabled) != null) ||
+							(item.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null)
 							:
-							(item.AvailableConsumptionRecipes.FirstOrDefault(n => n.Enabled) != null) ||
-							(item.AvailableProductionRecipes.FirstOrDefault(n => n.Enabled) != null));
+							(item.AvailableConsumptionRecipes.FirstOrDefault(r => r.Enabled) != null) ||
+							(item.AvailableProductionRecipes.FirstOrDefault(r => r.Enabled) != null));
 
 						bool validAssembler = ShowUnavailable ?
-							(item.ConsumptionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null) ||
-							(item.ProductionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null)
+							(item.ConsumptionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) ||
+							(item.ProductionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null)
 							:
-							(item.AvailableConsumptionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null) ||
-							(item.AvailableProductionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null);
+							(item.AvailableConsumptionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) ||
+							(item.AvailableProductionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null);
 
 
 						Color bgColor = (visible && item.Available) ? validAssembler ? IRButtonDefaultColor : IRButtonNoAssemblerColor : IRButtonHiddenColor;
@@ -524,7 +524,7 @@ namespace Foreman
 						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem))))
 					{
 						//quick hidden / enabled / available assembler check (done prior to name check for speed)
-						if ((recipe.Enabled || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus) && (recipe.Available || ShowUnavailable))
+						if ((recipe.Enabled || showHidden) && (recipe.Assemblers.FirstOrDefault(a => a.Enabled) != null || ignoreAssemblerStatus) && (recipe.Available || ShowUnavailable))
 						{
 							//name check - have to check recipe name along with all ingredients and products (both friendly name and base name) - if selected
 							if (recipe.LFriendlyName.Contains(filterString) ||
@@ -538,7 +538,7 @@ namespace Foreman
 									(includeSuppliers && KeyItemTempRange.Contains(recipe.ProductTemperatureMap[KeyItem])))
 								{
 									//holy... so - we finally finished all the checks, eh? Well, throw it on the pile of recipes to show then.
-									Color bgColor = (recipe.Enabled ? (recipe.HasEnabledAssemblers ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
+									Color bgColor = (recipe.Enabled ? (recipe.Assemblers.FirstOrDefault(a => a.Enabled) != null ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
 									recipeCounter++;
 									recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
 								}
