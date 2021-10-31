@@ -12,6 +12,8 @@ namespace Foreman
 
 		bool IsMiner { get; }
 		bool Enabled { get; set; }
+		bool IsMissing { get; }
+
 		float Speed { get; }
 
 		float BaseProductivityBonus { get; }
@@ -31,6 +33,8 @@ namespace Foreman
 
 		public bool IsMiner { get; private set; }
 		public bool Enabled { get; set; }
+		public bool IsMissing { get; private set; }
+
 		public float Speed { get; set; }
 
 		public float BaseProductivityBonus { get; set; }
@@ -45,10 +49,11 @@ namespace Foreman
 		internal HashSet<ModulePrototype> validModules { get; private set; }
 		internal HashSet<ItemPrototype> validFuels { get; private set; }
 
-		public AssemblerPrototype(DataCache dCache, string name, string friendlyName, bool isMiner) : base(dCache, name, friendlyName, "-")
+		public AssemblerPrototype(DataCache dCache, string name, string friendlyName, bool isMiner, bool isMissing = false) : base(dCache, name, friendlyName, "-")
 		{
 			IsMiner = isMiner;
 			Enabled = true;
+			IsMissing = isMissing;
 
 			validRecipes = new HashSet<RecipePrototype>();
 			validModules = new HashSet<ModulePrototype>();
@@ -66,7 +71,7 @@ namespace Foreman
 			if (modules != null)
 				foreach (Module module in modules.Where(m => m != null))
 					finalSpeed += module.SpeedBonus * this.Speed;
-            finalSpeed += beaconBonus * this.Speed;
+			finalSpeed += beaconBonus * this.Speed;
 
 			double craftingTime = recipe.Time / finalSpeed;
 			craftingTime = (float)(Math.Ceiling(craftingTime * 60d) / 60d); //Machines have to wait for a new tick before starting a new item, so round up to the nearest tick

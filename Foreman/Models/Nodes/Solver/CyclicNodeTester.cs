@@ -30,7 +30,7 @@ namespace Foreman
 			//setup test Graph and add in all recipes
 			ProductionGraph testGraph = new ProductionGraph();
 			foreach (Recipe recipe in dataCache.Recipes.Values)
-				testGraph.CreateRecipeNode(recipe, new Point(0, 0));
+				testGraph.CreateRecipeNode(recipe, new Point(0, 0), true);
 
 			//link every possible ingredinet-product
 			foreach (BaseNode node in testGraph.Nodes)

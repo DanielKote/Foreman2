@@ -5,25 +5,27 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public interface NodeLink : ISerializable
-    {
+	{
 		BaseNode Supplier { get; }
 		BaseNode Consumer { get; }
 		Item Item { get; }
 		double Throughput { get; }
+		bool IsValid { get; }
 
 		void Delete();
-    }
+	}
 
 
 	[Serializable]
-	public class NodeLinkPrototype: NodeLink
+	public class NodeLinkPrototype : NodeLink
 	{
 		protected ProductionGraph MyGraph;
 
 		public BaseNode Supplier { get { return supplier; } }
 		public BaseNode Consumer { get { return consumer; } }
 		public Item Item { get; private set; }
-        public double Throughput { get; set; }
+		public double Throughput { get; set; }
+		public bool IsValid { get { return LinkChecker.IsValidTemperatureConnection(Item, supplier, consumer); } }
 
 		internal BaseNodePrototype supplier;
 		internal BaseNodePrototype consumer;

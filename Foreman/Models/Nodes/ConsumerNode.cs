@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
@@ -6,9 +7,9 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public interface ConsumerNode : BaseNode
-    {
+	{
 		Item ConsumedItem { get; }
-    }
+	}
 
 	public class ConsumerNodePrototype : BaseNodePrototype, ConsumerNode
 	{
@@ -31,8 +32,16 @@ namespace Foreman
 		internal override double inputRateFor(Item item) { return 1; }
 		internal override double outputRateFor(Item item) { throw new ArgumentException("Consumer should not have outputs!"); }
 
+		public override bool IsValid { get { return !ConsumedItem.IsMissing; } }
+		public override List<string> GetErrors()
+		{
+			List<string> output = new List<string>();
+			if (!IsValid)
+				output.Add(string.Format("Item \"{0}\" doesnt exist in preset!", ConsumedItem.FriendlyName));
+			return output;
+		}
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("NodeType", NodeType.Consumer);
 			info.AddValue("NodeID", NodeID);

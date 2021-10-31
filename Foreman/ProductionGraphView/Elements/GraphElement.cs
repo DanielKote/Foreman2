@@ -44,15 +44,15 @@ namespace Foreman
 		}
 
 		public Point ConvertToLocal(Point graph_point) //converts the point (in graph coordinates) to the local (0,0 is the center of this element's bound) point
-        {
+		{
 			if (myParent == null) //owned by graphViewer
 				return Point.Subtract(graph_point, (Size)Location);
 			else //subelement of some element
 				return Point.Subtract(myParent.ConvertToLocal(graph_point), (Size)Location);
-        }
+		}
 
 		public Point ConvertToGraph(Point local_point)
-        {
+		{
 			if (myParent == null) //owned by graphViewer
 				return Point.Add(local_point, (Size)Location);
 			else //subelement of some element
@@ -60,18 +60,18 @@ namespace Foreman
 		}
 
 		public bool IntersectsWithZone(Rectangle graph_zone, int xborder, int yborder)
-        {
+		{
 			Point local_graph_zone_origin = ConvertToLocal(graph_zone.Location);
-			return   (Width / 2) > local_graph_zone_origin.X - xborder &&
+			return (Width / 2) > local_graph_zone_origin.X - xborder &&
 					-(Width / 2) < local_graph_zone_origin.X + graph_zone.Width + xborder &&
 					 (Height / 2) > local_graph_zone_origin.Y - yborder &&
 					-(Height / 2) < local_graph_zone_origin.Y + graph_zone.Height + yborder;
 		}
 
 		public virtual void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0)
-        {
+		{
 			Visible = IntersectsWithZone(graph_zone, xborder, yborder);
-        }
+		}
 
 		public virtual bool ContainsPoint(Point graph_point)
 		{

@@ -10,7 +10,7 @@ namespace Foreman
 
 		IReadOnlyCollection<Recipe> ProductionRecipes { get; }
 		IReadOnlyCollection<Recipe> ConsumptionRecipes { get; }
-		bool IsMissingItem { get; }
+		bool IsMissing { get; }
 		bool IsFluid { get; }
 		bool IsTemperatureDependent { get; }
 		double DefaultTemperature { get; }
@@ -24,15 +24,15 @@ namespace Foreman
 
 	public class ItemPrototype : DataObjectBasePrototype, Item
 	{
-        public Subgroup MySubgroup { get { return mySubgroup; } }
+		public Subgroup MySubgroup { get { return mySubgroup; } }
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }
 		public IReadOnlyCollection<Recipe> ConsumptionRecipes { get { return consumptionRecipes; } }
 
-		public bool IsMissingItem { get; private set; }
+		public bool IsMissing { get; private set; }
 
 		public bool IsFluid { get; private set; }
-        public bool IsTemperatureDependent { get; internal set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
+		public bool IsTemperatureDependent { get; internal set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
 		public double DefaultTemperature { get; internal set; } //for liquids
 
 		public float FuelValue { get; internal set; }
@@ -55,16 +55,16 @@ namespace Foreman
 			fuelsAssemblers = new HashSet<AssemblerPrototype>();
 
 			IsFluid = isfluid;
-            DefaultTemperature = 0;
+			DefaultTemperature = 0;
 			FuelValue = 0;
-            IsTemperatureDependent = false;
-			IsMissingItem = isMissing;
+			IsTemperatureDependent = false;
+			IsMissing = isMissing;
 		}
 
 		public override string ToString() { return String.Format("Item: {0}", Name); }
 
 		public string GetTemperatureRangeFriendlyName(fRange tempRange)
-        {
+		{
 			if (tempRange.Ignore)
 				return this.FriendlyName;
 

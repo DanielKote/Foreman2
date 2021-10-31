@@ -6,9 +6,9 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public interface PassthroughNode : BaseNode
-    {
+	{
 		Item PassthroughItem { get; }
-    }
+	}
 
 	public class PassthroughNodePrototype : BaseNodePrototype, PassthroughNode
 	{
@@ -28,6 +28,15 @@ namespace Foreman
 
 		internal override double inputRateFor(Item item) { return 1; }
 		internal override double outputRateFor(Item item) { return 1; }
+
+		public override bool IsValid { get { return !PassthroughItem.IsMissing; } }
+		public override List<string> GetErrors()
+		{
+			List<string> output = new List<string>();
+			if (!IsValid)
+				output.Add(string.Format("Item \"{0}\" doesnt exist in preset!", PassthroughItem.FriendlyName));
+			return output;
+		}
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{

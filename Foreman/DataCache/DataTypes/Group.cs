@@ -3,51 +3,51 @@ using System.Collections.Generic;
 
 namespace Foreman
 {
-    public interface Group : DataObjectBase
-    {
-        IReadOnlyList<Subgroup> Subgroups { get; }
-    }
+	public interface Group : DataObjectBase
+	{
+		IReadOnlyList<Subgroup> Subgroups { get; }
+	}
 
-    public interface Subgroup : DataObjectBase
-    {
-        Group MyGroup { get; }
-        IReadOnlyList<Recipe> Recipes { get; }
-        IReadOnlyList<Item> Items { get; }
-    }
+	public interface Subgroup : DataObjectBase
+	{
+		Group MyGroup { get; }
+		IReadOnlyList<Recipe> Recipes { get; }
+		IReadOnlyList<Item> Items { get; }
+	}
 
 
-    public class GroupPrototype : DataObjectBasePrototype, Group
-    {
-        public IReadOnlyList<Subgroup> Subgroups { get { return subgroups; } }
+	public class GroupPrototype : DataObjectBasePrototype, Group
+	{
+		public IReadOnlyList<Subgroup> Subgroups { get { return subgroups; } }
 
-        internal List<SubgroupPrototype> subgroups;
+		internal List<SubgroupPrototype> subgroups;
 
-        public GroupPrototype(DataCache dCache, string name, string lname, string order) : base(dCache, name, lname, order)
-        {
-            subgroups = new List<SubgroupPrototype>();
-        }
+		public GroupPrototype(DataCache dCache, string name, string lname, string order) : base(dCache, name, lname, order)
+		{
+			subgroups = new List<SubgroupPrototype>();
+		}
 
-        public void SortSubgroups() { subgroups.Sort(); } //sort them by their order string
-    }
+		public void SortSubgroups() { subgroups.Sort(); } //sort them by their order string
+	}
 
-    public class SubgroupPrototype : DataObjectBasePrototype, Subgroup
-    {
-        public Group MyGroup { get { return myGroup; } }
+	public class SubgroupPrototype : DataObjectBasePrototype, Subgroup
+	{
+		public Group MyGroup { get { return myGroup; } }
 
-        public IReadOnlyList<Recipe> Recipes { get { return recipes; } }
-        public IReadOnlyList<Item> Items { get { return items; } }
+		public IReadOnlyList<Recipe> Recipes { get { return recipes; } }
+		public IReadOnlyList<Item> Items { get { return items; } }
 
-        internal GroupPrototype myGroup;
+		internal GroupPrototype myGroup;
 
-        internal List<RecipePrototype> recipes;
-        internal List<ItemPrototype> items;
+		internal List<RecipePrototype> recipes;
+		internal List<ItemPrototype> items;
 
-        public SubgroupPrototype(DataCache dCache, string name, string order) : base(dCache, name, name, order)
-        {
-            recipes = new List<RecipePrototype>();
-            items = new List<ItemPrototype>();
-        }
+		public SubgroupPrototype(DataCache dCache, string name, string order) : base(dCache, name, name, order)
+		{
+			recipes = new List<RecipePrototype>();
+			items = new List<ItemPrototype>();
+		}
 
-        public void SortIRs() { recipes.Sort(); items.Sort(); } //sort them by their order string
-    }
+		public void SortIRs() { recipes.Sort(); items.Sort(); } //sort them by their order string
+	}
 }

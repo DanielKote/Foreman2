@@ -6,9 +6,9 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public interface SupplierNode : BaseNode
-    {
+	{
 		Item SuppliedItem { get; }
-    }
+	}
 
 	public class SupplierNodePrototype : BaseNodePrototype, SupplierNode
 	{
@@ -28,6 +28,15 @@ namespace Foreman
 
 		internal override double inputRateFor(Item item) { throw new ArgumentException("Supplier should not have outputs!"); }
 		internal override double outputRateFor(Item item) { return 1; }
+
+		public override bool IsValid { get { return !SuppliedItem.IsMissing; } }
+		public override List<string> GetErrors()
+		{
+			List<string> output = new List<string>();
+			if (!IsValid)
+				output.Add(string.Format("Item \"{0}\" doesnt exist in preset!", SuppliedItem.FriendlyName));
+			return output;
+		}
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{

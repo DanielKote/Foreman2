@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Foreman
 {
 	public interface Technology : DataObjectBase
-    {
+	{
 		IReadOnlyCollection<Technology> Prerequisites { get; }
 		IReadOnlyCollection<Technology> PostTechs { get; }
 		IReadOnlyCollection<Recipe> UnlockedRecipes { get; }
@@ -13,10 +13,10 @@ namespace Foreman
 	}
 
 	public class TechnologyPrototype : DataObjectBasePrototype, Technology
-    {
-        public IReadOnlyCollection<Technology> Prerequisites { get { return prerequisites; } }
+	{
+		public IReadOnlyCollection<Technology> Prerequisites { get { return prerequisites; } }
 		public IReadOnlyCollection<Technology> PostTechs { get { return postTechs; } }
-        public IReadOnlyCollection<Recipe> UnlockedRecipes { get { return unlockedRecipes; } }
+		public IReadOnlyCollection<Recipe> UnlockedRecipes { get { return unlockedRecipes; } }
 
 		public bool Enabled { get; set; }
 

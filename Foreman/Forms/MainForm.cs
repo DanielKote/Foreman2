@@ -20,7 +20,7 @@ namespace Foreman
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
-        {
+		{
 			//WindowState = FormWindowState.Maximized;
 
 			List<Preset> validPresets = GetValidPresetsList();
@@ -36,27 +36,37 @@ namespace Foreman
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
+				if (!Enum.IsDefined(typeof(ProductionGraphViewer.RateUnit), Properties.Settings.Default.DefaultRateUnit))
+					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraphViewer.RateUnit.Per1Sec;
 				GraphViewer.SelectedRateUnit = (ProductionGraphViewer.RateUnit)Properties.Settings.Default.DefaultRateUnit;
-				
 				RateOptionsDropDown.Items.AddRange(ProductionGraphViewer.RateUnitNames);
 				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
 
+				if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
+					Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
+				GraphViewer.Graph.ModuleSelector.SelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
 				ModuleDropDown.Items.AddRange(ModuleSelector.StyleNames);
-				ModuleDropDown.SelectedIndex = Math.Min(Properties.Settings.Default.DefaultModuleOption, ModuleSelector.StyleNames.Length - 1);
+				ModuleDropDown.SelectedIndex = (int)GraphViewer.Graph.ModuleSelector.SelectionStyle;
+
+				if (!Enum.IsDefined(typeof(AssemblerSelector.Style), Properties.Settings.Default.DefaultAssemblerOption))
+					Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
+				GraphViewer.Graph.AssemblerSelector.SelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
 				AssemblerDropDown.Items.AddRange(AssemblerSelector.StyleNames);
-				AssemblerDropDown.SelectedIndex = Math.Min(Properties.Settings.Default.DefaultAssemblerOption, AssemblerSelector.StyleNames.Length - 1);
+				AssemblerDropDown.SelectedIndex = (int)GraphViewer.Graph.AssemblerSelector.SelectionStyle;
 
 				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
-				
+
 				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
 				SimpleViewCheckBox.Checked = Properties.Settings.Default.SimpleView;
-				
+
+				Properties.Settings.Default.Save();
+
 				UpdateControlValues();
 				GraphViewer.Focus();
 			}
-        }
+		}
 
 		private void UpdateControlValues()
 		{
@@ -107,9 +117,9 @@ namespace Foreman
 
 			try
 			{
-				if(Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
+				if (Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
 					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false);
-				else if(Path.GetExtension(dialog.FileName).ToLower() == ".json")
+				else if (Path.GetExtension(dialog.FileName).ToLower() == ".json")
 					GraphViewer.LoadFromOldJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
 				//NOTE: MainCache will update
 			}
@@ -129,15 +139,15 @@ namespace Foreman
 			GraphViewer.Invalidate();
 		}
 
-        private void MainHelpButton_Click(object sender, EventArgs e)
-        {
+		private void MainHelpButton_Click(object sender, EventArgs e)
+		{
 			//yea, need to add a help window at some point...
-        }
+		}
 
 		//---------------------------------------------------------Settings/export/additem/addrecipe
 
 		public static List<Preset> GetValidPresetsList()
-        {
+		{
 			List<Preset> presets = new List<Preset>();
 			List<string> existingPresetFiles = new List<string>();
 			foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.json"))
@@ -218,7 +228,7 @@ namespace Foreman
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-			GraphViewer.AddItem(new Point(15,15), location);
+			GraphViewer.AddItem(new Point(15, 15), location);
 		}
 
 		//---------------------------------------------------------Production properties
@@ -252,23 +262,23 @@ namespace Foreman
 		//---------------------------------------------------------Gridlines
 
 		private void MinorGridlinesDropDown_SelectedIndexChanged(object sender, EventArgs e)
-        {
+		{
 			int updatedGridUnit = 0;
 			if (MinorGridlinesDropDown.SelectedIndex > 0)
 				updatedGridUnit = 6 * (int)(Math.Pow(2, MinorGridlinesDropDown.SelectedIndex - 1));
 
-			if(GraphViewer.Grid.CurrentGridUnit != updatedGridUnit)
-            {
+			if (GraphViewer.Grid.CurrentGridUnit != updatedGridUnit)
+			{
 				GraphViewer.Grid.CurrentGridUnit = updatedGridUnit;
 				GraphViewer.Invalidate();
-            }
+			}
 
 			Properties.Settings.Default.MinorGridlines = MinorGridlinesDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
 		}
 
 		private void MajorGridlinesDropDown_SelectedIndexChanged(object sender, EventArgs e)
-        {
+		{
 			int updatedGridUnit = 0;
 			if (MajorGridlinesDropDown.SelectedIndex > 0)
 				updatedGridUnit = 6 * (int)(Math.Pow(2, MajorGridlinesDropDown.SelectedIndex - 1));
@@ -317,10 +327,10 @@ namespace Foreman
 			Properties.Settings.Default.SimpleView = SimpleViewCheckBox.Checked;
 			Properties.Settings.Default.Save();
 			GraphViewer.Invalidate();
-        }
+		}
 
 		private void ModuleDropDown_SelectedIndexChanged(object sender, EventArgs e)
-        {
+		{
 			Properties.Settings.Default.DefaultModuleOption = ModuleDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
 			GraphViewer.Graph.ModuleSelector.SelectionStyle = (ModuleSelector.Style)ModuleDropDown.SelectedIndex;
@@ -354,9 +364,9 @@ namespace Foreman
 				return cp;
 			}
 		}
-    }
+	}
 
-    public class Preset : IEquatable<Preset>
+	public class Preset : IEquatable<Preset>
 	{
 		public string Name { get; set; }
 		public bool IsCurrentlySelected { get; set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,20 +10,23 @@ namespace Foreman
 	public enum RateType { Auto, Manual };
 
 	public interface BaseNode : ISerializable
-    {
+	{
 		string DisplayName { get; }
 		int NodeID { get; }
 		Point Location { get; set; }
 
 		IEnumerable<Item> Inputs { get; }
 		IEnumerable<Item> Outputs { get; }
-		
+
 		IReadOnlyList<NodeLink> InputLinks { get; }
 		IReadOnlyList<NodeLink> OutputLinks { get; }
 
 		RateType RateType { get; set; }
 		float ActualRate { get; }
 		float DesiredRate { get; set; }
+
+		bool IsValid { get; }
+		List<string> GetErrors();
 
 		float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
 		float GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
@@ -59,6 +63,8 @@ namespace Foreman
 		public float ActualRate { get; protected set; } // The rate the solver calculated is appropriate for this node.
 		public float DesiredRate { get; set; } // If the rateType is manual, this field contains the rate the user desires.
 
+		public abstract bool IsValid { get; }
+
 		internal List<NodeLinkPrototype> inputLinks { get; private set; }
 		internal List<NodeLinkPrototype> outputLinks { get; private set; }
 
@@ -69,6 +75,8 @@ namespace Foreman
 		public virtual float GetProductivityMultiplier() { return 1; }
 		public virtual float GetConsumptionMultiplier() { return 1; }
 		public virtual float GetPollutionMultiplier() { return 1; }
+
+		public abstract List<string> GetErrors();
 
 		public void Delete() { MyGraph.DeleteNode(this); }
 
@@ -85,13 +93,13 @@ namespace Foreman
 
 		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
 
-        public float GetSuppliedRate(Item item)
-        {
-            return (float)InputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
-        }
+		public float GetSuppliedRate(Item item)
+		{
+			return (float)InputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
+		}
 
-        public bool IsOversupplied(Item item)
-        {
+		public bool IsOversupplied(Item item)
+		{
 			//supply & consume > 1 ---> allow for 0.1% error
 			//supply & consume [0.001 -> 1]  ---> allow for 2% error
 			//supply & consume [0 ->0.001] ---> allow for any errors (as long as neither are 0)
@@ -105,8 +113,8 @@ namespace Foreman
 		}
 
 		public bool ManualRateNotMet()
-        {
-            return (RateType == RateType.Manual) && Math.Abs(ActualRate - DesiredRate) > 0.0001;
-        }
-    }
+		{
+			return (RateType == RateType.Manual) && Math.Abs(ActualRate - DesiredRate) > 0.0001;
+		}
+	}
 }

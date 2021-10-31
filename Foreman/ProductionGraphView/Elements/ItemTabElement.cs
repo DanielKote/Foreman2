@@ -38,7 +38,7 @@ namespace Foreman
 
 		private ContextMenu rightClickMenu;
 
-		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, NodeElement node ) //item tab is always to be owned by a node
+		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, NodeElement node) //item tab is always to be owned by a node
 			: base(graphViewer, node)
 		{
 			rightClickMenu = new ContextMenu();
@@ -54,7 +54,7 @@ namespace Foreman
 		}
 
 		public Point GetConnectionPoint() //in graph coordinates
-        {
+		{
 			if (LinkType == LinkType.Input)
 				return ConvertToGraph(new Point(0, Height / 2));
 			else //if(LinkType == LinkType.Output)
@@ -62,7 +62,7 @@ namespace Foreman
 		}
 
 		public void UpdateValues(float consumeRate, float suppliedRate, bool isOversupplied)
-        {
+		{
 			borderPen = regularBorderPen;
 			if (consumeRate >= 1000)
 				text = String.Format(line1FormatC, consumeRate);
@@ -105,8 +105,8 @@ namespace Foreman
 			}
 		}
 
-        public override List<TooltipInfo> GetToolTips(Point graph_point)
-        {
+		public override List<TooltipInfo> GetToolTips(Point graph_point)
+		{
 			List<TooltipInfo> toolTips = new List<TooltipInfo>();
 			TooltipInfo tti = new TooltipInfo();
 			NodeElement parentNode = (NodeElement)myParent;
@@ -119,9 +119,9 @@ namespace Foreman
 					tti.Text = Item.FriendlyName;
 				else
 				{
-					fRange tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Output); //input type tab means output of connection link
+					fRange tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Output); //input type tab means output of connection link
 					if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
-						tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Input); //if there was no temp range on this side of this throughput node, try to just copy the other side
+						tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Input); //if there was no temp range on this side of this throughput node, try to just copy the other side
 					tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
 				}
 
@@ -137,9 +137,9 @@ namespace Foreman
 					tti.Text = Item.FriendlyName;
 				else
 				{
-					fRange tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Input); //output type tab means input of connection link
+					fRange tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Input); //output type tab means input of connection link
 					if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
-						tempRange = LinkElement.GetTemperatureRange(Item, parentNode, LinkType.Output); //if there was no temp range on this side of this throughput node, try to just copy the other side
+						tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Output); //if there was no temp range on this side of this throughput node, try to just copy the other side
 					tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
 				}
 

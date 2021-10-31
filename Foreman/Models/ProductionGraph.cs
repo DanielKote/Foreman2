@@ -13,10 +13,10 @@ namespace Foreman
 	public enum LinkType { Input, Output }
 
 	public class NodeEventArgs : EventArgs
-    {
+	{
 		public BaseNode node;
 		public NodeEventArgs(BaseNode node) { this.node = node; }
-    }
+	}
 	public class NodeLinkEventArgs : EventArgs
 	{
 		public NodeLink nodeLink;
@@ -27,11 +27,11 @@ namespace Foreman
 	public class ProductionGraph : ISerializable
 	{
 		public class NewNodeCollection
-        {
+		{
 			public List<BaseNode> newNodes { get; private set; }
 			public List<NodeLink> newLinks { get; private set; }
 			public NewNodeCollection() { newNodes = new List<BaseNode>(); newLinks = new List<NodeLink>(); }
-        }
+		}
 
 		private const int XBorder = 200;
 		private const int YBorder = 100;
@@ -40,7 +40,8 @@ namespace Foreman
 
 		public AssemblerSelector AssemblerSelector { get; private set; }
 		public ModuleSelector ModuleSelector { get; private set; }
-		
+		public FuelSelector FuelSelector { get; private set; }
+
 		public IReadOnlyCollection<BaseNode> Nodes { get { return nodes; } }
 		public IReadOnlyCollection<NodeLink> NodeLinks { get { return nodeLinks; } }
 		public List<BaseNode> SerializeNodeList { get; set; } //if this isnt null then the serialized production graph will only contain these nodes (and links between them)
@@ -51,7 +52,10 @@ namespace Foreman
 		public event EventHandler<NodeLinkEventArgs> LinkDeleted;
 		public event EventHandler<EventArgs> NodeValuesUpdated;
 
-		public Rectangle Bounds { get {
+		public Rectangle Bounds
+		{
+			get
+			{
 				if (nodes.Count == 0)
 					return new Rectangle(0, 0, 0, 0);
 
@@ -83,10 +87,11 @@ namespace Foreman
 
 			AssemblerSelector = new AssemblerSelector();
 			ModuleSelector = new ModuleSelector();
+			FuelSelector = new FuelSelector();
 		}
 
 		public ConsumerNode CreateConsumerNode(Item item, Point location)
-        {
+		{
 			ConsumerNodePrototype node = new ConsumerNodePrototype(this, lastNodeID++, item);
 			node.Location = location;
 			nodes.Add(node);
@@ -95,7 +100,7 @@ namespace Foreman
 		}
 
 		public SupplierNode CreateSupplierNode(Item item, Point location)
-        {
+		{
 			SupplierNodePrototype node = new SupplierNodePrototype(this, lastNodeID++, item);
 			node.Location = location;
 			nodes.Add(node);
@@ -112,9 +117,9 @@ namespace Foreman
 			return node;
 		}
 
-		public RecipeNode CreateRecipeNode(Recipe recipe, Point location)
-        {
-			RecipeNodePrototype node = new RecipeNodePrototype(this, lastNodeID++, recipe);
+		public RecipeNode CreateRecipeNode(Recipe recipe, Point location, bool autoPopulate)
+		{
+			RecipeNodePrototype node = new RecipeNodePrototype(this, lastNodeID++, recipe, autoPopulate);
 			node.Location = location;
 			nodes.Add(node);
 			NodeAdded?.Invoke(this, new NodeEventArgs(node));
@@ -122,7 +127,7 @@ namespace Foreman
 		}
 
 		public NodeLink CreateLink(BaseNode supplier, BaseNode consumer, Item item)
-        {
+		{
 			BaseNodePrototype supplierP = (BaseNodePrototype)supplier;
 			BaseNodePrototype consumerP = (BaseNodePrototype)consumer;
 			if (supplier.OutputLinks.Any(l => l.Item == item && l.Consumer == consumer)) //check for an already existing connection
@@ -137,7 +142,7 @@ namespace Foreman
 		}
 
 		public void DeleteNode(BaseNode node)
-        {
+		{
 			foreach (NodeLinkPrototype link in node.InputLinks.ToList())
 				DeleteLink(link);
 			foreach (NodeLinkPrototype link in node.OutputLinks.ToList())
@@ -148,13 +153,13 @@ namespace Foreman
 		}
 
 		public void DeleteNodes(IEnumerable<BaseNode> nodes)
-        {
+		{
 			foreach (BaseNode node in nodes)
 				DeleteNode(node);
-        }
+		}
 
 		public void DeleteLink(NodeLink link)
-        {
+		{
 			NodeLinkPrototype linkP = (NodeLinkPrototype)link;
 			linkP.consumer.inputLinks.Remove(linkP);
 			linkP.supplier.outputLinks.Remove(linkP);
@@ -163,12 +168,12 @@ namespace Foreman
 		}
 
 		public void ClearGraph()
-        {
+		{
 			nodes.Clear();
 			nodeLinks.Clear();
 			SerializeNodeList = null;
 			lastNodeID = 0;
-        }
+		}
 
 		public IEnumerable<BaseNode> GetSuppliers(Item item)
 		{
@@ -230,13 +235,16 @@ namespace Foreman
 		}
 
 		public NewNodeCollection InsertNodesFromJson(DataCache cache, JToken json) //cache is necessary since we will possibly be adding to mssing items/recipes
-        {
+		{
 			NewNodeCollection newNodeCollection = new NewNodeCollection();
 			Dictionary<int, BaseNode> oldNodeIndices = new Dictionary<int, BaseNode>(); //the links between the node index (as imported) and the newly created node (which will now have a different index). Used to link up nodes
 
-			//check compliance on all items and recipes (data-cache will take care of it) - this means add in any missing items/recipes and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
-			cache.ProcessNewItemSet(json["IncludedItems"].Select(t => (string)t).ToList());
-			Dictionary<long, Recipe> recipeLinks = cache.ProcessNewRecipeShorts(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
+			//check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
+			cache.ProcessImportedItemsSet(json["IncludedItems"].Select(t => (string)t));
+			cache.ProcessImportedAssemblersSet(json["IncludedAssemblers"].Select(t => (string)t));
+			cache.ProcessImportedModulesSet(json["IncludedModules"].Select(t => (string)t));
+			cache.ProcessImportedBeaconsSet(json["IncludedBeacons"].Select(t => (string)t));
+			Dictionary<long, Recipe> recipeLinks = cache.ProcessImportedRecipesSet(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
 
 			//add in all the graph nodes
 			foreach (JToken nodeJToken in json["Nodes"].ToList())
@@ -271,32 +279,68 @@ namespace Foreman
 						break;
 					case NodeType.Recipe:
 						long recipeID = (long)nodeJToken["RecipeID"];
-						RecipeNodePrototype recipeNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location);
+						RecipeNodePrototype recipeNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location, false);
 
-						if (nodeJToken["Assembler"] != null)
+						if (nodeJToken["Assembler"] == null) //kind of an obvious one - if this happens then something is QuiteWrong(tm)
+							Trace.Fail("Attempt at inserting a recipe node with a null assembler!");
+
+						string assemblerName = (string)nodeJToken["Assembler"];
+						if (cache.Assemblers.ContainsKey(assemblerName))
+							recipeNode.SelectedAssembler = cache.Assemblers[assemblerName];
+						else
+							recipeNode.SelectedAssembler = cache.MissingAssemblers[assemblerName];
+
+						foreach (string moduleName in nodeJToken["AssemblerModules"].Select(t => (string)t).ToList())
 						{
-							string assemblerName = (string)nodeJToken["Assembler"];
-							if (cache.Assemblers.ContainsKey(assemblerName))
-								recipeNode.SelectedAssembler = cache.Assemblers[assemblerName];
-							foreach (string moduleName in nodeJToken["AssemblerModules"].Select(t => (string)t).ToList())
-								if (cache.Modules.ContainsKey(moduleName))
-									recipeNode.AssemblerModules.Add(cache.Modules[moduleName]);
+							if (cache.Modules.ContainsKey(moduleName))
+								recipeNode.AssemblerModules.Add(cache.Modules[moduleName]);
+							else
+								recipeNode.AssemblerModules.Add(cache.MissingModules[moduleName]);
 						}
-						if(nodeJToken["Beacon"] != null)
-                        {
+
+						if (nodeJToken["Fuel"] != null)
+						{
+							if (cache.Items.ContainsKey((string)nodeJToken["Fuel"]))
+								recipeNode.BurnerItem = cache.Items[(string)nodeJToken["Fuel"]];
+							else
+								recipeNode.BurnerItem = cache.MissingItems[(string)nodeJToken["Fuel"]];
+						}
+						else if (recipeNode.SelectedAssembler.IsBurner) //and fuel is null :/
+							recipeNode.BurnerItem = FuelSelector.GetFuel(recipeNode.SelectedAssembler);
+
+						if(nodeJToken["Burnt"] != null)
+						{
+							Item burntItem;
+							if (cache.Items.ContainsKey((string)nodeJToken["Burnt"]))
+								burntItem = cache.Items[(string)nodeJToken["Burnt"]];
+							else
+								burntItem = cache.MissingItems[(string)nodeJToken["Burnt"]];
+							if (recipeNode.BurntItem != burntItem)
+								recipeNode.SetBurntOverride(burntItem);
+						}
+
+						if (nodeJToken["Beacon"] != null)
+						{
 							string beaconName = (string)nodeJToken["Beacon"];
 							if (cache.Beacons.ContainsKey(beaconName))
 								recipeNode.SelectedBeacon = cache.Beacons[beaconName];
+							else
+								recipeNode.SelectedBeacon = cache.MissingBeacons[beaconName];
+
 							foreach (string moduleName in nodeJToken["BeaconModules"].Select(t => (string)t).ToList())
+							{
 								if (cache.Modules.ContainsKey(moduleName))
 									recipeNode.BeaconModules.Add(cache.Modules[moduleName]);
+								else
+									recipeNode.BeaconModules.Add(cache.MissingModules[moduleName]);
+							}
 							recipeNode.BeaconCount = (float)nodeJToken["BeaconCount"];
 						}
 						newNode = recipeNode;
 						break;
 					default:
-							Trace.Fail("Unknown node type: " + nodeJToken["NodeType"]);
-							break;
+						Trace.Fail("Unknown node type: " + nodeJToken["NodeType"]);
+						break;
 				}
 
 				newNode.RateType = (RateType)(int)nodeJToken["RateType"];
@@ -313,13 +357,14 @@ namespace Foreman
 				BaseNode supplier = oldNodeIndices[(int)nodeLinkJToken["SupplierID"]];
 				BaseNode consumer = oldNodeIndices[(int)nodeLinkJToken["ConsumerID"]];
 				Item item;
-				
+
 				string itemName = (string)nodeLinkJToken["Item"];
 				if (cache.Items.ContainsKey(itemName))
 					item = cache.Items[itemName];
 				else
 					item = cache.MissingItems[itemName];
 
+				//if(LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
 				newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
 			}
 			return newNodeCollection;
@@ -343,21 +388,36 @@ namespace Foreman
 				includedLinks = linkSet;
 			}
 
-			//prepare list of items and recipes that are part of the saved set
+			//prepare list of items/assemblers/modules/beacons/recipes that are part of the saved set. Recipes have to include a missing component due to the possibility of different recipes having same name (ex: regular iron.recipe, missing iron.recipe, missing iron.recipe #2)
 			HashSet<string> includedItems = new HashSet<string>();
+			HashSet<string> includedAssemblers = new HashSet<string>();
+			HashSet<string> includedModules = new HashSet<string>();
+			HashSet<string> includedBeacons = new HashSet<string>();
+			
 			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
-			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new MissingRecipeComparer()); //compares by name, ingredients, and products (not amounts, just items)
+			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new RecipeNaInPrComparer()); //compares by name, ingredients, and products (not amounts, just items)
+
 
 			foreach (BaseNode node in Nodes)
 			{
 				if (node is RecipeNode rnode)
 				{
-					if (rnode.BaseRecipe.IsMissingRecipe)
+					if (rnode.BaseRecipe.IsMissing)
 						includedMissingRecipes.Add(rnode.BaseRecipe);
 					else
 						includedRecipes.Add(rnode.BaseRecipe);
+
+					if (rnode.SelectedAssembler != null)
+						includedAssemblers.Add(rnode.SelectedAssembler.Name);
+					if (rnode.SelectedBeacon != null)
+						includedBeacons.Add(rnode.SelectedBeacon.Name);
+					foreach (Module module in rnode.AssemblerModules)
+						includedModules.Add(module.Name);
+					foreach (Module module in rnode.BeaconModules)
+						includedModules.Add(module.Name);
 				}
 
+				//these will process all inputs/outputs -> so fuel/burnt items are included automatically!
 				foreach (Item input in node.Inputs)
 					includedItems.Add(input.Name);
 				foreach (Item output in node.Outputs)
@@ -369,6 +429,10 @@ namespace Foreman
 			//serialize
 			info.AddValue("IncludedItems", includedItems);
 			info.AddValue("IncludedRecipes", includedRecipeShorts);
+			info.AddValue("IncludedAssemblers", includedAssemblers);
+			info.AddValue("IncludedModules", includedModules);
+			info.AddValue("IncludedBeacons", includedBeacons);
+
 			info.AddValue("Nodes", includedNodes);
 			info.AddValue("NodeLinks", includedLinks);
 		}

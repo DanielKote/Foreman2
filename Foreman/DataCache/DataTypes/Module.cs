@@ -14,6 +14,8 @@ namespace Foreman
 		float ProductivityBonus { get; }
 		float ConsumptionBonus { get; }
 		float PollutionBonus { get; }
+
+		bool IsMissing { get; }
 		bool Enabled { get; set; }
 	}
 
@@ -24,19 +26,23 @@ namespace Foreman
 		public IReadOnlyCollection<Beacon> ValidBeacons { get { return validBeacons; } }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
-		public bool Enabled { get; set; }
 		public float SpeedBonus { get; set; }
 		public float ProductivityBonus { get; set; }
 		public float ConsumptionBonus { get; set; }
 		public float PollutionBonus { get; set; }
 
+		public bool Enabled { get; set; }
+		public bool IsMissing { get; private set; }
+
 		internal HashSet<RecipePrototype> validRecipes { get; private set; }
 		internal HashSet<AssemblerPrototype> validAssemblers { get; private set; }
 		internal HashSet<BeaconPrototype> validBeacons { get; private set; }
 
-		public ModulePrototype(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName, "-")
+		public ModulePrototype(DataCache dCache, string name, string friendlyName, bool isMissing = false) : base(dCache, name, friendlyName, "-")
 		{
 			Enabled = true;
+			IsMissing = isMissing;
+
 			SpeedBonus = 0;
 			ProductivityBonus = 0;
 			ConsumptionBonus = 0;

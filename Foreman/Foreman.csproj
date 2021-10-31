@@ -121,6 +121,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BenchmarkTimer.cs" />
     <Compile Include="Controls\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -143,6 +144,7 @@
     <Compile Include="Controls\SyncListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DataCache\DataTypes\RecipeShort.cs" />
     <Compile Include="DataCache\FactorioPathsProcessor.cs" />
     <Compile Include="DataCache\IconCache.cs" />
     <Compile Include="DataCache\DataTypes\Assembler.cs" />
@@ -177,11 +179,13 @@
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\AssemblerSelector.cs" />
+    <Compile Include="Models\FuelSelector.cs" />
+    <Compile Include="Models\LinkChecker.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\Nodes\ConsumerNode.cs" />
     <Compile Include="Models\Nodes\PassthroughNode.cs" />
     <Compile Include="Models\Nodes\RecipeNode.cs" />
-    <Compile Include="Models\Solver\CyclicNodeTester.cs" />
+    <Compile Include="Models\Nodes\Solver\CyclicNodeTester.cs" />
     <Compile Include="Models\Nodes\SupplierNode.cs" />
     <Compile Include="DataCache\DataCache.cs" />
     <Compile Include="Forms\SettingsForm.cs">
@@ -196,10 +200,10 @@
     <Compile Include="ProductionGraphView\Elements\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
     <Compile Include="DataCache\IconCacheProcessor.cs" />
-    <Compile Include="Models\Solver\GoogleSolver.cs" />
+    <Compile Include="Models\Nodes\Solver\GoogleSolver.cs" />
     <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
     <Compile Include="ProductionGraphView\Elements\GraphElement.cs" />
-    <Compile Include="Models\Solver\GraphOptimisation.cs" />
+    <Compile Include="Models\Nodes\Solver\GraphOptimisation.cs" />
     <Compile Include="Forms\ImageExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -217,7 +221,7 @@
     <Compile Include="DataCache\DataTypes\Item.cs" />
     <Compile Include="ProductionGraphView\Elements\LinkElement.cs" />
     <Compile Include="Models\Nodes\BaseNode.cs" />
-    <Compile Include="Models\Solver\ProductionSolver.cs" />
+    <Compile Include="Models\Nodes\Solver\ProductionSolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\DataReloadForm.cs">
       <SubType>Form</SubType>

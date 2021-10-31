@@ -35,7 +35,7 @@ namespace Foreman
 		}
 
 		private void EnableProgressBar(bool enabled)
-        {
+		{
 			FactorioLocationGroup.Enabled = !enabled;
 			FactorioSettingsGroup.Enabled = !enabled;
 			PresetNameGroup.Enabled = !enabled;
@@ -80,8 +80,8 @@ namespace Foreman
 				CleanupFailedImport();
 				return;
 			}
-			if(NewPresetName.Length < 5)
-            {
+			if (NewPresetName.Length < 5)
+			{
 				MessageBox.Show("Preset name has to be longer than 5!");
 				CleanupFailedImport();
 				return;
@@ -114,10 +114,10 @@ namespace Foreman
 			}
 
 			FileVersionInfo factorioVersionInfo = FileVersionInfo.GetVersionInfo(Path.Combine(new string[] { installPath, "bin", "x64", "factorio.exe" }));
-			if(factorioVersionInfo.ProductMajorPart < 1 || factorioVersionInfo.ProductMinorPart < 1 || (factorioVersionInfo.ProductMinorPart == 1 && factorioVersionInfo.ProductBuildPart < 4))
-            {
+			if (factorioVersionInfo.ProductMajorPart < 1 || factorioVersionInfo.ProductMinorPart < 1 || (factorioVersionInfo.ProductMinorPart == 1 && factorioVersionInfo.ProductBuildPart < 4))
+			{
 				EnableProgressBar(false);
-				MessageBox.Show("Factorio version ("+factorioVersionInfo.ProductVersion+") can not be used with Foreman. Please use Factorio 1.1.4 or newer.");
+				MessageBox.Show("Factorio version (" + factorioVersionInfo.ProductVersion + ") can not be used with Foreman. Please use Factorio 1.1.4 or newer.");
 				ErrorLogging.LogLine(string.Format("Factorio version was too old. {0} instead of 1.1.4+", factorioVersionInfo.ProductVersion));
 				CleanupFailedImport();
 				return;
@@ -157,15 +157,15 @@ namespace Foreman
 				Close();
 			}
 			else
-            {
+			{
 				//CleanupFailedImport(); //should have already been done.
 				EnableProgressBar(false);
-            }
+			}
 
 		}
 
 		private async Task<string> ProcessPreset(string installPath, string userDataPath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token)
-        {
+		{
 			return await Task.Run(() =>
 			{
 				//prepare for running factorio
@@ -227,17 +227,17 @@ namespace Foreman
 				while (!process.HasExited)
 				{
 					resultString += process.StandardOutput.ReadToEnd();
-					if(token.IsCancellationRequested)
-                    {
+					if (token.IsCancellationRequested)
+					{
 						process.Close();
 						CleanupFailedImport(modsPath);
 						return "";
-                    }
+					}
 					Thread.Sleep(100);
 				}
 
-				if(resultString.IndexOf("Is another instance already running?") != -1)
-                {
+				if (resultString.IndexOf("Is another instance already running?") != -1)
+				{
 					MessageBox.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
 					CleanupFailedImport(modsPath);
 					return "";
@@ -273,7 +273,7 @@ namespace Foreman
 					return "";
 				}
 				else if (resultString.IndexOf("<<<END-EXPORT-P1>>>") == -1 || resultString.IndexOf("<<<END-EXPORT-P2>>>") == -1)
-                {
+				{
 					MessageBox.Show("Foreman export could not be completed - possible mod conflict detected. Please run factorio and ensure it can successfully load to menu before retrying.");
 					ErrorLogging.LogLine("Foreman export failed partway. Consult errorExporting.json for full output (and search for <<<END-EXPORT-P1>>> or <<<END-EXPORT-P2>>>, at least one of which is missing)");
 					File.WriteAllText(Path.Combine(Application.StartupPath, "errorExporting.json"), resultString);
@@ -309,7 +309,7 @@ namespace Foreman
 					dataJObject = JObject.Parse(dataString); //this is pretty much the entire json preset - just need to save it.
 				}
 				catch
-                {
+				{
 					MessageBox.Show("Foreman export could not be completed - unknown json parsing error.\nSorry");
 					ErrorLogging.LogLine("json parsing of output failed. This is clearly an error with the export mod (foremanexport_1.0.0). Consult _iconJObjectOut.json and _dataJObjectOut.json and check which one isnt a valid json (and why)");
 					File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
@@ -319,8 +319,8 @@ namespace Foreman
 				}
 
 				//now to trawl over the dataJObject entities and replace any 'lid' with 'localised_name'
-				foreach(JToken set in dataJObject.Values().ToList())
-                {
+				foreach (JToken set in dataJObject.Values().ToList())
+				{
 					foreach (JToken obj in set.ToList())
 					{
 						if (obj is JObject jobject && (string)jobject["lid"] != null)
@@ -330,7 +330,7 @@ namespace Foreman
 							jobject.Remove("lid");
 						}
 					}
-                }
+				}
 
 				//save new preset (data)
 				File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".json"), dataJObject.ToString(Formatting.Indented));
@@ -375,19 +375,19 @@ namespace Foreman
 							}
 						}
 						else
-                        {
+						{
 							CleanupFailedImport(modsPath, presetPath);
 							return "";
-                        }
+						}
 					}
 				}
 
 				return NewPresetName;
 			});
-        }
+		}
 
 		private void CleanupFailedImport(string modsPath = "", string presetPath = "")
-        {
+		{
 			NewPresetName = "";
 
 			if (File.Exists("temp-save.zip"))
@@ -402,8 +402,8 @@ namespace Foreman
 				File.Delete(Path.Combine(Application.StartupPath, presetPath + ".dat"));
 		}
 
-        private void PresetNameTextBox_TextChanged(object sender, EventArgs e)
-        {
+		private void PresetNameTextBox_TextChanged(object sender, EventArgs e)
+		{
 			int i = PresetNameTextBox.SelectionStart;
 			string filteredText = string.Concat(PresetNameTextBox.Text.Where(c => char.IsLetterOrDigit(c) || ExtraChars.Contains(c)));
 			if (filteredText != PresetNameTextBox.Text)
@@ -420,6 +420,6 @@ namespace Foreman
 				PresetNameTextBox.BackColor = Color.Pink;
 			else
 				PresetNameTextBox.BackColor = Color.LightGreen;
-        }
-    }
+		}
+	}
 }

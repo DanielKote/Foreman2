@@ -4,7 +4,7 @@ using System.Drawing;
 namespace Foreman
 {
 	public interface DataObjectBase : IComparable<DataObjectBase>
-    {
+	{
 		string Name { get; }
 		string LFriendlyName { get; }
 		string FriendlyName { get; }
@@ -16,19 +16,19 @@ namespace Foreman
 	}
 
 	public abstract class DataObjectBasePrototype : DataObjectBase
-    {
+	{
 		private static readonly char[] orderSeparators = { '[', ']' };
 
 		protected DataCache myCache { get; private set; }
 
-        public string Name { get; private set; }
+		public string Name { get; private set; }
 		public string LFriendlyName { get; private set; }
 		public string FriendlyName { get; private set; }
 
 		private string[] OrderCompareArray;
 
 		public DataObjectBasePrototype(DataCache dCache, string name, string friendlyName, string order)
-        {
+		{
 			myCache = dCache;
 			Name = name;
 			FriendlyName = friendlyName;
@@ -38,11 +38,11 @@ namespace Foreman
 			AverageColor = Color.Black;
 
 			OrderCompareArray = order.Split(orderSeparators);
-        }
+		}
 
 		public void SetIconAndColor(IconColorPair icp)
 		{
-			if(icp.Icon != null)
+			if (icp.Icon != null)
 				this.Icon = icp.Icon;
 			else
 				this.Icon = DataCache.UnknownIcon;
@@ -50,7 +50,7 @@ namespace Foreman
 			this.AverageColor = icp.Color;
 		}
 
-        public Color AverageColor { get; private set; }
+		public Color AverageColor { get; private set; }
 		public Bitmap Icon { get; private set; }
 
 		public override bool Equals(object obj)
@@ -76,7 +76,7 @@ namespace Foreman
 
 		public override int GetHashCode() { return Name.GetHashCode(); }
 		public int CompareTo(DataObjectBase other)
-        {
+		{
 			if (other is DataObjectBasePrototype otherP)
 			{
 
@@ -100,6 +100,6 @@ namespace Foreman
 				return LFriendlyName.CompareTo(otherP.LFriendlyName);
 			}
 			return 0;
-        }
+		}
 	}
 }

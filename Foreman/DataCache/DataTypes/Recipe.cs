@@ -7,13 +7,12 @@ using Newtonsoft.Json.Linq;
 namespace Foreman
 {
 	public interface Recipe : DataObjectBase
-    {
+	{
 		Subgroup MySubgroup { get; }
 
 		float Time { get; set; }
 		long RecipeID { get; }
-		bool IsMissingRecipe { get; }
-		bool IsCyclic { get; }
+		bool IsMissing { get; }
 		bool HasEnabledAssemblers { get; }
 		bool Enabled { get; set; }
 
@@ -37,18 +36,18 @@ namespace Foreman
 	}
 
 	public class RecipePrototype : DataObjectBasePrototype, Recipe
-    {
-        public Subgroup MySubgroup { get { return mySubgroup; } }
+	{
+		public Subgroup MySubgroup { get { return mySubgroup; } }
 
-        public float Time { get; set; }
+		public float Time { get; set; }
 
-        public IReadOnlyDictionary<Item, float> ProductSet { get { return productSet; } }
+		public IReadOnlyDictionary<Item, float> ProductSet { get { return productSet; } }
 		public IReadOnlyList<Item> ProductList { get { return productList; } }
-        public IReadOnlyDictionary<Item, float> ProductTemperatureMap { get { return productTemperatureMap; } }
+		public IReadOnlyDictionary<Item, float> ProductTemperatureMap { get { return productTemperatureMap; } }
 
-        public IReadOnlyDictionary<Item, float> IngredientSet { get { return ingredientSet; } }
+		public IReadOnlyDictionary<Item, float> IngredientSet { get { return ingredientSet; } }
 		public IReadOnlyList<Item> IngredientList { get { return ingredientList; } }
-        public IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get { return ingredientTemperatureMap; } }
+		public IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get { return ingredientTemperatureMap; } }
 
 		public IReadOnlyCollection<Assembler> ValidAssemblers { get { return validAssemblers; } }
 		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
@@ -70,8 +69,7 @@ namespace Foreman
 
 		internal HashSet<TechnologyPrototype> myUnlockTechnologies { get; private set; }
 
-		public bool IsMissingRecipe { get; private set; }
-		public bool IsCyclic { get; set; }
+		public bool IsMissing { get; private set; }
 		public bool HasEnabledAssemblers { get { return validAssemblers.FirstOrDefault(a => a.Enabled) != null; } }
 		public bool Enabled { get; set; }
 
@@ -87,16 +85,15 @@ namespace Foreman
 
 			Time = 0.5f;
 			this.Enabled = true;
-			this.IsCyclic = false;
-			this.IsMissingRecipe = isMissing;
+			this.IsMissing = isMissing;
 
 			ingredientSet = new Dictionary<Item, float>();
 			ingredientList = new List<ItemPrototype>();
-            ingredientTemperatureMap = new Dictionary<Item, fRange>();
+			ingredientTemperatureMap = new Dictionary<Item, fRange>();
 
 			productSet = new Dictionary<Item, float>();
 			productList = new List<ItemPrototype>();
-            productTemperatureMap = new Dictionary<Item, float>();
+			productTemperatureMap = new Dictionary<Item, float>();
 
 			validAssemblers = new HashSet<AssemblerPrototype>();
 			validModules = new HashSet<ModulePrototype>();
@@ -110,48 +107,48 @@ namespace Foreman
 			if (!item.IsTemperatureDependent)
 				return item.FriendlyName;
 			return item.GetTemperatureRangeFriendlyName(IngredientTemperatureMap[item]);
-        }
+		}
 
-        public string GetProductFriendlyName(Item item)
-        {
-            if (!ProductSet.ContainsKey(item))
-                return item.FriendlyName;
+		public string GetProductFriendlyName(Item item)
+		{
+			if (!ProductSet.ContainsKey(item))
+				return item.FriendlyName;
 
-            string name = item.FriendlyName;
-            if (item.IsTemperatureDependent)
+			string name = item.FriendlyName;
+			if (item.IsTemperatureDependent)
 				name += " (" + ProductTemperatureMap[item].ToString("0") + "°)";
 
-            return name;
-        }
+			return name;
+		}
 
-        public bool TestIngredientConnection(Recipe provider, Item ingredient) //checks if the temperature that the ingredient is coming out at fits within the range of temperatures required for this recipe
-        {
-            if (!IngredientSet.ContainsKey(ingredient) || !provider.ProductSet.ContainsKey(ingredient))
-                return false;
+		public bool TestIngredientConnection(Recipe provider, Item ingredient) //checks if the temperature that the ingredient is coming out at fits within the range of temperatures required for this recipe
+		{
+			if (!IngredientSet.ContainsKey(ingredient) || !provider.ProductSet.ContainsKey(ingredient))
+				return false;
 
-            return IngredientTemperatureMap[ingredient].Contains(provider.ProductTemperatureMap[ingredient]);
-        }
+			return IngredientTemperatureMap[ingredient].Contains(provider.ProductTemperatureMap[ingredient]);
+		}
 
-        public void InternalOneWayAddIngredient(ItemPrototype item, float quantity, float minTemp = float.NegativeInfinity, float maxTemp = float.PositiveInfinity)
-        {
+		public void InternalOneWayAddIngredient(ItemPrototype item, float quantity, float minTemp = float.NegativeInfinity, float maxTemp = float.PositiveInfinity)
+		{
 			if (IngredientSet.ContainsKey(item))
 				ingredientSet[item] += quantity;
 			else
-            {
+			{
 				ingredientSet.Add(item, quantity);
 				ingredientList.Add(item);
-                ingredientTemperatureMap.Add(item, new fRange(minTemp, maxTemp));
-            }
-        }
+				ingredientTemperatureMap.Add(item, new fRange(minTemp, maxTemp));
+			}
+		}
 
 		internal void InternalOneWayDeleteIngredient(ItemPrototype item) //only from delete calls
 		{
 			ingredientSet.Remove(item);
 			ingredientList.Remove(item);
-            ingredientTemperatureMap.Remove(item);
-        }
+			ingredientTemperatureMap.Remove(item);
+		}
 
-        public void InternalOneWayAddProduct(ItemPrototype item, float quantity, float temperature = 0)
+		public void InternalOneWayAddProduct(ItemPrototype item, float quantity, float temperature = 0)
 		{
 			if (productSet.ContainsKey(item))
 				productSet[item] += quantity;
@@ -159,7 +156,7 @@ namespace Foreman
 			{
 				productSet.Add(item, quantity);
 				productList.Add(item);
-                productTemperatureMap.Add(item, temperature);
+				productTemperatureMap.Add(item, temperature);
 			}
 		}
 
@@ -167,16 +164,16 @@ namespace Foreman
 		{
 			productSet.Remove(item);
 			productList.Remove(item);
-            productTemperatureMap.Remove(item);
+			productTemperatureMap.Remove(item);
 		}
 
 		public override string ToString() { return String.Format("Recipe: {0} Id:{1}", Name, RecipeID); }
 	}
 
-    public class MissingRecipeComparer : IEqualityComparer<Recipe>
-    {
-        public bool Equals(Recipe x, Recipe y)
-        {
+	public class RecipeNaInPrComparer : IEqualityComparer<Recipe> //compares by name, ingredient names, and product names
+	{
+		public bool Equals(Recipe x, Recipe y)
+		{
 			if (x == y)
 				return true;
 
@@ -197,71 +194,9 @@ namespace Foreman
 			return true;
 		}
 
-        public int GetHashCode(Recipe obj)
-        {
+		public int GetHashCode(Recipe obj)
+		{
 			return obj.GetHashCode();
-        }
-    }
-
-    public class RecipeShort : IEquatable<RecipeShort>
-	{
-		public string Name { get; private set; }
-		public long RecipeID { get; private set; }
-		public bool isMissing { get; private set; }
-		public Dictionary<string, float> Ingredients { get; private set; }
-		public Dictionary<string, float> Products { get; private set; }
-
-		public RecipeShort(string name)
-		{
-			Name = name;
-			RecipeID = -1;
-			isMissing = false;
-			Ingredients = new Dictionary<string, float>();
-			Products = new Dictionary<string, float>();
-		}
-
-		public RecipeShort(Recipe recipe)
-		{
-			Name = recipe.Name;
-			RecipeID = recipe.RecipeID;
-			isMissing = recipe.IsMissingRecipe;
-
-			Ingredients = new Dictionary<string, float>();
-			foreach (var kvp in recipe.IngredientSet)
-				Ingredients.Add(kvp.Key.Name, kvp.Value);
-			Products = new Dictionary<string, float>();
-			foreach (var kvp in recipe.ProductSet)
-				Products.Add(kvp.Key.Name, kvp.Value);
-		}
-
-		public RecipeShort(JToken recipe)
-		{
-			Name = (string)recipe["Name"];
-			RecipeID = (long)recipe["RecipeID"];
-			isMissing = (bool)recipe["isMissing"];
-
-			Ingredients = new Dictionary<string, float>();
-			foreach (JProperty ingredient in recipe["Ingredients"])
-				Ingredients.Add((string)ingredient.Name, (float)ingredient.Value);
-
-			Products = new Dictionary<string, float>();
-			foreach (JProperty ingredient in recipe["Products"])
-				Products.Add((string)ingredient.Name, (float)ingredient.Value);
-		}
-
-		public static List<RecipeShort> GetSetFromJson(JToken jdata)
-		{
-			List<RecipeShort> resultList = new List<RecipeShort>();
-			foreach (JToken recipe in jdata)
-				resultList.Add(new RecipeShort(recipe));
-			return resultList;
-		}
-
-		public bool Equals(RecipeShort other)
-		{
-			return this.Name == other.Name &&
-				this.Ingredients.Count == other.Ingredients.Count && this.Ingredients.SequenceEqual(other.Ingredients) &&
-				this.Products.Count == other.Products.Count && this.Products.SequenceEqual(other.Products);
 		}
 	}
 

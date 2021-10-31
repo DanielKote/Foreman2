@@ -10,7 +10,7 @@ namespace Foreman
 {
 	public partial class NodeElement : GraphElement
 	{
-        public static bool StickyDragOrigin = false; //true: drag axies are established at start of drag; false: drag axies are established upon activation of axis limits (shift)
+		public static bool StickyDragOrigin = false; //true: drag axies are established at start of drag; false: drag axies are established upon activation of axis limits (shift)
 		public Point DragOrigin { get; private set; } //used to limit drag to horizontal or vertical (if such is selected)
 
 		public bool Highlighted = false; //selection - note that this doesnt mean it is or isnt in selection (at least not during drag operation - ex: dragging a not-selection over a group of selected nodes will change their highlight status, but wont add them to the 'selected' set until you let go of the drag)
@@ -26,9 +26,9 @@ namespace Foreman
 		private static Brush demandBGBrush = new SolidBrush(Color.FromArgb(249, 237, 195));
 		private static Brush missingBGBrush = new SolidBrush(Color.FromArgb(0xff, 0x7f, 0x6b));
 		private static Brush oversuppliedBGBrush = new SolidBrush(Color.FromArgb(0xff, 0x7f, 0x6b));
-        private static Brush textBrush = new SolidBrush(Color.FromArgb(69, 69, 69));
+		private static Brush textBrush = new SolidBrush(Color.FromArgb(69, 69, 69));
 		private static Pen productivityTickBGPen = new Pen(Color.FromArgb(166, 0, 0), 5);
-		private static Brush SelectionOverlayBrush = new SolidBrush(Color.FromArgb(100,100, 100, 200));
+		private static Brush SelectionOverlayBrush = new SolidBrush(Color.FromArgb(100, 100, 100, 200));
 
 		private static Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 		private static Font size7Font = new Font(FontFamily.GenericSansSerif, 7);
@@ -74,25 +74,25 @@ namespace Foreman
 			if (DisplayedNode is ConsumerNode)
 			{
 				backgroundBrush = demandBGBrush;
-				if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
+				if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissing)
 					backgroundBrush = missingBGBrush;
 			}
 			else if (DisplayedNode is SupplierNode)
 			{
 				backgroundBrush = supplyBGBrush;
-				if (((SupplierNode)DisplayedNode).SuppliedItem.IsMissingItem)
+				if (((SupplierNode)DisplayedNode).SuppliedItem.IsMissing)
 					backgroundBrush = missingBGBrush;
 			}
 			else if (DisplayedNode is RecipeNode)
 			{
 				backgroundBrush = recipeBGBrush;
-				if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissingRecipe)
+				if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissing)
 					backgroundBrush = missingBGBrush;
 			}
 			else if (DisplayedNode is PassthroughNode)
 			{
 				backgroundBrush = passthroughBGBrush;
-				if (((PassthroughNode)DisplayedNode).PassthroughItem.IsMissingItem)
+				if (((PassthroughNode)DisplayedNode).PassthroughItem.IsMissing)
 					backgroundBrush = missingBGBrush;
 			}
 			else
@@ -121,7 +121,7 @@ namespace Foreman
 			if (DisplayedNode is SupplierNode)
 			{
 				SupplierNode node = (SupplierNode)DisplayedNode;
-				if (node.SuppliedItem.IsMissingItem)
+				if (node.SuppliedItem.IsMissing)
 					Text = String.Format("Item not loaded! ({0})", node.DisplayName);
 				else
 					Text = "Input: " + node.SuppliedItem.FriendlyName;
@@ -129,7 +129,7 @@ namespace Foreman
 			else if (DisplayedNode is ConsumerNode)
 			{
 				ConsumerNode node = (ConsumerNode)DisplayedNode;
-				if (node.ConsumedItem.IsMissingItem)
+				if (node.ConsumedItem.IsMissing)
 					Text = String.Format("Item not loaded! ({0})", node.DisplayName);
 				else
 					Text = "Output: " + node.ConsumedItem.FriendlyName;
@@ -137,7 +137,7 @@ namespace Foreman
 			else if (DisplayedNode is RecipeNode)
 			{
 				RecipeNode node = (RecipeNode)DisplayedNode;
-				if (node.BaseRecipe.IsMissingRecipe)
+				if (node.BaseRecipe.IsMissing)
 					Text = String.Format("Recipe not loaded! ({0})", node.DisplayName);
 				else
 					Text = node.BaseRecipe.FriendlyName;
@@ -251,7 +251,7 @@ namespace Foreman
 				result += tab.Bounds.Width + tabPadding;
 			return result;
 		}
-		
+
 		protected int GetItemTabXHeuristic(ItemTabElement tab)
 		{
 			int total = 0;
@@ -290,10 +290,10 @@ namespace Foreman
 			new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), myGraphViewer);
 		}
 
-        public override void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0)
-        {
+		public override void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0)
+		{
 			base.UpdateVisibility(graph_zone, xborder, yborder + 30); //account for the vertical item boxes
-        }
+		}
 
 		public override bool ContainsPoint(Point graph_point)
 		{
@@ -389,7 +389,7 @@ namespace Foreman
 			return toolTips;
 		}
 
-        public override void MouseDown(Point graph_point, MouseButtons button)
+		public override void MouseDown(Point graph_point, MouseButtons button)
 		{
 			MouseDownLocation = graph_point;
 
@@ -416,24 +416,24 @@ namespace Foreman
 				tab?.MouseUp(graph_point, button, wasDragged);
 				if (tab == null)
 				{
-                    rightClickMenu.MenuItems.Clear();
-                    rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
-                        new EventHandler((o, e) =>
-                        {
+					rightClickMenu.MenuItems.Clear();
+					rightClickMenu.MenuItems.Add(new MenuItem("Delete node",
+						new EventHandler((o, e) =>
+						{
 							myGraphViewer.Graph.DeleteNode(DisplayedNode);
 							myGraphViewer.Graph.UpdateNodeValues();
-                        })));
-                    if (myGraphViewer.SelectedNodes.Count > 2 && myGraphViewer.SelectedNodes.Contains(this))
-                    {
-                        rightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
-                        new EventHandler((o, e) =>
-                        {
-                            myGraphViewer.TryDeleteSelectedNodes();
-                        })));
-                    }
-                    rightClickMenu.Show(myGraphViewer, myGraphViewer.GraphToScreen(graph_point));
-                }
-            }
+						})));
+					if (myGraphViewer.SelectedNodes.Count > 2 && myGraphViewer.SelectedNodes.Contains(this))
+					{
+						rightClickMenu.MenuItems.Add(new MenuItem("Delete selected nodes",
+						new EventHandler((o, e) =>
+						{
+							myGraphViewer.TryDeleteSelectedNodes();
+						})));
+					}
+					rightClickMenu.Show(myGraphViewer, myGraphViewer.GraphToScreen(graph_point));
+				}
+			}
 		}
 
 		public override void Dragged(Point graph_point)

@@ -8,8 +8,8 @@ namespace Foreman
 {
 	class DraggedLinkElement : BaseLinkElement
 	{
-        public override Item Item { get; protected set; }
-        public LinkType StartConnectionType { get; private set; }
+		public override Item Item { get; protected set; }
+		public LinkType StartConnectionType { get; private set; }
 		private Point newObjectLocation;
 
 		private bool dragEnded;
@@ -29,8 +29,8 @@ namespace Foreman
 
 		public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder) { Visible = true; } //always visible.
 
-        protected override Point[] GetCurveEndpoints()
-        {
+		protected override Point[] GetCurveEndpoints()
+		{
 			if (dragEnded)
 				return null; //no update
 
@@ -110,7 +110,7 @@ namespace Foreman
 		{
 			if (dragEnded)
 				return;
-			
+
 			NodeElement mousedElement = myGraphViewer.GetNodeAtPoint(graph_point);
 			if (mousedElement != null)
 			{
@@ -123,7 +123,7 @@ namespace Foreman
 				if (SupplierElement != null &&
 					ConsumerElement != null &&
 					Item.IsTemperatureDependent &&
-					!LinkElement.IsValidTemperatureConnection(Item, SupplierElement, ConsumerElement))
+					!LinkChecker.IsValidTemperatureConnection(Item, SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode))
 				{
 					if (StartConnectionType == LinkType.Input)
 						SupplierElement = null;

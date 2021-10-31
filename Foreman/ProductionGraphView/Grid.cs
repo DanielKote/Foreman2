@@ -3,8 +3,8 @@ using System.Drawing;
 
 namespace Foreman
 {
-    public class Grid
-    {
+	public class Grid
+	{
 		public int CurrentGridUnit = 0;
 		public int CurrentMajorGridUnit = 0;
 		public bool ShowGrid = false;
@@ -17,12 +17,12 @@ namespace Foreman
 		private static readonly Pen lockedAxisPen = new Pen(Color.FromArgb(180, 80, 80), 4);
 
 		public Grid()
-        {
+		{
 			CurrentGridUnit = Properties.Settings.Default.MinorGridlines;
-        }
+		}
 
 		public void Paint(Graphics graphics, float viewScale, Rectangle visibleGraphBounds, NodeElement draggedNode = null)
-        {
+		{
 			if (ShowGrid)
 			{
 				gridPen.Width = 1 / viewScale;

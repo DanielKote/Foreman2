@@ -5,10 +5,10 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
-    public static class FactorioPathsProcessor
-    {
-        public static List<string> GetFactorioInstallLocations()
-        {
+	public static class FactorioPathsProcessor
+	{
+		public static List<string> GetFactorioInstallLocations()
+		{
 			//check default folders for a factorio installation (to fill in the path as the 'default')
 			List<string> factorioPaths = new List<string>();
 

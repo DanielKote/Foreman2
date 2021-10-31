@@ -46,7 +46,8 @@ namespace Foreman
 			if (Scale2xCheckBox.Checked)
 			{
 				scale = 2;
-			} else if (Scale3xCheckBox.Checked)
+			}
+			else if (Scale3xCheckBox.Checked)
 			{
 				scale = 3;
 			}
