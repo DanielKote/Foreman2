@@ -4,37 +4,20 @@ using System.Linq;
 
 namespace Foreman
 {
-	public interface Beacon : DataObjectBase
+	public interface Beacon : EntityObjectBase
 	{
-		int ModuleSlots { get; }
-		float Effectivity { get; }
-
-		IReadOnlyCollection<Module> Modules { get; }
-		IReadOnlyCollection<Item> AssociatedItems { get; }
-
-		bool IsMissing { get; }
+		double BeaconEffectivity { get; }
 	}
 
-	public class BeaconPrototype : DataObjectBasePrototype, Beacon
+	internal class BeaconPrototype : EntityObjectBasePrototype, Beacon
 	{
-		public int ModuleSlots { get; set; }
-		public float Effectivity { get; set; }
+		public double BeaconEffectivity { get; set; }
 
-		public IReadOnlyCollection<Module> Modules { get { return modules; } }
-		public IReadOnlyCollection<Item> AssociatedItems { get { return associatedItems; } }
-
-		public bool IsMissing { get; private set; }
 		public override bool Available { get { return associatedItems.FirstOrDefault(i => i.Available) != null; } set { } }
 
-		internal HashSet<ModulePrototype> modules { get; private set; }
-		internal List<ItemPrototype> associatedItems { get; private set; } //should honestly only be 1, but knowing modders....
-
-		public BeaconPrototype(DataCache dCache, string name, string friendlyName, bool isMissing = false) : base(dCache, name, friendlyName, "-")
+		public BeaconPrototype(DataCache dCache, string name, string friendlyName, EnergySource source, bool isMissing = false) : base(dCache, name, friendlyName, EntityType.Beacon, source, isMissing)
 		{
-			IsMissing = isMissing;
-
-			modules = new HashSet<ModulePrototype>();
-			associatedItems = new List<ItemPrototype>();
+			BeaconEffectivity = 0.5f;
 		}
 
 		public override string ToString() { return string.Format("Beacon: {0}", Name); }

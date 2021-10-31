@@ -12,17 +12,16 @@ namespace Foreman
 		IReadOnlyCollection<Recipe> ProductionRecipes { get; }
 		IReadOnlyCollection<Recipe> ConsumptionRecipes { get; }
 
-		IReadOnlyCollection<Recipe> AvailableProductionRecipes { get; }
-		IReadOnlyCollection<Recipe> AvailableConsumptionRecipes { get; }
-
 		bool IsMissing { get; }
 		bool IsFluid { get; }
 		bool IsTemperatureDependent { get; }
 		double DefaultTemperature { get; }
+		double SpecificHeatCapacity { get; }
 
-		float FuelValue { get; }
+		double FuelValue { get; }
+		double PollutionMultiplier { get; }
 		Item BurnResult { get; }
-		IReadOnlyCollection<Assembler> FuelsAssemblers { get; }
+		IReadOnlyCollection<EntityObjectBase> FuelsEntities { get; }
 
 		string GetTemperatureRangeFriendlyName(fRange tempRange);
 	}
@@ -33,24 +32,24 @@ namespace Foreman
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }
 		public IReadOnlyCollection<Recipe> ConsumptionRecipes { get { return consumptionRecipes; } }
-		public IReadOnlyCollection<Recipe> AvailableProductionRecipes { get; private set; }
-		public IReadOnlyCollection<Recipe> AvailableConsumptionRecipes { get; private set; }
 
 		public bool IsMissing { get; private set; }
 
 		public bool IsFluid { get; private set; }
 		public bool IsTemperatureDependent { get; internal set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
 		public double DefaultTemperature { get; internal set; } //for liquids
+		public double SpecificHeatCapacity { get; internal set; } //also liquids
 
-		public float FuelValue { get; internal set; }
+		public double FuelValue { get; internal set; }
+		public double PollutionMultiplier { get; internal set; }
 		public Item BurnResult { get; internal set; }
-		public IReadOnlyCollection<Assembler> FuelsAssemblers { get { return fuelsAssemblers; } }
+		public IReadOnlyCollection<EntityObjectBase> FuelsEntities { get { return fuelsEntities; } }
 
 		internal SubgroupPrototype mySubgroup;
 
 		internal HashSet<RecipePrototype> productionRecipes { get; private set; }
 		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
-		internal HashSet<AssemblerPrototype> fuelsAssemblers { get; private set; }
+		internal HashSet<EntityObjectBasePrototype> fuelsEntities { get; private set; }
 
 		public ItemPrototype(DataCache dCache, string name, string friendlyName, bool isfluid, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
@@ -59,19 +58,14 @@ namespace Foreman
 
 			productionRecipes = new HashSet<RecipePrototype>();
 			consumptionRecipes = new HashSet<RecipePrototype>();
-			fuelsAssemblers = new HashSet<AssemblerPrototype>();
+			fuelsEntities = new HashSet<EntityObjectBasePrototype>();
 
 			IsFluid = isfluid;
 			DefaultTemperature = 0;
-			FuelValue = 1; //useful for preventing overlow issues when using missing items / non-fuel items (loading with wrong mods / importing from alt mod group can cause this)
+			FuelValue = 1f; //useful for preventing overlow issues when using missing items / non-fuel items (loading with wrong mods / importing from alt mod group can cause this)
+			PollutionMultiplier = 1f;
 			IsTemperatureDependent = false;
 			IsMissing = isMissing;
-		}
-
-		internal void UpdateAvailabilities()
-		{
-			AvailableConsumptionRecipes = new HashSet<Recipe>(consumptionRecipes.Where(r => r.Available));
-			AvailableProductionRecipes = new HashSet<Recipe>(productionRecipes.Where(r => r.Available));
 		}
 
 		public string GetTemperatureRangeFriendlyName(fRange tempRange)
@@ -80,8 +74,8 @@ namespace Foreman
 				return this.FriendlyName;
 
 			string name = this.FriendlyName;
-			bool includeMin = tempRange.Min >= float.MinValue; //== float.NegativeInfinity;
-			bool includeMax = tempRange.Max <= float.MaxValue; //== float.PositiveInfinity;
+			bool includeMin = tempRange.Min >= double.MinValue; //== double.NegativeInfinity;
+			bool includeMax = tempRange.Max <= double.MaxValue; //== double.PositiveInfinity;
 
 			if (tempRange.Min == tempRange.Max)
 				name += " (" + tempRange.Min.ToString("0") + "°)";

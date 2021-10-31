@@ -82,8 +82,10 @@ namespace Foreman
 					Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 6, 60, 18);
 					//graphics.DrawRectangle(devPen, textbox);
 
-					float beaconCount = recipeNode.BeaconCount;
-					string text = "x" + beaconCount.ToString("0.##");
+					double beaconCount = recipeNode.GetTotalBeacons(graphViewer.GetRateMultipler());
+					string sbeaconCount = (beaconCount >= 100000)? beaconCount.ToString("0.##e0") : beaconCount.ToString("0");
+
+					string text = graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Medium? string.Format("x {0}", (recipeNode.BeaconCount).ToString("0.##")) : string.Format("x {0} (Σ{1})", (recipeNode.BeaconCount).ToString("0.##"), sbeaconCount);
 					GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
 				}
 			}

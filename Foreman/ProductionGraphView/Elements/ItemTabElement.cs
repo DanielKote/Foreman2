@@ -53,15 +53,15 @@ namespace Foreman
 				return LocalToGraph(new Point(0, -Height / 2));
 		}
 
-		public void UpdateValues(float consumeRate, float suppliedRate, bool isOversupplied)
+		public void UpdateValues(double consumeRate, double suppliedRate, bool isOversupplied)
 		{
 			borderPen = regularBorderPen;
-			text = GraphicsStuff.FloatToString(consumeRate);
+			text = GraphicsStuff.DoubleToString(consumeRate);
 
 			if (isOversupplied)
 			{
 				borderPen = oversuppliedBorderPen;
-				text += "\n" + GraphicsStuff.FloatToString(suppliedRate);
+				text += "\n" + GraphicsStuff.DoubleToString(suppliedRate);
 			}
 
 			int textHeight = (int)graphViewer.CreateGraphics().MeasureString(text, textFont).Height;

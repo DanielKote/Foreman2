@@ -68,10 +68,10 @@ namespace Foreman
 		public struct Permutation
 		{
 			public Module[] Modules; //NOTE: a null module is possible! this means that this particular permutation isnt using all slots.
-			public float SpeedBonus;
-			public float ProductivityBonus;
-			public float ConsumptionBonus;
-			public float PollutionBonus;
+			public double SpeedBonus;
+			public double ProductivityBonus;
+			public double ConsumptionBonus;
+			public double PollutionBonus;
 			public int SquaredTierValue; //total of all added modules tiers squared (ex: T1+T2+T3 would have a value of 1+4+9) ->usefull for solving for 'cheapest' option
 
 			public Permutation(Module[] modules)

@@ -14,10 +14,10 @@ namespace Foreman
 
 		Item AssociatedItem { get; }
 
-		float SpeedBonus { get; }
-		float ProductivityBonus { get; }
-		float ConsumptionBonus { get; }
-		float PollutionBonus { get; }
+		double SpeedBonus { get; }
+		double ProductivityBonus { get; }
+		double ConsumptionBonus { get; }
+		double PollutionBonus { get; }
 
 		int Tier { get; }
 
@@ -32,10 +32,10 @@ namespace Foreman
 		public IReadOnlyCollection<Recipe> AvailableRecipes { get; private set; }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
-		public float SpeedBonus { get; set; }
-		public float ProductivityBonus { get; set; }
-		public float ConsumptionBonus { get; set; }
-		public float PollutionBonus { get; set; }
+		public double SpeedBonus { get; set; }
+		public double ProductivityBonus { get; set; }
+		public double ConsumptionBonus { get; set; }
+		public double PollutionBonus { get; set; }
 
 		public int Tier { get; set; }
 

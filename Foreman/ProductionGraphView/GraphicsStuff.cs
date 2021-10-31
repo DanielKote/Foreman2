@@ -107,34 +107,34 @@ namespace Foreman
 			}
 		}
 
-		public static string FloatToString(float value)
+		public static string DoubleToString(double value)
 		{
-			if (value >= 100000)
+			if (Math.Abs(value) >= 100000)
 				return value.ToString("0.00e0");
-			if (value >= 10000)
+			if (Math.Abs(value) >= 10000)
 				return value.ToString("0");
-			if (value >= 100)
+			if (Math.Abs(value) >= 100)
 				return value.ToString("0.#");
-			if (value >= 10)
+			if (Math.Abs(value) >= 10)
 				return value.ToString("0.##");
-			if (value >= 0.1)
+			if (Math.Abs(value) >= 0.1)
 				return value.ToString("0.###");
-			if (value != 0)
+			if (Math.Abs(value) != 0)
 				return value.ToString("0.######");
 			return "0";
 		}
 
-		public static string FloatToEnergy(float value)
+		public static string DoubleToEnergy(double value, string unit)
 		{
-			if (value >= 1000000000000)
-				return (value / 1000000000000).ToString("0.##") + "PJ";
-			if (value >= 1000000000)
-				return (value / 1000000000000).ToString("0.##") + "GJ";
-			if (value >= 1000000)
-				return (value / 1000000000000).ToString("0.##") + "MJ";
-			if (value >= 1000)
-				return (value / 1000000000000).ToString("0.##") + "KJ";
-			return (value / 1000000000000).ToString("0.##") + "J";
+			if (Math.Abs(value) >= 1000000000000)
+				return (value / 1000000000000).ToString("0.##") + "P" + unit;
+			if (Math.Abs(value) >= 1000000000)
+				return (value / 1000000000).ToString("0.##") + "G" + unit;
+			if (Math.Abs(value) >= 1000000)
+				return (value / 1000000).ToString("0.##") + "M" + unit;
+			if (Math.Abs(value) >= 1000)
+				return (value / 1000).ToString("0.##") + "K" + unit;
+			return (value).ToString("0.##") + "" + unit;
 		}
 	}
 
@@ -246,6 +246,18 @@ namespace Foreman
 			}
 
 			graphics.DrawRectangle(BorderPen, boundary);
+		}
+	}
+
+	//https://stackoverflow.com/questions/13477689/find-number-of-decimal-places-in-decimal-value-regardless-of-culture
+	public static class MathDecimals
+	{
+		public static int GetDecimals(decimal d, int i = 0)
+		{
+			decimal multiplied = (decimal)((double)d * Math.Pow(10, i));
+			if (Math.Round(multiplied) == multiplied)
+				return i;
+			return GetDecimals(d, i + 1);
 		}
 	}
 }

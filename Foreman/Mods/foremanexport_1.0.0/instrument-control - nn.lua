@@ -119,6 +119,7 @@ local function ExportItems()
 		if item.fuel_category ~= nil then
 			titem['fuel_category'] = item.fuel_category
 			titem['fuel_value'] = item.fuel_value
+			titem['pollution_multiplier'] = item.fuel_emissions_multiplier
 		end
 
 		if item.burnt_result ~= nil then
@@ -144,9 +145,11 @@ local function ExportFluids()
 		tfluid['subgroup'] = fluid.subgroup.name
 		tfluid['default_temperature'] = fluid.default_temperature
 		tfluid['max_temperature'] = fluid.max_temperature
-
-		if fluid.fuel_value ~= nil then
+		tfluid['heat_capacity'] = fluid.heat_capacity
+		
+		if fluid.fuel_value ~= 0 then
 			tfluid['fuel_value'] = fluid.fuel_value
+			tfluid['pollution_multiplier'] = fluid.emissions_multiplier
 		end
 
 		tfluid['lid'] = '$'..localindex
@@ -193,107 +196,112 @@ end
 
 local function ExportEntities()
 	tentities = {}
-	for _, entity in pairs(game.entity_prototypes) do --select any entity with an energy source (or fluid -> offshore pump). we will sort them out later.
-		if entity.is_building then
-			if entity.fluid ~= nil or entity.burner_prototype ~= nil or entity.electric_energy_source_prototype ~= nil or entity.heat_energy_source_prototype ~= nil or entity.fluid_energy_source_prototype ~= nil or entity.void_energy_source_prototype ~= nil then
-				tentity = {}
-				tentity['name'] = entity.name
-				tentity['icon_name'] = 'icon.e.'..entity.name
-				tentity["icon_alt_name"] = 'icon.i.'..entity.name
-				tentity['order'] = entity.order
-				tentity['type'] = entity.type
+	for _, entity in pairs(game.entity_prototypes) do --select any entity with an energy source (or fluid -> offshore pump). we will sort them out later. BONUS: also grab the 'character' entity - for those hand-crafts
+		if entity.type == 'boiler' or entity.type == 'generator' or entity.type == 'reactor' or entity.type == 'mining-drill' or entity.type == 'offshore-pump' or entity.type == 'furnace' or entity.type == 'assembling-machine' or entity.type == 'beacon' or entity.type == 'rocket-silo' or entity.type == 'burner-generator' or entity.type == "character" then
+			tentity = {}
+			tentity['name'] = entity.name
+			tentity['icon_name'] = 'icon.e.'..entity.name
+			tentity["icon_alt_name"] = 'icon.i.'..entity.name
+			tentity['order'] = entity.order
+			tentity['type'] = entity.type
 
-				if entity.next_upgrade ~= nil then tentity['next_upgrade'] = entity.next_upgrade.name end
+			if entity.next_upgrade ~= nil then tentity['next_upgrade'] = entity.next_upgrade.name end
 
+			if entity.crafting_speed ~= nil then tentity['speed'] = entity.crafting_speed
+			elseif entity.mining_speed ~= nil then tentity['speed'] = entity.mining_speed
+			elseif entity.pumping_speed ~= nil then tentity['speed'] = entity.pumping_speed end
 
-				if entity.crafting_speed ~= nil then tentity['speed'] = entity.crafting_speed
-				elseif entity.mining_speed ~= nil then tentity['speed'] = entity.mining_speed
-				elseif entity.pumping_speed ~= nil then tentity['speed'] = entity.pumping_speed end
+			if entity.fluid ~= nil then tentity['fluid_result'] = entity.fluid.name end
+			if entity.maximum_temperature ~= nil then tentity['maximum_temperature'] = entity.maximum_temperature end
+			if entity.target_temperature ~= nil then tentity['target_temperature'] = entity.target_temperature end
+			if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_tick'] = entity.fluid_usage_per_tick end
 
-				if entity.fluid ~= nil then tentity['fluid_result'] = entity.fluid.name end
-				if entity.maximum_temperature ~= nil then tentity['maximum_temperature'] = entity.maximum_temperature end
-				if entity.target_temperature ~= nil then tentity['target_temperature'] = entity.target_temperature end
-				if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_tick'] = entity.fluid_usage_per_tick end
+			if entity.module_inventory_size ~= nil then tentity['module_inventory_size'] =  entity.module_inventory_size end
+			if entity.base_productivity ~= nil then tentity['base_productivity'] = entity.base_productivity end
+			if entity.distribution_effectivity ~= nil then tentity['distribution_effectivity'] = entity.distribution_effectivity end
+			if entity.neighbour_bonus ~= nil then tentity['neighbour_bonus'] = entity.neighbour_bonus end
+			--ingredient_count is depreciated
 
-				if entity.module_inventory_size ~= nil then tentity['module_inventory_size'] =  entity.module_inventory_size end
-				if entity.base_productivity ~= nil then tentity['base_productivity'] = entity.base_productivity end
-				if entity.distribution_effectivity ~= nil then tentity['distribution_effectivity'] = entity.distribution_effectivity end
-				if entity.neighbour_bonus ~= nil then tentity['neighbour_bonus'] = entity.neighbour_bonus end
-				--ingredient_count is depreciated
-
-				tentity['associated_items'] = {}
-				if entity.items_to_place_this ~= nil then
-					for _, item in pairs(entity.items_to_place_this) do
-						if(type(item) == 'string') then
-							table.insert(tentity['associated_items'], item)
-						else
-							table.insert(tentity['associated_items'], item['name'])
-						end
+			tentity['associated_items'] = {}
+			if entity.items_to_place_this ~= nil then
+				for _, item in pairs(entity.items_to_place_this) do
+					if(type(item) == 'string') then
+						table.insert(tentity['associated_items'], item)
+					else
+						table.insert(tentity['associated_items'], item['name'])
 					end
 				end
-
-				tentity['allowed_effects'] = {}
-				if entity.allowed_effects then
-					for effect, allowed in pairs(entity.allowed_effects) do
-						if allowed then
-							table.insert(entity['allowed_effects'], effect)
-						end
-					end
-				end
-
-				if entity.crafting_categories ~= nil then
-					tentity['crafting_categories'] = {}
-					for category, _ in pairs(entity.crafting_categories) do
-						table.insert(tentity['crafting_categories'], category)
-					end
-				end
-
-				if entity.resource_categories ~= nil then
-					tentity['resource_categories'] = {}
-					for category, _ in pairs(entity.resource_categories) do
-						table.insert(tentity['resource_categories'], category)
-					end
-				end
-
-				tentity['energy_usage'] = (entity.energy_usage == nil) and 0 or entity.energy_usage
-				tentity['energy_production'] = entity.max_energy_production
-
-				if entity.burner_prototype ~= null then
-					tentity['fuel_type'] = 'item'
-					tentity['fuel_effectivity'] = entity.burner_prototype.effectivity
-					tentity['pollution'] = entity.burner_prototype.emissions
-
-					tentity['fuel_categories'] = {}
-					for fname, _ in pairs(entity.burner_prototype.fuel_categories) do
-						table.insert(tentity['fuel_categories'], fname)
-					end
-				elseif entity.fluid_energy_source_prototype then
-					tentity['fuel_type'] = 'fluid'
-					tentity['fuel_effectivity'] = entity.fluid_energy_source_prototype.effectivity
-					tentity['pollution'] = entity.fluid_energy_source_prototype.emissions
-
-					tentity['burns_fluid'] = entity.fluid_energy_source_prototype.burns_fluid
-				elseif entity.electric_energy_source_prototype then
-					tentity['fuel_type'] = 'electricity'
-					tentity['fuel_effectivity'] = 1
-					tentity['drain'] = entity.electric_energy_source_prototype.drain
-					tentity['pollution'] = entity.electric_energy_source_prototype.emissions
-				elseif entity.heat_energy_source_prototype  then
-					tentity['fuel_type'] = 'heat'
-					tentity['fuel_effectivity'] = 1
-					tentity['pollution'] = entity.heat_energy_source_prototype.emissions
-				elseif entity.void_energy_source_prototype  then
-					tentity['fuel_type'] = 'void'
-					tentity['fuel_effectivity'] = 1
-					tentity['pollution'] = entity.void_energy_source_prototype.emissions
-				end
-
-				tentity['lid'] = '$'..localindex
-				ExportLocalisedString(entity.localised_name, localindex)
-				localindex = localindex + 1
-
-				table.insert(tentities, tentity)
 			end
+
+			tentity['allowed_effects'] = {}
+			if entity.allowed_effects then
+				for effect, allowed in pairs(entity.allowed_effects) do
+					if allowed then
+						table.insert(tentity['allowed_effects'], effect)
+					end
+				end
+			end
+
+			if entity.crafting_categories ~= nil then
+				tentity['crafting_categories'] = {}
+				for category, _ in pairs(entity.crafting_categories) do
+					table.insert(tentity['crafting_categories'], category)
+				end
+			end
+
+			if entity.resource_categories ~= nil then
+				tentity['resource_categories'] = {}
+				for category, _ in pairs(entity.resource_categories) do
+					table.insert(tentity['resource_categories'], category)
+				end
+			end
+
+			tentity['max_energy_usage'] = (entity.max_energy_usage == nil) and 0 or entity.max_energy_usage
+			tentity['energy_usage'] = (entity.energy_usage == nil) and 0 or entity.energy_usage
+			tentity['energy_production'] = entity.max_energy_production
+
+			if entity.burner_prototype ~= null then
+				tentity['fuel_type'] = 'item'
+				tentity['fuel_effectivity'] = entity.burner_prototype.effectivity
+				tentity['pollution'] = entity.burner_prototype.emissions
+
+				tentity['fuel_categories'] = {}
+				for fname, _ in pairs(entity.burner_prototype.fuel_categories) do
+					table.insert(tentity['fuel_categories'], fname)
+				end
+
+			elseif entity.fluid_energy_source_prototype then
+				tentity['fuel_type'] = 'fluid'
+				tentity['fuel_effectivity'] = entity.fluid_energy_source_prototype.effectivity
+				tentity['pollution'] = entity.fluid_energy_source_prototype.emissions
+				tentity['burns_fluid'] = entity.fluid_energy_source_prototype.burns_fluid
+
+			elseif entity.electric_energy_source_prototype then
+				tentity['fuel_type'] = 'electricity'
+				tentity['fuel_effectivity'] = 1
+				tentity['drain'] = entity.electric_energy_source_prototype.drain
+				tentity['pollution'] = entity.electric_energy_source_prototype.emissions
+
+			elseif entity.heat_energy_source_prototype  then
+				tentity['fuel_type'] = 'heat'
+				tentity['fuel_effectivity'] = 1
+				tentity['pollution'] = entity.heat_energy_source_prototype.emissions
+
+			elseif entity.void_energy_source_prototype  then
+				tentity['fuel_type'] = 'void'
+				tentity['fuel_effectivity'] = 1
+				tentity['pollution'] = entity.void_energy_source_prototype.emissions
+			else
+				tentity['fuel_type'] = 'void'
+				tentity['fuel_effectivity'] = 1
+				tentity['pollution'] = 0
+			end
+
+			tentity['lid'] = '$'..localindex
+			ExportLocalisedString(entity.localised_name, localindex)
+			localindex = localindex + 1
+
+			table.insert(tentities, tentity)
 		end
 	end
 	etable['entities'] = tentities

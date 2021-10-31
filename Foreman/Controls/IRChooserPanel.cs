@@ -16,6 +16,8 @@ namespace Foreman
 		protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 70, 70, 70);
 		protected static readonly Color IRButtonHiddenColor = Color.FromArgb(255, 120, 0, 0);
 		protected static readonly Color IRButtonNoAssemblerColor = Color.FromArgb(255, 100, 100, 0);
+		protected static readonly Color IRButtonUnavailableColor = Color.FromArgb(255, 170, 10, 160);
+
 
 		private NFButton[,] IRButtons;
 		private List<NFButton> GroupButtons = new List<NFButton>();
@@ -37,6 +39,8 @@ namespace Foreman
 
 		protected bool ShowUnavailable { get; private set; }
 
+		private object _updateLock = new object();
+
 		public IRChooserPanel(ProductionGraphViewer parent, Point originPoint)
 		{
 			PGViewer = parent;
@@ -46,6 +50,7 @@ namespace Foreman
 			InitializeComponent();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			this.Disposed += IRChooserPanel_Disposed;
+			this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 
 			IRButtons = new NFButton[IRTable.ColumnCount - 1, IRTable.RowCount];
 
@@ -69,8 +74,6 @@ namespace Foreman
 
 		public new void Show()
 		{
-			this.Visible = false;
-			PGViewer.Controls.Add(this);
 			InitializeButtons();
 			SetSelectedGroup(null);
 
@@ -78,10 +81,10 @@ namespace Foreman
 			ShowHiddenCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 			IgnoreAssemblerCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 
-			this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-			this.Visible = true;
+			PGViewer.Controls.Add(this);
 			this.BringToFront();
 			PGViewer.PerformLayout();
+			this.Focus();
 			FilterTextBox.Focus();
 		}
 
@@ -192,7 +195,7 @@ namespace Foreman
 				}
 
 				bool so = scrollOnly;
-				this.BeginInvoke((MethodInvoker)delegate
+				this.UIThread(delegate
 				{
 					if (currentID != updateID)
 						return;
@@ -219,7 +222,7 @@ namespace Foreman
 
 						int c = column;
 						int r = row;
-						this.BeginInvoke((MethodInvoker)delegate
+						this.UIThread(delegate
 						{
 							if (currentID != updateID)
 								return;
@@ -248,7 +251,7 @@ namespace Foreman
 					}
 				}
 			});
-			this.BeginInvoke((MethodInvoker)delegate
+			this.UIThread(delegate
 			{
 				if (currentID != updateID)
 					return;
@@ -281,7 +284,7 @@ namespace Foreman
 
 		protected void UpdateGroupButton(Group group, bool enabled)
 		{
-			this.BeginInvoke((MethodInvoker)delegate
+			this.UIThread(delegate
 			{
 				GroupButtonLinks[group].Enabled = enabled;
 			});
@@ -392,7 +395,7 @@ namespace Foreman
 			{
 				int itemCount = 0;
 				foreach (Subgroup sgroup in group.Subgroups)
-					itemCount += ShowUnavailable ? sgroup.Items.Count : sgroup.AvailableItems.Count;
+					itemCount += ShowUnavailable ? sgroup.Items.Count : sgroup.Items.Count(i => i.Available);
 				if (itemCount > 0)
 					groups.Add(group);
 			}
@@ -418,19 +421,13 @@ namespace Foreman
 					List<KeyValuePair<DataObjectBase, Color>> itemList = new List<KeyValuePair<DataObjectBase, Color>>();
 					foreach (Item item in sgroup.Items.Where(n => ((ShowUnavailable || n.Available) && (n.LFriendlyName.Contains(filterString) || n.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))))
 					{
-						bool visible = (ShowUnavailable || item.Available) && (ShowUnavailable?
-							(item.ConsumptionRecipes.FirstOrDefault(r => r.Enabled) != null) ||
-							(item.ProductionRecipes.FirstOrDefault(r => r.Enabled) != null)
-							:
-							(item.AvailableConsumptionRecipes.FirstOrDefault(r => r.Enabled) != null) ||
-							(item.AvailableProductionRecipes.FirstOrDefault(r => r.Enabled) != null));
+						bool visible = (ShowUnavailable || item.Available) &&
+							((item.ConsumptionRecipes.FirstOrDefault(r => r.Enabled && (ShowUnavailable || r.Available)) != null) ||
+							(item.ProductionRecipes.FirstOrDefault(r => r.Enabled && (ShowUnavailable || r.Available)) != null));
 
-						bool validAssembler = ShowUnavailable ?
-							(item.ConsumptionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) ||
-							(item.ProductionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null)
-							:
-							(item.AvailableConsumptionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) ||
-							(item.AvailableProductionRecipes.FirstOrDefault(r => r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null);
+						bool validAssembler =
+							(item.ConsumptionRecipes.FirstOrDefault(r => (ShowUnavailable || r.Available) && r.Assemblers.FirstOrDefault(a => a.Enabled && (ShowUnavailable || a.Available)) != null) != null) ||
+							(item.ProductionRecipes.FirstOrDefault(r => (ShowUnavailable || r.Available) && r.Assemblers.FirstOrDefault(a => a.Enabled && (ShowUnavailable || a.Available)) != null) != null);
 
 
 						Color bgColor = (visible && item.Available) ? validAssembler ? IRButtonDefaultColor : IRButtonNoAssemblerColor : IRButtonHiddenColor;
@@ -531,7 +528,6 @@ namespace Foreman
 					ShowHiddenCheckBox.Visible = false;
 					IgnoreAssemblerCheckBox.Visible = false;
 					ItemIconPanel.Location = new Point(4, 4);
-
 				}
 				else if (includeConsumers && includeSuppliers)
 				{
@@ -548,7 +544,7 @@ namespace Foreman
 			{
 				int recipeCount = 0;
 				foreach (Subgroup sgroup in group.Subgroups)
-					recipeCount += ShowUnavailable ? sgroup.Recipes.Count : sgroup.AvailableRecipes.Count;
+					recipeCount += ShowUnavailable ? sgroup.Recipes.Count : sgroup.Recipes.Count(r => r.Available);
 				if (recipeCount > 0)
 					groups.Add(group);
 			}
@@ -595,7 +591,9 @@ namespace Foreman
 									(includeSuppliers && KeyItemTempRange.Contains(recipe.ProductTemperatureMap[KeyItem])))
 								{
 									//holy... so - we finally finished all the checks, eh? Well, throw it on the pile of recipes to show then.
-									Color bgColor = (recipe.Enabled ? (recipe.Assemblers.FirstOrDefault(a => a.Enabled) != null ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
+									Color bgColor = !recipe.Enabled ? IRButtonHiddenColor :
+										(!recipe.Available || recipe.Assemblers.FirstOrDefault(a => a.Available) == null) ? IRButtonUnavailableColor :
+										recipe.Assemblers.FirstOrDefault(a => a.Enabled) == null ? IRButtonNoAssemblerColor : IRButtonDefaultColor;
 									recipeCounter++;
 									recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
 								}

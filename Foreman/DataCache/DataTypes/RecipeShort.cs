@@ -10,16 +10,16 @@ namespace Foreman
 		public string Name { get; private set; }
 		public long RecipeID { get; private set; }
 		public bool isMissing { get; private set; }
-		public Dictionary<string, float> Ingredients { get; private set; }
-		public Dictionary<string, float> Products { get; private set; }
+		public Dictionary<string, double> Ingredients { get; private set; }
+		public Dictionary<string, double> Products { get; private set; }
 
 		public RecipeShort(string name)
 		{
 			Name = name;
 			RecipeID = -1;
 			isMissing = false;
-			Ingredients = new Dictionary<string, float>();
-			Products = new Dictionary<string, float>();
+			Ingredients = new Dictionary<string, double>();
+			Products = new Dictionary<string, double>();
 		}
 
 		public RecipeShort(Recipe recipe)
@@ -28,10 +28,10 @@ namespace Foreman
 			RecipeID = recipe.RecipeID;
 			isMissing = recipe.IsMissing;
 
-			Ingredients = new Dictionary<string, float>();
+			Ingredients = new Dictionary<string, double>();
 			foreach (var kvp in recipe.IngredientSet)
 				Ingredients.Add(kvp.Key.Name, kvp.Value);
-			Products = new Dictionary<string, float>();
+			Products = new Dictionary<string, double>();
 			foreach (var kvp in recipe.ProductSet)
 				Products.Add(kvp.Key.Name, kvp.Value);
 		}
@@ -42,13 +42,13 @@ namespace Foreman
 			RecipeID = (long)recipe["RecipeID"];
 			isMissing = (bool)recipe["isMissing"];
 
-			Ingredients = new Dictionary<string, float>();
+			Ingredients = new Dictionary<string, double>();
 			foreach (JProperty ingredient in recipe["Ingredients"])
-				Ingredients.Add((string)ingredient.Name, (float)ingredient.Value);
+				Ingredients.Add((string)ingredient.Name, (double)ingredient.Value);
 
-			Products = new Dictionary<string, float>();
+			Products = new Dictionary<string, double>();
 			foreach (JProperty ingredient in recipe["Products"])
-				Products.Add((string)ingredient.Name, (float)ingredient.Value);
+				Products.Add((string)ingredient.Name, (double)ingredient.Value);
 		}
 
 		public static List<RecipeShort> GetSetFromJson(JToken jdata)

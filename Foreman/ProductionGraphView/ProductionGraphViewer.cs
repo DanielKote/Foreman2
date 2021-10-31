@@ -19,7 +19,7 @@ namespace Foreman
 	{
 		public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
 		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
-		private static readonly float[] RateMultiplier = new float[] { 1f / 1, 1f / 60, 1f / 300, 1f / 600, 1f / 1800, 1f / 3600 }; //, 1/21600, 1/43200, 1/86400 };
+		private static readonly float[] RateMultiplier = new float[] { 1f, 60f, 300f, 600f, 1800f, 3600f }; //, 21600f, 43200f, 86400f };
 
 		private enum DragOperation { None, Item, Selection }
 		public enum NewNodeType { Disconnected, Supplier, Consumer }
@@ -282,7 +282,7 @@ namespace Foreman
 
 			//open up the edit panel
 			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y), this, true, false);
-			fttc.Closing += (s,e) => { SubwindowOpen = false; bNodeElement.Update(); this.Invalidate(); };
+			fttc.Closing += (s,e) => { SubwindowOpen = false; bNodeElement.Update(); Graph.UpdateNodeValues(); };
 		}
 
 		public void EditRecipeNode(RecipeNodeElement rNodeElement)
@@ -300,27 +300,25 @@ namespace Foreman
 			{
 				//offset view if necessary to ensure entire window will be seen (with 25 pixels boundary). Additionally we want the tooltips to start 100 pixels above the arrow point instead of based on the center of the control (due to the dynamically changing height of the recipe option panel)
 				Point recipeEditPanelOriginPoint = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y)), editPanel.Size, Direction.Right).Location;
-				recipeEditPanelOriginPoint.Y = recipeEditPanelOriginPoint.Y + editPanel.Height / 2 - 125;
+				recipeEditPanelOriginPoint.Y += editPanel.Height / 2 - 125;
+				recipeEditPanelOriginPoint.X -= recipePanel.Width + 5;
 				Point offset = new Point(
-					(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.X), this.Width - recipeEditPanelOriginPoint.X - editPanel.Width - rNodeElement.Width - 250)),
+					(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.X), this.Width - recipeEditPanelOriginPoint.X - editPanel.Width)),
 					(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.Y), this.Height - recipeEditPanelOriginPoint.Y - editPanel.Height - 25)));
 
 				editPanel.Location = Point.Add(recipeEditPanelOriginPoint, (Size)offset);
-
-				recipePanel.Location = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y)), recipePanel.Size, Direction.Left).Location;
-				recipePanel.Location = new Point(recipePanel.Location.X, editPanel.Location.Y);
+				recipePanel.Location = new Point(editPanel.Location.X + editPanel.Width + 5, editPanel.Location.Y);
 
 				ViewOffset = Point.Add(ViewOffset, new Size((int)(offset.X / ViewScale), (int)(offset.Y / ViewScale)));
-				UpdateGraphBounds();
+				UpdateGraphBounds(false);
 				Invalidate();
+
 			}
 
 			//add the visible recipe to the right of the node
 			new FloatingTooltipControl(recipePanel, Direction.Left, new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
 			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
-
-			//open up the edit panel
-			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.Update(); this.Invalidate(); };
+			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.Update(); Graph.UpdateNodeValues(); };
 		}
 
 		//----------------------------------------------Selection functions
@@ -417,13 +415,13 @@ namespace Foreman
 			//process link element widths
 			if (DynamicLinkWidth)
 			{
-				float itemMax = 0;
-				float fluidMax = 0;
+				double itemMax = 0;
+				double fluidMax = 0;
 				foreach (LinkElement element in linkElements)
 				{
 					if (element.Item.IsFluid)
 						fluidMax = Math.Max(fluidMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
-					else
+					else if(element.Item.Name != "§§heat") //ignore heat as an item	
 						itemMax = Math.Max(itemMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
 				}
 				itemMax += itemMax == 0 ? 1 : 0;
@@ -432,9 +430,9 @@ namespace Foreman
 				foreach (LinkElement element in linkElements)
 				{
 					if (element.Item.IsFluid)
-						element.LinkWidth = minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / fluidMax);
+						element.LinkWidth = (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / fluidMax)), maxLinkWidth);
 					else
-						element.LinkWidth = minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / itemMax);
+						element.LinkWidth = (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item) / itemMax)), maxLinkWidth);
 				}
 			}
 			else
@@ -978,6 +976,7 @@ namespace Foreman
 
 			//grab recipe list
 			List<string> itemNames = json["ProductionGraph"]["IncludedItems"].Select(t => (string)t).ToList();
+			List<string> assemblerNames = json["ProductionGraph"]["IncludedAssemblers"].Select(t => (string)t).ToList();
 			List<RecipeShort> recipeShorts = RecipeShort.GetSetFromJson(json["ProductionGraph"]["IncludedRecipes"]);
 
 			//now - two options:
@@ -996,7 +995,7 @@ namespace Foreman
 				Preset savedWPreset = allPresets.FirstOrDefault(p => p.Name == (string)json["SavedPresetName"]);
 				if (savedWPreset != null)
 				{
-					var errors = DataCache.TestPreset(savedWPreset, modSet, itemNames, recipeShorts);
+					var errors = PresetProcessor.TestPreset(savedWPreset, modSet, itemNames, assemblerNames, recipeShorts);
 					if (errors != null && errors.ErrorCount == 0) //no errors found here. We will then use this exact preset and not search for a different one
 						chosenPreset = savedWPreset;
 					else
@@ -1012,7 +1011,7 @@ namespace Foreman
 				{
 					foreach (Preset preset in allPresets)
 					{
-						PresetErrorPackage errors = DataCache.TestPreset(preset, modSet, itemNames, recipeShorts);
+						PresetErrorPackage errors = PresetProcessor.TestPreset(preset, modSet, itemNames, assemblerNames, recipeShorts);
 						if (errors != null)
 							presetErrors.Add(errors);
 					}

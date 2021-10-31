@@ -33,7 +33,7 @@ namespace Foreman
 			public NewNodeCollection() { newNodes = new List<BaseNode>(); newLinks = new List<NodeLink>(); }
 		}
 
-		public const float MaxSetFlow = 10000000000; //10 billion should be enough for pretty much everything.
+		public const double MaxSetFlow = 10000000000000; //10 trillion should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
 		private const int XBorder = 200;
 		private const int YBorder = 100;
 
@@ -296,8 +296,7 @@ namespace Foreman
 							newNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location, (rNode) => {
 								newNodeCollection.newNodes.Add(rNode);
 
-								if (nodeJToken["Assembler"] == null) //kind of an obvious one - if this happens then something is QuiteWrong(tm)
-									Trace.Fail("Attempt at inserting a recipe node with a null assembler!");
+								rNode.NeighbourCount = (double)nodeJToken["Neighbours"];
 
 								string assemblerName = (string)nodeJToken["Assembler"];
 								if (cache.Assemblers.ContainsKey(assemblerName))
@@ -349,7 +348,10 @@ namespace Foreman
 										else
 											rNode.AddBeaconModule(cache.MissingModules[moduleName]);
 									}
-									rNode.BeaconCount = (float)nodeJToken["BeaconCount"];
+
+									rNode.BeaconCount = (double)nodeJToken["BeaconCount"];
+									rNode.BeaconsPerAssembler = (double)nodeJToken["BeaconsPerAssembler"];
+									rNode.BeaconsConst = (double)nodeJToken["BeaconsConst"];
 								}
 							});
 							break;
@@ -359,7 +361,12 @@ namespace Foreman
 
 					newNode.RateType = (RateType)(int)nodeJToken["RateType"];
 					if (newNode.RateType == RateType.Manual)
-						newNode.DesiredRate = (float)nodeJToken["DesiredRate"];
+					{
+						if (newNode is RecipeNode rnewNode)
+							rnewNode.DesiredAssemblerCount = (double)nodeJToken["DesiredAssemblers"];
+						else
+							newNode.DesiredRate = (double)nodeJToken["DesiredRate"];
+					}
 
 					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode);
 				}

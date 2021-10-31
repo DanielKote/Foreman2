@@ -36,7 +36,7 @@ namespace Foreman
 			if (baseNode is RecipeNode recipeNode) //check for valid assembler count is not necessary (data cache deletes any recipes with 0 assemblers), but just in case
 			{
 				RateGroup.Text = "Number of assemblers:";
-				fixedTextBox.Text = Convert.ToString(recipeNode.GetBaseNumberOfAssemblers() * myGraphViewer.GetRateMultipler());
+				fixedTextBox.Text = Convert.ToString(recipeNode.ActualAssemblerCount / myGraphViewer.GetRateMultipler());
 
 				updateInProgress = true;
 				Recipe recipe = recipeNode.BaseRecipe;
@@ -187,7 +187,7 @@ namespace Foreman
 			}
 
 			if (baseNode is RecipeNode rNode)
-				fixedTextBox.Text = Convert.ToString(rNode.GetBaseNumberOfAssemblers() * myGraphViewer.GetRateMultipler());
+				fixedTextBox.Text = Convert.ToString(rNode.ActualAssemblerCount / myGraphViewer.GetRateMultipler());
 			else
 				fixedTextBox.Text = Convert.ToString(baseNode.DesiredRate);
 		}
@@ -197,7 +197,7 @@ namespace Foreman
 			if (float.TryParse(fixedTextBox.Text, out float newAmount))
 			{
 				if (baseNode is RecipeNode rNode)
-					rNode.SetBaseNumberOfAssemblers(newAmount / myGraphViewer.GetRateMultipler());
+					rNode.DesiredAssemblerCount = (newAmount * myGraphViewer.GetRateMultipler());
 				else
 					baseNode.DesiredRate = newAmount;
 

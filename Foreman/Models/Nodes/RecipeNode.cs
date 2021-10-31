@@ -8,11 +8,18 @@ namespace Foreman
 {
 	public interface RecipeNode : BaseNode
 	{
+		double DesiredAssemblerCount { get; set; } //for a per second operation (so multiplier for time is required in/out)
+		double ActualAssemblerCount { get; }
+
 		Recipe BaseRecipe { get; }
 
 		Assembler SelectedAssembler { get;}
 		Beacon SelectedBeacon { get;}
-		float BeaconCount { get; set; }
+
+		double NeighbourCount { get; set; }
+		double BeaconCount { get; set; }
+		double BeaconsPerAssembler { get; set; }
+		double BeaconsConst { get; set; }
 
 		IReadOnlyList<Module> AssemblerModules { get; }
 		IReadOnlyList<Module> BeaconModules { get; }
@@ -20,12 +27,11 @@ namespace Foreman
 		Item Fuel { get; }
 		Item FuelRemains { get; }
 
-		//both of these work with the base time unit (1:1, in this case meaning 1sec) -> so when getting/setting the values they need to be multiplied/divided by the rate conversion factor (ex: by 60 if in minutes)
-		float GetBaseNumberOfAssemblers();
-		void SetBaseNumberOfAssemblers(float num); //can be used to set the 'rate' of the recipe based on # of assemblers instead of the 'number of recipe results?' that setting the ActualRate would do.
-
 		void SetAssembler(Assembler assembler);
 		void AutoSetAssembler();
+
+		void SetFuel(Item fuel);
+		void AutoSetFuel();
 
 		void AddAssemblerModule(Module module);
 		void RemoveAssemblerModule(int index);
@@ -37,18 +43,38 @@ namespace Foreman
 		void RemoveBeaconModule(int index);
 		void SetBeaconModules(IEnumerable<Module> modules);
 
-		void SetFuel(Item fuel);
-		void AutoSetFuel();
+		//per 1 assembler
+		double GetAssemblerEnergyConsumption();
+		double GetAssemblerElectricalProduction();
+		double GetAssemblerPollutionProduction();
+
+
+		//total for entire set
+		double GetTotalAssemblerFuelConsumption();
+		double GetTotalAssemblerElectricalConsumption(double rateMultiplier);
+		double GetTotalAssemblerElectricalProduction();
+		double GetTotalBeaconElectricalConsumption(double rateMultiplier);
+		double GetTotalBeaconPollutionProduction(double rateMultiplier);
+
+		double GetTotalBeacons(double rateMultiplier);
 	}
 
 
 	public class RecipeNodePrototype : BaseNodePrototype, RecipeNode
 	{
 		public Recipe BaseRecipe { get; private set; }
+		public double DesiredAssemblerCount { get; set; }
+		public override double DesiredRate { get { return Math.Round(DesiredAssemblerCount * SelectedAssembler.Speed * GetSpeedMultiplier() / BaseRecipe.Time, RoundingDP); } set { Trace.Fail("Desired rate set on a recipe node!"); } }
+		public double ActualAssemblerCount { get { return Math.Round(ActualRate * (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())), RoundingDP); } }
+
+		public double NeighbourCount { get; set; }
 
 		public Assembler SelectedAssembler { get; private set; }
 		public Beacon SelectedBeacon { get; private set; }
-		public float BeaconCount { get; set; }
+		public double BeaconCount { get; set; }
+
+		public double BeaconsPerAssembler { get; set; }
+		public double BeaconsConst { get; set; }
 
 		private List<Module> assemblerModules;
 		private List<Module> beaconModules;
@@ -63,13 +89,19 @@ namespace Foreman
 
 		public override string DisplayName { get { return BaseRecipe.FriendlyName; } }
 
+
 		public RecipeNodePrototype(ProductionGraph graph, int nodeID, Recipe baseRecipe, bool autoPopulate) : base(graph, nodeID)
 		{
 			BaseRecipe = baseRecipe;
 
 			SelectedBeacon = null;
 			SelectedAssembler = null;
+			NeighbourCount = 0;
+
 			BeaconCount = 0;
+			BeaconsPerAssembler = 0;
+			BeaconsConst = 0;
+
 			beaconModules = new List<Module>();
 			assemblerModules = new List<Module>();
 
@@ -83,6 +115,169 @@ namespace Foreman
 				SetFuel(null);
 			}
 		}
+
+		public override IEnumerable<Item> Inputs
+		{
+			get
+			{
+				foreach (Item item in BaseRecipe.IngredientList)
+					yield return item;
+				if (Fuel != null && !BaseRecipe.IngredientSet.ContainsKey(Fuel)) //provide the burner item if it isnt null or already part of recipe ingredients
+					yield return Fuel;
+			}
+		}
+		public override IEnumerable<Item> Outputs
+		{
+			get
+			{
+				foreach (Item item in BaseRecipe.ProductList)
+					yield return item;
+				if (FuelRemains != null && !BaseRecipe.ProductSet.ContainsKey(FuelRemains)) //provide the burnt remains item if it isnt null or already part of recipe products
+					yield return FuelRemains;
+			}
+		}
+
+		public override double GetConsumeRate(Item item) { return (double)Math.Round(inputRateFor(item) * ActualRate, RoundingDP); }
+		public override double GetSupplyRate(Item item) { return (double)Math.Round(outputRateFor(item) * ActualRate, RoundingDP); }
+
+		internal override double inputRateFor(Item item)
+		{
+			if (item != Fuel)
+				return BaseRecipe.IngredientSet[item];
+			else
+			{
+				if (SelectedAssembler == null || (!SelectedAssembler.IsMissing && !SelectedAssembler.IsBurner))
+					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
+
+				double recipeRate = BaseRecipe.IngredientSet.ContainsKey(item) ? BaseRecipe.IngredientSet[item] : 0;
+				//burner rate = recipe time (modified by speed bonus & assembler) * assembler energy consumption (modified by consumption bonus and assembler) / fuel value of the item
+				double burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.ConsumptionEffectivity) / Fuel.FuelValue;
+				return recipeRate + burnerRate;
+			}
+		}
+		internal override double outputRateFor(Item item) //Note to Foreman 1.0: YES! this is where all the productivity is taken care of! (not in the solver... why would you multiply the productivity while setting up the constraints and not during the ratios here???)
+		{
+			if (item != FuelRemains)
+			{
+				if (SelectedAssembler.EntityType == EntityType.Reactor)
+					return BaseRecipe.ProductSet[item] * (1 + SelectedAssembler.NeighbourBonus * NeighbourCount) * GetProductivityMultiplier();
+				else
+					return BaseRecipe.ProductSet[item] * GetProductivityMultiplier();
+			}
+			else
+			{
+				if (SelectedAssembler == null || !SelectedAssembler.IsBurner)
+					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
+
+				double recipeRate = BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] * GetProductivityMultiplier() : 0;
+				//burner rate is much the same as above (without the productivity), just have to make sure we still use the Burner item!
+				double g = GetSpeedMultiplier();
+				double f = GetConsumptionMultiplier();
+				double burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.ConsumptionEffectivity) / Fuel.FuelValue;
+				return recipeRate + burnerRate;
+			}
+		}
+
+		public override double GetSpeedMultiplier()
+		{
+			double multiplier = 1.0f;
+			foreach (Module module in AssemblerModules)
+				multiplier += module.SpeedBonus;
+			foreach (Module beaconModule in BeaconModules)
+				multiplier += beaconModule.SpeedBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+			return multiplier;
+		}
+
+		public override double GetProductivityMultiplier()
+		{
+			double multiplier = 1.0f + (SelectedAssembler == null ? 0 : SelectedAssembler.BaseProductivityBonus);
+			foreach (Module module in AssemblerModules)
+				multiplier += module.ProductivityBonus;
+			foreach (Module beaconModule in BeaconModules)
+				multiplier += beaconModule.ProductivityBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+			return multiplier;
+		}
+
+		public override double GetConsumptionMultiplier()
+		{
+			double multiplier = 1.0f;
+			foreach (Module module in AssemblerModules)
+				multiplier += module.ConsumptionBonus;
+			foreach (Module beaconModule in BeaconModules)
+				multiplier += beaconModule.ConsumptionBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+			return multiplier > 0.2f ? multiplier : 0.2f;
+		}
+
+		public override double GetPollutionMultiplier()
+		{
+			double multiplier = 1.0f;
+			foreach (Module module in AssemblerModules)
+				multiplier += module.PollutionBonus;
+			foreach (Module beaconModule in BeaconModules)
+				multiplier += beaconModule.PollutionBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+			return multiplier > 0.2f ? multiplier : 0.2f;
+		}
+
+		public double GetAssemblerEnergyConsumption()
+		{
+			return SelectedAssembler.EnergyDrain + (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier());
+		}
+
+		public double GetAssemblerElectricalProduction()
+		{
+			return SelectedAssembler.EnergyProduction; //consumption multiplier? not sure. Not even sure if a generator can have modules act on it...
+		}
+
+		public double GetAssemblerPollutionProduction()
+		{
+			return SelectedAssembler.Pollution * GetPollutionMultiplier() * GetAssemblerEnergyConsumption() / 60; //pollution is counted in per second instead of per tick, so we have to account for the 60x here
+		}
+
+		public double GetTotalAssemblerFuelConsumption()
+		{
+			if (Fuel == null)
+				return 0;
+			return (BaseRecipe.Time * SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() * ActualRate) / (SelectedAssembler.Speed * GetSpeedMultiplier() * SelectedAssembler.ConsumptionEffectivity * Fuel.FuelValue);
+		}
+
+		public double GetTotalAssemblerElectricalConsumption(double rateMultiplier)
+		{
+			if (SelectedAssembler.EnergySource != EnergySource.Electric)
+				return 0;
+
+			double partialAssembler = ActualAssemblerCount % rateMultiplier;
+			double entireAssemblers = ActualAssemblerCount - partialAssembler;
+
+			return ((entireAssemblers + (partialAssembler / rateMultiplier < 0.05 ? 0 : 1)) * SelectedAssembler.EnergyDrain) + (ActualAssemblerCount * SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier()); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
+		}
+
+		public double GetTotalAssemblerElectricalProduction()
+		{
+			return GetAssemblerElectricalProduction() * ActualAssemblerCount; 
+		}
+
+		public double GetTotalBeaconElectricalConsumption(double rateMultiplier)
+		{
+			if (SelectedBeacon == null || SelectedBeacon.EnergySource != EnergySource.Electric)
+				return 0;
+			return GetTotalBeacons(rateMultiplier) * (SelectedBeacon.EnergyConsumption + SelectedBeacon.EnergyDrain) * rateMultiplier;
+		}
+
+		public double GetTotalBeaconPollutionProduction(double rateMultiplier)
+		{
+			if (SelectedBeacon == null)
+				return 0;
+			return GetTotalBeacons(rateMultiplier) * SelectedBeacon.Pollution * rateMultiplier;
+		}
+
+		public double GetTotalBeacons(double rateMultiplier)
+		{
+			if (SelectedBeacon == null)
+				return 0;
+			return Math.Ceiling(((int)((ActualAssemblerCount / rateMultiplier) + 0.8) * BeaconsPerAssembler) + BeaconsConst);
+		}
+
+		//------------------------------------------------------------------------edit functions
 
 		public void SetAssembler(Assembler assembler)
 		{
@@ -125,6 +320,9 @@ namespace Foreman
 			if (SelectedBeacon == null)
 			{
 				beaconModules.Clear();
+				BeaconCount = 0;
+				BeaconsPerAssembler = 0;
+				BeaconsConst = 0;
 			}
 			else
 			{
@@ -194,6 +392,8 @@ namespace Foreman
 		{
 			SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler));
 		}
+
+		//------------------------------------------------------------------------state / warining / errors functions
 
 		public override void UpdateState() { State = GetUpdatedState(); }
 
@@ -417,116 +617,7 @@ namespace Foreman
 			return resolutions;
 		}
 
-		public override IEnumerable<Item> Inputs
-		{
-			get
-			{
-				foreach (Item item in BaseRecipe.IngredientList)
-					yield return item;
-				if (Fuel != null && !BaseRecipe.IngredientSet.ContainsKey(Fuel)) //provide the burner item if it isnt null or already part of recipe ingredients
-					yield return Fuel;
-			}
-		}
-		public override IEnumerable<Item> Outputs
-		{
-			get
-			{
-				foreach (Item item in BaseRecipe.ProductList)
-					yield return item;
-				if (FuelRemains != null && !BaseRecipe.ProductSet.ContainsKey(FuelRemains)) //provide the burnt remains item if it isnt null or already part of recipe products
-					yield return FuelRemains;
-			}
-		}
-
-		public override float GetConsumeRate(Item item) { return (float)Math.Round(inputRateFor(item) * ActualRate, RoundingDP); }
-		public override float GetSupplyRate(Item item) { return (float)Math.Round(outputRateFor(item) * ActualRate, RoundingDP); }
-
-		internal override double inputRateFor(Item item)
-		{
-			if (item != Fuel)
-				return BaseRecipe.IngredientSet[item];
-			else
-			{
-				if (SelectedAssembler == null || (!SelectedAssembler.IsMissing && !SelectedAssembler.IsBurner))
-					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
-
-				float recipeRate = BaseRecipe.IngredientSet.ContainsKey(item) ? BaseRecipe.IngredientSet[item] : 0;
-				//burner rate = recipe time (modified by speed bonus & assembler) * assembler energy consumption (modified by consumption bonus and assembler) / fuel value of the item
-				float burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.EnergyEffectivity) / Fuel.FuelValue;
-				return (float)Math.Round((recipeRate + burnerRate), RoundingDP);
-			}
-		}
-		internal override double outputRateFor(Item item) //Note to Foreman 1.0: YES! this is where all the productivity is taken care of! (not in the solver... why would you multiply the productivity while setting up the constraints and not during the ratios here???)
-		{
-			if (item != FuelRemains)
-				return BaseRecipe.ProductSet[item];
-			else
-			{
-				if (SelectedAssembler == null || !SelectedAssembler.IsBurner)
-					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
-
-				float recipeRate = BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] : 0;
-				//burner rate is much the same as above, just have to make sure we still use the Burner item!
-				float g = GetSpeedMultiplier();
-				float f = GetConsumptionMultiplier();
-				float burnerRate = (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * (SelectedAssembler.EnergyConsumption * GetConsumptionMultiplier() / SelectedAssembler.EnergyEffectivity) / Fuel.FuelValue;
-				return (float)Math.Round((recipeRate + burnerRate), RoundingDP);
-			}
-		}
-
-		public override float GetSpeedMultiplier()
-		{
-			float multiplier = 1.0f;
-			foreach (Module module in AssemblerModules)
-				multiplier += module.SpeedBonus;
-			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.SpeedBonus * SelectedBeacon.Effectivity * BeaconCount;
-			return multiplier;
-		}
-
-		public override float GetProductivityMultiplier()
-		{
-			float multiplier = 1.0f + (SelectedAssembler == null ? 0 : SelectedAssembler.BaseProductivityBonus);
-			foreach (Module module in AssemblerModules)
-				multiplier += module.ProductivityBonus;
-			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.ProductivityBonus * SelectedBeacon.Effectivity * BeaconCount;
-			return multiplier;
-		}
-
-		public override float GetConsumptionMultiplier()
-		{
-			float multiplier = 1.0f;
-			foreach (Module module in AssemblerModules)
-				multiplier += module.ConsumptionBonus;
-			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.ConsumptionBonus * SelectedBeacon.Effectivity * BeaconCount;
-			return multiplier > 0.2f ? multiplier : 0.2f;
-		}
-
-		public override float GetPollutionMultiplier()
-		{
-			float multiplier = 1.0f;
-			foreach (Module module in AssemblerModules)
-				multiplier += module.PollutionBonus;
-			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.PollutionBonus * SelectedBeacon.Effectivity * BeaconCount;
-			return multiplier > 0.2f ? multiplier : 0.2f;
-		}
-
-		public float GetBaseNumberOfAssemblers()
-		{
-			if (SelectedAssembler == null)
-				return 0;
-			return (float)Math.Round(ActualRate * (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())), RoundingDP);
-		}
-
-		public void SetBaseNumberOfAssemblers(float num)
-		{
-			if (SelectedAssembler == null)
-				return;
-			DesiredRate = (float)Math.Round(num * SelectedAssembler.Speed * GetSpeedMultiplier() / BaseRecipe.Time, RoundingDP);
-		}
+		//------------------------------------------------------------------------object save & string
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
@@ -536,8 +627,9 @@ namespace Foreman
 			info.AddValue("RecipeID", BaseRecipe.RecipeID);
 			info.AddValue("RateType", RateType);
 			info.AddValue("ActualRate", ActualRate);
+			info.AddValue("Neighbours", NeighbourCount);
 			if (RateType == RateType.Manual)
-				info.AddValue("DesiredRate", DesiredRate);
+				info.AddValue("DesiredAssemblers", DesiredAssemblerCount);
 
 			if (SelectedAssembler != null)
 			{
@@ -551,8 +643,10 @@ namespace Foreman
 			if (SelectedBeacon != null)
 			{
 				info.AddValue("Beacon", SelectedBeacon.Name);
-				info.AddValue("BeaconCount", BeaconCount);
 				info.AddValue("BeaconModules", BeaconModules.Select(m => m.Name));
+				info.AddValue("BeaconCount", BeaconCount);
+				info.AddValue("BeaconsPerAssembler", BeaconsPerAssembler);
+				info.AddValue("BeaconsConst", BeaconsConst);
 			}
 		}
 

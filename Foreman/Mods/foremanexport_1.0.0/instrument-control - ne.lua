@@ -8,41 +8,6 @@ local function ExportLocalisedString(lstring, index)
 	localised_print('<#~#>')
 end
 
-local function ExportEnergySource(entity, ttable)
-	ttable["min_energy_usage"] = (entity.energy_usage == nil) and 0 or entity.energy_usage
-	ttable["max_energy_usage"] = entity.max_energy_usage
-
-	if entity.burner_prototype ~= null then
-		ttable['fuel_type'] = 'item'
-		ttable['fuel_effectivity'] = entity.burner_prototype.effectivity
-		ttable['pollution'] = entity.burner_prototype.emissions
-
-		ttable['fuel_categories'] = {}
-		for fname, _ in pairs(entity.burner_prototype.fuel_categories) do
-			table.insert(ttable['fuel_categories'], fname)
-		end
-	elseif entity.fluid_energy_source_prototype then
-		ttable['fuel_type'] = 'fluid'
-		ttable['fuel_effectivity'] = entity.fluid_energy_source_prototype.effectivity
-		ttable['pollution'] = entity.fluid_energy_source_prototype.emissions
-
-		ttable['burns_fluid'] = entity.fluid_energy_source_prototype.burns_fluid
-	elseif entity.electric_energy_source_prototype then
-		ttable['fuel_type'] = 'electricity'
-		ttable['fuel_effectivity'] = 1
-		ttable['drain'] = entity.electric_energy_source_prototype.drain
-		ttable['pollution'] = entity.electric_energy_source_prototype.emissions
-	elseif entity.heat_energy_source_prototype  then
-		ttable['fuel_type'] = 'heat'
-		ttable['fuel_effectivity'] = 1
-		ttable['pollution'] = entity.heat_energy_source_prototype.emissions
-	elseif entity.void_energy_source_prototype  then
-		ttable['fuel_type'] = 'void'
-		ttable['fuel_effectivity'] = 1
-		ttable['pollution'] = entity.void_energy_source_prototype.emissions
-	end
-end
-
 local function ExportModList()
 	tmods = {}
 	table.insert(tmods, {['name'] = 'core', ['version'] = '1.0'})
@@ -154,6 +119,7 @@ local function ExportItems()
 		if item.fuel_category ~= nil then
 			titem['fuel_category'] = item.fuel_category
 			titem['fuel_value'] = item.fuel_value
+			titem['pollution_multiplier'] = item.fuel_emissions_multiplier
 		end
 
 		if item.burnt_result ~= nil then
@@ -179,9 +145,11 @@ local function ExportFluids()
 		tfluid['subgroup'] = fluid.subgroup.name
 		tfluid['default_temperature'] = fluid.default_temperature
 		tfluid['max_temperature'] = fluid.max_temperature
-
-		if fluid.fuel_value ~= nil then
+		tfluid['heat_capacity'] = fluid.heat_capacity
+		
+		if fluid.fuel_value ~= 0 then
 			tfluid['fuel_value'] = fluid.fuel_value
+			tfluid['pollution_multiplier'] = fluid.emissions_multiplier
 		end
 
 		tfluid['lid'] = '$'..localindex
@@ -226,148 +194,117 @@ local function ExportModules()
 	etable['modules'] = tmodules
 end
 
-local function ExportCraftingMachines()
-	tassemblers = {}
-	for _, machine in pairs(game.entity_prototypes) do
-		if machine.ingredient_count ~= nil then
-			tmachine = {}
-			tmachine['name'] = machine.name
-			tmachine['icon_name'] = 'icon.e.'..machine.name
-			tmachine["icon_alt_name"] = 'icon.i.'..machine.name
-			tmachine['order'] = machine.order
-			tmachine['crafting_speed'] = machine.crafting_speed
-			tmachine['base_productivity'] = machine.base_productivity
-			tmachine['module_inventory_size'] =  (machine.module_inventory_size ~= nil) and machine.module_inventory_size or 0
+local function ExportEntities()
+	tentities = {}
+	for _, entity in pairs(game.entity_prototypes) do --select any entity with an energy source (or fluid -> offshore pump). we will sort them out later. BONUS: also grab the 'character' entity - for those hand-crafts
+		if entity.type == 'boiler' or entity.type == 'generator' or entity.type == 'reactor' or entity.type == 'mining-drill' or entity.type == 'offshore-pump' or entity.type == 'furnace' or entity.type == 'assembling-machine' or entity.type == 'beacon' or entity.type == 'rocket-silo' or entity.type == 'burner-generator' or entity.type == "character" then
+			tentity = {}
+			tentity['name'] = entity.name
+			tentity['icon_name'] = 'icon.e.'..entity.name
+			tentity["icon_alt_name"] = 'icon.i.'..entity.name
+			tentity['order'] = entity.order
+			tentity['type'] = entity.type
 
-			tmachine['associated_items'] = {}
-			if machine.items_to_place_this ~= nil then
-				for _, item in pairs(machine.items_to_place_this) do
+			if entity.next_upgrade ~= nil then tentity['next_upgrade'] = entity.next_upgrade.name end
+
+			if entity.crafting_speed ~= nil then tentity['speed'] = entity.crafting_speed
+			elseif entity.mining_speed ~= nil then tentity['speed'] = entity.mining_speed
+			elseif entity.pumping_speed ~= nil then tentity['speed'] = entity.pumping_speed end
+
+			if entity.fluid ~= nil then tentity['fluid_result'] = entity.fluid.name end
+			if entity.maximum_temperature ~= nil then tentity['maximum_temperature'] = entity.maximum_temperature end
+			if entity.target_temperature ~= nil then tentity['target_temperature'] = entity.target_temperature end
+			if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_tick'] = entity.fluid_usage_per_tick end
+
+			if entity.module_inventory_size ~= nil then tentity['module_inventory_size'] =  entity.module_inventory_size end
+			if entity.base_productivity ~= nil then tentity['base_productivity'] = entity.base_productivity end
+			if entity.distribution_effectivity ~= nil then tentity['distribution_effectivity'] = entity.distribution_effectivity end
+			if entity.neighbour_bonus ~= nil then tentity['neighbour_bonus'] = entity.neighbour_bonus end
+			--ingredient_count is depreciated
+
+			tentity['associated_items'] = {}
+			if entity.items_to_place_this ~= nil then
+				for _, item in pairs(entity.items_to_place_this) do
 					if(type(item) == 'string') then
-						table.insert(tmachine['associated_items'], item)
+						table.insert(tentity['associated_items'], item)
 					else
-						table.insert(tmachine['associated_items'], item['name'])
+						table.insert(tentity['associated_items'], item['name'])
 					end
 				end
 			end
 
-			tmachine['crafting_categories'] = {}
-			for category, _ in pairs(machine.crafting_categories) do
-				table.insert(tmachine['crafting_categories'], category)
-			end
-
-			tmachine['allowed_effects'] = {}
-			if machine.allowed_effects then
-				for effect, allowed in pairs(machine.allowed_effects) do
+			tentity['allowed_effects'] = {}
+			if entity.allowed_effects then
+				for effect, allowed in pairs(entity.allowed_effects) do
 					if allowed then
-						table.insert(tmachine['allowed_effects'], effect)
+						table.insert(tentity['allowed_effects'], effect)
 					end
 				end
 			end
 
-			ExportEnergySource(machine, tmachine)
+			if entity.crafting_categories ~= nil then
+				tentity['crafting_categories'] = {}
+				for category, _ in pairs(entity.crafting_categories) do
+					table.insert(tentity['crafting_categories'], category)
+				end
+			end
 
-			tmachine['lid'] = '$'..localindex
-			ExportLocalisedString(machine.localised_name, localindex)
+			if entity.resource_categories ~= nil then
+				tentity['resource_categories'] = {}
+				for category, _ in pairs(entity.resource_categories) do
+					table.insert(tentity['resource_categories'], category)
+				end
+			end
+
+			tentity['max_energy_usage'] = (entity.max_energy_usage == nil) and 0 or entity.max_energy_usage
+			tentity['energy_usage'] = (entity.energy_usage == nil) and 0 or entity.energy_usage
+			tentity['energy_production'] = entity.max_energy_production
+
+			if entity.burner_prototype ~= null then
+				tentity['fuel_type'] = 'item'
+				tentity['fuel_effectivity'] = entity.burner_prototype.effectivity
+				tentity['pollution'] = entity.burner_prototype.emissions
+
+				tentity['fuel_categories'] = {}
+				for fname, _ in pairs(entity.burner_prototype.fuel_categories) do
+					table.insert(tentity['fuel_categories'], fname)
+				end
+
+			elseif entity.fluid_energy_source_prototype then
+				tentity['fuel_type'] = 'fluid'
+				tentity['fuel_effectivity'] = entity.fluid_energy_source_prototype.effectivity
+				tentity['pollution'] = entity.fluid_energy_source_prototype.emissions
+				tentity['burns_fluid'] = entity.fluid_energy_source_prototype.burns_fluid
+
+			elseif entity.electric_energy_source_prototype then
+				tentity['fuel_type'] = 'electricity'
+				tentity['fuel_effectivity'] = 1
+				tentity['drain'] = entity.electric_energy_source_prototype.drain
+				tentity['pollution'] = entity.electric_energy_source_prototype.emissions
+
+			elseif entity.heat_energy_source_prototype  then
+				tentity['fuel_type'] = 'heat'
+				tentity['fuel_effectivity'] = 1
+				tentity['pollution'] = entity.heat_energy_source_prototype.emissions
+
+			elseif entity.void_energy_source_prototype  then
+				tentity['fuel_type'] = 'void'
+				tentity['fuel_effectivity'] = 1
+				tentity['pollution'] = entity.void_energy_source_prototype.emissions
+			else
+				tentity['fuel_type'] = 'void'
+				tentity['fuel_effectivity'] = 1
+				tentity['pollution'] = 0
+			end
+
+			tentity['lid'] = '$'..localindex
+			ExportLocalisedString(entity.localised_name, localindex)
 			localindex = localindex + 1
 
-			table.insert(tassemblers, tmachine)
+			table.insert(tentities, tentity)
 		end
 	end
-	etable['assemblers'] = tassemblers
-end
-
-local function ExportBeacons()
-	tbeacons = {}
-	for _, beacon in pairs(game.entity_prototypes) do
-		if beacon.distribution_effectivity ~= nil then
-			tbeacon = {}
-			tbeacon['name'] = beacon.name
-			tbeacon['icon_name'] = 'icon.e.'..beacon.name
-			tbeacon["icon_alt_name"] = 'icon.i.'..beacon.name
-			tbeacon['order'] = beacon.order
-			tbeacon['module_inventory_size'] = (beacon.module_inventory_size ~= nil) and beacon.module_inventory_size or 0
-			tbeacon['distribution_effectivity'] = beacon.distribution_effectivity
-
-			tbeacon['associated_items'] = {}
-			if beacon.items_to_place_this ~= nil then
-				for _, item in pairs(beacon.items_to_place_this) do
-					if(type(item) == 'string') then
-						table.insert(tbeacon['associated_items'], item)
-					else
-						table.insert(tbeacon['associated_items'], item['name'])
-					end
-				end
-			end
-
-			tbeacon['allowed_effects'] = {}
-			if beacon.allowed_effects then
-				for effect, allowed in pairs(beacon.allowed_effects) do
-					if allowed then
-						table.insert(tbeacon['allowed_effects'], effect)
-					end
-				end
-			end
-
-			ExportEnergySource(beacon, tbeacon)
-		
-			tbeacon['lid'] = '$'..localindex
-			ExportLocalisedString(beacon.localised_name, localindex)
-			localindex = localindex + 1
-
-			table.insert(tbeacons, tbeacon)
-		end
-	end
-	etable['beacons'] = tbeacons
-end
-
-local function ExportMiners()
-	tminers = {}
-	for _, miner in pairs(game.entity_prototypes) do
-		if miner.resource_categories ~= nil then
-			tminer = {}
-			tminer['name'] = miner.name
-			tminer['icon_name'] = 'icon.e.'..miner.name
-			tminer['icon_alt_name'] = 'icon.i.'..miner.name
-			tminer['order'] = miner.order
-			tminer['mining_speed'] = miner.mining_speed
-			tminer['base_productivity'] = miner.base_productivity
-			tminer['module_inventory_size'] = (miner.module_inventory_size ~= nil) and miner.module_inventory_size or 0
-
-			tminer['associated_items'] = {}
-			if miner.items_to_place_this ~= nil then
-				for _, item in pairs(miner.items_to_place_this) do
-					if(type(item) == 'string') then
-						table.insert(tminer['associated_items'], item)
-					else
-						table.insert(tminer['associated_items'], item['name'])
-					end
-				end
-			end
-
-			tminer['resource_categories'] = {}
-			for category, _ in pairs(miner.resource_categories) do
-				table.insert(tminer['resource_categories'], category)
-			end
-
-			tminer['allowed_effects'] = {}
-			if miner.allowed_effects then
-				for effect, allowed in pairs(miner.allowed_effects) do
-					if allowed then
-						table.insert(tminer['allowed_effects'], effect)
-					end
-				end
-			end
-
-			ExportEnergySource(miner, tminer)
-
-			tminer['lid'] = '$'..localindex
-			ExportLocalisedString(miner.localised_name, localindex)
-			localindex = localindex + 1
-
-			table.insert(tminers, tminer)
-		end
-	end
-	etable['miners'] = tminers
+	etable['entities'] = tentities
 end
 
 local function ExportResources()
@@ -408,94 +345,6 @@ local function ExportResources()
 		end
 	end
 	etable['resources'] = tresources
-end
-
-
-local function ExportOffshorePumps()
-	topumps = {}
-	for _, opump in pairs(game.entity_prototypes) do
-		if opump.fluid ~= nil then
-			topump = {}
-			topump['name'] = opump.name
-			topump['icon_name'] = 'icon.e.'..opump.name
-			topump['icon_alt_name'] = 'icon.i.'..opump.name
-			topump['order'] = opump.order
-			topump['pumping_speed'] = opump.pumping_speed
-			topump['fluid'] = opump.fluid.name
-			topump['module_inventory_size'] = (opump.module_inventory_size ~= nil) and opump.module_inventory_size or 0
-
-			topump['associated_items'] = {}
-			if opump.items_to_place_this ~= nil then
-				for _, item in pairs(opump.items_to_place_this) do
-					if(type(item) == 'string') then
-						table.insert(topump['associated_items'], item)
-					else
-						table.insert(topump['associated_items'], item['name'])
-					end
-				end
-			end
-
-			topump['allowed_effects'] = {}
-			if opump.allowed_effects then
-				for effect, allowed in pairs(opump.allowed_effects) do
-					if allowed then
-						table.insert(topump['allowed_effects'], effect)
-					end
-				end
-			end
-
-			ExportEnergySource(opump, topump)
-
-			topump['lid'] = '$'..localindex
-			ExportLocalisedString(opump.localised_name, localindex)
-			localindex = localindex + 1
-
-			table.insert(topumps, topump)
-		end
-	end
-	etable['offshorepumps'] = topumps
-end
-
-local function ExportHeatUsers()
-	theatusers = {}
-	for _, huser in pairs(game.entity_prototypes) do
-		if huser.heat_energy_source_prototype  ~= nil then
-			thuser = {}
-			thuser['name'] = huser.name
-			thuser['icon_name'] = 'icon.e.'..huser.name
-			thuser['icon_alt_name'] = 'icon.i.'..huser.name
-			thuser['order'] = huser.order
-
-			thuser['associated_items'] = {}
-			if huser.items_to_place_this ~= nil then
-				for _, item in pairs(huser.items_to_place_this) do
-					if(type(item) == 'string') then
-						table.insert(thuser['associated_items'], item)
-					else
-						table.insert(thuser['associated_items'], item['name'])
-					end
-				end
-			end
-
-			thuser['allowed_effects'] = {}
-			if huser.allowed_effects then
-				for effect, allowed in pairs(huser.allowed_effects) do
-					if allowed then
-						table.insert(thuser['allowed_effects'], effect)
-					end
-				end
-			end
-
-			ExportEnergySource(huser, thuser)
-
-			thuser['lid'] = '$'..localindex
-			ExportLocalisedString(huser.localised_name, localindex)
-			localindex = localindex + 1
-
-			table.insert(theatusers, thuser)
-		end
-	end
-	etable['heatusers'] = theatusers
 end
 
 local function ExportGroups()
@@ -547,12 +396,8 @@ script.on_nth_tick(1,
 		ExportItems()
 		ExportFluids()
 		ExportModules()
-		ExportCraftingMachines()
-		ExportBeacons()
-		ExportMiners()
-		ExportHeatUsers()
+		ExportEntities()
 		ExportResources()
-		ExportOffshorePumps()
 		ExportGroups()
 		ExportSubGroups()
 

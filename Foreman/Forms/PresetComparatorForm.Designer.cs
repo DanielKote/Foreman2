@@ -42,6 +42,8 @@ namespace Foreman
 			this.RecipeTabPage = new System.Windows.Forms.TabPage();
 			this.AssemblerTabPage = new System.Windows.Forms.TabPage();
 			this.MinerTabPage = new System.Windows.Forms.TabPage();
+			this.PowerTabPage = new System.Windows.Forms.TabPage();
+			this.BeaconTabPage = new System.Windows.Forms.TabPage();
 			this.ModuleTabPage = new System.Windows.Forms.TabPage();
 			this.CloseButton = new System.Windows.Forms.Button();
 			this.TabTable = new System.Windows.Forms.TableLayoutPanel();
@@ -171,6 +173,8 @@ namespace Foreman
 			this.ComparisonTabControl.Controls.Add(this.RecipeTabPage);
 			this.ComparisonTabControl.Controls.Add(this.AssemblerTabPage);
 			this.ComparisonTabControl.Controls.Add(this.MinerTabPage);
+			this.ComparisonTabControl.Controls.Add(this.PowerTabPage);
+			this.ComparisonTabControl.Controls.Add(this.BeaconTabPage);
 			this.ComparisonTabControl.Controls.Add(this.ModuleTabPage);
 			this.ComparisonTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ComparisonTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
@@ -233,6 +237,24 @@ namespace Foreman
 			this.MinerTabPage.Size = new System.Drawing.Size(651, 0);
 			this.MinerTabPage.TabIndex = 4;
 			this.MinerTabPage.Text = "Miners";
+			// 
+			// PowerTabPage
+			// 
+			this.PowerTabPage.Location = new System.Drawing.Point(4, 25);
+			this.PowerTabPage.Name = "PowerTabPage";
+			this.PowerTabPage.Size = new System.Drawing.Size(651, 0);
+			this.PowerTabPage.TabIndex = 6;
+			this.PowerTabPage.Text = "Power";
+			this.PowerTabPage.UseVisualStyleBackColor = true;
+			// 
+			// BeaconTabPage
+			// 
+			this.BeaconTabPage.Location = new System.Drawing.Point(4, 25);
+			this.BeaconTabPage.Name = "BeaconTabPage";
+			this.BeaconTabPage.Size = new System.Drawing.Size(651, 0);
+			this.BeaconTabPage.TabIndex = 7;
+			this.BeaconTabPage.Text = "Beacons";
+			this.BeaconTabPage.UseVisualStyleBackColor = true;
 			// 
 			// ModuleTabPage
 			// 
@@ -646,5 +668,7 @@ namespace Foreman
 		private System.Windows.Forms.TableLayoutPanel VsTable;
 		private System.Windows.Forms.TableLayoutPanel MainTable;
 		private System.Windows.Forms.TabPage ModTabPage;
+		private System.Windows.Forms.TabPage PowerTabPage;
+		private System.Windows.Forms.TabPage BeaconTabPage;
 	}
 }

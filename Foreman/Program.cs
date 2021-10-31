@@ -20,12 +20,24 @@ namespace Foreman
 		[STAThread]
 		static void Main()
 		{
-			//test6(); return;
+			//test7(); return;
 
 			ErrorLogging.ClearLog();
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
+		}
+
+		public static void test7()
+		{
+			double ActualAssemblerCount = 59.999;
+			double rateMultiplier = 60;
+			double partialAssemblers = ActualAssemblerCount % rateMultiplier;
+			double fullAssemblers = ActualAssemblerCount - partialAssemblers;
+			Console.WriteLine(fullAssemblers);
+			Console.WriteLine(partialAssemblers);
+
+			Console.WriteLine(12.123 % 1);
 		}
 
 		public static void test6()
@@ -317,7 +329,7 @@ namespace Foreman
 
 			Console.WriteLine(resultString);
 			return;
-
+			/*
 			string iconString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P1>>>") + 23);
 			iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>") - 2);
 
@@ -326,8 +338,8 @@ namespace Foreman
 
 			JObject iconJObject = JObject.Parse(iconString);
 			JObject dataJObject = JObject.Parse(dataString);
-
 			Console.WriteLine(dataString);
+			*/
 
 			//JObject resut = JObject.Parse(q);
 			//Console.Write(resut.ToString(Newtonsoft.Json.Formatting.Indented));

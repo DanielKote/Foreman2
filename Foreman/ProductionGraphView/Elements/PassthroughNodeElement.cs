@@ -33,7 +33,7 @@ namespace Foreman
 				//graphics.DrawRectangle(devPen, titleSlot);
 
 				graphics.DrawString("-Limit-", TitleFont, TextBrush, titleSlot, TitleFormat);
-				GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.FloatToString(DisplayedNode.DesiredRate), BaseFont, textSlot);
+				GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.DoubleToString(DisplayedNode.DesiredRate), BaseFont, textSlot);
 			}
 		}
 

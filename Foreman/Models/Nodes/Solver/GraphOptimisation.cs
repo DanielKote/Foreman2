@@ -38,13 +38,24 @@ namespace Foreman
 			// TODO: Handle BIG NUMBERS
 			// TODO: Return error in solution!?
 			if (solution == null)
-				throw new Exception("Solver failed but that shouldn't happen.\n" + solver.ToString());
+			{
+				//Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
+				//have to check for cyclic recipes currently in the graph, and see if we can somehow find which one is causing issues and display it.
+				//work in the solver is kind of necessary here....
+
+				//removed the exception raising since this can actually happen now.
+				//throw new Exception("Solver failed but that shouldn't happen.\n" + solver.ToString());
+				ErrorLogging.LogLine(solver.ToString());
+				Console.WriteLine(solver.ToString());
+			}
 
 			foreach (BaseNodePrototype node in nodeGroup)
 			{
-				node.SetSolvedRate(solution.ActualRate(node));
-				foreach (NodeLinkPrototype link in node.outputLinks.Union(node.inputLinks))
-					link.Throughput = solution.Throughput(link);
+				node.SetSolvedRate(solution?.ActualRate(node)?? 0, false);
+				foreach (NodeLinkPrototype link in node.outputLinks)
+					link.Throughput = solution?.Throughput(link)?? 0;
+				foreach (NodeLinkPrototype link in node.inputLinks)
+					link.Throughput = solution?.Throughput(link)?? 0;
 
 			}
 		}
@@ -59,9 +70,10 @@ namespace Foreman
 			ActualRate = 0;
 		}
 
-		internal virtual void SetSolvedRate(double rate)
+		internal virtual void SetSolvedRate(double rate, bool error)
 		{
-			ActualRate = (float)rate;
+			SolverError = error;
+			ActualRate = rate;
 		}
 
 		internal void AddConstraints(ProductionSolver solver)

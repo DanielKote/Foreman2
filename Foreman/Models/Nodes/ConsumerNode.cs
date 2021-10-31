@@ -26,8 +26,8 @@ namespace Foreman
 			ActualRate = 1f;
 		}
 
-		public override float GetConsumeRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
-		public override float GetSupplyRate(Item item) { throw new ArgumentException("Consumer does not supply! nothing should be asking for the supply rate"); }
+		public override double GetConsumeRate(Item item) { return (double)Math.Round(ActualRate, RoundingDP); }
+		public override double GetSupplyRate(Item item) { throw new ArgumentException("Consumer does not supply! nothing should be asking for the supply rate"); }
 
 		internal override double inputRateFor(Item item) { return 1; }
 		internal override double outputRateFor(Item item) { throw new ArgumentException("Consumer should not have outputs!"); }

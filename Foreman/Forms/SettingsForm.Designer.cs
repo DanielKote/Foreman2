@@ -50,10 +50,16 @@
 			this.MinersPage = new System.Windows.Forms.TabPage();
 			this.MinerListView = new System.Windows.Forms.ListView();
 			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.PowersPage = new System.Windows.Forms.TabPage();
+			this.PowerListView = new System.Windows.Forms.ListView();
+			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.BeaconsPage = new System.Windows.Forms.TabPage();
+			this.BeaconListView = new System.Windows.Forms.ListView();
+			this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ModulesPage = new System.Windows.Forms.TabPage();
 			this.ModuleListView = new System.Windows.Forms.ListView();
 			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.RecipePage = new System.Windows.Forms.TabPage();
+			this.RecipesPage = new System.Windows.Forms.TabPage();
 			this.RecipeListView = new System.Windows.Forms.ListView();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
@@ -70,9 +76,9 @@
 			this.PresetMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.SelectPresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.DeletePresetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.RecipeToolTip = new Foreman.RecipeToolTip();
 			this.MainTable = new System.Windows.Forms.TableLayoutPanel();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.RecipeToolTip = new Foreman.RecipeToolTip();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -81,8 +87,10 @@
 			this.EnabledObjectsTabControl.SuspendLayout();
 			this.AssemblersPage.SuspendLayout();
 			this.MinersPage.SuspendLayout();
+			this.PowersPage.SuspendLayout();
+			this.BeaconsPage.SuspendLayout();
 			this.ModulesPage.SuspendLayout();
-			this.RecipePage.SuspendLayout();
+			this.RecipesPage.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.PresetsTable.SuspendLayout();
 			this.CurrentPresetTable.SuspendLayout();
@@ -95,7 +103,7 @@
 			// 
 			this.groupBox4.Controls.Add(this.ModSelectionBox);
 			this.groupBox4.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.groupBox4.Location = new System.Drawing.Point(209, 2);
+			this.groupBox4.Location = new System.Drawing.Point(210, 2);
 			this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Padding = new System.Windows.Forms.Padding(5);
@@ -124,7 +132,7 @@
 			this.groupBox1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.groupBox1.Controls.Add(this.DifficultyTable);
 			this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.groupBox1.Location = new System.Drawing.Point(209, 406);
+			this.groupBox1.Location = new System.Drawing.Point(210, 406);
 			this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
@@ -205,11 +213,11 @@
 			this.groupBox2.Controls.Add(this.EnabledObjectsTable);
 			this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.groupBox2.Location = new System.Drawing.Point(425, 2);
+			this.groupBox2.Location = new System.Drawing.Point(426, 2);
 			this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
-			this.groupBox2.Size = new System.Drawing.Size(278, 478);
+			this.groupBox2.Size = new System.Drawing.Size(343, 478);
 			this.groupBox2.TabIndex = 17;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Enabled Objects:";
@@ -234,7 +242,7 @@
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.EnabledObjectsTable.Size = new System.Drawing.Size(274, 458);
+			this.EnabledObjectsTable.Size = new System.Drawing.Size(339, 458);
 			this.EnabledObjectsTable.TabIndex = 0;
 			// 
 			// ShowUnavailablesCheckBox
@@ -245,7 +253,7 @@
 			this.ShowUnavailablesCheckBox.Location = new System.Drawing.Point(43, 53);
 			this.ShowUnavailablesCheckBox.Margin = new System.Windows.Forms.Padding(2);
 			this.ShowUnavailablesCheckBox.Name = "ShowUnavailablesCheckBox";
-			this.ShowUnavailablesCheckBox.Size = new System.Drawing.Size(229, 17);
+			this.ShowUnavailablesCheckBox.Size = new System.Drawing.Size(294, 17);
 			this.ShowUnavailablesCheckBox.TabIndex = 31;
 			this.ShowUnavailablesCheckBox.Text = "Show Unavailables";
 			this.ShowUnavailablesCheckBox.UseVisualStyleBackColor = true;
@@ -274,7 +282,7 @@
 			this.LoadEnabledFromSaveButton.Location = new System.Drawing.Point(4, 2);
 			this.LoadEnabledFromSaveButton.Margin = new System.Windows.Forms.Padding(4, 2, 7, 2);
 			this.LoadEnabledFromSaveButton.Name = "LoadEnabledFromSaveButton";
-			this.LoadEnabledFromSaveButton.Size = new System.Drawing.Size(263, 23);
+			this.LoadEnabledFromSaveButton.Size = new System.Drawing.Size(328, 23);
 			this.LoadEnabledFromSaveButton.TabIndex = 28;
 			this.LoadEnabledFromSaveButton.Text = "Load From Save";
 			this.LoadEnabledFromSaveButton.UseVisualStyleBackColor = true;
@@ -285,15 +293,18 @@
 			this.EnabledObjectsTable.SetColumnSpan(this.EnabledObjectsTabControl, 2);
 			this.EnabledObjectsTabControl.Controls.Add(this.AssemblersPage);
 			this.EnabledObjectsTabControl.Controls.Add(this.MinersPage);
+			this.EnabledObjectsTabControl.Controls.Add(this.PowersPage);
+			this.EnabledObjectsTabControl.Controls.Add(this.BeaconsPage);
 			this.EnabledObjectsTabControl.Controls.Add(this.ModulesPage);
-			this.EnabledObjectsTabControl.Controls.Add(this.RecipePage);
+			this.EnabledObjectsTabControl.Controls.Add(this.RecipesPage);
 			this.EnabledObjectsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.EnabledObjectsTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.EnabledObjectsTabControl.Location = new System.Drawing.Point(4, 76);
 			this.EnabledObjectsTabControl.Margin = new System.Windows.Forms.Padding(4);
+			this.EnabledObjectsTabControl.Multiline = true;
 			this.EnabledObjectsTabControl.Name = "EnabledObjectsTabControl";
 			this.EnabledObjectsTabControl.SelectedIndex = 0;
-			this.EnabledObjectsTabControl.Size = new System.Drawing.Size(266, 378);
+			this.EnabledObjectsTabControl.Size = new System.Drawing.Size(331, 378);
 			this.EnabledObjectsTabControl.TabIndex = 27;
 			// 
 			// AssemblersPage
@@ -303,7 +314,7 @@
 			this.AssemblersPage.Location = new System.Drawing.Point(4, 22);
 			this.AssemblersPage.Margin = new System.Windows.Forms.Padding(2);
 			this.AssemblersPage.Name = "AssemblersPage";
-			this.AssemblersPage.Size = new System.Drawing.Size(258, 353);
+			this.AssemblersPage.Size = new System.Drawing.Size(323, 352);
 			this.AssemblersPage.TabIndex = 0;
 			this.AssemblersPage.Text = "Assemblers";
 			this.AssemblersPage.UseVisualStyleBackColor = true;
@@ -322,7 +333,7 @@
 			this.AssemblerListView.LabelWrap = false;
 			this.AssemblerListView.Location = new System.Drawing.Point(0, 0);
 			this.AssemblerListView.Name = "AssemblerListView";
-			this.AssemblerListView.Size = new System.Drawing.Size(258, 353);
+			this.AssemblerListView.Size = new System.Drawing.Size(323, 352);
 			this.AssemblerListView.SmallImageList = this.IconList;
 			this.AssemblerListView.TabIndex = 17;
 			this.AssemblerListView.UseCompatibleStateImageBehavior = false;
@@ -336,7 +347,7 @@
 			// columnHeader4
 			// 
 			this.columnHeader4.Text = "Name";
-			this.columnHeader4.Width = 225;
+			this.columnHeader4.Width = 290;
 			// 
 			// IconList
 			// 
@@ -351,7 +362,7 @@
 			this.MinersPage.Location = new System.Drawing.Point(4, 22);
 			this.MinersPage.Margin = new System.Windows.Forms.Padding(2);
 			this.MinersPage.Name = "MinersPage";
-			this.MinersPage.Size = new System.Drawing.Size(258, 353);
+			this.MinersPage.Size = new System.Drawing.Size(323, 352);
 			this.MinersPage.TabIndex = 2;
 			this.MinersPage.Text = "Miners";
 			this.MinersPage.UseVisualStyleBackColor = true;
@@ -370,7 +381,7 @@
 			this.MinerListView.LabelWrap = false;
 			this.MinerListView.Location = new System.Drawing.Point(0, 0);
 			this.MinerListView.Name = "MinerListView";
-			this.MinerListView.Size = new System.Drawing.Size(258, 353);
+			this.MinerListView.Size = new System.Drawing.Size(323, 352);
 			this.MinerListView.SmallImageList = this.IconList;
 			this.MinerListView.TabIndex = 17;
 			this.MinerListView.UseCompatibleStateImageBehavior = false;
@@ -384,7 +395,87 @@
 			// columnHeader3
 			// 
 			this.columnHeader3.Text = "Name";
-			this.columnHeader3.Width = 225;
+			this.columnHeader3.Width = 290;
+			// 
+			// PowersPage
+			// 
+			this.PowersPage.Controls.Add(this.PowerListView);
+			this.PowersPage.Location = new System.Drawing.Point(4, 22);
+			this.PowersPage.Name = "PowersPage";
+			this.PowersPage.Size = new System.Drawing.Size(323, 352);
+			this.PowersPage.TabIndex = 5;
+			this.PowersPage.Text = "Power";
+			this.PowersPage.UseVisualStyleBackColor = true;
+			// 
+			// PowerListView
+			// 
+			this.PowerListView.CheckBoxes = true;
+			this.PowerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader5});
+			this.PowerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.PowerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.PowerListView.FullRowSelect = true;
+			this.PowerListView.GridLines = true;
+			this.PowerListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.PowerListView.HideSelection = false;
+			this.PowerListView.LabelWrap = false;
+			this.PowerListView.Location = new System.Drawing.Point(0, 0);
+			this.PowerListView.Name = "PowerListView";
+			this.PowerListView.Size = new System.Drawing.Size(323, 352);
+			this.PowerListView.SmallImageList = this.IconList;
+			this.PowerListView.TabIndex = 18;
+			this.PowerListView.UseCompatibleStateImageBehavior = false;
+			this.PowerListView.View = System.Windows.Forms.View.Details;
+			this.PowerListView.VirtualMode = true;
+			this.PowerListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.PowerListView_RetrieveVirtualItem);
+			this.PowerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListView_KeyDown);
+			this.PowerListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseClick);
+			this.PowerListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseDoubleClick);
+			// 
+			// columnHeader5
+			// 
+			this.columnHeader5.Text = "Name";
+			this.columnHeader5.Width = 290;
+			// 
+			// BeaconsPage
+			// 
+			this.BeaconsPage.Controls.Add(this.BeaconListView);
+			this.BeaconsPage.Location = new System.Drawing.Point(4, 22);
+			this.BeaconsPage.Name = "BeaconsPage";
+			this.BeaconsPage.Size = new System.Drawing.Size(323, 352);
+			this.BeaconsPage.TabIndex = 6;
+			this.BeaconsPage.Text = "Beacons";
+			this.BeaconsPage.UseVisualStyleBackColor = true;
+			// 
+			// BeaconListView
+			// 
+			this.BeaconListView.CheckBoxes = true;
+			this.BeaconListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader6});
+			this.BeaconListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BeaconListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.BeaconListView.FullRowSelect = true;
+			this.BeaconListView.GridLines = true;
+			this.BeaconListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.BeaconListView.HideSelection = false;
+			this.BeaconListView.LabelWrap = false;
+			this.BeaconListView.Location = new System.Drawing.Point(0, 0);
+			this.BeaconListView.Name = "BeaconListView";
+			this.BeaconListView.Size = new System.Drawing.Size(323, 352);
+			this.BeaconListView.SmallImageList = this.IconList;
+			this.BeaconListView.TabIndex = 19;
+			this.BeaconListView.UseCompatibleStateImageBehavior = false;
+			this.BeaconListView.View = System.Windows.Forms.View.Details;
+			this.BeaconListView.VirtualMode = true;
+			this.BeaconListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.BeaconListView_RetrieveVirtualItem);
+			this.BeaconListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ListView_KeyDown);
+			this.BeaconListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseClick);
+			this.BeaconListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListView_MouseDoubleClick);
+			// 
+			// columnHeader6
+			// 
+			this.columnHeader6.Text = "Name";
+			this.columnHeader6.Width = 290;
 			// 
 			// ModulesPage
 			// 
@@ -393,7 +484,7 @@
 			this.ModulesPage.Location = new System.Drawing.Point(4, 22);
 			this.ModulesPage.Margin = new System.Windows.Forms.Padding(2);
 			this.ModulesPage.Name = "ModulesPage";
-			this.ModulesPage.Size = new System.Drawing.Size(258, 353);
+			this.ModulesPage.Size = new System.Drawing.Size(323, 352);
 			this.ModulesPage.TabIndex = 3;
 			this.ModulesPage.Text = "Modules";
 			this.ModulesPage.UseVisualStyleBackColor = true;
@@ -412,7 +503,7 @@
 			this.ModuleListView.LabelWrap = false;
 			this.ModuleListView.Location = new System.Drawing.Point(0, 0);
 			this.ModuleListView.Name = "ModuleListView";
-			this.ModuleListView.Size = new System.Drawing.Size(258, 353);
+			this.ModuleListView.Size = new System.Drawing.Size(323, 352);
 			this.ModuleListView.SmallImageList = this.IconList;
 			this.ModuleListView.TabIndex = 17;
 			this.ModuleListView.UseCompatibleStateImageBehavior = false;
@@ -426,18 +517,18 @@
 			// columnHeader2
 			// 
 			this.columnHeader2.Text = "Name";
-			this.columnHeader2.Width = 225;
+			this.columnHeader2.Width = 290;
 			// 
-			// RecipePage
+			// RecipesPage
 			// 
-			this.RecipePage.Controls.Add(this.RecipeListView);
-			this.RecipePage.Location = new System.Drawing.Point(4, 22);
-			this.RecipePage.Margin = new System.Windows.Forms.Padding(2);
-			this.RecipePage.Name = "RecipePage";
-			this.RecipePage.Size = new System.Drawing.Size(258, 352);
-			this.RecipePage.TabIndex = 4;
-			this.RecipePage.Text = "Recipes";
-			this.RecipePage.UseVisualStyleBackColor = true;
+			this.RecipesPage.Controls.Add(this.RecipeListView);
+			this.RecipesPage.Location = new System.Drawing.Point(4, 22);
+			this.RecipesPage.Margin = new System.Windows.Forms.Padding(2);
+			this.RecipesPage.Name = "RecipesPage";
+			this.RecipesPage.Size = new System.Drawing.Size(323, 352);
+			this.RecipesPage.TabIndex = 4;
+			this.RecipesPage.Text = "Recipes";
+			this.RecipesPage.UseVisualStyleBackColor = true;
 			// 
 			// RecipeListView
 			// 
@@ -453,7 +544,7 @@
 			this.RecipeListView.LabelWrap = false;
 			this.RecipeListView.Location = new System.Drawing.Point(0, 0);
 			this.RecipeListView.Name = "RecipeListView";
-			this.RecipeListView.Size = new System.Drawing.Size(258, 352);
+			this.RecipeListView.Size = new System.Drawing.Size(323, 352);
 			this.RecipeListView.SmallImageList = this.IconList;
 			this.RecipeListView.TabIndex = 16;
 			this.RecipeListView.UseCompatibleStateImageBehavior = false;
@@ -467,7 +558,7 @@
 			// columnHeader1
 			// 
 			this.columnHeader1.Text = "Name";
-			this.columnHeader1.Width = 225;
+			this.columnHeader1.Width = 290;
 			// 
 			// FilterTextBox
 			// 
@@ -476,7 +567,7 @@
 			this.FilterTextBox.Location = new System.Drawing.Point(43, 29);
 			this.FilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 7, 2);
 			this.FilterTextBox.Name = "FilterTextBox";
-			this.FilterTextBox.Size = new System.Drawing.Size(224, 20);
+			this.FilterTextBox.Size = new System.Drawing.Size(289, 20);
 			this.FilterTextBox.TabIndex = 29;
 			this.FilterTextBox.TextChanged += new System.EventHandler(this.Filters_Changed);
 			// 
@@ -489,7 +580,7 @@
 			this.groupBox3.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Padding = new System.Windows.Forms.Padding(2);
-			this.groupBox3.Size = new System.Drawing.Size(419, 478);
+			this.groupBox3.Size = new System.Drawing.Size(420, 478);
 			this.groupBox3.TabIndex = 18;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Factorio Presets:";
@@ -513,7 +604,7 @@
 			this.PresetsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.PresetsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.PresetsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.PresetsTable.Size = new System.Drawing.Size(415, 458);
+			this.PresetsTable.Size = new System.Drawing.Size(416, 458);
 			this.PresetsTable.TabIndex = 12;
 			// 
 			// ImportPresetButton
@@ -525,7 +616,7 @@
 			this.ImportPresetButton.Location = new System.Drawing.Point(5, 406);
 			this.ImportPresetButton.Margin = new System.Windows.Forms.Padding(5, 2, 5, 2);
 			this.ImportPresetButton.Name = "ImportPresetButton";
-			this.ImportPresetButton.Size = new System.Drawing.Size(197, 23);
+			this.ImportPresetButton.Size = new System.Drawing.Size(198, 23);
 			this.ImportPresetButton.TabIndex = 1;
 			this.ImportPresetButton.Text = "Import New Preset From Factorio";
 			this.ImportPresetButton.UseVisualStyleBackColor = true;
@@ -540,7 +631,7 @@
 			this.ComparePresetsButton.Location = new System.Drawing.Point(5, 433);
 			this.ComparePresetsButton.Margin = new System.Windows.Forms.Padding(5, 2, 5, 2);
 			this.ComparePresetsButton.Name = "ComparePresetsButton";
-			this.ComparePresetsButton.Size = new System.Drawing.Size(197, 23);
+			this.ComparePresetsButton.Size = new System.Drawing.Size(198, 23);
 			this.ComparePresetsButton.TabIndex = 2;
 			this.ComparePresetsButton.Text = "Compare Presets";
 			this.ComparePresetsButton.UseVisualStyleBackColor = true;
@@ -555,9 +646,10 @@
 			this.PresetListBox.Location = new System.Drawing.Point(5, 24);
 			this.PresetListBox.Margin = new System.Windows.Forms.Padding(5, 5, 5, 7);
 			this.PresetListBox.Name = "PresetListBox";
-			this.PresetListBox.Size = new System.Drawing.Size(197, 373);
+			this.PresetListBox.Size = new System.Drawing.Size(198, 373);
 			this.PresetListBox.TabIndex = 0;
 			this.PresetListBox.SelectedValueChanged += new System.EventHandler(this.PresetListBox_SelectedValueChanged);
+			this.PresetListBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.PresetListBox_MouseDoubleClick);
 			this.PresetListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PresetListBox_MouseDown);
 			// 
 			// CurrentPresetTable
@@ -574,7 +666,7 @@
 			this.CurrentPresetTable.Name = "CurrentPresetTable";
 			this.CurrentPresetTable.RowCount = 1;
 			this.CurrentPresetTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.CurrentPresetTable.Size = new System.Drawing.Size(201, 13);
+			this.CurrentPresetTable.Size = new System.Drawing.Size(202, 13);
 			this.CurrentPresetTable.TabIndex = 13;
 			// 
 			// label1
@@ -599,7 +691,7 @@
 			this.CurrentPresetLabel.Location = new System.Drawing.Point(58, 0);
 			this.CurrentPresetLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.CurrentPresetLabel.Name = "CurrentPresetLabel";
-			this.CurrentPresetLabel.Size = new System.Drawing.Size(141, 13);
+			this.CurrentPresetLabel.Size = new System.Drawing.Size(142, 13);
 			this.CurrentPresetLabel.TabIndex = 4;
 			this.CurrentPresetLabel.Text = "preset";
 			this.CurrentPresetLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -613,7 +705,7 @@
 			this.ConfirmButton.Location = new System.Drawing.Point(2, 2);
 			this.ConfirmButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ConfirmButton.Name = "ConfirmButton";
-			this.ConfirmButton.Size = new System.Drawing.Size(641, 23);
+			this.ConfirmButton.Size = new System.Drawing.Size(707, 23);
 			this.ConfirmButton.TabIndex = 25;
 			this.ConfirmButton.Text = "Confirm";
 			this.ConfirmButton.UseVisualStyleBackColor = true;
@@ -625,7 +717,7 @@
 			this.CancelSettingsButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelSettingsButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.CancelSettingsButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.CancelSettingsButton.Location = new System.Drawing.Point(647, 2);
+			this.CancelSettingsButton.Location = new System.Drawing.Point(713, 2);
 			this.CancelSettingsButton.Margin = new System.Windows.Forms.Padding(2);
 			this.CancelSettingsButton.Name = "CancelSettingsButton";
 			this.CancelSettingsButton.Size = new System.Drawing.Size(50, 23);
@@ -655,21 +747,12 @@
 			this.DeletePresetMenuItem.Size = new System.Drawing.Size(142, 22);
 			this.DeletePresetMenuItem.Text = "Delete Preset";
 			// 
-			// RecipeToolTip
-			// 
-			this.RecipeToolTip.AutoPopDelay = 100000;
-			this.RecipeToolTip.BackColor = System.Drawing.Color.DimGray;
-			this.RecipeToolTip.ForeColor = System.Drawing.Color.White;
-			this.RecipeToolTip.InitialDelay = 100000;
-			this.RecipeToolTip.OwnerDraw = true;
-			this.RecipeToolTip.ReshowDelay = 100000;
-			// 
 			// MainTable
 			// 
 			this.MainTable.AutoSize = true;
 			this.MainTable.ColumnCount = 2;
-			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
-			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
+			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55F));
+			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 45F));
 			this.MainTable.Controls.Add(this.FormButtonsTable, 0, 1);
 			this.MainTable.Controls.Add(this.groupBox3, 0, 0);
 			this.MainTable.Controls.Add(this.groupBox2, 1, 0);
@@ -678,7 +761,7 @@
 			this.MainTable.RowCount = 2;
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MainTable.Size = new System.Drawing.Size(705, 515);
+			this.MainTable.Size = new System.Drawing.Size(771, 515);
 			this.MainTable.TabIndex = 27;
 			// 
 			// FormButtonsTable
@@ -696,8 +779,17 @@
 			this.FormButtonsTable.Name = "FormButtonsTable";
 			this.FormButtonsTable.RowCount = 1;
 			this.FormButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.FormButtonsTable.Size = new System.Drawing.Size(699, 27);
+			this.FormButtonsTable.Size = new System.Drawing.Size(765, 27);
 			this.FormButtonsTable.TabIndex = 28;
+			// 
+			// RecipeToolTip
+			// 
+			this.RecipeToolTip.AutoPopDelay = 100000;
+			this.RecipeToolTip.BackColor = System.Drawing.Color.DimGray;
+			this.RecipeToolTip.ForeColor = System.Drawing.Color.White;
+			this.RecipeToolTip.InitialDelay = 100000;
+			this.RecipeToolTip.OwnerDraw = true;
+			this.RecipeToolTip.ReshowDelay = 100000;
 			// 
 			// SettingsForm
 			// 
@@ -707,7 +799,7 @@
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelButton = this.CancelSettingsButton;
-			this.ClientSize = new System.Drawing.Size(714, 524);
+			this.ClientSize = new System.Drawing.Size(777, 524);
 			this.Controls.Add(this.MainTable);
 			this.DoubleBuffered = true;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -729,8 +821,10 @@
 			this.EnabledObjectsTabControl.ResumeLayout(false);
 			this.AssemblersPage.ResumeLayout(false);
 			this.MinersPage.ResumeLayout(false);
+			this.PowersPage.ResumeLayout(false);
+			this.BeaconsPage.ResumeLayout(false);
 			this.ModulesPage.ResumeLayout(false);
-			this.RecipePage.ResumeLayout(false);
+			this.RecipesPage.ResumeLayout(false);
 			this.groupBox3.ResumeLayout(false);
 			this.PresetsTable.ResumeLayout(false);
 			this.PresetsTable.PerformLayout();
@@ -773,7 +867,7 @@
         private System.Windows.Forms.Button LoadEnabledFromSaveButton;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox FilterTextBox;
-        private System.Windows.Forms.TabPage RecipePage;
+        private System.Windows.Forms.TabPage RecipesPage;
         private System.Windows.Forms.ListView RecipeListView;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ImageList IconList;
@@ -791,5 +885,11 @@
 		private System.Windows.Forms.TableLayoutPanel MainTable;
 		private System.Windows.Forms.TableLayoutPanel FormButtonsTable;
 		private System.Windows.Forms.TableLayoutPanel EnabledObjectsTable;
+		private System.Windows.Forms.TabPage PowersPage;
+		private System.Windows.Forms.ListView PowerListView;
+		private System.Windows.Forms.ColumnHeader columnHeader5;
+		private System.Windows.Forms.TabPage BeaconsPage;
+		private System.Windows.Forms.ListView BeaconListView;
+		private System.Windows.Forms.ColumnHeader columnHeader6;
 	}
 }

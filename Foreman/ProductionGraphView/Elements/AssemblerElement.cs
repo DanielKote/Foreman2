@@ -97,7 +97,7 @@ namespace Foreman
 			}
 			else
 			{
-				float assemblerCount = recipeNode.GetBaseNumberOfAssemblers() * graphViewer.GetRateMultipler();
+				double assemblerCount = recipeNode.ActualAssemblerCount / graphViewer.GetRateMultipler();
 				if (assemblerCount >= 1000)
 					text += assemblerCount.ToString("0.##e0");
 				else if (assemblerCount >= 0.1)

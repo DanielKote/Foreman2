@@ -36,8 +36,8 @@ namespace Foreman
 			//					SO: we need to check all directly-down connected recipes for min&max temp production. minTemp is set to be the minimum produced temperature, and maxTemp is set to be the maximum produced temperature
 			//					ALL RANGES ARE RIGHT SIDE RANGES (ex: 0 -> 20), and basically require the consumer to accept any temperature within this range (producer range must be inside consumer range)
 
-			float minTemp = (direction == LinkType.Input) ? float.NegativeInfinity : float.PositiveInfinity;
-			float maxTemp = (direction == LinkType.Input) ? float.PositiveInfinity : float.NegativeInfinity;
+			double minTemp = (direction == LinkType.Input) ? double.NegativeInfinity : double.PositiveInfinity;
+			double maxTemp = (direction == LinkType.Input) ? double.PositiveInfinity : double.NegativeInfinity;
 
 			bool gotOne = false;
 			Queue<BaseNode> neQueue = new Queue<BaseNode>(); //RecipeNode or PassthroughNodes

@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BenchmarkTimer.cs" />
+    <Compile Include="Controls\ControlExtensions.cs" />
     <Compile Include="Controls\DataObjectCheckedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -162,6 +163,7 @@
     <Compile Include="Controls\SyncListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DataCache\DataTypes\EntityObjectBase.cs" />
     <Compile Include="DataCache\DataTypes\RecipeShort.cs" />
     <Compile Include="DataCache\FactorioPathsProcessor.cs" />
     <Compile Include="DataCache\IconCache.cs" />
@@ -172,6 +174,7 @@
     <Compile Include="DataCache\DataTypes\Module.cs" />
     <Compile Include="DataCache\DataTypes\Technology.cs" />
     <Compile Include="DataCache\InfoPackageClasses.cs" />
+    <Compile Include="DataCache\PresetProcessor.cs" />
     <Compile Include="Forms\SavefileLoadForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -343,10 +346,10 @@
     </None>
     <None Include="packages.config" />
     <None Include="Presets\Factorio 1.1 Vanilla.dat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Presets\Factorio 1.1 Vanilla.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -366,7 +369,28 @@
     <Content Include="Graphics\ErrorIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Graphics\MiningIcon.png">
+    <Content Include="Graphics\ExtraGroupIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\HeatEGeneration.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\HeatIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\PlayerAssembler.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\SteamEGeneration.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\SteamFromFuel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\SteamFromHeat.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\SteamFromLFuel.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\UnknownIcon.png">

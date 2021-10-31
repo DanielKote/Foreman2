@@ -43,19 +43,21 @@ namespace Foreman
 
 		private static readonly Color AvailableObjectColor = Color.White;
 		private static readonly Color UnavailableObjectColor = Color.Pink;
-		private static readonly Brush AvailableObjectBrush = Brushes.Black;
-		private static readonly Brush UnavailableObjectBrush = Brushes.DarkMagenta;
 
 		private SettingsFormOptions originalOptions;
 		public SettingsFormOptions CurrentOptions;
 
 		private List<ListViewItem> unfilteredAssemblerList;
 		private List<ListViewItem> unfilteredMinerList;
+		private List<ListViewItem> unfilteredPowerList;
+		private List<ListViewItem> unfilteredBeaconList;
 		private List<ListViewItem> unfilteredModuleList;
 		private List<ListViewItem> unfilteredRecipeList;
 
 		private List<ListViewItem> filteredAssemblerList;
 		private List<ListViewItem> filteredMinerList;
+		private List<ListViewItem> filteredPowerList;
+		private List<ListViewItem> filteredBeaconList;
 		private List<ListViewItem> filteredModuleList;
 		private List<ListViewItem> filteredRecipeList;
 
@@ -72,11 +74,15 @@ namespace Foreman
 
 			unfilteredAssemblerList = new List<ListViewItem>();
 			unfilteredMinerList = new List<ListViewItem>();
+			unfilteredPowerList = new List<ListViewItem>();
+			unfilteredBeaconList = new List<ListViewItem>();
 			unfilteredModuleList = new List<ListViewItem>();
 			unfilteredRecipeList = new List<ListViewItem>();
 
 			filteredAssemblerList = new List<ListViewItem>();
 			filteredMinerList = new List<ListViewItem>();
+			filteredPowerList = new List<ListViewItem>();
+			filteredBeaconList = new List<ListViewItem>();
 			filteredModuleList = new List<ListViewItem>();
 			filteredRecipeList = new List<ListViewItem>();
 
@@ -101,7 +107,7 @@ namespace Foreman
 			if (selectedPreset == null)
 				selectedPreset = CurrentOptions.SelectedPreset;
 
-			PresetInfo presetInfo = DataCache.ReadPresetInfo(selectedPreset);
+			PresetInfo presetInfo = PresetProcessor.ReadPresetInfo(selectedPreset);
 			ModSelectionBox.Items.Clear();
 			if (presetInfo.ModList != null)
 			{
@@ -118,8 +124,10 @@ namespace Foreman
 			IconList.Images.Clear();
 			IconList.Images.Add(DataCache.UnknownIcon);
 
-			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => !a.IsMiner), unfilteredAssemblerList);
-			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.IsMiner), unfilteredMinerList);
+			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler), unfilteredAssemblerList);
+			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner), unfilteredMinerList);
+			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor), unfilteredPowerList);
+			LoadUnfilteredList(CurrentOptions.DCache.Beacons.Values, unfilteredBeaconList);
 			LoadUnfilteredList(CurrentOptions.DCache.Modules.Values, unfilteredModuleList);
 			LoadUnfilteredList(CurrentOptions.DCache.Recipes.Values, unfilteredRecipeList);
 
@@ -165,6 +173,8 @@ namespace Foreman
 		{
 			UpdateFilteredList(unfilteredAssemblerList, filteredAssemblerList, AssemblerListView);
 			UpdateFilteredList(unfilteredMinerList, filteredMinerList, MinerListView);
+			UpdateFilteredList(unfilteredPowerList, filteredPowerList, PowerListView);
+			UpdateFilteredList(unfilteredBeaconList, filteredBeaconList, BeaconListView);
 			UpdateFilteredList(unfilteredModuleList, filteredModuleList, ModuleListView);
 			UpdateFilteredList(unfilteredRecipeList, filteredRecipeList, RecipeListView);
 		}
@@ -237,6 +247,17 @@ namespace Foreman
 				PresetMenuStrip.Visible = false;
 		}
 
+		private void PresetListBox_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			var index = PresetListBox.IndexFromPoint(e.Location);
+			if (index != ListBox.NoMatches)
+			{
+				CurrentOptions.SelectedPreset = ((Preset)PresetListBox.Items[index]);
+				this.Close();
+
+			}
+		}
+
 		private void DeletePresetMenuItem_Click(object sender, EventArgs e)
 		{
 			Preset selectedPreset = (Preset)PresetListBox.SelectedItem;
@@ -260,12 +281,8 @@ namespace Foreman
 
 		private void SelectPresetMenuItem_Click(object sender, EventArgs e)
 		{
-			Preset selectedPreset = (Preset)PresetListBox.SelectedItem;
-			if (!selectedPreset.IsCurrentlySelected) //safety check - should always pass
-			{
-				CurrentOptions.SelectedPreset = selectedPreset;
-				this.Close();
-			}
+			CurrentOptions.SelectedPreset = (Preset)PresetListBox.SelectedItem;
+			this.Close();
 		}
 
 		private void Filters_Changed(object sender, EventArgs e)
@@ -331,6 +348,8 @@ namespace Foreman
 
 		private void AssemblerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredAssemblerList[e.ItemIndex]; }
 		private void MinerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredMinerList[e.ItemIndex]; }
+		private void PowerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredPowerList[e.ItemIndex]; }
+		private void BeaconListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredBeaconList[e.ItemIndex]; }
 		private void ModuleListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredModuleList[e.ItemIndex]; }
 		private void RecipeListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredRecipeList[e.ItemIndex]; }
 

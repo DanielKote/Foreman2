@@ -11,15 +11,15 @@ namespace Foreman
 	{
 		Subgroup MySubgroup { get; }
 
-		float Time { get; set; }
+		double Time { get; set; }
 		long RecipeID { get; }
 		bool IsMissing { get; }
 
-		IReadOnlyDictionary<Item, float> ProductSet { get; }
+		IReadOnlyDictionary<Item, double> ProductSet { get; }
 		IReadOnlyList<Item> ProductList { get; }
-		IReadOnlyDictionary<Item, float> ProductTemperatureMap { get; }
+		IReadOnlyDictionary<Item, double> ProductTemperatureMap { get; }
 
-		IReadOnlyDictionary<Item, float> IngredientSet { get; }
+		IReadOnlyDictionary<Item, double> IngredientSet { get; }
 		IReadOnlyList<Item> IngredientList { get; }
 		IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get; }
 
@@ -38,13 +38,13 @@ namespace Foreman
 	{
 		public Subgroup MySubgroup { get { return mySubgroup; } }
 
-		public float Time { get; set; }
+		public double Time { get; set; }
 
-		public IReadOnlyDictionary<Item, float> ProductSet { get { return productSet; } }
+		public IReadOnlyDictionary<Item, double> ProductSet { get { return productSet; } }
 		public IReadOnlyList<Item> ProductList { get { return productList; } }
-		public IReadOnlyDictionary<Item, float> ProductTemperatureMap { get { return productTemperatureMap; } }
+		public IReadOnlyDictionary<Item, double> ProductTemperatureMap { get { return productTemperatureMap; } }
 
-		public IReadOnlyDictionary<Item, float> IngredientSet { get { return ingredientSet; } }
+		public IReadOnlyDictionary<Item, double> IngredientSet { get { return ingredientSet; } }
 		public IReadOnlyList<Item> IngredientList { get { return ingredientList; } }
 		public IReadOnlyDictionary<Item, fRange> IngredientTemperatureMap { get { return ingredientTemperatureMap; } }
 
@@ -55,11 +55,11 @@ namespace Foreman
 
 		internal SubgroupPrototype mySubgroup;
 
-		internal Dictionary<Item, float> productSet { get; private set; }
-		internal Dictionary<Item, float> productTemperatureMap { get; private set; }
+		internal Dictionary<Item, double> productSet { get; private set; }
+		internal Dictionary<Item, double> productTemperatureMap { get; private set; }
 		internal List<ItemPrototype> productList { get; private set; }
 
-		internal Dictionary<Item, float> ingredientSet { get; private set; }
+		internal Dictionary<Item, double> ingredientSet { get; private set; }
 		internal Dictionary<Item, fRange> ingredientTemperatureMap { get; private set; }
 		internal List<ItemPrototype> ingredientList { get; private set; }
 
@@ -84,13 +84,13 @@ namespace Foreman
 			this.Enabled = true;
 			this.IsMissing = isMissing;
 
-			ingredientSet = new Dictionary<Item, float>();
+			ingredientSet = new Dictionary<Item, double>();
 			ingredientList = new List<ItemPrototype>();
 			ingredientTemperatureMap = new Dictionary<Item, fRange>();
 
-			productSet = new Dictionary<Item, float>();
+			productSet = new Dictionary<Item, double>();
 			productList = new List<ItemPrototype>();
-			productTemperatureMap = new Dictionary<Item, float>();
+			productTemperatureMap = new Dictionary<Item, double>();
 
 			assemblers = new HashSet<AssemblerPrototype>();
 			modules = new HashSet<ModulePrototype>();
@@ -126,7 +126,7 @@ namespace Foreman
 			return IngredientTemperatureMap[ingredient].Contains(provider.ProductTemperatureMap[ingredient]);
 		}
 
-		public void InternalOneWayAddIngredient(ItemPrototype item, float quantity, float minTemp = float.NegativeInfinity, float maxTemp = float.PositiveInfinity)
+		public void InternalOneWayAddIngredient(ItemPrototype item, double quantity, double minTemp = double.NegativeInfinity, double maxTemp = double.PositiveInfinity)
 		{
 			if (IngredientSet.ContainsKey(item))
 				ingredientSet[item] += quantity;
@@ -145,7 +145,7 @@ namespace Foreman
 			ingredientTemperatureMap.Remove(item);
 		}
 
-		public void InternalOneWayAddProduct(ItemPrototype item, float quantity, float temperature = 0)
+		public void InternalOneWayAddProduct(ItemPrototype item, double quantity, double temperature = 0)
 		{
 			if (productSet.ContainsKey(item))
 				productSet[item] += quantity;
@@ -202,12 +202,12 @@ namespace Foreman
 		//NOTE: there is no check for min to be guaranteed to be less than max, and this is BY DESIGN
 		//this means that if your range is for example from 10 to 8, (and it isnt ignored), ANY call to Contains methods will return false
 		//ex: 2 recipes, one requiring fluid 0->10 degrees, other requiring fluid 20->30 degrees. A proper summation of ranges will result in a vaild range of 20->10 degrees to satisfy both recipes, aka: NO TEMP WILL SATISFY!
-		public float Min;
-		public float Max;
+		public double Min;
+		public double Max;
 		public bool Ignore;
 
-		public fRange(float min, float max, bool ignore = false) { Min = min; Max = max; Ignore = ignore; }
-		public bool Contains(float value) { return Ignore || (value >= Min && value <= Max); }
+		public fRange(double min, double max, bool ignore = false) { Min = min; Max = max; Ignore = ignore; }
+		public bool Contains(double value) { return Ignore || (value >= Min && value <= Max); }
 		public bool Contains(fRange range) { return Ignore || (this.Min <= range.Min && this.Max >= range.Max); }
 		public bool IsContainedIn(fRange range) { return Ignore || (range.Min <= this.Min && range.Max >= this.Max); } //Ignore counts only for this! not for the provided range
 	}

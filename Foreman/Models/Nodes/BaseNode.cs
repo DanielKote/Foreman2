@@ -23,10 +23,11 @@ namespace Foreman
 		IReadOnlyList<NodeLink> OutputLinks { get; }
 
 		RateType RateType { get; set; }
-		float ActualRate { get; }
-		float DesiredRate { get; set; }
+		double ActualRate { get; }
+		double DesiredRate { get; set; }
 
 		NodeState State { get; }
+		bool SolverError { get; } //if true then the solver came out with an infinity or something similar when trying to solve. Most likely solution is a cyclic recipe situation. Still - we need to display this
 		void UpdateState();
 
 		List<string> GetErrors();
@@ -34,18 +35,18 @@ namespace Foreman
 		Dictionary<string, Action> GetErrorResolutions(); //<resolution title : action that will happen if this resolution is picked> ex: <"delete node", Action(will delete this node)>
 		Dictionary<string, Action> GetWarningResolutions();
 
-		float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
-		float GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
-		float GetSuppliedRate(Item item); //actual rate an item is supplied to this node (sum of all links for a given item to this node)
+		double GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
+		double GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
+		double GetSuppliedRate(Item item); //actual rate an item is supplied to this node (sum of all links for a given item to this node)
 
 		bool IsOversupplied();
 		bool IsOversupplied(Item item); //true if GetConsumeRate < GetSuppliedRate
 		bool ManualRateNotMet(); //true if ActualRate < DesiredRate (and RateType is manual)
 
-		float GetSpeedMultiplier();
-		float GetProductivityMultiplier();
-		float GetConsumptionMultiplier();
-		float GetPollutionMultiplier();
+		double GetSpeedMultiplier();
+		double GetProductivityMultiplier();
+		double GetConsumptionMultiplier();
+		double GetPollutionMultiplier();
 
 		void Delete();
 
@@ -68,21 +69,22 @@ namespace Foreman
 		public IReadOnlyList<NodeLink> InputLinks { get { return inputLinks; } }
 		public IReadOnlyList<NodeLink> OutputLinks { get { return outputLinks; } }
 
-		public float ActualRate { get; protected set; } // The rate the solver calculated is appropriate for this node.
-		public float DesiredRate { get; set; } // If the rateType is manual, this field contains the rate the user desires.
+		public double ActualRate { get; protected set; } // The rate the solver calculated is appropriate for this node.
+		public virtual double DesiredRate { get; set; } // If the rateType is manual, this field contains the rate the user desires. If the node is a recipe node, then this is read only -> use DesiredAssemblers instead
 
 		internal List<NodeLinkPrototype> inputLinks { get; private set; }
 		internal List<NodeLinkPrototype> outputLinks { get; private set; }
 
-		public abstract float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node
-		public abstract float GetSupplyRate(Item item); //calculated rate a given item is supplied by this node
+		public abstract double GetConsumeRate(Item item); //calculated rate a given item is consumed by this node
+		public abstract double GetSupplyRate(Item item); //calculated rate a given item is supplied by this node
 
-		public virtual float GetSpeedMultiplier() { return 1; }
-		public virtual float GetProductivityMultiplier() { return 1; }
-		public virtual float GetConsumptionMultiplier() { return 1; }
-		public virtual float GetPollutionMultiplier() { return 1; }
+		public virtual double GetSpeedMultiplier() { return 1; }
+		public virtual double GetProductivityMultiplier() { return 1; }
+		public virtual double GetConsumptionMultiplier() { return 1; }
+		public virtual double GetPollutionMultiplier() { return 1; }
 
 		public NodeState State { get; protected set; }
+		public bool SolverError { get; protected set; }
 		public abstract void UpdateState();
 
 		public abstract List<string> GetErrors();
@@ -115,6 +117,7 @@ namespace Foreman
 			MyGraph = graph;
 			NodeID = nodeID;
 			Location = new Point(0, 0);
+			SolverError = false;
 
 			inputLinks = new List<NodeLinkPrototype>();
 			outputLinks = new List<NodeLinkPrototype>();
@@ -122,9 +125,9 @@ namespace Foreman
 
 		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
 
-		public float GetSuppliedRate(Item item)
+		public double GetSuppliedRate(Item item)
 		{
-			return (float)InputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
+			return (double)InputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
 		}
 
 		public bool IsOversupplied()
@@ -142,8 +145,8 @@ namespace Foreman
 			//supply & consume [0 ->0.001] ---> allow for any errors (as long as neither are 0)
 			//supply & consume = 0 ---> no errors if both are exactly 0
 
-			float consumeRate = GetConsumeRate(item);
-			float supplyRate = GetSuppliedRate(item);
+			double consumeRate = GetConsumeRate(item);
+			double supplyRate = GetSuppliedRate(item);
 			if ((consumeRate == 0 && supplyRate == 0) || (supplyRate < 0.001 && supplyRate < 0.001))
 				return false;
 			return ((supplyRate - consumeRate) / supplyRate) > ((consumeRate > 1 && supplyRate > 1) ? 0.001f : 0.05f);

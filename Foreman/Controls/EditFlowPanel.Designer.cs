@@ -29,11 +29,12 @@
         private void InitializeComponent()
         {
 			this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
-			this.FixedItemFlowInput = new System.Windows.Forms.TextBox();
 			this.FixedOption = new System.Windows.Forms.RadioButton();
 			this.AutoOption = new System.Windows.Forms.RadioButton();
 			this.RateLabel = new System.Windows.Forms.Label();
+			this.FixedFlowInput = new System.Windows.Forms.NumericUpDown();
 			this.RateOptionsTable.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.FixedFlowInput)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// RateOptionsTable
@@ -45,28 +46,17 @@
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.RateOptionsTable.Controls.Add(this.FixedItemFlowInput, 2, 1);
 			this.RateOptionsTable.Controls.Add(this.FixedOption, 1, 1);
 			this.RateOptionsTable.Controls.Add(this.AutoOption, 0, 1);
 			this.RateOptionsTable.Controls.Add(this.RateLabel, 0, 0);
+			this.RateOptionsTable.Controls.Add(this.FixedFlowInput, 2, 1);
 			this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
 			this.RateOptionsTable.Name = "RateOptionsTable";
 			this.RateOptionsTable.RowCount = 2;
 			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.RateOptionsTable.Size = new System.Drawing.Size(215, 47);
+			this.RateOptionsTable.Size = new System.Drawing.Size(225, 47);
 			this.RateOptionsTable.TabIndex = 19;
-			// 
-			// FixedItemFlowInput
-			// 
-			this.FixedItemFlowInput.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FixedItemFlowInput.Location = new System.Drawing.Point(112, 24);
-			this.FixedItemFlowInput.Name = "FixedItemFlowInput";
-			this.FixedItemFlowInput.Size = new System.Drawing.Size(100, 20);
-			this.FixedItemFlowInput.TabIndex = 2;
-			this.FixedItemFlowInput.TextChanged += new System.EventHandler(this.FixedItemFlowInput_TextChanged);
-			this.FixedItemFlowInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
-			this.FixedItemFlowInput.Leave += new System.EventHandler(this.FixedItemFlowInput_LostFocus);
 			// 
 			// FixedOption
 			// 
@@ -79,7 +69,6 @@
 			this.FixedOption.Text = "Fixed";
 			this.FixedOption.UseVisualStyleBackColor = true;
 			this.FixedOption.CheckedChanged += new System.EventHandler(this.FixedOption_CheckChanged);
-			this.FixedOption.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
 			// 
 			// AutoOption
 			// 
@@ -93,7 +82,6 @@
 			this.AutoOption.TabStop = true;
 			this.AutoOption.Text = "Auto";
 			this.AutoOption.UseVisualStyleBackColor = true;
-			this.AutoOption.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
 			// 
 			// RateLabel
 			// 
@@ -104,10 +92,27 @@
 			this.RateLabel.Location = new System.Drawing.Point(3, 1);
 			this.RateLabel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
 			this.RateLabel.Name = "RateLabel";
-			this.RateLabel.Size = new System.Drawing.Size(209, 17);
+			this.RateLabel.Size = new System.Drawing.Size(219, 17);
 			this.RateLabel.TabIndex = 3;
 			this.RateLabel.Text = "Item Flowrate (per 1 hour):";
 			this.RateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// FixedFlowInput
+			// 
+			this.FixedFlowInput.AutoSize = true;
+			this.FixedFlowInput.DecimalPlaces = 4;
+			this.FixedFlowInput.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FixedFlowInput.Location = new System.Drawing.Point(112, 24);
+			this.FixedFlowInput.Maximum = new decimal(new int[] {
+            1000000000,
+            0,
+            0,
+            0});
+			this.FixedFlowInput.Name = "FixedFlowInput";
+			this.FixedFlowInput.Size = new System.Drawing.Size(110, 20);
+			this.FixedFlowInput.TabIndex = 4;
+			this.FixedFlowInput.ThousandsSeparator = true;
+			this.FixedFlowInput.ValueChanged += new System.EventHandler(this.FixedFlowInput_ValueChanged);
 			// 
 			// EditFlowPanel
 			// 
@@ -120,10 +125,10 @@
 			this.DoubleBuffered = true;
 			this.ForeColor = System.Drawing.Color.White;
 			this.Name = "EditFlowPanel";
-			this.Size = new System.Drawing.Size(221, 53);
-			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyPressed);
+			this.Size = new System.Drawing.Size(231, 53);
 			this.RateOptionsTable.ResumeLayout(false);
 			this.RateOptionsTable.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.FixedFlowInput)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -132,9 +137,9 @@
 		#endregion
 
 		private System.Windows.Forms.TableLayoutPanel RateOptionsTable;
-		public System.Windows.Forms.TextBox FixedItemFlowInput;
 		public System.Windows.Forms.RadioButton FixedOption;
 		public System.Windows.Forms.RadioButton AutoOption;
 		private System.Windows.Forms.Label RateLabel;
+		private System.Windows.Forms.NumericUpDown FixedFlowInput;
 	}
 }

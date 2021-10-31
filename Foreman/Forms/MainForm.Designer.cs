@@ -42,13 +42,14 @@
 			this.SaveGraphButton = new System.Windows.Forms.Button();
 			this.ProductionGroupBox = new System.Windows.Forms.GroupBox();
 			this.GraphOptionsTable = new System.Windows.Forms.TableLayoutPanel();
-			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.ShowNodeRecipeCheckBox = new System.Windows.Forms.CheckBox();
 			this.HighLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.MediumLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.LowLodRadioButton = new System.Windows.Forms.RadioButton();
+			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
+			this.RecipeEditPanelPositionLockCheckBox = new System.Windows.Forms.CheckBox();
 			this.ShowUnavailableCheckBox = new System.Windows.Forms.CheckBox();
 			this.GridLinesGroupBox = new System.Windows.Forms.GroupBox();
 			this.GridlinesTable = new System.Windows.Forms.TableLayoutPanel();
@@ -66,7 +67,6 @@
 			this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.RecipeEditPanelPositionLockCheckBox = new System.Windows.Forms.CheckBox();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MenuTable.SuspendLayout();
 			this.MenuButtonsTable.SuspendLayout();
@@ -91,7 +91,7 @@
 			this.MainLayoutPanel.RowCount = 2;
 			this.MainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.MainLayoutPanel.Size = new System.Drawing.Size(934, 661);
+			this.MainLayoutPanel.Size = new System.Drawing.Size(934, 761);
 			this.MainLayoutPanel.TabIndex = 1;
 			// 
 			// GraphViewer
@@ -110,7 +110,7 @@
 			this.GraphViewer.Name = "GraphViewer";
 			this.GraphViewer.RecipeTooltipEnabled = false;
 			this.GraphViewer.SelectedRateUnit = Foreman.ProductionGraphViewer.RateUnit.Per1Sec;
-			this.GraphViewer.Size = new System.Drawing.Size(928, 526);
+			this.GraphViewer.Size = new System.Drawing.Size(928, 626);
 			this.GraphViewer.TabIndex = 12;
 			this.GraphViewer.TooltipsEnabled = true;
 			this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
@@ -136,7 +136,7 @@
 			this.MenuTable.Name = "MenuTable";
 			this.MenuTable.RowCount = 1;
 			this.MenuTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MenuTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.MenuTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 126F));
 			this.MenuTable.Size = new System.Drawing.Size(928, 126);
 			this.MenuTable.TabIndex = 18;
 			// 
@@ -325,20 +325,6 @@
 			this.GraphOptionsTable.Size = new System.Drawing.Size(186, 89);
 			this.GraphOptionsTable.TabIndex = 2;
 			// 
-			// PauseUpdatesCheckbox
-			// 
-			this.PauseUpdatesCheckbox.AutoSize = true;
-			this.GraphOptionsTable.SetColumnSpan(this.PauseUpdatesCheckbox, 4);
-			this.PauseUpdatesCheckbox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 72);
-			this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-			this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
-			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(180, 17);
-			this.PauseUpdatesCheckbox.TabIndex = 3;
-			this.PauseUpdatesCheckbox.Text = "Pause all calculations";
-			this.PauseUpdatesCheckbox.UseVisualStyleBackColor = true;
-			this.PauseUpdatesCheckbox.CheckedChanged += new System.EventHandler(this.PauseUpdatesCheckbox_CheckedChanged);
-			// 
 			// ShowNodeRecipeCheckBox
 			// 
 			this.ShowNodeRecipeCheckBox.AutoSize = true;
@@ -420,6 +406,34 @@
 			this.LowLodRadioButton.Text = "Low";
 			this.LowLodRadioButton.UseVisualStyleBackColor = true;
 			this.LowLodRadioButton.CheckedChanged += new System.EventHandler(this.LODRadioButton_CheckedChanged);
+			// 
+			// PauseUpdatesCheckbox
+			// 
+			this.PauseUpdatesCheckbox.AutoSize = true;
+			this.GraphOptionsTable.SetColumnSpan(this.PauseUpdatesCheckbox, 4);
+			this.PauseUpdatesCheckbox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 72);
+			this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+			this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
+			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(180, 17);
+			this.PauseUpdatesCheckbox.TabIndex = 3;
+			this.PauseUpdatesCheckbox.Text = "Pause all calculations";
+			this.PauseUpdatesCheckbox.UseVisualStyleBackColor = true;
+			this.PauseUpdatesCheckbox.CheckedChanged += new System.EventHandler(this.PauseUpdatesCheckbox_CheckedChanged);
+			// 
+			// RecipeEditPanelPositionLockCheckBox
+			// 
+			this.RecipeEditPanelPositionLockCheckBox.AutoSize = true;
+			this.GraphOptionsTable.SetColumnSpan(this.RecipeEditPanelPositionLockCheckBox, 4);
+			this.RecipeEditPanelPositionLockCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 55);
+			this.RecipeEditPanelPositionLockCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+			this.RecipeEditPanelPositionLockCheckBox.Name = "RecipeEditPanelPositionLockCheckBox";
+			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(180, 17);
+			this.RecipeEditPanelPositionLockCheckBox.TabIndex = 11;
+			this.RecipeEditPanelPositionLockCheckBox.Text = "Lock Recipe Editor to TL corner";
+			this.RecipeEditPanelPositionLockCheckBox.UseVisualStyleBackColor = true;
+			this.RecipeEditPanelPositionLockCheckBox.CheckedChanged += new System.EventHandler(this.RecipeEditPanelPositionLockCheckBox_CheckedChanged);
 			// 
 			// ShowUnavailableCheckBox
 			// 
@@ -678,29 +692,15 @@
 			this.label1.Text = "Modules:";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// RecipeEditPanelPositionLockCheckBox
-			// 
-			this.RecipeEditPanelPositionLockCheckBox.AutoSize = true;
-			this.GraphOptionsTable.SetColumnSpan(this.RecipeEditPanelPositionLockCheckBox, 4);
-			this.RecipeEditPanelPositionLockCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 55);
-			this.RecipeEditPanelPositionLockCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-			this.RecipeEditPanelPositionLockCheckBox.Name = "RecipeEditPanelPositionLockCheckBox";
-			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(180, 17);
-			this.RecipeEditPanelPositionLockCheckBox.TabIndex = 11;
-			this.RecipeEditPanelPositionLockCheckBox.Text = "Lock Recipe Editor to TL corner";
-			this.RecipeEditPanelPositionLockCheckBox.UseVisualStyleBackColor = true;
-			this.RecipeEditPanelPositionLockCheckBox.CheckedChanged += new System.EventHandler(this.RecipeEditPanelPositionLockCheckBox_CheckedChanged);
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(934, 661);
+			this.ClientSize = new System.Drawing.Size(934, 761);
 			this.Controls.Add(this.MainLayoutPanel);
 			this.DoubleBuffered = true;
 			this.KeyPreview = true;
-			this.MinimumSize = new System.Drawing.Size(950, 700);
+			this.MinimumSize = new System.Drawing.Size(950, 800);
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Foreman 2.0";

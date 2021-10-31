@@ -23,8 +23,8 @@ namespace Foreman
 			PassthroughItem = item;
 		}
 
-		public override float GetConsumeRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
-		public override float GetSupplyRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
+		public override double GetConsumeRate(Item item) { return (double)Math.Round(ActualRate, RoundingDP); }
+		public override double GetSupplyRate(Item item) { return (double)Math.Round(ActualRate, RoundingDP); }
 
 		internal override double inputRateFor(Item item) { return 1; }
 		internal override double outputRateFor(Item item) { return 1; }

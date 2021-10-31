@@ -30,7 +30,9 @@ namespace Foreman
 		private List<object>[] unfilteredItemTabObjects; //Items
 		private List<object>[] unfilteredRecipeTabObjects; //Recipes
 		private List<object>[] unfilteredAssemblerTabObjects; //Assemblers
-		private List<object>[] unfilteredMinerTabObjects; //Miners
+		private List<object>[] unfilteredMinerTabObjects; //Assemblers (miners)
+		private List<object>[] unfilteredPowerTabObjects; //Assemblers (power generation)
+		private List<object>[] unfilteredBeaconTabObjects; //Beacons
 		private List<object>[] unfilteredModuleTabObjects; //Modules
 		private List<object>[][] tabSet; //just a helper array to set unfilteredSelectedTabObjects to the correct value without having to if/switch
 
@@ -68,8 +70,20 @@ namespace Foreman
 			unfilteredRecipeTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
 			unfilteredAssemblerTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
 			unfilteredMinerTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
+			unfilteredPowerTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
+			unfilteredBeaconTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
 			unfilteredModuleTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-			tabSet = new List<object>[][] { unfilteredModTabObjects, unfilteredItemTabObjects, unfilteredRecipeTabObjects, unfilteredAssemblerTabObjects, unfilteredMinerTabObjects, unfilteredModuleTabObjects };
+
+			tabSet = new List<object>[][] {
+				unfilteredModTabObjects,
+				unfilteredItemTabObjects,
+				unfilteredRecipeTabObjects,
+				unfilteredAssemblerTabObjects,
+				unfilteredMinerTabObjects,
+				unfilteredPowerTabObjects,
+				unfilteredBeaconTabObjects,
+				unfilteredModuleTabObjects
+			};
 
 			unfilteredSelectedTabObjects = tabSet[0];
 
@@ -112,6 +126,8 @@ namespace Foreman
 				unfilteredRecipeTabObjects[i].Clear();
 				unfilteredAssemblerTabObjects[i].Clear();
 				unfilteredMinerTabObjects[i].Clear();
+				unfilteredPowerTabObjects[i].Clear();
+				unfilteredBeaconTabObjects[i].Clear();
 				unfilteredModuleTabObjects[i].Clear();
 
 				filteredSelectedTabLVIs[i].Clear();
@@ -187,8 +203,10 @@ namespace Foreman
 			//2.2: items, recipes, assemblers, miners, and modules
 			ProcessObject(LeftCache.Items, RightCache.Items, unfilteredItemTabObjects);
 			ProcessObject(LeftCache.Recipes, RightCache.Recipes, unfilteredRecipeTabObjects);
-			ProcessObject(LeftCache.Assemblers.Values.Where(a => !a.IsMiner).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => !a.IsMiner).ToDictionary(a => a.Name), unfilteredAssemblerTabObjects);
-			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.IsMiner).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.IsMiner).ToDictionary(a => a.Name), unfilteredMinerTabObjects);
+			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler).ToDictionary(a => a.Name), unfilteredAssemblerTabObjects);
+			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner).ToDictionary(a => a.Name), unfilteredMinerTabObjects);
+			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor).ToDictionary(a => a.Name), unfilteredPowerTabObjects);
+			ProcessObject(LeftCache.Beacons.Values.ToDictionary(a => a.Name), RightCache.Beacons.Values.ToDictionary(a => a.Name), unfilteredBeaconTabObjects);
 			ProcessObject(LeftCache.Modules, RightCache.Modules, unfilteredModuleTabObjects);
 
 			//process the tab (for the first time) - it will also populate the actual lists.
@@ -222,7 +240,7 @@ namespace Foreman
 						unfilteredSelectedTabLVIs[i].Add(lvItem);
 					}
 				}
-				else //item,recipe,assembler,miner,module -> all are DataObjectBase types
+				else //item,recipe,assembler,miner,beacon,module -> all are DataObjectBase types
 				{
 					foreach (object obj in unfilteredSelectedTabObjects[i])
 					{
@@ -271,7 +289,7 @@ namespace Foreman
 						similarInternals = (lRecipe.IngredientList.Count == rRecipe.IngredientList.Count) && (lRecipe.ProductList.Count == rRecipe.ProductList.Count);
 						similarInternals &= (lRecipe.Available == rRecipe.Available);
 						bool exactInternals = similarInternals;
-						float scale = rRecipe.Time / lRecipe.Time;
+						double scale = rRecipe.Time / lRecipe.Time;
 						if (similarInternals)
 						{
 							foreach (Item lingredient in lRecipe.IngredientList)
@@ -298,13 +316,19 @@ namespace Foreman
 
 					case 3: //assemblers
 					case 4: //miners
+					case 5: //power (aka: assemblers)
 						Assembler lAssembler = (Assembler)l.Tag;
 						Assembler rAssembler = (Assembler)r.Tag;
 
 						similarInternals = (lAssembler.Speed == rAssembler.Speed && lAssembler.ModuleSlots == rAssembler.ModuleSlots);
 						break;
+					case 6: //beacons
+						Beacon lBeacon = (Beacon)l.Tag;
+						Beacon rBeacon = (Beacon)r.Tag;
 
-					case 5: //modules
+						similarInternals = (lBeacon.ModuleSlots == rBeacon.ModuleSlots);
+						break;
+					case 7: //modules
 						Module lModule = (Module)l.Tag;
 						Module rModule = (Module)r.Tag;
 
@@ -462,7 +486,7 @@ namespace Foreman
 					RecipeToolTip.SetRecipe(recipe, compareTypeTT ? (rLVI.Tag as Recipe) : null);
 					RecipeToolTip.Show((Control)sender, location);
 				}
-				else if (lLVI.Tag is Assembler assembler) //assembler or miner
+				else if (lLVI.Tag is Assembler assembler) //assembler, miner, or power
 				{
 					string left = assembler.FriendlyName + "\n" +
 						string.Format("   Speed:         {0}x\n", assembler.Speed) +
@@ -474,6 +498,21 @@ namespace Foreman
 						right = rassembler.FriendlyName + "\n" +
 						string.Format("   Speed:         {0}x\n", rassembler.Speed) +
 						string.Format("   Module Slots:  {0}", rassembler.ModuleSlots);
+					}
+
+					TextToolTip.SetText(left, right);
+					TextToolTip.Show((Control)sender, location);
+				}
+				else if (lLVI.Tag is Beacon beacon)
+				{
+					string left = beacon.FriendlyName + "\n" +
+						string.Format("   Module Slots:  {0}", beacon.ModuleSlots);
+					string right = "";
+					if(compareTypeTT)
+					{
+						Beacon rbeacon = rLVI.Tag as Beacon;
+						right = rbeacon.FriendlyName + "\n" +
+							string.Format("   Module Slots:  {0}", rbeacon.ModuleSlots);
 					}
 
 					TextToolTip.SetText(left, right);

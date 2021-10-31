@@ -93,6 +93,7 @@ namespace Foreman
 
 			objective.SetMinimization();
 
+			//solver.Solve(); //<<------------------------------------------------------------------------------------------------------------- Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
 			if (solver.Solve() != Solver.OPTIMAL)
 				return null;
 
@@ -114,7 +115,7 @@ namespace Foreman
 		// one of these on the ultimate output node, though multiple are supported, on any node. If
 		// there is a conflict, a 'best effort' solution will be returned, where some nodes actual
 		// rates will not match the desired asked for here.
-		public void AddTarget(BaseNode node, float desiredRate)
+		public void AddTarget(BaseNode node, double desiredRate)
 		{
 			var nodeVar = variableFor(node, RateType.ACTUAL);
 			var errorVar = variableFor(node, RateType.ERROR);
