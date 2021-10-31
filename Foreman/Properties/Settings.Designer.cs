@@ -38,12 +38,12 @@ namespace Foreman.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int DefaultModules {
+        public int DefaultModuleOption {
             get {
-                return ((int)(this["DefaultModules"]));
+                return ((int)(this["DefaultModuleOption"]));
             }
             set {
-                this["DefaultModules"] = value;
+                this["DefaultModuleOption"] = value;
             }
         }
         
@@ -146,12 +146,12 @@ namespace Foreman.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int DefaultAssemblers {
+        public int DefaultAssemblerOption {
             get {
-                return ((int)(this["DefaultAssemblers"]));
+                return ((int)(this["DefaultAssemblerOption"]));
             }
             set {
-                this["DefaultAssemblers"] = value;
+                this["DefaultAssemblerOption"] = value;
             }
         }
         
@@ -164,6 +164,18 @@ namespace Foreman.Properties {
             }
             set {
                 this["DefaultRateUnit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastSaveFileLocation {
+            get {
+                return ((string)(this["LastSaveFileLocation"]));
+            }
+            set {
+                this["LastSaveFileLocation"] = value;
             }
         }
     }

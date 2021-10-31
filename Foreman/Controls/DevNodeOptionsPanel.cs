@@ -45,15 +45,7 @@ namespace Foreman
 				AssemblerSelectionBox.Items.AddRange(recipe.ValidAssemblers.Where(a => a.Enabled).ToArray());
 				if (recipeNode.SelectedAssembler != null && !AssemblerSelectionBox.Items.Contains(recipeNode.SelectedAssembler))
 					AssemblerSelectionBox.Items.Add(recipeNode.SelectedAssembler);
-				if (AssemblerSelectionBox.Items.Count == 0)
-				{
-					//no valid assemblers - all options disabled except for desired amount / rate type
-					AssemblerSelectionBox.Items.Add(recipe.ValidAssemblers.First());
-					AssemblerGroup.Enabled = false;
-					AssemblerGroup.BackColor = Color.Pink;
-					BeaconGroup.Enabled = false;
-					BeaconGroup.BackColor = Color.Pink;
-				}
+
 				AssemblerSelectionBox.SelectedItem = recipeNode.SelectedAssembler ?? AssemblerSelectionBox.Items[0];
 
 				if (recipeNode.AssemblerModules.Count > 0)

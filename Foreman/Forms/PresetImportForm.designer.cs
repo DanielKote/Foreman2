@@ -1,6 +1,6 @@
 ﻿namespace Foreman
 {
-	partial class ImportPresetForm
+	partial class PresetImportForm
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -46,6 +46,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.PresetNameTextBox = new System.Windows.Forms.TextBox();
             this.ImportProgressBar = new Foreman.CustomProgressBar();
+            this.label4 = new System.Windows.Forms.Label();
             this.FactorioLocationGroup.SuspendLayout();
             this.FactorioSettingsGroup.SuspendLayout();
             this.TechnologyDifficultyGroup.SuspendLayout();
@@ -206,6 +207,7 @@
             // 
             // PresetNameGroup
             // 
+            this.PresetNameGroup.Controls.Add(this.label4);
             this.PresetNameGroup.Controls.Add(this.label3);
             this.PresetNameGroup.Controls.Add(this.PresetNameTextBox);
             this.PresetNameGroup.Location = new System.Drawing.Point(12, 181);
@@ -219,19 +221,19 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            this.label3.Location = new System.Drawing.Point(196, 25);
+            this.label3.Location = new System.Drawing.Point(404, 16);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(397, 15);
+            this.label3.Size = new System.Drawing.Size(189, 15);
             this.label3.TabIndex = 5;
-            this.label3.Text = "(5-30 characters: letters, numbers, space, brackets, dash or underscore)";
+            this.label3.Text = "5-40 characters: letters, numbers,";
             // 
             // PresetNameTextBox
             // 
             this.PresetNameTextBox.BackColor = System.Drawing.Color.Moccasin;
             this.PresetNameTextBox.Location = new System.Drawing.Point(7, 22);
-            this.PresetNameTextBox.MaxLength = 30;
+            this.PresetNameTextBox.MaxLength = 40;
             this.PresetNameTextBox.Name = "PresetNameTextBox";
-            this.PresetNameTextBox.Size = new System.Drawing.Size(183, 22);
+            this.PresetNameTextBox.Size = new System.Drawing.Size(391, 22);
             this.PresetNameTextBox.TabIndex = 0;
             this.PresetNameTextBox.TextChanged += new System.EventHandler(this.PresetNameTextBox_TextChanged);
             // 
@@ -243,6 +245,16 @@
             this.ImportProgressBar.Size = new System.Drawing.Size(470, 32);
             this.ImportProgressBar.TabIndex = 5;
             this.ImportProgressBar.Visible = false;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            this.label4.Location = new System.Drawing.Point(404, 32);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(168, 15);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "brackets, dash or underscore.";
             // 
             // ImportPresetForm
             // 
@@ -297,5 +309,6 @@
         private System.Windows.Forms.GroupBox PresetNameGroup;
         private System.Windows.Forms.TextBox PresetNameTextBox;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
     }
 }

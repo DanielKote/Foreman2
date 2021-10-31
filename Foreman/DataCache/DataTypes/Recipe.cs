@@ -15,7 +15,7 @@ namespace Foreman
 		bool IsMissingRecipe { get; }
 		bool IsCyclic { get; }
 		bool HasEnabledAssemblers { get; }
-		bool Hidden { get; set; }
+		bool Enabled { get; set; }
 
 		IReadOnlyDictionary<Item, float> ProductSet { get; }
 		IReadOnlyList<Item> ProductList { get; }
@@ -73,7 +73,7 @@ namespace Foreman
 		public bool IsMissingRecipe { get; private set; }
 		public bool IsCyclic { get; set; }
 		public bool HasEnabledAssemblers { get { return validAssemblers.FirstOrDefault(a => a.Enabled) != null; } }
-		public bool Hidden { get; set; }
+		public bool Enabled { get; set; }
 
 		private static long lastRecipeID = 0;
 		public long RecipeID { get; private set; }
@@ -86,7 +86,7 @@ namespace Foreman
 			subgroup.recipes.Add(this);
 
 			Time = 0.5f;
-			this.Hidden = false;
+			this.Enabled = true;
 			this.IsCyclic = false;
 			this.IsMissingRecipe = isMissing;
 

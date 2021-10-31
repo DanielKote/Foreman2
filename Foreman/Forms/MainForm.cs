@@ -37,14 +37,22 @@ namespace Foreman
 				}
 
 				GraphViewer.SelectedRateUnit = (ProductionGraphViewer.RateUnit)Properties.Settings.Default.DefaultRateUnit;
+				
 				RateOptionsDropDown.Items.AddRange(ProductionGraphViewer.RateUnitNames);
 				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
-				ModuleDropDown.SelectedIndex = Properties.Settings.Default.DefaultModules;
+
+				ModuleDropDown.Items.AddRange(ModuleSelector.StyleNames);
+				ModuleDropDown.SelectedIndex = Math.Min(Properties.Settings.Default.DefaultModuleOption, ModuleSelector.StyleNames.Length - 1);
+				AssemblerDropDown.Items.AddRange(AssemblerSelector.StyleNames);
+				AssemblerDropDown.SelectedIndex = Math.Min(Properties.Settings.Default.DefaultAssemblerOption, AssemblerSelector.StyleNames.Length - 1);
+
 				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
+				
 				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
 				SimpleViewCheckBox.Checked = Properties.Settings.Default.SimpleView;
+				
 				UpdateControlValues();
 				GraphViewer.Focus();
 			}
@@ -166,11 +174,7 @@ namespace Foreman
 			bool reload = false;
 			do
 			{
-				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
-				foreach (Assembler assembler in GraphViewer.DCache.Assemblers.Values)
-					oldOptions.Assemblers.Add(assembler, assembler.Enabled);
-				foreach (Module module in GraphViewer.DCache.Modules.Values)
-					oldOptions.Modules.Add(module, module.Enabled);
+				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions(GraphViewer.DCache);
 
 				oldOptions.Presets = GetValidPresetsList();
 				oldOptions.SelectedPreset = oldOptions.Presets[0];
@@ -189,13 +193,6 @@ namespace Foreman
 						List<Preset> validPresets = GetValidPresetsList();
 						GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, true);
 						Properties.Settings.Default.Save();
-					}
-					else //update the assemblers, miners, modules if we havent switched preset (if we have, then all are enabled)
-					{
-						foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
-							kvp.Key.Enabled = kvp.Value;
-						foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
-							kvp.Key.Enabled = kvp.Value;
 					}
 
 					GraphViewer.Invalidate();
@@ -324,14 +321,16 @@ namespace Foreman
 
 		private void ModuleDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-			Properties.Settings.Default.DefaultModules = ModuleDropDown.SelectedIndex;
+			Properties.Settings.Default.DefaultModuleOption = ModuleDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
+			GraphViewer.Graph.ModuleSelector.SelectionStyle = (ModuleSelector.Style)ModuleDropDown.SelectedIndex;
 		}
 
 		private void AssemblerDropDown_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			Properties.Settings.Default.DefaultAssemblers = AssemblerDropDown.SelectedIndex;
+			Properties.Settings.Default.DefaultAssemblerOption = AssemblerDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
+			GraphViewer.Graph.AssemblerSelector.SelectionStyle = (AssemblerSelector.Style)AssemblerDropDown.SelectedIndex;
 		}
 
 		//---------------------------------------------------------double buffering commands

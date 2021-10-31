@@ -10,7 +10,6 @@ namespace Foreman
 		IReadOnlyCollection<Recipe> UnlockedRecipes { get; }
 
 		bool Enabled { get; set; }
-		bool Locked { get; }
 	}
 
 	public class TechnologyPrototype : DataObjectBasePrototype, Technology
@@ -19,10 +18,7 @@ namespace Foreman
 		public IReadOnlyCollection<Technology> PostTechs { get { return postTechs; } }
         public IReadOnlyCollection<Recipe> UnlockedRecipes { get { return unlockedRecipes; } }
 
-		private bool enabled = false;
-		private bool locked = false;
-		public bool Enabled { get { return enabled; } set { enabled = value && !Locked; } }
-		public bool Locked { get { return locked; } internal set { locked = value; if (value) enabled = false; } } //cant be enabled if locked
+		public bool Enabled { get; set; }
 
 		internal HashSet<TechnologyPrototype> prerequisites { get; private set; }
 		internal HashSet<TechnologyPrototype> postTechs { get; private set; }

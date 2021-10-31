@@ -10,7 +10,7 @@ using System.Text;
 namespace Foreman
 {
 	public enum NodeType { Supplier, Consumer, Passthrough, Recipe }
-	public enum LinkType { Input, Output };
+	public enum LinkType { Input, Output }
 
 	public class NodeEventArgs : EventArgs
     {
@@ -37,6 +37,9 @@ namespace Foreman
 		private const int YBorder = 100;
 
 		public bool PauseUpdates { get; set; }
+
+		public AssemblerSelector AssemblerSelector { get; private set; }
+		public ModuleSelector ModuleSelector { get; private set; }
 		
 		public IReadOnlyCollection<BaseNode> Nodes { get { return nodes; } }
 		public IReadOnlyCollection<NodeLink> NodeLinks { get { return nodeLinks; } }
@@ -77,6 +80,9 @@ namespace Foreman
 			nodes = new HashSet<BaseNodePrototype>();
 			nodeLinks = new HashSet<NodeLinkPrototype>();
 			lastNodeID = 0;
+
+			AssemblerSelector = new AssemblerSelector();
+			ModuleSelector = new ModuleSelector();
 		}
 
 		public ConsumerNode CreateConsumerNode(Item item, Point location)

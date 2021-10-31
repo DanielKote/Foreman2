@@ -5,7 +5,7 @@
     <Setting Name="CurrentPresetName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="DefaultModules" Type="System.Int32" Scope="User">
+    <Setting Name="DefaultModuleOption" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="MinorGridlines" Type="System.Int32" Scope="User">
@@ -32,11 +32,14 @@
     <Setting Name="SimpleView" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="DefaultAssemblers" Type="System.Int32" Scope="User">
+    <Setting Name="DefaultAssemblerOption" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="DefaultRateUnit" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="LastSaveFileLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

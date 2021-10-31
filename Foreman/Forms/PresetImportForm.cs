@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 namespace Foreman
 {
-	public partial class ImportPresetForm : Form
+	public partial class PresetImportForm : Form
 	{
 		private char[] ExtraChars = { '(', ')', '-', '_', '.', ' ' };
 		private CancellationTokenSource cts;
@@ -21,46 +21,15 @@ namespace Foreman
 		public string NewPresetName { get; private set; }
 		public bool ImportStarted { get; private set; }
 
-		public ImportPresetForm()
+		public PresetImportForm()
 		{
 			NewPresetName = "";
 			ImportStarted = false;
 			cts = new CancellationTokenSource();
 			InitializeComponent();
 
-			//check default folders for a factorio installation (to fill in the path as the 'default')
-			List<string> factorioPaths = new List<string>();
 
-			//program files install
-			string pfConfigPath = Path.Combine(new string[] { "c:\\", "Program Files", "Factorio", "config-path.cfg" });
-			if (File.Exists(pfConfigPath))
-				factorioPaths.Add(Path.GetDirectoryName(pfConfigPath));
-
-			//steam
-			object steamPathA = Microsoft.Win32.Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "SteamPath", "");
-			object steamPathB = Microsoft.Win32.Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "");
-			string steamPath = (steamPathA != null && !string.IsNullOrEmpty((string)steamPathA)) ? (string)steamPathA : (steamPathB != null && !string.IsNullOrEmpty((string)steamPathB)) ? (string)steamPathB : "";
-			if (!string.IsNullOrEmpty((string)steamPath))
-            {
-				string libraryFoldersFilePath = Path.Combine(new string[] { (string)steamPath, "steamapps", "libraryfolders.vdf" });
-				if(File.Exists(libraryFoldersFilePath))
-                {
-					string[] steamLSettings = File.ReadAllLines(libraryFoldersFilePath);
-					foreach(string line in steamLSettings)
-                    {
-						if(line.Contains("\"path\""))
-                        {
-							string libraryPath = line.Substring(0, line.LastIndexOf("\""));
-							libraryPath = libraryPath.Substring(libraryPath.LastIndexOf("\"") + 1);
-							string factorioConfigPath = Path.Combine(new string[] { libraryPath, "steamapps", "common", "Factorio", "config-path.cfg" });
-							if (File.Exists(factorioConfigPath))
-							factorioPaths.Add(Path.GetDirectoryName(factorioConfigPath));
-                        }
-                    }
-                }
-            }
-
-			FactorioLocationComboBox.Items.AddRange(factorioPaths.ToArray());
+			FactorioLocationComboBox.Items.AddRange(FactorioPathsProcessor.GetFactorioInstallLocations().ToArray());
 			if (FactorioLocationComboBox.Items.Count > 0)
 				FactorioLocationComboBox.SelectedIndex = 0;
 		}
@@ -154,7 +123,12 @@ namespace Foreman
 				return;
 			}
 
-			string userDataPath = GetFactorioUserPath(installPath);
+			string userDataPath = FactorioPathsProcessor.GetFactorioUserPath(installPath, true);
+			if (string.IsNullOrEmpty(userDataPath))
+			{
+				CleanupFailedImport();
+				return;
+			}
 
 			//we now have the two paths to use - installPath and userDataPath. can begin processing Factorio
 			var progress = new Progress<KeyValuePair<int, string>>(value =>
@@ -190,87 +164,6 @@ namespace Foreman
 
 		}
 
-		private string GetFactorioUserPath(string installPath)
-        {
-			//find config-path.cfg, read it, and use it to find config.ini
-			string configPath = Path.Combine(installPath, "config-path.cfg");
-			if (!File.Exists(configPath))
-			{
-				EnableProgressBar(false);
-				MessageBox.Show("config-path.cfg missing from the install location. Maybe run Factorio once to ensure all files are there?\nAlternatively a reinstall might be required.");
-				ErrorLogging.LogLine(string.Format("config-path.cfg was not found at {0}. this was supposed to be the install folder", installPath));
-				CleanupFailedImport();
-				return "";
-			}
-
-			string config = File.ReadAllText(configPath);
-			string configIniPath = Path.Combine(ProcessPathString(config.Substring(12, config.IndexOf('\n') - 12), installPath), "config.ini");
-
-			//read config.ini file
-			if (!File.Exists(configIniPath))
-			{
-				EnableProgressBar(false);
-				MessageBox.Show("config.ini could not be found. Factorio setup is corrupted?");
-				ErrorLogging.LogLine(string.Format("config.ini file was not found at {0}. config-path.cfg was at {1} and linked here.", configIniPath, configPath));
-				CleanupFailedImport();
-				return "";
-			}
-			string[] configIni = File.ReadAllLines(configIniPath);
-			string writePath = "";
-			foreach (string line in configIni)
-				if (line.IndexOf("write-data") != -1 && line.IndexOf(";") != 0)
-					writePath = line.Substring(line.IndexOf("write-data") + 11);
-
-			return ProcessPathString(writePath, installPath);
-		}
-
-		private string ProcessPathString(string input, string installPath)
-        {
-			if (input.StartsWith(".factorio"))
-			{
-				string path = installPath;
-				string folder = (input == ".factorio") ? "" : input.Substring(9).Replace("/", "\\");
-				if (folder.Length > 0) folder = folder.Substring(1);
-				while (folder.IndexOf("..") != -1)
-				{
-					path = Path.GetDirectoryName(path);
-					folder = folder.Substring(folder.IndexOf("..") + 2);
-					if (folder.Length > 0) folder = folder.Substring(1);
-				}
-				return string.IsNullOrEmpty(folder) ? path : Path.Combine(path, folder);
-			}
-			else if (input.StartsWith("__PATH__executable__"))
-			{
-				string path = Path.Combine(new string[] { installPath, "bin", "x64" });
-				string folder = input.Equals("__PATH__executable__") ? "" : input.Substring(20).Replace("/", "\\");
-				if (folder.Length > 0) folder = folder.Substring(1);
-				while (folder.IndexOf("..") != -1)
-				{
-					path = Path.GetDirectoryName(path);
-					folder = folder.Substring(folder.IndexOf("..") + 2);
-					if (folder.Length > 0) folder = folder.Substring(1);
-				}
-				return string.IsNullOrEmpty(folder) ? path : Path.Combine(path, folder);
-			}
-			else if (input.StartsWith("__PATH__system-write-data__"))
-			{
-				string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("/", "\\");
-				string folder = input.Equals("__PATH__system-write-data__") ? "" : input.Substring(27).Replace("/", "\\");
-				if (folder.Length > 0) folder = folder.Substring(1);
-				while (folder.IndexOf("..") != -1)
-				{
-					path = Path.GetDirectoryName(path);
-					folder = folder.Substring(folder.IndexOf("..") + 2);
-					if (folder.Length > 0) folder = folder.Substring(1);
-				}
-				return string.IsNullOrEmpty(folder) ? Path.Combine(path, "Factorio") : Path.Combine(new string[] { path, "Factorio", folder });
-			}
-			else
-				ErrorLogging.LogLine("path string (from one of the config files) did not start as expected (.factorio || __PATH__executable__ || __PATH__system-write-data__). Path string:" + input);
-
-			return installPath; //something weird must have happened to end up here. Honesty these path conversions are a bit of a mess - not enough examples to be sure its correct (works with all case 'I' have...)
-		}
-
 		private async Task<string> ProcessPreset(string installPath, string userDataPath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token)
         {
 			return await Task.Run(() =>
@@ -291,29 +184,29 @@ namespace Foreman
 				Directory.CreateDirectory(Path.Combine(modsPath, "foremanexport_1.0.0"));
 				try
 				{
-					File.Copy(Path.Combine(new string[] { "Mod", "foremanexport_1.0.0", "info.json" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "info.json" }), true);
-					File.Copy(Path.Combine(new string[] { "Mod", "foremanexport_1.0.0", "instrument-after-data.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-after-data.lua" }), true);
+					File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "info.json" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "info.json" }), true);
+					File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-after-data.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-after-data.lua" }), true);
 
 
 					//recipe&technology difficulties each have their own lua script
 					if (NormalRecipeRButton.Checked)
 					{
 						if (NormalTechnologyRButton.Checked)
-							File.Copy(Path.Combine(new string[] { "Mod", "foremanexport_1.0.0", "instrument-control - nn.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - nn.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
 						else
-							File.Copy(Path.Combine(new string[] { "Mod", "foremanexport_1.0.0", "instrument-control - ne.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - ne.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
 					}
 					else
 					{
 						if (NormalTechnologyRButton.Checked)
-							File.Copy(Path.Combine(new string[] { "Mod", "foremanexport_1.0.0", "instrument-control - en.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - en.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
 						else
-							File.Copy(Path.Combine(new string[] { "Mod", "foremanexport_1.0.0", "instrument-control - ee.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - ee.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
 					}
 				}
 				catch
 				{
-					MessageBox.Show("could not copy foreman export mod files (Mod/foremanexport_1.0.0/) to the factorio mods folder. Reinstall foreman?");
+					MessageBox.Show("could not copy foreman export mod files (Mods/foremanexport_1.0.0/) to the factorio mods folder. Reinstall foreman?");
 					ErrorLogging.LogLine("copying of foreman export mod files failed.");
 					CleanupFailedImport(modsPath);
 					return "";
@@ -388,21 +281,21 @@ namespace Foreman
 					return "";
 				}
 
+				string lnamesString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-LN>>>") + 23);
+				lnamesString = lnamesString.Substring(0, lnamesString.IndexOf("<<<END-EXPORT-LN>>>") - 2);
+				lnamesString = lnamesString.Replace("\n", "").Replace("\r", "").Replace("<#~#>", "\n");
+
 				string iconString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P1>>>") + 23);
 				iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>") - 2);
 
 				string dataString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P2>>>") + 23);
 				dataString = dataString.Substring(0, dataString.IndexOf("<<<END-EXPORT-P2>>>") - 2);
 
-				char[] delims = new[] { '\r', '\n' };
-				string[] dataStringLines = dataString.Split(delims, StringSplitOptions.RemoveEmptyEntries);
-				for (int i = 0; i < dataStringLines.Length; i++)
-					if (dataStringLines[i].StartsWith("Unknown key:"))
-					{
-						dataStringLines[i] = dataStringLines[i].Substring(dataStringLines[i].LastIndexOf("\"") + 1);
-						if (dataStringLines[i].StartsWith(" ")) dataStringLines[i] = dataStringLines[i].Substring(1);
-					}
-				dataString = string.Concat(dataStringLines);
+
+				string[] lnames = lnamesString.Split('\n'); //keep empties - we know where they are!
+				Dictionary<string, string> localisedNames = new Dictionary<string, string>(); //this is the link between the 'lid' property and the localised names in dataString
+				for (int i = 0; i < lnames.Length / 2; i++)
+					localisedNames.Add('$' + i.ToString(), lnames[(i * 2) + 1].Replace("Unknown key: \"", "").Replace("\"", ""));
 
 #if DEBUG
 				File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
@@ -425,6 +318,21 @@ namespace Foreman
 					return "";
 				}
 
+				//now to trawl over the dataJObject entities and replace any 'lid' with 'localised_name'
+				foreach(JToken set in dataJObject.Values().ToList())
+                {
+					foreach (JToken obj in set.ToList())
+					{
+						if (obj is JObject jobject && (string)jobject["lid"] != null)
+						{
+							JProperty lname = new JProperty("localised_name", localisedNames[(string)jobject["lid"]]);
+							jobject.Add(lname);
+							jobject.Remove("lid");
+						}
+					}
+                }
+
+				//save new preset (data)
 				File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".json"), dataJObject.ToString(Formatting.Indented));
 #if DEBUG
 				File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconJObject.ToString(Formatting.Indented));

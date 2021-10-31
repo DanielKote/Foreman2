@@ -1,11 +1,4 @@
 ExportIcons = true
-DebugLog = false
-
-function LOG(text)
-	if DebugLog then
-		log(text)
-	end
-end
 
 local function ExportLine(text, indentSize)
 	indents = ''

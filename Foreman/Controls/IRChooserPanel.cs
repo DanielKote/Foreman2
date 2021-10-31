@@ -360,8 +360,8 @@ namespace Foreman
                     foreach (Item item in sgroup.Items.Where(n => n.LFriendlyName.Contains(filterString) || n.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))
                     {
                         bool visible =
-                            (item.ConsumptionRecipes.FirstOrDefault(n => !n.Hidden) != null) ||
-                            (item.ProductionRecipes.FirstOrDefault(n => !n.Hidden) != null);
+                            (item.ConsumptionRecipes.FirstOrDefault(n => n.Enabled) != null) ||
+                            (item.ProductionRecipes.FirstOrDefault(n => n.Enabled) != null);
                         bool validAssembler = 
                             (item.ConsumptionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null) ||
                             (item.ProductionRecipes.FirstOrDefault(n => n.HasEnabledAssemblers) != null);
@@ -515,7 +515,7 @@ namespace Foreman
                         (includeSuppliers && r.ProductSet.ContainsKey(KeyItem))))
                     {
                         //quick hidden / enabled assembler check (done prior to name check for speed)
-                        if ((!recipe.Hidden || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus))
+                        if ((recipe.Enabled || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus))
                         {
                             //name check - have to check recipe name along with all ingredients and products (both friendly name and base name) - if selected
                             if (recipe.LFriendlyName.Contains(filterString) ||
@@ -529,7 +529,7 @@ namespace Foreman
                                     (includeSuppliers && KeyItemTempRange.Contains(recipe.ProductTemperatureMap[KeyItem])))
                                 {
                                     //holy... so - we finally finished all the checks, eh? Well, throw it on the pile of recipes to show then.
-                                    Color bgColor = (!recipe.Hidden ? (recipe.HasEnabledAssemblers ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
+                                    Color bgColor = (recipe.Enabled ? (recipe.HasEnabledAssemblers ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
                                     recipeCounter++;
                                     recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
                                 }
@@ -583,7 +583,7 @@ namespace Foreman
             else if(e.Button == MouseButtons.Right) //flip hidden status of recipe
             {
                 Recipe selectedRecipe = (sender as NFButton).Tag as Recipe;
-                selectedRecipe.Hidden = !selectedRecipe.Hidden;
+                selectedRecipe.Enabled = !selectedRecipe.Enabled;
                 UpdateIRButtons();
             }
         }

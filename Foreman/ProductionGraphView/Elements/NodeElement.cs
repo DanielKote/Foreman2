@@ -319,7 +319,7 @@ namespace Foreman
 						bgBrush = oversuppliedBGBrush;
 
 				RecipeNode rNode = DisplayedNode as RecipeNode;
-				if (DisplayedNode.ManualRateNotMet() || (rNode != null && !(!rNode.BaseRecipe.Hidden && rNode.BaseRecipe.HasEnabledAssemblers)))
+				if (DisplayedNode.ManualRateNotMet() || (rNode != null && !(rNode.BaseRecipe.Enabled && rNode.BaseRecipe.HasEnabledAssemblers)))
 					GraphicsStuff.FillRoundRect(trans.X - (Width / 2) - 5, trans.Y - (Height / 2) - 5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
 
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, bgBrush);

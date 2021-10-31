@@ -1,0 +1,106 @@
+ticons = {}
+
+local function ExportIcon(icon, icon_size, icons, tabl)
+
+	if icon ~= nil and icons ~= nil then
+		tabl['icon_data'] = {}
+		tabl['icon_data']['icon'] = icon
+		tabl['icon_data']['icon_size'] = icon_size
+
+		if icons ~= nil then
+			tabl['icon_data']['icons'] = {}
+
+			for _, ic in ipairs(icons) do
+				tabl['icon_data']['icons']['icon'] = ic.icon
+				tabl['icon_data']['icons']['icon_size'] = ic.icon_size
+				tabl['icon_data']['icons']['icon_scale'] = ic.icon_scale
+
+				if ic.tint == nil or (ic.tint[1] == nil and ic.tint['r'] == nil and ic.tint['g'] == nil and ic.tint['b'] == nil and ic.tint['a'] == nil) then
+					tabl['icon_data']['icons']['tint'] = {255,255,255,255}
+				elseif ic.tint[1] ~= nil then
+					tabl['icon_data']['icons']['tint'] = { ic.tint[1], ic.tint[2], ic.tint[3], (ic.tint[4] == nil and '255' or ic.tint[4]) }
+				else --must be the r/g/b/a set
+					tabl['icon_data']['icons']['tint'] = { (ic.tint['r'] == nil and '255' or ic.tint['r']), (ic.tint['g'] == nil and '255' or ic.tint['g']), (ic.tint['b'] == nil and '255' or ic.tint['b']), (ic.tint['a'] == nil and '255' or ic.tint['a']) }
+				end
+
+				if ic.shift == nil then
+					tabl['icon_data']['icons']['shift'] = {0,0}
+				else
+					tabl['icon_data']['icons']['shift'] = {ic.shift[1], ic.shift[2]}
+				end
+			end
+		end
+	end
+end
+
+
+
+
+output = {}
+
+output['technologies'] = data.raw.technology
+output['recipes'] = data.raw.recipe
+output['items'] = {}
+output['fluids'] = data.raw.fluid
+output['groups'] = data.raw['item-group']
+
+for _, section in ipairs({ 'item', 'capsule', 'module', 'ammo', 'gun', 'armor', 'tool', 'repair-tool', 'rail-planner', 'item-with-entity-data', 'item-with-inventory', 'item-with-label', 'item-with-tags', 'spider-vehicle', 'spidertron-remote' }) do
+	for name, obj in pairs(data.raw[section]) do
+		output['items'][name] = obj
+	end
+end
+
+
+ttechnologies = {}
+for _, data in pairs(output.technologies) do
+	tabl = {}
+	tabl['name'] = data.name
+	tabl['icon_name'] = 'icon.t.'..data.name
+	ExportIcon(data.icon, data.icon_size, data.icons, tabl)
+	table.insert(ttechnologies, tabl)
+end
+ticons['technologies'] = ttechnologies
+
+trecipes = {}
+for _, data in pairs(output.recipes) do
+	tabl = {}
+	tabl['name'] = data.name
+	tabl['icon_name'] = 'icon.r.'..data.name
+	ExportIcon(data.icon, data.icon_size, data.icons, tabl)
+	table.insert(trecipes, tabl)
+end
+ticons['recipes'] = trecipes
+
+titems = {}
+for _, data in pairs(output.items) do
+	tabl = {}
+	tabl['name'] = data.name
+	tabl['icon_name'] = 'icon.i.'..data.name
+	ExportIcon(data.icon, data.icon_size, data.icons, tabl)
+	table.insert(titems, tabl)
+end
+ticons['items'] = titems
+
+tfluids = {}
+for _, data in pairs(output.fluids) do
+	tabl = {}
+	tabl['name'] = data.name
+	tabl['icon_name'] = 'icon.i.'..data.name
+	ExportIcon(data.icon, data.icon_size, data.icons, tabl)
+	table.insert(tfluids, tabl)
+end
+ticons['fluids'] = tfluids
+
+tgroups = {}
+for _, data in pairs(output.groups) do
+	tabl = {}
+	tabl['name'] = data.name
+	tabl['icon_name'] = 'icon.g.'..data.name
+	ExportIcon(data.icon, data.icon_size, data.icons, tabl)
+	table.insert(tgroups, tabl)
+end
+ticons['fluids'] = tgroups
+
+localised_print('<<<START-EXPORT-P1>>>')
+localised_print(game.table_to_json(ticons))
+localised_print('<<<END-EXPORT-P1>>>')

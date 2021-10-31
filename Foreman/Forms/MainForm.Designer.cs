@@ -45,6 +45,7 @@
             this.DynamicLWCheckBox = new System.Windows.Forms.CheckBox();
             this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
             this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
+            this.SimpleViewCheckBox = new System.Windows.Forms.CheckBox();
             this.GridLinesGroupBox = new System.Windows.Forms.GroupBox();
             this.AlignSelectionButton = new System.Windows.Forms.Button();
             this.GridlinesCheckbox = new System.Windows.Forms.CheckBox();
@@ -52,12 +53,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.MajorGridlinesDropDown = new System.Windows.Forms.ComboBox();
             this.MinorGridlinesDropDown = new System.Windows.Forms.ComboBox();
-            this.AssemblersGroupBox = new System.Windows.Forms.GroupBox();
+            this.DefaultsGroupBox = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
             this.AssemblerDropDown = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.ModuleDropDown = new System.Windows.Forms.ComboBox();
-            this.SimpleViewCheckBox = new System.Windows.Forms.CheckBox();
             this.GraphViewer = new Foreman.ProductionGraphViewer();
             this.MainLayoutPanel.SuspendLayout();
             this.MainToolbar.SuspendLayout();
@@ -65,7 +65,7 @@
             this.ButtonsBFlowLayoutPanel.SuspendLayout();
             this.ProductionGroupBox.SuspendLayout();
             this.GridLinesGroupBox.SuspendLayout();
-            this.AssemblersGroupBox.SuspendLayout();
+            this.DefaultsGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainLayoutPanel
@@ -92,7 +92,7 @@
             this.MainToolbar.Controls.Add(this.ButtonsBFlowLayoutPanel);
             this.MainToolbar.Controls.Add(this.ProductionGroupBox);
             this.MainToolbar.Controls.Add(this.GridLinesGroupBox);
-            this.MainToolbar.Controls.Add(this.AssemblersGroupBox);
+            this.MainToolbar.Controls.Add(this.DefaultsGroupBox);
             this.MainToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainToolbar.Location = new System.Drawing.Point(0, 0);
             this.MainToolbar.Margin = new System.Windows.Forms.Padding(0);
@@ -227,6 +227,7 @@
             this.ProductionGroupBox.Controls.Add(this.DynamicLWCheckBox);
             this.ProductionGroupBox.Controls.Add(this.PauseUpdatesCheckbox);
             this.ProductionGroupBox.Controls.Add(this.RateOptionsDropDown);
+            this.ProductionGroupBox.Controls.Add(this.SimpleViewCheckBox);
             this.ProductionGroupBox.Location = new System.Drawing.Point(228, 4);
             this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
             this.ProductionGroupBox.Name = "ProductionGroupBox";
@@ -234,12 +235,12 @@
             this.ProductionGroupBox.Size = new System.Drawing.Size(210, 126);
             this.ProductionGroupBox.TabIndex = 4;
             this.ProductionGroupBox.TabStop = false;
-            this.ProductionGroupBox.Text = "Production properties:";
+            this.ProductionGroupBox.Text = "Graph Options:";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 23);
+            this.label4.Location = new System.Drawing.Point(9, 26);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(79, 17);
             this.label4.TabIndex = 5;
@@ -248,7 +249,7 @@
             // DynamicLWCheckBox
             // 
             this.DynamicLWCheckBox.AutoSize = true;
-            this.DynamicLWCheckBox.Location = new System.Drawing.Point(12, 68);
+            this.DynamicLWCheckBox.Location = new System.Drawing.Point(12, 52);
             this.DynamicLWCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
             this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
             this.DynamicLWCheckBox.Size = new System.Drawing.Size(146, 21);
@@ -261,7 +262,7 @@
             // 
             this.PauseUpdatesCheckbox.AutoSize = true;
             this.PauseUpdatesCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(12, 94);
+            this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(12, 99);
             this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
             this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(188, 21);
@@ -274,12 +275,24 @@
             // 
             this.RateOptionsDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.RateOptionsDropDown.FormattingEnabled = true;
-            this.RateOptionsDropDown.Location = new System.Drawing.Point(98, 20);
+            this.RateOptionsDropDown.Location = new System.Drawing.Point(100, 23);
             this.RateOptionsDropDown.Margin = new System.Windows.Forms.Padding(4);
             this.RateOptionsDropDown.Name = "RateOptionsDropDown";
             this.RateOptionsDropDown.Size = new System.Drawing.Size(102, 24);
             this.RateOptionsDropDown.TabIndex = 2;
             this.RateOptionsDropDown.SelectedIndexChanged += new System.EventHandler(this.RateOptionsDropDown_SelectedIndexChanged);
+            // 
+            // SimpleViewCheckBox
+            // 
+            this.SimpleViewCheckBox.AutoSize = true;
+            this.SimpleViewCheckBox.Location = new System.Drawing.Point(12, 75);
+            this.SimpleViewCheckBox.Margin = new System.Windows.Forms.Padding(4);
+            this.SimpleViewCheckBox.Name = "SimpleViewCheckBox";
+            this.SimpleViewCheckBox.Size = new System.Drawing.Size(105, 21);
+            this.SimpleViewCheckBox.TabIndex = 0;
+            this.SimpleViewCheckBox.Text = "Simple View";
+            this.SimpleViewCheckBox.UseVisualStyleBackColor = true;
+            this.SimpleViewCheckBox.CheckedChanged += new System.EventHandler(this.SimpleViewCheckBox_CheckedChanged);
             // 
             // GridLinesGroupBox
             // 
@@ -386,80 +399,59 @@
             this.MinorGridlinesDropDown.TabIndex = 3;
             this.MinorGridlinesDropDown.SelectedIndexChanged += new System.EventHandler(this.MinorGridlinesDropDown_SelectedIndexChanged);
             // 
-            // AssemblersGroupBox
+            // DefaultsGroupBox
             // 
-            this.AssemblersGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.AssemblersGroupBox.Controls.Add(this.label5);
-            this.AssemblersGroupBox.Controls.Add(this.AssemblerDropDown);
-            this.AssemblersGroupBox.Controls.Add(this.label1);
-            this.AssemblersGroupBox.Controls.Add(this.ModuleDropDown);
-            this.AssemblersGroupBox.Controls.Add(this.SimpleViewCheckBox);
-            this.AssemblersGroupBox.Location = new System.Drawing.Point(705, 4);
-            this.AssemblersGroupBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.AssemblersGroupBox.Name = "AssemblersGroupBox";
-            this.AssemblersGroupBox.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.AssemblersGroupBox.Size = new System.Drawing.Size(243, 126);
-            this.AssemblersGroupBox.TabIndex = 7;
-            this.AssemblersGroupBox.TabStop = false;
-            this.AssemblersGroupBox.Text = "Assemblers";
+            this.DefaultsGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.DefaultsGroupBox.Controls.Add(this.label5);
+            this.DefaultsGroupBox.Controls.Add(this.AssemblerDropDown);
+            this.DefaultsGroupBox.Controls.Add(this.label1);
+            this.DefaultsGroupBox.Controls.Add(this.ModuleDropDown);
+            this.DefaultsGroupBox.Location = new System.Drawing.Point(705, 4);
+            this.DefaultsGroupBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.DefaultsGroupBox.Name = "DefaultsGroupBox";
+            this.DefaultsGroupBox.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.DefaultsGroupBox.Size = new System.Drawing.Size(243, 126);
+            this.DefaultsGroupBox.TabIndex = 7;
+            this.DefaultsGroupBox.TabStop = false;
+            this.DefaultsGroupBox.Text = "Defaults:";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(111, 89);
+            this.label5.Location = new System.Drawing.Point(7, 25);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(130, 17);
+            this.label5.Size = new System.Drawing.Size(81, 17);
             this.label5.TabIndex = 4;
-            this.label5.Text = "Default Assemblers";
+            this.label5.Text = "Assemblers";
             // 
             // AssemblerDropDown
             // 
             this.AssemblerDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.AssemblerDropDown.FormattingEnabled = true;
-            this.AssemblerDropDown.Items.AddRange(new object[] {
-            "Worst",
-            "Middle",
-            "Best"});
-            this.AssemblerDropDown.Location = new System.Drawing.Point(9, 85);
+            this.AssemblerDropDown.Location = new System.Drawing.Point(89, 23);
             this.AssemblerDropDown.Name = "AssemblerDropDown";
-            this.AssemblerDropDown.Size = new System.Drawing.Size(96, 24);
+            this.AssemblerDropDown.Size = new System.Drawing.Size(147, 24);
             this.AssemblerDropDown.TabIndex = 3;
             this.AssemblerDropDown.SelectedIndexChanged += new System.EventHandler(this.AssemblerDropDown_SelectedIndexChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(111, 56);
+            this.label1.Location = new System.Drawing.Point(7, 56);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(110, 17);
+            this.label1.Size = new System.Drawing.Size(61, 17);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Default modules";
+            this.label1.Text = "Modules";
             // 
             // ModuleDropDown
             // 
             this.ModuleDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ModuleDropDown.FormattingEnabled = true;
-            this.ModuleDropDown.Items.AddRange(new object[] {
-            "None",
-            "Speed",
-            "Productivity"});
-            this.ModuleDropDown.Location = new System.Drawing.Point(9, 53);
+            this.ModuleDropDown.Location = new System.Drawing.Point(89, 53);
             this.ModuleDropDown.Name = "ModuleDropDown";
-            this.ModuleDropDown.Size = new System.Drawing.Size(96, 24);
+            this.ModuleDropDown.Size = new System.Drawing.Size(147, 24);
             this.ModuleDropDown.TabIndex = 1;
             this.ModuleDropDown.SelectedIndexChanged += new System.EventHandler(this.ModuleDropDown_SelectedIndexChanged);
-            // 
-            // SimpleViewCheckBox
-            // 
-            this.SimpleViewCheckBox.AutoSize = true;
-            this.SimpleViewCheckBox.Location = new System.Drawing.Point(9, 23);
-            this.SimpleViewCheckBox.Margin = new System.Windows.Forms.Padding(4);
-            this.SimpleViewCheckBox.Name = "SimpleViewCheckBox";
-            this.SimpleViewCheckBox.Size = new System.Drawing.Size(105, 21);
-            this.SimpleViewCheckBox.TabIndex = 0;
-            this.SimpleViewCheckBox.Text = "Simple View";
-            this.SimpleViewCheckBox.UseVisualStyleBackColor = true;
-            this.SimpleViewCheckBox.CheckedChanged += new System.EventHandler(this.SimpleViewCheckBox_CheckedChanged);
             // 
             // GraphViewer
             // 
@@ -503,8 +495,8 @@
             this.ProductionGroupBox.PerformLayout();
             this.GridLinesGroupBox.ResumeLayout(false);
             this.GridLinesGroupBox.PerformLayout();
-            this.AssemblersGroupBox.ResumeLayout(false);
-            this.AssemblersGroupBox.PerformLayout();
+            this.DefaultsGroupBox.ResumeLayout(false);
+            this.DefaultsGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -530,7 +522,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox MajorGridlinesDropDown;
         private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
-        private System.Windows.Forms.GroupBox AssemblersGroupBox;
+        private System.Windows.Forms.GroupBox DefaultsGroupBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox ModuleDropDown;
         private System.Windows.Forms.CheckBox SimpleViewCheckBox;

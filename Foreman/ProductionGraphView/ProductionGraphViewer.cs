@@ -925,7 +925,7 @@ namespace Foreman
 
 			info.AddValue("IncludedMods", DCache.IncludedMods.Select(m => m.Key + "|"+m.Value));
 
-			info.AddValue("HiddenRecipes", DCache.Recipes.Values.Where(r => r.Hidden).Select(r => r.Name));
+			info.AddValue("EnabledRecipes", DCache.Recipes.Values.Where(r => r.Enabled).Select(r => r.Name));
 			info.AddValue("EnabledAssemblers", DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
 			info.AddValue("EnabledModules", DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
 
@@ -1047,9 +1047,11 @@ namespace Foreman
 					if (DCache.Modules.ContainsKey(name))
 						DCache.Modules[name].Enabled = true;
 
-				foreach (string recipe in json["HiddenRecipes"].Select(t => (string)t).ToList())
+				foreach (Recipe recipe in DCache.Recipes.Values)
+					recipe.Enabled = false;
+				foreach (string recipe in json["EnabledRecipes"].Select(t => (string)t).ToList())
 					if (DCache.Recipes.ContainsKey(recipe))
-						DCache.Recipes[recipe].Hidden = true;
+						DCache.Recipes[recipe].Enabled = true;
 			}
 
 			//add all nodes

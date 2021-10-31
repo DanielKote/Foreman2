@@ -143,6 +143,7 @@
     <Compile Include="Controls\SyncListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DataCache\FactorioPathsProcessor.cs" />
     <Compile Include="DataCache\IconCache.cs" />
     <Compile Include="DataCache\DataTypes\Assembler.cs" />
     <Compile Include="DataCache\DataTypes\Beacon.cs" />
@@ -150,11 +151,18 @@
     <Compile Include="DataCache\DataTypes\Group.cs" />
     <Compile Include="DataCache\DataTypes\Module.cs" />
     <Compile Include="DataCache\DataTypes\Technology.cs" />
-    <Compile Include="Forms\ImportPresetForm.cs">
+    <Compile Include="DataCache\InfoPackageClasses.cs" />
+    <Compile Include="Forms\SavefileLoadForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ImportPresetForm.designer.cs">
-      <DependentUpon>ImportPresetForm.cs</DependentUpon>
+    <Compile Include="Forms\SavefileLoadForm.Designer.cs">
+      <DependentUpon>SavefileLoadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PresetImportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PresetImportForm.designer.cs">
+      <DependentUpon>PresetImportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\PresetComparatorForm.cs">
       <SubType>Form</SubType>
@@ -168,6 +176,8 @@
     <Compile Include="Forms\PresetSelectionForm.Designer.cs">
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\AssemblerSelector.cs" />
+    <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\Nodes\ConsumerNode.cs" />
     <Compile Include="Models\Nodes\PassthroughNode.cs" />
     <Compile Include="Models\Nodes\RecipeNode.cs" />
@@ -180,6 +190,7 @@
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="ProductionGraphView\Elements\BaseLinkElement.cs" />
     <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
     <Compile Include="ProductionGraphView\Elements\DraggedLinkElement.cs" />
@@ -231,8 +242,11 @@
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImportPresetForm.resx">
-      <DependentUpon>ImportPresetForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\SavefileLoadForm.resx">
+      <DependentUpon>SavefileLoadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PresetImportForm.resx">
+      <DependentUpon>PresetImportForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PresetComparatorForm.resx">
       <DependentUpon>PresetComparatorForm.cs</DependentUpon>
@@ -267,22 +281,28 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />
-    <None Include="Mod\foremanexport_1.0.0\info.json">
+    <None Include="Mods\foremanexport_1.0.0\info.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_1.0.0\instrument-after-data.lua">
+    <None Include="Mods\foremanexport_1.0.0\instrument-after-data.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_1.0.0\instrument-control - ee.lua">
+    <None Include="Mods\foremanexport_1.0.0\instrument-control - ee.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_1.0.0\instrument-control - en.lua">
+    <None Include="Mods\foremanexport_1.0.0\instrument-control - en.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_1.0.0\instrument-control - ne.lua">
+    <None Include="Mods\foremanexport_1.0.0\instrument-control - ne.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\foremanexport_1.0.0\instrument-control - nn.lua">
+    <None Include="Mods\foremanexport_1.0.0\instrument-control - nn.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Mods\foremansavereader_1.0.0\info.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Mods\foremansavereader_1.0.0\instrument-control.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

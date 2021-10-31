@@ -1,0 +1,14 @@
+{
+  "name": "foremansavereader",
+  "version": "1.0.0",
+  "factorio_version": "1.1",
+  "title": "foremansavereader",
+  "author": "Me",
+  "contact": "",
+  "homepage": "",
+  "description": "temp mod to grab the mod list and the enabled statuses of technologies and recipes)",
+  "dependencies": 
+  [
+					"base >= 1.1.4"
+	]
+}

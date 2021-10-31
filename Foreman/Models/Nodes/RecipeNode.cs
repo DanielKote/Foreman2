@@ -33,7 +33,9 @@ namespace Foreman
 		public List<Module> AssemblerModules { get; private set; }
 		public List<Module> BeaconModules { get; private set; }
 
-		public Item BurnerItem { get; set; }
+		private Item burnerItem;
+		private List<Item> burnerItemPriority;
+		public Item BurnerItem { get { return burnerItem; } set { burnerItem = value; if (value != null) { burnerItemPriority.Remove(value); burnerItemPriority.Add(value); } } }
 		public Item BurntItem { get { if (BurnerItem != null && BurnerItem.BurnResult != null) return BurnerItem.BurnResult; else return null; } }
 
 		public override string DisplayName { get { return BaseRecipe.FriendlyName; } }
@@ -41,12 +43,21 @@ namespace Foreman
 		public RecipeNodePrototype(ProductionGraph graph, int nodeID, Recipe baseRecipe) : base(graph, nodeID)
 		{
 			BaseRecipe = baseRecipe;
-			SelectedAssembler = null;
+			SelectedAssembler = graph.AssemblerSelector.GetAssembler(baseRecipe);
+			AssemblerModules = graph.ModuleSelector.GetModules(SelectedAssembler, baseRecipe);
+			if (SelectedAssembler != null && SelectedAssembler.IsBurner)
+			{
+				BurnerItem = burnerItemPriority.LastOrDefault(item => item.FuelsAssemblers.Contains(SelectedAssembler));
+				if (BurnerItem == null)
+					BurnerItem = SelectedAssembler.ValidFuels.FirstOrDefault();
+			}
+			else
+				BurnerItem = null;
+
 			SelectedBeacon = null;
-			BurnerItem = null;
 			BeaconCount = 0;
-			AssemblerModules = new List<Module>();
 			BeaconModules = new List<Module>();
+			burnerItemPriority = new List<Item>();
 		}
 
 		public override IEnumerable<Item> Inputs

@@ -11,30 +11,23 @@ namespace Foreman
     {
         public class SettingsFormOptions
         {
-            public Dictionary<Assembler, bool> Assemblers;
-            public Dictionary<Module, bool> Modules;
+            public DataCache DCache { get; private set; }
 
             public List<Preset> Presets;
             public Preset SelectedPreset;
 
-            public SettingsFormOptions()
+            public SettingsFormOptions(DataCache cache)
             {
-                Assemblers = new Dictionary<Assembler, bool>();
-                Modules = new Dictionary<Module, bool>();
-
+                DCache = cache;
                 Presets = new List<Preset>();
             }
 
             public SettingsFormOptions Clone()
             {
-                SettingsFormOptions clone = new SettingsFormOptions();
-                foreach (KeyValuePair<Assembler, bool> kvp in Assemblers)
-                    clone.Assemblers.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<Module, bool> kvp in Modules)
-                    clone.Modules.Add(kvp.Key, kvp.Value);
+                SettingsFormOptions clone = new SettingsFormOptions(this.DCache);
+
                 foreach (Preset preset in Presets)
                     clone.Presets.Add(preset);
-
                 clone.SelectedPreset = this.SelectedPreset;
 
                 return clone;
@@ -42,19 +35,7 @@ namespace Foreman
 
             public bool Equals(SettingsFormOptions other, bool ignoreAssemblersMinersModules = true)
             {
-                bool same = (other.SelectedPreset == this.SelectedPreset);
-
-                if (!ignoreAssemblersMinersModules)
-                {
-                    if (same)
-                        foreach (KeyValuePair<Assembler, bool> kvp in Assemblers)
-                            same = same && other.Assemblers.Contains(kvp) && (kvp.Value == other.Assemblers[kvp.Key]);
-                    if (same)
-                        foreach (KeyValuePair<Module, bool> kvp in Modules)
-                            same = same && other.Modules.Contains(kvp) && (kvp.Value == other.Modules[kvp.Key]);
-                }
-
-                //ignore mods - its a readonly field
+                bool same = (other.SelectedPreset == this.SelectedPreset) && (other.DCache == this.DCache);
 
                 return same;
             }
@@ -63,48 +44,27 @@ namespace Foreman
         private SettingsFormOptions originalOptions;
         public SettingsFormOptions CurrentOptions;
 
+        private List<ListViewItem> unfilteredRecipeList;
+        private List<ListViewItem> filteredRecipeList;
+
         public SettingsForm(SettingsFormOptions options)
         {
             originalOptions = options;
             CurrentOptions = options.Clone();
 
             InitializeComponent();
+            MainForm.SetDoubleBuffered(AssemblerSelectionBox);
+            MainForm.SetDoubleBuffered(MinerSelectionBox);
+            MainForm.SetDoubleBuffered(ModuleSelectionBox);
 
+            unfilteredRecipeList = new List<ListViewItem>();
+            filteredRecipeList = new List<ListViewItem>();
+            
             SelectPresetMenuItem.Click += SelectPresetMenuItem_Click;
             DeletePresetMenuItem.Click += DeletePresetMenuItem_Click;
 
-            AssemblerSelectionBox.Items.AddRange(CurrentOptions.Assemblers.Keys.Where(a => !a.IsMiner).ToArray());
-            AssemblerSelectionBox.Sorted = true;
-            AssemblerSelectionBox.DisplayMember = "FriendlyName";
-            for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
-            {
-                if (CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[i]])
-                {
-                    AssemblerSelectionBox.SetItemChecked(i, true);
-                }
-            }
-
-            MinerSelectionBox.Items.AddRange(CurrentOptions.Assemblers.Keys.Where(a => a.IsMiner).ToArray());
-            MinerSelectionBox.Sorted = true;
-            MinerSelectionBox.DisplayMember = "FriendlyName";
-            for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
-            {
-                if (CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[i]])
-                {
-                    MinerSelectionBox.SetItemChecked(i, true);
-                }
-            }
-
-            ModuleSelectionBox.Items.AddRange(CurrentOptions.Modules.Keys.ToArray());
-            ModuleSelectionBox.Sorted = true;
-            ModuleSelectionBox.DisplayMember = "FriendlyName";
-            for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
-            {
-                if (CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[i]])
-                {
-                    ModuleSelectionBox.SetItemChecked(i, true);
-                }
-            }
+            LoadRecipeList();
+            UpdateAMM();
 
             CurrentPresetLabel.Text = CurrentOptions.SelectedPreset.Name;
             PresetListBox.Items.AddRange(CurrentOptions.Presets.ToArray());
@@ -113,20 +73,100 @@ namespace Foreman
             UpdateModList();
         }
 
+        private void LoadRecipeList()
+        {
+            IconList.Images.Clear();
+            IconList.Images.Add(DataCache.UnknownIcon);
+
+            unfilteredRecipeList.Clear();
+
+            foreach (Recipe recipe in CurrentOptions.DCache.Recipes.Values)
+            {
+                ListViewItem lvItem = new ListViewItem();
+                if (recipe.Icon != null)
+                {
+                    IconList.Images.Add(recipe.Icon);
+                    lvItem.ImageIndex = IconList.Images.Count - 1;
+                }
+                else
+                {
+                    lvItem.ImageIndex = 0;
+                }
+                lvItem.Text = recipe.FriendlyName;
+                lvItem.Tag = recipe;
+                lvItem.Name = recipe.Name; //key
+                lvItem.Checked = true; //have to set this to true before (potentially) changing to false in order for the check boxes to appear
+                lvItem.Checked = recipe.Enabled;
+                unfilteredRecipeList.Add(lvItem);
+            }
+            unfilteredRecipeList.Sort((a, b) => ((Recipe)a.Tag).CompareTo((Recipe)b.Tag));
+
+            UpdateFilteredRecipeList();
+        }
+
         private void UpdateModList()
         {
             Preset selectedPreset = (Preset)PresetListBox.SelectedItem;
             if (selectedPreset == null)
                 selectedPreset = CurrentOptions.SelectedPreset;
 
-            Dictionary<string, string> mods = DataCache.ReadModList(selectedPreset);
+            PresetInfo presetInfo = DataCache.ReadPresetInfo(selectedPreset);
             ModSelectionBox.Items.Clear();
-            if (mods != null)
+            if (presetInfo.ModList != null)
             {
-                List<string> modList = mods.Select(kvp => kvp.Key + "_" + kvp.Value).ToList();
+                List<string> modList = presetInfo.ModList.Select(kvp => kvp.Key + "_" + kvp.Value).ToList();
                 modList.Sort();
                 ModSelectionBox.Items.AddRange(modList.ToArray());
             }
+            RecipeDifficultyLabel.Text = presetInfo.ExpensiveRecipes ? "Expensive" : "Normal";
+            TechnologyDifficultyLabel.Text = presetInfo.ExpensiveTechnology ? "Expensive" : "Normal";
+        }
+
+        private void UpdateAMM()
+        {
+            string filterString = FilterTextBox.Text.ToLower();
+
+            AssemblerSelectionBox.BeginUpdate();
+            AssemblerSelectionBox.Items.Clear();
+            AssemblerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => !a.IsMiner && a.LFriendlyName.Contains(filterString)).ToArray());
+            AssemblerSelectionBox.Sorted = true;
+            AssemblerSelectionBox.DisplayMember = "FriendlyName";
+            for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
+                AssemblerSelectionBox.SetItemChecked(i, ((Assembler)AssemblerSelectionBox.Items[i]).Enabled);
+            AssemblerSelectionBox.EndUpdate();
+
+            MinerSelectionBox.BeginUpdate();
+            MinerSelectionBox.Items.Clear();
+            MinerSelectionBox.Items.AddRange(CurrentOptions.DCache.Assemblers.Values.Where(a => a.IsMiner && a.LFriendlyName.Contains(filterString)).ToArray());
+            MinerSelectionBox.Sorted = true;
+            MinerSelectionBox.DisplayMember = "FriendlyName";
+            for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
+                MinerSelectionBox.SetItemChecked(i, ((Assembler)MinerSelectionBox.Items[i]).Enabled);
+            MinerSelectionBox.EndUpdate();
+
+            ModuleSelectionBox.BeginUpdate();
+            ModuleSelectionBox.Items.Clear();
+            ModuleSelectionBox.Items.AddRange(CurrentOptions.DCache.Modules.Values.Where(m => m.LFriendlyName.Contains(filterString)).ToArray());
+            ModuleSelectionBox.Sorted = true;
+            ModuleSelectionBox.DisplayMember = "FriendlyName";
+            for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
+                ModuleSelectionBox.SetItemChecked(i, ((Module)ModuleSelectionBox.Items[i]).Enabled);
+            ModuleSelectionBox.EndUpdate();
+        }
+
+        private void UpdateFilteredRecipeList()
+        {
+            string filterString = FilterTextBox.Text.ToLower();
+
+            filteredRecipeList.Clear();
+            foreach (ListViewItem lvItem in unfilteredRecipeList)
+            {
+                if (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString))
+                    filteredRecipeList.Add(lvItem);
+            }
+
+            RecipeListView.VirtualListSize = filteredRecipeList.Count;
+            RecipeListView.Invalidate();
         }
 
         //PRESETS LIST------------------------------------------------------------------------------------------
@@ -212,17 +252,23 @@ namespace Foreman
             }
         }
 
+        private void FilterTextBox_TextChanged(object sender, EventArgs e)
+        {
+            UpdateAMM();
+            UpdateFilteredRecipeList();
+        }
+
         //ASSEMBLER------------------------------------------------------------------------------------------
         private void AssemblerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
+            ((Assembler)AssemblerSelectionBox.Items[e.Index]).Enabled = (e.NewValue == CheckState.Checked);
         }
         private void AssemblerSelectionAllButton_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
             {
                 AssemblerSelectionBox.SetItemChecked(i, true);
-                CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[i]] = true;
+                ((Assembler)AssemblerSelectionBox.Items[i]).Enabled = true;
             }
         }
         private void AssemblerSelectionNoneButton_Click(object sender, EventArgs e)
@@ -230,7 +276,7 @@ namespace Foreman
             for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
             {
                 AssemblerSelectionBox.SetItemChecked(i, false);
-                CurrentOptions.Assemblers[(Assembler)AssemblerSelectionBox.Items[i]] = false;
+                ((Assembler)AssemblerSelectionBox.Items[i]).Enabled = false;
             }
         }
 
@@ -242,14 +288,14 @@ namespace Foreman
         //MINER------------------------------------------------------------------------------------------
         private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
+            ((Assembler)MinerSelectionBox.Items[e.Index]).Enabled = (e.NewValue == CheckState.Checked);
         }
         private void MinerSelectionAllButton_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
             {
                 MinerSelectionBox.SetItemChecked(i, true);
-                CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[i]] = true;
+                ((Assembler)MinerSelectionBox.Items[i]).Enabled = true;
             }
         }
         private void MinerSelectionNoneButton_Click(object sender, EventArgs e)
@@ -257,7 +303,7 @@ namespace Foreman
             for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
             {
                 MinerSelectionBox.SetItemChecked(i, false);
-                CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[i]] = false;
+                ((Assembler)MinerSelectionBox.Items[i]).Enabled = false;
             }
         }
 
@@ -269,14 +315,14 @@ namespace Foreman
         //MODULE------------------------------------------------------------------------------------------
         private void ModuleSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
+            ((Module)ModuleSelectionBox.Items[e.Index]).Enabled = (e.NewValue == CheckState.Checked);
         }
         private void ModuleSelectionAllButton_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
             {
                 ModuleSelectionBox.SetItemChecked(i, true);
-                CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[i]] = true;
+                ((Module)ModuleSelectionBox.Items[i]).Enabled = true;
             }
         }
         private void ModuleSelectionNoneButton_Click(object sender, EventArgs e)
@@ -284,13 +330,75 @@ namespace Foreman
             for (int i = 0; i < ModuleSelectionBox.Items.Count; i++)
             {
                 ModuleSelectionBox.SetItemChecked(i, false);
-                CurrentOptions.Modules[(Module)ModuleSelectionBox.Items[i]] = false;
+                ((Module)ModuleSelectionBox.Items[i]).Enabled = false;
             }
         }
 
         private void ModuleSelectionBox_Leave(object sender, EventArgs e)
         {
             ModuleSelectionBox.SelectedItem = null;
+        }
+
+        //RECIPES----------------------------------------------------------------------------------------
+
+        private void RecipeListView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.A && (e.Modifiers & Keys.Control) != 0)
+                NativeMethods.SelectAllItems(RecipeListView);
+        }
+
+        private void RecipeListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            ListViewItem lvi = RecipeListView.GetItemAt(e.X, e.Y);
+            if (lvi != null && e.X < (lvi.Bounds.Left + 16))
+            {
+                if (lvi.Selected) //check all selected
+                {
+                    bool setCheck = !lvi.Checked;
+                    foreach (int index in RecipeListView.SelectedIndices)
+                    {
+                        lvi = filteredRecipeList[index];
+                        lvi.Checked = setCheck;
+                        (lvi.Tag as Recipe).Enabled = lvi.Checked;
+                    }
+                }
+                else
+                {
+                    lvi.Checked = !lvi.Checked;
+                    (lvi.Tag as Recipe).Enabled = lvi.Checked;
+                }
+                RecipeListView.Invalidate();
+            }
+
+        }
+
+        private void RecipeListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            ListViewItem lvi = RecipeListView.GetItemAt(e.X, e.Y);
+            if (lvi != null && e.X < (lvi.Bounds.Left + 16))
+            {
+                if (lvi.Selected) //check all selected
+                {
+                    bool setCheck = lvi.Checked;
+                    foreach (int index in RecipeListView.SelectedIndices)
+                    {
+                        lvi = filteredRecipeList[index];
+                        lvi.Checked = setCheck;
+                        (lvi.Tag as Recipe).Enabled = lvi.Checked;
+                    }
+                }
+                else
+                {
+                    //lvi.Checked = lvi.Checked;
+                    (lvi.Tag as Recipe).Enabled = lvi.Checked;
+                }
+                RecipeListView.Invalidate();
+            }
+        }
+
+        private void RecipeListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+        {
+            e.Item = filteredRecipeList[e.ItemIndex];
         }
 
         //CONFIRM / RELOAD / CANCEL------------------------------------------------------------------------------------------
@@ -309,10 +417,10 @@ namespace Foreman
 
         private void ImportPresetButton_Click(object sender, EventArgs e)
         {
-            using (ImportPresetForm form = new ImportPresetForm())
+            using (PresetImportForm form = new PresetImportForm())
             {
                 form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 50;
+                form.Left = this.Left + 250;
                 form.Top = this.Top + 50;
                 DialogResult result = form.ShowDialog();
 
@@ -321,9 +429,13 @@ namespace Foreman
 
                 if(result == DialogResult.OK && !string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
                 {
-                    Preset newPreset = new Preset(form.NewPresetName, false, false);
-                    CurrentOptions.Presets.Add(newPreset);
-                    PresetListBox.Items.Add(newPreset);
+                    Preset newPreset = CurrentOptions.Presets.FirstOrDefault(p => p.Name.ToLower() == form.NewPresetName.ToLower()); //extra check just in case we were overwriting
+                    if(newPreset == null)
+                    { 
+                        newPreset = new Preset(form.NewPresetName, false, false);
+                        CurrentOptions.Presets.Add(newPreset);
+                        PresetListBox.Items.Add(newPreset);
+                    }
 
                     if(MessageBox.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
@@ -348,6 +460,108 @@ namespace Foreman
                 form.Left = this.Left + 50;
                 form.Top = this.Top + 50;
                 form.ShowDialog();
+            }
+        }
+
+        private void LoadEnabledFromSaveButton_Click(object sender, EventArgs e)
+        {
+            using (SaveFileLoadForm form = new SaveFileLoadForm(CurrentOptions.DCache))
+            {
+                form.StartPosition = FormStartPosition.Manual;
+                form.Left = this.Left + 50;
+                form.Top = this.Top + 50;
+                DialogResult result = form.ShowDialog();
+                SaveFileInfo saveInfo = form.SaveFileInfo;
+
+                if(result == DialogResult.OK)
+                {
+                    int totalMods = CurrentOptions.DCache.IncludedMods.Count;
+                    string missingMods = "\nMissing Mods: ";
+                    string wrongVersionMods = "\nWrong Version Mods: ";
+                    string newMods = "\nAdded Mods: ";
+
+                    foreach(KeyValuePair<string,string> mod in CurrentOptions.DCache.IncludedMods)
+                    {
+                        if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
+                            continue;
+
+                        if (!saveInfo.Mods.ContainsKey(mod.Key))
+                            missingMods += mod.Key + ", ";
+                        else if (saveInfo.Mods[mod.Key] != mod.Value)
+                            wrongVersionMods += mod.Key + ", ";
+                    }
+                    foreach (KeyValuePair<string, string> mod in saveInfo.Mods)
+                    {
+                        if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
+                            continue;
+
+                        if (!CurrentOptions.DCache.IncludedMods.ContainsKey(mod.Key))
+                            newMods += mod.Key + ", ";
+                    }
+                    missingMods = missingMods.Substring(0, missingMods.Length - 2);
+                    if (missingMods == "\nMissing Mods") missingMods = "";
+                    wrongVersionMods = wrongVersionMods.Substring(0, wrongVersionMods.Length - 2);
+                    if (wrongVersionMods == "\nWrong Version Mods") wrongVersionMods = "";
+                    newMods = newMods.Substring(0, newMods.Length - 2);
+                    if (newMods == "\nAdded Mods") newMods = "";
+
+                    if (missingMods != "" || wrongVersionMods != "" || newMods != "")
+                        if (MessageBox.Show("selected save file mods do not match preset mods; out of {0} mods:" + missingMods + wrongVersionMods + newMods + "\nAre you sure you wish to use this save file?", "Save file mod inconsistencies found!", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                            return;
+
+
+                    //NOTE! there is a bit of inconsistency here; realistically we should enable/disable technology and calculate the enabled recipes ourselves. However to allow the user to have all recipes that he has available in the save
+                    //we will just ignore technology limitations and activate all recipes that were set as enabled in the save.
+                    //for now, technology isnt used at all, so it is just set to whatever and ignored.
+                    foreach (Technology tech in CurrentOptions.DCache.Technologies.Values)
+                    {
+                        if (saveInfo.Technologies.ContainsKey(tech.Name))
+                            tech.Enabled = saveInfo.Technologies[tech.Name];
+                        else
+                            tech.Enabled = false;
+                    }
+
+                    foreach (Recipe recipe in CurrentOptions.DCache.Recipes.Values)
+                    {
+                        if (recipe.Name.StartsWith("$r:")) //these are the special recipes we added for 'mining / extraction / etc'. They will naturally not exist in the loaded save, so we just keep set them as enabled
+                        {
+                            recipe.Enabled = true;
+                        }
+                        else
+                        {
+                            if (saveInfo.Recipes.ContainsKey(recipe.Name))
+                                recipe.Enabled = saveInfo.Recipes[recipe.Name];
+                            else
+                                recipe.Enabled = false;
+                        }
+                    }
+
+                    foreach (Assembler assembler in CurrentOptions.DCache.Assemblers.Values)
+                    {
+                        bool enabled = false;
+                        foreach (Recipe recipe in assembler.AssociatedItem.ProductionRecipes)
+                            enabled |= recipe.Enabled;
+                        assembler.Enabled = enabled;
+                    }
+
+                    foreach (Module module in CurrentOptions.DCache.Modules.Values)
+                    {
+                        bool enabled = false;
+                        foreach (Recipe recipe in module.AssociatedItem.ProductionRecipes)
+                            enabled |= recipe.Enabled;
+                        module.Enabled = enabled;
+                    }
+                    
+                    foreach (ListViewItem item in unfilteredRecipeList)
+                        item.Checked = ((Recipe)item.Tag).Enabled;
+
+                    UpdateAMM();
+                    UpdateFilteredRecipeList();
+                }
+                else if(result == DialogResult.Abort)
+                {
+                    MessageBox.Show("Error while reading save file. Try running factorio, opening the save game, saving again, and retrying?");
+                }
             }
         }
     }

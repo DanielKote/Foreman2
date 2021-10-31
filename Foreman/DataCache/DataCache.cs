@@ -11,53 +11,6 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
-    public class PresetErrorPackage : IComparable<PresetErrorPackage>
-    {
-        public Preset Preset;
-
-        public List<string> RequiredMods;
-        public List<string> RequiredItems;
-        public List<string> RequiredRecipes;
-
-        public List<string> MissingRecipes;
-        public List<string> IncorrectRecipes;
-        public List<string> ValidMissingRecipes; //any recipes that were missing previously but have been found to fit in this current preset
-        public List<string> MissingItems;
-        public List<string> MissingMods;
-        public List<string> AddedMods;
-        public List<string> WrongVersionMods;
-
-        public int ErrorCount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count + MissingMods.Count + AddedMods.Count + WrongVersionMods.Count; } }
-        public int MICount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count; } }
-
-        public PresetErrorPackage(Preset preset)
-        {
-            Preset = preset;
-            RequiredMods = new List<string>();
-            RequiredItems = new List<string>();
-            RequiredRecipes = new List<string>();
-
-            MissingRecipes = new List<string>();
-            IncorrectRecipes = new List<string>();
-            ValidMissingRecipes = new List<string>();
-            MissingItems = new List<string>();
-            MissingMods = new List<string>(); // in mod-name|version format
-            AddedMods = new List<string>(); //in mod-name|version format
-            WrongVersionMods = new List<string>(); //in mod-name|expected-version|preset-version format
-        }
-
-        public int CompareTo(PresetErrorPackage other) //usefull for sorting the Presets by increasing severity (mods, items/recipes)
-        {
-            int modErrorComparison = this.MissingMods.Count.CompareTo(other.MissingMods.Count);
-            if (modErrorComparison != 0)
-                return modErrorComparison;
-            modErrorComparison = this.AddedMods.Count.CompareTo(other.AddedMods.Count);
-            if (modErrorComparison != 0)
-                return modErrorComparison;
-            return this.MICount.CompareTo(other.MICount);
-        }
-    }
-
     public class DataCache
     {
         public string PresetName { get; private set; }
@@ -276,18 +229,18 @@ namespace Foreman
             return recipeLinks;
         }
 
-        public static Dictionary<string,string> ReadModList(Preset preset)
+        public static PresetInfo ReadPresetInfo(Preset preset)
         {
             Dictionary<string, string> mods = new Dictionary<string, string>();
             string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
             if (!File.Exists(presetPath))
-                return mods;
+                return new PresetInfo(null, false, false);
 
             JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
             foreach (var objJToken in jsonData["mods"].ToList())
                 mods.Add((string)objJToken["name"], (string)objJToken["version"]);
 
-            return mods;
+            return new PresetInfo(mods, (int)jsonData["difficulty"][0] == 1, (int)jsonData["difficulty"][1] == 1);
         }
 
         public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string,string> modList,  List<string> itemList, List<RecipeShort> recipeShorts)
@@ -508,8 +461,8 @@ namespace Foreman
             {
                 string name = (string)productJToken["name"];
                 float amount = (float)productJToken["amount"];
-                float temperature = 0; // ((string)productJToken["type"] == "fluid" && productJToken["temperature"].Type != JTokenType.Null) ? (float)productJToken["temperature"] : 0;
-                if ((string)productJToken["type"] == "fluid" && productJToken["temperature"].Type != JTokenType.Null)
+                float temperature = 0;
+                if ((string)productJToken["type"] == "fluid" && productJToken["temperature"] != null)
                 {
                     temperature = (float)productJToken["temperature"];
                     if (((ItemPrototype)items[name]).DefaultTemperature != temperature)
@@ -528,8 +481,8 @@ namespace Foreman
                 string name = (string)ingredientJToken["name"];
                 float amount = (float)ingredientJToken["amount"];
 
-                float minTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["minimum_temperature"].Type != JTokenType.Null) ? (float)ingredientJToken["minimum_temperature"] : float.NegativeInfinity;
-                float maxTemp = ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"].Type != JTokenType.Null) ? (float)ingredientJToken["maximum_temperature"] : float.PositiveInfinity;
+                float minTemp =  ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["minimum_temperature"] != null) ? (float)ingredientJToken["minimum_temperature"] : float.NegativeInfinity;
+                float maxTemp =  ((string)ingredientJToken["type"] == "fluid" && ingredientJToken["maximum_temperature"] != null) ? (float)ingredientJToken["maximum_temperature"] : float.PositiveInfinity;
 
                 if (amount != 0)
                 {
@@ -774,11 +727,11 @@ namespace Foreman
 
             //now to add an extra recipe that will be used to 'mine' this fluid
             RecipePrototype recipe;
-            if (!recipes.ContainsKey("$p:" + fluid.Name))
+            if (!recipes.ContainsKey("$r:" + fluid.Name))
             {
                 recipe = new RecipePrototype(
                     this,
-                    "$p:" + fluid.Name,
+                    "$r:" + fluid.Name,
                     fluid.FriendlyName + " Extraction",
                     extractionSubgroupFluidsOP,
                     fluid.Name);
@@ -793,7 +746,7 @@ namespace Foreman
                 recipes.Add(recipe.Name, recipe);
             }
             else
-                recipe = (RecipePrototype)recipes["$p:" + fluid.Name];
+                recipe = (RecipePrototype)recipes["$r:" + fluid.Name];
 
             recipe.validAssemblers.Add(assembler);
             assembler.validRecipes.Add(recipe);
