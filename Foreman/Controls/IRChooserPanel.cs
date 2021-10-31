@@ -137,7 +137,7 @@ namespace Foreman
 
         protected virtual List<Group> GetSortedGroups()
         {
-            List<Group> groups = PGViewer.Graph.DCache.Groups.Values.ToList();
+            List<Group> groups = PGViewer.DCache.Groups.Values.ToList();
             groups.Sort();
             return groups;
         }
@@ -331,7 +331,7 @@ namespace Foreman
         protected override List<Group> GetSortedGroups()
         {
             List<Group> groups = new List<Group>();
-            foreach (Group group in PGViewer.Graph.DCache.Groups.Values)
+            foreach (Group group in PGViewer.DCache.Groups.Values)
             {
                 int itemCount = 0;
                 foreach (Subgroup sgroup in group.Subgroups)
@@ -420,8 +420,8 @@ namespace Foreman
 
     public class RecipeChooserPanel : IRChooserPanel
     {
-        public Action<ProductionNode> CallbackMethod; //returns the created production node (or null if not created)
-        public void Show(Action<ProductionNode> callback) { CallbackMethod = callback; }
+        public Action<NodeType, Recipe> CallbackMethod; //returns the selected node type and the selected recipe (or null if not a recipe node)
+        public void Show(Action<NodeType, Recipe> callback) { CallbackMethod = callback; }
         protected Item KeyItem;
         protected fRange KeyItemTempRange;
 
@@ -480,7 +480,7 @@ namespace Foreman
         protected override List<Group> GetSortedGroups()
         {
             List<Group> groups = new List<Group>();
-            foreach (Group group in PGViewer.Graph.DCache.Groups.Values)
+            foreach (Group group in PGViewer.DCache.Groups.Values)
             {
                 int recipeCount = 0;
                 foreach (Subgroup sgroup in group.Subgroups)
@@ -572,12 +572,12 @@ namespace Foreman
         {
             if (e.Button == MouseButtons.Left) //select recipe
             {
-                Recipe selectedRecipe = (Recipe)((Button)sender).Tag;
                 Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
                 Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
                 Properties.Settings.Default.Save();
+                Recipe selectedRecipe = (Recipe)((Button)sender).Tag;
+                CallbackMethod(NodeType.Recipe, selectedRecipe);
                 Dispose();
-                CallbackMethod(RecipeNode.Create(selectedRecipe, PGViewer.Graph));
             }
             else if(e.Button == MouseButtons.Right) //flip hidden status of recipe
             {
@@ -589,34 +589,28 @@ namespace Foreman
 
         private void AddSupplyButton_Click(object sender, EventArgs e)
         {
-            SupplierNode newNode = SupplierNode.Create(KeyItem, PGViewer.Graph);
-            newNode.rateType = RateType.Auto;
             Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.Save();
-            CallbackMethod(newNode);
-            Dispose();
-        }
-
-        private void AddPassthroughButton_Click(object sender, EventArgs e)
-        {
-            PassthroughNode newNode = PassthroughNode.Create(KeyItem, PGViewer.Graph);
-            newNode.rateType = RateType.Auto;
-            Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
-            Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
-            Properties.Settings.Default.Save();
-            CallbackMethod(newNode);
+            CallbackMethod(NodeType.Supplier, null);
             Dispose();
         }
 
         private void AddConsumerButton_Click(object sender, EventArgs e)
         {
-            ConsumerNode newNode = ConsumerNode.Create(KeyItem, PGViewer.Graph);
-            newNode.rateType = RateType.Auto;
             Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.Save();
-            CallbackMethod(newNode);
+            CallbackMethod(NodeType.Consumer, null);
+            Dispose();
+        }
+
+        private void AddPassthroughButton_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
+            Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+            Properties.Settings.Default.Save();
+            CallbackMethod(NodeType.Passthrough, null);
             Dispose();
         }
 

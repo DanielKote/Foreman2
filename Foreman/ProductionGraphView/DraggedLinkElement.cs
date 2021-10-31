@@ -29,31 +29,8 @@ namespace Foreman
 			get { return new Point(); }
 			set { }
 		}
-		public override int X
-		{
-			get { return 0; }
-			set { }
-		}
-		public override int Y
-		{
-			get { return 0; }
-			set { }
-		}
-		public override Point Size
-		{
-			get { return new Point(); }
-			set { }
-		}
-		public override int Width
-		{
-			get { return 0; }
-			set { }
-		}
-		public override int Height
-		{
-			get { return 0; }
-			set { }
-		}
+		public override int X { get { return 0; } set { } }
+		public override int Y { get { return 0; } set { } }
 
 		public DraggedLinkElement(ProductionGraphViewer parent, NodeElement startNode, LinkType startConnectionType, Item item)
 			: base(parent)
@@ -80,21 +57,21 @@ namespace Foreman
 
 		public void UpdateCurve() //updates all points & boundaries (important for occluding objects outside view)
 		{
-			pointN = Parent.ScreenToGraph(Parent.PointToClient(Cursor.Position));
+			pointN = myGraphViewer.ScreenToGraph(myGraphViewer.PointToClient(Cursor.Position));
 			pointM = pointN;
 			newObjectLocation = pointN;
 
 			//only snap to grid if grid exists and its a free link (not linking 2 existing objects)
-			if ((SupplierElement == null || ConsumerElement == null) && Parent.ShowGrid && Parent.CurrentGridUnit > 0)
+			if ((SupplierElement == null || ConsumerElement == null) && myGraphViewer.ShowGrid && myGraphViewer.CurrentGridUnit > 0)
 			{
 				int X = pointN.X;
 				int Y = pointN.Y;
 
-				X += Math.Sign(X) * Parent.CurrentGridUnit / 2;
-				X -= X % Parent.CurrentGridUnit + Width / 2;
+				X += Math.Sign(X) * myGraphViewer.CurrentGridUnit / 2;
+				X -= X % myGraphViewer.CurrentGridUnit;
 
-				Y += Math.Sign(Y) * Parent.CurrentGridUnit / 2;
-				Y -= Y % Parent.CurrentGridUnit + Height / 2;
+				Y += Math.Sign(Y) * myGraphViewer.CurrentGridUnit / 2;
+				Y -= Y % myGraphViewer.CurrentGridUnit;
 
 				pointN = new Point(X, Y);
 				pointM = pointN;
@@ -132,7 +109,7 @@ namespace Foreman
 				pointMidM = new Point(midX, pointM.Y + 120);
 			}
 		}
-		public override void Paint(Graphics graphics, Point trans)
+		protected override void Draw(Graphics graphics, Point trans)
 		{
 			UpdateCurve();
 
@@ -143,7 +120,7 @@ namespace Foreman
 				{
 					if (pen.Color.GetBrightness() > 0.8)
 						pen.Color = Color.FromArgb((int)(pen.Color.R * 0.8), (int)(pen.Color.G * 0.8), (int)(pen.Color.B * 0.8));
-					graphics.DrawBezier(pen, PT(pointN,trans), PT(pointN2, trans), PT(pointM2,trans), PT(pointM,trans));
+					graphics.DrawBezier(pen, Point.Add(pointN, (Size)trans), Point.Add(pointN2, (Size)trans), Point.Add(pointM2, (Size)trans), Point.Add(pointM, (Size)trans));
 				}
 			}
 			else
@@ -166,32 +143,23 @@ namespace Foreman
 		{
 			if (SupplierElement != null && ConsumerElement != null)
 			{
-				if (StartConnectionType == LinkType.Input)
-				{
-					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
-				}
-				else
-				{
-					NodeLink.Create(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
-				}
+				myGraphViewer.Graph.CreateLink(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
 
-				Parent.Graph.UpdateNodeValues();
-				Parent.AddRemoveElements();
-				Parent.UpdateNodes();
-				Parent.UpdateGraphBounds();
-				Parent.Invalidate();
+				myGraphViewer.Graph.UpdateNodeValues();
+				myGraphViewer.UpdateGraphBounds();
+				myGraphViewer.Invalidate();
 			}
 			else //at least one null
 			{
-				Point originPoint = new Point(Parent.GraphToScreen(location).X - 150, 15);
-				originPoint.X = Math.Max(15, Math.Min(Parent.Width - 650, originPoint.X));
+				Point originPoint = new Point(myGraphViewer.GraphToScreen(location).X - 150, 15);
+				originPoint.X = Math.Max(15, Math.Min(myGraphViewer.Width - 650, originPoint.X));
 
 				bool includeSuppliers = StartConnectionType == LinkType.Input && SupplierElement == null;
 				bool includeConsumers = StartConnectionType == LinkType.Output && ConsumerElement == null;
 				if (includeSuppliers)
-					Parent.AddRecipe(originPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
+					myGraphViewer.AddRecipe(originPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
 				else if (includeConsumers)
-					Parent.AddRecipe(originPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Consumer, SupplierElement);
+					myGraphViewer.AddRecipe(originPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Consumer, SupplierElement);
 			}
 			Dispose();
 		}
@@ -225,7 +193,7 @@ namespace Foreman
 
 		public override void MouseMoved(Point location)
 		{
-			NodeElement mousedElement = Parent.GetElementsAtPoint(location).OfType<NodeElement>().FirstOrDefault();
+			NodeElement mousedElement = myGraphViewer.GetElementsAtPoint(location).OfType<NodeElement>().FirstOrDefault();
 			if (mousedElement != null)
 			{
                 if (StartConnectionType == LinkType.Input && mousedElement.DisplayedNode.Outputs.Contains(Item))

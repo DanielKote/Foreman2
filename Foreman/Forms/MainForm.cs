@@ -34,7 +34,7 @@ namespace Foreman
 					form.Left = this.Left + 150;
 					form.Top = this.Top + 100;
 					form.ShowDialog(); //LOAD FACTORIO DATA
-					GraphViewer.Graph = new ProductionGraph(form.GetDataCache());
+					GraphViewer.DCache = form.GetDataCache();
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
@@ -49,15 +49,14 @@ namespace Foreman
 
 		private void UpdateControlValues()
 		{
-			FixedAmountButton.Checked = GraphViewer.Graph.SelectedAmountType == AmountType.FixedAmount;
-			RateButton.Checked = GraphViewer.Graph.SelectedAmountType == AmountType.Rate;
-			if (GraphViewer.Graph.SelectedUnit == RateUnit.PerSecond)
+			FixedAmountButton.Checked = GraphViewer.SelectedAmountType == AmountType.FixedAmount;
+			RateButton.Checked = GraphViewer.SelectedAmountType == AmountType.Rate;
+			if (GraphViewer.SelectedRateUnit == RateUnit.PerSecond)
 				RateOptionsDropDown.SelectedIndex = 0;
 			else
 				RateOptionsDropDown.SelectedIndex = 1;
 
-			AssemblerDisplayCheckBox.Checked = GraphViewer.ShowAssemblers;
-			MinerDisplayCheckBox.Checked = GraphViewer.ShowMiners;
+			SimpleViewCheckBox.Checked = GraphViewer.SimpleView;
 
 			GraphViewer.Invalidate();
 		}
@@ -121,7 +120,7 @@ namespace Foreman
 
 		private void ClearButton_Click(object sender, EventArgs e)
 		{
-			GraphViewer.Graph.Nodes.Clear();
+			GraphViewer.Graph.ClearGraph();
 			GraphViewer.Elements.Clear();
 			GraphViewer.Invalidate();
 		}
@@ -172,11 +171,11 @@ namespace Foreman
 			do
 			{
 				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
-				foreach (Assembler assembler in GraphViewer.Graph.DCache.Assemblers.Values)
+				foreach (Assembler assembler in GraphViewer.DCache.Assemblers.Values)
 					oldOptions.Assemblers.Add(assembler, assembler.Enabled);
-				foreach (Miner miner in GraphViewer.Graph.DCache.Miners.Values)
+				foreach (Miner miner in GraphViewer.DCache.Miners.Values)
 					oldOptions.Miners.Add(miner, miner.Enabled);
-				foreach (Module module in GraphViewer.Graph.DCache.Modules.Values)
+				foreach (Module module in GraphViewer.DCache.Modules.Values)
 					oldOptions.Modules.Add(module, module.Enabled);
 
 				oldOptions.Presets = GetValidPresetsList();
@@ -207,8 +206,7 @@ namespace Foreman
 							kvp.Key.Enabled = kvp.Value;
 					}
 
-					GraphViewer.UpdateNodes();
-					UpdateControlValues();
+					GraphViewer.Invalidate();
 				}
 			} while (reload);
 		}
@@ -240,7 +238,7 @@ namespace Foreman
 		{
 			if ((sender as RadioButton).Checked)
 			{
-				this.GraphViewer.Graph.SelectedAmountType = AmountType.Rate;
+				this.GraphViewer.SelectedAmountType = AmountType.Rate;
 				RateOptionsDropDown.Enabled = true;
 			}
 			else
@@ -248,20 +246,16 @@ namespace Foreman
 				RateOptionsDropDown.Enabled = false;
 			}
 			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.UpdateNodes();
-			GraphViewer.Invalidate();
 		}
 
 		private void FixedAmountButton_CheckedChanged(object sender, EventArgs e)
 		{
 			if ((sender as RadioButton).Checked)
 			{
-				this.GraphViewer.Graph.SelectedAmountType = AmountType.FixedAmount;
+				this.GraphViewer.SelectedAmountType = AmountType.FixedAmount;
 			}
 
 			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.UpdateNodes();
-			GraphViewer.Invalidate();
 		}
 
 		private void RateOptionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
@@ -269,15 +263,13 @@ namespace Foreman
 			switch ((sender as ComboBox).SelectedIndex)
 			{
 				case 0:
-					GraphViewer.Graph.SelectedUnit = RateUnit.PerSecond;
+					GraphViewer.SelectedRateUnit = RateUnit.PerSecond;
 					break;
 				case 1:
-					GraphViewer.Graph.SelectedUnit = RateUnit.PerMinute;
+					GraphViewer.SelectedRateUnit = RateUnit.PerMinute;
 					break;
 			}
 			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.Invalidate();
-			GraphViewer.UpdateNodes();
 		}
 
 		private void DynamicLWCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -296,8 +288,6 @@ namespace Foreman
 		{
 			GraphViewer.Graph.PauseUpdates = PauseUpdatesCheckbox.Checked;
 			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.UpdateNodes();
-			GraphViewer.Invalidate();
 		}
 
 		//---------------------------------------------------------Gridlines
@@ -362,38 +352,14 @@ namespace Foreman
 
 		//---------------------------------------------------------Assemblers
 
-		private void AssemblerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
+		private void SimpleViewCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			GraphViewer.ShowAssemblers = (sender as CheckBox).Checked;
-			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.UpdateNodes();
-		}
-
-		private void MinerDisplayCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			GraphViewer.ShowMiners = (sender as CheckBox).Checked;
-			GraphViewer.Graph.UpdateNodeValues();
-			GraphViewer.UpdateNodes();
-		}
+			GraphViewer.SimpleView = SimpleViewCheckBox.Checked;
+			GraphViewer.Invalidate();
+        }
 
 		private void ModuleDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-			switch(ModuleDropDown.SelectedIndex)
-            {
-				case 1:
-					GraphViewer.Graph.defaultModuleSelector = ModuleSelector.Fastest;
-					break;
-
-				case 2:
-					GraphViewer.Graph.defaultModuleSelector = ModuleSelector.Productive;
-					break;
-
-				case 0:
-				default:
-					GraphViewer.Graph.defaultModuleSelector = ModuleSelector.None;
-					break;
-            }
-
 			Properties.Settings.Default.DefaultModules = ModuleDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
 		}
@@ -421,7 +387,7 @@ namespace Foreman
 		}
     }
 
-	public class Preset : IEquatable<Preset>
+    public class Preset : IEquatable<Preset>
 	{
 		public string Name { get; set; }
 		public bool IsCurrentlySelected { get; set; }

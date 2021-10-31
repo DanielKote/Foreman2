@@ -5,102 +5,89 @@ using System.Runtime.Serialization;
 
 namespace Foreman
 {
-	public partial class RecipeNode : ProductionNode
+	public interface RecipeNode : BaseNode
+    {
+		Recipe BaseRecipe { get; }
+		Assembler SelectedAssembler { get; set; }
+		Beacon SelectedBeacon { get; set; }
+		List<Module> AssemblerModules { get; }
+		List<Module> BeaconModules { get; }
+	}
+
+
+	public class RecipeNodePrototype : BaseNodePrototype, RecipeNode
 	{
 		public Recipe BaseRecipe { get; private set; }
-		// If null, best available assembler should be used, using speed (not number of module slots)
-		// as a proxy since "best" can have varying definitions.
-		public Assembler Assembler { get; set; }
 
-		public ModuleSelector NodeModules { get; set; }
+		public Assembler SelectedAssembler { get; set; }
+		public Beacon SelectedBeacon { get; set; }
+		public float BeaconCount { get; set; }
 
+		public List<Module> AssemblerModules { get; private set; }
+		public List<Module> BeaconModules { get; private set; }
 
-		protected RecipeNode(Recipe baseRecipe, ProductionGraph graph)
-			: base(graph)
+		public override string DisplayName { get { return BaseRecipe.FriendlyName; } }
+		public override IEnumerable<Item> Inputs { get { foreach (Item item in BaseRecipe.IngredientList) yield return item; } }
+		public override IEnumerable<Item> Outputs { get { foreach (Item item in BaseRecipe.ProductList) yield return item; } }
+
+		public RecipeNodePrototype(ProductionGraph graph, int nodeID, Recipe baseRecipe) : base(graph, nodeID)
 		{
 			BaseRecipe = baseRecipe;
-			NodeModules = graph.defaultModuleSelector ?? ModuleSelector.None;
+			SelectedAssembler = null;
+			SelectedBeacon = null;
+			AssemblerModules = new List<Module>();
+			BeaconModules = new List<Module>();
 		}
 
-		public override IEnumerable<Item> Inputs
+		public override float GetConsumeRate(Item item) { return (float)Math.Round(BaseRecipe.IngredientSet[item] * ActualRate, RoundingDP); }
+		public override float GetSupplyRate(Item item) { return (float)Math.Round(BaseRecipe.ProductSet[item] * ActualRate * GetProductivityMultiplier(), RoundingDP); }
+
+		internal override double outputRateFor(Item item) { return BaseRecipe.ProductSet[item]; }
+		internal override double inputRateFor(Item item) { return BaseRecipe.IngredientSet[item]; }
+
+		public override float GetSpeedMultiplier()
 		{
-			get
-			{
-				foreach (Item item in BaseRecipe.IngredientSet.Keys)
-					yield return item;
-			}
+			float multiplier = 1.0f;
+			foreach (Module module in AssemblerModules)
+				multiplier += module.SpeedBonus;
+			foreach (Module beaconModule in BeaconModules)
+				multiplier += beaconModule.SpeedBonus * SelectedBeacon.Effectivity * BeaconCount;
+			return multiplier;
 		}
 
-		public override IEnumerable<Item> Outputs
+		public override float GetProductivityMultiplier()
 		{
-			get
-			{
-				foreach (Item item in BaseRecipe.ProductSet.Keys)
-					yield return item;
-			}
-		}
-
-		public static RecipeNode Create(Recipe baseRecipe, ProductionGraph graph)
-		{
-			RecipeNode node = new RecipeNode(baseRecipe, graph);
-			node.Graph.Nodes.Add(node);
-			node.Graph.InvalidateCaches();
-			return node;
-		}
-
-		public override string DisplayName
-		{
-			get { return BaseRecipe.FriendlyName; }
-		}
-
-		public override string ToString()
-		{
-			return String.Format("Recipe Tree Node: {0}", BaseRecipe.Name);
+			float multiplier = 1.0f + (SelectedAssembler == null ? 0 : SelectedAssembler.BaseProductivityBonus);
+			foreach (Module module in AssemblerModules)
+				multiplier += module.ProductivityBonus;
+			foreach (Module beaconModule in BeaconModules)
+				multiplier += beaconModule.ProductivityBonus * SelectedBeacon.Effectivity * BeaconCount;
+			return multiplier;
 		}
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("NodeType", "Recipe");
+			info.AddValue("NodeType", NodeType.Recipe);
+			info.AddValue("NodeID:", NodeID);
+			info.AddValue("Location", Location);
 			info.AddValue("RecipeID", BaseRecipe.RecipeID);
-			info.AddValue("SpeedBonus", SpeedBonus);
-			info.AddValue("ProductivityBonus", ProductivityBonus);
-			info.AddValue("RateType", rateType);
-			info.AddValue("ActualRate", actualRate);
-			if (rateType == RateType.Manual)
-				info.AddValue("DesiredRate", desiredRate);
-			if (Assembler != null)
-				info.AddValue("Assembler", Assembler.Name);
-			NodeModules.GetObjectData(info, context);
+			info.AddValue("RateType", RateType);
+			info.AddValue("ActualRate", ActualRate);
+			if (RateType == RateType.Manual)
+				info.AddValue("DesiredRate", DesiredRate);
+			if (SelectedAssembler != null)
+			{
+				info.AddValue("Assembler", SelectedAssembler.Name);
+				info.AddValue("AssemblerModules", AssemblerModules.Select(m => m.Name));
+			}
+			if (SelectedBeacon != null)
+			{
+				info.AddValue("Beacon", SelectedBeacon.Name);
+				info.AddValue("BeaconCount", BeaconCount);
+				info.AddValue("BeaconModules", BeaconModules.Select(m => m.Name));
+			}
 		}
 
-		public override float GetConsumeRate(Item item)
-		{
-			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.IngredientSet.ContainsKey(item))
-				return 0f;
-			return (float)Math.Round(BaseRecipe.IngredientSet[item] * actualRate, RoundingDP);
-		}
-
-		public override float GetSupplyRate(Item item)
-		{
-			if (BaseRecipe.IsMissingRecipe || !BaseRecipe.ProductSet.ContainsKey(item))
-				return 0f;
-			return (float)Math.Round(BaseRecipe.ProductSet[item] * actualRate * ProductivityMultiplier(), RoundingDP);
-		}
-
-		internal override double outputRateFor(Item item)
-		{
-			return BaseRecipe.ProductSet[item];
-		}
-
-		internal override double inputRateFor(Item item)
-		{
-			return BaseRecipe.IngredientSet[item];
-		}
-
-		public override float ProductivityMultiplier()
-		{
-			var assemblerBonus = 0; // = GetAssemblers().Keys.Sum(x => x.GetAssemblerProductivity());
-			return (float)(1.0 + ProductivityBonus + assemblerBonus);
-		}
-	}
+        public override string ToString() { return string.Format("Recipe node for: {0}", BaseRecipe.Name); }
+    }
 }

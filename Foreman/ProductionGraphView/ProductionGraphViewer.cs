@@ -15,14 +15,21 @@ using System.IO;
 
 namespace Foreman
 {
+	public enum AmountType { FixedAmount, Rate }
+	public enum RateUnit { PerMinute, PerSecond }
+
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
+
 		private enum DragOperation { None, Item, Selection, Processed }
 		public enum NewNodeType { Disconnected, Supplier, Consumer }
 
+		public AmountType SelectedAmountType { get; set; }
+		public RateUnit SelectedRateUnit { get; set; }
+
 		public HashSet<GraphElement> Elements = new HashSet<GraphElement>();
-		public ProductionGraph Graph; //set it up when we have cache
+		public ProductionGraph Graph;
 		private Point lastMouseDragPoint;
 		public Point ViewOffset;
 		public float ViewScale = 1f;
@@ -59,8 +66,7 @@ namespace Foreman
 
 		private readonly Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
 
-		public bool ShowAssemblers = false;
-		public bool ShowMiners = false;
+		public bool SimpleView { get; set; } //simple: show only the item/recipe names.
 
 		public bool DynamicLinkWidth = false;
 		private const int minLinkWidth = 3;
@@ -69,33 +75,8 @@ namespace Foreman
 		public HashSet<FloatingTooltipControl> floatingTooltipControls = new HashSet<FloatingTooltipControl>();
 		StringFormat stringFormat = new StringFormat(); //used for tooltip drawing so as not to create a new one each time
 
-		public Rectangle GraphBounds
-		{
-			get
-			{
-				int counter = 0;
-				int x = int.MaxValue;
-				int y = int.MaxValue;
-				foreach (NodeElement element in Elements.OfType<NodeElement>())
-				{
-					counter++;
-					x = Math.Min(element.X, x);
-					y = Math.Min(element.Y, y);
-				}
-				int width = 0;
-				int height = 0;
-				foreach (NodeElement element in Elements.OfType<NodeElement>())
-				{
-					height = Math.Max(element.Y + element.Height - y, height);
-					width = Math.Max(element.X + element.Width - x, width);
-				}
+		public DataCache DCache;
 
-				if (counter > 0)
-					return new Rectangle(x - 80, y - 80, width + 160, height + 160);
-				else
-					return new Rectangle(0, 0, 0, 0);
-			}
-		}
 		private Rectangle visibleGraphBounds;
 
 		private ContextMenu rightClickMenu = new ContextMenu();
@@ -105,7 +86,17 @@ namespace Foreman
 			InitializeComponent();
 			MouseWheel += new MouseEventHandler(ProductionGraphViewer_MouseWheel);
 			Resize += new EventHandler(ProductionGraphViewer_Resized);
+			
 			ViewOffset = new Point(Width / -2, Height / -2);
+			ViewScale = 1f;
+
+			Graph = new ProductionGraph();
+            //Graph.ClearGraph()
+            Graph.NodeAdded += Graph_NodeAdded;
+            Graph.NodeDeleted += Graph_NodeDeleted;
+            Graph.LinkAdded += Graph_LinkAdded;
+            Graph.LinkDeleted += Graph_LinkDeleted;
+            Graph.NodeValuesUpdated += Graph_NodeValuesUpdated;
 
 			selectedNodes = new HashSet<NodeElement>();
 			CurrentSelectionNodes = new HashSet<NodeElement>();
@@ -114,9 +105,48 @@ namespace Foreman
 			Invalidate();
 		}
 
-		//----------------------------------------------Node functions
+        private void Graph_NodeValuesUpdated(object sender, EventArgs e)
+        {
+			try
+			{
+				foreach (NodeElement node in Elements.OfType<NodeElement>().ToList())
+					node.Update();
+			}
+			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
+			Invalidate();
+		}
 
-		public void AddItem(Point drawOrigin, Point newLocation)
+        private void Graph_LinkDeleted(object sender, NodeLinkEventArgs e)
+        {
+			LinkElement deletedElement = Elements.OfType<LinkElement>().FirstOrDefault(l => l.DisplayedLink == e.nodeLink);
+			Elements.Remove(deletedElement);
+			Invalidate();
+        }
+
+        private void Graph_LinkAdded(object sender, NodeLinkEventArgs e)
+        {
+			NodeElement supplier = Elements.OfType<NodeElement>().FirstOrDefault(n => n.DisplayedNode == e.nodeLink.Supplier);
+			NodeElement consumer = Elements.OfType<NodeElement>().FirstOrDefault(n => n.DisplayedNode == e.nodeLink.Consumer);
+			Elements.Add(new LinkElement(this, e.nodeLink, supplier, consumer));
+			Invalidate();
+        }
+
+        private void Graph_NodeDeleted(object sender, NodeEventArgs e)
+        {
+			NodeElement deletedElement = Elements.OfType<NodeElement>().FirstOrDefault(l => l.DisplayedNode == e.node);
+			Elements.Remove(deletedElement);
+			Invalidate();
+		}
+
+        private void Graph_NodeAdded(object sender, NodeEventArgs e)
+        {
+			Elements.Add(new NodeElement(this, e.node));
+			Invalidate();
+		}
+
+        //----------------------------------------------Adding new node functions
+
+        public void AddItem(Point drawOrigin, Point newLocation)
 		{
 			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
 			itemChooser.Show(selectedItem => {
@@ -143,103 +173,35 @@ namespace Foreman
 			}
 
 			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
-			recipeChooser.Show(newProductionNode =>
+			BaseNode newNode = null;
+			recipeChooser.Show((nodeType, recipe) =>
 			{
-				if(newProductionNode != null)
+				switch(nodeType)
                 {
-					NodeElement newElement = new NodeElement(newProductionNode, this);
-					newElement.Update();
-					newElement.Location = newLocation;
+					case NodeType.Consumer:
+						newNode = Graph.CreateConsumerNode(baseItem, newLocation);
+						break;
+					case NodeType.Supplier:
+						newNode = Graph.CreateSupplierNode(baseItem, newLocation);
+						break;
+					case NodeType.Passthrough:
+						newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
+						break;
+					case NodeType.Recipe:
+						newNode = Graph.CreateRecipeNode(recipe, newLocation);
+						break;
+                }
 
-					if(nNodeType == NewNodeType.Consumer)
-                    {
-						NodeLink newLink = NodeLink.Create(originElement.DisplayedNode, newElement.DisplayedNode, baseItem);
-						new LinkElement(this, newLink, originElement, newElement);
-					}
-					else if(nNodeType == NewNodeType.Supplier)
-                    {
-						NodeLink newLink = NodeLink.Create(newElement.DisplayedNode, originElement.DisplayedNode, baseItem);
-						new LinkElement(this, newLink, newElement, originElement);
-					}
-				}
+				if (nNodeType == NewNodeType.Consumer)
+					Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
+				else if (nNodeType == NewNodeType.Supplier)
+					Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
 
 				Graph.UpdateNodeValues();
-				AddRemoveElements();
-				UpdateNodes();
-				UpdateGraphBounds();
-				Invalidate();
 			});
         }
 
-		public void UpdateNodes()
-		{
-			try
-			{
-
-				foreach (NodeElement node in Elements.OfType<NodeElement>().ToList())
-				{
-					node.Update();
-				}
-			} catch (OverflowException)
-			{
-				//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
-			}
-			Invalidate();
-		}
-
-		public void AddRemoveElements()
-		{
-			Elements.RemoveWhere(e => e is LinkElement le && !Graph.GetAllNodeLinks().Contains(le.DisplayedLink));
-			Elements.RemoveWhere(e => e is NodeElement le && !Graph.Nodes.Contains(le.DisplayedNode));
-			selectedNodes.RemoveWhere(e => !Graph.Nodes.Contains(e.DisplayedNode));
-
-			foreach (ProductionNode node in Graph.Nodes)
-			{
-				if (!Elements.OfType<NodeElement>().Any(e => e.DisplayedNode == node))
-				{
-					Elements.Add(new NodeElement(node, this));
-				}
-			}
-
-			foreach (NodeLink link in Graph.GetAllNodeLinks())
-			{
-				if (!Elements.OfType<LinkElement>().Any(e => e.DisplayedLink == link))
-				{
-					Elements.Add(new LinkElement(this, link, GetElementForNode(link.Supplier), GetElementForNode(link.Consumer)));
-				}
-			}
-
-			UpdateNodes();
-			Invalidate();
-		}
-
-		public void RemoveAssociatedLinks(ItemTab tab)
-        {
-			if (tab.Type == LinkType.Input)
-			{
-				var removedLinks = Elements.Where(e => e is LinkElement le && le.ConsumerTab == tab).ToList();
-				foreach (LinkElement removedLink in removedLinks)
-				{
-					removedLink.DisplayedLink.Destroy();
-					Elements.Remove(removedLink);
-				}
-			}
-			else
-			{
-				var removedLinks = Elements.Where(e => e is LinkElement le && le.SupplierTab == tab).ToList();
-				foreach (LinkElement removedLink in removedLinks)
-				{
-					removedLink.DisplayedLink.Destroy();
-					Elements.Remove(removedLink);
-				}
-			}
-
-			Graph.UpdateNodeValues();
-			UpdateNodes();
-			Invalidate();
-		}
-
-		public NodeElement GetElementForNode(ProductionNode node)
+		public NodeElement GetElementForNode(BaseNode node)
 		{
 			return Elements.OfType<NodeElement>().FirstOrDefault(e => e.DisplayedNode == node);
 		}
@@ -247,24 +209,8 @@ namespace Foreman
 		public IEnumerable<GraphElement> GetElementsAtPoint(Point point)
 		{
 			foreach (GraphElement element in GetPaintingOrder().Reverse())
-				if (element.ContainsPoint(Point.Add(point, new Size(-element.X, -element.Y))))
+				if (element.ContainsPoint(point))
 					yield return element;
-		}
-
-		public void DeleteNode(NodeElement node)
-		{
-			if (node != null)
-			{
-				foreach (NodeLink link in node.DisplayedNode.InputLinks.ToList().Union(node.DisplayedNode.OutputLinks.ToList()))
-				{
-					Elements.RemoveWhere(e => e is LinkElement le && le.DisplayedLink == link);
-				}
-				Elements.Remove(node);
-				node.DisplayedNode.Destroy();
-				Graph.UpdateNodeValues();
-				UpdateNodes();
-				Invalidate();
-			}
 		}
 
 		public void TryDeleteSelectedNodes()
@@ -275,8 +221,9 @@ namespace Foreman
 			if (proceed)
 			{
 				foreach (NodeElement node in selectedNodes)
-					DeleteNode(node);
+					Graph.DeleteNode(node.DisplayedNode);
 				selectedNodes.Clear();
+				Graph.UpdateNodeValues();
 			}
 		}
 
@@ -306,10 +253,7 @@ namespace Foreman
 		public void AlignSelected()
 		{
 			foreach (NodeElement ne in selectedNodes)
-			{
-				ne.X = AlignToGrid(ne.X);
-				ne.Y = AlignToGrid(ne.Y);
-			}
+				ne.Location = new Point(AlignToGrid(ne.X), AlignToGrid(ne.Y));
 			Invalidate();
 		}
 
@@ -425,7 +369,7 @@ namespace Foreman
 
 			//all elements (nodes & lines)
 			foreach (GraphElement element in GetPaintingOrder())
-			element.Paint(graphics, new Point(element.X, element.Y));
+			element.Paint(graphics, new Point(0,0));
 
 			//selection zone
 			if(currentDragOperation == DragOperation.Selection)
@@ -443,7 +387,7 @@ namespace Foreman
 				var element = GetElementsAtPoint(ScreenToGraph(PointToClient(Control.MousePosition))).FirstOrDefault();
 				if (element != null)
 				{
-					foreach (TooltipInfo tti in element.GetToolTips(Point.Add(ScreenToGraph(PointToClient(Control.MousePosition)), new Size(-element.X, -element.Y))))
+					foreach (TooltipInfo tti in element.GetToolTips(Point.Subtract(ScreenToGraph(PointToClient(Control.MousePosition)), (Size)element.Location)))
 						DrawTooltip(tti.ScreenLocation, tti.ScreenSize, tti.Direction, graphics, tti.Text);
 				}
 			}
@@ -557,7 +501,7 @@ namespace Foreman
 			var clickedElement = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
 			if (clickedElement != null)
 			{
-				clickedElement.MouseDown(Point.Add(ScreenToGraph(e.Location), new Size(-clickedElement.X, -clickedElement.Y)), e.Button);
+				clickedElement.MouseDown(Point.Subtract(ScreenToGraph(e.Location), (Size)clickedElement.Location), e.Button);
 			}
 
 			if (e.Button == MouseButtons.Middle || (e.Button == MouseButtons.Right && clickedElement == null))
@@ -593,7 +537,7 @@ namespace Foreman
 				GraphElement element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
 				if (element != null)
 				{
-					element.MouseUp(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)), e.Button, (currentDragOperation == DragOperation.Item));
+					element.MouseUp(Point.Subtract(ScreenToGraph(e.Location), (Size)element.Location), e.Button, (currentDragOperation == DragOperation.Item));
 				}
 			}
 
@@ -661,14 +605,14 @@ namespace Foreman
 				var element = GetElementsAtPoint(ScreenToGraph(e.Location)).FirstOrDefault();
 				if (element != null)
 				{
-					element.MouseMoved(Point.Add(ScreenToGraph(e.Location), new Size(-element.X, -element.Y)));
+					element.MouseMoved(Point.Subtract(ScreenToGraph(e.Location), (Size)element.Location));
 				}
 			}
 
 			switch(currentDragOperation)
 			{
 				case DragOperation.None: //check for minimal distance to be considered a drag operation
-					Point dragDiff = Point.Add(Control.MousePosition, new Size(-mouseDownStartScreenPoint.X, -mouseDownStartScreenPoint.Y));
+					Point dragDiff = Point.Subtract(Control.MousePosition, (Size)mouseDownStartScreenPoint);
 					if (dragDiff.X * dragDiff.X + dragDiff.Y * dragDiff.Y > minDragDiff)
 					{
 						if (MouseDownElement != null) //there is an item under the mouse during drag
@@ -682,23 +626,16 @@ namespace Foreman
 					if (selectedNodes.Contains(MouseDownElement)) //dragging a group
 					{
 						Point startPoint = MouseDownElement.Location;
-						MouseDownElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-MouseDownElement.X, -MouseDownElement.Y)));
+						MouseDownElement.Dragged(Point.Subtract(ScreenToGraph(e.Location), (Size)MouseDownElement.Location));
 						Point endPoint = MouseDownElement.Location;
 						if (startPoint != endPoint)
-						{
 							foreach(NodeElement node in selectedNodes)
-                            {
 								if (node != MouseDownElement)
-								{
-									node.X += endPoint.X - startPoint.X;
-									node.Y += endPoint.Y - startPoint.Y;
-								}
-                            }
-						}
+									node.Location = new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.X - startPoint.Y);
 					}
 					else //dragging single item
 					{
-						MouseDownElement.Dragged(Point.Add(ScreenToGraph(e.Location), new Size(-MouseDownElement.X, -MouseDownElement.Y)));
+						MouseDownElement.Dragged(Point.Subtract(ScreenToGraph(e.Location), (Size)MouseDownElement.Location));
 					}
 					break;
 
@@ -800,25 +737,25 @@ namespace Foreman
 				Console.WriteLine((int)(Keys.Left));
 
 				foreach (NodeElement node in selectedNodes)
-					node.X -= moveUnit;
+					node.Location = new Point(node.X - moveUnit, node.Y);
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Right)
 			{
 				foreach (NodeElement node in selectedNodes)
-					node.X += moveUnit;
+					node.Location = new Point(node.X + moveUnit, node.Y);
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Up)
 			{
 				foreach (NodeElement node in selectedNodes)
-					node.Y -= moveUnit;
+					node.Location = new Point(node.X, node.Y - moveUnit);
 				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Down)
 			{
 				foreach (NodeElement node in selectedNodes)
-					node.Y += moveUnit;
+					node.Location = new Point(node.X, node.Y + moveUnit);
 				processed = true;
 			}
 
@@ -850,7 +787,7 @@ namespace Foreman
 		{
 			if (limitView)
 			{
-				Rectangle bounds = GraphBounds;
+				Rectangle bounds = Graph.Bounds;
 				Point screenCentre = ScreenToGraph(Width / 2, Height / 2);
 				if (bounds.Width == 0 || bounds.Height == 0)
 				{
@@ -919,48 +856,21 @@ namespace Foreman
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			//prepare list of used items & list of used recipes (with their inputs & outputs)
-			HashSet<string> includedItems = new HashSet<string>();
-			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
-			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new MissingRecipeComparer()); //compares by name, ingredients, and products
-
-			foreach(ProductionNode node in Graph.Nodes)
-            {
-				if (node is RecipeNode rnode)
-				{
-					if(rnode.BaseRecipe.IsMissingRecipe)
-						includedMissingRecipes.Add(rnode.BaseRecipe);
-					else
-						includedRecipes.Add(rnode.BaseRecipe);
-				}
-
-				foreach (Item input in node.Inputs)
-					includedItems.Add(input.Name);
-				foreach (Item output in node.Outputs)
-					includedItems.Add(output.Name);
-            }
-			List<RecipeShort> includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
-			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
-			
 			//write
-			info.AddValue("SavedPresetName", Graph.DCache.PresetName);
-			info.AddValue("AmountType", Graph.SelectedAmountType);
-			info.AddValue("Unit", Graph.SelectedUnit);
+			info.AddValue("SavedPresetName", DCache.PresetName);
+			info.AddValue("AmountType", SelectedAmountType);
+			info.AddValue("Unit", SelectedRateUnit);
 			info.AddValue("ViewOffset", ViewOffset);
 			info.AddValue("ViewScale", ViewScale);
 
-			info.AddValue("IncludedMods", Graph.DCache.IncludedMods.Select(m => m.Key + "|"+m.Value));
-			info.AddValue("IncludedItems", includedItems);
-			info.AddValue("IncludedRecipes", includedRecipeShorts);
+			info.AddValue("IncludedMods", DCache.IncludedMods.Select(m => m.Key + "|"+m.Value));
 
-			info.AddValue("HiddenRecipes", Graph.DCache.Recipes.Values.Where(r => r.Hidden).Select(r => r.Name));
-			info.AddValue("EnabledAssemblers", Graph.DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
-			info.AddValue("EnabledMiners", Graph.DCache.Miners.Values.Where(m => m.Enabled).Select(m => m.Name));
-			info.AddValue("EnabledModules", Graph.DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
+			info.AddValue("HiddenRecipes", DCache.Recipes.Values.Where(r => r.Hidden).Select(r => r.Name));
+			info.AddValue("EnabledAssemblers", DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
+			info.AddValue("EnabledMiners", DCache.Miners.Values.Where(m => m.Enabled).Select(m => m.Name));
+			info.AddValue("EnabledModules", DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
 
-			info.AddValue("Nodes", Graph.Nodes);
-			info.AddValue("NodeLinks", Graph.GetAllNodeLinks());
-			info.AddValue("ElementLocations", Graph.Nodes.Select(n => GetElementForNode(n).Location).ToList());
+			info.AddValue("ProductionGraph", Graph);
 		}
 
 		public void LoadFromOldJson(JObject json)
@@ -984,8 +894,8 @@ namespace Foreman
             }
 
 			//grab recipe list
-			List<string> itemNames = json["IncludedItems"].Select(t => (string)t).ToList();
-			List<RecipeShort> recipeShorts = RecipeShort.GetSetFromJson(json["IncludedRecipes"]);
+			List<string> itemNames = json["ProductionGraph"]["IncludedItems"].Select(t => (string)t).ToList();
+			List<RecipeShort> recipeShorts = RecipeShort.GetSetFromJson(json["ProductionGraph"]["IncludedRecipes"]);
 
 			//now - two options:
 			// a) we are told to use the first preset (basically, the selected preset) - so that is the only one added to the possible Presets
@@ -1043,7 +953,6 @@ namespace Foreman
 			}
 
 			//clear graph
-			Graph.Nodes.Clear();
 			Elements.Clear();
 
 			//load new preset
@@ -1053,13 +962,15 @@ namespace Foreman
 				form.Left = this.Left + 150;
 				form.Top = this.Top + 100;
 				form.ShowDialog(); //LOAD FACTORIO DATA
-				Graph = new ProductionGraph(form.GetDataCache());
-				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size)
+				DCache = form.GetDataCache();
+				Graph = new ProductionGraph();
+				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
 			}
 
 			//set up graph options
-			Graph.SelectedAmountType = (AmountType)(int)json["AmountType"];
-			Graph.SelectedUnit = (RateUnit)(int)json["Unit"];
+			SelectedAmountType = (AmountType)(int)json["AmountType"];
+			SelectedRateUnit = (RateUnit)(int)json["Unit"];
+
 			string[] viewOffsetString = ((string)json["ViewOffset"]).Split(',');
 			ViewOffset = new Point(int.Parse(viewOffsetString[0]), int.Parse(viewOffsetString[1]));
 			ViewScale = (float)json["ViewScale"];
@@ -1067,178 +978,54 @@ namespace Foreman
 			if (!enableEverything)
 			{
 				//update enabled statuses
-				foreach (Assembler assembler in Graph.DCache.Assemblers.Values)
+				foreach (Assembler assembler in DCache.Assemblers.Values)
 					assembler.Enabled = false;
 				foreach (string name in json["EnabledAssemblers"].Select(t => (string)t).ToList())
-					if (Graph.DCache.Assemblers.ContainsKey(name))
-						Graph.DCache.Assemblers[name].Enabled = true;
+					if (DCache.Assemblers.ContainsKey(name))
+						DCache.Assemblers[name].Enabled = true;
 
-				foreach (Miner miner in Graph.DCache.Miners.Values)
+				foreach (Miner miner in DCache.Miners.Values)
 					miner.Enabled = false;
 				foreach (string name in json["EnabledMiners"].Select(t => (string)t).ToList())
-					if (Graph.DCache.Miners.ContainsKey(name))
-						Graph.DCache.Miners[name].Enabled = true;
+					if (DCache.Miners.ContainsKey(name))
+						DCache.Miners[name].Enabled = true;
 
-				foreach (Module module in Graph.DCache.Modules.Values)
+				foreach (Module module in DCache.Modules.Values)
 					module.Enabled = false;
 				foreach (string name in json["EnabledModules"].Select(t => (string)t).ToList())
-					if (Graph.DCache.Modules.ContainsKey(name))
-						Graph.DCache.Modules[name].Enabled = true;
+					if (DCache.Modules.ContainsKey(name))
+						DCache.Modules[name].Enabled = true;
 
 				foreach (string recipe in json["HiddenRecipes"].Select(t => (string)t).ToList())
-					if (Graph.DCache.Recipes.ContainsKey(recipe))
-						Graph.DCache.Recipes[recipe].Hidden = true;
+					if (DCache.Recipes.ContainsKey(recipe))
+						DCache.Recipes[recipe].Hidden = true;
 			}
+
 			//add all nodes
-			InsertJsonObjects(json, false);
-		}
+			ProductionGraph.NewNodeCollection newNodes = Graph.InsertNodesFromJson(DCache, json["ProductionGraph"], 1f);
 
-		public void InsertJsonObjects(JObject json, bool relativePlacement = false) //this is used when loading a saved flowchart (ex: load chart, or change preset), along with when we paste a copied node collection (from this instance of foreman or a different one)
-		{
-			//match rate types
-			float multiplier = 1;
-			if(Graph.SelectedUnit != (RateUnit)(int)json["Unit"])
-            {
-				if (Graph.SelectedUnit == RateUnit.PerMinute) //json unit is per second
-					multiplier = 60;
-				else if (Graph.SelectedUnit == RateUnit.PerSecond) //json unit is per minute
-					multiplier = 1 / 60;
-            }
-
-			//check compliance on all items and recipes (data-cache will take care of it) - this means add in any missing items/recipes and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
-			Graph.DCache.ProcessNewItemSet(json["IncludedItems"].Select(t => (string)t).ToList());
-			Dictionary<long, Recipe> recipeLinks = Graph.DCache.ProcessNewRecipeShorts(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
-
-			//load in the graph nodes
-			HashSet<int> failedNodes = new HashSet<int>(); //we will use these in the 'extreme' case of failure to create a node. Any links to such nodes will be ignored
-			foreach (JToken node in json["Nodes"].ToList())
-			{
-				ProductionNode newNode = null;
-
-				switch ((string)node["NodeType"])
-				{
-					case "Consumer":
-						{
-							string itemName = (string)node["ItemName"];
-							if (Graph.DCache.MissingItems.ContainsKey(itemName))
-								newNode = ConsumerNode.Create(Graph.DCache.MissingItems[itemName], Graph);
-							else if (Graph.DCache.Items.ContainsKey(itemName))
-								newNode = ConsumerNode.Create(Graph.DCache.Items[itemName], Graph);
-							break;
-						}
-					case "Supply":
-						{
-							string itemName = (string)node["ItemName"];
-							if (Graph.DCache.MissingItems.ContainsKey(itemName))
-								newNode = SupplierNode.Create(Graph.DCache.MissingItems[itemName], Graph);
-							else if (Graph.DCache.Items.ContainsKey(itemName))
-								newNode = SupplierNode.Create(Graph.DCache.Items[itemName], Graph);
-							break;
-						}
-					case "PassThrough":
-						{
-							string itemName = (string)node["ItemName"];
-							if (Graph.DCache.MissingItems.ContainsKey(itemName))
-                                newNode = PassthroughNode.Create(Graph.DCache.MissingItems[itemName], Graph);
-                            else if (Graph.DCache.Items.ContainsKey(itemName))
-                                newNode = PassthroughNode.Create(Graph.DCache.Items [itemName], Graph);
-							break;
-						}
-					case "Recipe":
-						{
-							long recipeID = (long)node["RecipeID"];
-							newNode = RecipeNode.Create(recipeLinks[recipeID], Graph);
-
-							if (node["Assembler"] != null)
-							{
-								var assemblerKey = (string)node["Assembler"];
-								if (Graph.DCache.Assemblers.ContainsKey(assemblerKey))
-									(newNode as RecipeNode).Assembler = Graph.DCache.Assemblers[assemblerKey];
-							}
-							(newNode as RecipeNode).NodeModules = ModuleSelector.Load(node, Graph.DCache);
-							break;
-						}
-                    default:
-                        {
-                            Trace.Fail("Unknown node type: " + node["NodeType"]);
-                            break;
-                        }
-				}
-
-				if (newNode != null)
-				{
-					newNode.rateType = (RateType)(int)node["RateType"];
-					if (newNode.rateType == RateType.Manual)
-						newNode.desiredRate = (float)node["DesiredRate"] * multiplier;
-					if (node["SpeedBonus"] != null)
-						newNode.SpeedBonus = Math.Round((float)node["SpeedBonus"], 4);
-					if (node["ProductivityBonus"] != null)
-						newNode.ProductivityBonus = Math.Round((float)node["ProductivityBonus"], 4);
-				}
-				else
-                {
-					Trace.Fail("ErrorNode created: ");
-					newNode = ErrorNode.Create(Graph);
-                }
-			}
-
-			//link the nodes
-			foreach (JToken nodelink in json["NodeLinks"].ToList())
-			{
-				int supplierId = (int)nodelink["Supplier"];
-				ProductionNode supplier = Graph.Nodes[supplierId];
-				int consumerId = (int)nodelink["Consumer"];
-				ProductionNode consumer = Graph.Nodes[consumerId];
-				if (!failedNodes.Contains(supplierId) && !failedNodes.Contains(consumerId) && !(supplier is ErrorNode) && !(consumer is ErrorNode))
-				{
-					string itemName = (string)nodelink["Item"];
-					Item item;
-					if (Graph.DCache.Items.ContainsKey(itemName))
-						item = Graph.DCache.Items[itemName];
-					else if (Graph.DCache.MissingItems.ContainsKey(itemName))
-						item = Graph.DCache.MissingItems[itemName];
-					else
-						continue;
-					NodeLink.Create(supplier, consumer, item);
-				}
-			}
-
-			//add in the graph elements based on the nodes added in above
-			//Graph.UpdateNodeValues();
-			AddRemoveElements();
-
-			//place the nodes in their correct locations
-			List<string> ElementLocations = json["ElementLocations"].Select(l => (string)l).ToList();
-			for (int i = 0; i < ElementLocations.Count; i++)
-			{
-				int[] splitPoint = ElementLocations[i].Split(',').Select(s => Convert.ToInt32(s)).ToArray();
-				GraphElement element = GetElementForNode(Graph.Nodes[i]);
-				element.Location = new Point(splitPoint[0], splitPoint[1]);
-			}
-
-			//update the graph (both value optimization and nodes)
 			UpdateGraphBounds();
 			Graph.UpdateNodeValues();
-			UpdateNodes();
-			Invalidate();
 		}
 
 		//Stolen from the designer file
 		protected override void Dispose(bool disposing)
 		{
 			stringFormat.Dispose();
+			size10Font.Dispose();
+
 			foreach (var element in Elements.ToList())
 			{
 				element.Dispose();
 			}
 
-			size10Font.Dispose();
 
 			if (disposing && (components != null))
 			{
 				components.Dispose();
 			}
 			rightClickMenu.Dispose();
+
 			base.Dispose(disposing);
 		}
 	}

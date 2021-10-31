@@ -98,15 +98,15 @@ namespace ForemanTest
         abstract public class ProductionNodeBuilder
         {
 
-            public ProductionNode Built { get; protected set; } // TODO: Build if not already
+            public BaseNode Built { get; protected set; } // TODO: Build if not already
             abstract internal void Build(ProductionGraph graph);
         }
 
         public class SingletonNodeBuilder : ProductionNodeBuilder
         {
-            private Func<ItemPrototype, ProductionGraph, ProductionNode> createFunction;
+            private Func<ItemPrototype, ProductionGraph, BaseNode> createFunction;
 
-            public SingletonNodeBuilder(Func<Item, ProductionGraph, ProductionNode> f)
+            public SingletonNodeBuilder(Func<Item, ProductionGraph, BaseNode> f)
             {
                 this.createFunction = f;
             }
@@ -227,7 +227,7 @@ namespace ForemanTest
                 return Suppliers(itemName).Where(x => x is SupplierNode).Select(x => x.actualRate).Sum();
             }
 
-            private IEnumerable<ProductionNode> Suppliers(string itemName)
+            private IEnumerable<BaseNode> Suppliers(string itemName)
             {
                 return Graph.GetSuppliers(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }
@@ -237,7 +237,7 @@ namespace ForemanTest
                 return Consumers(itemName).Where(x => x is ConsumerNode).Select(x => x.actualRate).Sum();
             }
 
-            private IEnumerable<ProductionNode> Consumers(string itemName)
+            private IEnumerable<BaseNode> Consumers(string itemName)
             {
                 return Graph.GetConsumers(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
             }

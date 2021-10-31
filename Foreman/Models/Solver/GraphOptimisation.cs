@@ -13,29 +13,21 @@ namespace Foreman
         private static int updateCounter = 0;
         public static void FindOptimalGraphToSatisfyFixedNodes(this ProductionGraph graph)
         {
-            foreach (ProductionNode node in graph.Nodes.Where(n => n.rateType == RateType.Auto))
-            {
+            foreach (BaseNodePrototype node in graph.Nodes.Where(n => n.RateType == RateType.Auto))
                 node.ResetSolvedRate();
-            }
 
             foreach (var nodeGroup in graph.GetConnectedComponents())
-            {
                 OptimiseNodeGroup(nodeGroup);
-            }
-
-            graph.UpdateLinkThroughputs();
 
             Debug.WriteLine("UPDATE #" + updateCounter++);
         }
 
-        public static void OptimiseNodeGroup(IEnumerable<ProductionNode> nodeGroup)
+        private static void OptimiseNodeGroup(IEnumerable<BaseNode> nodeGroup)
         {
             ProductionSolver solver = new ProductionSolver();
 
-            foreach (var node in nodeGroup)
-            {
+            foreach (BaseNodePrototype node in nodeGroup)
                 node.AddConstraints(solver);
-            }
 
             var solution = solver.Solve();
 
@@ -48,39 +40,36 @@ namespace Foreman
             if (solution == null)
                 throw new Exception("Solver failed but that shouldn't happen.\n" + solver.ToString());
 
-            foreach (var node in nodeGroup)
+            foreach (BaseNodePrototype node in nodeGroup)
             {
                 node.SetSolvedRate(solution.ActualRate(node));
-                foreach (var link in node.OutputLinks.Union(node.InputLinks))
-                {
+                foreach (NodeLinkPrototype link in node.outputLinks.Union(node.inputLinks))
                     link.Throughput = solution.Throughput(link);
-                }
+
             }
         }
     }
 
     // Using partial classes here to group all the constraints related code into this file so it's
     // easy to understand as a whole.
-    public abstract partial class ProductionNode
+    public abstract partial class BaseNodePrototype
     {
         internal void ResetSolvedRate()
         {
-            actualRate = 0;
+            ActualRate = 0;
         }
 
         internal virtual void SetSolvedRate(double rate)
         {
-            actualRate = (float)rate;
+            ActualRate = (float)rate;
         }
 
         internal void AddConstraints(ProductionSolver solver)
         {
             solver.AddNode(this);
 
-            if (rateType == RateType.Manual)
-            {
-                solver.AddTarget(this, desiredRate);
-            }
+            if (RateType == RateType.Manual)
+                solver.AddTarget(this, DesiredRate);
 
             foreach (var itemInputs in InputLinks.GroupBy(x => x.Item))
             {

@@ -139,6 +139,7 @@
     </Compile>
     <Compile Include="DataCache\IconCache.cs" />
     <Compile Include="DataTypes\Assembler.cs" />
+    <Compile Include="DataTypes\Beacon.cs" />
     <Compile Include="DataTypes\DataObjectBase.cs" />
     <Compile Include="DataTypes\Group.cs" />
     <Compile Include="DataTypes\Module.cs" />
@@ -163,9 +164,9 @@
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\ConsumerNode.cs" />
-    <Compile Include="Models\ErrorNode.cs" />
     <Compile Include="Models\PassthroughNode.cs" />
     <Compile Include="Models\RecipeNode.cs" />
+    <Compile Include="Models\Solver\CyclicNodeTester.cs" />
     <Compile Include="Models\SupplierNode.cs" />
     <Compile Include="DataCache\DataCache.cs" />
     <Compile Include="Forms\SettingsForm.cs">
@@ -178,7 +179,6 @@
     <Compile Include="ProductionGraphView\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
     <Compile Include="DataCache\IconCacheProcessor.cs" />
-    <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
     <Compile Include="ProductionGraphView\GraphElement.cs" />
@@ -199,7 +199,7 @@
     <Compile Include="DataTypes\Item.cs" />
     <Compile Include="ProductionGraphView\LinkElement.cs" />
     <Compile Include="DataTypes\Miner.cs" />
-    <Compile Include="Models\ProductionNode.cs" />
+    <Compile Include="Models\BaseNode.cs" />
     <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\DataReloadForm.cs">
@@ -209,23 +209,16 @@
       <DependentUpon>DataReloadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controls\RateOptionsPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\RateOptionsPanel.Designer.cs">
-      <DependentUpon>RateOptionsPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="DataTypes\Recipe.cs" />
-    <Compile Include="Models\Solver\ProductionGraph.cs" />
-    <Compile Include="Controls\ProductionGraphViewer.cs">
+    <Compile Include="Models\ProductionGraph.cs" />
+    <Compile Include="ProductionGraphView\ProductionGraphViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ProductionGraphViewer.Designer.cs">
+    <Compile Include="ProductionGraphView\ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="ProductionGraphView\NodeElement.cs" />
     <Compile Include="Models\NodeLink.cs" />
-    <Compile Include="DataCache\ZipStorer.cs" />
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -260,11 +253,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Controls\ProductionGraphViewer.resx">
+    <EmbeddedResource Include="ProductionGraphView\ProductionGraphViewer.resx">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\RateOptionsPanel.resx">
-      <DependentUpon>RateOptionsPanel.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Foreman_TemporaryKey.pfx" />

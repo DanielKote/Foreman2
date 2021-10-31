@@ -10690,6 +10690,21 @@
       "order": "z-e[rocket-silo]"
     }
   ],
+  "beacons": [
+    {
+      "name": "beacon",
+      "icon_name": "icon.i.beacon",
+      "localised_name": "Beacon",
+      "distribution_effectivity": 0.5,
+      "module_inventory_size": 2,
+      "allowed_effects": [
+        "consumption",
+        "speed",
+        "productivity",
+        "pollution"
+      ]
+    }
+  ],
   "miners": [
     {
       "name": "burner-mining-drill",
@@ -10700,6 +10715,12 @@
       "module_inventory_size": 0,
       "resource_categories": [
         "basic-solid"
+      ],
+      "allowed_effects": [
+        "consumption",
+        "speed",
+        "productivity",
+        "pollution"
       ],
       "order": "z-a[items]-a[burner-mining-drill]"
     },
@@ -10713,6 +10734,12 @@
       "resource_categories": [
         "basic-solid"
       ],
+      "allowed_effects": [
+        "consumption",
+        "speed",
+        "productivity",
+        "pollution"
+      ],
       "order": "z-a[items]-b[electric-mining-drill]"
     },
     {
@@ -10724,6 +10751,12 @@
       "module_inventory_size": 2,
       "resource_categories": [
         "basic-fluid"
+      ],
+      "allowed_effects": [
+        "consumption",
+        "speed",
+        "productivity",
+        "pollution"
       ],
       "order": "z-b[fluids]-b[pumpjack]"
     }

@@ -51,11 +51,11 @@ namespace Foreman
 				scale = 3;
 			}
 
-			Bitmap image = new Bitmap(graphViewer.GraphBounds.Width * scale, graphViewer.GraphBounds.Height * scale);
+			Bitmap image = new Bitmap(graphViewer.Graph.Bounds.Width * scale, graphViewer.Graph.Bounds.Height * scale);
 			using (Graphics graphics = Graphics.FromImage(image))
 			{
 				graphics.ScaleTransform(scale, scale);
-				graphics.TranslateTransform(-graphViewer.GraphBounds.X, -graphViewer.GraphBounds.Y);
+				graphics.TranslateTransform(-graphViewer.Graph.Bounds.X, -graphViewer.Graph.Bounds.Y);
 				graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
 				if (!TransparencyCheckBox.Checked)

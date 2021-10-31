@@ -335,9 +335,9 @@ namespace Foreman
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(23, 4);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(123, 17);
+            this.label2.Size = new System.Drawing.Size(152, 17);
             this.label2.TabIndex = 0;
-            this.label2.Text = "Right Preset Only:";
+            this.label2.Text = "Right Preset Exclusive:";
             // 
             // panel3
             // 
@@ -400,9 +400,9 @@ namespace Foreman
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(14, 4);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(114, 17);
+            this.label5.Size = new System.Drawing.Size(143, 17);
             this.label5.TabIndex = 3;
-            this.label5.Text = "Left Preset Only:";
+            this.label5.Text = "Left Preset Exclusive:";
             // 
             // LeftOnlyListView
             // 

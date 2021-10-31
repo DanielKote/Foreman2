@@ -12,6 +12,7 @@ local AvailableItems = {}
 local AvailableFluids = {}
 local AvailableModules = {}
 local AvailableAMachines = {}
+local AvailableBeacons = {}
 local AvailableMiners = {}
 local AvailableResources = {}
 local AvailableOffshorePumps = {}
@@ -242,7 +243,25 @@ local function ProcessPrototypes()
 		end
 	end
 
-	--1.6.0: process available raw miners
+	--1.6.0: process available beacons
+	for name, entity in pairs(game.entity_prototypes) do
+		if AvailableItems[name] and (entity.distribution_effectivity ~= nil) then
+			AvailableBeacons[name] = entity
+		end
+	end
+
+	LOG('-------------------------AVAILABLE BEACONS----------------------')
+	for name, _ in pairs(AvailableBeacons) do
+		LOG(name)
+	end
+	LOG('-------------------------BLOCKED BEACONS----------------------')
+	for name, entity in pairs(game.entity_prototypes) do
+		if (entity.ingredient_count ~= nil ) and (not AvailableBeacons[name]) then
+			LOG(name)
+		end
+	end
+
+	--1.7.0: process available raw miners
 	for name, entity in pairs(game.entity_prototypes) do
 		if AvailableItems[name] and entity.resource_categories then
 			AvailableMiners[name] = entity
@@ -260,7 +279,7 @@ local function ProcessPrototypes()
 		end
 	end
 	
-	--1.7.0: process available(all) resources : these are the items/fluids that can be mined
+	--1.8.0: process available(all) resources : these are the items/fluids that can be mined
 	for name, entity in pairs(game.entity_prototypes) do
 		if entity.resource_category then
 			AvailableResources[name] = entity
@@ -271,7 +290,7 @@ local function ProcessPrototypes()
 		LOG(name)
 	end
 
-	--1.8.0: process available offshore pumps (will be placed as miners)
+	--1.9.0: process available offshore pumps (will be placed as miners)
 	for name, entity in pairs(game.entity_prototypes) do
 		if AvailableItems[name] and entity.fluid then
 			AvailableOffshorePumps[name] = entity
@@ -289,7 +308,7 @@ local function ProcessPrototypes()
 		end
 	end
 
-	--1.9: just list all the groups and subgroups for debugging if necessary
+	--1.10: just list all the groups and subgroups for debugging if necessary
 	LOG('-------------------------GROUPS----------------------')
 	for name, _ in pairs(game.item_group_prototypes) do
 		LOG(name)
@@ -668,6 +687,50 @@ local function ExportCraftingMachines()
 	ExportLine('],', 1)
 end
 
+local function ExportBeacons()
+	ExportLine('"beacons": [', 1)
+	counter = 0
+	for _, _ in pairs(AvailableBeacons) do
+		counter = counter + 1
+	end
+	for name, beacon in pairs(AvailableBeacons) do
+		ExportLine('{', 2)
+
+		ExportParameter('name', beacon.name, false, ',', 3)
+		ExportParameter('icon_name', 'icon.i.'..beacon.name, false, ',', 3)
+
+		ExportLine('"localised_name": "', 3)
+		ExportLocalisedString(beacon.localised_name)
+		ExportLine('",', 0)
+		
+		ExportParameter('distribution_effectivity', beacon.distribution_effectivity, true, ',', 3)
+		ExportParameter('module_inventory_size', beacon.module_inventory_size, true, ',', 3)
+
+		ExportLine('"allowed_effects": [', 3)
+		pcounter = 0
+		for _, _ in pairs(beacon.allowed_effects) do
+			pcounter = pcounter + 1
+		end
+		for effect, _ in pairs(beacon.allowed_effects) do
+			pcounter = pcounter - 1
+			if pcounter > 0 then
+				ExportLine('"'..effect..'",', 4)
+			else
+				ExportLine('"'..effect..'"', 4)
+			end
+		end
+		ExportLine(']', 3)
+
+		counter = counter - 1 
+		if counter > 0 then
+			ExportLine('},', 2)
+		else
+			ExportLine('}', 2)
+		end
+	end
+	ExportLine('],', 1)
+end
+
 local function ExportMiners()
 	ExportLine('"miners": [', 1)
 	counter = 0
@@ -703,6 +766,21 @@ local function ExportMiners()
 		end
 		ExportLine('],', 3)
 		
+		ExportLine('"allowed_effects": [', 3)
+		pcounter = 0
+		for _, _ in pairs(miner.allowed_effects) do
+			pcounter = pcounter + 1
+		end
+		for effect, _ in pairs(miner.allowed_effects) do
+			pcounter = pcounter - 1
+			if pcounter > 0 then
+				ExportLine('"'..effect..'",', 4)
+			else
+				ExportLine('"'..effect..'"', 4)
+			end
+		end
+		ExportLine('],', 3)
+
 		ExportParameter('order', miner.order, false, '', 3)
 		
 		counter = counter - 1 
@@ -893,6 +971,7 @@ script.on_nth_tick(1,
 		ExportFluids()
 		ExportModules()
 		ExportCraftingMachines()
+		ExportBeacons()
 		ExportMiners()
 		ExportResources()
 		ExportOffshorePumps()

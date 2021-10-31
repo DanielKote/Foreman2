@@ -431,6 +431,7 @@ namespace Foreman
         private void ListView_StartHover(object sender, MouseEventArgs e)
         {
             ListViewItem lLVI = ((ListView)sender).GetItemAt(e.Location.X, e.Location.Y);
+            Point location = new Point(e.X + 15, e.Y);
             if (lLVI != null)
             {
                 ListViewItem rLVI = null;
@@ -444,7 +445,7 @@ namespace Foreman
                 if(lLVI.Tag is Recipe recipe)
                 {
                     RecipeToolTip.SetRecipe(recipe, compareTypeTT? (rLVI.Tag as Recipe) : null);
-                    RecipeToolTip.Show((Control)sender, e.Location);
+                    RecipeToolTip.Show((Control)sender, location);
 
                 }
                 else if(lLVI.Tag is ProductionEntity pEntity) //assembler or miner
@@ -462,7 +463,7 @@ namespace Foreman
                     }
 
                     TextToolTip.SetText(left, right);
-                    TextToolTip.Show((Control)sender, e.Location);
+                    TextToolTip.Show((Control)sender, location);
                 }
                 else if(lLVI.Tag is Module module)
                 {
@@ -482,7 +483,7 @@ namespace Foreman
                         string.Format("   Pollution bonus:    {0}", rmodule.PollutionBonus.ToString("%0"));
                     }
                     TextToolTip.SetText(left, right);
-                    TextToolTip.Show((Control)sender, e.Location);
+                    TextToolTip.Show((Control)sender, location);
                 }
             }
 

@@ -18,16 +18,16 @@ namespace Foreman
     {
         public class Solution
         {
-            public Solution(Dictionary<ProductionNode, double> nodes, Dictionary<NodeLink, double> links)
+            public Solution(Dictionary<BaseNode, double> nodes, Dictionary<NodeLink, double> links)
             {
                 this.Nodes = nodes;
                 this.Links = links;
             }
 
-            public Dictionary<ProductionNode, double> Nodes { get; private set; }
+            public Dictionary<BaseNode, double> Nodes { get; private set; }
             public Dictionary<NodeLink, double> Links { get; private set; }
 
-            public double ActualRate(ProductionNode node)
+            public double ActualRate(BaseNode node)
             {
                 return Nodes[node];
             }
@@ -51,7 +51,7 @@ namespace Foreman
 
         // Keep track of nodes as they are added to ensure the solution contains all of them, even if
         // there are no links.
-        private List<ProductionNode> nodes;
+        private List<BaseNode> nodes;
 
         // Used to ensure uniqueness of variables names
         private int counter;
@@ -63,10 +63,10 @@ namespace Foreman
             this.solver = GoogleSolver.Create();
             this.objective = solver.Objective();
             this.allVariables = new Dictionary<object, Variable>();
-            this.nodes = new List<ProductionNode>();
+            this.nodes = new List<BaseNode>();
         }
 
-        public void AddNode(ProductionNode node)
+        public void AddNode(BaseNode node)
         {
             var x = variableFor(node);
 
@@ -114,7 +114,7 @@ namespace Foreman
         // one of these on the ultimate output node, though multiple are supported, on any node. If
         // there is a conflict, a 'best effort' solution will be returned, where some nodes actual
         // rates will not match the desired asked for here.
-        public void AddTarget(ProductionNode node, float desiredRate)
+        public void AddTarget(BaseNode node, float desiredRate)
         {
             var nodeVar = variableFor(node, RateType.ACTUAL);
             var errorVar = variableFor(node, RateType.ERROR);
@@ -129,15 +129,15 @@ namespace Foreman
         }
 
         // Constrain a ratio on the output side of a node
-        public void AddOutputRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, double rate)
+        public void AddOutputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
         {
             Debug.Assert(links.All(x => x.Supplier == node));
 
-            addRatio(node, item, links, rate * node.ProductivityMultiplier(), EndpointType.SUPPLY);
+            addRatio(node, item, links, rate * node.GetProductivityMultiplier(), EndpointType.SUPPLY);
         }
 
         // Constrain a ratio on the input side of a node
-        public void AddInputRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, double rate)
+        public void AddInputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
         {
             Debug.Assert(links.All(x => x.Consumer == node));
 
@@ -148,7 +148,7 @@ namespace Foreman
         // than is being produced by the supplier.
         // 
         // Consuming less than is being produced is fine. This represents a backup.
-        public void AddInputLink(ProductionNode node, Item item, IEnumerable<NodeLink> links, double inputRate)
+        public void AddInputLink(BaseNode node, Item item, IEnumerable<NodeLink> links, double inputRate)
         {
             Debug.Assert(links.All(x => x.Consumer == node));
 
@@ -194,7 +194,7 @@ namespace Foreman
         // For example, if a copper wire recipe (1 plate makes 2 wires) is connected to two different
         // consumers, then the sum of the wire rate flowing over those two links must be equal to 2
         // time the rate of the recipe.
-        private void addRatio(ProductionNode node, Item item, IEnumerable<NodeLink> links, double rate, EndpointType type)
+        private void addRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate, EndpointType type)
         {
             // Ensure that the sum of all inputs for this type of item is in relation to the rate of the recipe
             // So for the steel input to a solar panel, the sum of every input variable to this node must equal 5 * rate.
@@ -209,7 +209,7 @@ namespace Foreman
             }
         }
 
-        private void minimizeError(ProductionNode node, Variable errorVar)
+        private void minimizeError(BaseNode node, Variable errorVar)
         {
             var absErrorVar = variableFor(node, RateType.ABS_ERROR);
 
@@ -251,7 +251,7 @@ namespace Foreman
             return string.Join(":", components).ToLower().Replace(" ", "-");
         }
 
-        private Variable variableFor(ProductionNode node, RateType type = RateType.ACTUAL)
+        private Variable variableFor(BaseNode node, RateType type = RateType.ACTUAL)
         {
             return variableFor(Tuple.Create(node, type), makeName("node", type, node.DisplayName));
         }

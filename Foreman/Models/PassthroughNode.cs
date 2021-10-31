@@ -1,96 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Foreman
 {
-	public class PassthroughNode : ProductionNode
+	public interface PassthroughNode : BaseNode
+    {
+		Item PassthroughItem { get; }
+    }
+
+	public class PassthroughNodePrototype : BaseNodePrototype, PassthroughNode
 	{
-		public Item PassedItem;
+		public Item PassthroughItem { get; private set; }
 
-		protected PassthroughNode(Item item, ProductionGraph graph)
-			: base(graph)
+		public override string DisplayName { get { return PassthroughItem.FriendlyName; } }
+		public override IEnumerable<Item> Inputs { get { yield return PassthroughItem; } }
+		public override IEnumerable<Item> Outputs { get { yield return PassthroughItem; } }
+
+		public PassthroughNodePrototype(ProductionGraph graph, int nodeID, Item item) : base(graph, nodeID)
 		{
-			this.PassedItem = item;
+			PassthroughItem = item;
 		}
 
-		public override IEnumerable<Item> Inputs
-		{
-			get { return Enumerable.Repeat(PassedItem, 1); }
-		}
+		public override float GetConsumeRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
+		public override float GetSupplyRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
 
-		public override IEnumerable<Item> Outputs
-		{
-			get { return Inputs; }
-		}
-
-		public static PassthroughNode Create(Item item, ProductionGraph graph)
-		{
-			PassthroughNode node = new PassthroughNode(item, graph);
-			node.Graph.Nodes.Add(node);
-			node.Graph.InvalidateCaches();
-			return node;
-		}
-
-		//If the graph is showing amounts rather than rates, round up all fractions (because it doesn't make sense to do half a recipe, for example)
-		private float ValidateRecipeRate(float amount)
-		{
-			if (Graph.SelectedAmountType == AmountType.FixedAmount)
-			{
-				return (float)Math.Ceiling(Math.Round(amount, RoundingDP)); //Subtracting a very small number stops the amount from getting rounded up due to FP errors. It's a bit hacky but it works for now.
-			}
-			else
-			{
-				return (float)Math.Round(amount, RoundingDP);
-			}
-		}
-
-		public override string DisplayName
-		{
-			get { return PassedItem.FriendlyName; }
-		}
-
-		public override string ToString()
-		{
-			return String.Format("Pass-through Tree Node: {0}", PassedItem.Name);
-		}
+		internal override double outputRateFor(Item item) { return 1; }
+		internal override double inputRateFor(Item item) { return 1; }
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("NodeType", "PassThrough");
-			info.AddValue("ItemName", PassedItem.Name);
-			info.AddValue("RateType", rateType);
-			info.AddValue("ActualRate", actualRate);
-			if (rateType == RateType.Manual)
-			{
-				info.AddValue("DesiredRate", desiredRate);
-			}
+			info.AddValue("NodeType", NodeType.Passthrough);
+			info.AddValue("NodeID:", NodeID);
+			info.AddValue("Location", Location);
+			info.AddValue("Item", PassthroughItem.Name);
+			info.AddValue("RateType", RateType);
+			info.AddValue("ActualRate", ActualRate);
+			if (RateType == RateType.Manual)
+				info.AddValue("DesiredRate", DesiredRate);
 		}
 
-		public override float GetConsumeRate(Item item)
-		{
-			return (float)Math.Round(actualRate, RoundingDP);
-		}
-
-		public override float GetSupplyRate(Item item)
-		{
-			return (float)Math.Round(actualRate, RoundingDP);
-		}
-
-		internal override double outputRateFor(Item item)
-		{
-			return 1;
-		}
-
-		internal override double inputRateFor(Item item)
-		{
-			return 1;
-		}
-
-		public override float ProductivityMultiplier()
-		{
-			return 1;
-		}
+		public override string ToString() { return string.Format("Passthrough node for: {0}", PassthroughItem.Name); }
 	}
 }

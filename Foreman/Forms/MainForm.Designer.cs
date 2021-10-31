@@ -56,8 +56,7 @@
             this.AssemblersGroupBox = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.ModuleDropDown = new System.Windows.Forms.ComboBox();
-            this.AssemblerDisplayCheckBox = new System.Windows.Forms.CheckBox();
-            this.MinerDisplayCheckBox = new System.Windows.Forms.CheckBox();
+            this.SimpleViewCheckBox = new System.Windows.Forms.CheckBox();
             this.GraphViewer = new Foreman.ProductionGraphViewer();
             this.MainLayoutPanel.SuspendLayout();
             this.MainToolbar.SuspendLayout();
@@ -413,8 +412,7 @@
             this.AssemblersGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.AssemblersGroupBox.Controls.Add(this.label1);
             this.AssemblersGroupBox.Controls.Add(this.ModuleDropDown);
-            this.AssemblersGroupBox.Controls.Add(this.AssemblerDisplayCheckBox);
-            this.AssemblersGroupBox.Controls.Add(this.MinerDisplayCheckBox);
+            this.AssemblersGroupBox.Controls.Add(this.SimpleViewCheckBox);
             this.AssemblersGroupBox.Location = new System.Drawing.Point(705, 4);
             this.AssemblersGroupBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
             this.AssemblersGroupBox.Name = "AssemblersGroupBox";
@@ -440,36 +438,25 @@
             this.ModuleDropDown.Items.AddRange(new object[] {
             "None",
             "Speed",
-            "Productivity"});
+            "Productivity",
+            "Efficiency"});
             this.ModuleDropDown.Location = new System.Drawing.Point(7, 97);
             this.ModuleDropDown.Name = "ModuleDropDown";
             this.ModuleDropDown.Size = new System.Drawing.Size(96, 24);
             this.ModuleDropDown.TabIndex = 1;
             this.ModuleDropDown.SelectedIndexChanged += new System.EventHandler(this.ModuleDropDown_SelectedIndexChanged);
             // 
-            // AssemblerDisplayCheckBox
+            // SimpleViewCheckBox
             // 
-            this.AssemblerDisplayCheckBox.AutoSize = true;
-            this.AssemblerDisplayCheckBox.Location = new System.Drawing.Point(9, 23);
-            this.AssemblerDisplayCheckBox.Margin = new System.Windows.Forms.Padding(4);
-            this.AssemblerDisplayCheckBox.Name = "AssemblerDisplayCheckBox";
-            this.AssemblerDisplayCheckBox.Size = new System.Drawing.Size(153, 21);
-            this.AssemblerDisplayCheckBox.TabIndex = 0;
-            this.AssemblerDisplayCheckBox.Text = "Display Assemblers";
-            this.AssemblerDisplayCheckBox.UseVisualStyleBackColor = true;
-            this.AssemblerDisplayCheckBox.CheckedChanged += new System.EventHandler(this.AssemblerDisplayCheckBox_CheckedChanged);
-            // 
-            // MinerDisplayCheckBox
-            // 
-            this.MinerDisplayCheckBox.AutoSize = true;
-            this.MinerDisplayCheckBox.Location = new System.Drawing.Point(9, 50);
-            this.MinerDisplayCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.MinerDisplayCheckBox.Name = "MinerDisplayCheckBox";
-            this.MinerDisplayCheckBox.Size = new System.Drawing.Size(194, 21);
-            this.MinerDisplayCheckBox.TabIndex = 0;
-            this.MinerDisplayCheckBox.Text = "Display Miners/Pumpjacks";
-            this.MinerDisplayCheckBox.UseVisualStyleBackColor = true;
-            this.MinerDisplayCheckBox.CheckedChanged += new System.EventHandler(this.MinerDisplayCheckBox_CheckedChanged);
+            this.SimpleViewCheckBox.AutoSize = true;
+            this.SimpleViewCheckBox.Location = new System.Drawing.Point(9, 23);
+            this.SimpleViewCheckBox.Margin = new System.Windows.Forms.Padding(4);
+            this.SimpleViewCheckBox.Name = "SimpleViewCheckBox";
+            this.SimpleViewCheckBox.Size = new System.Drawing.Size(105, 21);
+            this.SimpleViewCheckBox.TabIndex = 0;
+            this.SimpleViewCheckBox.Text = "Simple View";
+            this.SimpleViewCheckBox.UseVisualStyleBackColor = true;
+            this.SimpleViewCheckBox.CheckedChanged += new System.EventHandler(this.SimpleViewCheckBox_CheckedChanged);
             // 
             // GraphViewer
             // 
@@ -541,8 +528,7 @@
         private System.Windows.Forms.GroupBox AssemblersGroupBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox ModuleDropDown;
-        private System.Windows.Forms.CheckBox AssemblerDisplayCheckBox;
-        private System.Windows.Forms.CheckBox MinerDisplayCheckBox;
+        private System.Windows.Forms.CheckBox SimpleViewCheckBox;
         private ProductionGraphViewer GraphViewer;
         private System.Windows.Forms.Button AddItemButton;
         private System.Windows.Forms.Button AddRecipeButton;

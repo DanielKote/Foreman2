@@ -7,24 +7,20 @@ namespace Foreman
 	public interface Assembler : ProductionEntity
 	{
 		IReadOnlyCollection<Recipe> ValidRecipes { get; }
-		IReadOnlyCollection<Module> ValidModules { get; }
 		Item AssociatedItem { get; }
 	}
 
 	public class AssemblerPrototype : ProductionEntityPrototype, Assembler
 	{
 		public IReadOnlyCollection<Recipe> ValidRecipes { get { return validRecipes; } }
-		public IReadOnlyCollection<Module> ValidModules { get { return validModules; } }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
-		internal HashSet<RecipePrototype> validRecipes;
-		internal HashSet<ModulePrototype> validModules;
+		internal HashSet<RecipePrototype> validRecipes { get; private set; }
 
 		public AssemblerPrototype(DataCache dCache, string name, string friendlyName) : base(dCache, name, friendlyName)
 		{
 			Enabled = true;
 			validRecipes = new HashSet<RecipePrototype>();
-			validModules = new HashSet<ModulePrototype>();
 		}
 
 		public override string ToString()

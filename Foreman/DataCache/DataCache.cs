@@ -72,6 +72,7 @@ namespace Foreman
         public IReadOnlyDictionary<string, Miner> Miners { get { return miners; } }
         public IReadOnlyDictionary<string, Resource> Resources { get { return resources; } }
         public IReadOnlyDictionary<string, Module> Modules { get { return modules; } }
+        public IReadOnlyDictionary<string, Beacon> Beacons { get { return beacons; } }
 
         public IReadOnlyCollection<Recipe> MissingRecipes { get { return missingRecipes; } }
         public IReadOnlyDictionary<string, Item> MissingItems { get { return missingItems; } }
@@ -90,6 +91,7 @@ namespace Foreman
         private Dictionary<string, Miner> miners;
         private Dictionary<string, Resource> resources;
         private Dictionary<string, Module> modules;
+        private Dictionary<string, Beacon> beacons;
 
         private HashSet<Recipe> missingRecipes;
         private Dictionary<string, Item> missingItems;
@@ -114,6 +116,7 @@ namespace Foreman
             miners = new Dictionary<string, Miner>();
             resources = new Dictionary<string, Resource>();
             modules = new Dictionary<string, Module>();
+            beacons = new Dictionary<string, Beacon>();
 
             missingItems = new Dictionary<string, Item>();
             missingRecipes = new HashSet<Recipe>(new MissingRecipeComparer()); //deep compare that checks name, ingredients, and products
@@ -153,20 +156,22 @@ namespace Foreman
                     ProcessFluid(objJToken, iconCache);
                 foreach (var objJToken in jsonData["resources"].ToList())
                     ProcessResource(objJToken);
-                foreach (var objJToken in jsonData["miners"].ToList())
-                    ProcessMiner(objJToken, iconCache);
-                foreach (var objJToken in jsonData["offshorepumps"].ToList())
-                    ProcessOffshorePump(objJToken, iconCache);
                 foreach (var objJToken in jsonData["recipes"].ToList())
                     ProcessRecipe(objJToken, iconCache);
                 foreach (var objJToken in jsonData["modules"].ToList())
-                    ProcessModule(objJToken);
+                    ProcessModule(objJToken, iconCache);
                 foreach (var objJToken in jsonData["technologies"].ToList())
                     ProcessTechnology(objJToken, iconCache);
                 foreach (var objJToken in jsonData["technologies"].ToList())
                     ProcessTechnologyP2(objJToken); //required to properly link technology prerequisites
                 foreach (var objJToken in jsonData["assemblers"].ToList())
                     ProcessAssembler(objJToken, iconCache);
+                foreach (var objJToken in jsonData["miners"].ToList())
+                    ProcessMiner(objJToken, iconCache);
+                foreach (var objJToken in jsonData["offshorepumps"].ToList())
+                    ProcessOffshorePump(objJToken, iconCache);
+                foreach (var objJtoken in jsonData["beacons"].ToList())
+                    ProcessBeacon(objJtoken, iconCache);
 
                 //remove these temporary dictionaries (no longer necessary)
                 craftingCategories.Clear();
@@ -361,6 +366,7 @@ namespace Foreman
             miners.Clear();
             resources.Clear();
             modules.Clear();
+            beacons.Clear();
 
             missingItems.Clear();
             missingRecipes.Clear();
@@ -461,67 +467,6 @@ namespace Foreman
             resources.Add(resource.Name, resource);
         }
 
-        private void ProcessMiner(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
-        {
-            MinerPrototype miner = new MinerPrototype(
-                this,
-                (string)objJToken["name"],
-                (string)objJToken["localised_name"]);
-
-            miner.Speed = (float)objJToken["mining_speed"];
-            miner.ModuleSlots = (int)objJToken["module_inventory_size"];
-            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
-                miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
-
-            foreach (var categoryJToken in objJToken["resource_categories"])
-            {
-                if (resourceCategories.ContainsKey((string)categoryJToken))
-                {
-                    foreach (ResourcePrototype resource in resourceCategories[(string)categoryJToken])
-                    {
-                        resource.validMiners.Add(miner);
-                        miner.mineableResources.Add(resource);
-                    }
-                }
-            }
-
-            miners.Add(miner.Name, miner);
-        }
-
-        private void ProcessOffshorePump(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
-        {
-            MinerPrototype miner = new MinerPrototype(
-                this,
-                (string)objJToken["name"],
-                (string)objJToken["localised_name"]);
-
-            miner.Speed = (float)objJToken["pumping_speed"];
-            miner.ModuleSlots = 0;
-            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
-                miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
-
-            string fluidName = (string)objJToken["fluid"];
-            if (!items.ContainsKey(fluidName))
-                return;
-            ItemPrototype fluid = (ItemPrototype)items[fluidName];
-
-            //now to add an extra 'resource' if there isnt one with the type of fluid being pumped out here. Once we ensure there is one, we add this miner to it
-            string rcName = "fer." + fluid.Name;
-            if(!resources.ContainsKey(rcName))
-            {
-                ResourcePrototype extraResource = new ResourcePrototype(this, rcName);
-                extraResource.Time = (1f/60); //'mining-speed' of 20, and time of 1/60s (every tick) leads to 1200 water per second. mods can set the mining/pumping-speed.
-                extraResource.resultingItems.Add(fluid);
-                fluid.miningResources.Add(extraResource);
-
-                resources.Add(extraResource.Name, extraResource);
-            }
-
-            ((ResourcePrototype)resources[rcName]).validMiners.Add(miner);
-            miner.mineableResources.Add((ResourcePrototype)resources[rcName]);
-            miners.Add(miner.Name, miner);
-        }
-
         private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             RecipePrototype recipe = new RecipePrototype(
@@ -585,12 +530,16 @@ namespace Foreman
             recipes.Add(recipe.Name, recipe);
         }
 
-        private void ProcessModule(JToken objJToken)
+        private void ProcessModule(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
         {
             ModulePrototype module = new ModulePrototype(
                 this,
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
+
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                module.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+
             module.SpeedBonus = (float)objJToken["module_effects_speed"];
             module.ProductivityBonus = (float)objJToken["module_effects_productivity"];
             module.EfficiencyBonus = (float)objJToken["module_effects_consumption"];
@@ -666,6 +615,7 @@ namespace Foreman
 
             assembler.Speed = (float)objJToken["crafting_speed"];
             assembler.ModuleSlots = (int)objJToken["module_inventory_size"];
+            assembler.BaseProductivityBonus = (float)objJToken["base_productivity"];
 
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
                 assembler.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
@@ -695,6 +645,107 @@ namespace Foreman
             }
 
             assemblers.Add(assembler.Name, assembler);
+        }
+
+
+        private void ProcessMiner(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+        {
+            MinerPrototype miner = new MinerPrototype(
+                this,
+                (string)objJToken["name"],
+                (string)objJToken["localised_name"]);
+
+            miner.Speed = (float)objJToken["mining_speed"];
+            miner.ModuleSlots = (int)objJToken["module_inventory_size"];
+            miner.BaseProductivityBonus = (float)objJToken["base_productivity"];
+
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+
+            foreach (var categoryJToken in objJToken["resource_categories"])
+            {
+                if (resourceCategories.ContainsKey((string)categoryJToken))
+                {
+                    foreach (ResourcePrototype resource in resourceCategories[(string)categoryJToken])
+                    {
+                        resource.validMiners.Add(miner);
+                        miner.mineableResources.Add(resource);
+                    }
+                }
+            }
+            
+            foreach (var effectJToken in objJToken["allowed_effects"])
+            {
+                if (moduleCategories.ContainsKey((string)effectJToken))
+                {
+                    foreach (ModulePrototype module in moduleCategories[(string)effectJToken])
+                    {
+                        module.validMiners.Add(miner);
+                        miner.validModules.Add(module);
+                    }
+                }
+            }
+
+            miners.Add(miner.Name, miner);
+        }
+
+        private void ProcessOffshorePump(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+        {
+            MinerPrototype miner = new MinerPrototype(
+                this,
+                (string)objJToken["name"],
+                (string)objJToken["localised_name"]);
+
+            miner.Speed = (float)objJToken["pumping_speed"];
+            miner.ModuleSlots = 0;
+            if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+                miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+
+            string fluidName = (string)objJToken["fluid"];
+            if (!items.ContainsKey(fluidName))
+                return;
+            ItemPrototype fluid = (ItemPrototype)items[fluidName];
+
+            //now to add an extra 'resource' if there isnt one with the type of fluid being pumped out here. Once we ensure there is one, we add this miner to it
+            string rcName = "fer." + fluid.Name;
+            if (!resources.ContainsKey(rcName))
+            {
+                ResourcePrototype extraResource = new ResourcePrototype(this, rcName);
+                extraResource.Time = (1f / 60); //'mining-speed' of 20, and time of 1/60s (every tick) leads to 1200 water per second. mods can set the mining/pumping-speed.
+                extraResource.resultingItems.Add(fluid);
+                fluid.miningResources.Add(extraResource);
+
+                resources.Add(extraResource.Name, extraResource);
+            }
+
+            ((ResourcePrototype)resources[rcName]).validMiners.Add(miner);
+            miner.mineableResources.Add((ResourcePrototype)resources[rcName]);
+            miners.Add(miner.Name, miner);
+        }
+
+        private void ProcessBeacon(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+        {
+            BeaconPrototype beacon = new BeaconPrototype(
+                this,
+                (string)objJToken["name"],
+                (string)objJToken["localised_name"]);
+
+            beacon.Effectivity = (float)objJToken["distribution_effectivity"];
+            beacon.ModuleSlots = (int)objJToken["module_inventory_size"];
+
+            foreach (var effectJToken in objJToken["allowed_effects"])
+            {
+                if (moduleCategories.ContainsKey((string)effectJToken))
+                {
+                    foreach (ModulePrototype module in moduleCategories[(string)effectJToken])
+                    {
+                        module.validBeacons.Add(beacon);
+                        beacon.validModules.Add(module);
+                    }
+                }
+            }
+
+            beacons.Add(beacon.Name, beacon);
         }
 
         //This is used to clean up the items & recipes to those that can actually appear given the settings.
@@ -777,11 +828,7 @@ namespace Foreman
 
         private void MarkCyclicRecipes()
         {
-            ProductionGraph testGraph = new ProductionGraph(this);
-            foreach (Recipe recipe in Recipes.Values)
-                RecipeNode.Create(recipe, testGraph);
-            testGraph.CreateAllPossibleInputLinks();
-            foreach (var scc in testGraph.GetStronglyConnectedComponents(true))
+            foreach (var scc in CyclicNodeTester.GetStronglyConnectedComponents(this))
                 foreach (var node in scc)
                     ((RecipePrototype)((RecipeNode)node).BaseRecipe).IsCyclic = true;
         }

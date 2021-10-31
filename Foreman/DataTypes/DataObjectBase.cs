@@ -22,9 +22,8 @@ namespace Foreman
 		protected DataCache myCache { get; private set; }
 
         public string Name { get; private set; }
-
-		public virtual string LFriendlyName { get; private set; }
-		public virtual string FriendlyName { get; private set; }
+		public string LFriendlyName { get; private set; }
+		public string FriendlyName { get; private set; }
 
 		private string[] OrderCompareArray;
 
@@ -51,8 +50,8 @@ namespace Foreman
 			this.AverageColor = icp.Color;
 		}
 
-        public virtual Color AverageColor { get; private set; }
-		public virtual Bitmap Icon { get; private set; }
+        public Color AverageColor { get; private set; }
+		public Bitmap Icon { get; private set; }
 
 		public override bool Equals(object obj)
 		{

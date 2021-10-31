@@ -28,31 +28,8 @@ namespace Foreman
 			get { return new Point(); }
 			set { }
 		}
-		public override int X
-		{
-			get { return 0; }
-			set { }
-		}
-		public override int Y
-		{
-			get { return 0; }
-			set { }
-		}
-		public override Point Size
-		{
-			get { return new Point(); }
-			set { }
-		}
-		public override int Width
-		{
-			get { return 0; }
-			set { }
-		}
-		public override int Height
-		{
-			get { return 0; }
-			set { }
-		}
+		public override int X { get { return 0; } set { } }
+		public override int Y { get { return 0; } set { } }
 
 		public LinkElement(ProductionGraphViewer parent, NodeLink displayedLink, NodeElement supplierElement, NodeElement consumerElement)
 			: base(parent)
@@ -78,8 +55,8 @@ namespace Foreman
 
 		public void UpdateCurve() //updates all points & boundaries (important for occluding objects outside view)
         {
-			Point pointNupdate = (SupplierTab is null) ? new Point(SupplierElement.X + Width / 2, Y) : new Point(SupplierElement.X + SupplierTab.X + SupplierTab.Width / 2, SupplierElement.Y + SupplierTab.Y);
-			Point pointMupdate = (ConsumerTab is null) ? new Point(ConsumerElement.X + Width / 2, Y + ConsumerElement.Height) : new Point(ConsumerElement.X + ConsumerTab.X + ConsumerTab.Width / 2, ConsumerElement.Y + ConsumerTab.Y + ConsumerTab.Height);
+			Point pointNupdate = (SupplierTab is null) ? new Point(SupplierElement.X, Y - (ConsumerElement.Height / 2)) : new Point(SupplierElement.X + SupplierTab.X, SupplierElement.Y  +SupplierTab.Y - (ConsumerTab.Height / 2));
+			Point pointMupdate = (ConsumerTab is null) ? new Point(ConsumerElement.X, Y + (ConsumerElement.Height / 2)) : new Point(ConsumerElement.X + ConsumerTab.X, ConsumerElement.Y + ConsumerTab.Y + (ConsumerTab.Height / 2));
 
 			if (pointNupdate != pointN || pointMupdate != pointM)
 			{
@@ -124,7 +101,7 @@ namespace Foreman
 			}
 		}
 
-		public override void Paint(Graphics graphics, Point trans)
+		protected override void Draw(Graphics graphics, Point trans)
 		{
 			if (Visible)
 			{
@@ -134,28 +111,30 @@ namespace Foreman
 				{
 					if (linkingUp)
 						graphics.DrawBeziers(pen, new Point[] {
-							PT(PT(pointN,trans), 0, 10),
-							PT(PT(pointN,trans), 0, 10),
-							PT(pointN,trans),
-							PT(pointN,trans),
-							PT(pointN2,trans),
-							PT(pointM2, trans),
-							PT(pointM,trans),
-							PT(pointM,trans),
-							PT(PT(pointM,trans), 0, -10),
-							PT(PT(pointM,trans), 0, -10) });
+							new Point(pointN.X + trans.X + 0, pointN.Y + trans.Y + 10),
+							new Point(pointN.X + trans.X + 0, pointN.Y + trans.Y + 10),
+							Point.Add(pointN,(Size)trans),
+							Point.Add(pointN,(Size)trans),
+							Point.Add(pointN2,(Size)trans),
+							Point.Add(pointM2,(Size)trans),
+							Point.Add(pointM,(Size)trans),
+							Point.Add(pointM,(Size)trans),
+							new Point(pointM.X + trans.X + 0, pointM.Y + trans.Y - 10),
+							new Point(pointM.X + trans.X + 0, pointM.Y + trans.Y - 10),
+						});
 					else
 						graphics.DrawBeziers(pen, new Point[]{
-							PT(pointN, trans),
-							PT(pointN2, trans),
-							PT(pointMidN, trans),
-							PT(pointMidA, trans),
-							PT(pointMidA, trans),
-							PT(pointMidB, trans),
-							PT(pointMidB, trans),
-							PT(pointMidM, trans),
-							PT(pointM2, trans),
-							PT(pointM, trans) });
+							Point.Add(pointN, (Size)trans),
+							Point.Add(pointN2, (Size)trans),
+							Point.Add(pointMidN, (Size)trans),
+							Point.Add(pointMidA, (Size)trans),
+							Point.Add(pointMidA, (Size)trans),
+							Point.Add(pointMidB, (Size)trans),
+							Point.Add(pointMidB, (Size)trans),
+							Point.Add(pointMidM, (Size)trans),
+							Point.Add(pointM2, (Size)trans),
+							Point.Add(pointM, (Size)trans)
+						});
 				}
 			}
 		}
@@ -184,12 +163,12 @@ namespace Foreman
 			float maxTemp = (direction == LinkType.Input)? float.PositiveInfinity : float.NegativeInfinity;
 
 			bool gotOne = false;
-			Queue<ProductionNode> neQueue = new Queue<ProductionNode>(); //RecipeNode or PassthroughNodes
+			Queue<BaseNode> neQueue = new Queue<BaseNode>(); //RecipeNode or PassthroughNodes
 			if (node.DisplayedNode is RecipeNode || node.DisplayedNode is PassthroughNode)
 				neQueue.Enqueue(node.DisplayedNode);
 			while (neQueue.Count > 0)
 			{
-				ProductionNode cNode = neQueue.Dequeue();
+				BaseNode cNode = neQueue.Dequeue();
 				if (cNode is PassthroughNode)
 				{
 					if(direction == LinkType.Input)

@@ -1,50 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.Serialization;
 
 namespace Foreman
 {
+	public interface NodeLink : ISerializable
+    {
+		BaseNode Supplier { get; }
+		BaseNode Consumer { get; }
+		Item Item { get; }
+		double Throughput { get; }
+    }
+
+
 	[Serializable]
-	public class NodeLink: ISerializable
+	public class NodeLinkPrototype: NodeLink
 	{
-		public ProductionNode Supplier;
-		public ProductionNode Consumer;
-		public Item Item;
-        public double Throughput;
+		public BaseNode Supplier { get { return supplier; } }
+		public BaseNode Consumer { get { return consumer; } }
+		public Item Item { get; private set; }
+        public double Throughput { get; set; }
 
-		private NodeLink(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
+		internal BaseNodePrototype supplier;
+		internal BaseNodePrototype consumer;
+
+		internal NodeLinkPrototype(BaseNodePrototype supplier, BaseNodePrototype consumer, Item item)
 		{
-			Supplier = supplier;
-			Consumer = consumer;
+			this.supplier = supplier;
+			this.consumer = consumer;
 			Item = item;
-		}
-
-		public static NodeLink Create(ProductionNode supplier, ProductionNode consumer, Item item, float maxAmount = float.PositiveInfinity)
-		{
-			if (supplier.OutputLinks.Any(l => l.Item == item && l.Consumer == consumer))
-			{
-				return null;
-			}
-			NodeLink link = new NodeLink(supplier, consumer, item, maxAmount);
-			supplier.OutputLinks.Add(link);
-			consumer.InputLinks.Add(link);
-			supplier.Graph.InvalidateCaches();
-			return link;
-		}
-
-		public void Destroy()
-		{
-			Supplier.OutputLinks.Remove(this);
-			Consumer.InputLinks.Remove(this);
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("Supplier", Supplier.Graph.Nodes.IndexOf(Supplier));
-			info.AddValue("Consumer", Consumer.Graph.Nodes.IndexOf(Consumer));
+			info.AddValue("SupplierID", supplier.NodeID);
+			info.AddValue("ConsumerID", consumer.NodeID);
 			info.AddValue("Item", Item.Name);
 		}
+
+		public override string ToString() { return string.Format("NodeLink for {0} connecting {1} -> {2}", Item.Name, supplier.NodeID, consumer.NodeID); }
 	}
 }
