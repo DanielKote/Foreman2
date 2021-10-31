@@ -241,7 +241,7 @@ namespace Foreman
 				//unlock science packs
 				graphics.FillRectangle(DarkBackgroundBrush, new Rectangle(xOffset, yOffset, SectionWidth, 22));
 				yOffset += 2;
-				graphics.DrawString("Required Science Packs: ", SectionFont, TextBrush, 4 + xOffset, 0 + yOffset);
+				graphics.DrawString(recipes[r].MyUnlockSciencePacks.Count > 1 ? "Required science packs (options):" : "Required science packs:", SectionFont, TextBrush, 4 + xOffset, 0 + yOffset);
 				yOffset += 20;
 				for (int i = 0; i < maxSciencePackListsCount; i++)
 				{

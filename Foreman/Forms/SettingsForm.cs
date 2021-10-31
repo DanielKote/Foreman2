@@ -31,10 +31,13 @@ namespace Foreman
 			public bool DEV_ShowUnavailableItems;
 			public bool DEV_UseRecipeBWFilters;
 
+			public HashSet<DataObjectBase> EnabledObjects;
+
 			public SettingsFormOptions(DataCache cache)
 			{
 				DCache = cache;
 				Presets = new List<Preset>();
+				EnabledObjects = new HashSet<DataObjectBase>();
 			}
 		}
 
@@ -166,12 +169,12 @@ namespace Foreman
 
 		private void LoadUnfilteredList(IEnumerable<DataObjectBase> origin, List<ListViewItem> lviList)
 		{
-			foreach (DataObjectBase dOjbect in origin)
+			foreach (DataObjectBase dObject in origin)
 			{
 				ListViewItem lvItem = new ListViewItem();
-				if (dOjbect.Icon != null)
+				if (dObject.Icon != null)
 				{
-					IconList.Images.Add(dOjbect.Icon);
+					IconList.Images.Add(dObject.Icon);
 					lvItem.ImageIndex = IconList.Images.Count - 1;
 				}
 				else
@@ -179,12 +182,12 @@ namespace Foreman
 					lvItem.ImageIndex = 0;
 				}
 
-				lvItem.Text = dOjbect.FriendlyName;
-				lvItem.Tag = dOjbect;
-				lvItem.Name = dOjbect.Name; //key
+				lvItem.Text = dObject.FriendlyName;
+				lvItem.Tag = dObject;
+				lvItem.Name = dObject.Name; //key
 				lvItem.Checked = true; //have to set this to true before (potentially) changing to false in order for the check boxes to appear
-				lvItem.Checked = dOjbect.Enabled;
-				lvItem.BackColor = dOjbect.Available ? AvailableObjectColor : UnavailableObjectColor;
+				lvItem.Checked = Options.EnabledObjects.Contains(dObject);
+				lvItem.BackColor = dObject.Available ? AvailableObjectColor : UnavailableObjectColor;
 				lviList.Add(lvItem);
 			}
 			unfilteredRecipeList.Sort(delegate (ListViewItem a, ListViewItem b)
@@ -284,6 +287,7 @@ namespace Foreman
 			{
 				Options.SelectedPreset = ((Preset)PresetListBox.Items[index]);
 				UpdateSettings();
+				DialogResult = DialogResult.OK;
 				this.Close();
 
 			}
@@ -314,6 +318,7 @@ namespace Foreman
 		{
 			Options.SelectedPreset = (Preset)PresetListBox.SelectedItem;
 			UpdateSettings();
+			DialogResult = DialogResult.OK;
 			this.Close();
 		}
 
@@ -342,13 +347,19 @@ namespace Foreman
 					{
 						lvi = (sender as ListView).Items[index];
 						lvi.Checked = setCheck;
-						(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
+						if (lvi.Checked)
+							Options.EnabledObjects.Add((DataObjectBase)lvi.Tag);
+						else
+							Options.EnabledObjects.Remove((DataObjectBase)lvi.Tag);
 					}
 				}
 				else
 				{
 					lvi.Checked = !lvi.Checked;
-					(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
+					if (lvi.Checked)
+						Options.EnabledObjects.Add((DataObjectBase)lvi.Tag);
+					else
+						Options.EnabledObjects.Remove((DataObjectBase)lvi.Tag);
 				}
 				(sender as ListView).Invalidate();
 			}
@@ -366,13 +377,19 @@ namespace Foreman
 					{
 						lvi = (sender as ListView).Items[index];
 						lvi.Checked = setCheck;
-						(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
+						if (lvi.Checked)
+							Options.EnabledObjects.Add((DataObjectBase)lvi.Tag);
+						else
+							Options.EnabledObjects.Remove((DataObjectBase)lvi.Tag);
 					}
 				}
 				else
 				{
 					//lvi.Checked = lvi.Checked;
-					(lvi.Tag as DataObjectBase).Enabled = lvi.Checked;
+					if (lvi.Checked)
+						Options.EnabledObjects.Add((DataObjectBase)lvi.Tag);
+					else
+						Options.EnabledObjects.Remove((DataObjectBase)lvi.Tag);
 				}
 				(sender as ListView).Invalidate();
 			}
@@ -404,11 +421,13 @@ namespace Foreman
 		private void ConfirmButton_Click(object sender, EventArgs e)
 		{
 			UpdateSettings();
+			DialogResult = DialogResult.OK;
 			this.Close();
 		}
 
 		private void CancelButton_Click(object sender, EventArgs e)
 		{
+			DialogResult = DialogResult.Cancel;
 			this.Close();
 		}
 
@@ -427,6 +446,8 @@ namespace Foreman
 
 			Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
 			Options.DEV_UseRecipeBWFilters = !LoadBarrelingCheckBox.Checked;
+
+			//Options.EnabledObjects auto set by check/uncheck of lists
 		}
 
 		//PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------
@@ -457,6 +478,7 @@ namespace Foreman
 					{
 						Options.SelectedPreset = newPreset;
 						UpdateSettings();
+						DialogResult = DialogResult.OK;
 						this.Close();
 					}
 				}
@@ -482,7 +504,7 @@ namespace Foreman
 
 		private void LoadEnabledFromSaveButton_Click(object sender, EventArgs e)
 		{
-			using (SaveFileLoadForm form = new SaveFileLoadForm(Options.DCache))
+			using (SaveFileLoadForm form = new SaveFileLoadForm(Options.DCache, Options.EnabledObjects))
 			{
 				form.StartPosition = FormStartPosition.Manual;
 				form.Left = this.Left + 50;
@@ -492,17 +514,17 @@ namespace Foreman
 				if(result == DialogResult.OK)
 				{
 					foreach (ListViewItem item in unfilteredAssemblerList)
-						item.Checked = ((Assembler)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredBeaconList)
-						item.Checked = ((Beacon)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredMinerList)
-						item.Checked = ((Assembler)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredModuleList)
-						item.Checked = ((Module)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredPowerList)
-						item.Checked = ((Assembler)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredRecipeList)
-						item.Checked = ((Recipe)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 
 					UpdateFilteredLists();
 				}
@@ -515,7 +537,7 @@ namespace Foreman
 
 		private void SetEnabledFromSciencePacksButton_Click(object sender, EventArgs e)
 		{
-			using (SciencePacksLoadForm form = new SciencePacksLoadForm(Options.DCache))
+			using (SciencePacksLoadForm form = new SciencePacksLoadForm(Options.DCache, Options.EnabledObjects))
 			{
 				form.StartPosition = FormStartPosition.Manual;
 				form.Left = this.Left + 50;
@@ -525,17 +547,17 @@ namespace Foreman
 				if (result == DialogResult.OK)
 				{
 					foreach (ListViewItem item in unfilteredAssemblerList)
-						item.Checked = ((Assembler)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredBeaconList)
-						item.Checked = ((Beacon)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredMinerList)
-						item.Checked = ((Assembler)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredModuleList)
-						item.Checked = ((Module)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredPowerList)
-						item.Checked = ((Assembler)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 					foreach (ListViewItem item in unfilteredRecipeList)
-						item.Checked = ((Recipe)item.Tag).Enabled;
+						item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 
 					UpdateFilteredLists();
 				}

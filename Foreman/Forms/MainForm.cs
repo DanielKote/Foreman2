@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
+using System.Linq;
 
 namespace Foreman
 {
@@ -205,46 +206,61 @@ namespace Foreman
 			options.DEV_ShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
 			options.DEV_UseRecipeBWFilters = Properties.Settings.Default.UseRecipeBWfilters;
 
+			options.EnabledObjects.UnionWith(GraphViewer.DCache.Recipes.Values.Where(r => r.Enabled));
+			options.EnabledObjects.UnionWith(GraphViewer.DCache.Assemblers.Values.Where(r => r.Enabled));
+			options.EnabledObjects.UnionWith(GraphViewer.DCache.Beacons.Values.Where(r => r.Enabled));
+			options.EnabledObjects.UnionWith(GraphViewer.DCache.Modules.Values.Where(r => r.Enabled));
+
 			using (SettingsForm form = new SettingsForm(options))
 			{
 				form.StartPosition = FormStartPosition.Manual;
 				form.Left = this.Left + 50;
 				form.Top = this.Top + 50;
-				form.ShowDialog();
-
-				if (options.SelectedPreset != options.Presets[0] || options.DEV_UseRecipeBWFilters != Properties.Settings.Default.UseRecipeBWfilters) //different preset or recipeBWFilter change -> need to reload datacache
+				if (form.ShowDialog() == DialogResult.OK)
 				{
-					Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset.Name;
-					Properties.Settings.Default.UseRecipeBWfilters = options.DEV_UseRecipeBWFilters;
+					if (options.SelectedPreset != options.Presets[0] || options.DEV_UseRecipeBWFilters != Properties.Settings.Default.UseRecipeBWfilters) //different preset or recipeBWFilter change -> need to reload datacache
+					{
+						Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset.Name;
+						Properties.Settings.Default.UseRecipeBWfilters = options.DEV_UseRecipeBWFilters;
 
-					List<Preset> validPresets = GetValidPresetsList();
-					await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
+						List<Preset> validPresets = GetValidPresetsList();
+						await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
+					}
+
+					GraphViewer.LevelOfDetail = options.LevelOfDetail;
+					Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
+					GraphViewer.NodeCountForSimpleView = options.NodeCountForSimpleView;
+					Properties.Settings.Default.NodeCountForSimpleView = options.NodeCountForSimpleView;
+					GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
+					Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
+					GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;
+					Properties.Settings.Default.ShowRecipeToolTip = options.ShowRecipeToolTip;
+					GraphViewer.LockedRecipeEditPanelPosition = options.LockedRecipeEditPanelPosition;
+					Properties.Settings.Default.LockedRecipeEditorPosition = options.LockedRecipeEditPanelPosition;
+					GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = options.DefaultAssemblerStyle;
+					Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
+					GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
+					Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
+					GraphViewer.ArrowRenderer.ShowWarningArrows = options.ShowWarningArrows;
+					Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
+					GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
+					Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;
+
+					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
+					Properties.Settings.Default.Save();
+
+					foreach (Recipe recipe in GraphViewer.DCache.Recipes.Values)
+						recipe.Enabled = options.EnabledObjects.Contains(recipe);
+					foreach (Assembler assembler in GraphViewer.DCache.Assemblers.Values)
+						assembler.Enabled = options.EnabledObjects.Contains(assembler);
+					foreach (Beacon beacon in GraphViewer.DCache.Beacons.Values)
+						beacon.Enabled = options.EnabledObjects.Contains(beacon);
+					foreach (Module module in GraphViewer.DCache.Modules.Values)
+						module.Enabled = options.EnabledObjects.Contains(module);
+
+					GraphViewer.Graph.UpdateNodeStates();
+					GraphViewer.UpdateNodeVisuals();
 				}
-
-				GraphViewer.LevelOfDetail = options.LevelOfDetail;
-				Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
-				GraphViewer.NodeCountForSimpleView = options.NodeCountForSimpleView;
-				Properties.Settings.Default.NodeCountForSimpleView = options.NodeCountForSimpleView;
-				GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
-				Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
-				GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;
-				Properties.Settings.Default.ShowRecipeToolTip = options.ShowRecipeToolTip;
-				GraphViewer.LockedRecipeEditPanelPosition = options.LockedRecipeEditPanelPosition;
-				Properties.Settings.Default.LockedRecipeEditorPosition = options.LockedRecipeEditPanelPosition;
-				GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = options.DefaultAssemblerStyle;
-				Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
-				GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
-				Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
-				GraphViewer.ArrowRenderer.ShowWarningArrows = options.ShowWarningArrows;
-				Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
-				GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
-				Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;
-
-				Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
-				Properties.Settings.Default.Save();
-
-				GraphViewer.Graph.UpdateNodeStates();
-				GraphViewer.UpdateNodeVisuals();
 			}
 		}
 

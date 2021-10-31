@@ -636,17 +636,12 @@ namespace Foreman
 					if (currentDragOperation == DragOperation.Selection)
 					{
 						if ((Control.ModifierKeys & Keys.Alt) != 0) //removal zone processing
-						{
-							foreach (BaseNodeElement newlySelectedNode in currentSelectionNodes)
-								selectedNodes.Remove(newlySelectedNode);
-						}
+							selectedNodes.ExceptWith(currentSelectionNodes);
 						else
 						{
 							if ((Control.ModifierKeys & Keys.Control) == 0) //if we arent using control, then we are just selecting
 								selectedNodes.Clear();
-
-							foreach (BaseNodeElement newlySelectedNode in currentSelectionNodes)
-								selectedNodes.Add(newlySelectedNode);
+							selectedNodes.UnionWith(currentSelectionNodes);
 						}
 						currentSelectionNodes.Clear();
 					}
@@ -739,8 +734,7 @@ namespace Foreman
 				case DragOperation.Selection:
 					SelectionZone = new Rectangle(Math.Min(SelectionZoneOriginPoint.X, graph_location.X), Math.Min(SelectionZoneOriginPoint.Y, graph_location.Y), Math.Abs(SelectionZoneOriginPoint.X - graph_location.X), Math.Abs(SelectionZoneOriginPoint.Y - graph_location.Y));
 					currentSelectionNodes.Clear();
-					foreach (BaseNodeElement element in nodeElements.Where(element => element.IntersectsWithZone(SelectionZone, -20, -20)))
-						currentSelectionNodes.Add(element);
+					currentSelectionNodes.UnionWith(nodeElements.Where(element => element.IntersectsWithZone(SelectionZone, -20, -20)));
 
 					UpdateSelection();
 
@@ -794,8 +788,7 @@ namespace Foreman
 					var writer = new JsonTextWriter(new StringWriter(stringBuilder));
 
 					Graph.SerializeNodeIdSet = new HashSet<int>();
-					foreach (BaseNodeElement selectedNode in selectedNodes)
-						Graph.SerializeNodeIdSet.Add(selectedNode.DisplayedNode.NodeID);
+					Graph.SerializeNodeIdSet.UnionWith(selectedNodes.Select(n => n.DisplayedNode.NodeID));
 
 					JsonSerializer serialiser = JsonSerializer.Create();
 					serialiser.Formatting = Formatting.None;

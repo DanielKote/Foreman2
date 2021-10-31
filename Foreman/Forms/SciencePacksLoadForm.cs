@@ -18,10 +18,12 @@ namespace Foreman
 		private int IconSize = 48; //actually a bit smaller due to button padding, but whatever.
 
 		private readonly DataCache DCache;
+		private readonly HashSet<DataObjectBase> EnabledObjects;
 
-		public SciencePacksLoadForm(DataCache cache)
+		public SciencePacksLoadForm(DataCache cache, HashSet<DataObjectBase> enabledObjects)
 		{
 			DCache = cache;
+			EnabledObjects = enabledObjects;
 
 			InitializeComponent();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -93,47 +95,42 @@ namespace Foreman
 		private void ConfirmationButton_Click(object sender, EventArgs e)
 		{
 			HashSet<Item> acceptedSciencePacks = new HashSet<Item>(SciencePackButtons.Where(kvp => kvp.Value).Select(kvp => kvp.Key.Tag as Item));
+			EnabledObjects.Clear();
+			EnabledObjects.Add(DCache.PlayerAssembler);
 
-			//go through all technologies, check for fit compared to accepted science packs, and enable if it conforms
+			//go through all technologies, check for fit compared to accepted science packs, and add its recipes to the set of enabled recipes
 			foreach (Technology tech in DCache.Technologies.Values)
-			{
-				tech.Enabled = tech.Available && !tech.SciPackList.Except(acceptedSciencePacks).Any();
-				if (tech.Enabled) Console.WriteLine(tech);
-			}
+				if (tech.Available && !tech.SciPackList.Except(acceptedSciencePacks).Any())
+					EnabledObjects.UnionWith(tech.UnlockedRecipes);
 
-			//disable all recipes, then enable only those recipes that are enabled by the enabled technologies
-			foreach (Recipe recipe in DCache.Recipes.Values)
-				recipe.Enabled = false;
-			foreach (Technology tech in DCache.Technologies.Values.Where(t => t.Enabled))
-				foreach (Recipe recipe in tech.UnlockedRecipes)
-					recipe.Enabled = recipe.Available;
-
-			//update enabled status of assemblers, beacons, and modules based on the enabled status of their items' production recipes
+			//go through all the assemblers, beacons, and modules and add them to the enabled set if at least one of their associated items has at least one production recipe that is in the enabled set.
 			foreach (Assembler assembler in DCache.Assemblers.Values)
 			{
 				bool enabled = false;
 				foreach (IReadOnlyCollection<Recipe> recipes in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
 					foreach (Recipe recipe in recipes)
-						enabled |= recipe.Enabled;
-				assembler.Enabled = enabled;
+						enabled |= EnabledObjects.Contains(recipe);
+				if (enabled)
+					EnabledObjects.Add(assembler);
 			}
-			DCache.PlayerAssembler.Enabled = true;
 
 			foreach (Beacon beacon in DCache.Beacons.Values)
 			{
 				bool enabled = false;
 				foreach (IReadOnlyCollection<Recipe> recipes in beacon.AssociatedItems.Select(item => item.ProductionRecipes))
 					foreach (Recipe recipe in recipes)
-						enabled |= recipe.Enabled;
-				beacon.Enabled = enabled;
+						enabled |= EnabledObjects.Contains(recipe);
+				if (enabled)
+					EnabledObjects.Add(beacon);
 			}
 
 			foreach (Module module in DCache.Modules.Values)
 			{
 				bool enabled = false;
 				foreach (Recipe recipe in module.AssociatedItem.ProductionRecipes)
-					enabled |= recipe.Enabled;
-				module.Enabled = enabled;
+					enabled |= EnabledObjects.Contains(recipe);
+				if (enabled)
+					EnabledObjects.Add(module);
 			}
 
 			DialogResult = DialogResult.OK;

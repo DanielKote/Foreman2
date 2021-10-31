@@ -329,17 +329,13 @@ namespace Foreman
 						includedAssemblers.Add(rnode.SelectedAssembler.Name);
 					if (rnode.SelectedBeacon != null)
 						includedBeacons.Add(rnode.SelectedBeacon.Name);
-					foreach (Module module in rnode.AssemblerModules)
-						includedModules.Add(module.Name);
-					foreach (Module module in rnode.BeaconModules)
-						includedModules.Add(module.Name);
+					includedModules.UnionWith(rnode.AssemblerModules.Select(m => m.Name));
+					includedModules.UnionWith(rnode.BeaconModules.Select(m => m.Name));
 				}
 
 				//these will process all inputs/outputs -> so fuel/burnt items are included automatically!
-				foreach (Item input in node.Inputs)
-					includedItems.Add(input.Name);
-				foreach (Item output in node.Outputs)
-					includedItems.Add(output.Name);
+				includedItems.UnionWith(node.Inputs.Select(i => i.Name));
+				includedItems.UnionWith(node.Outputs.Select(i => i.Name));
 			}
 			List<RecipeShort> includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
 			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)

@@ -13,7 +13,8 @@ namespace Foreman
 {
 	public partial class SaveFileLoadForm : Form
 	{
-		private DataCache DCache;
+		private readonly DataCache DCache;
+		private readonly HashSet<DataObjectBase> EnabledObjects;
 		public SaveFileInfo SaveFileInfo;
 
 		private CancellationTokenSource cts;
@@ -22,9 +23,10 @@ namespace Foreman
 		private string saveFilePath;
 		private string factorioPath;
 
-		public SaveFileLoadForm(DataCache cache)
+		public SaveFileLoadForm(DataCache cache, HashSet<DataObjectBase> enabledObjects)
 		{
 			DCache = cache;
+			EnabledObjects = enabledObjects;
 			SaveFileInfo = null;
 
 			cts = new CancellationTokenSource();
@@ -239,61 +241,44 @@ namespace Foreman
 				if (MessageBox.Show("selected save file mods do not match preset mods; out of {0} mods:" + missingMods + wrongVersionMods + newMods + "\nAre you sure you wish to use this save file?", "Save file mod inconsistencies found!", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
 					return;
 
-
-			//NOTE! there is a bit of inconsistency here; realistically we should enable/disable technology and calculate the enabled recipes ourselves. However to allow the user to have all recipes that he has available in the save
-			//we will just ignore technology limitations and activate all recipes that were set as enabled in the save.
-			//for now, technology isnt used at all.
-			/*
-			foreach (Technology tech in CurrentOptions.DCache.Technologies.Values)
-			{
-				if (saveInfo.Technologies.ContainsKey(tech.Name))
-					tech.Enabled = saveInfo.Technologies[tech.Name];
-				else
-					tech.Enabled = false;
-			}*/
+			//we will not be updating technology based on the read data. we will instead be updating the recipes based on their enabled status. This is due to the possibility that a recipe was 'manually' enabled outside of the default technology unlocks. Is this possible? I dont know.
+			EnabledObjects.Clear();
+			EnabledObjects.Add(DCache.PlayerAssembler);
 
 			foreach (Recipe recipe in DCache.Recipes.Values)
-			{
-				if (recipe.Name.StartsWith("§§")) //these are the special recipes we added for 'mining / extraction / etc'. They will naturally not exist in the loaded save, so we just keep set them as enabled
-				{
-					recipe.Enabled = true;
-				}
-				else
-				{
-					if (SaveFileInfo.Recipes.ContainsKey(recipe.Name))
-						recipe.Enabled = SaveFileInfo.Recipes[recipe.Name];
-					else
-						recipe.Enabled = false;
-				}
-			}
+				if (recipe.Name.StartsWith("§§") || SaveFileInfo.Recipes.ContainsKey(recipe.Name))
+					EnabledObjects.Add(recipe);
 
-			//update enabled status of assemblers, beacons, and modules based on the enabled status of their items' production recipes
+			//go through all the assemblers, beacons, and modules and add them to the enabled set if at least one of their associated items has at least one production recipe that is in the enabled set.
 			foreach (Assembler assembler in DCache.Assemblers.Values)
 			{
 				bool enabled = false;
 				foreach (IReadOnlyCollection<Recipe> recipes in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
 					foreach (Recipe recipe in recipes)
-						enabled |= recipe.Enabled;
-				assembler.Enabled = enabled;
+						enabled |= EnabledObjects.Contains(recipe);
+				if (enabled)
+					EnabledObjects.Add(assembler);
 			}
-			DCache.PlayerAssembler.Enabled = true;
 
 			foreach (Beacon beacon in DCache.Beacons.Values)
 			{
 				bool enabled = false;
 				foreach (IReadOnlyCollection<Recipe> recipes in beacon.AssociatedItems.Select(item => item.ProductionRecipes))
 					foreach (Recipe recipe in recipes)
-						enabled |= recipe.Enabled;
-				beacon.Enabled = enabled;
+						enabled |= EnabledObjects.Contains(recipe);
+				if (enabled)
+					EnabledObjects.Add(beacon);
 			}
 
 			foreach (Module module in DCache.Modules.Values)
 			{
 				bool enabled = false;
 				foreach (Recipe recipe in module.AssociatedItem.ProductionRecipes)
-					enabled |= recipe.Enabled;
-				module.Enabled = enabled;
+					enabled |= EnabledObjects.Contains(recipe);
+				if (enabled)
+					EnabledObjects.Add(module);
 			}
+
 		}
 
 		private void CancellationButton_Click(object sender, EventArgs e)

@@ -1218,8 +1218,7 @@ namespace Foreman
 					foreach (Item sciPack in TechRequiredSciPacks(prereq))
 						requiredItems.Add(sciPack);
 
-				foreach (Item sciPack in requiredItems)
-					sciPacks.Add(sciPack);
+				sciPacks.UnionWith(requiredItems);
 				techRequirements.Add(tech, requiredItems);
 
 				return requiredItems;
