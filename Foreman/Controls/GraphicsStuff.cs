@@ -247,7 +247,7 @@ namespace Foreman
 				{
 					if (i < recipes[r].MyUnlockSciencePacks.Count)
 					{
-						int iconSize = Math.Min(24, SectionWidth / (8 + recipes[r].MyUnlockSciencePacks[i].Count)); //ensure all science packs will fit (there should be space for 8, but knowing mods... this might not be enough)
+						int iconSize = recipes[r].MyUnlockSciencePacks[i].Count == 0? 24 : Math.Min(24, (SectionWidth - 8) / recipes[r].MyUnlockSciencePacks[i].Count); //ensure all science packs will fit (there should be space for 8, but knowing mods... this might not be enough)
 						for (int j = 0; j < recipes[r].MyUnlockSciencePacks[i].Count; j++)
 							graphics.DrawImage(recipes[r].MyUnlockSciencePacks[i][j].Icon, xOffset + 4 + (j * iconSize), 3 + yOffset, iconSize, iconSize);
 					}

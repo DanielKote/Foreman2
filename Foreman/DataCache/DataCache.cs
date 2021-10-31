@@ -886,8 +886,11 @@ namespace Foreman
 				{
 					foreach (RecipePrototype recipe in craftingCategories[(string)categoryJToken])
 					{
-						recipe.assemblers.Add(aEntity);
-						aEntity.recipes.Add(recipe);
+						if (TestRecipeEntityPipeFit(recipe, objJToken))
+						{
+							recipe.assemblers.Add(aEntity);
+							aEntity.recipes.Add(recipe);
+						}
 					}
 				}
 			}
@@ -902,27 +905,11 @@ namespace Foreman
 				{
 					foreach (RecipePrototype recipe in resourceCategories[(string)categoryJToken])
 					{
-						recipe.assemblers.Add(aEntity);
-						aEntity.recipes.Add(recipe);
-
-						if (aEntity.associatedItems.Count == 0)
+						if (TestRecipeEntityPipeFit(recipe, objJToken))
 						{
-							recipe.myUnlockTechnologies.Add(startingTech);
-							startingTech.unlockedRecipes.Add(recipe);
-						}
-						else //add the recipe unlock to all recipes that can produce the items that can place this burner
-						{
-							foreach (Item placeItem in aEntity.associatedItems)
-							{
-								foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
-								{
-									foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
-									{
-										recipe.myUnlockTechnologies.Add(tech);
-										tech.unlockedRecipes.Add(recipe);
-									}
-								}
-							}
+							ProcessEntityRecipeTechlink(aEntity, recipe);
+							recipe.assemblers.Add(aEntity);
+							aEntity.recipes.Add(recipe);
 						}
 					}
 				}
@@ -956,25 +943,6 @@ namespace Foreman
 				recipe.InternalOneWayAddProduct(fluid, 60);
 				fluid.productionRecipes.Add(recipe);
 
-				if (aEntity.associatedItems.Count == 0)
-				{
-					recipe.myUnlockTechnologies.Add(startingTech);
-					startingTech.unlockedRecipes.Add(recipe);
-				}
-				else
-				{
-					foreach (Item placeItem in aEntity.associatedItems)
-					{
-						foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
-						{
-							foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
-							{
-								recipe.myUnlockTechnologies.Add(tech);
-								tech.unlockedRecipes.Add(recipe);
-							}
-						}
-					}
-				}
 
 				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
 				{
@@ -987,6 +955,7 @@ namespace Foreman
 			else
 				recipe = (RecipePrototype)recipes[extractionRecipeName];
 
+			ProcessEntityRecipeTechlink(aEntity, recipe);
 			recipe.assemblers.Add(aEntity);
 			aEntity.recipes.Add(recipe);
 
@@ -1034,25 +1003,6 @@ namespace Foreman
 				recipe.InternalOneWayAddProduct(product, 60, temp);
 				product.productionRecipes.Add(recipe);
 
-				if (aEntity.associatedItems.Count == 0)
-				{
-					recipe.myUnlockTechnologies.Add(startingTech);
-					startingTech.unlockedRecipes.Add(recipe);
-				}
-				else
-				{
-					foreach (Item placeItem in aEntity.associatedItems)
-					{
-						foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
-						{
-							foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
-							{
-								recipe.myUnlockTechnologies.Add(tech);
-								tech.unlockedRecipes.Add(recipe);
-							}
-						}
-					}
-				}
 
 				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
 				{
@@ -1065,6 +1015,7 @@ namespace Foreman
 			else
 				recipe = (RecipePrototype)recipes[boilRecipeName];
 
+			ProcessEntityRecipeTechlink(aEntity, recipe);
 			recipe.assemblers.Add(aEntity);
 			aEntity.recipes.Add(recipe);
 
@@ -1107,25 +1058,6 @@ namespace Foreman
 
 				ingredient.consumptionRecipes.Add(recipe);
 
-				if (aEntity.associatedItems.Count == 0)
-				{
-					recipe.myUnlockTechnologies.Add(startingTech);
-					startingTech.unlockedRecipes.Add(recipe);
-				}
-				else
-				{
-					foreach (Item placeItem in aEntity.associatedItems)
-					{
-						foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
-						{
-							foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
-							{
-								recipe.myUnlockTechnologies.Add(tech);
-								tech.unlockedRecipes.Add(recipe);
-							}
-						}
-					}
-				}
 
 				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
 				{
@@ -1138,6 +1070,7 @@ namespace Foreman
 			else
 				recipe = (RecipePrototype)recipes[generationRecipeName];
 
+			ProcessEntityRecipeTechlink(aEntity, recipe);
 			recipe.assemblers.Add(aEntity);
 			aEntity.recipes.Add(recipe);
 
@@ -1148,26 +1081,7 @@ namespace Foreman
 		{
 			aEntity.recipes.Add(BurnerRecipe);
 			BurnerRecipe.assemblers.Add(aEntity);
-
-			if (aEntity.associatedItems.Count == 0)
-			{
-				BurnerRecipe.myUnlockTechnologies.Add(startingTech);
-				startingTech.unlockedRecipes.Add(BurnerRecipe);
-			}
-			else
-			{
-				foreach (Item placeItem in aEntity.associatedItems)
-				{
-					foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
-					{
-						foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
-						{
-							BurnerRecipe.myUnlockTechnologies.Add(tech);
-							tech.unlockedRecipes.Add(BurnerRecipe);
-						}
-					}
-				}
-			}
+			ProcessEntityRecipeTechlink(aEntity, BurnerRecipe);
 
 			aEntity.Speed = 1f; //doesnt matter -> the recipe is empty.
 
@@ -1179,31 +1093,86 @@ namespace Foreman
 			aEntity.NeighbourBonus = objJToken["neighbour_bonus"] == null ? 0 : (double)objJToken["neighbour_bonus"];
 			aEntity.recipes.Add(HeatRecipe);
 			HeatRecipe.assemblers.Add(aEntity);
-
-			if (aEntity.associatedItems.Count == 0)
-			{
-				HeatRecipe.myUnlockTechnologies.Add(startingTech);
-				startingTech.unlockedRecipes.Add(HeatRecipe);
-			}
-			else
-			{
-				foreach (Item placeItem in aEntity.associatedItems)
-				{
-					foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
-					{
-						foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
-						{
-							HeatRecipe.myUnlockTechnologies.Add(tech);
-							tech.unlockedRecipes.Add(HeatRecipe);
-						}
-					}
-				}
-			}
+			ProcessEntityRecipeTechlink(aEntity, HeatRecipe);
 
 			aEntity.Speed = (aEntity.EnergyConsumption) / HeatItem.FuelValue; //the speed of producing 1MJ of energy as heat for this reactor
 
 			return true;
 		}
+
+		private void ProcessEntityRecipeTechlink(EntityObjectBasePrototype entity, RecipePrototype recipe)
+		{
+			if (entity.associatedItems.Count == 0)
+			{
+				recipe.myUnlockTechnologies.Add(startingTech);
+				startingTech.unlockedRecipes.Add(recipe);
+			}
+			else
+			{
+				foreach (Item placeItem in entity.associatedItems)
+				{
+					foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
+					{
+						foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
+						{
+							recipe.myUnlockTechnologies.Add(tech);
+							tech.unlockedRecipes.Add(recipe);
+						}
+					}
+				}
+			}
+		}
+
+		private bool TestRecipeEntityPipeFit(RecipePrototype recipe, JToken objJToken) //returns true if the fluid boxes of the entity (assembler or miner) can accept the provided recipe (with its in/out fluids)
+		{
+			int inPipes = (int)objJToken["in_pipes"];
+			List<string> inPipeFilters = objJToken["in_pipe_filters"].Select(o => (string)o).ToList();
+			int outPipes = (int)objJToken["out_pipes"];
+			List<string> outPipeFilters = objJToken["out_pipe_filters"].Select(o => (string)o).ToList();
+			int ioPipes = (int)objJToken["io_pipes"];
+			List<string> ioPipeFilters = objJToken["io_pipe_filters"].Select(o => (string)o).ToList();
+
+			int inCount = 0; //unfiltered
+			int outCount = 0; //unfiltered
+			foreach(Item inFluid in recipe.ingredientList.Where(i => i.IsFluid))
+			{
+				if (inPipeFilters.Contains(inFluid.Name))
+				{
+					inPipes--;
+					inPipeFilters.Remove(inFluid.Name);
+				}
+				else if (ioPipeFilters.Contains(inFluid.Name))
+				{
+					ioPipes--;
+					ioPipeFilters.Remove(inFluid.Name);
+				}
+				else
+					inCount++;
+			}
+			foreach (Item outFluid in recipe.productList.Where(i => i.IsFluid))
+			{
+				if (outPipeFilters.Contains(outFluid.Name))
+				{
+					outPipes--;
+					outPipeFilters.Remove(outFluid.Name);
+				}
+				else if (ioPipeFilters.Contains(outFluid.Name))
+				{
+					ioPipes--;
+					ioPipeFilters.Remove(outFluid.Name);
+				}
+				else
+					outCount++;
+			}
+			//remove any unused filtered pipes from the equation - they cant be used due to the filters.
+			inPipes -= inPipeFilters.Count;
+			ioPipes -= ioPipeFilters.Count;
+			outPipes -= outPipeFilters.Count;
+
+			//return true if the remaining unfiltered ingredients & products (fluids) can fit into the remaining unfiltered pipes
+			return (inCount - inPipes <= ioPipes && outCount - outPipes <= ioPipes && inCount + outCount <= inPipes + outPipes + ioPipes); 
+		}
+
 
 		//------------------------------------------------------Finalization steps of LoadAllData (cleanup and cyclic checks)
 

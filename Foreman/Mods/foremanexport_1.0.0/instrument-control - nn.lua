@@ -264,6 +264,7 @@ local function ExportEntities()
 			end
 
 			--fluid boxes for input/output of boiler & generator need to be processed (almost guaranteed to be 'steam' and 'water', but... tests have shown that we can heat up whatever we want)
+			--additinally we want count of fluid boxes in/out (for checking recipe validity)
 			if entity.type == 'boiler' then
 				tentity['target_temperature'] = entity.target_temperature
 
@@ -285,6 +286,33 @@ local function ExportEntities()
 				if entity.fluidbox_prototypes[1].filter ~= nil then
 					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
 				end
+			else
+				inPipes = 0
+				inPipeFilters = {}
+				ioPipes = 0
+				ioPipeFilters = {}
+				outPipes = 0
+				outPipeFilters = {}
+				-- i will ignore temperature limitations for this.
+
+				for _, fbox in pairs(entity.fluidbox_prototypes) do
+					if fbox.production_type == "input" then
+						inPipes = inPipes + 1
+						if fbox.filter ~= nil then table.insert(inPipeFilters, fbox.filter.name) end
+					elseif fbox.production_type == "output" then
+						outPipes = outPipes + 1
+						if fbox.filter ~= nil then table.insert(outPipeFilters, fbox.filter.name) end
+					elseif fbox.production_type == "input-output" then
+						ioPipes = ioPipes + 1
+						if fbox.filter ~= nil then table.insert(ioPipeFilters, fbox.filter.name) end
+					end
+				end
+				tentity['in_pipes'] = inPipes
+				tentity['in_pipe_filters'] = inPipeFilters
+				tentity['out_pipes'] = outPipes
+				tentity['out_pipe_filters'] = outPipeFilters
+				tentity['io_pipes'] = ioPipes
+				tentity['io_pipe_filters'] = ioPipeFilters
 			end
 
 			tentity['max_energy_usage'] = (entity.max_energy_usage == nil) and 0 or entity.max_energy_usage

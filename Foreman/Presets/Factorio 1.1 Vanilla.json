@@ -14716,6 +14716,12 @@
         "nuclear-reactor"
       ],
       "allowed_effects": {},
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 666666.66666666663,
       "energy_usage": 0,
       "energy_production": 0,
@@ -14787,6 +14793,12 @@
       "resource_categories": [
         "basic-solid"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 2500,
       "energy_usage": 2500,
       "energy_production": 0,
@@ -14819,6 +14831,12 @@
       "resource_categories": [
         "basic-solid"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 1,
+      "io_pipe_filters": {},
       "max_energy_usage": 1500,
       "energy_usage": 1500,
       "energy_production": 0,
@@ -14840,6 +14858,14 @@
         "offshore-pump"
       ],
       "allowed_effects": {},
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 1,
+      "out_pipe_filters": [
+        "water"
+      ],
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 0,
       "energy_usage": 0,
       "energy_production": 0,
@@ -14869,6 +14895,12 @@
       "resource_categories": [
         "basic-fluid"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 1,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 1500,
       "energy_usage": 1500,
       "energy_production": 0,
@@ -14895,6 +14927,12 @@
       "crafting_categories": [
         "smelting"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 1500,
       "energy_usage": 1500,
       "energy_production": 0,
@@ -14922,6 +14960,12 @@
       "crafting_categories": [
         "smelting"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 1500,
       "energy_usage": 1500,
       "energy_production": 0,
@@ -14954,6 +14998,12 @@
       "crafting_categories": [
         "smelting"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 3000,
       "energy_usage": 3000,
       "energy_production": 0,
@@ -14982,6 +15032,12 @@
         "basic-crafting",
         "advanced-crafting"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 1250,
       "energy_usage": 1250,
       "energy_production": 0,
@@ -15016,6 +15072,12 @@
         "advanced-crafting",
         "crafting-with-fluid"
       ],
+      "in_pipes": 1,
+      "in_pipe_filters": {},
+      "out_pipes": 1,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 2500,
       "energy_usage": 2500,
       "energy_production": 0,
@@ -15049,6 +15111,12 @@
         "advanced-crafting",
         "crafting-with-fluid"
       ],
+      "in_pipes": 1,
+      "in_pipe_filters": {},
+      "out_pipes": 1,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 6250,
       "energy_usage": 6250,
       "energy_production": 0,
@@ -15079,6 +15147,12 @@
       "crafting_categories": [
         "oil-processing"
       ],
+      "in_pipes": 2,
+      "in_pipe_filters": {},
+      "out_pipes": 3,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 7000,
       "energy_usage": 7000,
       "energy_production": 0,
@@ -15109,6 +15183,12 @@
       "crafting_categories": [
         "chemistry"
       ],
+      "in_pipes": 2,
+      "in_pipe_filters": {},
+      "out_pipes": 2,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 3500,
       "energy_usage": 3500,
       "energy_production": 0,
@@ -15139,6 +15219,12 @@
       "crafting_categories": [
         "centrifuging"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 5833.333333333333,
       "energy_usage": 5833.333333333333,
       "energy_production": 0,
@@ -15164,6 +15250,12 @@
         "speed",
         "pollution"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 8000,
       "energy_usage": 8000,
       "energy_production": 0,
@@ -15194,6 +15286,12 @@
       "crafting_categories": [
         "rocket-building"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 66500,
       "energy_usage": 4166.666666666667,
       "energy_production": 0,
@@ -15213,6 +15311,12 @@
         "burner-generator"
       ],
       "allowed_effects": {},
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 16666.666666666668,
       "energy_usage": 0,
       "energy_production": 16666.666666666668,
@@ -15239,6 +15343,12 @@
       "resource_categories": [
         "basic-solid"
       ],
+      "in_pipes": 0,
+      "in_pipe_filters": {},
+      "out_pipes": 0,
+      "out_pipe_filters": {},
+      "io_pipes": 0,
+      "io_pipe_filters": {},
       "max_energy_usage": 0,
       "energy_usage": 0,
       "energy_production": 0,
