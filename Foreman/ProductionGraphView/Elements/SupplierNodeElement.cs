@@ -23,8 +23,11 @@ namespace Foreman
 
 		public override void Update() { base.Update(); }
 
-		protected override void DetailsDraw(Graphics graphics, Point trans)
+		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
 		{
+			if (simple)
+				return;
+
 			string text = DisplayedNode.DisplayName;
 			Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + 28, Width - 10, 20);
 			Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 20, titleSlot.Width, (Height / 2) - 5);

@@ -86,20 +86,20 @@ namespace Foreman
 			return Bounds.Contains(GraphToLocal(graph_point));
 		}
 
-		public void Paint(Graphics graphics)
+		public void Paint(Graphics graphics, bool simple)
 		{
 			if (Visible)
 			{
 				//call own draw operation
-				Draw(graphics);
+				Draw(graphics, simple);
 
 				//call paint operations (this function) for each of the sub-elements owned by this element (who will call their own draw and further paint operations on their own sub elements)
 				foreach (GraphElement element in SubElements)
-					element.Paint(graphics);
+					element.Paint(graphics, simple);
 			}
 		}
 
-		protected abstract void Draw(Graphics graphics);
+		protected abstract void Draw(Graphics graphics, bool simple);
 
 		public virtual List<TooltipInfo> GetToolTips(Point graph_point) { return new List<TooltipInfo>(); }
 		public virtual void MouseMoved(Point graph_point) { }

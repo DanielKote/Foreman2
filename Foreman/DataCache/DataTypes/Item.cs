@@ -21,6 +21,7 @@ namespace Foreman
 		double FuelValue { get; }
 		double PollutionMultiplier { get; }
 		Item BurnResult { get; }
+		Item FuelOrigin { get; }
 		IReadOnlyCollection<EntityObjectBase> FuelsEntities { get; }
 
 		string GetTemperatureRangeFriendlyName(fRange tempRange);
@@ -43,13 +44,14 @@ namespace Foreman
 		public double FuelValue { get; internal set; }
 		public double PollutionMultiplier { get; internal set; }
 		public Item BurnResult { get; internal set; }
-		public IReadOnlyCollection<EntityObjectBase> FuelsEntities { get { return fuelsEntities; } }
+		public Item FuelOrigin { get; internal set; }
+		public IReadOnlyCollection<EntityObjectBase> FuelsEntities { get { return fuelsAssemblers; } }
 
 		internal SubgroupPrototype mySubgroup;
 
 		internal HashSet<RecipePrototype> productionRecipes { get; private set; }
 		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
-		internal HashSet<EntityObjectBasePrototype> fuelsEntities { get; private set; }
+		internal HashSet<EntityObjectBasePrototype> fuelsAssemblers { get; private set; }
 
 		public ItemPrototype(DataCache dCache, string name, string friendlyName, bool isfluid, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
@@ -58,7 +60,7 @@ namespace Foreman
 
 			productionRecipes = new HashSet<RecipePrototype>();
 			consumptionRecipes = new HashSet<RecipePrototype>();
-			fuelsEntities = new HashSet<EntityObjectBasePrototype>();
+			fuelsAssemblers = new HashSet<EntityObjectBasePrototype>();
 
 			IsFluid = isfluid;
 			DefaultTemperature = 0;

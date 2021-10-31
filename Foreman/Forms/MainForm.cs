@@ -19,9 +19,9 @@ namespace Foreman
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
-		private void MainForm_Load(object sender, EventArgs e)
+		private async void MainForm_Load(object sender, EventArgs e)
 		{
-			//WindowState = FormWindowState.Maximized;
+			WindowState = FormWindowState.Maximized;
 
 			List<Preset> validPresets = GetValidPresetsList();
 			if (validPresets != null && validPresets.Count > 0)
@@ -39,68 +39,34 @@ namespace Foreman
 				if (!Enum.IsDefined(typeof(ProductionGraphViewer.RateUnit), Properties.Settings.Default.DefaultRateUnit))
 					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraphViewer.RateUnit.Per1Sec;
 				GraphViewer.SelectedRateUnit = (ProductionGraphViewer.RateUnit)Properties.Settings.Default.DefaultRateUnit;
-				RateOptionsDropDown.Items.AddRange(ProductionGraphViewer.RateUnitNames);
-				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
 
 				if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
 					Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
-				GraphViewer.Graph.ModuleSelector.SelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
-				ModuleDropDown.Items.AddRange(ModuleSelector.StyleNames);
-				ModuleDropDown.SelectedIndex = (int)GraphViewer.Graph.ModuleSelector.SelectionStyle;
+				GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
 
 				if (!Enum.IsDefined(typeof(AssemblerSelector.Style), Properties.Settings.Default.DefaultAssemblerOption))
 					Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
-				GraphViewer.Graph.AssemblerSelector.SelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
-				AssemblerDropDown.Items.AddRange(AssemblerSelector.StyleNames);
-				AssemblerDropDown.SelectedIndex = (int)GraphViewer.Graph.AssemblerSelector.SelectionStyle;
+				GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
 
-				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
-				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
-				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
-				ShowUnavailableCheckBox.Checked = Properties.Settings.Default.ShowUnavailable;
-
-				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
-				ShowNodeRecipeCheckBox.Checked = Properties.Settings.Default.ShowRecipeToolTip;
-
-				RecipeEditPanelPositionLockCheckBox.Checked = Properties.Settings.Default.LockedRecipeEditorPosition;
 				GraphViewer.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
 
 				if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
 					Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
 				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
 
+				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
+				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
+				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
+
 				Properties.Settings.Default.Save();
 
-				UpdateControlValues();
+				GraphViewer.Invalidate();
 				GraphViewer.Focus();
 #if DEBUG
-				GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
-				UpdateControlValues();
+				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
+				GraphViewer.Invalidate();
 #endif
 			}
-		}
-
-		public void UpdateControlValues()
-		{
-			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
-			Properties.Settings.Default.DefaultRateUnit = RateOptionsDropDown.SelectedIndex;
-
-			ModuleDropDown.SelectedIndex = (int)GraphViewer.Graph.ModuleSelector.SelectionStyle;
-			Properties.Settings.Default.DefaultModuleOption = ModuleDropDown.SelectedIndex;
-
-			AssemblerDropDown.SelectedIndex = (int)GraphViewer.Graph.AssemblerSelector.SelectionStyle;
-			Properties.Settings.Default.DefaultAssemblerOption = AssemblerDropDown.SelectedIndex;
-
-			Properties.Settings.Default.Save();
-
-			if (Properties.Settings.Default.LevelOfDetail == (int)ProductionGraphViewer.LOD.Low)
-				LowLodRadioButton.Checked = true;
-			else if (Properties.Settings.Default.LevelOfDetail == (int)ProductionGraphViewer.LOD.Medium)
-				MediumLodRadioButton.Checked = true;
-			else
-				HighLodRadioButton.Checked = true;
-
-			GraphViewer.Invalidate();
 		}
 
 		//---------------------------------------------------------Save/Load/Clear/Help
@@ -138,7 +104,7 @@ namespace Foreman
 			}
 		}
 
-		private void LoadGraphButton_Click(object sender, EventArgs e)
+		private async void LoadGraphButton_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
 			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
@@ -152,7 +118,7 @@ namespace Foreman
 			try
 			{
 				if (Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
-					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false, true);
+					await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false, true);
 				else if (Path.GetExtension(dialog.FileName).ToLower() == ".json")
 					GraphViewer.LoadFromOldJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
 				//NOTE: MainCache will update
@@ -163,7 +129,6 @@ namespace Foreman
 				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
 			}
 
-			UpdateControlValues();
 			GraphViewer.Invalidate();
 		}
 
@@ -213,31 +178,52 @@ namespace Foreman
 			return presets;
 		}
 
-		private void SettingsButton_Click(object sender, EventArgs e)
+		private async void SettingsButton_Click(object sender, EventArgs e)
 		{
-			SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions(GraphViewer.DCache);
+			SettingsForm.SettingsFormOptions options = new SettingsForm.SettingsFormOptions(GraphViewer.DCache);
 
-			oldOptions.Presets = GetValidPresetsList();
-			oldOptions.SelectedPreset = oldOptions.Presets[0];
+			options.Presets = GetValidPresetsList();
+			options.SelectedPreset = options.Presets[0];
 
-			using (SettingsForm form = new SettingsForm(oldOptions))
+			options.LevelOfDetail = GraphViewer.LevelOfDetail;
+			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
+			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
+			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
+			options.DefaultAssemblerStyle = GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
+			options.DefaultModuleStyle = GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
+			options.DEV_ShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
+
+			using (SettingsForm form = new SettingsForm(options))
 			{
 				form.StartPosition = FormStartPosition.Manual;
 				form.Left = this.Left + 50;
 				form.Top = this.Top + 50;
 				form.ShowDialog();
 
-				if (oldOptions.SelectedPreset != form.CurrentOptions.SelectedPreset) //different preset -> need to reload datacache
+				if (options.SelectedPreset != form.Options.SelectedPreset) //different preset -> need to reload datacache
 				{
-					Properties.Settings.Default.CurrentPresetName = form.CurrentOptions.SelectedPreset.Name;
+					Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset.Name;
 					List<Preset> validPresets = GetValidPresetsList();
-					GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
-					Properties.Settings.Default.Save();
+					await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
 				}
+
+				GraphViewer.LevelOfDetail = options.LevelOfDetail;
+				Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
+				GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
+				Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
+				GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;
+				Properties.Settings.Default.ShowRecipeToolTip = options.ShowRecipeToolTip;
+				GraphViewer.LockedRecipeEditPanelPosition = options.LockedRecipeEditPanelPosition;
+				Properties.Settings.Default.LockedRecipeEditorPosition = options.LockedRecipeEditPanelPosition;
+				GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = options.DefaultAssemblerStyle;
+				Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
+				GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
+				Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
+				Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
+				Properties.Settings.Default.Save();
 
 				GraphViewer.Graph.UpdateNodeStates();
 				GraphViewer.UpdateNodeVisuals();
-				UpdateControlValues();
 			}
 		}
 
@@ -253,7 +239,7 @@ namespace Foreman
 		private void AddRecipeButton_Click(object sender, EventArgs e)
 		{
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-			GraphViewer.AddRecipe(new Point(15, 15), null, location, ProductionGraphViewer.NewNodeType.Disconnected);
+			GraphViewer.AddRecipe(new Point(15, 15), null, location, NewNodeType.Disconnected);
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)
@@ -272,18 +258,6 @@ namespace Foreman
 			GraphViewer.Graph.UpdateNodeValues();
 		}
 
-		private void DynamicLWCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			if (GraphViewer.DynamicLinkWidth != DynamicLWCheckBox.Checked)
-			{
-				GraphViewer.DynamicLinkWidth = DynamicLWCheckBox.Checked;
-				GraphViewer.Invalidate();
-			}
-
-			Properties.Settings.Default.DynamicLineWidth = (DynamicLWCheckBox.Checked);
-			Properties.Settings.Default.Save();
-		}
-
 		private void PauseUpdatesCheckbox_CheckedChanged(object sender, EventArgs e)
 		{
 			GraphViewer.Graph.PauseUpdates = PauseUpdatesCheckbox.Checked;
@@ -291,28 +265,6 @@ namespace Foreman
 				GraphViewer.Graph.UpdateNodeValues();
 			else
 				GraphViewer.Invalidate();
-		}
-
-		private void ShowNodeRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			GraphViewer.RecipeTooltipEnabled = ShowNodeRecipeCheckBox.Checked;
-			Properties.Settings.Default.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
-			Properties.Settings.Default.Save();
-		}
-
-		private void LODRadioButton_CheckedChanged(object sender, EventArgs e)
-		{
-			GraphViewer.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
-			Properties.Settings.Default.LevelOfDetail = (int)GraphViewer.LevelOfDetail;
-			Properties.Settings.Default.Save();
-			GraphViewer.UpdateNodeVisuals();
-		}
-
-		private void RecipeEditPanelPositionLockCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			GraphViewer.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
-			Properties.Settings.Default.LockedRecipeEditorPosition = RecipeEditPanelPositionLockCheckBox.Checked;
-			Properties.Settings.Default.Save();
 		}
 
 		//---------------------------------------------------------Gridlines
@@ -373,29 +325,6 @@ namespace Foreman
 				GraphViewer.Grid.ShowGrid = !GraphViewer.Grid.ShowGrid;
 				GridlinesCheckbox.Checked = GraphViewer.Grid.ShowGrid;
 			}
-		}
-
-		//---------------------------------------------------------Assemblers
-
-		private void DEV_ShowUnavailableCheckBox_CheckChanged(object sender, EventArgs e)
-		{
-			Properties.Settings.Default.ShowUnavailable = ShowUnavailableCheckBox.Checked;
-			Properties.Settings.Default.Save();
-
-		}
-
-		private void ModuleDropDown_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			Properties.Settings.Default.DefaultModuleOption = ModuleDropDown.SelectedIndex;
-			Properties.Settings.Default.Save();
-			GraphViewer.Graph.ModuleSelector.SelectionStyle = (ModuleSelector.Style)ModuleDropDown.SelectedIndex;
-		}
-
-		private void AssemblerDropDown_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			Properties.Settings.Default.DefaultAssemblerOption = AssemblerDropDown.SelectedIndex;
-			Properties.Settings.Default.Save();
-			GraphViewer.Graph.AssemblerSelector.SelectionStyle = (AssemblerSelector.Style)AssemblerDropDown.SelectedIndex;
 		}
 
 		//---------------------------------------------------------double buffering commands

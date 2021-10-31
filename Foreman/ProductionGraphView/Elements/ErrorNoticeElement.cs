@@ -25,8 +25,11 @@ namespace Foreman
 			Visible = visible;
 		}
 
-		protected override void Draw(Graphics graphics)
+		protected override void Draw(Graphics graphics, bool simple)
 		{
+			if (simple)
+				return;
+
 			Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
 			graphics.DrawImage(errorIcon, trans.X, trans.Y, ErrorIconSize, ErrorIconSize);
 		}
@@ -37,7 +40,7 @@ namespace Foreman
 				return null;
 
 			List<string> text = null;
-			switch(((BaseNodeElement)myParent).DisplayedNode.State)
+			switch (((BaseNodeElement)myParent).DisplayedNode.State)
 			{
 				case NodeState.Error:
 					text = ((BaseNodeElement)myParent).DisplayedNode.GetErrors();
@@ -63,7 +66,7 @@ namespace Foreman
 				tti.Text += text[i] + "\n";
 				solutionsAvailable |= text[i].StartsWith(">"); //we use > as the start of something solvable, and ?> as the start of 'no solution'
 			}
-			if(solutionsAvailable)
+			if (solutionsAvailable)
 				tti.Text += "\nLeft click to autoresolve.\nRight click for options.";
 			tooltips.Add(tti);
 

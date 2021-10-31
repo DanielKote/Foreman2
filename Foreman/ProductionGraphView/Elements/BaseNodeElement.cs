@@ -19,6 +19,7 @@ namespace Foreman
 
 		protected abstract Brush CleanBgBrush { get; }
 		private static readonly Brush errorBgBrush = Brushes.Coral;
+		private static readonly Brush ManualRateBGFilterBrush = new SolidBrush(Color.FromArgb(50, 0, 0, 0));
 
 		private static readonly Brush equalFlowBorderBrush = Brushes.DarkGreen;
 		private static readonly Brush oversuppliedFlowBorderBrush = Brushes.DarkGoldenrod;
@@ -156,7 +157,7 @@ namespace Foreman
 			return false;
 		}
 
-		protected override void Draw(Graphics graphics)
+		protected override void Draw(Graphics graphics, bool simple)
 		{
 			Point trans = LocalToGraph(new Point(0, 0)); //all draw operations happen in graph 0,0 origin coordinates. So we need to transform all our draw operations to the local 0,0 (center of object)
 
@@ -166,19 +167,22 @@ namespace Foreman
 
 			GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 10, graphics, borderBrush); //flow status border
 			GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, bgBrush); //basic background (with given background brush)
+			if (DisplayedNode.RateType == RateType.Manual)
+				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, ManualRateBGFilterBrush); //darken background if its a manual rate set
+
 			if (DisplayedNode.State == NodeState.Warning)
 				GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, errorBgBrush); //warning flag
 
 
 			//draw in all the inside details for this node
-			DetailsDraw(graphics, trans);
+			DetailsDraw(graphics, trans, simple);
 
 			//highlight
 			if (Highlighted)
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, selectionOverlayBrush);
 		}
 
-		protected abstract void DetailsDraw(Graphics graphics, Point trans); //draw the inside of the node.
+		protected abstract void DetailsDraw(Graphics graphics, Point trans, bool simple); //draw the inside of the node.
 
 		public override List<TooltipInfo> GetToolTips(Point graph_point)
 		{
@@ -209,7 +213,7 @@ namespace Foreman
 		{
 			DragStarted = false;
 			GraphElement subelement = SubElements.OfType<ItemTabElement>().FirstOrDefault(it => it.ContainsPoint(graph_point));
-			if(!wasDragged)
+			if (!wasDragged)
 			{
 				if (subelement != null)
 					subelement.MouseUp(graph_point, button, false);
@@ -217,7 +221,7 @@ namespace Foreman
 					errorNotice.MouseUp(graph_point, button, false);
 				else
 					MouseUpAction(graph_point, button);
-			}	
+			}
 		}
 
 		protected virtual void MouseUpAction(Point graph_point, MouseButtons button)
@@ -242,7 +246,7 @@ namespace Foreman
 						{
 							graphViewer.TryDeleteSelectedNodes();
 						}))
-					{  });
+					{ });
 				}
 				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
 			}
@@ -259,13 +263,15 @@ namespace Foreman
 				if (draggedTab != null)
 					graphViewer.StartLinkDrag(this, draggedTab.LinkType, draggedTab.Item);
 				else
+				{
 					DragStarted = true;
+				}
 			}
 			else //drag started -> proceed with dragging the node around
 			{
-				Size offset = (Size)graphViewer.Grid.AlignToGrid(Point.Subtract(graph_point, (Size)MouseDownLocation));
-				Point newLocation = Point.Add(MouseDownNodeLocation, offset);
-				if(graphViewer.Grid.LockDragToAxis)
+				Size offset = (Size)Point.Subtract(graph_point, (Size)MouseDownLocation);
+				Point newLocation = graphViewer.Grid.AlignToGrid(Point.Add(MouseDownNodeLocation, offset));
+				if (graphViewer.Grid.LockDragToAxis)
 				{
 					Point lockedDragOffset = Point.Subtract(graph_point, (Size)graphViewer.Grid.DragOrigin);
 

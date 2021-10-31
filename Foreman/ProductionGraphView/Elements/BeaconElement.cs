@@ -41,53 +41,52 @@ namespace Foreman
 			Visible = visible;
 		}
 
-		protected override void Draw(Graphics graphics)
+		protected override void Draw(Graphics graphics, bool simple)
 		{
+			if (recipeNode.SelectedBeacon == null || simple)
+				return;
+
 			Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
 			//graphics.DrawRectangle(devPen, trans.X, trans.Y, Width, Height);
 
-			if (recipeNode.SelectedBeacon != null)
+			//beacon
+			graphics.DrawImage(recipeNode.SelectedBeacon.Icon, trans.X + ModuleSpacing * 3 + 2, trans.Y, BeaconIconSize, BeaconIconSize);
+
+			//modules
+			if (recipeNode.BeaconModules.Count <= 6)
 			{
-				//beacon
-				graphics.DrawImage(recipeNode.SelectedBeacon.Icon, trans.X + ModuleSpacing * 3 + 2, trans.Y, BeaconIconSize, BeaconIconSize);
 
-				//modules
-				if (recipeNode.BeaconModules.Count <= 6)
-				{
-
-					for (int i = 0; i < moduleLocations.Length && i < recipeNode.BeaconModules.Count; i++)
+				for (int i = 0; i < moduleLocations.Length && i < recipeNode.BeaconModules.Count; i++)
 					graphics.DrawImage(recipeNode.BeaconModules[i].Icon, trans.X + moduleLocations[i].X + moduleOffset.X, trans.Y + moduleLocations[i].Y + moduleOffset.Y, ModuleIconSize, ModuleIconSize);
-				}
-				else //resot to drawing circles for each module instead -> 8x4 set, so 32 max modules
+			}
+			else //resot to drawing circles for each module instead -> 8x4 set, so 32 max modules
+			{
+				for (int x = 0; x < 8; x++)
 				{
-					for (int x = 0; x < 8; x++)
+					for (int y = 0; y < 4; y++)
 					{
-						for (int y = 0; y < 4; y++)
+						if (recipeNode.BeaconModules.Count > (x * 4) + y)
 						{
-							if (recipeNode.BeaconModules.Count > (x * 4) + y)
-							{
-								Pen marker = recipeNode.BeaconModules[(x * 4) + y].ProductivityBonus > 0 ? prodModulePen :
-									recipeNode.BeaconModules[(x * 4) + y].ConsumptionBonus < 0 ? effModulePen :
-									recipeNode.BeaconModules[(x * 4) + y].SpeedBonus > 0 ? speedModulePen : unknownModulePen;
-								graphics.DrawEllipse(marker, trans.X + moduleOffset.X + 20 - (x * 5), trans.Y + moduleOffset.Y + (y * 5), 2, 2);
-							}
+							Pen marker = recipeNode.BeaconModules[(x * 4) + y].ProductivityBonus > 0 ? prodModulePen :
+								recipeNode.BeaconModules[(x * 4) + y].ConsumptionBonus < 0 ? effModulePen :
+								recipeNode.BeaconModules[(x * 4) + y].SpeedBonus > 0 ? speedModulePen : unknownModulePen;
+							graphics.DrawEllipse(marker, trans.X + moduleOffset.X + 20 - (x * 5), trans.Y + moduleOffset.Y + (y * 5), 2, 2);
 						}
 					}
 				}
+			}
 
+			//quantity
+			if (recipeNode.SelectedBeacon != null) // && recipeNode.BeaconCount > 0)
+			{
+				Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 6, 60, 18);
+				//graphics.DrawRectangle(devPen, textbox);
 
-				//quantity
-				if (recipeNode.SelectedBeacon != null) // && recipeNode.BeaconCount > 0)
-				{
-					Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 6, 60, 18);
-					//graphics.DrawRectangle(devPen, textbox);
+				double beaconCount = recipeNode.GetTotalBeacons(graphViewer.GetRateMultipler());
+				string sbeaconCount = (beaconCount >= 100000) ? beaconCount.ToString("0.##e0") : beaconCount.ToString("0");
 
-					double beaconCount = recipeNode.GetTotalBeacons(graphViewer.GetRateMultipler());
-					string sbeaconCount = (beaconCount >= 100000)? beaconCount.ToString("0.##e0") : beaconCount.ToString("0");
-
-					string text = graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Medium? string.Format("x {0}", (recipeNode.BeaconCount).ToString("0.##")) : string.Format("x {0} (Σ{1})", (recipeNode.BeaconCount).ToString("0.##"), sbeaconCount);
-					GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
-				}
+				string text = graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Medium ? string.Format("x {0}", (recipeNode.BeaconCount).ToString("0.##")) : string.Format("x {0} (Σ{1})", (recipeNode.BeaconCount).ToString("0.##"), sbeaconCount);
+				GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
 			}
 		}
 

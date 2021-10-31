@@ -7,54 +7,75 @@ namespace Foreman
 {
 	public class AssemblerSelector
 	{
-		public enum Style { Worst, WorstNonBurner, Best, BestNonBurner, MostModules }
-		public static readonly string[] StyleNames = new string[] { "Worst", "Worst non-Burer", "Best", "Best non-Burner", "Most Modules" };
+		public enum Style { Worst, WorstNonBurner, WorstBurner, Best, BestNonBurner, BestBurner, MostModules }
+		public static readonly string[] StyleNames = new string[] { "Worst", "Worst non-Burer", "Worst Burner", "Best", "Best non-Burner", "Best Burner", "Most Modules" };
 
-		public Style SelectionStyle { get; set; }
+		public Style DefaultSelectionStyle { get; set; }
 
-		public AssemblerSelector() { SelectionStyle = Style.WorstNonBurner; }
+		public AssemblerSelector() { DefaultSelectionStyle = Style.WorstNonBurner; }
 
-		public Assembler GetAssembler(Recipe recipe)
-		{
-			if (SelectionStyle == Style.MostModules)
+
+		public Assembler GetAssembler(Recipe recipe) { return GetAssembler(recipe, DefaultSelectionStyle); }
+		public Assembler GetAssembler(Recipe recipe, Style style) { return GetOrderedAssemblerList(recipe, style).First(); }
+		public List<Assembler> GetOrderedAssemblerList(Recipe recipe) { return GetOrderedAssemblerList(recipe, DefaultSelectionStyle); }
+
+		public List<Assembler> GetOrderedAssemblerList(Recipe recipe, Style style)
+		{ 
+			if (style == Style.MostModules)
 			{
 				return recipe.Assemblers
-					.OrderBy(a => a.Enabled)
-					.ThenBy(a => a.Available)
-					.ThenBy(a => ((a.ModuleSlots * 1000000) + a.Speed))
-					.LastOrDefault();
+					.OrderByDescending(a => a.Enabled)
+					.ThenByDescending(a => a.Available)
+					.ThenByDescending(a => ((a.ModuleSlots * 1000000) + a.Speed))
+					.ToList();
 			}
 			else
 			{
 				int orderDirection;
-				bool noBurners;
+				bool includeNonBurners;
+				bool includeBurners;
 
-				switch (SelectionStyle)
+				switch (style)
 				{
 					case Style.Worst:
 						orderDirection = -1;
-						noBurners = false;
+						includeNonBurners = true;
+						includeBurners = true;
+						break;
+					case Style.WorstBurner:
+						orderDirection = -1;
+						includeNonBurners = false;
+						includeBurners = true;
 						break;
 					case Style.WorstNonBurner:
 						orderDirection = -1;
-						noBurners = true;
+						includeNonBurners = true;
+						includeBurners = false;
 						break;
 					case Style.Best:
 						orderDirection = 1;
-						noBurners = false;
+						includeNonBurners = true;
+						includeBurners = true;
+						break;
+					case Style.BestBurner:
+						orderDirection = 1;
+						includeNonBurners = false;
+						includeBurners = true;
 						break;
 					case Style.BestNonBurner:
 					default:
 						orderDirection = 1;
-						noBurners = true;
+						includeNonBurners = true;
+						includeBurners = false;
 						break;
 				}
 
-				return recipe.Assemblers.Where(a => !(noBurners && a.IsBurner))
-					.OrderBy(a => a.Enabled)
-					.ThenBy(a => a.Available)
-					.ThenBy(a => orderDirection * ((a.Speed * 1000000) + a.ModuleSlots))
-					.LastOrDefault();
+				return recipe.Assemblers
+					.OrderByDescending(a => (a.IsBurner && includeBurners) || (!a.IsBurner && includeNonBurners))
+					.ThenByDescending(a => a.Enabled)
+					.ThenByDescending(a => a.Available)
+					.ThenByDescending(a => orderDirection * ((a.Speed * 1000000) + a.ModuleSlots))
+					.ToList();
 			}
 		}
 	}

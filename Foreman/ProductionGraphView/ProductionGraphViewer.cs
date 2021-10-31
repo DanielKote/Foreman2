@@ -10,9 +10,11 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Text;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Foreman
 {
+	public enum NewNodeType { Disconnected, Supplier, Consumer }
 
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
@@ -22,7 +24,6 @@ namespace Foreman
 		private static readonly float[] RateMultiplier = new float[] { 1f, 60f, 300f, 600f, 1800f, 3600f }; //, 21600f, 43200f, 86400f };
 
 		private enum DragOperation { None, Item, Selection }
-		public enum NewNodeType { Disconnected, Supplier, Consumer }
 		public enum LOD { Low, Medium, High } //low: only names. medium: assemblers, beacons, etc. high: include assembler percentages
 
 		public RateUnit SelectedRateUnit { get; set; }
@@ -30,7 +31,8 @@ namespace Foreman
 		public string GetRateName() { return RateUnitNames[(int)SelectedRateUnit]; }
 
 		public LOD LevelOfDetail { get; set; }
-		public bool RecipeTooltipEnabled { get; set; }
+		public int MaxDetailedObjects { get; set; } //if the number of elements to draw is over this amount then the drawing functions will switch to simple view draws (mostly for FPS during zoomed out views)
+		public bool ShowRecipeToolTip { get; set; }
 		public bool TooltipsEnabled { get; set; }
 		private bool SubwindowOpen; //used together with tooltip enabled -> if we open up an item/recipe/assembler window, this will halt tooltip show.
 		public bool DynamicLinkWidth = false;
@@ -88,6 +90,7 @@ namespace Foreman
 
 			ViewOffset = new Point(Width / -2, Height / -2);
 			ViewScale = 1f;
+			MaxDetailedObjects = 200;
 
 			TooltipsEnabled = true;
 			SubwindowOpen = false;
@@ -175,10 +178,10 @@ namespace Foreman
 			itemChooser.Show();
 		}
 
-		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null)
+		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null, bool offsetLocationToItemTabLevel = false)
 		{
 			SubwindowOpen = true;
-			if (nNodeType != NewNodeType.Disconnected && (originElement == null || baseItem == null))
+			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
 
 			if (Grid.ShowGrid)
@@ -193,9 +196,9 @@ namespace Foreman
 					tempRange = LinkChecker.GetTemperatureRange(baseItem, originElement.DisplayedNode, LinkType.Input);
 			}
 
-			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType != NewNodeType.Consumer, nNodeType != NewNodeType.Supplier);
+			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
 			BaseNode newNode = null;
-			int lastRecipeWidth = 0;
+			int lastNodeWidth = 0;
 			recipeChooser.RecipeRequested += (o, recipeRequestArgs) =>
 			 {
 				 switch (recipeRequestArgs.NodeType)
@@ -210,17 +213,53 @@ namespace Foreman
 						 newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
 						 break;
 					 case NodeType.Recipe:
-						 newNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
+						 RecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
+						 newNode = rNode;
+						 if ((nNodeType == NewNodeType.Consumer && !recipeRequestArgs.Recipe.IngredientSet.ContainsKey(baseItem)) || (nNodeType == NewNodeType.Supplier && !recipeRequestArgs.Recipe.ProductSet.ContainsKey(baseItem))) 
+						 {
+							 AssemblerSelector.Style style;
+							 switch (Graph.AssemblerSelector.DefaultSelectionStyle)
+							 {
+								 case AssemblerSelector.Style.Best:
+								 case AssemblerSelector.Style.BestBurner:
+								 case AssemblerSelector.Style.BestNonBurner:
+									 style = AssemblerSelector.Style.BestBurner;
+									 break;
+								 case AssemblerSelector.Style.Worst:
+								 case AssemblerSelector.Style.WorstBurner:
+								 case AssemblerSelector.Style.WorstNonBurner:
+								 default:
+									 style = AssemblerSelector.Style.WorstBurner;
+									 break;
+							 }
+							 List<Assembler> assemblerOptions = Graph.AssemblerSelector.GetOrderedAssemblerList(recipeRequestArgs.Recipe, style);
+
+							 if(nNodeType == NewNodeType.Consumer)
+							 {
+								 rNode.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem)));
+								 rNode.SetFuel(baseItem);
+							 }
+							 else // if(nNodeType == NewNodeType.Supplier)
+							 {
+								 rNode.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem.FuelOrigin)));
+								 rNode.SetFuel(baseItem.FuelOrigin);
+							 }
+						 }
 						 break;
 				 }
 
-				//this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
-				//should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
-				int offsetDistance = lastRecipeWidth / 2;
-				 lastRecipeWidth = 50 + Math.Max(newNode.Inputs.Count(), newNode.Outputs.Count()) * (ItemTabElement.TabWidth + ItemTabElement.TabBorder);
+				 //this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
+				 //should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
+				 BaseNodeElement newNodeElement = NodeElementDictionary[newNode];
+				 int offsetDistance = lastNodeWidth / 2;
+				 lastNodeWidth = newNodeElement.Width; //effectively: this recipe width
 				 if (offsetDistance > 0)
-					 offsetDistance += lastRecipeWidth / 2;
-				 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y));
+					 offsetDistance += (lastNodeWidth / 2) + 12;
+				 if (offsetLocationToItemTabLevel)
+					 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y + (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0)));
+				 else
+					 newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y));
+
 				 newNode.Location = newLocation;
 				 Invalidate();
 
@@ -260,7 +299,7 @@ namespace Foreman
 
 		public void EditNode(BaseNodeElement bNodeElement)
 		{
-			if(bNodeElement is RecipeNodeElement rNodeElement)
+			if (bNodeElement is RecipeNodeElement rNodeElement)
 			{
 				EditRecipeNode(rNodeElement);
 				return;
@@ -282,7 +321,7 @@ namespace Foreman
 
 			//open up the edit panel
 			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y), this, true, false);
-			fttc.Closing += (s,e) => { SubwindowOpen = false; bNodeElement.Update(); Graph.UpdateNodeValues(); };
+			fttc.Closing += (s, e) => { SubwindowOpen = false; bNodeElement.Update(); Graph.UpdateNodeValues(); };
 		}
 
 		public void EditRecipeNode(RecipeNodeElement rNodeElement)
@@ -421,7 +460,7 @@ namespace Foreman
 				{
 					if (element.Item.IsFluid)
 						fluidMax = Math.Max(fluidMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
-					else if(element.Item.Name != "§§heat") //ignore heat as an item	
+					else if (element.Item.Name != "§§heat") //ignore heat as an item	
 						itemMax = Math.Max(itemMax, element.ConsumerElement.DisplayedNode.GetConsumeRate(element.Item));
 				}
 				itemMax += itemMax == 0 ? 1 : 0;
@@ -442,8 +481,9 @@ namespace Foreman
 			}
 
 			//all elements (nodes & lines)
+			int visibleElements = GetPaintingOrder().Count(e => e.Visible && e is BaseNodeElement);
 			foreach (GraphElement element in GetPaintingOrder())
-				element.Paint(graphics);
+				element.Paint(graphics, visibleElements > MaxDetailedObjects || ViewScale < 0.2); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
 
 			//selection zone
 			if (currentDragOperation == DragOperation.Selection)
@@ -454,7 +494,7 @@ namespace Foreman
 
 			//floating tooltips
 			ToolTipRenderer.Paint(graphics, TooltipsEnabled && !SubwindowOpen && currentDragOperation == DragOperation.None && !viewBeingDragged);
-			
+
 			//paused border
 			if (Graph != null && Graph.PauseUpdates) //graph null check is purely for design view
 				graphics.DrawRectangle(pausedBorders, 0, 0, Width - 3, Height - 3);
@@ -480,6 +520,9 @@ namespace Foreman
 		{
 			BaseNodeElement supplier = nodeElementDictionary[e.nodeLink.Supplier];
 			BaseNodeElement consumer = nodeElementDictionary[e.nodeLink.Consumer];
+			supplier.Update();
+			consumer.Update();
+
 			LinkElement element = new LinkElement(this, e.nodeLink, supplier, consumer);
 			linkElementDictionary.Add(e.nodeLink, element);
 			linkElements.Add(element);
@@ -666,11 +709,16 @@ namespace Foreman
 						if (startPoint != endPoint)
 							foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
 								node.Location = new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y);
+
 					}
 					else //dragging single item
 					{
 						MouseDownElement.Dragged(graph_location);
 					}
+
+					//accept middle mouse button for view dragging purposes (while dragging item or selection)
+					if ((Control.MouseButtons & MouseButtons.Middle) == MouseButtons.Middle)
+						viewBeingDragged = true;
 					break;
 
 				case DragOperation.Selection:
@@ -680,6 +728,10 @@ namespace Foreman
 						currentSelectionNodes.Add(element);
 
 					UpdateSelection();
+
+					//accept middle mouse button for view dragging purposes (while dragging item or selection)
+					if ((Control.MouseButtons & MouseButtons.Middle) == MouseButtons.Middle)
+						viewBeingDragged = true;
 					break;
 			}
 
@@ -789,7 +841,7 @@ namespace Foreman
 			if (Grid.LockDragToAxis != lockDragAxis)
 			{
 				Grid.LockDragToAxis = lockDragAxis;
-				Grid.DragOrigin = MouseDownElement?.Location ?? new Point();
+				Grid.DragOrigin = Grid.AlignToGrid(MouseDownElement?.Location ?? new Point());
 				if (currentDragOperation == DragOperation.Item)
 					MouseDownElement?.Dragged(ScreenToGraph(PointToClient(Control.MousePosition)));
 			}
@@ -815,8 +867,8 @@ namespace Foreman
 			if (Grid.LockDragToAxis != lockDragAxis)
 			{
 				Grid.LockDragToAxis = lockDragAxis;
-				Grid.DragOrigin = MouseDownElement?.Location ?? new Point();
-				if(currentDragOperation == DragOperation.Item)
+				Grid.DragOrigin = Grid.AlignToGrid(MouseDownElement?.Location ?? new Point());
+				if (currentDragOperation == DragOperation.Item)
 					MouseDownElement?.Dragged(ScreenToGraph(PointToClient(Control.MousePosition)));
 			}
 			Invalidate();
@@ -940,8 +992,8 @@ namespace Foreman
 			info.AddValue("ViewScale", ViewScale);
 
 			//graph defaults (saved here instead of within the graph since they are used here, plus they arent used during copy/paste)
-			info.AddValue("AssemblerSelectorStyle", Graph.AssemblerSelector.SelectionStyle);
-			info.AddValue("ModuleSelectorStyle", Graph.ModuleSelector.SelectionStyle);
+			info.AddValue("AssemblerSelectorStyle", Graph.AssemblerSelector.DefaultSelectionStyle);
+			info.AddValue("ModuleSelectorStyle", Graph.ModuleSelector.DefaultSelectionStyle);
 			info.AddValue("FuelPriorityList", Graph.FuelSelector.FuelPriority.Select(i => i.Name));
 
 			//enabled lists
@@ -964,7 +1016,7 @@ namespace Foreman
 			// i mean - i already changed it 3 times to accomodate various things, and I havent even updated the assembler/modules for a given node yet!
 		}
 
-		public void LoadFromJson(JObject json, bool useFirstPreset, bool setEnablesFromJson)
+		public async Task LoadFromJson(JObject json, bool useFirstPreset, bool setEnablesFromJson)
 		{
 			//grab mod list
 			Dictionary<string, string> modSet = new Dictionary<string, string>();
@@ -995,7 +1047,7 @@ namespace Foreman
 				Preset savedWPreset = allPresets.FirstOrDefault(p => p.Name == (string)json["SavedPresetName"]);
 				if (savedWPreset != null)
 				{
-					var errors = PresetProcessor.TestPreset(savedWPreset, modSet, itemNames, assemblerNames, recipeShorts);
+					var errors = await PresetProcessor.TestPreset(savedWPreset, modSet, itemNames, assemblerNames, recipeShorts);
 					if (errors != null && errors.ErrorCount == 0) //no errors found here. We will then use this exact preset and not search for a different one
 						chosenPreset = savedWPreset;
 					else
@@ -1011,7 +1063,7 @@ namespace Foreman
 				{
 					foreach (Preset preset in allPresets)
 					{
-						PresetErrorPackage errors = PresetProcessor.TestPreset(preset, modSet, itemNames, assemblerNames, recipeShorts);
+						PresetErrorPackage errors = await PresetProcessor.TestPreset(preset, modSet, itemNames, assemblerNames, recipeShorts);
 						if (errors != null)
 							presetErrors.Add(errors);
 					}
@@ -1054,8 +1106,8 @@ namespace Foreman
 
 			//set up graph options
 			SelectedRateUnit = (RateUnit)(int)json["Unit"];
-			Graph.AssemblerSelector.SelectionStyle = (AssemblerSelector.Style)(int)json["AssemblerSelectorStyle"];
-			Graph.ModuleSelector.SelectionStyle = (ModuleSelector.Style)(int)json["ModuleSelectorStyle"];
+			Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)(int)json["AssemblerSelectorStyle"];
+			Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)(int)json["ModuleSelectorStyle"];
 			foreach (string fuelType in json["FuelPriorityList"].Select(t => (string)t))
 				if (DCache.Items.ContainsKey(fuelType))
 					Graph.FuelSelector.UseFuel(DCache.Items[fuelType]);
@@ -1064,7 +1116,7 @@ namespace Foreman
 			string[] viewOffsetString = ((string)json["ViewOffset"]).Split(',');
 			ViewOffset = new Point(int.Parse(viewOffsetString[0]), int.Parse(viewOffsetString[1]));
 			ViewScale = (float)json["ViewScale"];
-			
+
 			//update enabled statuses
 			if (setEnablesFromJson)
 			{

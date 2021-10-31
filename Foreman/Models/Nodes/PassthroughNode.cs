@@ -44,7 +44,7 @@ namespace Foreman
 		public override Dictionary<string, Action> GetErrorResolutions()
 		{
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-			if(PassthroughItem.IsMissing)
+			if (PassthroughItem.IsMissing)
 				resolutions.Add("Delete node", new Action(() => this.Delete()));
 			else
 				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())

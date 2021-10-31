@@ -39,8 +39,6 @@ namespace Foreman
 
 		protected bool ShowUnavailable { get; private set; }
 
-		private object _updateLock = new object();
-
 		public IRChooserPanel(ProductionGraphViewer parent, Point originPoint)
 		{
 			PGViewer = parent;
@@ -230,7 +228,7 @@ namespace Foreman
 							DataObjectBase irObject = (r + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[r + startRow][c].Key : null;
 							NFButton b = IRButtons[c, r];
 							if (irObject != null) //full
-								{
+							{
 
 								b.ForeColor = Color.Black;
 								b.BackColor = (r + startRow < filteredIRRowsList.Count) ? filteredIRRowsList[r + startRow][c].Value : Color.DimGray;
@@ -384,7 +382,7 @@ namespace Foreman
 		protected override void IRChooserPanel_Disposed(object sender, EventArgs e)
 		{
 			base.IRChooserPanel_Disposed(sender, e);
-			if(selectedItem != null)
+			if (selectedItem != null)
 				ItemRequested?.Invoke(this, new ItemRequestArgs(selectedItem));
 		}
 
@@ -489,21 +487,25 @@ namespace Foreman
 		private ToolTip rToolTip = new RecipeToolTip();
 		protected override ToolTip IRButtonToolTip { get { return rToolTip; } }
 
-		public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, Item item, fRange tempRange, bool includeSuppliers, bool includeConsumers) : base(parent, originPoint)
+		public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, Item item, fRange tempRange, NewNodeType nodeType) : base(parent, originPoint)
 		{
-			AsIngredientCheckBox.Checked = includeConsumers;
-			AsProductCheckBox.Checked = includeSuppliers;
+			bool asIngredient = (nodeType == NewNodeType.Consumer || nodeType == NewNodeType.Disconnected);
+			bool asProduct = (nodeType == NewNodeType.Supplier || nodeType == NewNodeType.Disconnected);
+
+			AsIngredientCheckBox.Checked = asIngredient;
+			AsProductCheckBox.Checked = asProduct;
 			ShowHiddenCheckBox.Text = "Show Disabled";
 
-			AddConsumerButton.Click += new EventHandler(AddConsumerButton_Click);
-			AddPassthroughButton.Click += new EventHandler(AddPassthroughButton_Click);
-			AddSupplyButton.Click += new EventHandler(AddSupplyButton_Click);
-			AsIngredientCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
-			AsProductCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
+			AddConsumerButton.Click += AddConsumerButton_Click;
+			AddPassthroughButton.Click += AddPassthroughButton_Click;
+			AddSupplyButton.Click += AddSupplyButton_Click;
+			AsIngredientCheckBox.CheckedChanged += FilterCheckBox_CheckedChanged;
+			AsProductCheckBox.CheckedChanged += FilterCheckBox_CheckedChanged;
+			AsFuelCheckBox.CheckedChanged += FilterCheckBox_CheckedChanged;
 			RecipeNameOnlyFilterCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 
 			KeyItem = item;
-			KeyItemTempRange = (includeSuppliers && includeConsumers) ? new fRange(0, 0, true) : tempRange; //cant use temp range if adding both s&c (its a disconnected node anyway)
+			KeyItemTempRange = (nodeType == NewNodeType.Disconnected) ? new fRange(0, 0, true) : tempRange; //cant use temp range if its a disconnected node
 
 			RecipeNameOnlyFilterCheckBox.Visible = true;
 			if (KeyItem == null)
@@ -515,10 +517,15 @@ namespace Foreman
 				ItemIconPanel.Visible = true;
 				ItemIconPanel.BackgroundImage = KeyItem.Icon;
 				OtherNodeOptionsTable.Visible = true;
-				AddConsumerButton.Visible = includeConsumers;
-				AddSupplyButton.Visible = includeSuppliers;
+				AddConsumerButton.Visible = asIngredient;
+				AddSupplyButton.Visible = asProduct;
 
-				if (!(includeConsumers && KeyItem.ConsumptionRecipes.Count > 0) && !(includeSuppliers && KeyItem.ProductionRecipes.Count > 0))
+				bool hasConsumptionRecipes = KeyItem.ConsumptionRecipes.Count > 0;
+				bool hasFuelConsumptionRecipes = KeyItem.FuelsEntities.FirstOrDefault(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.FirstOrDefault(r => r.Enabled) != null) != null;
+				bool hasProductionRecipes = KeyItem.ProductionRecipes.Count > 0;
+				bool hasFuelProductionRecipes = (KeyItem.FuelOrigin != null && KeyItem.FuelOrigin.FuelsEntities.FirstOrDefault(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.FirstOrDefault(r => r.Enabled) != null) != null);
+
+				if (!(asIngredient && (hasConsumptionRecipes || hasFuelConsumptionRecipes)) && !(asProduct && (hasProductionRecipes || hasFuelProductionRecipes))) //no valid recipes
 				{
 					GroupTable.Visible = false;
 					IRTable.Visible = false;
@@ -529,10 +536,15 @@ namespace Foreman
 					IgnoreAssemblerCheckBox.Visible = false;
 					ItemIconPanel.Location = new Point(4, 4);
 				}
-				else if (includeConsumers && includeSuppliers)
+				else if (asIngredient && asProduct)
 				{
+					AsFuelCheckBox.Visible = (asIngredient && hasFuelConsumptionRecipes) || (asProduct && hasFuelProductionRecipes);
 					AsIngredientCheckBox.Visible = true;
 					AsProductCheckBox.Visible = true;
+				}
+				else if (asIngredient)
+				{
+					AsFuelCheckBox.Visible = (asIngredient && KeyItem.FuelsEntities.Count > 0);
 				}
 			}
 		}
@@ -561,7 +573,8 @@ namespace Foreman
 			bool showHidden = ShowHiddenCheckBox.Checked;
 			bool includeSuppliers = AsProductCheckBox.Checked;
 			bool includeConsumers = AsIngredientCheckBox.Checked;
-			bool ignoreItem = KeyItem == null;
+			bool includeFuel = AsFuelCheckBox.Checked;
+			bool ignoreItem = (KeyItem == null);
 
 			Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>> filteredRecipes = new Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>>();
 			Dictionary<Group, int> filteredRecipeCount = new Dictionary<Group, int>();
@@ -572,9 +585,12 @@ namespace Foreman
 				foreach (Subgroup sgroup in group.Subgroups)
 				{
 					List<KeyValuePair<DataObjectBase, Color>> recipeList = new List<KeyValuePair<DataObjectBase, Color>>();
-					foreach (Recipe recipe in sgroup.Recipes.Where(r => ignoreItem || //filter for the items first (simpler and clears out most recipes if there is a key item provided)
+					//filter for the items first (simpler and clears out most recipes if there is a key item provided). NOTE: need to filter for use of item in ingredients, products, and any recipe that has an assembler that has this item as fuel or burn result
+					foreach (Recipe recipe in sgroup.Recipes.Where(r => ignoreItem ||
 						(includeConsumers && r.IngredientSet.ContainsKey(KeyItem)) ||
-						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem))))
+						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem)) ||
+						(includeConsumers && includeFuel && KeyItem.FuelsEntities.Count > 0 && r.Assemblers.FirstOrDefault(a => a.Fuels.Contains(KeyItem)) != null) ||
+						(includeSuppliers && includeFuel && KeyItem.FuelOrigin != null && r.Assemblers.FirstOrDefault(a => a.Fuels.Contains(KeyItem.FuelOrigin)) != null)))
 					{
 						//quick hidden / enabled / available assembler check (done prior to name check for speed)
 						if ((recipe.Enabled || showHidden) && (recipe.Assemblers.FirstOrDefault(a => a.Enabled) != null || ignoreAssemblerStatus) && (recipe.Available || ShowUnavailable))
@@ -635,6 +651,7 @@ namespace Foreman
 		{
 			if (e.Button == MouseButtons.Left) //select recipe
 			{
+				Recipe sRecipe = (Recipe)((Button)sender).Tag;
 				RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Recipe, (Recipe)((Button)sender).Tag));
 
 				if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)

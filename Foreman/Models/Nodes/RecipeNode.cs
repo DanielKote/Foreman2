@@ -13,8 +13,8 @@ namespace Foreman
 
 		Recipe BaseRecipe { get; }
 
-		Assembler SelectedAssembler { get;}
-		Beacon SelectedBeacon { get;}
+		Assembler SelectedAssembler { get; }
+		Beacon SelectedBeacon { get; }
 
 		double NeighbourCount { get; set; }
 		double BeaconCount { get; set; }
@@ -29,6 +29,7 @@ namespace Foreman
 
 		void SetAssembler(Assembler assembler);
 		void AutoSetAssembler();
+		void AutoSetAssembler(AssemblerSelector.Style style);
 
 		void SetFuel(Item fuel);
 		void AutoSetFuel();
@@ -37,6 +38,7 @@ namespace Foreman
 		void RemoveAssemblerModule(int index);
 		void SetAssemblerModules(IEnumerable<Module> modules);
 		void AutoSetAssemblerModules();
+		void AutoSetAssemblerModules(ModuleSelector.Style style);
 
 		void SetBeacon(Beacon beacon);
 		void AddBeaconModule(Module module);
@@ -57,6 +59,9 @@ namespace Foreman
 		double GetTotalBeaconPollutionProduction(double rateMultiplier);
 
 		double GetTotalBeacons(double rateMultiplier);
+
+		//for solver
+		double GetMaxIORatio();
 	}
 
 
@@ -83,8 +88,8 @@ namespace Foreman
 		public IReadOnlyList<Module> BeaconModules { get { return beaconModules; } }
 
 		public Item Fuel { get; private set; }
-		public Item FuelRemains { get { return (fuelRemainsOverride != null)? fuelRemainsOverride : (Fuel != null && Fuel.BurnResult != null)? Fuel.BurnResult : null; } }
-		internal void SetBurntOverride(Item item){ if(Fuel == null || Fuel.BurnResult != item) fuelRemainsOverride = item; }
+		public Item FuelRemains { get { return (fuelRemainsOverride != null) ? fuelRemainsOverride : (Fuel != null && Fuel.BurnResult != null) ? Fuel.BurnResult : null; } }
+		internal void SetBurntOverride(Item item) { if (Fuel == null || Fuel.BurnResult != item) fuelRemainsOverride = item; }
 		private Item fuelRemainsOverride; //returns as BurntItem if set (error import)
 
 		public override string DisplayName { get { return BaseRecipe.FriendlyName; } }
@@ -230,7 +235,7 @@ namespace Foreman
 
 		public double GetAssemblerPollutionProduction()
 		{
-			return SelectedAssembler.Pollution * GetPollutionMultiplier() * GetAssemblerEnergyConsumption() / 60; //pollution is counted in per second instead of per tick, so we have to account for the 60x here
+			return SelectedAssembler.Pollution * GetPollutionMultiplier() * GetAssemblerEnergyConsumption(); //pollution is counted in per energy
 		}
 
 		public double GetTotalAssemblerFuelConsumption()
@@ -253,7 +258,7 @@ namespace Foreman
 
 		public double GetTotalAssemblerElectricalProduction()
 		{
-			return GetAssemblerElectricalProduction() * ActualAssemblerCount; 
+			return GetAssemblerElectricalProduction() * ActualAssemblerCount;
 		}
 
 		public double GetTotalBeaconElectricalConsumption(double rateMultiplier)
@@ -277,10 +282,29 @@ namespace Foreman
 			return Math.Ceiling(((int)((ActualAssemblerCount / rateMultiplier) + 0.8) * BeaconsPerAssembler) + BeaconsConst);
 		}
 
+		public double GetMaxIORatio()
+		{
+			double maxValue = 0;
+			double minValue = double.MaxValue;
+			foreach (Item item in Inputs)
+			{
+				maxValue = Math.Max(maxValue, inputRateFor(item));
+				minValue = Math.Min(minValue, inputRateFor(item));
+			}
+			foreach (Item item in Outputs)
+			{
+				maxValue = Math.Max(maxValue, outputRateFor(item));
+				minValue = Math.Min(minValue, outputRateFor(item));
+			}
+			return maxValue / minValue;
+		}
+
 		//------------------------------------------------------------------------edit functions
 
 		public void SetAssembler(Assembler assembler)
 		{
+			if (assembler == null)
+				Trace.Fail("Cant set a null assembler!");
 			SelectedAssembler = assembler;
 
 			//fuel
@@ -310,6 +334,12 @@ namespace Foreman
 		public void AutoSetAssembler()
 		{
 			SetAssembler(MyGraph.AssemblerSelector.GetAssembler(BaseRecipe));
+			SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler));
+		}
+
+		public void AutoSetAssembler(AssemblerSelector.Style style)
+		{
+			SetAssembler(MyGraph.AssemblerSelector.GetAssembler(BaseRecipe, style));
 			SetFuel(MyGraph.FuelSelector.GetFuel(SelectedAssembler));
 		}
 
@@ -344,7 +374,7 @@ namespace Foreman
 		public void SetAssemblerModules(IEnumerable<Module> modules)
 		{
 			assemblerModules.Clear();
-			if(modules != null)
+			if (modules != null)
 				foreach (Module module in modules)
 					assemblerModules.Add(module);
 			UpdateState();
@@ -356,6 +386,13 @@ namespace Foreman
 			UpdateState();
 		}
 
+		public void AutoSetAssemblerModules(ModuleSelector.Style style)
+		{
+			assemblerModules = MyGraph.ModuleSelector.GetModules(SelectedAssembler, BaseRecipe, style);
+			UpdateState();
+		}
+
+
 		public void AddBeaconModule(Module module) { beaconModules.Add(module); UpdateState(); }
 
 		public void RemoveBeaconModule(int index) { if (index >= 0 && index < beaconModules.Count) beaconModules.RemoveAt(index); UpdateState(); }
@@ -363,7 +400,7 @@ namespace Foreman
 		public void SetBeaconModules(IEnumerable<Module> modules)
 		{
 			beaconModules.Clear();
-			if(modules != null)
+			if (modules != null)
 				foreach (Module module in modules)
 					beaconModules.Add(module);
 			UpdateState();
@@ -384,8 +421,8 @@ namespace Foreman
 				Fuel = fuel;
 				MyGraph.FuelSelector.UseFuel(fuel);
 				fuelRemainsOverride = null; //updating the fuel item will naturally remove any override
-				UpdateState();
 			}
+			UpdateState();
 		}
 
 		public void AutoSetFuel()
@@ -474,7 +511,7 @@ namespace Foreman
 					output.Add(string.Format("> Assembler has too many modules ({0}/{1})!", AssemblerModules.Count, SelectedAssembler.ModuleSlots));
 			}
 
-			if(SelectedBeacon != null)
+			if (SelectedBeacon != null)
 			{
 				if (SelectedBeacon.IsMissing)
 					output.Add(string.Format("> Beacon \"{0}\" doesnt exist in preset!", SelectedBeacon.FriendlyName));
@@ -512,9 +549,10 @@ namespace Foreman
 				}
 
 				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null || AssemblerModules.Count > SelectedAssembler.ModuleSlots)
-					resolutions.Add("Fix assembler modules", new Action(() => {
-						for (int i = AssemblerModules.Count - 1; i >= 0; i--) 
-							if (AssemblerModules[i].IsMissing || !SelectedAssembler.Modules.Contains(assemblerModules[i]) || !BaseRecipe.Modules.Contains(assemblerModules[i])) 
+					resolutions.Add("Fix assembler modules", new Action(() =>
+					{
+						for (int i = AssemblerModules.Count - 1; i >= 0; i--)
+							if (AssemblerModules[i].IsMissing || !SelectedAssembler.Modules.Contains(assemblerModules[i]) || !BaseRecipe.Modules.Contains(assemblerModules[i]))
 								RemoveAssemblerModule(i);
 						while (AssemblerModules.Count > SelectedAssembler.ModuleSlots)
 							RemoveAssemblerModule(AssemblerModules.Count - 1);
@@ -526,7 +564,8 @@ namespace Foreman
 						resolutions.Add("Remove Beacon", new Action(() => SetBeacon(null)));
 
 					if (BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null || beaconModules.Count > SelectedBeacon.ModuleSlots)
-						resolutions.Add("Fix beacon modules", new Action(() => {
+						resolutions.Add("Fix beacon modules", new Action(() =>
+						{
 							for (int i = BeaconModules.Count - 1; i >= 0; i--)
 								if (BeaconModules[i].IsMissing || !SelectedAssembler.Modules.Contains(beaconModules[i]) || !BaseRecipe.Modules.Contains(beaconModules[i]) || !SelectedBeacon.Modules.Contains(beaconModules[i]))
 									RemoveBeaconModule(i);
@@ -539,7 +578,7 @@ namespace Foreman
 					resolutions.Add(kvp.Key, kvp.Value);
 			}
 
-		return resolutions;
+			return resolutions;
 		}
 
 		public override List<string> GetWarnings()
@@ -564,7 +603,7 @@ namespace Foreman
 				output.Add("X> Selected assembler is uncraftable.");
 
 			//fuel
-			if(Fuel != null)
+			if (Fuel != null)
 			{
 				if (!Fuel.Available)
 					output.Add("X> Selected fuel is uncraftable");
@@ -600,14 +639,16 @@ namespace Foreman
 				if (SelectedAssembler.Fuels.FirstOrDefault(fuel => fuel.ProductionRecipes.FirstOrDefault(r => r.Enabled && r.Assemblers.FirstOrDefault(a => a.Enabled) != null) != null) != null)
 					resolutions.Add("Switch to valid fuel", new Action(() => AutoSetFuel()));
 			if (assemblerModules.FirstOrDefault(m => !m.Enabled) != null)
-				resolutions.Add("Remove disabled modules from assembler", new Action(() => {
+				resolutions.Add("Remove disabled modules from assembler", new Action(() =>
+				{
 					for (int i = AssemblerModules.Count - 1; i >= 0; i--)
 						if (!AssemblerModules[i].Enabled)
 							RemoveAssemblerModule(i);
 					UpdateState();
 				}));
 			if (SelectedBeacon != null && beaconModules.FirstOrDefault(m => !m.Enabled) != null)
-				resolutions.Add("Remove disabled modules from beacon", new Action(() => {
+				resolutions.Add("Remove disabled modules from beacon", new Action(() =>
+				{
 					for (int i = BeaconModules.Count - 1; i >= 0; i--)
 						if (!BeaconModules[i].Enabled)
 							RemoveBeaconModule(i);

@@ -9,11 +9,12 @@ namespace Foreman
 		public enum Style { None, Speed, Productivity, ProductivityOnly, Efficiency, EfficiencyOnly }
 		public static readonly string[] StyleNames = new string[] { "None", "Speed", "Productivity", "Productivity Only", "Efficiency", "Efficiency Only" };
 
-		public Style SelectionStyle { get; set; }
+		public Style DefaultSelectionStyle { get; set; }
 
-		public ModuleSelector() { SelectionStyle = Style.None; }
+		public ModuleSelector() { DefaultSelectionStyle = Style.None; }
 
-		public List<Module> GetModules(Assembler assembler, Recipe recipe)
+		public List<Module> GetModules(Assembler assembler, Recipe recipe) { return GetModules(assembler, recipe, DefaultSelectionStyle); }
+		public List<Module> GetModules(Assembler assembler, Recipe recipe, Style style)
 		{
 			List<Module> moduleList = new List<Module>();
 			Module bestModule = null;
@@ -21,7 +22,7 @@ namespace Foreman
 				return moduleList;
 
 
-			switch (SelectionStyle)
+			switch (style)
 			{
 				//speed, productivity, and productivity only have no max limits, so the 'best' option will always involve identical modules. just pick the best module and fill the module slots.
 				//efficiency however is capped at -80% consumption bonus, so we have to get a permutation and pick the 'best'
@@ -40,7 +41,7 @@ namespace Foreman
 					List<ModulePermutator.Permutation> modulePermutations = ModulePermutator.GetOptimalEfficiencyPermutations(speedModules, efficiencyModules, assembler.ModuleSlots);
 
 					//return best module permutation that has the lowest consumption (max -80%), and the highest speed.
-					if(modulePermutations.Count > 0)
+					if (modulePermutations.Count > 0)
 						return modulePermutations.OrderByDescending(p => p.ConsumptionBonus).ThenBy(p => p.SpeedBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.Where(m => m != null).OrderBy(m => m.FriendlyName).ToList();
 					return moduleList; //empty
 				case Style.EfficiencyOnly:
@@ -48,7 +49,7 @@ namespace Foreman
 					List<ModulePermutator.Permutation> modulePermutationsB = ModulePermutator.GetOptimalEfficiencyPermutations(new List<Module>(), moduleOptions, assembler.ModuleSlots);
 
 					//return best module permutation that has the lowest consumption (max -80%), and the lowest tier cost
-					if(modulePermutationsB.Count > 0)
+					if (modulePermutationsB.Count > 0)
 						return modulePermutationsB.OrderByDescending(p => p.ConsumptionBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.Where(m => m != null).OrderBy(m => m.FriendlyName).ToList();
 					return moduleList; //empty
 				case Style.None:
@@ -83,7 +84,7 @@ namespace Foreman
 				PollutionBonus = 0;
 				SquaredTierValue = 0;
 
-				foreach(Module m in modules)
+				foreach (Module m in modules)
 				{
 					if (m != null)
 					{

@@ -103,7 +103,7 @@ namespace Foreman
 			return false;
 		}
 
-		protected override void Draw(Graphics graphics)
+		protected override void Draw(Graphics graphics, bool simple)
 		{
 			UpdateCurve();
 

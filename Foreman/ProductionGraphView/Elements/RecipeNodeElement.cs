@@ -59,7 +59,7 @@ namespace Foreman
 				width -= width % WidthD;
 			}
 			Width = width - 2;
-			Height = (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low )? BaseSimpleHeight : BaseRecipeHeight;
+			Height = (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) ? BaseSimpleHeight : BaseRecipeHeight;
 
 			//update tabs (necessary now that it is possible that an item was added or removed)... I am looking at you furnaces!!!
 			//done by first checking all old tabs and removing any that are no longer part of the displayed node, then looking at the displayed node io and adding any new tabs that are necessary.
@@ -88,9 +88,15 @@ namespace Foreman
 			base.Update();
 		}
 
-		protected override void DetailsDraw(Graphics graphics, Point trans)
+		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
 		{
-			if(graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
+			if (simple)
+			{
+				//productivity ticks
+				int pModules = ((RecipeNode)DisplayedNode).AssemblerModules.Count(m => m.ProductivityBonus > 0);
+				pModules += (int)(((RecipeNode)DisplayedNode).BeaconModules.Count(m => m.ProductivityBonus > 0) * ((RecipeNode)DisplayedNode).BeaconCount);
+			}
+			else if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
 			{
 				//text
 				string text = DisplayedNode.DisplayName;
@@ -106,7 +112,7 @@ namespace Foreman
 				int pModules = ((RecipeNode)DisplayedNode).AssemblerModules.Count(m => m.ProductivityBonus > 0);
 				pModules += (int)(((RecipeNode)DisplayedNode).BeaconModules.Count(m => m.ProductivityBonus > 0) * ((RecipeNode)DisplayedNode).BeaconCount);
 
-				for(int i=0; i<pModules && i < 6; i++)
+				for (int i = 0; i < pModules && i < 6; i++)
 					graphics.DrawEllipse(productivityPen, trans.X - (Width / 2) - 3, trans.Y - (Height / 2) + 10 + i * 12, 6, 6);
 				if (pModules > 6)
 				{
@@ -120,7 +126,7 @@ namespace Foreman
 		{
 			List<TooltipInfo> tooltips = new List<TooltipInfo>();
 
-			if (graphViewer.RecipeTooltipEnabled)
+			if (graphViewer.ShowRecipeToolTip)
 			{
 				Recipe[] Recipes = new Recipe[] { ((RecipeNode)DisplayedNode).BaseRecipe };
 				TooltipInfo ttiRecipe = new TooltipInfo();

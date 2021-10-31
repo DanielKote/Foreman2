@@ -72,12 +72,10 @@ namespace Foreman
 				Point screenPoint = new Point(graphViewer.GraphToScreen(graph_point).X - 150, 15);
 				screenPoint.X = Math.Max(15, Math.Min(graphViewer.Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
 
-				bool includeSuppliers = StartConnectionType == LinkType.Input && SupplierElement == null;
-				bool includeConsumers = StartConnectionType == LinkType.Output && ConsumerElement == null;
-				if (includeSuppliers)
-					graphViewer.AddRecipe(screenPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Supplier, ConsumerElement);
-				else if (includeConsumers)
-					graphViewer.AddRecipe(screenPoint, Item, newObjectLocation, ProductionGraphViewer.NewNodeType.Consumer, SupplierElement);
+				if (StartConnectionType == LinkType.Input && SupplierElement == null)
+					graphViewer.AddRecipe(screenPoint, Item, newObjectLocation, NewNodeType.Supplier, ConsumerElement, true);
+				else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
+					graphViewer.AddRecipe(screenPoint, Item, newObjectLocation, NewNodeType.Consumer, SupplierElement, true);
 				else
 					Trace.Fail("Both null dragged link!");
 			}

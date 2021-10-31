@@ -48,7 +48,7 @@ namespace Foreman
 			this.NeighbourInput = new System.Windows.Forms.NumericUpDown();
 			this.AModuleOptionsLabel = new System.Windows.Forms.Label();
 			this.AModulesLabel = new System.Windows.Forms.Label();
-			this.label7 = new System.Windows.Forms.Label();
+			this.AssemblerRateLabel = new System.Windows.Forms.Label();
 			this.AssemblerTitle = new System.Windows.Forms.Label();
 			this.MainTable = new System.Windows.Forms.TableLayoutPanel();
 			this.BeaconTable = new System.Windows.Forms.TableLayoutPanel();
@@ -359,18 +359,18 @@ namespace Foreman
 			this.AModulesLabel.TabIndex = 12;
 			this.AModulesLabel.Text = "Modules:";
 			// 
-			// label7
+			// AssemblerRateLabel
 			// 
-			this.label7.AutoSize = true;
-			this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
-			this.label7.Location = new System.Drawing.Point(3, 1);
-			this.label7.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(251, 22);
-			this.label7.TabIndex = 3;
-			this.label7.Text = "# of Assemblers:";
-			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.AssemblerRateLabel.AutoSize = true;
+			this.AssemblerRateLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AssemblerRateLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+			this.AssemblerRateLabel.Location = new System.Drawing.Point(3, 1);
+			this.AssemblerRateLabel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
+			this.AssemblerRateLabel.Name = "AssemblerRateLabel";
+			this.AssemblerRateLabel.Size = new System.Drawing.Size(251, 22);
+			this.AssemblerRateLabel.TabIndex = 3;
+			this.AssemblerRateLabel.Text = "# of Assemblers:";
+			this.AssemblerRateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// AssemblerTitle
 			// 
@@ -1033,7 +1033,7 @@ namespace Foreman
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-			this.RateOptionsTable.Controls.Add(this.label7, 0, 0);
+			this.RateOptionsTable.Controls.Add(this.AssemblerRateLabel, 0, 0);
 			this.RateOptionsTable.Controls.Add(this.FixedAssemblersOption, 2, 0);
 			this.RateOptionsTable.Controls.Add(this.AutoAssemblersOption, 1, 0);
 			this.RateOptionsTable.Controls.Add(this.FixedAssemblerInput, 3, 0);
@@ -1134,7 +1134,7 @@ namespace Foreman
 		private System.Windows.Forms.Label AssemblerSpeedLabel;
 		private System.Windows.Forms.Label AModuleOptionsLabel;
 		private System.Windows.Forms.Label AModulesLabel;
-		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.Label AssemblerRateLabel;
 		private System.Windows.Forms.Label AssemblerTitle;
 		private System.Windows.Forms.TableLayoutPanel AssemblerTable;
 		private System.Windows.Forms.Panel AModulesChoicePanel;

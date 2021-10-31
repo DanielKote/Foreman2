@@ -11537,6 +11537,8 @@
         "boiler"
       ],
       "allowed_effects": {},
+      "fluid_ingredient": "water",
+      "fluid_product": "steam",
       "max_energy_usage": 30000,
       "energy_usage": 0,
       "energy_production": 0,
@@ -11560,6 +11562,7 @@
         "steam-engine"
       ],
       "allowed_effects": {},
+      "fluid_ingredient": "steam",
       "max_energy_usage": 0,
       "energy_usage": 0,
       "energy_production": 15000,
@@ -11602,6 +11605,8 @@
         "heat-exchanger"
       ],
       "allowed_effects": {},
+      "fluid_ingredient": "water",
+      "fluid_product": "steam",
       "max_energy_usage": 166666.66666666666,
       "energy_usage": 0,
       "energy_production": 0,
@@ -11622,6 +11627,7 @@
         "steam-turbine"
       ],
       "allowed_effects": {},
+      "fluid_ingredient": "steam",
       "max_energy_usage": 0,
       "energy_usage": 0,
       "energy_production": 97000,
@@ -11695,7 +11701,7 @@
       "order": "z-b[fluids]-a[offshore-pump]",
       "type": "offshore-pump",
       "speed": 20,
-      "fluid_result": "water",
+      "fluid_product": "water",
       "associated_items": [
         "offshore-pump"
       ],

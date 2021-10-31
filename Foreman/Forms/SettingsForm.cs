@@ -16,36 +16,25 @@ namespace Foreman
 			public List<Preset> Presets;
 			public Preset SelectedPreset;
 
+			public ProductionGraphViewer.LOD LevelOfDetail;
+			public bool DynamicLinkWidth;
+			public bool ShowRecipeToolTip;
+			public bool LockedRecipeEditPanelPosition;
+			public AssemblerSelector.Style DefaultAssemblerStyle;
+			public ModuleSelector.Style DefaultModuleStyle;
+			public bool DEV_ShowUnavailableItems;
+
 			public SettingsFormOptions(DataCache cache)
 			{
 				DCache = cache;
 				Presets = new List<Preset>();
-			}
-
-			public SettingsFormOptions Clone()
-			{
-				SettingsFormOptions clone = new SettingsFormOptions(this.DCache);
-
-				foreach (Preset preset in Presets)
-					clone.Presets.Add(preset);
-				clone.SelectedPreset = this.SelectedPreset;
-
-				return clone;
-			}
-
-			public bool Equals(SettingsFormOptions other, bool ignoreAssemblersMinersModules = true)
-			{
-				bool same = (other.SelectedPreset == this.SelectedPreset) && (other.DCache == this.DCache);
-
-				return same;
 			}
 		}
 
 		private static readonly Color AvailableObjectColor = Color.White;
 		private static readonly Color UnavailableObjectColor = Color.Pink;
 
-		private SettingsFormOptions originalOptions;
-		public SettingsFormOptions CurrentOptions;
+		public SettingsFormOptions Options;
 
 		private List<ListViewItem> unfilteredAssemblerList;
 		private List<ListViewItem> unfilteredMinerList;
@@ -63,14 +52,18 @@ namespace Foreman
 
 		public SettingsForm(SettingsFormOptions options)
 		{
-			originalOptions = options;
-			CurrentOptions = options.Clone();
+			Options = options;
 
 			InitializeComponent();
 			MainForm.SetDoubleBuffered(AssemblerListView);
 			MainForm.SetDoubleBuffered(MinerListView);
 			MainForm.SetDoubleBuffered(ModuleListView);
 			MainForm.SetDoubleBuffered(RecipeListView);
+
+			AssemblerListView.Columns[0].Width = AssemblerListView.Width - 32;
+			MinerListView.Columns[0].Width = MinerListView.Width - 32;
+			ModuleListView.Columns[0].Width = ModuleListView.Width - 32;
+			RecipeListView.Columns[0].Width = RecipeListView.Width - 32;
 
 			unfilteredAssemblerList = new List<ListViewItem>();
 			unfilteredMinerList = new List<ListViewItem>();
@@ -92,11 +85,35 @@ namespace Foreman
 			MouseHoverDetector mhDetector = new MouseHoverDetector(100, 200);
 			mhDetector.Add(RecipeListView, RecipeListView_StartHover, RecipeListView_EndHover);
 
-
-			CurrentPresetLabel.Text = CurrentOptions.SelectedPreset.Name;
-			PresetListBox.Items.AddRange(CurrentOptions.Presets.ToArray());
+			CurrentPresetLabel.Text = Options.SelectedPreset.Name;
+			PresetListBox.Items.AddRange(Options.Presets.ToArray());
 			PresetListBox.Items.RemoveAt(0); //0 is the currently active preset.
 
+			//settings
+			DynamicLWCheckBox.Checked = Options.DynamicLinkWidth;
+			ShowNodeRecipeCheckBox.Checked = Options.ShowRecipeToolTip;
+			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
+			switch(Options.LevelOfDetail)
+			{
+				case ProductionGraphViewer.LOD.Low:
+					LowLodRadioButton.Checked = true;
+					break;
+				case ProductionGraphViewer.LOD.Medium:
+					MediumLodRadioButton.Checked = true;
+					break;
+				case ProductionGraphViewer.LOD.High:
+					HighLodRadioButton.Checked = true;
+					break;
+			}
+
+			AssemblerSelectorStyleDropDown.Items.AddRange(AssemblerSelector.StyleNames);
+			AssemblerSelectorStyleDropDown.SelectedIndex = (int)Options.DefaultAssemblerStyle;
+			ModuleSelectorStyleDropDown.Items.AddRange(ModuleSelector.StyleNames);
+			ModuleSelectorStyleDropDown.SelectedIndex = (int)Options.DefaultModuleStyle;
+
+			ShowUnavailablesCheckBox.Checked = Options.DEV_ShowUnavailableItems;
+
+			//lists
 			LoadUnfilteredLists();
 			UpdateModList();
 		}
@@ -105,7 +122,7 @@ namespace Foreman
 		{
 			Preset selectedPreset = (Preset)PresetListBox.SelectedItem;
 			if (selectedPreset == null)
-				selectedPreset = CurrentOptions.SelectedPreset;
+				selectedPreset = Options.SelectedPreset;
 
 			PresetInfo presetInfo = PresetProcessor.ReadPresetInfo(selectedPreset);
 			ModSelectionBox.Items.Clear();
@@ -124,12 +141,12 @@ namespace Foreman
 			IconList.Images.Clear();
 			IconList.Images.Add(DataCache.UnknownIcon);
 
-			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler), unfilteredAssemblerList);
-			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner), unfilteredMinerList);
-			LoadUnfilteredList(CurrentOptions.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor), unfilteredPowerList);
-			LoadUnfilteredList(CurrentOptions.DCache.Beacons.Values, unfilteredBeaconList);
-			LoadUnfilteredList(CurrentOptions.DCache.Modules.Values, unfilteredModuleList);
-			LoadUnfilteredList(CurrentOptions.DCache.Recipes.Values, unfilteredRecipeList);
+			LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler), unfilteredAssemblerList);
+			LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner), unfilteredMinerList);
+			LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor), unfilteredPowerList);
+			LoadUnfilteredList(Options.DCache.Beacons.Values, unfilteredBeaconList);
+			LoadUnfilteredList(Options.DCache.Modules.Values, unfilteredModuleList);
+			LoadUnfilteredList(Options.DCache.Recipes.Values, unfilteredRecipeList);
 
 			UpdateFilteredLists();
 		}
@@ -182,7 +199,7 @@ namespace Foreman
 		private void UpdateFilteredList(List<ListViewItem> unfilteredList, List<ListViewItem> filteredList, ListView owner)
 		{
 			string filterString = FilterTextBox.Text.ToLower();
-			bool showUnavailables = ShowUnavailablesCheckBox.Checked;
+			bool showUnavailables = ShowUnavailablesFilterCheckBox.Checked;
 
 			filteredList.Clear();
 
@@ -252,7 +269,8 @@ namespace Foreman
 			var index = PresetListBox.IndexFromPoint(e.Location);
 			if (index != ListBox.NoMatches)
 			{
-				CurrentOptions.SelectedPreset = ((Preset)PresetListBox.Items[index]);
+				Options.SelectedPreset = ((Preset)PresetListBox.Items[index]);
+				UpdateSettings();
 				this.Close();
 
 			}
@@ -274,14 +292,15 @@ namespace Foreman
 						File.Delete(iconPath);
 
 					PresetListBox.Items.Remove(selectedPreset);
-					CurrentOptions.Presets.Remove(selectedPreset);
+					Options.Presets.Remove(selectedPreset);
 				}
 			}
 		}
 
 		private void SelectPresetMenuItem_Click(object sender, EventArgs e)
 		{
-			CurrentOptions.SelectedPreset = (Preset)PresetListBox.SelectedItem;
+			Options.SelectedPreset = (Preset)PresetListBox.SelectedItem;
+			UpdateSettings();
 			this.Close();
 		}
 
@@ -371,13 +390,26 @@ namespace Foreman
 		//CONFIRM / RELOAD / CANCEL------------------------------------------------------------------------------------------
 		private void ConfirmButton_Click(object sender, EventArgs e)
 		{
+			UpdateSettings();
 			this.Close();
 		}
 
 		private void CancelButton_Click(object sender, EventArgs e)
 		{
-			CurrentOptions = originalOptions;
 			this.Close();
+		}
+
+		private void UpdateSettings()
+		{
+			Options.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
+			Options.DynamicLinkWidth = DynamicLWCheckBox.Checked;
+			Options.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
+			Options.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
+
+			Options.DefaultAssemblerStyle = (AssemblerSelector.Style)AssemblerSelectorStyleDropDown.SelectedIndex;
+			Options.DefaultModuleStyle = (ModuleSelector.Style)ModuleSelectorStyleDropDown.SelectedIndex;
+
+			Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
 		}
 
 		//PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------
@@ -396,17 +428,18 @@ namespace Foreman
 
 				if (result == DialogResult.OK && !string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
 				{
-					Preset newPreset = CurrentOptions.Presets.FirstOrDefault(p => p.Name.ToLower() == form.NewPresetName.ToLower()); //extra check just in case we were overwriting
+					Preset newPreset = Options.Presets.FirstOrDefault(p => p.Name.ToLower() == form.NewPresetName.ToLower()); //extra check just in case we were overwriting
 					if (newPreset == null)
 					{
 						newPreset = new Preset(form.NewPresetName, false, false);
-						CurrentOptions.Presets.Add(newPreset);
+						Options.Presets.Add(newPreset);
 						PresetListBox.Items.Add(newPreset);
 					}
 
 					if (MessageBox.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
 					{
-						CurrentOptions.SelectedPreset = newPreset;
+						Options.SelectedPreset = newPreset;
+						UpdateSettings();
 						this.Close();
 					}
 				}
@@ -415,7 +448,7 @@ namespace Foreman
 
 		private void ComparePresetsButton_Click(object sender, EventArgs e)
 		{
-			if (CurrentOptions.Presets.Count < 2)
+			if (Options.Presets.Count < 2)
 			{
 				MessageBox.Show("Can not compare presets!\n...you only have 1 preset :/");
 				return;
@@ -432,7 +465,7 @@ namespace Foreman
 
 		private void LoadEnabledFromSaveButton_Click(object sender, EventArgs e)
 		{
-			using (SaveFileLoadForm form = new SaveFileLoadForm(CurrentOptions.DCache))
+			using (SaveFileLoadForm form = new SaveFileLoadForm(Options.DCache))
 			{
 				form.StartPosition = FormStartPosition.Manual;
 				form.Left = this.Left + 50;
@@ -442,12 +475,12 @@ namespace Foreman
 
 				if (result == DialogResult.OK)
 				{
-					int totalMods = CurrentOptions.DCache.IncludedMods.Count;
+					int totalMods = Options.DCache.IncludedMods.Count;
 					string missingMods = "\nMissing Mods: ";
 					string wrongVersionMods = "\nWrong Version Mods: ";
 					string newMods = "\nAdded Mods: ";
 
-					foreach (KeyValuePair<string, string> mod in CurrentOptions.DCache.IncludedMods)
+					foreach (KeyValuePair<string, string> mod in Options.DCache.IncludedMods)
 					{
 						if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
 							continue;
@@ -462,7 +495,7 @@ namespace Foreman
 						if (mod.Key == "foremanexport" || mod.Key == "foremansavereader" || mod.Key == "core")
 							continue;
 
-						if (!CurrentOptions.DCache.IncludedMods.ContainsKey(mod.Key))
+						if (!Options.DCache.IncludedMods.ContainsKey(mod.Key))
 							newMods += mod.Key + ", ";
 					}
 					missingMods = missingMods.Substring(0, missingMods.Length - 2);
@@ -489,7 +522,7 @@ namespace Foreman
                             tech.Enabled = false;
                     }*/
 
-					foreach (Recipe recipe in CurrentOptions.DCache.Recipes.Values)
+					foreach (Recipe recipe in Options.DCache.Recipes.Values)
 					{
 						if (recipe.Name.StartsWith("$r:")) //these are the special recipes we added for 'mining / extraction / etc'. They will naturally not exist in the loaded save, so we just keep set them as enabled
 						{
@@ -504,7 +537,7 @@ namespace Foreman
 						}
 					}
 
-					foreach (Assembler assembler in CurrentOptions.DCache.Assemblers.Values)
+					foreach (Assembler assembler in Options.DCache.Assemblers.Values)
 					{
 						bool enabled = false;
 						foreach (Recipe recipe in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
@@ -512,7 +545,7 @@ namespace Foreman
 						assembler.Enabled = enabled;
 					}
 
-					foreach (Module module in CurrentOptions.DCache.Modules.Values)
+					foreach (Module module in Options.DCache.Modules.Values)
 					{
 						bool enabled = false;
 						foreach (Recipe recipe in module.AssociatedItem.ProductionRecipes)

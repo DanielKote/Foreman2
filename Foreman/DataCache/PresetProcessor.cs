@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman
@@ -23,7 +24,73 @@ namespace Foreman
 			return new PresetInfo(mods, (int)jsonData["difficulty"][0] == 1, (int)jsonData["difficulty"][1] == 1);
 		}
 
-		public static PresetErrorPackage TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
+		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
+		{
+			//return await TestPresetThroughDataCache(preset, modList, itemList, entityList, recipeShorts);
+			return await TestPresetStreamlined(preset, modList, itemList, entityList, recipeShorts);
+		}
+
+		//full load of data cache and comparison. This is naturally slower than the streamlined version, since we load all the extras that arent necessary for comparison (like energy types, technologies, availability calculations, etc)
+		//but on the +ve side any changes to preset json format is incorporated into data cache and requires no update to this function.
+		private static async Task<PresetErrorPackage> TestPresetThroughDataCache(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
+		{
+			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+			if (!File.Exists(presetPath))
+				return null;
+
+			DataCache presetCache = new DataCache();
+			await presetCache.LoadAllData(preset, null, false);
+
+			//compare to provided mod/item/recipe sets (recipes have a chance of existing in multitudes - aka: missing recipes)
+			PresetErrorPackage errors = new PresetErrorPackage(preset);
+			foreach (var mod in modList)
+			{
+				errors.RequiredMods.Add(mod.Key + "|" + mod.Value);
+
+				if (!presetCache.IncludedMods.ContainsKey(mod.Key))
+					errors.MissingMods.Add(mod.Key + "|" + mod.Value);
+				else if (presetCache.IncludedMods[mod.Key] != mod.Value)
+					errors.WrongVersionMods.Add(mod.Key + "|" + mod.Value + "|" + presetCache.IncludedMods[mod.Key]);
+			}
+			foreach (var mod in presetCache.IncludedMods)
+				if (!modList.ContainsKey(mod.Key))
+					errors.AddedMods.Add(mod.Key + "|" + mod.Value);
+
+			foreach (string itemName in itemList)
+			{
+				errors.RequiredItems.Add(itemName);
+
+				if (!presetCache.Items.ContainsKey(itemName))
+					errors.MissingItems.Add(itemName);
+			}
+
+			foreach (RecipeShort recipeS in recipeShorts)
+			{
+				errors.RequiredRecipes.Add(recipeS.Name);
+				if (recipeS.isMissing)
+				{
+					if (presetCache.Recipes.ContainsKey(recipeS.Name) && recipeS.Equals(presetCache.Recipes[recipeS.Name]))
+						errors.ValidMissingRecipes.Add(recipeS.Name);
+					else
+						errors.IncorrectRecipes.Add(recipeS.Name);
+				}
+				else
+				{
+					if (!presetCache.Recipes.ContainsKey(recipeS.Name))
+						errors.MissingRecipes.Add(recipeS.Name);
+					else if (!recipeS.Equals(presetCache.Recipes[recipeS.Name]))
+						errors.IncorrectRecipes.Add(recipeS.Name);
+				}
+			}
+
+			return errors;
+		}
+
+		//this preset comparer loads a 'light' version of the preset - basically loading the items and entities as strings only (no data), and only the minimal info for recipes (name, ingredients + amounts, products + amounts)
+		//this speeds things up such that the comparison takes around 150ms for a large preset like seablock (10x vanilla), instead of 250ms as for a full datacache load.
+		//still, this is only really helpful if you are using 10 presets (1.5 sec load inatead of 2.5 sec) or more, but hey; i will keep it.
+		//any changes to preset json style have to be reflected here though (unlike for a full data cache loader above, which just incorporates any changes to data cache as long as they dont impact the outputs)
+		private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
 		{
 
 			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
@@ -38,16 +105,13 @@ namespace Foreman
 			Dictionary<string, string> presetMods = new Dictionary<string, string>();
 
 			//built in items
-			presetItems.Add("§§i:heat:");
+			presetItems.Add("§§i:heat");
 			//built in recipes:
 			RecipeShort heatRecipe = new RecipeShort("§§r:h:heat-generation");
 			heatRecipe.Products.Add("§§i:heat", 1);
 			presetRecipes.Add(heatRecipe.Name, heatRecipe);
 			RecipeShort burnerRecipe = new RecipeShort("§§r:h:burner-electicity");
 			presetRecipes.Add(burnerRecipe.Name, burnerRecipe);
-			RecipeShort steamBurnerRecipe = new RecipeShort("§§r:h:steam-electricity");
-			steamBurnerRecipe.Ingredients.Add("steam", 60);
-			presetRecipes.Add(steamBurnerRecipe.Name, steamBurnerRecipe);
 			//built in assemblers:
 			presetEntities.Add("§§a:player-assembler");
 
@@ -90,7 +154,7 @@ namespace Foreman
 				if (objJToken["products"].Count() == 0)
 					continue;
 
-				RecipeShort recipe = new RecipeShort("§§r:" + (string)objJToken["name"]);
+				RecipeShort recipe = new RecipeShort("§§r:e:" + (string)objJToken["name"]);
 
 				foreach (var productJToken in objJToken["products"])
 				{
@@ -111,21 +175,40 @@ namespace Foreman
 
 			foreach (var objJToken in jsonData["entities"])
 			{
-				if ((string)objJToken["type"] == "offshore-pump")
+				string type = (string)objJToken["type"];
+				if (type == "offshore-pump")
 				{
-					string fluidName = (string)objJToken["fluid_result"];
-					RecipeShort recipe = new RecipeShort("§§r:" + fluidName);
+					string fluidName = (string)objJToken["fluid_product"];
+					RecipeShort recipe = new RecipeShort("§§r:e:" + fluidName);
 					recipe.Products.Add(fluidName, 60);
 
 					if (!presetRecipes.ContainsKey(recipe.Name))
 						presetRecipes.Add(recipe.Name, recipe);
 				}
-				else if ((string)objJToken["type"] == "boiler")
+				else if (type == "boiler")
 				{
+					if (objJToken["fluid_ingredient"] == null || objJToken["fluid_product"] == null)
+						continue;
+
 					double temp = (double)objJToken["target_temperature"];
-					RecipeShort recipe = new RecipeShort("§§r:boil" + temp.ToString());
-					recipe.Ingredients.Add("water", 60);
-					recipe.Products.Add("steam", 60);
+					string ingredient = (string)objJToken["fluid_ingredient"];
+					string product = (string)objJToken["fluid_product"];
+
+					RecipeShort recipe = new RecipeShort(string.Format("§§r:b:{0}:{1}:{2}", ingredient, product, temp.ToString()));
+					recipe.Ingredients.Add(ingredient, 60);
+					recipe.Products.Add(product, 60);
+
+					if (!presetRecipes.ContainsKey(recipe.Name))
+						presetRecipes.Add(recipe.Name, recipe);
+				}
+				else if (type == "generator")
+				{
+					if (objJToken["fluid_ingredient"] == null)
+						continue;
+
+					string ingredient = (string)objJToken["fluid_ingredient"];
+					RecipeShort recipe = new RecipeShort(string.Format("§§r:g:{0}", ingredient));
+					recipe.Ingredients.Add(ingredient, 60);
 
 					if (!presetRecipes.ContainsKey(recipe.Name))
 						presetRecipes.Add(recipe.Name, recipe);
@@ -176,8 +259,5 @@ namespace Foreman
 
 			return errors;
 		}
-
-
-
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -52,6 +53,36 @@ namespace Foreman
 				}
 			}
 			catch (Exception) { return new Bitmap(size, size); }
+		}
+
+		public static Bitmap ConbineIcons(Bitmap aIcon, Bitmap bIcon, int size, bool diagonalSlice = true)
+		{
+			Bitmap result = new Bitmap(size, size);
+			using (Graphics g = Graphics.FromImage(result))
+			{
+				using (GraphicsPath tlPath = new GraphicsPath())
+				{
+					tlPath.AddLine(0, 0, 0, size);
+					tlPath.AddLine(0, size, size, 0);
+					tlPath.AddLine(size, 0, 0, 0);
+					if (diagonalSlice)
+						g.Clip = new Region(tlPath);
+					if (aIcon != null)
+						g.DrawImage(aIcon, 0, 0, size, size);
+				}
+
+				using (GraphicsPath trPath = new GraphicsPath())
+				{
+					trPath.AddLine(size, size, 0, size);
+					trPath.AddLine(0, size, size, 0);
+					trPath.AddLine(size, 0, size, size);
+					if (diagonalSlice)
+						g.Clip = new Region(trPath);
+					if (bIcon != null)
+						g.DrawImage(bIcon, 0, 0, size, size);
+				}
+			}
+			return result;
 		}
 
 

@@ -508,7 +508,7 @@ namespace Foreman
 					string left = beacon.FriendlyName + "\n" +
 						string.Format("   Module Slots:  {0}", beacon.ModuleSlots);
 					string right = "";
-					if(compareTypeTT)
+					if (compareTypeTT)
 					{
 						Beacon rbeacon = rLVI.Tag as Beacon;
 						right = rbeacon.FriendlyName + "\n" +

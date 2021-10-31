@@ -175,6 +175,12 @@
     <Compile Include="DataCache\DataTypes\Technology.cs" />
     <Compile Include="DataCache\InfoPackageClasses.cs" />
     <Compile Include="DataCache\PresetProcessor.cs" />
+    <Compile Include="Forms\GraphInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\GraphInfoForm.Designer.cs">
+      <DependentUpon>GraphInfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SavefileLoadForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -281,6 +287,9 @@
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GraphInfoForm.resx">
+      <DependentUpon>GraphInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SavefileLoadForm.resx">
       <DependentUpon>SavefileLoadForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -366,6 +375,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Graphics\ElectricityIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\ErrorIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -379,18 +391,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\PlayerAssembler.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graphics\SteamEGeneration.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graphics\SteamFromFuel.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graphics\SteamFromHeat.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graphics\SteamFromLFuel.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\UnknownIcon.png">

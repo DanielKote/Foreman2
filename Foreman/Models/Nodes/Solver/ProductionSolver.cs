@@ -16,6 +16,11 @@ namespace Foreman
 	// https://developers.google.com/optimization/lp/glop
 	public class ProductionSolver
 	{
+
+		private double rateObjectiveCoefficient; //we want to minimize the rates of each node, but not at the expense of oversupply or errors
+		private double oversupplyObjectiveCoefficient; //cost of oversupply needs to be great enough that the solver doesnt choose to 0 rate and swallow that error. This is higher than previously due to some fuels being extremely high value (
+		private double absErrorObjectiveCoefficient; //errors should be avoided at all cost (if possible)
+
 		public class Solution
 		{
 			public Solution(Dictionary<BaseNode, double> nodes, Dictionary<NodeLink, double> links)
@@ -58,8 +63,14 @@ namespace Foreman
 
 		enum EndpointType { SUPPLY, CONSUME, ERROR }
 
-		public ProductionSolver()
+		public ProductionSolver(double maxRecipeIORatio = 1200000) : this(1, maxRecipeIORatio * 10, maxRecipeIORatio * 10000) { } //io ratio is the maximum input : output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat, so the maxRecipeIORatio should be 120000)
+
+		public ProductionSolver(double rateObjectiveC, double supplyObjectiveC, double errorObjectiveC)
 		{
+			rateObjectiveCoefficient = rateObjectiveC;
+			oversupplyObjectiveCoefficient = supplyObjectiveC;
+			absErrorObjectiveCoefficient = errorObjectiveC;
+
 			this.solver = GoogleSolver.Create();
 			this.objective = solver.Objective();
 			this.allVariables = new Dictionary<object, Variable>();
@@ -79,7 +90,7 @@ namespace Foreman
 			// results depending on which the user is wanting. Need to figure out concrete examples
 			// of where this would happen. With sufficiently large error co-efficients it's probably
 			// fine for most real world recipes?
-			objective.SetCoefficient(x, 1.0);
+			objective.SetCoefficient(x, rateObjectiveCoefficient);
 		}
 
 		// Returns null if no optimal solution can be found. Technically GLOP can return non-optimal
@@ -183,7 +194,7 @@ namespace Foreman
 
 					// The cost of over-supply needs to be greater than benefit of minimizing rate,
 					// other-wise pure consumption nodes won't consume anything.
-					objective.SetCoefficient(errorVariable, 100);
+					objective.SetCoefficient(errorVariable, oversupplyObjectiveCoefficient);
 				}
 			}
 		}
@@ -234,7 +245,7 @@ namespace Foreman
 			abs2.SetCoefficient(absErrorVar, 1);
 			abs2.SetCoefficient(errorVar, -1);
 
-			objective.SetCoefficient(absErrorVar, 1000000);
+			objective.SetCoefficient(absErrorVar, absErrorObjectiveCoefficient);
 		}
 
 		private Constraint MakeConstraint(double low, double high)

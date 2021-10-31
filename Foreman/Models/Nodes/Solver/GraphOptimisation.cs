@@ -24,7 +24,11 @@ namespace Foreman
 
 		private static void OptimiseNodeGroup(IEnumerable<BaseNode> nodeGroup)
 		{
-			ProductionSolver solver = new ProductionSolver();
+			double maxRatio = 1;
+			foreach (RecipeNode node in nodeGroup.Where(n => n is RecipeNode))
+				maxRatio = Math.Max(maxRatio, node.GetMaxIORatio());
+
+			ProductionSolver solver = new ProductionSolver(maxRatio);
 
 			foreach (BaseNodePrototype node in nodeGroup)
 				node.AddConstraints(solver);
@@ -51,11 +55,11 @@ namespace Foreman
 
 			foreach (BaseNodePrototype node in nodeGroup)
 			{
-				node.SetSolvedRate(solution?.ActualRate(node)?? 0, false);
+				node.SetSolvedRate(solution?.ActualRate(node) ?? 0, false);
 				foreach (NodeLinkPrototype link in node.outputLinks)
-					link.Throughput = solution?.Throughput(link)?? 0;
+					link.Throughput = solution?.Throughput(link) ?? 0;
 				foreach (NodeLinkPrototype link in node.inputLinks)
-					link.Throughput = solution?.Throughput(link)?? 0;
+					link.Throughput = solution?.Throughput(link) ?? 0;
 
 			}
 		}

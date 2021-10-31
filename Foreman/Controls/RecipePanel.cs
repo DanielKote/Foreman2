@@ -18,7 +18,7 @@ namespace Foreman
 			this.Location = new Point(0, 0);
 		}
 
-		protected override void OnPaint(PaintEventArgs e) { RecipePainter.Paint(Recipes, e.Graphics, new Point(0,0)); }
+		protected override void OnPaint(PaintEventArgs e) { RecipePainter.Paint(Recipes, e.Graphics, new Point(0, 0)); }
 		protected override void OnPaintBackground(PaintEventArgs e) { }
 	}
 }

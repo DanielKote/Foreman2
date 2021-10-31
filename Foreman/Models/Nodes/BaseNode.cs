@@ -96,7 +96,7 @@ namespace Foreman
 		protected Dictionary<string, Action> GetInvalidConnectionResolutions()
 		{
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-			if(!AllLinksValid)
+			if (!AllLinksValid)
 			{
 				resolutions.Add("Delete invalid links", new Action(() =>
 				{

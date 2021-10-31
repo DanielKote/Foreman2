@@ -293,7 +293,8 @@ namespace Foreman
 							break;
 						case NodeType.Recipe:
 							long recipeID = (long)nodeJToken["RecipeID"];
-							newNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location, (rNode) => {
+							newNode = (RecipeNodePrototype)CreateRecipeNode(recipeLinks[recipeID], location, (rNode) =>
+							{
 								newNodeCollection.newNodes.Add(rNode);
 
 								rNode.NeighbourCount = (double)nodeJToken["Neighbours"];
@@ -392,7 +393,7 @@ namespace Foreman
 				else
 					item = cache.MissingItems[itemName];
 
-				if(LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
+				if (LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
 					newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
 			}
 			return newNodeCollection;
@@ -421,7 +422,7 @@ namespace Foreman
 			HashSet<string> includedAssemblers = new HashSet<string>();
 			HashSet<string> includedModules = new HashSet<string>();
 			HashSet<string> includedBeacons = new HashSet<string>();
-			
+
 			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
 			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new RecipeNaInPrComparer()); //compares by name, ingredients, and products (not amounts, just items)
 

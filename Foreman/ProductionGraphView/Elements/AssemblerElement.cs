@@ -42,8 +42,11 @@ namespace Foreman
 			Visible = visible;
 		}
 
-		protected override void Draw(Graphics graphics)
+		protected override void Draw(Graphics graphics, bool simple)
 		{
+			if (simple)
+				return;
+
 			Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
 			//graphics.DrawRectangle(devPen, trans.X, trans.Y, Width, Height);
 
@@ -58,7 +61,7 @@ namespace Foreman
 			}
 			else //resot to drawing circles for each module instead -> 5x6 set, so max 30 modules shown
 			{
-				for(int x = 0; x < 5; x++)
+				for (int x = 0; x < 5; x++)
 				{
 					for (int y = 0; y < 6; y++)
 					{
@@ -125,7 +128,7 @@ namespace Foreman
 				tti.Direction = Direction.Down;
 				tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(1 + (recipeNode.AssemblerModules.Count > 3 ? recipeNode.AssemblerModules.Count > 6 ? ModuleSpacing * 3 / 2 : ModuleSpacing : ModuleSpacing * 3 / 2) - (Width / 2), -Height / 2)));
 				tti.Text = "Assembler Modules:";
-				
+
 				Dictionary<Module, int> moduleCounter = new Dictionary<Module, int>();
 				foreach (Module m in recipeNode.AssemblerModules)
 				{
@@ -135,7 +138,7 @@ namespace Foreman
 						moduleCounter.Add(m, 1);
 				}
 
-				foreach(Module m in moduleCounter.Keys.OrderBy(m => m.FriendlyName))
+				foreach (Module m in moduleCounter.Keys.OrderBy(m => m.FriendlyName))
 					tti.Text += string.Format("\n   {0} :{1}", moduleCounter[m], m.FriendlyName);
 				tooltips.Add(tti);
 			}

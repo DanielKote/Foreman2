@@ -65,6 +65,23 @@ namespace Foreman
 				this.Ingredients.Count == other.Ingredients.Count && this.Ingredients.SequenceEqual(other.Ingredients) &&
 				this.Products.Count == other.Products.Count && this.Products.SequenceEqual(other.Products);
 		}
+
+		public bool Equals(Recipe other)
+		{
+			bool similar = this.Name == other.Name &&
+				this.Ingredients.Count == other.IngredientList.Count && this.Products.Count == other.ProductList.Count;
+
+			if (similar)
+			{
+				foreach (Item ingredient in other.IngredientList)
+					if (!this.Ingredients.ContainsKey(ingredient.Name) || this.Ingredients[ingredient.Name] != other.IngredientSet[ingredient])
+						return false;
+				foreach (Item ingredient in other.ProductList)
+					if (!this.Products.ContainsKey(ingredient.Name) || this.Products[ingredient.Name] != other.ProductSet[ingredient])
+						return false;
+			}
+			return true;
+		}
 	}
 
 	public class RecipeShortNaInPrComparer : IEqualityComparer<RecipeShort> //unlike the default recipeshort comparer this one doesnt compare ingredient & product quantities, just names

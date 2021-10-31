@@ -145,7 +145,7 @@ local function ExportFluids()
 		tfluid['subgroup'] = fluid.subgroup.name
 		tfluid['default_temperature'] = fluid.default_temperature
 		tfluid['max_temperature'] = fluid.max_temperature
-		tfluid['heat_capacity'] = fluid.heat_capacity
+		tfluid['heat_capacity'] = fluid.heat_capacity == nil and 0 or fluid.heat_capacity
 		
 		if fluid.fuel_value ~= 0 then
 			tfluid['fuel_value'] = fluid.fuel_value
@@ -211,7 +211,7 @@ local function ExportEntities()
 			elseif entity.mining_speed ~= nil then tentity['speed'] = entity.mining_speed
 			elseif entity.pumping_speed ~= nil then tentity['speed'] = entity.pumping_speed end
 
-			if entity.fluid ~= nil then tentity['fluid_result'] = entity.fluid.name end
+			if entity.fluid ~= nil then tentity['fluid_product'] = entity.fluid.name end
 			if entity.maximum_temperature ~= nil then tentity['maximum_temperature'] = entity.maximum_temperature end
 			if entity.target_temperature ~= nil then tentity['target_temperature'] = entity.target_temperature end
 			if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_tick'] = entity.fluid_usage_per_tick end
@@ -253,6 +253,20 @@ local function ExportEntities()
 				tentity['resource_categories'] = {}
 				for category, _ in pairs(entity.resource_categories) do
 					table.insert(tentity['resource_categories'], category)
+				end
+			end
+
+			--fluid boxes for input/output of boiler & generator need to be processed (almost guaranteed to be 'steam' and 'water', but... tests have shown that we can heat up whatever we want)
+			if entity.type == 'boiler' then
+				if entity.fluidbox_prototypes[1].filter ~= nil then
+					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
+				end
+				if entity.fluidbox_prototypes[2].filter ~= nil then
+					tentity['fluid_product'] = entity.fluidbox_prototypes[2].filter.name
+				end
+			elseif entity.type == 'generator' then
+				if entity.fluidbox_prototypes[1].filter ~= nil then
+					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
 				end
 			end
 

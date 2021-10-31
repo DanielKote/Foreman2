@@ -64,7 +64,7 @@ namespace Foreman
 						minTemp = Math.Max(minTemp, recipe.IngredientTemperatureMap[item].Min);
 						maxTemp = Math.Min(maxTemp, recipe.IngredientTemperatureMap[item].Max);
 					}
-					else if(direction == LinkType.Output && recipe.ProductSet.ContainsKey(item))
+					else if (direction == LinkType.Output && recipe.ProductSet.ContainsKey(item))
 					{
 						minTemp = Math.Min(minTemp, recipe.ProductTemperatureMap[item]);
 						maxTemp = Math.Max(maxTemp, recipe.ProductTemperatureMap[item]);
