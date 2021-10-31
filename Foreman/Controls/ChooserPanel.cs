@@ -11,6 +11,7 @@ namespace Foreman
 {
 	public partial class ChooserPanel : UserControl
 	{
+
 		public const int RecipeIconSize = 64;
 		public const int ModuleIconSize = 32;
 		public const int AssemblerIconSize = 32;
