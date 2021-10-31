@@ -1,6 +1,4 @@
-﻿//#define IgnoreIcons
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -58,9 +56,8 @@ namespace Foreman
 
     public static class IconProcessor
     {
-        internal static readonly Color NoTint = Color.FromArgb(255, 0, 0, 0);
+        internal static readonly Color NoTint = Color.FromArgb(255, 255, 255, 255);
         internal static readonly Pen HiddenSlashPen = new Pen(new SolidBrush(Color.DarkRed), 4);
-        internal static readonly int IconCanvasSize = 64;
 
         private static Bitmap unknownIcon;
         public static Bitmap GetUnknownIcon()
@@ -82,14 +79,13 @@ namespace Foreman
 
         public static IconColorPair GetIconAndColor(IconInfo iinfo, List<IconInfo> iinfos, int defaultCanvasSize)
         {
-#if IgnoreIcons
-            return new IconColorPair(GetUnknownIcon(), Color.Black);
-#endif
             if (iinfos == null)
                 iinfos = new List<IconInfo>();
-            int mainIconSize = iinfo.iconSize > 0 ? iinfo.iconSize : defaultCanvasSize;
-            double IconCanvasScale = (double)IconCanvasSize / mainIconSize;
-            //if (iinfos.Count > 0 && iinfos[0].iconSize > 0 && iinfos[0].iconScale == 0) mainIconSize = iinfos[0].iconSize;
+            double IconCanvasScale = defaultCanvasSize == 32 ? 2 : 1; //just some upscailing for icons (64x64 look better)
+            int IconCanvasSize = (int)(defaultCanvasSize * IconCanvasScale);
+
+            if (iinfo.iconPath.Contains("wind_turbine_icon"))
+                Console.WriteLine("!!");
 
             if(iinfos.Count == 0) //if there are no icons, use the single icon
                 iinfos.Add(iinfo);
@@ -104,77 +100,86 @@ namespace Foreman
             if (empty)
                 return new IconColorPair(null, Color.Black);
 
-            Bitmap icon = new Bitmap(IconCanvasSize, IconCanvasSize, PixelFormat.Format32bppArgb);
-            //using(Graphics g = Graphics.FromImage(icon)) { g.FillRectangle(Brushes.Gray, new Rectangle(0, 0, icon.Width, icon.Height)); }
+            //prepare the canvas - we will add each successive icon/layer on top of it
+            Bitmap canvas = new Bitmap(IconCanvasSize, IconCanvasSize, PixelFormat.Format32bppPArgb);
+            BitmapData canvasData = canvas.LockBits(new Rectangle(0, 0, canvas.Width, canvas.Height), ImageLockMode.ReadWrite, canvas.PixelFormat);
+            int cBPP = Bitmap.GetPixelFormatSize(canvas.PixelFormat) / 8;
+            int bCount = canvasData.Stride * canvas.Height;
+            byte[] canvasPixels = new byte[bCount];
+            IntPtr ptrCanvasFPixel = canvasData.Scan0;
+            Marshal.Copy(ptrCanvasFPixel, canvasPixels, 0, canvasPixels.Length);
+            int heightInPixels = canvasData.Height;
+            int widthInBytes = canvasData.Width * cBPP;
+
             foreach (IconInfo ii in iinfos)
             {
                 //load the image and prep it for processing
                 int iconSize = ii.iconSize > 0 ? ii.iconSize : iinfo.iconSize;
-                int iconDrawSize = (int)(iconSize * (ii.iconScale > 0 ? ii.iconScale : (double)mainIconSize / iconSize));
+                int iconDrawSize = (int)(iconSize * (ii.iconScale > 0 ? ii.iconScale : (double)defaultCanvasSize / iconSize));
                 iconDrawSize = (int)(iconDrawSize * IconCanvasScale);
 
                 Bitmap iconImage = LoadImage(ii.iconPath, iconDrawSize);
                 if (iconImage == null)
-                    return new IconColorPair(GetUnknownIcon(), Color.Black);
+                    continue;
 
-                //apply tint (if necessary)
-                //NOTE: tint is applied as pre-multiplied alpha, so: A(result) = A(original); RGB(result) = RGB(tint) + RGB(original) * (255 - A(tint))
-                if (ii.iconTint != NoTint)
+                //draw the icon onto a layer (that we will apply tint to and blend with canvas)
+                Bitmap layerSlice = new Bitmap(canvas.Width, canvas.Height, canvas.PixelFormat);
+                using (Graphics g = Graphics.FromImage(layerSlice))
+                    g.DrawImageUnscaled(iconImage, (IconCanvasSize / 2) - (iconDrawSize / 2) + ii.iconOffset.X, (IconCanvasSize / 2) - (iconDrawSize / 2) + ii.iconOffset.Y);
+
+                //grab the layer data
+                BitmapData layerData = layerSlice.LockBits(new Rectangle(0, 0, canvas.Width, canvas.Height), ImageLockMode.ReadOnly, canvas.PixelFormat);
+                byte[] layerPixels = new byte[bCount];
+                IntPtr ptrLayerFPixel = layerData.Scan0;
+                Marshal.Copy(ptrLayerFPixel, layerPixels, 0, layerPixels.Length);
+
+                //blend -> for each value in 0->1 (so when multiplying, you have to divide by 255 if in 0->255)
+                //newCanvas(A/R/G/B) = Layer(A/R/G/B) * tint(A/R/G/B)   +   oldCanvas(A/R/G/B) * (1 - tint(A) * Layer(A))
+                //https://www.factorio.com/blog/post/fff-172
+                for (int y = 0; y < heightInPixels; y++)
                 {
-                    BitmapData iconData = iconImage.LockBits(new Rectangle(0, 0, iconImage.Width, iconImage.Height), ImageLockMode.ReadWrite, iconImage.PixelFormat);
-                    int bytesPerPixel = Bitmap.GetPixelFormatSize(iconImage.PixelFormat) / 8;
-                    int byteCount = iconData.Stride * iconImage.Height;
-                    byte[] pixels = new byte[byteCount];
-                    IntPtr ptrFirstPixel = iconData.Scan0;
-                    Marshal.Copy(ptrFirstPixel, pixels, 0, pixels.Length);
-                    int heightInPixels = iconData.Height;
-                    int widthInBytes = iconData.Width * bytesPerPixel;
-
-                    for (int y = 0; y < heightInPixels; y++)
+                    int currentLine = y * canvasData.Stride;
+                    for (int x = 0; x < widthInBytes; x = x + cBPP)
                     {
-                        int currentLine = y * iconData.Stride;
-                        for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
-                        {
-                            int pixelA = pixels[currentLine + x + 3];
-                            if (pixelA > 0)
-                            {
-                                // calculate new pixel value
-                                pixels[currentLine + x] = (byte)Math.Min((int)ii.iconTint.B + (pixelA * (255 - ii.iconTint.A) * pixels[currentLine + x] / 65025), 255);
-                                pixels[currentLine + x + 1] = (byte)Math.Min((int)ii.iconTint.G + (pixelA * (255 - ii.iconTint.A) * pixels[currentLine + x + 1] / 65025), 255);
-                                pixels[currentLine + x + 2] = (byte)Math.Min((int)ii.iconTint.R + (pixelA * (255 - ii.iconTint.A) * pixels[currentLine + x + 2] / 65025), 255);
-                            }
-                        }
+                        int canvasMulti = 255 - (ii.iconTint.A * layerPixels[currentLine + x + 3] / 255);
+                        canvasPixels[currentLine + x + 0] = (byte)Math.Min(255,
+                            (layerPixels[currentLine + x + 0] * ii.iconTint.B / 255) +
+                            (canvasPixels[currentLine + x + 0] * canvasMulti / 255));
+                        canvasPixels[currentLine + x + 1] = (byte)Math.Min(255,
+                            (layerPixels[currentLine + x + 1] * ii.iconTint.G / 255) +
+                            (canvasPixels[currentLine + x + 1] * canvasMulti / 255));
+                        canvasPixels[currentLine + x + 2] = (byte)Math.Min(255,
+                            (layerPixels[currentLine + x + 2] * ii.iconTint.R / 255) +
+                            (canvasPixels[currentLine + x + 2] * canvasMulti / 255));
+                        canvasPixels[currentLine + x + 3] = (byte)Math.Min(255,
+                            (layerPixels[currentLine + x + 3] * ii.iconTint.A / 255) +
+                            (canvasPixels[currentLine + x + 3] * canvasMulti / 255));
+
                     }
-                    // copy modified bytes back
-                    Marshal.Copy(pixels, 0, ptrFirstPixel, pixels.Length);
-                    iconImage.UnlockBits(iconData);
                 }
-
-                //draw the processed icon (singluar) onto the main canvas
-                using(Graphics g = Graphics.FromImage(icon))
-                {
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    //prepare drawing zone
-                    Rectangle iconBorder = new Rectangle(
-                        (IconCanvasSize / 2) - (iconDrawSize / 2) + ii.iconOffset.X,
-                        (IconCanvasSize / 2) - (iconDrawSize / 2) + ii.iconOffset.Y,
-                        iconDrawSize,
-                        iconDrawSize);
-                    g.DrawImage(iconImage, iconBorder);
-                }
-
+                layerSlice.UnlockBits(layerData);
             }
-            Color averageColor = GetAverageColor(icon);
-            if (averageColor.GetBrightness() > 0.9)
-                icon = AddBorder(icon);
-            if (averageColor.GetBrightness() > 0.7)
-                averageColor = Color.FromArgb((int)(averageColor.A * 0.7), (int)(averageColor.R * 0.7), (int)(averageColor.G * 0.7), (int)(averageColor.B * 0.7));
 
-            return new IconColorPair(icon, averageColor);
+            //we are done adding all the layers, so copy the canvas data
+            Marshal.Copy(canvasPixels, 0, ptrCanvasFPixel, canvasPixels.Length);
+            canvas.UnlockBits(canvasData);
+
+            //at this point we need to convert the canvas into a non-alpha multiplied format due to winforms having issues with it
+            Bitmap result = new Bitmap(canvas.Width, canvas.Height, PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(result))
+                g.DrawImageUnscaled(canvas, 0, 0);
+
+            //finally, calculate the average color (yes, it comes out a bit different due to inclusion of transparency)
+            Color averageColor = GetAverageColor(result);
+            if (averageColor.GetBrightness() > 0.9)
+                result = AddBorder(result); //if the image is too bright, add a border to it. Honestly, this is never done anymore - it was useful before layer blending was fixed and some icons came out... white.
+            if (averageColor.GetBrightness() > 0.7)
+                averageColor = Color.FromArgb(255, (int)(averageColor.R * 0.7), (int)(averageColor.G * 0.7), (int)(averageColor.B * 0.7));
+
+            return new IconColorPair(result, averageColor);
         }
 
-        private static Bitmap LoadImage(string fileName, int resultSize = 32)
+        private static Bitmap LoadImage(string fileName, int resultSize = 32) //NOTE: must make sure we use pre-multiplied alpha
         {
             if (String.IsNullOrEmpty(fileName))
             { return null; }
@@ -214,9 +219,13 @@ namespace Foreman
             {
                 using (Bitmap image = new Bitmap(fullPath)) //If you don't do this, the file is locked for the lifetime of the bitmap
                 {
-                    Bitmap bmp = new Bitmap(resultSize, resultSize);
+                    Bitmap bmp = new Bitmap(resultSize, resultSize, PixelFormat.Format32bppPArgb);
                     using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                         g.DrawImage(image, new Rectangle(0, 0, (resultSize * image.Width / image.Height), resultSize));
+                    }
                     return bmp;
                 }
             }
@@ -241,20 +250,24 @@ namespace Foreman
             int widthInBytes = iconData.Width * bytesPerPixel;
 
             int[] totalPixel = { 0, 0, 0, 0 };
+            int totalCounter = 0;
             for (int y = 0; y < heightInPixels; y++)
             {
                 int currentLine = y * iconData.Stride;
                 for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
                 {
-                    totalPixel[3] += iconPixels[currentLine + x];     //B
-                    totalPixel[2] += iconPixels[currentLine + x + 1]; //G
-                    totalPixel[1] += iconPixels[currentLine + x + 2]; //R
-                    totalPixel[0] += iconPixels[currentLine + x + 3]; //A
+                    if (iconPixels[currentLine + x + 3] > 10) //ignore transparent pixels
+                    {
+                        totalPixel[3] += iconPixels[currentLine + x];     //B
+                        totalPixel[2] += iconPixels[currentLine + x + 1]; //G
+                        totalPixel[1] += iconPixels[currentLine + x + 2]; //R
+                        totalCounter++;
+                    }
                 }
             }
-            for (int i = 0; i < 4; i++)
+            for (int i = 1; i < 4; i++)
             {
-                totalPixel[i] /= (byteCount / bytesPerPixel);
+                totalPixel[i] /= totalCounter;
                 totalPixel[i] = Math.Min(totalPixel[i], 255);
             }
             icon.UnlockBits(iconData);
@@ -313,40 +326,6 @@ namespace Foreman
             }
 
             return canvas;
-        }
-
-        //Asad Butt, Mon Oct 24 2016, 0fnt, "Convert an image to grayscale", Feb 15 '10 at 12:37, http://stackoverflow.com/a/2265990
-        //not used at the moment, left behind just in case
-        public static Bitmap MakeMonochrome(Bitmap src)
-        {
-            if (src == null) { return null; }
-
-
-            Bitmap dst = new Bitmap(src.Width, src.Height);
-            Graphics g = Graphics.FromImage(dst);
-
-            ColorMatrix colorMatrix = new ColorMatrix(
-                new float[][]
-                {
-                    new float[] {.3f, .3f, .3f, 0, 0},
-                    new float[] {.59f, .59f, .59f, 0, 0},
-                    new float[] {.11f, .11f, .11f, 0, 0},
-                    new float[] {0, 0, 0, 1, 0},
-                    new float[] {0, 0, 0, 0, 1}
-                });
-
-            ImageAttributes attrib = new ImageAttributes();
-
-            attrib.SetColorMatrix(colorMatrix);
-
-            g.DrawImage(src,
-                new Rectangle(0, 0, src.Width, src.Height),
-                0, 0, src.Width, src.Height,
-                GraphicsUnit.Pixel, attrib
-                );
-
-            g.Dispose();
-            return dst;
         }
     }
 }

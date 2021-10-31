@@ -23,9 +23,6 @@ namespace Foreman
         public Dictionary<string, Resource> Resources;
         public Dictionary<string, Module> Modules;
 
-        public Dictionary<string, Exception> FailedFiles;
-        public Dictionary<string, Exception> FailedPaths;
-
         private Dictionary<string, Group> SubgroupToGroupLinks; //used internally to link up subgroup to the correct group
         private const float defaultRecipeTime = 0.5f;
 
@@ -47,9 +44,6 @@ namespace Foreman
             Miners = new Dictionary<string, Miner>();
             Resources = new Dictionary<string, Resource>();
             Modules = new Dictionary<string, Module>();
-
-            FailedFiles = new Dictionary<string, Exception>();
-            FailedPaths = new Dictionary<string, Exception>();
 
             IconCache = new Dictionary<int, IconColorPair>();
         }

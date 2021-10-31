@@ -94,7 +94,7 @@ function ProcessIconData(obj, indentSize)
 			output = output..indents..'"tint": ['..obj.tint[1]..', '..obj.tint[2]..', '..obj.tint[3]..', '..a..']'
 		end
 	else
-		output = output..indents..'"tint": [0,0,0,255]'
+		output = output..indents..'"tint": [255,255,255,255]'
 	end
 	return output
 end

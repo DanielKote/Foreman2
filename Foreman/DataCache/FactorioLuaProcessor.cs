@@ -1039,9 +1039,6 @@ namespace Foreman
         {
             string fileName = GetLuaValueOrDefault<string>(values, "icon", true);
             int defaultIconSize = GetLuaValueOrDefault<int>(values, "icon_size", true, 0);
-            string mipmaps = GetLuaValueOrDefault<string>(values, "icon_mipmaps", true);
-            if (mipmaps != null)
-                defaultIconSize = 4 * Convert.ToInt32(Math.Pow(2, Convert.ToDouble(mipmaps)));
 
             IconInfo mIconInfo = new IconInfo(fileName, defaultIconSize);
             List<IconInfo> iconInfos = new List<IconInfo>();

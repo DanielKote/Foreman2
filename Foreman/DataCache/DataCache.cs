@@ -47,6 +47,7 @@ namespace Foreman
 
         private static Dictionary<string, Exception> failedFiles = new Dictionary<string, Exception>();
         private static Dictionary<string, Exception> failedPathDirectories = new Dictionary<string, Exception>();
+        private static List<string> notFoundMods = new List<string>();
  
         private static GenerationType GetGenerationType() { return (GenerationType)(Settings.Default.GenerationType); }
         private static string ScriptOutPath { get { return Path.Combine(Settings.Default.FactorioUserDataPath, "script-output"); } }
@@ -59,6 +60,8 @@ namespace Foreman
 
                 JObject jsonData;
                 JsonDataProcessor processor = new JsonDataProcessor();
+                bool modLoadRequired = true;
+
                 switch (GetGenerationType())
                 {
                     case GenerationType.FactorioLUA:
@@ -87,9 +90,10 @@ namespace Foreman
                             return;
                         }
 
-                        bool modLoadRequired = true;
                         if (File.Exists(iconDataFile) && !reloadIconCache)
                             modLoadRequired = !processor.LoadIconCache(iconDataFile);
+                        else if (File.Exists(iconDataFile))
+                            File.Delete(iconDataFile);
 
                         //failed to load cache (corrupt or doesnt exist), have to load mods / mod info
                         if (modLoadRequired)
@@ -102,7 +106,6 @@ namespace Foreman
 
                         jsonData = JObject.Parse(File.ReadAllText(setupFile));
                         processor.LoadData(jsonData, progress, ctoken, 15, 95);
-                        processor.SaveIconCache(Path.Combine(ScriptOutPath, "ForemanFactorioIconData.dat"));
                         break;
                 }
 
@@ -116,17 +119,19 @@ namespace Foreman
                 resources = processor.Resources;
                 modules = processor.Modules;
 
-                foreach (KeyValuePair<string, Exception> kvp in processor.FailedFiles)
-                    failedFiles.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<string, Exception> kvp in processor.FailedPaths)
-                    failedPathDirectories.Add(kvp.Key, kvp.Value);
                 foreach(string mod in processor.IncludedMods)
                 {
                     if (Mods.ContainsKey(mod))
                         Mods[mod] = true;
                     else
+                    {
+                        if(modLoadRequired)
+                            notFoundMods.Add(mod);
                         Mods.Add(mod, true);
+                    }
                 }
+                if(notFoundMods.Count == 0)
+                    processor.SaveIconCache(Path.Combine(ScriptOutPath, "ForemanFactorioIconData.dat"));
 
                 progress.Report(new KeyValuePair<int, string>(96, "Checking for cyclic recipes"));
                 MarkCyclicRecipes();
@@ -159,6 +164,7 @@ namespace Foreman
 
             failedFiles?.Clear();
             failedPathDirectories?.Clear();
+            notFoundMods.Clear();
         }
 
         private static void ReportErrors()
@@ -166,19 +172,28 @@ namespace Foreman
             if (failedPathDirectories.Any())
             {
                 ErrorLogging.LogLine("There were errors setting the lua path variable for the following directories:");
-                foreach (String dir in failedPathDirectories.Keys)
-                {
+                foreach (string dir in failedPathDirectories.Keys)
                     ErrorLogging.LogLine(String.Format("{0} ({1})", dir, failedPathDirectories[dir].Message));
-                }
             }
 
             if (failedFiles.Any())
             {
                 ErrorLogging.LogLine("The following files could not be loaded due to errors:");
-                foreach (String file in failedFiles.Keys)
-                {
+                foreach (string file in failedFiles.Keys)
                     ErrorLogging.LogLine(String.Format("{0} ({1})", file, failedFiles[file].Message));
+            }
+
+            if(notFoundMods.Any())
+            {
+                ErrorLogging.LogLine("The following mods could not be found on the drive:");
+                string missingMods = "";
+                foreach (string mod in notFoundMods)
+                {
+                    ErrorLogging.LogLine(mod);
+                    missingMods += "\n  " + mod;
                 }
+
+                MessageBox.Show("Error during Icon creation! The following MODS are missing from the factorio directory:" + missingMods + "\n\nIt is recommended to ensure all the mods are present and restart.");
             }
         }
 

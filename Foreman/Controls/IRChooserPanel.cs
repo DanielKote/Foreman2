@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -11,7 +10,7 @@ namespace Foreman
     public abstract partial class IRChooserPanel : UserControl
     {
         private static readonly Color SelectedGroupButtonBGColor = Color.FromArgb(255,255,180,100);
-        protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 60, 60, 60);
+        protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 70, 70, 70);
         protected static readonly Color IRButtonHiddenColor = Color.FromArgb(255, 120, 0, 0);
         protected static readonly Color IRButtonNoAssemblerColor = Color.FromArgb(255, 100, 100, 0);
 
@@ -80,19 +79,18 @@ namespace Foreman
             {
                 NFButton button = new NFButton();
                 button.BackColor = Color.DimGray;
-                button.BackgroundImageLayout = ImageLayout.Zoom;
                 button.UseVisualStyleBackColor = false;
                 button.FlatStyle = FlatStyle.Flat;
                 button.FlatAppearance.BorderSize = 0;
                 button.TabStop = false;
-                button.Click += new EventHandler(GroupButton_Click);
                 button.Margin = new Padding(0);
                 button.Size = new Size(64, 64);
-                button.Image = new Bitmap(group.Icon, 50, 50);
+                button.Image = new Bitmap(group.Icon, 58, 58);
                 button.Tag = group;
 
                 GroupButtonToolTip.SetToolTip(button, string.IsNullOrEmpty(group.FriendlyName) ? "-" : group.FriendlyName);
 
+                button.Click += new EventHandler(GroupButton_Click);
                 button.MouseHover += new EventHandler(GroupButton_MouseHover);
                 button.MouseLeave += new EventHandler(GroupButton_MouseLeave);
 

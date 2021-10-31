@@ -31,7 +31,6 @@
             this.ModsGroupBox = new System.Windows.Forms.GroupBox();
             this.ModSelectionNoneButton = new System.Windows.Forms.Button();
             this.ModSelectionAllButton = new System.Windows.Forms.Button();
-            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.ModuleSelectionNoneButton = new System.Windows.Forms.Button();
             this.ModuleSelectionAllButton = new System.Windows.Forms.Button();
@@ -66,6 +65,7 @@
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.LanguageDropDown = new System.Windows.Forms.ComboBox();
             this.ReloadButton = new System.Windows.Forms.Button();
+            this.ModSelectionBox = new Foreman.CheckboxListWithErrors();
             this.ModsGroupBox.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -115,16 +115,6 @@
             this.ModSelectionAllButton.Text = "All";
             this.ModSelectionAllButton.UseVisualStyleBackColor = true;
             this.ModSelectionAllButton.Click += new System.EventHandler(this.ModSelectionAllButton_Click);
-            // 
-            // ModSelectionBox
-            // 
-            this.ModSelectionBox.CheckOnClick = true;
-            this.ModSelectionBox.FormattingEnabled = true;
-            this.ModSelectionBox.Location = new System.Drawing.Point(9, 19);
-            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.ModSelectionBox.Name = "ModSelectionBox";
-            this.ModSelectionBox.Size = new System.Drawing.Size(240, 514);
-            this.ModSelectionBox.TabIndex = 10;
             // 
             // groupBox7
             // 
@@ -511,6 +501,16 @@
             this.ReloadButton.Text = "Reload";
             this.ReloadButton.UseVisualStyleBackColor = true;
             this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
+            // 
+            // ModSelectionBox
+            // 
+            this.ModSelectionBox.CheckOnClick = true;
+            this.ModSelectionBox.FormattingEnabled = true;
+            this.ModSelectionBox.Location = new System.Drawing.Point(9, 19);
+            this.ModSelectionBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.ModSelectionBox.Name = "ModSelectionBox";
+            this.ModSelectionBox.Size = new System.Drawing.Size(240, 514);
+            this.ModSelectionBox.TabIndex = 10;
             // 
             // SettingsForm
             // 
