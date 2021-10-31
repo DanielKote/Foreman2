@@ -49,8 +49,8 @@ namespace Foreman
 		private Brush backgroundBrush;
 		private Font myFont;
 
-		private List<ItemTab> inputTabs;
-		private List<ItemTab> outputTabs;
+		private List<ItemTabElement> inputTabs;
+		private List<ItemTabElement> outputTabs;
 
 		private ContextMenu rightClickMenu;
 
@@ -65,53 +65,54 @@ namespace Foreman
 			DragStarted = false;
 
 			rightClickMenu = new ContextMenu();
-			inputTabs = new List<ItemTab>();
-			outputTabs = new List<ItemTab>();
+			inputTabs = new List<ItemTabElement>();
+			outputTabs = new List<ItemTabElement>();
 
 			Width = minWidth;
 			Height = baseHeight;
 
-            if (DisplayedNode is ConsumerNode)
-            {
+			if (DisplayedNode is ConsumerNode)
+			{
 				backgroundBrush = demandBGBrush;
-                if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
+				if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissingItem)
 					backgroundBrush = missingBGBrush;
-            }
-            else if (DisplayedNode is SupplierNode)
-            {
+			}
+			else if (DisplayedNode is SupplierNode)
+			{
 				backgroundBrush = supplyBGBrush;
-                if (((SupplierNode)DisplayedNode).SuppliedItem.IsMissingItem)
+				if (((SupplierNode)DisplayedNode).SuppliedItem.IsMissingItem)
 					backgroundBrush = missingBGBrush;
-            }
-            else if (DisplayedNode is RecipeNode)
-            {
+			}
+			else if (DisplayedNode is RecipeNode)
+			{
 				backgroundBrush = recipeBGBrush;
-                if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissingRecipe)
+				if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissingRecipe)
 					backgroundBrush = missingBGBrush;
-            }
-            else if (DisplayedNode is PassthroughNode)
-            {
+			}
+			else if (DisplayedNode is PassthroughNode)
+			{
 				backgroundBrush = passthroughBGBrush;
-                if (((PassthroughNode)DisplayedNode).PassthroughItem.IsMissingItem)
+				if (((PassthroughNode)DisplayedNode).PassthroughItem.IsMissingItem)
 					backgroundBrush = missingBGBrush;
-            }
-            else
-                Trace.Fail("No branch for node: " + DisplayedNode.ToString());
-
-			foreach (Item item in node.Inputs)
-			{
-				ItemTab newTab = new ItemTab(item, LinkType.Input, myGraphViewer, this);
-				inputTabs.Add(newTab);
 			}
-			foreach (Item item in node.Outputs)
-			{
-				ItemTab newTab = new ItemTab(item, LinkType.Output, myGraphViewer, this);
-				outputTabs.Add(newTab);
-			}
+			else
+				Trace.Fail("No branch for node: " + DisplayedNode.ToString());
 
 			if (DisplayedNode is RecipeNode || DisplayedNode is SupplierNode)
 			{
 				//assembler stuff
+			}
+
+			//first stage item tab creation - absolutely necessary in the constructor due to the creation and simultaneous linking of nodes being possible (drag to new node for example).
+			foreach (Item item in DisplayedNode.Inputs)
+			{
+				ItemTabElement newTab = new ItemTabElement(item, LinkType.Input, myGraphViewer, this);
+				inputTabs.Add(newTab);
+			}
+			foreach (Item item in DisplayedNode.Outputs)
+			{
+				ItemTabElement newTab = new ItemTabElement(item, LinkType.Output, myGraphViewer, this);
+				outputTabs.Add(newTab);
 			}
 		}
 
@@ -142,6 +143,41 @@ namespace Foreman
 					Text = node.BaseRecipe.FriendlyName;
 			}
 
+			//update tabs (necessary now that it is possible that an item was added or removed)... I am looking at you furnaces!!!
+			//done by first checking all old tabs and removing any that are no longer part of the displayed node, then looking at the displayed node io and adding any new tabs that are necessary.
+			//could potentially be done by just deleting all the old ones and remaking them from scratch, but come on - thats much more intensive than just doing some checks!
+			foreach (ItemTabElement oldTab in inputTabs.Where(tab => !DisplayedNode.Inputs.Contains(tab.Item)).ToList())
+			{
+				foreach (NodeLink link in DisplayedNode.InputLinks.Where(link => link.Item == oldTab.Item).ToList())
+					link.Delete();
+				inputTabs.Remove(oldTab);
+				oldTab.Dispose();
+			}
+			foreach (ItemTabElement oldTab in outputTabs.Where(tab => !DisplayedNode.Outputs.Contains(tab.Item)).ToList())
+			{
+				foreach (NodeLink link in DisplayedNode.OutputLinks.Where(link => link.Item == oldTab.Item).ToList())
+					link.Delete();
+				outputTabs.Remove(oldTab);
+				oldTab.Dispose();
+			}
+			foreach (Item item in DisplayedNode.Inputs)
+			{
+				if (inputTabs.FirstOrDefault(tab => tab.Item == item) == null)
+				{
+					ItemTabElement newTab = new ItemTabElement(item, LinkType.Input, myGraphViewer, this);
+					inputTabs.Add(newTab);
+				}
+			}
+			foreach (Item item in DisplayedNode.Outputs)
+			{
+				if (outputTabs.FirstOrDefault(tab => tab.Item == item) == null)
+				{
+					ItemTabElement newTab = new ItemTabElement(item, LinkType.Output, myGraphViewer, this);
+					outputTabs.Add(newTab);
+				}
+			}
+
+			//size update
 			int iconWidth = Math.Max(minWidth, getMaxIconWidths() + 10);
 			int width, height;
 
@@ -174,9 +210,9 @@ namespace Foreman
 			Height = height;
 
 			//update tabs
-			foreach (ItemTab tab in inputTabs)
+			foreach (ItemTabElement tab in inputTabs)
 				tab.UpdateValues(DisplayedNode.GetConsumeRate(tab.Item), DisplayedNode.GetSuppliedRate(tab.Item), DisplayedNode.IsOversupplied(tab.Item)); //for inputs we want the consumption/supply/oversupply values
-			foreach (ItemTab tab in outputTabs)
+			foreach (ItemTabElement tab in outputTabs)
 				tab.UpdateValues(DisplayedNode.GetSupplyRate(tab.Item), 0, false); //for outputs we only care to display the supply rate
 
 			UpdateTabOrder();
@@ -188,14 +224,14 @@ namespace Foreman
 			outputTabs = outputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ToList();
 
 			int x = -GetIconWidths(outputTabs) / 2;
-			foreach (ItemTab tab in outputTabs)
+			foreach (ItemTabElement tab in outputTabs)
 			{
 				x += tabPadding;
 				tab.Location = new Point(x + (tab.Width / 2), -Height / 2);
 				x += tab.Width;
 			}
 			x = -GetIconWidths(inputTabs) / 2;
-			foreach (ItemTab tab in inputTabs)
+			foreach (ItemTabElement tab in inputTabs)
 			{
 				x += tabPadding;
 				tab.Location = new Point(x + (tab.Width / 2), Height / 2);
@@ -208,15 +244,15 @@ namespace Foreman
 			return Math.Max(GetIconWidths(inputTabs), GetIconWidths(outputTabs));
 		}
 
-		private int GetIconWidths(List<ItemTab> tabs)
+		private int GetIconWidths(List<ItemTabElement> tabs)
 		{
 			int result = tabPadding;
-			foreach (ItemTab tab in tabs)
+			foreach (ItemTabElement tab in tabs)
 				result += tab.Bounds.Width + tabPadding;
 			return result;
 		}
 		
-		protected int GetItemTabXHeuristic(ItemTab tab)
+		protected int GetItemTabXHeuristic(ItemTabElement tab)
 		{
 			int total = 0;
 			IEnumerable<NodeLink> links;
@@ -234,14 +270,14 @@ namespace Foreman
 			return total;
 		}
 
-		public ItemTab GetOutputLineItemTab(Item item)
+		public ItemTabElement GetOutputLineItemTab(Item item)
 		{
 			if (!outputTabs.Any())
 				return null;
 			return outputTabs.First(it => it.Item == item);
 		}
 
-		public ItemTab GetInputLineItemTab(Item item)
+		public ItemTabElement GetInputLineItemTab(Item item)
 		{
 			if (!inputTabs.Any())
 				return null;
@@ -250,13 +286,8 @@ namespace Foreman
 
 		public void beginEditingNodeRate()
 		{
-			//RateOptionsPanel newPanel = new RateOptionsPanel(DisplayedNode, Parent);
-			//new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), Parent);
-
-			DisplayedNode.DesiredRate += 1;
-			DisplayedNode.RateType = RateType.Manual;
-			myGraphViewer.Invalidate();
-			myGraphViewer.Graph.UpdateNodeValues();
+			DevNodeOptionsPanel newPanel = new DevNodeOptionsPanel(DisplayedNode, myGraphViewer);
+			new FloatingTooltipControl(newPanel, Direction.Right, new Point(Location.X - (Width / 2), Location.Y), myGraphViewer);
 		}
 
         public override void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0)
@@ -269,7 +300,7 @@ namespace Foreman
 			if (base.ContainsPoint(graph_point))
 				return true;
 
-			foreach (ItemTab tab in SubElements.OfType<ItemTab>())
+			foreach (ItemTabElement tab in SubElements.OfType<ItemTabElement>())
 				if (tab.ContainsPoint(graph_point))
 					return true;
 
@@ -283,7 +314,7 @@ namespace Foreman
 				Point trans = ConvertToGraph(new Point(0, 0)); //all draw operations happen in graph 0,0 origin coordinates. So we need to transform all our draw operations to the local 0,0 (center of object)
 
 				Brush bgBrush = backgroundBrush;
-				foreach (ItemTab tab in inputTabs.Union(outputTabs))
+				foreach (ItemTabElement tab in inputTabs.Union(outputTabs))
 					if (tab.LinkType == LinkType.Input && DisplayedNode.IsOversupplied(tab.Item))
 						bgBrush = oversuppliedBGBrush;
 
@@ -296,12 +327,9 @@ namespace Foreman
 
 				if (rNode != null)
 				{
-					//int prodCount = 0;
-					//var assemblers = rNode.GetAssemblers();
-					//foreach (MachinePermutation assembler in assemblers.Keys)
-					//	foreach (Module module in assembler.modules)
-					//		if (module.ProductivityBonus > 0)
-					//			graphics.DrawEllipse(productivityPen, trans.X - (Width / 2) - 2, trans.Y - (Height / 2) + 20 + prodCount++ * 10, 5, 5);
+					int prodCount = rNode.AssemblerModules.Count(module => module.ProductivityBonus != 0) + rNode.BeaconModules.Count(module => module.ProductivityBonus != 0);
+					for (int i = 0; i < prodCount; i++)
+						graphics.DrawEllipse(productivityTickBGPen, trans.X - (Width / 2) - 2, trans.Y - (Height / 2) + 20 + i * 10, 5, 5);
 				}
 
 				if (Highlighted)
@@ -311,7 +339,7 @@ namespace Foreman
 
 		public override List<TooltipInfo> GetToolTips(Point graph_point)
 		{
-			ItemTab tab = SubElements.OfType<ItemTab>().FirstOrDefault(it => it.ContainsPoint(graph_point));
+			ItemTabElement tab = SubElements.OfType<ItemTabElement>().FirstOrDefault(it => it.ContainsPoint(graph_point));
 			List<TooltipInfo> toolTips = tab?.GetToolTips(graph_point) ?? new List<TooltipInfo>();
 
 			if (tab == null && DisplayedNode is RecipeNode rNode)
@@ -348,16 +376,7 @@ namespace Foreman
 					}*/
 				}
 
-				if (myGraphViewer.SelectedAmountType == AmountType.FixedAmount)
-				{
-					tti.Text += String.Format("\n\nCurrent iterations: {0}", DisplayedNode.ActualRate);
-				}
-				else
-				{
-					tti.Text += String.Format("\n\nCurrent Rate: {0}/{1}",
-						myGraphViewer.SelectedRateUnit == RateUnit.PerMinute ? DisplayedNode.ActualRate / 60 : DisplayedNode.ActualRate,
-						myGraphViewer.SelectedRateUnit == RateUnit.PerMinute ? "m" : "s");
-				}
+				tti.Text += String.Format("\n\nCurrent Rate: {0}", DisplayedNode.ActualRate);
 				toolTips.Add(tti);
 			}
 
@@ -393,7 +412,7 @@ namespace Foreman
 			else if (button == MouseButtons.Right)
 			{
 				//check if we clicked an item tab (and process it), if not -> process node
-				ItemTab tab = SubElements.OfType<ItemTab>().FirstOrDefault(it => it.ContainsPoint(graph_point));
+				ItemTabElement tab = SubElements.OfType<ItemTabElement>().FirstOrDefault(it => it.ContainsPoint(graph_point));
 				tab?.MouseUp(graph_point, button, wasDragged);
 				if (tab == null)
 				{
@@ -421,8 +440,8 @@ namespace Foreman
 		{
 			if (!DragStarted)
 			{
-				ItemTab draggedTab = null;
-				foreach (ItemTab tab in SubElements.OfType<ItemTab>())
+				ItemTabElement draggedTab = null;
+				foreach (ItemTabElement tab in SubElements.OfType<ItemTabElement>())
 					if (tab.ContainsPoint(MouseDownLocation))
 						draggedTab = tab;
 				if (draggedTab != null)

@@ -7,7 +7,7 @@ namespace Foreman
 {
 	public abstract class GraphElement : IDisposable
 	{
-		public HashSet<GraphElement> SubElements { get; private set; }
+		public List<GraphElement> SubElements { get; private set; }
 
 		//bounds assumes 0,0 is the center of this element. X,Y (or location) is the difference between this origin and the parent element origin (NOT! the graph origin! -> this means that moving the parent element will not change the x,y of the child elements)
 		//to simplify things, most point transformations make use of ConvertToLocal funtion which goes through the entire element-subelement ownership to convert a graph point to local coordinates (for in-class use).
@@ -39,7 +39,7 @@ namespace Foreman
 			if (myParent != null)
 				parent.SubElements.Add(this);
 
-			SubElements = new HashSet<GraphElement>();
+			SubElements = new List<GraphElement>();
 			Visible = true;
 		}
 
@@ -98,9 +98,11 @@ namespace Foreman
 
 		public virtual void Dispose()
 		{
-			foreach (GraphElement element in SubElements)
+			foreach (GraphElement element in SubElements.ToArray())
 				element.Dispose();
 			SubElements.Clear();
+			if (myParent != null)
+				myParent.SubElements.Remove(this);
 
 			myGraphViewer.Invalidate();
 		}

@@ -36,6 +36,9 @@ namespace Foreman
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
+				GraphViewer.SelectedRateUnit = (ProductionGraphViewer.RateUnit)Properties.Settings.Default.DefaultRateUnit;
+				RateOptionsDropDown.Items.AddRange(ProductionGraphViewer.RateUnitNames);
+				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
 				ModuleDropDown.SelectedIndex = Properties.Settings.Default.DefaultModules;
 				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
@@ -43,20 +46,14 @@ namespace Foreman
 				DynamicLWCheckBox.Checked = Properties.Settings.Default.DynamicLineWidth;
 				SimpleViewCheckBox.Checked = Properties.Settings.Default.SimpleView;
 				UpdateControlValues();
+				GraphViewer.Focus();
 			}
         }
 
 		private void UpdateControlValues()
 		{
-			FixedAmountButton.Checked = GraphViewer.SelectedAmountType == AmountType.FixedAmount;
-			RateButton.Checked = GraphViewer.SelectedAmountType == AmountType.Rate;
-			if (GraphViewer.SelectedRateUnit == RateUnit.PerSecond)
-				RateOptionsDropDown.SelectedIndex = 0;
-			else
-				RateOptionsDropDown.SelectedIndex = 1;
-
+			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.SelectedRateUnit;
 			SimpleViewCheckBox.Checked = GraphViewer.SimpleView;
-
 			GraphViewer.Invalidate();
 		}
 
@@ -100,19 +97,19 @@ namespace Foreman
 			if (dialog.ShowDialog() != DialogResult.OK)
 				return;
 
-			//try
-			//{
+			try
+			{
 				if(Path.GetExtension(dialog.FileName).ToLower() == ".fjson")
 					GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false);
 				else if(Path.GetExtension(dialog.FileName).ToLower() == ".json")
 					GraphViewer.LoadFromOldJson(JObject.Parse(File.ReadAllText(dialog.FileName)));
 				//NOTE: MainCache will update
-			//}
-			//catch (Exception exception)
-			//{
-			//	MessageBox.Show("Could not load this file. See log for more details");
-			//	ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
-			//}
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show("Could not load this file. See log for more details");
+				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+			}
 
 			UpdateControlValues();
 			GraphViewer.Invalidate();
@@ -172,8 +169,6 @@ namespace Foreman
 				SettingsForm.SettingsFormOptions oldOptions = new SettingsForm.SettingsFormOptions();
 				foreach (Assembler assembler in GraphViewer.DCache.Assemblers.Values)
 					oldOptions.Assemblers.Add(assembler, assembler.Enabled);
-				foreach (Miner miner in GraphViewer.DCache.Miners.Values)
-					oldOptions.Miners.Add(miner, miner.Enabled);
 				foreach (Module module in GraphViewer.DCache.Modules.Values)
 					oldOptions.Modules.Add(module, module.Enabled);
 
@@ -198,8 +193,6 @@ namespace Foreman
 					else //update the assemblers, miners, modules if we havent switched preset (if we have, then all are enabled)
 					{
 						foreach (KeyValuePair<Assembler, bool> kvp in form.CurrentOptions.Assemblers)
-							kvp.Key.Enabled = kvp.Value;
-						foreach (KeyValuePair<Miner, bool> kvp in form.CurrentOptions.Miners)
 							kvp.Key.Enabled = kvp.Value;
 						foreach (KeyValuePair<Module, bool> kvp in form.CurrentOptions.Modules)
 							kvp.Key.Enabled = kvp.Value;
@@ -233,41 +226,11 @@ namespace Foreman
 
 		//---------------------------------------------------------Production properties
 
-		private void RateButton_CheckedChanged(object sender, EventArgs e)
-		{
-			if ((sender as RadioButton).Checked)
-			{
-				this.GraphViewer.SelectedAmountType = AmountType.Rate;
-				RateOptionsDropDown.Enabled = true;
-			}
-			else
-			{
-				RateOptionsDropDown.Enabled = false;
-			}
-			GraphViewer.Graph.UpdateNodeValues();
-		}
-
-		private void FixedAmountButton_CheckedChanged(object sender, EventArgs e)
-		{
-			if ((sender as RadioButton).Checked)
-			{
-				this.GraphViewer.SelectedAmountType = AmountType.FixedAmount;
-			}
-
-			GraphViewer.Graph.UpdateNodeValues();
-		}
-
 		private void RateOptionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			switch ((sender as ComboBox).SelectedIndex)
-			{
-				case 0:
-					GraphViewer.SelectedRateUnit = RateUnit.PerSecond;
-					break;
-				case 1:
-					GraphViewer.SelectedRateUnit = RateUnit.PerMinute;
-					break;
-			}
+			Properties.Settings.Default.DefaultRateUnit = RateOptionsDropDown.SelectedIndex;
+			GraphViewer.SelectedRateUnit = (ProductionGraphViewer.RateUnit)RateOptionsDropDown.SelectedIndex;
+			Properties.Settings.Default.Save();
 			GraphViewer.Graph.UpdateNodeValues();
 		}
 
@@ -362,6 +325,12 @@ namespace Foreman
 		private void ModuleDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
 			Properties.Settings.Default.DefaultModules = ModuleDropDown.SelectedIndex;
+			Properties.Settings.Default.Save();
+		}
+
+		private void AssemblerDropDown_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			Properties.Settings.Default.DefaultAssemblers = AssemblerDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
 		}
 

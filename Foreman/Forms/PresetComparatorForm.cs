@@ -177,8 +177,8 @@ namespace Foreman
             //2.2: items, recipes, assemblers, miners, and modules
             ProcessObject(LeftCache.Items, RightCache.Items, unfilteredItemTabObjects);
             ProcessObject(LeftCache.Recipes, RightCache.Recipes, unfilteredRecipeTabObjects);
-            ProcessObject(LeftCache.Assemblers, RightCache.Assemblers, unfilteredAssemblerTabObjects);
-            ProcessObject(LeftCache.Miners, RightCache.Miners, unfilteredMinerTabObjects);
+            ProcessObject(LeftCache.Assemblers.Values.Where(a => !a.IsMiner).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => !a.IsMiner).ToDictionary(a => a.Name), unfilteredAssemblerTabObjects);
+            ProcessObject(LeftCache.Assemblers.Values.Where(a => a.IsMiner).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.IsMiner).ToDictionary(a => a.Name), unfilteredMinerTabObjects);
             ProcessObject(LeftCache.Modules, RightCache.Modules, unfilteredModuleTabObjects);
 
             //process the tab (for the first time) - it will also populate the actual lists.
@@ -282,17 +282,11 @@ namespace Foreman
                         break;
 
                     case 3: //assemblers
+                    case 4: //miners
                         Assembler lAssembler = (Assembler)l.Tag;
                         Assembler rAssembler = (Assembler)r.Tag;
 
                         similarInternals = (lAssembler.Speed == rAssembler.Speed && lAssembler.ModuleSlots == rAssembler.ModuleSlots);
-                        break;
-
-                    case 4: //miners
-                        Miner lMiner = (Miner)l.Tag;
-                        Miner rMiner = (Miner)r.Tag;
-
-                        similarInternals = (lMiner.Speed == rMiner.Speed && lMiner.ModuleSlots == rMiner.ModuleSlots);
                         break;
 
                     case 5: //modules
@@ -448,18 +442,18 @@ namespace Foreman
                     RecipeToolTip.Show((Control)sender, location);
 
                 }
-                else if(lLVI.Tag is ProductionEntity pEntity) //assembler or miner
+                else if(lLVI.Tag is Assembler assembler) //assembler or miner
                 {
-                    string left = pEntity.FriendlyName + "\n" +
-                        string.Format("   Speed:         {0}x\n", pEntity.Speed) +
-                        string.Format("   Module Slots:  {0}", pEntity.ModuleSlots);
+                    string left = assembler.FriendlyName + "\n" +
+                        string.Format("   Speed:         {0}x\n", assembler.Speed) +
+                        string.Format("   Module Slots:  {0}", assembler.ModuleSlots);
                     string right = "";
                     if(compareTypeTT)
                     {
-                        ProductionEntity rpEntity = rLVI.Tag as ProductionEntity;
-                        right = rpEntity.FriendlyName + "\n" +
-                        string.Format("   Speed:         {0}x\n", rpEntity.Speed) +
-                        string.Format("   Module Slots:  {0}", rpEntity.ModuleSlots);
+                        Assembler rassembler = rLVI.Tag as Assembler;
+                        right = rassembler.FriendlyName + "\n" +
+                        string.Format("   Speed:         {0}x\n", rassembler.Speed) +
+                        string.Format("   Module Slots:  {0}", rassembler.ModuleSlots);
                     }
 
                     TextToolTip.SetText(left, right);
@@ -470,7 +464,7 @@ namespace Foreman
                     string left = module.FriendlyName + "\n" +
                         string.Format("   Productivity bonus: {0}\n", module.ProductivityBonus.ToString("%0")) +
                         string.Format("   Speed bonus:        {0}\n", module.SpeedBonus.ToString("%0")) +
-                        string.Format("   Efficiency bonus:   {0}\n", (-module.EfficiencyBonus).ToString("%0")) +
+                        string.Format("   Efficiency bonus:   {0}\n", (-module.ConsumptionBonus).ToString("%0")) +
                         string.Format("   Pollution bonus:    {0}", module.PollutionBonus.ToString("%0"));
                     string right = "";
                     if (compareTypeTT)
@@ -479,7 +473,7 @@ namespace Foreman
                         right = rmodule.FriendlyName + "\n" +
                         string.Format("   Productivity bonus: {0}\n", rmodule.ProductivityBonus.ToString("%0")) +
                         string.Format("   Speed bonus:        {0}\n", rmodule.SpeedBonus.ToString("%0")) +
-                        string.Format("   Efficiency bonus:   {0}\n", (-rmodule.EfficiencyBonus).ToString("%0")) +
+                        string.Format("   Efficiency bonus:   {0}\n", (-rmodule.ConsumptionBonus).ToString("%0")) +
                         string.Format("   Pollution bonus:    {0}", rmodule.PollutionBonus.ToString("%0"));
                     }
                     TextToolTip.SetText(left, right);

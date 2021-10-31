@@ -10,12 +10,16 @@ namespace Foreman
 		BaseNode Consumer { get; }
 		Item Item { get; }
 		double Throughput { get; }
+
+		void Delete();
     }
 
 
 	[Serializable]
 	public class NodeLinkPrototype: NodeLink
 	{
+		protected ProductionGraph MyGraph;
+
 		public BaseNode Supplier { get { return supplier; } }
 		public BaseNode Consumer { get { return consumer; } }
 		public Item Item { get; private set; }
@@ -24,12 +28,15 @@ namespace Foreman
 		internal BaseNodePrototype supplier;
 		internal BaseNodePrototype consumer;
 
-		internal NodeLinkPrototype(BaseNodePrototype supplier, BaseNodePrototype consumer, Item item)
+		internal NodeLinkPrototype(ProductionGraph myGraph, BaseNodePrototype supplier, BaseNodePrototype consumer, Item item)
 		{
+			this.MyGraph = myGraph;
 			this.supplier = supplier;
 			this.consumer = consumer;
 			Item = item;
 		}
+
+		public void Delete() { MyGraph.DeleteLink(this); }
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{

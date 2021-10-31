@@ -36,19 +36,24 @@ namespace Foreman
         public static Bitmap GetUnknownIcon()
         {
             if (unknownIcon == null)
-            {
-                try
-                {
-                    using (Bitmap image = new Bitmap("UnknownIcon.png")) //If you don't do this, the file is locked for the lifetime of the bitmap
-                    {
-                        Bitmap bmp = new Bitmap(image);
-                        unknownIcon = bmp;
-                    }
-                }
-                catch (Exception) { return new Bitmap(32, 32); }
-            }
+                unknownIcon = GetIcon(Path.Combine("Graphics", "UnknownIcon.png"), 32);
             return unknownIcon;
         }
+        public static Bitmap GetIcon(string path, int size)
+        {
+            try
+            {
+                using (Bitmap image = new Bitmap(path)) //If you don't do this, the file is locked for the lifetime of the bitmap
+                {
+                    Bitmap bmp = new Bitmap(size,size);
+                    using(Graphics g = Graphics.FromImage(bmp))
+                        g.DrawImage(image, new Rectangle(0, 0, (size * image.Width / image.Height), size));
+                    return bmp;
+                }
+            }
+            catch (Exception) { return new Bitmap(size,size); }
+        }
+
 
         public static void SaveIconCache(string path, Dictionary<string, IconColorPair> iconCache)
         {

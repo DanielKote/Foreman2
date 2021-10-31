@@ -168,6 +168,7 @@ namespace Foreman
 
 #if DEBUG
 			Stopwatch stopwatch = new Stopwatch();
+			stopwatch.Start();
 #endif
 			ImportStarted = true;
 			NewPresetName = await ProcessPreset(installPath, userDataPath, progress, token);
@@ -322,7 +323,7 @@ namespace Foreman
 				process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 				process.StartInfo.FileName = exePath;
 
-				progress.Report(new KeyValuePair<int, string>(5, "Running Factorio - creating test save."));
+				progress.Report(new KeyValuePair<int, string>(10, "Running Factorio - creating test save."));
 				process.StartInfo.Arguments = "--create temp-save.zip";
 				process.StartInfo.UseShellExecute = false;
 				process.StartInfo.CreateNoWindow = true;
@@ -349,7 +350,7 @@ namespace Foreman
 					return "";
 				}
 
-				progress.Report(new KeyValuePair<int, string>(10, "Running Factorio - foreman export scripts."));
+				progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
 				process.StartInfo.Arguments = "--instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1";
 				process.Start();
 				resultString = "";
@@ -370,7 +371,7 @@ namespace Foreman
 				if (Directory.Exists(Path.Combine(modsPath, "foremanexport_1.0.0")))
 					Directory.Delete(Path.Combine(modsPath, "foremanexport_1.0.0"), true);
 
-				progress.Report(new KeyValuePair<int, string>(15, "Processing mod files."));
+				progress.Report(new KeyValuePair<int, string>(25, "Processing mod files."));
 
 				if (resultString.IndexOf("Is another instance already running?") != -1)
 				{
@@ -454,7 +455,7 @@ namespace Foreman
 						return "";
 					}
 
-					if (!icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, token, 20, 100))
+					if (!icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, token, 30, 100))
 					{
 						if (!token.IsCancellationRequested)
 						{

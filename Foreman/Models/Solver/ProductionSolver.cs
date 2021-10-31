@@ -133,7 +133,7 @@ namespace Foreman
         {
             Debug.Assert(links.All(x => x.Supplier == node));
 
-            addRatio(node, item, links, rate * node.GetProductivityMultiplier(), EndpointType.SUPPLY);
+            addRatio(node, item, links, rate, EndpointType.SUPPLY);
         }
 
         // Constrain a ratio on the input side of a node
@@ -148,7 +148,7 @@ namespace Foreman
         // than is being produced by the supplier.
         // 
         // Consuming less than is being produced is fine. This represents a backup.
-        public void AddInputLink(BaseNode node, Item item, IEnumerable<NodeLink> links, double inputRate)
+        public void AddInputLink(BaseNode node, Item item, IEnumerable<NodeLink> links)
         {
             Debug.Assert(links.All(x => x.Consumer == node));
 

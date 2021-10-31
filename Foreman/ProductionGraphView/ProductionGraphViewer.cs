@@ -13,16 +13,18 @@ using System.IO;
 
 namespace Foreman
 {
-	public enum AmountType { FixedAmount, Rate }
-	public enum RateUnit { PerMinute, PerSecond }
 
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
+		public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
+		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
+		private static readonly float[] RateMultiplier = new float[] { 1 / 1, 1 / 60, 1 / 300, 1 / 600, 1 / 1800, 1 / 3600 }; //, 1/21600, 1/43200, 1/86400 };
+		public static float GetRateMultipler(RateUnit ru) { return RateMultiplier[(int)ru]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
+
 		private enum DragOperation { None, Item, Selection }
 		public enum NewNodeType { Disconnected, Supplier, Consumer }
 
-		public AmountType SelectedAmountType { get; set; }
 		public RateUnit SelectedRateUnit { get; set; }
 
 		public bool SimpleView { get; set; } //simple: show only the item/recipe names.
@@ -205,7 +207,7 @@ namespace Foreman
 				//this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
 				//should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
 				int offsetDistance = lastRecipeWidth / 2;
-				lastRecipeWidth = 50 + Math.Max(newNode.Inputs.Count(), newNode.Outputs.Count()) * (ItemTab.TabWidth + ItemTab.TabBorder);
+				lastRecipeWidth = 50 + Math.Max(newNode.Inputs.Count(), newNode.Outputs.Count()) * (ItemTabElement.TabWidth + ItemTabElement.TabBorder);
 				if (offsetDistance > 0)
 					offsetDistance += lastRecipeWidth / 2;
 				newLocation = new Point(Grid.AlignToGrid(newLocation.X + offsetDistance), Grid.AlignToGrid(newLocation.Y));
@@ -917,7 +919,6 @@ namespace Foreman
 		{
 			//write
 			info.AddValue("SavedPresetName", DCache.PresetName);
-			info.AddValue("AmountType", SelectedAmountType);
 			info.AddValue("Unit", SelectedRateUnit);
 			info.AddValue("ViewOffset", ViewOffset);
 			info.AddValue("ViewScale", ViewScale);
@@ -926,7 +927,6 @@ namespace Foreman
 
 			info.AddValue("HiddenRecipes", DCache.Recipes.Values.Where(r => r.Hidden).Select(r => r.Name));
 			info.AddValue("EnabledAssemblers", DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
-			info.AddValue("EnabledMiners", DCache.Miners.Values.Where(m => m.Enabled).Select(m => m.Name));
 			info.AddValue("EnabledModules", DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
 
 			info.AddValue("ProductionGraph", Graph);
@@ -1026,7 +1026,6 @@ namespace Foreman
 			}
 
 			//set up graph options
-			SelectedAmountType = (AmountType)(int)json["AmountType"];
 			SelectedRateUnit = (RateUnit)(int)json["Unit"];
 
 			string[] viewOffsetString = ((string)json["ViewOffset"]).Split(',');
@@ -1041,12 +1040,6 @@ namespace Foreman
 				foreach (string name in json["EnabledAssemblers"].Select(t => (string)t).ToList())
 					if (DCache.Assemblers.ContainsKey(name))
 						DCache.Assemblers[name].Enabled = true;
-
-				foreach (Miner miner in DCache.Miners.Values)
-					miner.Enabled = false;
-				foreach (string name in json["EnabledMiners"].Select(t => (string)t).ToList())
-					if (DCache.Miners.ContainsKey(name))
-						DCache.Miners[name].Enabled = true;
 
 				foreach (Module module in DCache.Modules.Values)
 					module.Enabled = false;

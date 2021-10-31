@@ -12,7 +12,6 @@ namespace Foreman
         public class SettingsFormOptions
         {
             public Dictionary<Assembler, bool> Assemblers;
-            public Dictionary<Miner, bool> Miners;
             public Dictionary<Module, bool> Modules;
 
             public List<Preset> Presets;
@@ -21,7 +20,6 @@ namespace Foreman
             public SettingsFormOptions()
             {
                 Assemblers = new Dictionary<Assembler, bool>();
-                Miners = new Dictionary<Miner, bool>();
                 Modules = new Dictionary<Module, bool>();
 
                 Presets = new List<Preset>();
@@ -32,8 +30,6 @@ namespace Foreman
                 SettingsFormOptions clone = new SettingsFormOptions();
                 foreach (KeyValuePair<Assembler, bool> kvp in Assemblers)
                     clone.Assemblers.Add(kvp.Key, kvp.Value);
-                foreach (KeyValuePair<Miner, bool> kvp in Miners)
-                    clone.Miners.Add(kvp.Key, kvp.Value);
                 foreach (KeyValuePair<Module, bool> kvp in Modules)
                     clone.Modules.Add(kvp.Key, kvp.Value);
                 foreach (Preset preset in Presets)
@@ -53,9 +49,6 @@ namespace Foreman
                     if (same)
                         foreach (KeyValuePair<Assembler, bool> kvp in Assemblers)
                             same = same && other.Assemblers.Contains(kvp) && (kvp.Value == other.Assemblers[kvp.Key]);
-                    if (same)
-                        foreach (KeyValuePair<Miner, bool> kvp in Miners)
-                            same = same && other.Miners.Contains(kvp) && (kvp.Value == other.Miners[kvp.Key]);
                     if (same)
                         foreach (KeyValuePair<Module, bool> kvp in Modules)
                             same = same && other.Modules.Contains(kvp) && (kvp.Value == other.Modules[kvp.Key]);
@@ -80,7 +73,7 @@ namespace Foreman
             SelectPresetMenuItem.Click += SelectPresetMenuItem_Click;
             DeletePresetMenuItem.Click += DeletePresetMenuItem_Click;
 
-            AssemblerSelectionBox.Items.AddRange(CurrentOptions.Assemblers.Keys.ToArray());
+            AssemblerSelectionBox.Items.AddRange(CurrentOptions.Assemblers.Keys.Where(a => !a.IsMiner).ToArray());
             AssemblerSelectionBox.Sorted = true;
             AssemblerSelectionBox.DisplayMember = "FriendlyName";
             for (int i = 0; i < AssemblerSelectionBox.Items.Count; i++)
@@ -91,12 +84,12 @@ namespace Foreman
                 }
             }
 
-            MinerSelectionBox.Items.AddRange(CurrentOptions.Miners.Keys.ToArray());
+            MinerSelectionBox.Items.AddRange(CurrentOptions.Assemblers.Keys.Where(a => a.IsMiner).ToArray());
             MinerSelectionBox.Sorted = true;
             MinerSelectionBox.DisplayMember = "FriendlyName";
             for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
             {
-                if (CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]])
+                if (CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[i]])
                 {
                     MinerSelectionBox.SetItemChecked(i, true);
                 }
@@ -249,14 +242,14 @@ namespace Foreman
         //MINER------------------------------------------------------------------------------------------
         private void MinerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
+            CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[e.Index]] = (e.NewValue == CheckState.Checked);
         }
         private void MinerSelectionAllButton_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
             {
                 MinerSelectionBox.SetItemChecked(i, true);
-                CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]] = true;
+                CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[i]] = true;
             }
         }
         private void MinerSelectionNoneButton_Click(object sender, EventArgs e)
@@ -264,7 +257,7 @@ namespace Foreman
             for (int i = 0; i < MinerSelectionBox.Items.Count; i++)
             {
                 MinerSelectionBox.SetItemChecked(i, false);
-                CurrentOptions.Miners[(Miner)MinerSelectionBox.Items[i]] = false;
+                CurrentOptions.Assemblers[(Assembler)MinerSelectionBox.Items[i]] = false;
             }
         }
 

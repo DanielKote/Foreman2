@@ -124,6 +124,12 @@
     <Compile Include="Controls\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\DevNodeOptionsPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DevNodeOptionsPanel.Designer.cs">
+      <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\IRChooserPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -138,13 +144,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DataCache\IconCache.cs" />
-    <Compile Include="DataTypes\Assembler.cs" />
-    <Compile Include="DataTypes\Beacon.cs" />
-    <Compile Include="DataTypes\DataObjectBase.cs" />
-    <Compile Include="DataTypes\Group.cs" />
-    <Compile Include="DataTypes\Module.cs" />
-    <Compile Include="DataTypes\ProductionEntity.cs" />
-    <Compile Include="DataTypes\Technology.cs" />
+    <Compile Include="DataCache\DataTypes\Assembler.cs" />
+    <Compile Include="DataCache\DataTypes\Beacon.cs" />
+    <Compile Include="DataCache\DataTypes\DataObjectBase.cs" />
+    <Compile Include="DataCache\DataTypes\Group.cs" />
+    <Compile Include="DataCache\DataTypes\Module.cs" />
+    <Compile Include="DataCache\DataTypes\Technology.cs" />
     <Compile Include="Forms\ImportPresetForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -163,11 +168,11 @@
     <Compile Include="Forms\PresetSelectionForm.Designer.cs">
       <DependentUpon>PresetSelectionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\ConsumerNode.cs" />
-    <Compile Include="Models\PassthroughNode.cs" />
-    <Compile Include="Models\RecipeNode.cs" />
+    <Compile Include="Models\Nodes\ConsumerNode.cs" />
+    <Compile Include="Models\Nodes\PassthroughNode.cs" />
+    <Compile Include="Models\Nodes\RecipeNode.cs" />
     <Compile Include="Models\Solver\CyclicNodeTester.cs" />
-    <Compile Include="Models\SupplierNode.cs" />
+    <Compile Include="Models\Nodes\SupplierNode.cs" />
     <Compile Include="DataCache\DataCache.cs" />
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
@@ -175,14 +180,14 @@
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionGraphView\BaseLinkElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\BaseLinkElement.cs" />
     <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
-    <Compile Include="ProductionGraphView\DraggedLinkElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\DraggedLinkElement.cs" />
     <Compile Include="DataCache\ErrorLogging.cs" />
     <Compile Include="DataCache\IconCacheProcessor.cs" />
     <Compile Include="Models\Solver\GoogleSolver.cs" />
     <Compile Include="ProductionGraphView\GraphicsStuff.cs" />
-    <Compile Include="ProductionGraphView\GraphElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\GraphElement.cs" />
     <Compile Include="Models\Solver\GraphOptimisation.cs" />
     <Compile Include="Forms\ImageExportForm.cs">
       <SubType>Form</SubType>
@@ -191,17 +196,16 @@
       <DependentUpon>ImageExportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ProductionGraphView\Grid.cs" />
-    <Compile Include="ProductionGraphView\ItemTab.cs" />
+    <Compile Include="ProductionGraphView\Elements\ItemTabElement.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataTypes\Item.cs" />
-    <Compile Include="ProductionGraphView\LinkElement.cs" />
-    <Compile Include="DataTypes\Miner.cs" />
-    <Compile Include="Models\BaseNode.cs" />
+    <Compile Include="DataCache\DataTypes\Item.cs" />
+    <Compile Include="ProductionGraphView\Elements\LinkElement.cs" />
+    <Compile Include="Models\Nodes\BaseNode.cs" />
     <Compile Include="Models\Solver\ProductionSolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Forms\DataReloadForm.cs">
@@ -211,7 +215,7 @@
       <DependentUpon>DataReloadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DataTypes\Recipe.cs" />
+    <Compile Include="DataCache\DataTypes\Recipe.cs" />
     <Compile Include="Models\ProductionGraph.cs" />
     <Compile Include="ProductionGraphView\ProductionGraphViewer.cs">
       <SubType>UserControl</SubType>
@@ -219,8 +223,11 @@
     <Compile Include="ProductionGraphView\ProductionGraphViewer.Designer.cs">
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductionGraphView\NodeElement.cs" />
-    <Compile Include="Models\NodeLink.cs" />
+    <Compile Include="ProductionGraphView\Elements\NodeElement.cs" />
+    <Compile Include="Models\Nodes\NodeLink.cs" />
+    <EmbeddedResource Include="Controls\DevNodeOptionsPanel.resx">
+      <DependentUpon>DevNodeOptionsPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -300,10 +307,13 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Licences.txt">
+    <Content Include="Graphics\MiningIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="UnknownIcon.png">
+    <Content Include="Graphics\UnknownIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Licences.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

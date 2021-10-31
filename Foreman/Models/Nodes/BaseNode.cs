@@ -33,6 +33,10 @@ namespace Foreman
 
 		float GetSpeedMultiplier();
 		float GetProductivityMultiplier();
+		float GetConsumptionMultiplier();
+		float GetPollutionMultiplier();
+
+		void Delete();
 	}
 
 	[Serializable]
@@ -52,17 +56,21 @@ namespace Foreman
 		public IReadOnlyList<NodeLink> InputLinks { get { return inputLinks; } }
 		public IReadOnlyList<NodeLink> OutputLinks { get { return outputLinks; } }
 
-        public float ActualRate { get; protected set; } // The rate the solver calculated is appropriate for this node.
+		public float ActualRate { get; protected set; } // The rate the solver calculated is appropriate for this node.
 		public float DesiredRate { get; set; } // If the rateType is manual, this field contains the rate the user desires.
 
-        internal List<NodeLinkPrototype> inputLinks { get; private set; }
+		internal List<NodeLinkPrototype> inputLinks { get; private set; }
 		internal List<NodeLinkPrototype> outputLinks { get; private set; }
-     
-        public abstract float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node
-        public abstract float GetSupplyRate(Item item); //calculated rate a given item is supplied by this node
+
+		public abstract float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node
+		public abstract float GetSupplyRate(Item item); //calculated rate a given item is supplied by this node
 
 		public virtual float GetSpeedMultiplier() { return 1; }
 		public virtual float GetProductivityMultiplier() { return 1; }
+		public virtual float GetConsumptionMultiplier() { return 1; }
+		public virtual float GetPollutionMultiplier() { return 1; }
+
+		public void Delete() { MyGraph.DeleteNode(this); }
 
 		protected BaseNodePrototype(ProductionGraph graph, int nodeID)
 		{

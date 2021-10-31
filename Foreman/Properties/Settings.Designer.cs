@@ -142,5 +142,29 @@ namespace Foreman.Properties {
                 this["SimpleView"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int DefaultAssemblers {
+            get {
+                return ((int)(this["DefaultAssemblers"]));
+            }
+            set {
+                this["DefaultAssemblers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int DefaultRateUnit {
+            get {
+                return ((int)(this["DefaultRateUnit"]));
+            }
+            set {
+                this["DefaultRateUnit"] = value;
+            }
+        }
     }
 }

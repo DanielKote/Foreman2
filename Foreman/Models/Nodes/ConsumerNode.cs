@@ -28,10 +28,11 @@ namespace Foreman
 		public override float GetConsumeRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
 		public override float GetSupplyRate(Item item) { throw new ArgumentException("Consumer does not supply! nothing should be asking for the supply rate"); }
 
-		internal override double outputRateFor(Item item) { throw new ArgumentException("Consumer should not have outputs!"); }
 		internal override double inputRateFor(Item item) { return 1; }
+		internal override double outputRateFor(Item item) { throw new ArgumentException("Consumer should not have outputs!"); }
 
-		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("NodeType", NodeType.Consumer);
 			info.AddValue("NodeID", NodeID);

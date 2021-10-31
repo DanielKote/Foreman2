@@ -11,8 +11,8 @@ namespace Foreman
 		public NodeLink DisplayedLink { get; private set; }
 		public override Item Item { get { return DisplayedLink.Item; } protected set { } }
 
-		public ItemTab SupplierTab { get; protected set; }
-		public ItemTab ConsumerTab { get; protected set; }
+		public ItemTabElement SupplierTab { get; protected set; }
+		public ItemTabElement ConsumerTab { get; protected set; }
 
 		public LinkElement(ProductionGraphViewer graphViewer, NodeLink displayedLink, NodeElement supplierElement, NodeElement consumerElement) : base(graphViewer)
 		{

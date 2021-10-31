@@ -26,8 +26,8 @@ namespace Foreman
 		public override float GetConsumeRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
 		public override float GetSupplyRate(Item item) { return (float)Math.Round(ActualRate, RoundingDP); }
 
-		internal override double outputRateFor(Item item) { return 1; }
 		internal override double inputRateFor(Item item) { return 1; }
+		internal override double outputRateFor(Item item) { return 1; }
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{

@@ -319,6 +319,37 @@ local function ProcessPrototypes()
 	end
 end
 
+local function ExportMyBurnerSourcePrototype(entity)
+		--ExportParameter('energy_usage', entity.energy_usage ~= nil and entity.energy_usage or 0, true, ',', 3) --this is the base draw (ex: inserters) aka:not what we need
+		ExportParameter('max_energy_usage', entity.max_energy_usage, true, ',', 3)
+
+		if entity.burner_prototype then
+			ExportParameter('fuel_type', 'item', false, ',', 3)
+			ExportParameter('fuel_effectivity', entity.burner_prototype.effectivity, true, ',', 3)
+
+			ExportLine('"fuel_categories": [', 3)
+			ppcounter = 0
+			for _, _ in pairs(entity.burner_prototype.fuel_categories) do
+				ppcounter = ppcounter + 1
+			end
+			for fuel, _ in pairs(entity.burner_prototype.fuel_categories) do
+				ppcounter = ppcounter - 1
+				if ppcounter > 0 then
+					ExportLine('"'..fuel..'",', 4)
+				else
+					ExportLine('"'..fuel..'"', 4)
+				end
+			end
+			ExportLine('],', 3)
+
+		elseif entity.fluid_energy_source_prototype then
+			ExportParameter('fuel_type', 'liquid', false, ',', 3)
+			ExportParameter('fuel_effectivity', entity.fluid_energy_source_prototype.effectivity, true, ',', 3)
+			ExportParameter('burns_fluid', entity.fluid_energy_source_prototype.burns_fluid and 'true' or 'false', true, ',', 3) --honestly, if this isnt true I will likely say FK that. DONT want to try handling temperature dependent fuel intake.
+			
+		end
+end
+
 
 local function ExportModList()
 	ExportLine('"mods": [', 1)
@@ -525,6 +556,10 @@ local function ExportItems()
 			ExportParameter('fuel_value', item.fuel_value, false, ',', 3)
 		end
 
+		if item.burnt_result ~= nil then
+			ExportParameter('burnt_result', item.burnt_result.name, false, ',', 3)
+		end
+
 		ExportParameter('order', item.order, false, ',', 3)
 		ExportParameter('subgroup', item.subgroup.name, false, '', 3)
 		
@@ -662,18 +697,24 @@ local function ExportCraftingMachines()
 		
 		ExportLine('"allowed_effects": [', 3)
 		pcounter = 0
-		for _, _ in pairs(machine.allowed_effects) do
-			pcounter = pcounter + 1
+		for _, bool in pairs(machine.allowed_effects) do
+			if bool then
+				pcounter = pcounter + 1
+			end
 		end
-		for effect, _ in pairs(machine.allowed_effects) do
-			pcounter = pcounter - 1
-			if pcounter > 0 then
-				ExportLine('"'..effect..'",', 4)
-			else
-				ExportLine('"'..effect..'"', 4)
+		for effect, bool in pairs(machine.allowed_effects) do
+			if bool then
+				pcounter = pcounter - 1
+				if pcounter > 0 and bool then
+					ExportLine('"'..effect..'",', 4)
+				else
+					ExportLine('"'..effect..'"', 4)
+				end
 			end
 		end
 		ExportLine('],', 3)
+
+		ExportMyBurnerSourcePrototype(machine)
 
 		ExportParameter('order', machine.order, false, '', 3)
 		
@@ -708,18 +749,22 @@ local function ExportBeacons()
 
 		ExportLine('"allowed_effects": [', 3)
 		pcounter = 0
-		for _, _ in pairs(beacon.allowed_effects) do
-			pcounter = pcounter + 1
-		end
-		for effect, _ in pairs(beacon.allowed_effects) do
-			pcounter = pcounter - 1
-			if pcounter > 0 then
-				ExportLine('"'..effect..'",', 4)
-			else
-				ExportLine('"'..effect..'"', 4)
+		for _, bool in pairs(beacon.allowed_effects) do
+			if bool then
+				pcounter = pcounter + 1
 			end
 		end
-		ExportLine(']', 3)
+		for effect, bool in pairs(beacon.allowed_effects) do
+			if bool then
+				pcounter = pcounter - 1
+				if pcounter > 0 and bool then
+					ExportLine('"'..effect..'",', 4)
+				else
+					ExportLine('"'..effect..'"', 4)
+				end
+			end
+		end
+		ExportLine('],', 3)
 
 		counter = counter - 1 
 		if counter > 0 then
@@ -768,18 +813,25 @@ local function ExportMiners()
 		
 		ExportLine('"allowed_effects": [', 3)
 		pcounter = 0
-		for _, _ in pairs(miner.allowed_effects) do
-			pcounter = pcounter + 1
+		for _, bool in pairs(miner.allowed_effects) do
+			if bool then
+				pcounter = pcounter + 1
+			end
 		end
-		for effect, _ in pairs(miner.allowed_effects) do
-			pcounter = pcounter - 1
-			if pcounter > 0 then
-				ExportLine('"'..effect..'",', 4)
-			else
-				ExportLine('"'..effect..'"', 4)
+		for effect, bool in pairs(miner.allowed_effects) do
+			if bool then
+				pcounter = pcounter - 1
+				if pcounter > 0 and bool then
+					ExportLine('"'..effect..'",', 4)
+				else
+					ExportLine('"'..effect..'"', 4)
+				end
 			end
 		end
 		ExportLine('],', 3)
+
+
+		ExportMyBurnerSourcePrototype(miner)
 
 		ExportParameter('order', miner.order, false, '', 3)
 		
@@ -810,12 +862,12 @@ local function ExportResources()
 		ExportLine('",', 0)
 		
 		ExportParameter('resource_category', resource.resource_category, false, ',', 3)
-		ExportParameter('mining_time', resource.mineable_properties.mining_time, false, ',', 3)
+		ExportParameter('mining_time', resource.mineable_properties.mining_time, true, ',', 3)
 		if resource.mineable_properties.required_fluid then
 			ExportParameter('required_fluid', resource.mineable_properties.required_fluid, false, ',', 3)
 		end
 		if resource.mineable_properties.fluid_amount then
-			ExportParameter('fluid_amount', resource.mineable_properties.fluid_amount, false, ',', 3)
+			ExportParameter('fluid_amount', resource.mineable_properties.fluid_amount, true, ',', 3)
 		end
 		
 		ExportLine('"products": [', 3)
@@ -841,9 +893,9 @@ local function ExportResources()
 				end
 			end
 		end
-		ExportLine('],', 3)
+		ExportLine(']', 3)
 		
-		ExportParameter('minable', resource.mineable_properties.minable and 'true' or 'false', true, '', 3)
+		--ExportParameter('minable', resource.mineable_properties.minable and 'true' or 'false', true, '', 3)
 
 		counter = counter - 1 
 		if counter > 0 then
@@ -873,7 +925,9 @@ local function ExportOffshorePumps()
 		
 		ExportParameter('fluid', opump.fluid.name, false, ',', 3)
 		ExportParameter('pumping_speed', opump.pumping_speed, true, ',', 3)
-		
+
+		ExportMyBurnerSourcePrototype(opump)
+
 		ExportParameter('order', opump.order, false, '', 3)
 		
 		counter = counter - 1 

@@ -10,11 +10,14 @@ namespace Foreman
 
 		IReadOnlyCollection<Recipe> ProductionRecipes { get; }
 		IReadOnlyCollection<Recipe> ConsumptionRecipes { get; }
-		IReadOnlyCollection<Resource> MiningResources { get; }
 		bool IsMissingItem { get; }
 		bool IsFluid { get; }
 		bool IsTemperatureDependent { get; }
 		double DefaultTemperature { get; }
+
+		float FuelValue { get; }
+		Item BurnResult { get; }
+		IReadOnlyCollection<Assembler> FuelsAssemblers { get; }
 
 		string GetTemperatureRangeFriendlyName(fRange tempRange);
 	}
@@ -25,19 +28,22 @@ namespace Foreman
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }
 		public IReadOnlyCollection<Recipe> ConsumptionRecipes { get { return consumptionRecipes; } }
-		public IReadOnlyCollection<Resource> MiningResources { get { return miningResources; } }
-
-		internal SubgroupPrototype mySubgroup;
-
-		internal HashSet<RecipePrototype> productionRecipes { get; private set; }
-		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
-		internal HashSet<ResourcePrototype> miningResources { get; private set; }
 
 		public bool IsMissingItem { get; private set; }
 
 		public bool IsFluid { get; private set; }
         public bool IsTemperatureDependent { get; internal set; } //while building the recipes, if we notice any product fluid NOT producted at its default temperature, we mark that fluid as temperature dependent
 		public double DefaultTemperature { get; internal set; } //for liquids
+
+		public float FuelValue { get; internal set; }
+		public Item BurnResult { get; internal set; }
+		public IReadOnlyCollection<Assembler> FuelsAssemblers { get { return fuelsAssemblers; } }
+
+		internal SubgroupPrototype mySubgroup;
+
+		internal HashSet<RecipePrototype> productionRecipes { get; private set; }
+		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
+		internal HashSet<AssemblerPrototype> fuelsAssemblers { get; private set; }
 
 		public ItemPrototype(DataCache dCache, string name, string friendlyName, bool isfluid, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
@@ -46,10 +52,11 @@ namespace Foreman
 
 			productionRecipes = new HashSet<RecipePrototype>();
 			consumptionRecipes = new HashSet<RecipePrototype>();
-			miningResources = new HashSet<ResourcePrototype>();
+			fuelsAssemblers = new HashSet<AssemblerPrototype>();
 
 			IsFluid = isfluid;
             DefaultTemperature = 0;
+			FuelValue = 0;
             IsTemperatureDependent = false;
 			IsMissingItem = isMissing;
 		}

@@ -122,7 +122,7 @@ namespace Foreman
 			if (supplier.OutputLinks.Any(l => l.Item == item && l.Consumer == consumer)) //check for an already existing connection
 				return null;
 
-			NodeLinkPrototype link = new NodeLinkPrototype(supplierP, consumerP, item);
+			NodeLinkPrototype link = new NodeLinkPrototype(this, supplierP, consumerP, item);
 			supplierP.outputLinks.Add(link);
 			consumerP.inputLinks.Add(link);
 			nodeLinks.Add(link);
@@ -220,7 +220,7 @@ namespace Foreman
 				//If the numbers here are so big they're causing an overflow, there's not much I can do about it. It's already pretty clear in the UI that the values are unusable.
 				//At least this way it doesn't crash...
 			}
-			NodeValuesUpdated?.Invoke(this, EventArgs.Empty);
+			NodeValuesUpdated?.Invoke(this, EventArgs.Empty); //called even if no changes have been made in order to re-draw the graph (since something required a node value update - link deletion? node addition? whatever)
 		}
 
 		public NewNodeCollection InsertNodesFromJson(DataCache cache, JToken json) //cache is necessary since we will possibly be adding to mssing items/recipes

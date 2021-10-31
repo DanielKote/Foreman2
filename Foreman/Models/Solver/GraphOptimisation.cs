@@ -76,7 +76,7 @@ namespace Foreman
                 var item = itemInputs.Key;
 
                 solver.AddInputRatio(this, item, itemInputs, inputRateFor(item));
-                solver.AddInputLink(this, item, itemInputs, inputRateFor(item));
+                solver.AddInputLink(this, item, itemInputs);
             }
 
             foreach (var itemOutputs in OutputLinks.GroupBy(x => x.Item))
@@ -89,7 +89,7 @@ namespace Foreman
             }
         }
 
-        internal abstract double outputRateFor(Item item);
         internal abstract double inputRateFor(Item item);
+        internal abstract double outputRateFor(Item item);
     }
 }

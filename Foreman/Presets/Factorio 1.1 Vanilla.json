@@ -9995,6 +9995,7 @@
       "localised_name": "Uranium fuel cell",
       "fuel_category": "nuclear",
       "fuel_value": "8000000000",
+      "burnt_result": "used-up-uranium-fuel-cell",
       "order": "r[uranium-processing]-a[uranium-fuel-cell]",
       "subgroup": "intermediate-product"
     },
@@ -10511,11 +10512,12 @@
       "crafting_categories": [
         "smelting"
       ],
-      "allowed_effects": [
-        "consumption",
-        "speed",
-        "productivity",
-        "pollution"
+      "allowed_effects": [],
+      "max_energy_usage": 1500,
+      "fuel_type": "item",
+      "fuel_effectivity": 1,
+      "fuel_categories": [
+        "chemical"
       ],
       "order": "z-a[stone-furnace]"
     },
@@ -10529,11 +10531,12 @@
       "crafting_categories": [
         "smelting"
       ],
-      "allowed_effects": [
-        "consumption",
-        "speed",
-        "productivity",
-        "pollution"
+      "allowed_effects": [],
+      "max_energy_usage": 1500,
+      "fuel_type": "item",
+      "fuel_effectivity": 1,
+      "fuel_categories": [
+        "chemical"
       ],
       "order": "z-b[steel-furnace]"
     },
@@ -10553,6 +10556,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 3000,
       "order": "z-c[electric-furnace]"
     },
     {
@@ -10567,12 +10571,8 @@
         "basic-crafting",
         "advanced-crafting"
       ],
-      "allowed_effects": [
-        "consumption",
-        "speed",
-        "productivity",
-        "pollution"
-      ],
+      "allowed_effects": [],
+      "max_energy_usage": 1250,
       "order": "z-a[assembling-machine-1]"
     },
     {
@@ -10594,6 +10594,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 2500,
       "order": "z-b[assembling-machine-2]"
     },
     {
@@ -10615,6 +10616,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 6250,
       "order": "z-c[assembling-machine-3]"
     },
     {
@@ -10633,6 +10635,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 7000,
       "order": "z-d[refinery]"
     },
     {
@@ -10651,6 +10654,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 3500,
       "order": "z-e[chemical-plant]"
     },
     {
@@ -10669,6 +10673,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 5833.3333333333,
       "order": "z-g[centrifuge]"
     },
     {
@@ -10687,6 +10692,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 66666.666666667,
       "order": "z-e[rocket-silo]"
     }
   ],
@@ -10700,7 +10706,6 @@
       "allowed_effects": [
         "consumption",
         "speed",
-        "productivity",
         "pollution"
       ]
     }
@@ -10716,11 +10721,12 @@
       "resource_categories": [
         "basic-solid"
       ],
-      "allowed_effects": [
-        "consumption",
-        "speed",
-        "productivity",
-        "pollution"
+      "allowed_effects": [],
+      "max_energy_usage": 2500,
+      "fuel_type": "item",
+      "fuel_effectivity": 1,
+      "fuel_categories": [
+        "chemical"
       ],
       "order": "z-a[items]-a[burner-mining-drill]"
     },
@@ -10740,6 +10746,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 1500,
       "order": "z-a[items]-b[electric-mining-drill]"
     },
     {
@@ -10758,6 +10765,7 @@
         "productivity",
         "pollution"
       ],
+      "max_energy_usage": 1500,
       "order": "z-b[fluids]-b[pumpjack]"
     }
   ],
@@ -10766,87 +10774,81 @@
       "name": "crude-oil",
       "localised_name": "Crude oil",
       "resource_category": "basic-fluid",
-      "mining_time": "1",
+      "mining_time": 1,
       "products": [
         {
           "name": "crude-oil",
           "type": "fluid",
           "amount": 10
         }
-      ],
-      "minable": true
+      ]
     },
     {
       "name": "coal",
       "localised_name": "Coal",
       "resource_category": "basic-solid",
-      "mining_time": "1",
+      "mining_time": 1,
       "products": [
         {
           "name": "coal",
           "type": "item",
           "amount": 1
         }
-      ],
-      "minable": true
+      ]
     },
     {
       "name": "copper-ore",
       "localised_name": "Copper ore",
       "resource_category": "basic-solid",
-      "mining_time": "1",
+      "mining_time": 1,
       "products": [
         {
           "name": "copper-ore",
           "type": "item",
           "amount": 1
         }
-      ],
-      "minable": true
+      ]
     },
     {
       "name": "iron-ore",
       "localised_name": "Iron ore",
       "resource_category": "basic-solid",
-      "mining_time": "1",
+      "mining_time": 1,
       "products": [
         {
           "name": "iron-ore",
           "type": "item",
           "amount": 1
         }
-      ],
-      "minable": true
+      ]
     },
     {
       "name": "stone",
       "localised_name": "Stone",
       "resource_category": "basic-solid",
-      "mining_time": "1",
+      "mining_time": 1,
       "products": [
         {
           "name": "stone",
           "type": "item",
           "amount": 1
         }
-      ],
-      "minable": true
+      ]
     },
     {
       "name": "uranium-ore",
       "localised_name": "Uranium ore",
       "resource_category": "basic-solid",
-      "mining_time": "2",
+      "mining_time": 2,
       "required_fluid": "sulfuric-acid",
-      "fluid_amount": "10",
+      "fluid_amount": 10,
       "products": [
         {
           "name": "uranium-ore",
           "type": "item",
           "amount": 1
         }
-      ],
-      "minable": true
+      ]
     }
   ],
   "offshorepumps": [
@@ -10856,6 +10858,7 @@
       "localised_name": "Offshore pump",
       "fluid": "water",
       "pumping_speed": 20,
+      "max_energy_usage": 0,
       "order": "z-b[fluids]-a[offshore-pump]"
     }
   ],

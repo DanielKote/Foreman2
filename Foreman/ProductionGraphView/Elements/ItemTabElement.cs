@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Foreman
 {
-	public class ItemTab : GraphElement
+	public class ItemTabElement : GraphElement
 	{
 		public static int TabWidth { get { return iconSize + border * 3; } } //I just use these two to get a decent aproximation as to how far to space new nodes when bulk-added
 		public static int TabBorder { get { return border; } }
@@ -26,19 +26,19 @@ namespace Foreman
 
 		private static Font textFont = new Font(FontFamily.GenericSansSerif, 6);
 
-		private static string line1FormatA = "{0:0.##}{1}";
-		private static string line1FormatB = "{0:0.#}{1}";
-		private static string line1FormatC = "{0:0}{1}";
-		private static string line2FormatA = "\n({0:0.##}{1})";
-		private static string line2FormatB = "\n({0:0.#}{1})";
-		private static string line2FormatC = "\n({0:0}{1})";
+		private static string line1FormatA = "{0:0.##}";
+		private static string line1FormatB = "{0:0.#}";
+		private static string line1FormatC = "{0:0}";
+		private static string line2FormatA = "\n({0:0.##})";
+		private static string line2FormatB = "\n({0:0.#})";
+		private static string line2FormatC = "\n({0:0})";
 
 		private Pen borderPen;
 		private string text = "";
 
 		private ContextMenu rightClickMenu;
 
-		public ItemTab(Item item, LinkType type, ProductionGraphViewer graphViewer, NodeElement node ) //item tab is always to be owned by a node
+		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, NodeElement node ) //item tab is always to be owned by a node
 			: base(graphViewer, node)
 		{
 			rightClickMenu = new ContextMenu();
@@ -63,34 +63,23 @@ namespace Foreman
 
 		public void UpdateValues(float consumeRate, float suppliedRate, bool isOversupplied)
         {
-			string unit = "";
-			if (myGraphViewer.SelectedAmountType == AmountType.Rate && myGraphViewer.SelectedRateUnit == RateUnit.PerSecond)
-				unit = "/s";
-			else if (myGraphViewer.SelectedAmountType == AmountType.Rate && myGraphViewer.SelectedRateUnit == RateUnit.PerMinute)
-			{
-				unit = "/m";
-				consumeRate *= 60;
-				suppliedRate *= 60;
-			}
-
-			text = "";
 			borderPen = regularBorderPen;
 			if (consumeRate >= 1000)
-				text = String.Format(line1FormatC, consumeRate, unit);
+				text = String.Format(line1FormatC, consumeRate);
 			else if (consumeRate >= 100)
-				text = String.Format(line1FormatB, consumeRate, unit);
+				text = String.Format(line1FormatB, consumeRate);
 			else
-				text = String.Format(line1FormatA, consumeRate, unit);
+				text = String.Format(line1FormatA, consumeRate);
 
 			if (isOversupplied)
 			{
 				borderPen = oversuppliedBorderPen;
 				if (suppliedRate >= 1000)
-					text += String.Format(line2FormatC, suppliedRate, unit);
+					text += String.Format(line2FormatC, suppliedRate);
 				else if (suppliedRate >= 100)
-					text += String.Format(line2FormatB, suppliedRate, unit);
+					text += String.Format(line2FormatB, suppliedRate);
 				else
-					text += String.Format(line2FormatA, suppliedRate, unit);
+					text += String.Format(line2FormatA, suppliedRate);
 			}
 
 			int textHeight = (int)myGraphViewer.CreateGraphics().MeasureString(text, textFont).Height;
