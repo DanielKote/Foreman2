@@ -10,9 +10,6 @@ namespace Foreman
 {
 	public partial class NodeElement : GraphElement
 	{
-		public static bool StickyDragOrigin = false; //true: drag axies are established at start of drag; false: drag axies are established upon activation of axis limits (shift)
-		public Point DragOrigin { get; private set; } //used to limit drag to horizontal or vertical (if such is selected)
-
 		public bool Highlighted = false; //selection - note that this doesnt mean it is or isnt in selection (at least not during drag operation - ex: dragging a not-selection over a group of selected nodes will change their highlight status, but wont add them to the 'selected' set until you let go of the drag)
 		public BaseNode DisplayedNode { get; private set; }
 
@@ -38,16 +35,12 @@ namespace Foreman
 		//most values are attempted to fit the grid (6 * 2^n) - ex: 72 = 6 * (4+8)
 		public const int baseHeight = 96; //public because we actually use this as a nice offset value when making a new node (so when you drag a link and drop it it offsets the newly created node by half this)
 		public const int baseWIconHeight = 128; //same as above
-		private const int minWidth = 72;
-		private const int dWidth = 24;
-		private const int dHeight = 12;
 		private const int tabPadding = 7; //makes each tab be evenly spaced for grid
-		private const int maxT10Width = 144;
-
-		private string Text;
+		private const int modD = 24; //(6*4) -> height and width will be divisible by this (-2 on each to leave a space between adjacent nodes)
+		private const int passthroughNodeWidth = 72;
+		private const int minWidth = 144;
 
 		private Brush backgroundBrush;
-		private Font myFont;
 
 		private List<ItemTabElement> inputTabs;
 		private List<ItemTabElement> outputTabs;
@@ -55,12 +48,11 @@ namespace Foreman
 		private ContextMenu rightClickMenu;
 
 		private Point MouseDownLocation; //location where the mouse click down first happened - in graph coordinates (used to ensure that any drag operation begins at the start, and not at the point (+- a few pixels) where the drag was officially registed as a drag and not just a mouse click.
+		private Point MouseDownNodeLocation; //location of this node the moment the mouse click down first happened - in graph coordinates
 		private bool DragStarted;
 
 		public NodeElement(ProductionGraphViewer graphViewer, BaseNode node) : base(graphViewer)
 		{
-			Text = "";
-			myFont = size10Font;
 			DisplayedNode = node;
 			DragStarted = false;
 
@@ -68,80 +60,46 @@ namespace Foreman
 			inputTabs = new List<ItemTabElement>();
 			outputTabs = new List<ItemTabElement>();
 
-			Width = minWidth;
+			Width = (DisplayedNode is PassthroughNode)? passthroughNodeWidth : minWidth;
 			Height = baseHeight;
 
-			if (DisplayedNode is ConsumerNode)
-			{
-				backgroundBrush = demandBGBrush;
-				if (((ConsumerNode)DisplayedNode).ConsumedItem.IsMissing)
-					backgroundBrush = missingBGBrush;
-			}
-			else if (DisplayedNode is SupplierNode)
-			{
-				backgroundBrush = supplyBGBrush;
-				if (((SupplierNode)DisplayedNode).SuppliedItem.IsMissing)
-					backgroundBrush = missingBGBrush;
-			}
-			else if (DisplayedNode is RecipeNode)
-			{
-				backgroundBrush = recipeBGBrush;
-				if (((RecipeNode)DisplayedNode).BaseRecipe.IsMissing)
-					backgroundBrush = missingBGBrush;
-			}
-			else if (DisplayedNode is PassthroughNode)
-			{
-				backgroundBrush = passthroughBGBrush;
-				if (((PassthroughNode)DisplayedNode).PassthroughItem.IsMissing)
-					backgroundBrush = missingBGBrush;
-			}
+			if (DisplayedNode is ConsumerNode cNode)
+				backgroundBrush = cNode.IsValid ? demandBGBrush : missingBGBrush;
+			else if (DisplayedNode is SupplierNode sNode)
+				backgroundBrush = sNode.IsValid ? supplyBGBrush : missingBGBrush;
+			else if (DisplayedNode is PassthroughNode pNode)
+				backgroundBrush = pNode.IsValid ? passthroughBGBrush : missingBGBrush;
+			else if (DisplayedNode is RecipeNode rNode)
+				backgroundBrush = rNode.IsValid ? recipeBGBrush : missingBGBrush;
 			else
 				Trace.Fail("No branch for node: " + DisplayedNode.ToString());
 
-			if (DisplayedNode is RecipeNode || DisplayedNode is SupplierNode)
-			{
-				//assembler stuff
-			}
-
 			//first stage item tab creation - absolutely necessary in the constructor due to the creation and simultaneous linking of nodes being possible (drag to new node for example).
 			foreach (Item item in DisplayedNode.Inputs)
-			{
-				ItemTabElement newTab = new ItemTabElement(item, LinkType.Input, myGraphViewer, this);
-				inputTabs.Add(newTab);
-			}
+				inputTabs.Add(new ItemTabElement(item, LinkType.Input, myGraphViewer, this));
 			foreach (Item item in DisplayedNode.Outputs)
-			{
-				ItemTabElement newTab = new ItemTabElement(item, LinkType.Output, myGraphViewer, this);
-				outputTabs.Add(newTab);
-			}
+				outputTabs.Add(new ItemTabElement(item, LinkType.Output, myGraphViewer, this));
 		}
 
 		public void Update()
 		{
-			if (DisplayedNode is SupplierNode)
+			//size update
+			int width = Math.Max((DisplayedNode is PassthroughNode) ? passthroughNodeWidth : minWidth, Math.Max(GetIconWidths(inputTabs), GetIconWidths(outputTabs)) + 10);
+			int height = myGraphViewer.SimpleView ? baseHeight : baseWIconHeight;
+
+			//final size confirms
+			if (width % modD != 0)
 			{
-				SupplierNode node = (SupplierNode)DisplayedNode;
-				if (node.SuppliedItem.IsMissing)
-					Text = String.Format("Item not loaded! ({0})", node.DisplayName);
-				else
-					Text = "Input: " + node.SuppliedItem.FriendlyName;
+				width += modD;
+				width -= width % modD;
 			}
-			else if (DisplayedNode is ConsumerNode)
+			if (height % modD != 0)
 			{
-				ConsumerNode node = (ConsumerNode)DisplayedNode;
-				if (node.ConsumedItem.IsMissing)
-					Text = String.Format("Item not loaded! ({0})", node.DisplayName);
-				else
-					Text = "Output: " + node.ConsumedItem.FriendlyName;
+				height += modD;
+				height -= height % modD;
 			}
-			else if (DisplayedNode is RecipeNode)
-			{
-				RecipeNode node = (RecipeNode)DisplayedNode;
-				if (node.BaseRecipe.IsMissing)
-					Text = String.Format("Recipe not loaded! ({0})", node.DisplayName);
-				else
-					Text = node.BaseRecipe.FriendlyName;
-			}
+			Width = width - 2;
+			Height = height - 2;
 
 			//update tabs (necessary now that it is possible that an item was added or removed)... I am looking at you furnaces!!!
 			//done by first checking all old tabs and removing any that are no longer part of the displayed node, then looking at the displayed node io and adding any new tabs that are necessary.
@@ -161,55 +119,13 @@ namespace Foreman
 				oldTab.Dispose();
 			}
 			foreach (Item item in DisplayedNode.Inputs)
-			{
 				if (inputTabs.FirstOrDefault(tab => tab.Item == item) == null)
-				{
-					ItemTabElement newTab = new ItemTabElement(item, LinkType.Input, myGraphViewer, this);
-					inputTabs.Add(newTab);
-				}
-			}
+					inputTabs.Add(new ItemTabElement(item, LinkType.Input, myGraphViewer, this));
 			foreach (Item item in DisplayedNode.Outputs)
-			{
 				if (outputTabs.FirstOrDefault(tab => tab.Item == item) == null)
-				{
-					ItemTabElement newTab = new ItemTabElement(item, LinkType.Output, myGraphViewer, this);
-					outputTabs.Add(newTab);
-				}
-			}
+					outputTabs.Add(new ItemTabElement(item, LinkType.Output, myGraphViewer, this));
 
-			//size update
-			int iconWidth = Math.Max(minWidth, getMaxIconWidths() + 10);
-			int width, height;
-
-			Graphics graphics = myGraphViewer.CreateGraphics();
-			int minTextWidth = (int)graphics.MeasureString(Text, size10Font).Width + 10;
-			myFont = size10Font;
-			if (minTextWidth > maxT10Width && minTextWidth > iconWidth)
-			{
-				myFont = size7Font;
-				minTextWidth = (int)graphics.MeasureString(Text, size7Font).Width + 10;
-			}
-			width = Math.Max(iconWidth, minTextWidth);
-			height = baseHeight;
-
-			//final size confirms
-			if (width % dWidth != 0)
-			{
-				width += dWidth;
-				width -= width % dWidth;
-			}
-			if (height % dHeight != 0)
-			{
-				height += dHeight;
-				height -= height % dHeight;
-			}
-			width -= 2; //shrink by 1 on each side to make nodes being placed next to each other have a 2px gap between them (at least)
-			height -= 2;
-
-			Width = width;
-			Height = height;
-
-			//update tabs
+			//update tab values
 			foreach (ItemTabElement tab in inputTabs)
 				tab.UpdateValues(DisplayedNode.GetConsumeRate(tab.Item), DisplayedNode.GetSuppliedRate(tab.Item), DisplayedNode.IsOversupplied(tab.Item)); //for inputs we want the consumption/supply/oversupply values
 			foreach (ItemTabElement tab in outputTabs)
@@ -239,11 +155,6 @@ namespace Foreman
 			}
 		}
 
-		private int getMaxIconWidths()
-		{
-			return Math.Max(GetIconWidths(inputTabs), GetIconWidths(outputTabs));
-		}
-
 		private int GetIconWidths(List<ItemTabElement> tabs)
 		{
 			int result = tabPadding;
@@ -270,19 +181,8 @@ namespace Foreman
 			return total;
 		}
 
-		public ItemTabElement GetOutputLineItemTab(Item item)
-		{
-			if (!outputTabs.Any())
-				return null;
-			return outputTabs.First(it => it.Item == item);
-		}
-
-		public ItemTabElement GetInputLineItemTab(Item item)
-		{
-			if (!inputTabs.Any())
-				return null;
-			return inputTabs.First(it => it.Item == item);
-		}
+		public ItemTabElement GetOutputLineItemTab(Item item) { return outputTabs.First(it => it.Item == item); }
+		public ItemTabElement GetInputLineItemTab(Item item) { return inputTabs.First(it => it.Item == item); }
 
 		public void beginEditingNodeRate()
 		{
@@ -313,6 +213,7 @@ namespace Foreman
 			{
 				Point trans = ConvertToGraph(new Point(0, 0)); //all draw operations happen in graph 0,0 origin coordinates. So we need to transform all our draw operations to the local 0,0 (center of object)
 
+				//background
 				Brush bgBrush = backgroundBrush;
 				foreach (ItemTabElement tab in inputTabs.Union(outputTabs))
 					if (tab.LinkType == LinkType.Input && DisplayedNode.IsOversupplied(tab.Item))
@@ -323,7 +224,7 @@ namespace Foreman
 					GraphicsStuff.FillRoundRect(trans.X - (Width / 2) - 5, trans.Y - (Height / 2) - 5, Width + 10, Height + 10, 13, graphics, Brushes.DarkRed);
 
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, bgBrush);
-				graphics.DrawString(Text, myFont, textBrush, trans.X, trans.Y, centreFormat);
+				graphics.DrawString(DisplayedNode.GetNameString(), size10Font, textBrush, trans.X, trans.Y, centreFormat);
 
 				if (rNode != null)
 				{
@@ -341,7 +242,7 @@ namespace Foreman
 		{
 			ItemTabElement tab = SubElements.OfType<ItemTabElement>().FirstOrDefault(it => it.ContainsPoint(graph_point));
 			List<TooltipInfo> toolTips = tab?.GetToolTips(graph_point) ?? new List<TooltipInfo>();
-
+#if DEBUG
 			if (tab == null && DisplayedNode is RecipeNode rNode)
 			{
 				TooltipInfo tti = new TooltipInfo();
@@ -349,42 +250,16 @@ namespace Foreman
 				tti.ScreenLocation = myGraphViewer.GraphToScreen(Point.Add(Location, new Size(Width / 2, 0)));
 				tti.Text = String.Format("WH: {0},{1}\n", Width, Height);
 				tti.Text += String.Format("XY: {0},{1}\n", X, Y);
-
-				tti.Text += String.Format("Recipe: {0}", rNode.BaseRecipe.FriendlyName);
-				tti.Text += String.Format("\n--Base Time: {0}s", rNode.BaseRecipe.Time);
-				tti.Text += String.Format("\n--Base Ingredients:");
-				foreach (var kvp in rNode.BaseRecipe.IngredientSet)
-				{
-					tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
-				}
-				tti.Text += String.Format("\n--Base Products:");
-				foreach (var kvp in rNode.BaseRecipe.ProductSet)
-				{
-					tti.Text += String.Format("\n----{0} ({1})", kvp.Key.FriendlyName, kvp.Value.ToString());
-				}
-				if (!myGraphViewer.SimpleView)
-				{
-					/*
-					tti.Text += String.Format("\n\nAssemblers:");
-					foreach (var kvp in assemblerBox.AssemblerList)
-					{
-						tti.Text += String.Format("\n----{0} ({1})", kvp.Key.assembler.FriendlyName, kvp.Value.ToString());
-						foreach (var Module in kvp.Key.modules.Where(m => m != null))
-						{
-							tti.Text += String.Format("\n------{0}", Module.FriendlyName);
-						}
-					}*/
-				}
-
-				tti.Text += String.Format("\n\nCurrent Rate: {0}", DisplayedNode.ActualRate);
-				toolTips.Add(tti);
 			}
-
-			TooltipInfo helpToolTipInfo = new TooltipInfo();
-			helpToolTipInfo.Text = "Left click on this node to edit how fast it runs\nRight click for options";
-			helpToolTipInfo.Direction = Direction.None;
-			helpToolTipInfo.ScreenLocation = new Point(10, 10);
-			toolTips.Add(helpToolTipInfo);
+#endif
+			if (tab == null)
+			{
+				TooltipInfo helpToolTipInfo = new TooltipInfo();
+				helpToolTipInfo.Text = "Left click on this node to edit how fast it runs.\nRight click for options.";
+				helpToolTipInfo.Direction = Direction.None;
+				helpToolTipInfo.ScreenLocation = new Point(10, 10);
+				toolTips.Add(helpToolTipInfo);
+			}
 
 			return toolTips;
 		}
@@ -392,12 +267,10 @@ namespace Foreman
 		public override void MouseDown(Point graph_point, MouseButtons button)
 		{
 			MouseDownLocation = graph_point;
+			MouseDownNodeLocation = new Point(X, Y);
 
 			if (button == MouseButtons.Left)
-			{
 				myGraphViewer.MouseDownElement = this;
-				DragOrigin = new Point(X, Y);
-			}
 		}
 
 		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
@@ -451,32 +324,28 @@ namespace Foreman
 			}
 			else //drag started -> proceed with dragging the node around
 			{
-				int xtemp = graph_point.X;
-				int ytemp = graph_point.Y;
-
-				//lock to grid if it is set & is visible
-				if (myGraphViewer.Grid.ShowGrid)
+				Size offset = (Size)myGraphViewer.Grid.AlignToGrid(Point.Subtract(graph_point, (Size)MouseDownLocation));
+				Point newLocation = Point.Add(MouseDownNodeLocation, offset);
+				if(myGraphViewer.Grid.LockDragToAxis)
 				{
-					xtemp = myGraphViewer.Grid.AlignToGrid(xtemp);
-					ytemp = myGraphViewer.Grid.AlignToGrid(ytemp);
-				}
+					Point lockedDragOffset = Point.Subtract(graph_point, (Size)myGraphViewer.Grid.DragOrigin);
 
-				if (myGraphViewer.Grid.LockDragToAxis)
-				{
-					if (Math.Abs(DragOrigin.X - xtemp) > Math.Abs(DragOrigin.Y - ytemp))
-						ytemp = myGraphViewer.Grid.AlignToGrid(DragOrigin.Y);
+					if (Math.Abs(lockedDragOffset.X) > Math.Abs(lockedDragOffset.Y))
+						newLocation.Y = myGraphViewer.Grid.DragOrigin.Y;
 					else
-						xtemp = myGraphViewer.Grid.AlignToGrid(DragOrigin.X);
+						newLocation.X = myGraphViewer.Grid.DragOrigin.X;
 				}
-				else if (!StickyDragOrigin)
-					DragOrigin = new Point(X, Y);
 
-				this.Location = new Point(xtemp, ytemp);
+				if (Location != newLocation)
+				{
+					Location = newLocation;
 
-				foreach (BaseNode node in DisplayedNode.InputLinks.Select<NodeLink, BaseNode>(l => l.Supplier))
-					myGraphViewer.NodeElementDictionary[node].UpdateTabOrder();
-				foreach (BaseNode node in DisplayedNode.OutputLinks.Select<NodeLink, BaseNode>(l => l.Consumer))
-					myGraphViewer.NodeElementDictionary[node].UpdateTabOrder();
+					this.UpdateTabOrder();
+					foreach (BaseNode node in DisplayedNode.InputLinks.Select(l => l.Supplier))
+						myGraphViewer.NodeElementDictionary[node].UpdateTabOrder();
+					foreach (BaseNode node in DisplayedNode.OutputLinks.Select(l => l.Consumer))
+						myGraphViewer.NodeElementDictionary[node].UpdateTabOrder();
+				}
 			}
 		}
 

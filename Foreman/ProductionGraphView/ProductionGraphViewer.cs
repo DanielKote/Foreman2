@@ -647,12 +647,11 @@ namespace Foreman
 
 		private void ProductionGraphViewer_MouseMove(object sender, MouseEventArgs e)
 		{
-			Grid.LockDragToAxis = (Control.ModifierKeys & Keys.Shift) != 0;
 			Point graph_location = ScreenToGraph(e.Location);
 
 			if (currentDragOperation != DragOperation.Selection) //dont care about element mouse move operations during selection operation
 			{
-				GraphElement element = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(graph_location);
+				GraphElement element = draggedLinkElement ?? MouseDownElement;
 				element?.MouseMoved(graph_location);
 			}
 
@@ -768,17 +767,20 @@ namespace Foreman
 						return;
 
 					//update the locations of the new nodes to be centered around the mouse position (as opposed to wherever they were before)
-					long xTotal = 0;
-					long yTotal = 0;
+					long xAve = 0;
+					long yAve = 0;
 					foreach (BaseNode newNode in newNodeCollection.newNodes)
 					{
-						xTotal += newNode.Location.X;
-						yTotal += newNode.Location.Y;
+						xAve += newNode.Location.X;
+						yAve += newNode.Location.Y;
 					}
+					xAve /= newNodeCollection.newNodes.Count;
+					yAve /= newNodeCollection.newNodes.Count;
 
-					Point importCenter = new Point((int)(xTotal / newNodeCollection.newNodes.Count), (int)(yTotal / newNodeCollection.newNodes.Count));
-					Point mousePos = Grid.AlignToGrid(ScreenToGraph(PointToClient(Cursor.Position)));
-					Size offset = new Size(mousePos.X - importCenter.X, mousePos.Y - importCenter.Y);
+
+					Point importCenter = new Point((int)xAve, (int)yAve);
+					Point mousePos = ScreenToGraph(PointToClient(Cursor.Position));
+					Size offset = (Size)Grid.AlignToGrid(Point.Subtract(mousePos, (Size)importCenter));
 					foreach (BaseNode newNode in newNodeCollection.newNodes)
 						newNode.Location = Point.Add(newNode.Location, offset);
 
@@ -797,6 +799,14 @@ namespace Foreman
 			else if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
 				UpdateSelection();
 
+			bool lockDragAxis = (Control.ModifierKeys & Keys.Shift) != 0;
+			if (Grid.LockDragToAxis != lockDragAxis)
+			{
+				Grid.LockDragToAxis = lockDragAxis;
+				Grid.DragOrigin = MouseDownElement?.Location ?? new Point();
+				if (currentDragOperation == DragOperation.Item)
+					MouseDownElement?.Dragged(ScreenToGraph(PointToClient(Control.MousePosition)));
+			}
 			Invalidate();
 		}
 
@@ -815,6 +825,14 @@ namespace Foreman
 			else if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
 				UpdateSelection();
 
+			bool lockDragAxis = (Control.ModifierKeys & Keys.Shift) != 0;
+			if (Grid.LockDragToAxis != lockDragAxis)
+			{
+				Grid.LockDragToAxis = lockDragAxis;
+				Grid.DragOrigin = MouseDownElement?.Location ?? new Point();
+				if(currentDragOperation == DragOperation.Item)
+					MouseDownElement?.Dragged(ScreenToGraph(PointToClient(Control.MousePosition)));
+			}
 			Invalidate();
 		}
 
@@ -1017,7 +1035,11 @@ namespace Foreman
 					}
 				}
 				else if (chosenPreset.Name != Properties.Settings.Default.CurrentPresetName) //we had to switch the preset to a new one (without the user having to select a preset from a list)
+				{
 					MessageBox.Show(string.Format("Loaded graph uses a different Preset.\nPreset switched from \"{0}\" to \"{1}\"", Properties.Settings.Default.CurrentPresetName, chosenPreset.Name));
+					Properties.Settings.Default.CurrentPresetName = chosenPreset.Name;
+					Properties.Settings.Default.Save();
+				}
 			}
 
 			//clear graph

@@ -9,6 +9,7 @@ namespace Foreman
 		public int CurrentMajorGridUnit = 0;
 		public bool ShowGrid = false;
 		public bool LockDragToAxis = false;
+		public Point DragOrigin;
 
 		private static readonly Pen gridPen = new Pen(Color.FromArgb(220, 220, 220), 1);
 		private static readonly Pen gridMPen = new Pen(Color.FromArgb(180, 180, 180), 1);
@@ -66,8 +67,8 @@ namespace Foreman
 			//drag axis
 			if (LockDragToAxis && draggedNode != null)
 			{
-				int xaxis = draggedNode.DragOrigin.X;
-				int yaxis = draggedNode.DragOrigin.Y;
+				int xaxis = DragOrigin.X;
+				int yaxis = DragOrigin.Y;
 				xaxis = AlignToGrid(xaxis);
 				yaxis = AlignToGrid(yaxis);
 
@@ -80,7 +81,7 @@ namespace Foreman
 		public Point AlignToGrid(Point original) { return new Point(AlignToGrid(original.X), AlignToGrid(original.Y)); }
 		public int AlignToGrid(int original)
 		{
-			if (CurrentGridUnit < 1)
+			if (CurrentGridUnit < 1 || !ShowGrid)
 				return original;
 
 			original += Math.Sign(original) * CurrentGridUnit / 2;

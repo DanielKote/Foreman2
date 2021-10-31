@@ -18,20 +18,14 @@ namespace Foreman
 		private const int border = 3;
 		private int textHeight = 11;
 
-		private static StringFormat centreFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
+		private static StringFormat bottomFormat = new StringFormat() { LineAlignment = StringAlignment.Far, Alignment = StringAlignment.Center };
+		private static StringFormat topFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
 		private static Pen regularBorderPen = new Pen(Color.Gray, 3);
 		private static Pen oversuppliedBorderPen = new Pen(Color.DarkRed, 3);
 		private static Brush textBrush = new SolidBrush(Color.Black);
 		private static Brush fillBrush = new SolidBrush(Color.White);
 
 		private static Font textFont = new Font(FontFamily.GenericSansSerif, 6);
-
-		private static string line1FormatA = "{0:0.##}";
-		private static string line1FormatB = "{0:0.#}";
-		private static string line1FormatC = "{0:0}";
-		private static string line2FormatA = "\n({0:0.##})";
-		private static string line2FormatB = "\n({0:0.#})";
-		private static string line2FormatC = "\n({0:0})";
 
 		private Pen borderPen;
 		private string text = "";
@@ -65,21 +59,21 @@ namespace Foreman
 		{
 			borderPen = regularBorderPen;
 			if (consumeRate >= 1000)
-				text = String.Format(line1FormatC, consumeRate);
+				text = string.Format("{0:0}", consumeRate);
 			else if (consumeRate >= 100)
-				text = String.Format(line1FormatB, consumeRate);
+				text = string.Format("{0:0.#}", consumeRate);
 			else
-				text = String.Format(line1FormatA, consumeRate);
+				text = string.Format("{0:0.##}", consumeRate);
 
 			if (isOversupplied)
 			{
 				borderPen = oversuppliedBorderPen;
 				if (suppliedRate >= 1000)
-					text += String.Format(line2FormatC, suppliedRate);
+					text += string.Format("\n({0:0})", suppliedRate);
 				else if (suppliedRate >= 100)
-					text += String.Format(line2FormatB, suppliedRate);
+					text += string.Format("\n({0:0.#})", suppliedRate);
 				else
-					text += String.Format(line2FormatA, suppliedRate);
+					text += string.Format("\n({0:0.##})", suppliedRate);
 			}
 
 			int textHeight = (int)myGraphViewer.CreateGraphics().MeasureString(text, textFont).Height;
@@ -95,12 +89,12 @@ namespace Foreman
 
 			if (LinkType == LinkType.Output)
 			{
-				graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y + ((textHeight + border - Bounds.Height) / 2)), centreFormat);
+				graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y + ((textHeight + border - Bounds.Height - 12) / 2)), topFormat);
 				graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y + (Bounds.Height / 2) - (int)(border * 1.5) - iconSize, iconSize, iconSize);
 			}
 			else
 			{
-				graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y - ((textHeight + border - Bounds.Height) / 2)), centreFormat);
+				graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y - ((textHeight + border - Bounds.Height - 12) / 2)), bottomFormat);
 				graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y - (Bounds.Height / 2) + (int)(border * 1.5), iconSize, iconSize);
 			}
 		}
@@ -111,44 +105,28 @@ namespace Foreman
 			TooltipInfo tti = new TooltipInfo();
 			NodeElement parentNode = (NodeElement)myParent;
 
-			if (LinkType == LinkType.Input)
+			if (parentNode.DisplayedNode is RecipeNode rNode)
+				tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(Item);
+			else if (!Item.IsTemperatureDependent)
+				tti.Text = Item.FriendlyName;
+			else
 			{
-				if (parentNode.DisplayedNode is RecipeNode rNode)
-					tti.Text = rNode.BaseRecipe.GetIngredientFriendlyName(Item);
-				else if (!Item.IsTemperatureDependent)
-					tti.Text = Item.FriendlyName;
-				else
-				{
-					fRange tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Output); //input type tab means output of connection link
-					if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
-						tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Input); //if there was no temp range on this side of this throughput node, try to just copy the other side
-					tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
-				}
-
-				tti.Text += "\nDrag to create a new connection";
-				tti.Direction = Direction.Up;
-				tti.ScreenLocation = myGraphViewer.GraphToScreen(GetConnectionPoint());
-			}
-			else //if(mousedTab.Type == LinkType.Output)
-			{
-				if (parentNode.DisplayedNode is RecipeNode rNode)
-					tti.Text = rNode.BaseRecipe.GetProductFriendlyName(Item);
-				else if (!Item.IsTemperatureDependent)
-					tti.Text = Item.FriendlyName;
-				else
-				{
-					fRange tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Input); //output type tab means input of connection link
-					if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
-						tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType.Output); //if there was no temp range on this side of this throughput node, try to just copy the other side
-					tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
-				}
-
-				tti.Text += "\nDrag to create a new connection";
-				tti.Direction = Direction.Down;
-				tti.ScreenLocation = myGraphViewer.GraphToScreen(GetConnectionPoint());
+				fRange tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, (LinkType == LinkType.Input) ? LinkType.Output : LinkType.Input); //input type tab means output of connection link and vice versa
+				if (tempRange.Ignore && parentNode.DisplayedNode is PassthroughNode)
+					tempRange = LinkChecker.GetTemperatureRange(Item, parentNode.DisplayedNode, LinkType); //if there was no temp range on this side of this throughput node, try to just copy the other side
+				tti.Text = Item.GetTemperatureRangeFriendlyName(tempRange);
 			}
 
+			tti.Direction = (LinkType == LinkType.Input) ? Direction.Up : Direction.Down;
+			tti.ScreenLocation = myGraphViewer.GraphToScreen(GetConnectionPoint());
 			toolTips.Add(tti);
+
+			TooltipInfo helpToolTipInfo = new TooltipInfo();
+			helpToolTipInfo.Text = "Drag to create a new connection.\nRight click for options.";
+			helpToolTipInfo.Direction = Direction.None;
+			helpToolTipInfo.ScreenLocation = new Point(10, 10);
+			toolTips.Add(helpToolTipInfo);
+
 			return toolTips;
 		}
 

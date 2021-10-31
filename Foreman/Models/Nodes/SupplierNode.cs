@@ -29,12 +29,13 @@ namespace Foreman
 		internal override double inputRateFor(Item item) { throw new ArgumentException("Supplier should not have outputs!"); }
 		internal override double outputRateFor(Item item) { return 1; }
 
+		public override string GetNameString() { return "Input:\n" + SuppliedItem.FriendlyName; }
 		public override bool IsValid { get { return !SuppliedItem.IsMissing; } }
-		public override List<string> GetErrors()
+		public override List<KeyValuePair<string, string>> GetErrors()
 		{
-			List<string> output = new List<string>();
+			List<KeyValuePair<string, string>> output = new List<KeyValuePair<string, string>>();
 			if (!IsValid)
-				output.Add(string.Format("Item \"{0}\" doesnt exist in preset!", SuppliedItem.FriendlyName));
+				output.Add( new KeyValuePair<string, string>(string.Format("Item \"{0}\" doesnt exist in preset!", SuppliedItem.FriendlyName), "Delete this node."));
 			return output;
 		}
 

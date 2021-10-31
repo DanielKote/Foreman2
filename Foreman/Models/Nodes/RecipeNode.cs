@@ -90,46 +90,73 @@ namespace Foreman
 			}
 		}
 
-		public override bool IsValid { get { return GetErrors().Count == 0; } }
-		public override List<string> GetErrors()
+		public override string GetNameString() { return BaseRecipe.FriendlyName; }
+		public override bool IsValid { get {
+				if (BaseRecipe.IsMissing)
+					return false;
+				if (SelectedAssembler == null)
+					return false;
+				if (SelectedAssembler.IsMissing)
+					return false;
+				if (SelectedAssembler.IsBurner)
+				{
+					if (BurnerItem == null || !SelectedAssembler.ValidFuels.Contains(BurnerItem) || BurnerItem.IsMissing)
+						return false;
+					if (BurntItem != null && (BurnerItem == null || BurnerItem.BurnResult != BurntItem))
+						return false;
+				}
+				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null || AssemblerModules.Count > SelectedAssembler.ModuleSlots)
+					return false;
+				if (SelectedBeacon != null)
+					if (SelectedBeacon.IsMissing || BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null || BeaconModules.Count > SelectedBeacon.ModuleSlots)
+						return false;
+				return true;
+			}
+		}
+		public override List<KeyValuePair<string, string>> GetErrors()
 		{
-			List<string> output = new List<string>();
-			HashSet<Module> missingModules = new HashSet<Module>();
+			List<KeyValuePair<string, string>> output = new List<KeyValuePair<string, string>>();
 
 			if (BaseRecipe.IsMissing)
-				output.Add(string.Format("Recipe \"{0}\" doesnt exist in preset!", BaseRecipe.FriendlyName));
+				output.Add(new KeyValuePair<string, string>(string.Format("Recipe \"{0}\" doesnt exist in preset!", BaseRecipe.FriendlyName), "Delete this node."));
 
 			if (SelectedAssembler == null)
-				output.Add("No assembler exists for this recipe!");
+				output.Add(new KeyValuePair<string, string>("No assembler exists for this recipe!", "Select assembler from list."));
 			else
 			{
 				if (SelectedAssembler.IsMissing)
-					output.Add(string.Format("Assembler \"{0}\" doesnt exist in preset!", SelectedAssembler.FriendlyName));
+					output.Add(new KeyValuePair<string, string>(string.Format("Assembler \"{0}\" doesnt exist in preset!", SelectedAssembler.FriendlyName), "Select valid assembler from list."));
 
-				if (SelectedAssembler.IsBurner && BurnerItem == null)
-					output.Add("Burner Assembler has no fuel set!");
-				else if(SelectedAssembler.IsBurner && !SelectedAssembler.ValidFuels.Contains(BurnerItem))
+				if (SelectedAssembler.IsBurner)
+				{
+					if (BurnerItem == null)
+						output.Add(new KeyValuePair<string, string>("Burner Assembler has no fuel set!", "Select fuel for the assembler."));
+					else if (!SelectedAssembler.ValidFuels.Contains(BurnerItem))
+						output.Add(new KeyValuePair<string, string>("Burner Assembler has an invalid fuel set!", "Select fuel for the assembler from list."));
+					else if (BurnerItem.IsMissing)
+						output.Add(new KeyValuePair<string, string>("Burner Assembler's fuel doesnt exist in preset!", "Select new fuel from list."));
 
-				foreach (Module module in AssemblerModules)
-					if (module.IsMissing)
-						missingModules.Add(module);
+					if (BurntItem != null && (BurnerItem == null || BurnerItem.BurnResult != BurntItem))
+						output.Add(new KeyValuePair<string, string>("Burning result doesnt match fuel's burn result!", "Select new fuel from list."));
+				}
+
+				if (AssemblerModules.Where(m => m.IsMissing).FirstOrDefault() != null)
+					output.Add(new KeyValuePair<string, string>("Some of the assembler modules dont exist in preset!", "Remove invalid modules."));
 
 				if (AssemblerModules.Count > SelectedAssembler.ModuleSlots)
-					output.Add("Assembler has too many modules!");
+					output.Add(new KeyValuePair<string, string>(string.Format("Assembler has too many modules ({0}/{1})!", AssemblerModules.Count, SelectedAssembler.ModuleSlots), "Remove some modules."));
 			}
 
 			if(SelectedBeacon != null)
 			{
 				if(SelectedBeacon.IsMissing)
-					output.Add(string.Format("Beacon \"{0}\" doesnt exist in preset!", SelectedBeacon.FriendlyName));
+					output.Add(new KeyValuePair<string, string>(string.Format("Beacon \"{0}\" doesnt exist in preset!", SelectedBeacon.FriendlyName), "Select alternate beacon from list."));
 
-				foreach (Module module in BeaconModules)
-					if (module.IsMissing)
-						missingModules.Add(module);
+				if (BeaconModules.Where(m => m.IsMissing).FirstOrDefault() != null)
+					output.Add(new KeyValuePair<string, string>("Some of the beacon modules dont exist in preset!", "Remove invalid modules."));
 
 				if (BeaconModules.Count > SelectedBeacon.ModuleSlots)
-					output.Add("Beacon has too many modules!");
-
+					output.Add(new KeyValuePair<string, string>("Beacon has too many modules!", "Remove some modules."));
 			}
 
 			return output;

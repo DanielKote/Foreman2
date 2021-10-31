@@ -26,7 +26,8 @@ namespace Foreman
 		float DesiredRate { get; set; }
 
 		bool IsValid { get; }
-		List<string> GetErrors();
+		List<KeyValuePair<string,string>> GetErrors();
+		string GetNameString();
 
 		float GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
 		float GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
@@ -76,7 +77,8 @@ namespace Foreman
 		public virtual float GetConsumptionMultiplier() { return 1; }
 		public virtual float GetPollutionMultiplier() { return 1; }
 
-		public abstract List<string> GetErrors();
+		public abstract List<KeyValuePair<string, string>> GetErrors();
+		public abstract string GetNameString();
 
 		public void Delete() { MyGraph.DeleteNode(this); }
 

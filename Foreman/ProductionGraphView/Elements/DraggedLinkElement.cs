@@ -41,16 +41,7 @@ namespace Foreman
 			//only snap to grid if grid exists and its a free link (not linking 2 existing objects)
 			if ((SupplierElement == null || ConsumerElement == null) && myGraphViewer.Grid.ShowGrid && myGraphViewer.Grid.CurrentGridUnit > 0)
 			{
-				int X = pointNUpdate.X;
-				int Y = pointNUpdate.Y;
-
-				X += Math.Sign(X) * myGraphViewer.Grid.CurrentGridUnit / 2;
-				X -= X % myGraphViewer.Grid.CurrentGridUnit;
-
-				Y += Math.Sign(Y) * myGraphViewer.Grid.CurrentGridUnit / 2;
-				Y -= Y % myGraphViewer.Grid.CurrentGridUnit;
-
-				pointNUpdate = new Point(X, Y);
+				pointNUpdate = myGraphViewer.Grid.AlignToGrid(pointNUpdate);
 				pointMUpdate = pointNUpdate;
 				newObjectLocation = pointNUpdate;
 			}
