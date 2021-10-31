@@ -34,6 +34,10 @@ namespace Foreman
         private List<object>[] unfilteredModuleTabObjects; //Modules
         private List<object>[][] tabSet; //just a helper array to set unfilteredSelectedTabObjects to the correct value without having to if/switch
 
+        private static readonly Color EqualBGColor = Color.White;
+        private static readonly Color CloseEnoughBGColor = Color.Khaki;
+        private static readonly Color DifferentGBColor = Color.Pink;
+
         public PresetComparatorForm()
         {
             Comparing = false;
@@ -43,6 +47,16 @@ namespace Foreman
             RightHeader.Width = RightListView.Width - 30;
             LeftHeader.Width = LeftListView.Width - 30;
             LeftOnlyHeader.Width = LeftOnlyListView.Width - 30;
+            this.Size = new Size(1000, 700); //scrolling issues if we set it directly, so we set it to the min allowable size and set it to the preferred size here
+
+            TextToolTip.TextFont = new Font(FontFamily.GenericMonospace, 7.8f, FontStyle.Regular);
+
+            MouseHoverDetector mhDetector = new MouseHoverDetector(100,200);
+            mhDetector.Add(LeftOnlyListView, ListView_StartHover, ListView_EndHover);
+            mhDetector.Add(LeftListView, ListView_StartHover, ListView_EndHover);
+            mhDetector.Add(RightListView, ListView_StartHover, ListView_EndHover);
+            mhDetector.Add(RightOnlyListView, ListView_StartHover, ListView_EndHover);
+
             LoadPresetOptions();
 
             unfilteredModTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
@@ -176,7 +190,10 @@ namespace Foreman
         {
             unfilteredSelectedTabObjects = tabSet[ComparisonTabControl.SelectedIndex];
             IconList.Images.Clear();
+            TextToolTip.RemoveAll();
+            RecipeToolTip.RemoveAll();
             IconList.ImageSize = (ComparisonTabControl.SelectedIndex == 0 ? new Size(1, 1) : new Size(32, 32)); //0: mod list (no images)
+
             if (DataCache.UnknownIcon != null)
                 IconList.Images.Add(DataCache.UnknownIcon);
 
@@ -212,29 +229,123 @@ namespace Foreman
                         lvItem.Text = doBase.FriendlyName;
                         lvItem.Tag = doBase;
                         lvItem.Name = doBase.Name.ToLower(); //we will use this to filter by (cant filter by friendly name as that can cause the middle 2 to desync)
-                        if (doBase is Recipe recipe)
-                        {
-                            //add in the tooltip here for recipes
-                        }
                         unfilteredSelectedTabLVIs[i].Add(lvItem);
                     }
                 }
             }
+
+            //now to process the [1] and [2] (left & right) lists of ListViewItems to set the background to white/yellow/red (equal, close enough, different)
+            for (int i = 0; i < unfilteredSelectedTabLVIs[1].Count; i++)
+            {
+                Color bgColor = Color.White;
+                ListViewItem l = unfilteredSelectedTabLVIs[1][i];
+                ListViewItem r = unfilteredSelectedTabLVIs[2][i];
+                bool similarNames = l.Text.Equals(r.Text, StringComparison.OrdinalIgnoreCase);
+                bool similarInternals = true;
+                switch (ComparisonTabControl.SelectedIndex)
+                {
+                    case 0: //mods
+                        similarInternals = similarNames; //if the are different, mark as red.
+                        break;
+                    case 1: //items
+                        break; //everything has already been done (name comparsion)
+
+                    case 2: //recipes
+                        Recipe lRecipe = (Recipe)l.Tag;
+                        Recipe rRecipe = (Recipe)r.Tag;
+
+                        similarInternals  = (lRecipe.IngredientList.Count == rRecipe.IngredientList.Count) && (lRecipe.ProductList.Count == rRecipe.ProductList.Count);
+                        bool exactInternals = similarInternals;
+                        float scale = rRecipe.Time / lRecipe.Time;
+                        if (similarInternals)
+                        {
+                            foreach (Item lingredient in lRecipe.IngredientList)
+                            {
+                                Item ringredient = rRecipe.IngredientList.FirstOrDefault(item => item.Name == lingredient.Name);
+                                similarInternals = similarInternals && (ringredient != null);
+                                similarInternals = similarInternals && (Math.Abs((scale * lRecipe.IngredientSet[lingredient] / rRecipe.IngredientSet[ringredient]) - 1) < 0.001);
+                                exactInternals = exactInternals && similarInternals && (lRecipe.IngredientSet[lingredient] == rRecipe.IngredientSet[ringredient]);
+                            }
+                            foreach (Item lproduct in lRecipe.ProductList)
+                            {
+                                if (similarInternals)
+                                {
+                                    Item rproduct = rRecipe.ProductList.FirstOrDefault(item => item.Name == lproduct.Name);
+                                    similarInternals = similarInternals && (rproduct != null);
+                                    similarInternals = similarInternals && (Math.Abs((scale * lRecipe.ProductSet[lproduct] / rRecipe.ProductSet[rproduct]) - 1) < 0.001);
+                                    exactInternals = exactInternals && similarInternals && (lRecipe.ProductSet[lproduct] == rRecipe.ProductSet[rproduct]);
+                                }
+                            }
+                        }
+                        similarNames = similarNames && exactInternals; //for recipes, we want a 'close enough' in situation where the recipe name is different, and/or when the recipe ratio is the same.
+                        //AKA: 1A+2B->3C is considered as similar enough to 2A+4B->6C
+                        break;
+
+                    case 3: //assemblers
+                        Assembler lAssembler = (Assembler)l.Tag;
+                        Assembler rAssembler = (Assembler)r.Tag;
+
+                        similarInternals = (lAssembler.Speed == rAssembler.Speed && lAssembler.ModuleSlots == rAssembler.ModuleSlots);
+                        break;
+
+                    case 4: //miners
+                        Miner lMiner = (Miner)l.Tag;
+                        Miner rMiner = (Miner)r.Tag;
+
+                        similarInternals = (lMiner.Speed == rMiner.Speed && lMiner.ModuleSlots == rMiner.ModuleSlots);
+                        break;
+
+                    case 5: //modules
+                        Module lModule = (Module)l.Tag;
+                        Module rModule = (Module)r.Tag;
+
+                        similarInternals = (lModule.ProductivityBonus == rModule.ProductivityBonus && lModule.SpeedBonus == rModule.SpeedBonus);
+                        break;
+                }
+
+                bgColor = similarInternals ? (similarNames ? EqualBGColor : CloseEnoughBGColor) : DifferentGBColor;
+                unfilteredSelectedTabLVIs[1][i].BackColor = bgColor;
+                unfilteredSelectedTabLVIs[2][i].BackColor = bgColor;
+            }
+
         }
 
         private void UpdateFilteredLists()
         {
             string filter = FilterTextBox.Text.ToLower();
+            bool hideEqual = HideEqualObjectsCheckBox.Checked;
+            bool hideSimilar = HideSimilarObjectsCheckBox.Checked;
 
-            for (int i = 0; i < 4; i++)
+            //complete filter for LeftOnly and RightOnly sets ([0] and [3])
+            for (int i = 0; i < 4; i+=3) //so... for i=0 and i=3 only (Left Only and Right Only)
             {
                 filteredSelectedTabLVIs[i].Clear();
 
                 foreach (ListViewItem lvItem in unfilteredSelectedTabLVIs[i])
-                    if (lvItem.Name.Contains(filter))
+                    if (lvItem.Name.Contains(filter) || lvItem.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1)
                         filteredSelectedTabLVIs[i].Add(lvItem);
             }
 
+            //complete filter for Left&Right sets (have to process at the same time, since if a name fits the filter in one (but not the other), both are still added to maintain parity)
+            filteredSelectedTabLVIs[1].Clear();
+            filteredSelectedTabLVIs[2].Clear();
+            for(int j = 0; j < unfilteredSelectedTabLVIs[1].Count; j++) //remember: [1] and [2] both have the EXACT same # of items)
+            {
+                ListViewItem leftLVI = (ListViewItem)unfilteredSelectedTabLVIs[1][j];
+                ListViewItem rightLVI = (ListViewItem)unfilteredSelectedTabLVIs[2][j];
+
+                if (!(hideEqual && leftLVI.BackColor == EqualBGColor) && !(hideSimilar && leftLVI.BackColor == CloseEnoughBGColor) && (
+                    leftLVI.Name.Contains(filter) ||
+                    //rightLVI.Name.Contains(filter) //name of [1][j] and [2][j] are the same, dont have to check twice
+                    leftLVI.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1 ||
+                    rightLVI.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1))
+                {
+                    filteredSelectedTabLVIs[1].Add(leftLVI);
+                    filteredSelectedTabLVIs[2].Add(rightLVI);
+                }
+            }
+
+            //update listviews
             LeftOnlyListView.VirtualListSize = filteredSelectedTabLVIs[0].Count;
             LeftListView.VirtualListSize = filteredSelectedTabLVIs[1].Count;
             RightListView.VirtualListSize = filteredSelectedTabLVIs[2].Count;
@@ -289,7 +400,7 @@ namespace Foreman
         }
 
         private void ComparisonTabControl_SelectedIndexChanged(object sender, EventArgs e) { UpdateUnfilteredLVIs(); UpdateFilteredLists(); }
-        private void FilterTextBox_TextChanged(object sender, EventArgs e) { UpdateFilteredLists(); }
+        private void Filters_Changed(object sender, EventArgs e) { UpdateFilteredLists(); }
 
         private void LeftOnlyListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredSelectedTabLVIs[0][e.ItemIndex]; }
         private void LeftListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredSelectedTabLVIs[1][e.ItemIndex]; }
@@ -300,5 +411,87 @@ namespace Foreman
         private void RightListView_Resize(object sender, EventArgs e) { RightHeader.Width = RightListView.Width - 30; }
         private void LeftListView_Resize(object sender, EventArgs e) { LeftHeader.Width = LeftListView.Width - 30; }
         private void LeftOnlyListView_Resize(object sender, EventArgs e) { LeftOnlyHeader.Width = LeftOnlyListView.Width - 30; }
+
+        private void LeftOnlyListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e) { }// if (e.IsSelected) e.Item.Selected = false; }
+        private void LeftListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            RightListView.SelectedIndices.Clear();
+            RightListView.SelectedIndices.Add(e.ItemIndex);
+        }
+        private void RightListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if (LeftListView.SelectedIndices.Count == 0 || LeftListView.SelectedIndices[0] != e.ItemIndex)
+            {
+                LeftListView.SelectedIndices.Clear();
+                LeftListView.SelectedIndices.Add(e.ItemIndex);
+            }
+        }
+        private void RightOnlyListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e) { }//if (e.IsSelected) e.Item.Selected = false; }
+
+        private void ListView_StartHover(object sender, MouseEventArgs e)
+        {
+            ListViewItem lLVI = ((ListView)sender).GetItemAt(e.Location.X, e.Location.Y);
+            if (lLVI != null)
+            {
+                ListViewItem rLVI = null;
+                bool compareTypeTT = (sender == LeftListView || sender == RightListView);
+                if(compareTypeTT)
+                {
+                    lLVI = LeftListView.Items[lLVI.Index];
+                    rLVI = RightListView.Items[lLVI.Index];
+                }
+
+                if(lLVI.Tag is Recipe recipe)
+                {
+                    RecipeToolTip.SetRecipe(recipe, compareTypeTT? (rLVI.Tag as Recipe) : null);
+                    RecipeToolTip.Show((Control)sender, e.Location);
+
+                }
+                else if(lLVI.Tag is ProductionEntity pEntity) //assembler or miner
+                {
+                    string left = pEntity.FriendlyName + "\n" +
+                        string.Format("   Speed:         {0}x\n", pEntity.Speed) +
+                        string.Format("   Module Slots:  {0}", pEntity.ModuleSlots);
+                    string right = "";
+                    if(compareTypeTT)
+                    {
+                        ProductionEntity rpEntity = rLVI.Tag as ProductionEntity;
+                        right = rpEntity.FriendlyName + "\n" +
+                        string.Format("   Speed:         {0}x\n", rpEntity.Speed) +
+                        string.Format("   Module Slots:  {0}", rpEntity.ModuleSlots);
+                    }
+
+                    TextToolTip.SetText(left, right);
+                    TextToolTip.Show((Control)sender, e.Location);
+                }
+                else if(lLVI.Tag is Module module)
+                {
+                    string left = module.FriendlyName + "\n" +
+                        string.Format("   Productivity bonus: {0}\n", module.ProductivityBonus.ToString("%0")) +
+                        string.Format("   Speed bonus:        {0}\n", module.SpeedBonus.ToString("%0")) +
+                        string.Format("   Efficiency bonus:   {0}\n", (-module.EfficiencyBonus).ToString("%0")) +
+                        string.Format("   Pollution bonus:    {0}", module.PollutionBonus.ToString("%0"));
+                    string right = "";
+                    if (compareTypeTT)
+                    {
+                        Module rmodule = rLVI.Tag as Module;
+                        right = rmodule.FriendlyName + "\n" +
+                        string.Format("   Productivity bonus: {0}\n", rmodule.ProductivityBonus.ToString("%0")) +
+                        string.Format("   Speed bonus:        {0}\n", rmodule.SpeedBonus.ToString("%0")) +
+                        string.Format("   Efficiency bonus:   {0}\n", (-rmodule.EfficiencyBonus).ToString("%0")) +
+                        string.Format("   Pollution bonus:    {0}", rmodule.PollutionBonus.ToString("%0"));
+                    }
+                    TextToolTip.SetText(left, right);
+                    TextToolTip.Show((Control)sender, e.Location);
+                }
+            }
+
+        }
+
+        private void ListView_EndHover(object sender, EventArgs e)
+        {
+            RecipeToolTip.Hide((Control)sender);
+            TextToolTip.Hide((Control)sender);
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace Foreman
         protected ProductionGraphViewer PGViewer;
 
         protected abstract ToolTip IRButtonToolTip { get; }
-        private IGToolTip GroupButtonToolTip;
+        private CustomToolTip GroupButtonToolTip;
 
         protected abstract List<List<KeyValuePair<DataObjectBase, Color>>> GetSubgroupList();
         protected abstract void IRButton_MouseUp(object sender, MouseEventArgs e);
@@ -42,7 +42,7 @@ namespace Foreman
             InitializeComponent();
             IRFlowPanel.Height = IRPanelRows * 35 + 12;
 
-            GroupButtonToolTip = new IGToolTip();
+            GroupButtonToolTip = new CustomToolTip();
 
             IRPanelScrollBar.Minimum = 0;
             IRPanelScrollBar.Maximum = 0;
@@ -55,6 +55,7 @@ namespace Foreman
 
             ShowHiddenCheckBox.Checked = Properties.Settings.Default.ShowHidden;
             IgnoreAssemblerCheckBox.Checked = Properties.Settings.Default.IgnoreAssemblerStatus;
+            RecipeNameOnlyFilterCheckBox.Checked = Properties.Settings.Default.RecipeNameOnlyFilter;
 
             InitializeButtons();
 
@@ -253,7 +254,8 @@ namespace Foreman
         private void GroupButton_MouseHover(object sender, EventArgs e)
         {
             Control control = (Control)sender;
-            GroupButtonToolTip.Show(GroupButtonToolTip.GetToolTip(control), control, new Point(control.Width, 10));
+            GroupButtonToolTip.SetText(GroupButtonToolTip.GetToolTip(control));
+            GroupButtonToolTip.Show(control, new Point(control.Width, 10));
         }
         private void GroupButton_MouseLeave(object sender, EventArgs e)
         {
@@ -264,6 +266,7 @@ namespace Foreman
         {
             Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+            Properties.Settings.Default.RecipeNameOnlyFilter = RecipeNameOnlyFilterCheckBox.Checked;
             Properties.Settings.Default.Save();
             Dispose();
         }
@@ -301,7 +304,8 @@ namespace Foreman
         internal virtual void IRButton_MouseHover(object sender, EventArgs e)
         {
             Control control = (Control)sender;
-            IRButtonToolTip.Show(IRButtonToolTip.GetToolTip(control), control, new Point(control.Width, 10));
+            (IRButtonToolTip as CustomToolTip).SetText(IRButtonToolTip.GetToolTip(control));
+            (IRButtonToolTip as CustomToolTip).Show(control, new Point(control.Width, 10));
         }
         private void IRButton_MouseLeave(object sender, EventArgs e)
         {
@@ -314,12 +318,14 @@ namespace Foreman
         public Action<Item> CallbackMethod; //returns the selected item
         public void Show(Action<Item> callback) { CallbackMethod = callback; }
 
-        private ToolTip iToolTip = new IGToolTip();
+        private ToolTip iToolTip = new CustomToolTip();
         protected override ToolTip IRButtonToolTip { get { return iToolTip; } }
 
         public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint) : base(parent, originPoint)
         {
             SetSelectedGroup(null);
+
+
         }
 
         protected override List<Group> GetSortedGroups()
@@ -352,7 +358,7 @@ namespace Foreman
                 foreach(Subgroup sgroup in group.Subgroups)
                 {
                     List<KeyValuePair<DataObjectBase, Color>> itemList = new List<KeyValuePair<DataObjectBase, Color>>();
-                    foreach (Item item in sgroup.Items.Where(n => n.LFriendlyName.Contains(filterString)))
+                    foreach (Item item in sgroup.Items.Where(n => n.LFriendlyName.Contains(filterString) || n.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1))
                     {
                         bool visible =
                             (item.ConsumptionRecipes.FirstOrDefault(n => !n.Hidden) != null) ||
@@ -433,10 +439,12 @@ namespace Foreman
             AddSupplyButton.Click += new EventHandler(AddSupplyButton_Click);
             AsIngredientCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
             AsProductCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
+            RecipeNameOnlyFilterCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 
             KeyItem = item;
             KeyItemTempRange = (includeSuppliers && includeConsumers) ? new fRange(0, 0, true) : tempRange; //cant use temp range if adding both s&c (its a disconnected node anyway)
 
+            RecipeNameOnlyFilterCheckBox.Visible = true; 
             if (KeyItem == null)
             {
                 OtherNodeOptionsTableLayoutPanel.Visible = false;
@@ -489,6 +497,7 @@ namespace Foreman
             //step 1: calculate the visible recipes for each group (those that pass filter & hidden status)
             string filterString = FilterTextBox.Text.ToLower();
             bool ignoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
+            bool checkRecipeIPs = !RecipeNameOnlyFilterCheckBox.Checked;
             bool showHidden = ShowHiddenCheckBox.Checked;
             bool includeSuppliers = AsProductCheckBox.Checked;
             bool includeConsumers = AsIngredientCheckBox.Checked;
@@ -502,23 +511,29 @@ namespace Foreman
                 foreach (Subgroup sgroup in group.Subgroups)
                 {
                     List<KeyValuePair<DataObjectBase, Color>> recipeList = new List<KeyValuePair<DataObjectBase, Color>>();
-                    foreach (Recipe recipe in sgroup.Recipes.Where(n => 
-                        n.LFriendlyName.Contains(filterString) && (
-                            ignoreItem || 
-                            (includeConsumers && n.IngredientSet.ContainsKey(KeyItem)) ||
-                            (includeSuppliers && n.ProductSet.ContainsKey(KeyItem)) ) ))
+                    foreach (Recipe recipe in sgroup.Recipes.Where(r => ignoreItem || //filter for the items first (simpler and clears out most recipes if there is a key item provided)
+                        (includeConsumers && r.IngredientSet.ContainsKey(KeyItem)) ||
+                        (includeSuppliers && r.ProductSet.ContainsKey(KeyItem))))
                     {
+                        //quick hidden / enabled assembler check (done prior to name check for speed)
                         if ((!recipe.Hidden || showHidden) && (recipe.HasEnabledAssemblers || ignoreAssemblerStatus))
                         {
-                            //further check for temperature
-                            if (KeyItemTempRange.Ignore ||
-                                (includeConsumers && recipe.IngredientTemperatureMap[KeyItem].Contains(KeyItemTempRange)) ||
-                                (includeSuppliers && KeyItemTempRange.Contains(recipe.ProductTemperatureMap[KeyItem])))
+                            //name check - have to check recipe name along with all ingredients and products (both friendly name and base name) - if selected
+                            if (recipe.LFriendlyName.Contains(filterString) ||
+                                recipe.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1 || (checkRecipeIPs && (
+                                recipe.IngredientList.FirstOrDefault(i => i.LFriendlyName.Contains(filterString) || i.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1) != null ||
+                                recipe.ProductList.FirstOrDefault(i => i.LFriendlyName.Contains(filterString) || i.Name.IndexOf(filterString, StringComparison.OrdinalIgnoreCase) != -1) != null)))
                             {
-
-                                Color bgColor = (!recipe.Hidden ? (recipe.HasEnabledAssemblers ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
-                                recipeCounter++;
-                                recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
+                                //further check for temperature
+                                if (KeyItemTempRange.Ignore ||
+                                    (includeConsumers && recipe.IngredientTemperatureMap[KeyItem].Contains(KeyItemTempRange)) ||
+                                    (includeSuppliers && KeyItemTempRange.Contains(recipe.ProductTemperatureMap[KeyItem])))
+                                {
+                                    //holy... so - we finally finished all the checks, eh? Well, throw it on the pile of recipes to show then.
+                                    Color bgColor = (!recipe.Hidden ? (recipe.HasEnabledAssemblers ? IRButtonDefaultColor : IRButtonNoAssemblerColor) : IRButtonHiddenColor);
+                                    recipeCounter++;
+                                    recipeList.Add(new KeyValuePair<DataObjectBase, Color>(recipe, bgColor));
+                                }
                             }
                         }
                     }
@@ -610,7 +625,9 @@ namespace Foreman
             Control control = (Control)sender;
 
             int yoffset = -control.Location.Y + 16 + Math.Max(-100, Math.Min(0, 348 - RecipeToolTip.GetRecipeToolTipHeight((Recipe)((Button)sender).Tag)));
-            IRButtonToolTip.Show(IRButtonToolTip.GetToolTip(control), control, new Point(control.Width, yoffset));
+
+            (IRButtonToolTip as RecipeToolTip).SetRecipe((Recipe)((Button)sender).Tag);
+            (IRButtonToolTip as RecipeToolTip).Show(control, new Point(control.Width, yoffset));
         }
     }
 

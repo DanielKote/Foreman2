@@ -468,7 +468,7 @@ namespace Foreman
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
 
-            miner.MiningSpeed = (float)objJToken["mining_speed"];
+            miner.Speed = (float)objJToken["mining_speed"];
             miner.ModuleSlots = (int)objJToken["module_inventory_size"];
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
                 miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
@@ -495,7 +495,7 @@ namespace Foreman
                 (string)objJToken["name"],
                 (string)objJToken["localised_name"]);
 
-            miner.MiningSpeed = (float)objJToken["pumping_speed"];
+            miner.Speed = (float)objJToken["pumping_speed"];
             miner.ModuleSlots = 0;
             if (iconCache.ContainsKey((string)objJToken["icon_name"]))
                 miner.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
@@ -590,9 +590,11 @@ namespace Foreman
             ModulePrototype module = new ModulePrototype(
                 this,
                 (string)objJToken["name"],
-                (string)objJToken["localised_name"],
-                (float)objJToken["module_effects_speed"],
-                (float)objJToken["module_effects_productivity"]);
+                (string)objJToken["localised_name"]);
+            module.SpeedBonus = (float)objJToken["module_effects_speed"];
+            module.ProductivityBonus = (float)objJToken["module_effects_productivity"];
+            module.EfficiencyBonus = (float)objJToken["module_effects_consumption"];
+            module.PollutionBonus = (float)objJToken["module_effects_pollution"];
 
             foreach (var recipe in objJToken["limitations"])
             {

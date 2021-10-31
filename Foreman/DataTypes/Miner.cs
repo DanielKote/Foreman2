@@ -17,7 +17,6 @@ namespace Foreman
 	public interface Miner : ProductionEntity
 	{
 		IReadOnlyCollection<Resource> MineableResources { get; }
-		float MiningSpeed { get; }
 		Item AssociatedItem { get; }
 	}
 
@@ -41,7 +40,6 @@ namespace Foreman
 	public class MinerPrototype : ProductionEntityPrototype, Miner
 	{
 		public IReadOnlyCollection<Resource> MineableResources { get { return mineableResources; } }
-		public float MiningSpeed { get; set; }
 		public Item AssociatedItem { get { return myCache.Items[Name]; } }
 
 		internal HashSet<ResourcePrototype> mineableResources;
