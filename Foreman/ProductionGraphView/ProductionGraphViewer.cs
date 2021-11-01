@@ -719,8 +719,30 @@ namespace Foreman
 						{
 							Point endPoint = MouseDownElement.Location;
 							if (startPoint != endPoint)
+							{
+								HashSet<BaseNodeElement> processedNodes = new HashSet<BaseNodeElement>();
 								foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
+								{
 									node.SetLocation(new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y));
+
+									//item tab reshuffle
+									if (!processedNodes.Contains(node))
+									{
+										node.UpdateState();
+										processedNodes.Add(node);
+										foreach (BaseNodeElement linkedNode in node.DisplayedNode.InputLinks.Select(l => linkElementDictionary[l].SupplierElement).Where(se => !processedNodes.Contains(se)))
+										{
+											linkedNode.UpdateState();
+											processedNodes.Add(linkedNode);
+										}
+										foreach (BaseNodeElement linkedNode in node.DisplayedNode.OutputLinks.Select(l => linkElementDictionary[l].ConsumerElement).Where(se => !processedNodes.Contains(se)))
+										{
+											linkedNode.UpdateState();
+											processedNodes.Add(linkedNode);
+										}
+									}
+								}
+							}
 						}
 					}
 					else //dragging single item
