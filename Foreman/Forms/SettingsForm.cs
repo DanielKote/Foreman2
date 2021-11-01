@@ -15,6 +15,7 @@ namespace Foreman
 
 			public List<Preset> Presets;
 			public Preset SelectedPreset;
+			public bool RequireReload;
 
 			public ProductionGraphViewer.LOD LevelOfDetail;
 			public int NodeCountForSimpleView;
@@ -40,6 +41,7 @@ namespace Foreman
 				DCache = cache;
 				Presets = new List<Preset>();
 				EnabledObjects = new HashSet<DataObjectBase>();
+				RequireReload = false;
 			}
 		}
 
@@ -480,7 +482,15 @@ namespace Foreman
 						PresetListBox.Items.Add(newPreset);
 					}
 
-					if (MessageBox.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+
+					if(newPreset == Options.Presets[0]) //we have overwritten the currently active preset. Must force a reload
+					{
+						Options.RequireReload = true;
+						UpdateSettings();
+						DialogResult = DialogResult.OK;
+						this.Close();
+					}
+					else if (MessageBox.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
 					{
 						Options.SelectedPreset = newPreset;
 						UpdateSettings();

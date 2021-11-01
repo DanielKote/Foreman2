@@ -240,7 +240,7 @@ namespace Foreman
 				form.Top = this.Top + 50;
 				if (form.ShowDialog() == DialogResult.OK)
 				{
-					if (options.SelectedPreset != options.Presets[0] || options.DEV_UseRecipeBWFilters != Properties.Settings.Default.UseRecipeBWfilters) //different preset or recipeBWFilter change -> need to reload datacache
+					if (options.SelectedPreset != options.Presets[0] || options.DEV_UseRecipeBWFilters != Properties.Settings.Default.UseRecipeBWfilters || options.RequireReload) //different preset or recipeBWFilter change -> need to reload datacache
 					{
 						Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset.Name;
 						Properties.Settings.Default.UseRecipeBWfilters = options.DEV_UseRecipeBWFilters;
@@ -287,6 +287,9 @@ namespace Foreman
 
 					GraphViewer.Graph.UpdateNodeStates();
 					GraphViewer.UpdateNodeVisuals();
+
+					if (options.RequireReload)
+						SettingsButton_Click(this, EventArgs.Empty);
 				}
 			}
 		}
