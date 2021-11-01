@@ -1394,7 +1394,7 @@ namespace Foreman
 				clean = true;
 
 				//4.1: mark any recipe with no available assemblers to unavailable.
-				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available)))
+				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available || a == playerAssember)))
 				{
 					recipe.Available = false;
 					clean = false;
