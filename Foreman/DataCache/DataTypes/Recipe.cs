@@ -152,7 +152,7 @@ namespace Foreman
 				productSet.Add(item, quantity);
 				productList.Add(item);
 
-				temperature = (item is Fluid fluid && temperature == double.NaN) ? fluid.DefaultTemperature : temperature;
+				temperature = (item is Fluid fluid && double.IsNaN(temperature)) ? fluid.DefaultTemperature : temperature;
 				productTemperatureMap.Add(item, temperature);
 			}
 		}
