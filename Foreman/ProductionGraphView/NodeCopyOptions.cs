@@ -59,22 +59,18 @@ namespace Foreman
 			if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "NodeCopyOptions")
 				return null;
 
-			try
-			{
-				bool beacons = json["Beacon"] != null;
-				NodeCopyOptions nco = new NodeCopyOptions(
-					cache.Assemblers.ContainsKey((string)json["Assembler"]) ? cache.Assemblers[(string)json["Assembler"]] : null,
-					new List<Module>(json["AModules"].Where(j => cache.Modules.ContainsKey((string)j)).Select(j => cache.Modules[(string)j])),
-					(double)json["Neighbours"],
-					(json["Fuel"] != null && cache.Items.ContainsKey((string)json["Fuel"])) ? cache.Items[(string)json["fuel"]] : null,
-					(beacons && cache.Beacons.ContainsKey((string)json["Beacon"])) ? cache.Beacons[(string)json["Beacon"]] : null,
-					new List<Module>(json["BModules"].Where(j => cache.Modules.ContainsKey((string)j)).Select(j => cache.Modules[(string)j])),
-					beacons ? (double)json["BeaconCount"] : -1,
-					beacons ? (double)json["BeaconsPA"] : -1,
-					beacons ? (double)json["BeaconsC"] : -1);
-				return nco;
-			}
-			catch { return null; }
+			bool beacons = json["Beacon"] != null;
+			NodeCopyOptions nco = new NodeCopyOptions(
+				cache.Assemblers.ContainsKey((string)json["Assembler"]) ? cache.Assemblers[(string)json["Assembler"]] : null,
+				new List<Module>(json["AModules"].Where(j => cache.Modules.ContainsKey((string)j)).Select(j => cache.Modules[(string)j])),
+				(double)json["Neighbours"],
+				(json["Fuel"] != null && cache.Items.ContainsKey((string)json["Fuel"])) ? cache.Items[(string)json["Fuel"]] : null,
+				(beacons && cache.Beacons.ContainsKey((string)json["Beacon"])) ? cache.Beacons[(string)json["Beacon"]] : null,
+				new List<Module>(json["BModules"].Where(j => cache.Modules.ContainsKey((string)j)).Select(j => cache.Modules[(string)j])),
+				beacons ? (double)json["BeaconCount"] : 0,
+				beacons ? (double)json["BeaconsPA"] : 0,
+				beacons ? (double)json["BeaconsC"] : 0);
+			return nco;
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)

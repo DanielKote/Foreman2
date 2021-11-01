@@ -53,10 +53,10 @@ namespace Foreman
 		public double NeighbourCount { get; set; }
 
 		private Assembler assembler;
-		public Assembler SelectedAssembler { get { return assembler; } set { if (value != null) { assembler = value; UpdateState(); } } }
-		public Item Fuel { get { return fuel; } set { fuel = value; fuelRemainsOverride = null; UpdateState(); } }
+		public Assembler SelectedAssembler { get { return assembler; } set { if (value != null) { assembler = value; UpdateState(); OnNodeStateChanged(); } } }
+		public Item Fuel { get { return fuel; } set { fuel = value; fuelRemainsOverride = null; UpdateState(); OnNodeStateChanged(); } }
 		public Item FuelRemains { get { return fuelRemainsOverride ?? ((Fuel != null && Fuel.BurnResult != null) ? Fuel.BurnResult : null); } }
-		public void SetBurntOverride(Item item) { if (Fuel == null || Fuel.BurnResult != item) fuelRemainsOverride = item; UpdateState(); }
+		public void SetBurntOverride(Item item) { if (Fuel == null || Fuel.BurnResult != item) fuelRemainsOverride = item; UpdateState(); OnNodeStateChanged(); }
 		private Item fuel;
 		private Item fuelRemainsOverride; //returns as BurntItem if set (error import)
 
