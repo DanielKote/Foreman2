@@ -62,8 +62,10 @@ namespace Foreman
 				{
 					if (File.Exists(Path.Combine(new string[] { dialog.SelectedPath, "bin", "x64", "factorio.exe" })))
 						FactorioLocationComboBox.Text = dialog.SelectedPath;
+					else if(File.Exists(Path.Combine(new string[] {dialog.SelectedPath, "x64", "factorio.exe"})))
+						FactorioLocationComboBox.Text = Path.GetDirectoryName(dialog.SelectedPath);
 					else if (File.Exists(Path.Combine(dialog.SelectedPath, "factorio.exe")))
-						FactorioLocationComboBox.Text = Path.Combine(Path.GetDirectoryName(dialog.SelectedPath), @"..\\..\\");
+						FactorioLocationComboBox.Text = Path.GetDirectoryName(Path.GetDirectoryName(dialog.SelectedPath));
 					else
 						MessageBox.Show("Selected directory doesnt seem to be a factorio install folder (it should at the very least have \"bin\" and \"data\" folders, along with a \"config-path.cfg\" file)");
 				}

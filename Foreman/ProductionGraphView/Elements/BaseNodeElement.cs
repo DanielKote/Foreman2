@@ -255,7 +255,7 @@ namespace Foreman
 							graphViewer.Graph.DeleteNode(DisplayedNode);
 							graphViewer.Graph.UpdateNodeValues();
 						})));
-				if (graphViewer.SelectedNodes.Count > 2 && graphViewer.SelectedNodes.Contains(this))
+				if (graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(this))
 				{
 					RightClickMenu.Items.Add(new ToolStripMenuItem("Delete selected nodes", null,
 						new EventHandler((o, e) =>

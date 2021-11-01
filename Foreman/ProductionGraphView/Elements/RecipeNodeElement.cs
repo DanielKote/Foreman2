@@ -109,12 +109,12 @@ namespace Foreman
 				{
 					//text
 					bool oversupplied = DisplayedNode.IsOversupplied();
-					Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 35, trans.Y - (Height / 2) + (oversupplied ? 30 : 25), (Width - 10 - 35), Height - (oversupplied ? 60 : 50));
+					Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (oversupplied ? 32 : 27), (Width - 10 - 40), Height - (oversupplied ? 64 : 54));
 					//graphics.DrawRectangle(devPen, textSlot);
 					int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
 
 					//assembler icon
-					graphics.DrawImage(DisplayedNode.SelectedAssembler == null ? DataCache.UnknownIcon : DisplayedNode.SelectedAssembler.Icon, trans.X - Math.Min((Width / 2) - 5, (textLength / 2) + 32), trans.Y - 16, 32, 32);
+					graphics.DrawImage(DisplayedNode.SelectedAssembler == null ? DataCache.UnknownIcon : DisplayedNode.SelectedAssembler.Icon, trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);
 				}
 
 				//productivity ticks
