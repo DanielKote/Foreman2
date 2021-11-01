@@ -24,9 +24,6 @@ namespace Foreman
 
 		public FluidPrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, subgroup, order, isMissing)
 		{
-			mySubgroup = subgroup;
-			subgroup.items.Add(this);
-
 			IsTemperatureDependent = false;
 			DefaultTemperature = 0;
 			SpecificHeatCapacity = 0;
