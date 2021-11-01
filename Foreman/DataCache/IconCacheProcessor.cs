@@ -26,7 +26,7 @@ namespace Foreman
 		{
 			this.iconPath = iconPath;
 			this.iconSize = iconSize;
-			this.iconScale = iconSize > 0 ? 32 / iconSize : 1;
+			this.iconScale = 1;
 			this.iconOffset = new Point(0, 0);
 			iconTint = IconCacheProcessor.NoTint;
 		}
@@ -187,6 +187,7 @@ namespace Foreman
 				int baseIconSize = (iconDataJToken["icon_size"].Type == JTokenType.Null) ? 32 : (int)iconDataJToken["icon_size"];
 
 				IconInfo iicon = new IconInfo(mainIconPath, baseIconSize);
+				iicon.iconScale = defaultIconSize / iicon.iconSize;
 
 				List<IconInfo> iicons = new List<IconInfo>();
 				List<JToken> iconJTokens = iconDataJToken["icons"].ToList();
@@ -208,7 +209,7 @@ namespace Foreman
 		{
 			if (iinfos == null)
 				iinfos = new List<IconInfo>();
-			double IconCanvasScale = defaultCanvasSize == 32 ? 2 : 1; //just some upscailing for icons (64x64 look better)
+			double IconCanvasScale = defaultCanvasSize == 32 ? 2 : 1; //just some upscailing for icons (item icons are set at 32x32, but they look better at 64x64)
 			int IconCanvasSize = (int)(defaultCanvasSize * IconCanvasScale);
 
 			if (iinfos.Count == 0) //if there are no icons, use the single icon
