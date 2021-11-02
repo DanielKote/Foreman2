@@ -3,6 +3,7 @@ Foreman 2.0 License
 
 The MIT License (MIT)
 
+Copyright (c) 2021 Daniel Kotes
 Copyright (c) 2021 Mihail Filippov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
