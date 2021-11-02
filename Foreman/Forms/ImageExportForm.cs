@@ -27,7 +27,9 @@ namespace Foreman
 			{
 				dialog.AddExtension = true;
 				dialog.Filter = "PNG files (*.png)|*.png";
-				dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+				dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Exported Graphs");
+				if (!Directory.Exists(dialog.InitialDirectory))
+					Directory.CreateDirectory(dialog.InitialDirectory);
 				dialog.FileName = "Foreman Production Flowchart.png";
 				dialog.ValidateNames = true;
 				dialog.OverwritePrompt = true;
@@ -42,36 +44,30 @@ namespace Foreman
 
 		private void ExportButton_Click(object sender, EventArgs e)
 		{
-			int scale = 1;
-			if (Scale2xCheckBox.Checked)
+			if (string.IsNullOrEmpty(fileTextBox.Text) || string.IsNullOrEmpty(Path.GetDirectoryName(fileTextBox.Text)) || !Directory.Exists(Path.GetDirectoryName(fileTextBox.Text)))
 			{
-				scale = 2;
+				MessageBox.Show("Directory doesn't exist!");
 			}
-			else if (Scale3xCheckBox.Checked)
+			else
 			{
-				scale = 3;
-			}
+				int scale = 1;
+				if (Scale2xCheckBox.Checked)
+					scale = 2;
+				else if (Scale3xCheckBox.Checked)
+					scale = 3;
 
-			Bitmap image = new Bitmap(graphViewer.Graph.Bounds.Width * scale, graphViewer.Graph.Bounds.Height * scale);
-			using (Graphics graphics = Graphics.FromImage(image))
-			{
-				graphics.ScaleTransform(scale, scale);
-				graphics.TranslateTransform(-graphViewer.Graph.Bounds.X, -graphViewer.Graph.Bounds.Y);
-				graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-
-				if (!TransparencyCheckBox.Checked)
+				Bitmap image = new Bitmap(graphViewer.Graph.Bounds.Width * scale, graphViewer.Graph.Bounds.Height * scale);
+				using (Graphics graphics = Graphics.FromImage(image))
 				{
-					graphics.Clear(Color.White);
-				}
+					graphics.ScaleTransform(scale, scale);
+					graphics.TranslateTransform(-graphViewer.Graph.Bounds.X, -graphViewer.Graph.Bounds.Y);
+					graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
-				graphViewer.Paint(graphics, true);
+					if (!TransparencyCheckBox.Checked)
+						graphics.Clear(Color.White);
 
-				if (!Directory.Exists(Path.GetDirectoryName(fileTextBox.Text)))
-				{
-					MessageBox.Show("Directory doesn't exist!");
-				}
-				else
-				{
+					graphViewer.Paint(graphics, true);
+
 					try
 					{
 						image.Save(fileTextBox.Text, ImageFormat.Png);
@@ -80,6 +76,7 @@ namespace Foreman
 					catch (Exception exception)
 					{
 						MessageBox.Show("Error saving image: " + exception.Message);
+						ErrorLogging.LogLine("Error saving image: " + exception.ToString());
 					}
 				}
 			}
