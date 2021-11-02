@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.BrowseButton = new System.Windows.Forms.Button();
+			this.FactorioBrowseButton = new System.Windows.Forms.Button();
 			this.FactorioLocationComboBox = new System.Windows.Forms.ComboBox();
 			this.FactorioLocationGroup = new System.Windows.Forms.GroupBox();
 			this.FactorioLocationTable = new System.Windows.Forms.TableLayoutPanel();
@@ -48,6 +48,10 @@
 			this.PresetNameTextBox = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.MainTable = new System.Windows.Forms.TableLayoutPanel();
+			this.FactorioModLocationGroup = new System.Windows.Forms.GroupBox();
+			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.ModsBrowseButton = new System.Windows.Forms.Button();
+			this.ModsLocationComboBox = new System.Windows.Forms.ComboBox();
 			this.OKButton = new System.Windows.Forms.Button();
 			this.CancelImportButtonB = new System.Windows.Forms.Button();
 			this.ImportProgressBar = new Foreman.CustomProgressBar();
@@ -61,18 +65,20 @@
 			this.PresetNameGroup.SuspendLayout();
 			this.PresetNameTable.SuspendLayout();
 			this.MainTable.SuspendLayout();
+			this.FactorioModLocationGroup.SuspendLayout();
+			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// BrowseButton
+			// FactorioBrowseButton
 			// 
-			this.BrowseButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.BrowseButton.Location = new System.Drawing.Point(385, 3);
-			this.BrowseButton.Name = "BrowseButton";
-			this.BrowseButton.Size = new System.Drawing.Size(62, 23);
-			this.BrowseButton.TabIndex = 1;
-			this.BrowseButton.Text = "Browse...";
-			this.BrowseButton.UseVisualStyleBackColor = true;
-			this.BrowseButton.Click += new System.EventHandler(this.BrowseButton_Click);
+			this.FactorioBrowseButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FactorioBrowseButton.Location = new System.Drawing.Point(385, 3);
+			this.FactorioBrowseButton.Name = "FactorioBrowseButton";
+			this.FactorioBrowseButton.Size = new System.Drawing.Size(62, 23);
+			this.FactorioBrowseButton.TabIndex = 1;
+			this.FactorioBrowseButton.Text = "Browse...";
+			this.FactorioBrowseButton.UseVisualStyleBackColor = true;
+			this.FactorioBrowseButton.Click += new System.EventHandler(this.FactorioBrowseButton_Click);
 			// 
 			// FactorioLocationComboBox
 			// 
@@ -106,7 +112,7 @@
 			this.FactorioLocationTable.ColumnCount = 2;
 			this.FactorioLocationTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.FactorioLocationTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.FactorioLocationTable.Controls.Add(this.BrowseButton, 1, 0);
+			this.FactorioLocationTable.Controls.Add(this.FactorioBrowseButton, 1, 0);
 			this.FactorioLocationTable.Controls.Add(this.FactorioLocationComboBox, 0, 0);
 			this.FactorioLocationTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.FactorioLocationTable.Location = new System.Drawing.Point(2, 15);
@@ -121,7 +127,7 @@
 			this.MainTable.SetColumnSpan(this.FactorioSettingsGroup, 2);
 			this.FactorioSettingsGroup.Controls.Add(this.FactorioSettingsTable);
 			this.FactorioSettingsGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FactorioSettingsGroup.Location = new System.Drawing.Point(2, 52);
+			this.FactorioSettingsGroup.Location = new System.Drawing.Point(2, 102);
 			this.FactorioSettingsGroup.Margin = new System.Windows.Forms.Padding(2);
 			this.FactorioSettingsGroup.Name = "FactorioSettingsGroup";
 			this.FactorioSettingsGroup.Padding = new System.Windows.Forms.Padding(2);
@@ -259,7 +265,7 @@
 			this.MainTable.SetColumnSpan(this.PresetNameGroup, 2);
 			this.PresetNameGroup.Controls.Add(this.PresetNameTable);
 			this.PresetNameGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.PresetNameGroup.Location = new System.Drawing.Point(2, 138);
+			this.PresetNameGroup.Location = new System.Drawing.Point(2, 188);
 			this.PresetNameGroup.Margin = new System.Windows.Forms.Padding(2);
 			this.PresetNameGroup.Name = "PresetNameGroup";
 			this.PresetNameGroup.Padding = new System.Windows.Forms.Padding(5);
@@ -329,30 +335,85 @@
 			this.MainTable.ColumnCount = 2;
 			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.MainTable.Controls.Add(this.OKButton, 0, 3);
-			this.MainTable.Controls.Add(this.CancelImportButtonB, 1, 4);
-			this.MainTable.Controls.Add(this.ImportProgressBar, 0, 4);
-			this.MainTable.Controls.Add(this.CancelImportButton, 1, 3);
+			this.MainTable.Controls.Add(this.FactorioModLocationGroup, 0, 1);
+			this.MainTable.Controls.Add(this.OKButton, 0, 4);
+			this.MainTable.Controls.Add(this.CancelImportButtonB, 1, 5);
+			this.MainTable.Controls.Add(this.ImportProgressBar, 0, 5);
+			this.MainTable.Controls.Add(this.CancelImportButton, 1, 4);
 			this.MainTable.Controls.Add(this.FactorioLocationGroup, 0, 0);
-			this.MainTable.Controls.Add(this.FactorioSettingsGroup, 0, 1);
-			this.MainTable.Controls.Add(this.PresetNameGroup, 0, 2);
+			this.MainTable.Controls.Add(this.FactorioSettingsGroup, 0, 2);
+			this.MainTable.Controls.Add(this.PresetNameGroup, 0, 3);
 			this.MainTable.Location = new System.Drawing.Point(0, 0);
 			this.MainTable.Name = "MainTable";
-			this.MainTable.RowCount = 5;
+			this.MainTable.RowCount = 6;
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MainTable.Size = new System.Drawing.Size(458, 247);
+			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.MainTable.Size = new System.Drawing.Size(458, 297);
 			this.MainTable.TabIndex = 8;
+			// 
+			// FactorioModLocationGroup
+			// 
+			this.FactorioModLocationGroup.AutoSize = true;
+			this.FactorioModLocationGroup.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.MainTable.SetColumnSpan(this.FactorioModLocationGroup, 2);
+			this.FactorioModLocationGroup.Controls.Add(this.tableLayoutPanel1);
+			this.FactorioModLocationGroup.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FactorioModLocationGroup.Location = new System.Drawing.Point(2, 52);
+			this.FactorioModLocationGroup.Margin = new System.Windows.Forms.Padding(2);
+			this.FactorioModLocationGroup.Name = "FactorioModLocationGroup";
+			this.FactorioModLocationGroup.Padding = new System.Windows.Forms.Padding(2);
+			this.FactorioModLocationGroup.Size = new System.Drawing.Size(454, 46);
+			this.FactorioModLocationGroup.TabIndex = 9;
+			this.FactorioModLocationGroup.TabStop = false;
+			this.FactorioModLocationGroup.Text = "Mod Folder Location (leave blank for auto-detect):";
+			// 
+			// tableLayoutPanel1
+			// 
+			this.tableLayoutPanel1.AutoSize = true;
+			this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.tableLayoutPanel1.ColumnCount = 2;
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel1.Controls.Add(this.ModsBrowseButton, 1, 0);
+			this.tableLayoutPanel1.Controls.Add(this.ModsLocationComboBox, 0, 0);
+			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tableLayoutPanel1.Location = new System.Drawing.Point(2, 15);
+			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+			this.tableLayoutPanel1.RowCount = 1;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(450, 29);
+			this.tableLayoutPanel1.TabIndex = 0;
+			// 
+			// ModsBrowseButton
+			// 
+			this.ModsBrowseButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ModsBrowseButton.Location = new System.Drawing.Point(385, 3);
+			this.ModsBrowseButton.Name = "ModsBrowseButton";
+			this.ModsBrowseButton.Size = new System.Drawing.Size(62, 23);
+			this.ModsBrowseButton.TabIndex = 1;
+			this.ModsBrowseButton.Text = "Browse...";
+			this.ModsBrowseButton.UseVisualStyleBackColor = true;
+			this.ModsBrowseButton.Click += new System.EventHandler(this.ModsBrowseButton_Click);
+			// 
+			// ModsLocationComboBox
+			// 
+			this.ModsLocationComboBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ModsLocationComboBox.FormattingEnabled = true;
+			this.ModsLocationComboBox.Location = new System.Drawing.Point(3, 3);
+			this.ModsLocationComboBox.Name = "ModsLocationComboBox";
+			this.ModsLocationComboBox.Size = new System.Drawing.Size(376, 21);
+			this.ModsLocationComboBox.TabIndex = 3;
 			// 
 			// OKButton
 			// 
 			this.OKButton.AutoSize = true;
 			this.OKButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.OKButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.OKButton.Location = new System.Drawing.Point(3, 192);
+			this.OKButton.Location = new System.Drawing.Point(3, 242);
 			this.OKButton.Name = "OKButton";
 			this.OKButton.Size = new System.Drawing.Size(396, 23);
 			this.OKButton.TabIndex = 2;
@@ -366,7 +427,7 @@
 			this.CancelImportButtonB.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelImportButtonB.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.CancelImportButtonB.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.CancelImportButtonB.Location = new System.Drawing.Point(405, 221);
+			this.CancelImportButtonB.Location = new System.Drawing.Point(405, 271);
 			this.CancelImportButtonB.Name = "CancelImportButtonB";
 			this.CancelImportButtonB.Size = new System.Drawing.Size(50, 23);
 			this.CancelImportButtonB.TabIndex = 8;
@@ -379,7 +440,7 @@
 			// 
 			this.ImportProgressBar.CustomText = null;
 			this.ImportProgressBar.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ImportProgressBar.Location = new System.Drawing.Point(4, 222);
+			this.ImportProgressBar.Location = new System.Drawing.Point(4, 272);
 			this.ImportProgressBar.Margin = new System.Windows.Forms.Padding(4);
 			this.ImportProgressBar.Name = "ImportProgressBar";
 			this.ImportProgressBar.Size = new System.Drawing.Size(394, 21);
@@ -392,7 +453,7 @@
 			this.CancelImportButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelImportButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.CancelImportButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.CancelImportButton.Location = new System.Drawing.Point(405, 192);
+			this.CancelImportButton.Location = new System.Drawing.Point(405, 242);
 			this.CancelImportButton.Name = "CancelImportButton";
 			this.CancelImportButton.Size = new System.Drawing.Size(50, 23);
 			this.CancelImportButton.TabIndex = 6;
@@ -408,7 +469,7 @@
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelButton = this.CancelImportButton;
-			this.ClientSize = new System.Drawing.Size(467, 255);
+			this.ClientSize = new System.Drawing.Size(471, 312);
 			this.Controls.Add(this.MainTable);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.KeyPreview = true;
@@ -434,13 +495,16 @@
 			this.PresetNameTable.PerformLayout();
 			this.MainTable.ResumeLayout(false);
 			this.MainTable.PerformLayout();
+			this.FactorioModLocationGroup.ResumeLayout(false);
+			this.FactorioModLocationGroup.PerformLayout();
+			this.tableLayoutPanel1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
 
 		#endregion
-		private System.Windows.Forms.Button BrowseButton;
+		private System.Windows.Forms.Button FactorioBrowseButton;
         private System.Windows.Forms.ComboBox FactorioLocationComboBox;
         private System.Windows.Forms.GroupBox FactorioLocationGroup;
         private System.Windows.Forms.GroupBox FactorioSettingsGroup;
@@ -464,5 +528,9 @@
 		private System.Windows.Forms.Button OKButton;
 		private System.Windows.Forms.Button CancelImportButton;
 		private CustomProgressBar ImportProgressBar;
+		private System.Windows.Forms.GroupBox FactorioModLocationGroup;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+		private System.Windows.Forms.Button ModsBrowseButton;
+		private System.Windows.Forms.ComboBox ModsLocationComboBox;
 	}
 }

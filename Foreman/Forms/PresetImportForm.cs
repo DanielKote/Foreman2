@@ -51,7 +51,7 @@ namespace Foreman
 			this.ResumeLayout();
 		}
 
-		private void BrowseButton_Click(object sender, EventArgs e)
+		private void FactorioBrowseButton_Click(object sender, EventArgs e)
 		{
 			using (FolderBrowserDialog dialog = new FolderBrowserDialog())
 			{
@@ -68,6 +68,23 @@ namespace Foreman
 						FactorioLocationComboBox.Text = Path.GetDirectoryName(Path.GetDirectoryName(dialog.SelectedPath));
 					else
 						MessageBox.Show("Selected directory doesnt seem to be a factorio install folder (it should at the very least have \"bin\" and \"data\" folders, along with a \"config-path.cfg\" file)");
+				}
+			}
+		}
+
+		private void ModsBrowseButton_Click(object sender, EventArgs e)
+		{
+						using (FolderBrowserDialog dialog = new FolderBrowserDialog())
+			{
+				if (Directory.Exists(ModsLocationComboBox.Text))
+					dialog.SelectedPath = ModsLocationComboBox.Text;
+
+				if (dialog.ShowDialog() == DialogResult.OK)
+				{
+					if (File.Exists(Path.Combine(dialog.SelectedPath, "mod-list.json")))
+						ModsLocationComboBox.Text = dialog.SelectedPath;
+					else
+						MessageBox.Show("Selected directory doesnt seem to be a factorio mods folder (it should at the very least have \"mod-list.json\" file)");
 				}
 			}
 		}
@@ -138,14 +155,20 @@ namespace Foreman
 				return;
 			}
 
-			string userDataPath = FactorioPathsProcessor.GetFactorioUserPath(installPath, true);
-			if (string.IsNullOrEmpty(userDataPath))
+			string modsPath = ModsLocationComboBox.Text;
+			if (string.IsNullOrEmpty(modsPath) || !File.Exists(Path.Combine(modsPath, "mod-list.json")))
 			{
-				CleanupFailedImport();
-				return;
+				string userDataPath = FactorioPathsProcessor.GetFactorioUserPath(installPath, true);
+				if (string.IsNullOrEmpty(userDataPath))
+				{
+					MessageBox.Show("Couldnt auto-locate the mods folder - please manually locate the folder");
+					CleanupFailedImport();
+					return;
+				}
+				modsPath = Path.Combine(userDataPath, "mods");
 			}
 
-			//we now have the two paths to use - installPath and userDataPath. can begin processing Factorio
+			//we now have the two paths to use - installPath and modsPath. can begin processing Factorio
 			var progress = new Progress<KeyValuePair<int, string>>(value =>
 			{
 				if (value.Key > ImportProgressBar.Value)
@@ -160,7 +183,7 @@ namespace Foreman
 			stopwatch.Start();
 #endif
 			ImportStarted = true;
-			NewPresetName = await ProcessPreset(installPath, userDataPath, progress, token);
+			NewPresetName = await ProcessPreset(installPath, modsPath, progress, token);
 #if DEBUG
 			Console.WriteLine(string.Format("Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0")));
 			ErrorLogging.LogLine(string.Format("Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0")));
@@ -179,12 +202,11 @@ namespace Foreman
 
 		}
 
-		private async Task<string> ProcessPreset(string installPath, string userDataPath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token)
+		private async Task<string> ProcessPreset(string installPath, string modsPath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token)
 		{
 			return await Task.Run(() =>
 			{
 				//prepare for running factorio
-				string modsPath = Path.Combine(userDataPath, "mods");
 				string exePath = Path.Combine(new string[] { installPath, "bin", "x64", "factorio.exe" });
 				string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", NewPresetName });
 				if (!File.Exists(exePath))
@@ -232,7 +254,7 @@ namespace Foreman
 				process.StartInfo.FileName = exePath;
 
 				progress.Report(new KeyValuePair<int, string>(10, "Running Factorio - creating test save."));
-				process.StartInfo.Arguments = "--create temp-save.zip";
+				process.StartInfo.Arguments = string.Format("--mod-directory \"{0}\" --create temp-save.zip", modsPath);
 				process.StartInfo.UseShellExecute = false;
 				process.StartInfo.CreateNoWindow = true;
 				process.StartInfo.RedirectStandardOutput = true;
@@ -259,7 +281,7 @@ namespace Foreman
 				}
 
 				progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
-				process.StartInfo.Arguments = "--instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1";
+				process.StartInfo.Arguments = string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath);
 				process.Start();
 				resultString = "";
 				while (!process.HasExited)
