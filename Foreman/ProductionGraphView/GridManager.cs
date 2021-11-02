@@ -17,6 +17,7 @@ namespace Foreman
 		private static readonly Brush gridBrush = new SolidBrush(Color.FromArgb(240, 240, 240));
 		private static readonly Pen zeroAxisPen = new Pen(Color.FromArgb(140, 140, 140), 2);
 		private static readonly Pen lockedAxisPen = new Pen(Color.FromArgb(180, 80, 80), 4);
+		private const int minGridWidth = 6;
 
 		public GridManager()
 		{
@@ -35,7 +36,7 @@ namespace Foreman
 				//minor grid
 				if (CurrentGridUnit > 0)
 				{
-					if ((visibleGraphBounds.Width > CurrentGridUnit) && (viewScale * CurrentGridUnit) > 4)
+					if ((visibleGraphBounds.Width > CurrentGridUnit) && (viewScale * CurrentGridUnit) > minGridWidth)
 					{
 						for (int ix = visibleGraphBounds.X - (visibleGraphBounds.X % CurrentGridUnit); ix < visibleGraphBounds.X + visibleGraphBounds.Width; ix += CurrentGridUnit)
 							graphics.DrawLine(gridPen, ix, visibleGraphBounds.Y, ix, visibleGraphBounds.Y + visibleGraphBounds.Height);
@@ -50,7 +51,7 @@ namespace Foreman
 				//major grid
 				if (CurrentMajorGridUnit > CurrentGridUnit)
 				{
-					if ((visibleGraphBounds.Width > CurrentMajorGridUnit) && (viewScale * CurrentMajorGridUnit) > 4)
+					if ((visibleGraphBounds.Width > CurrentMajorGridUnit) && (viewScale * CurrentMajorGridUnit) > minGridWidth)
 					{
 						for (int ix = visibleGraphBounds.X - (visibleGraphBounds.X % CurrentMajorGridUnit); ix < visibleGraphBounds.X + visibleGraphBounds.Width; ix += CurrentMajorGridUnit)
 							graphics.DrawLine(gridMPen, ix, visibleGraphBounds.Y, ix, visibleGraphBounds.Y + visibleGraphBounds.Height);

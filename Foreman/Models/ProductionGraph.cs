@@ -43,7 +43,7 @@ namespace Foreman
 
 		public const double MaxSetFlow = 10000000000000; //10 trillion should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
 		private const int XBorder = 200;
-		private const int YBorder = 100;
+		private const int YBorder = 200;
 
 		public bool PauseUpdates { get; set; }
 

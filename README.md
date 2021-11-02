@@ -23,7 +23,7 @@ Movement around the graph can be done by dragging with the middle mouse button, 
 
 Dragging with the left mouse button (from an empty location) will enable you to select a group of nodes, and doing this while holding down the Ctrl key will 'add' to the currently selected nodes, while doing the selection while holding down the Alt key will 'subtract' from the currently selected nodes.
 
-A node (or a selection of nodes) can be moved around the graph by dragging them with the left mouse button.
+A node (or a selection of nodes) can be moved around the graph by dragging them with the left mouse button, or by using the arrow keys. Holding shift while dragging with the mouse will limit movement to the horizontal or vertical axis, while holding shift while moving with the arrow keys will move by a major grid increment rather than the minor grid increment.
 
 Once a group of nodes has been selected you can also Ctrl+C or Ctrl+X the group (copy/cut), and Ctrl-V afterwards to paste the nodes wherever you wish. Keep in mind that pasting nodes will deselect the currently selected nodes and select the newly pasted nodes instead.
 
@@ -162,7 +162,7 @@ Advanced (Load barreling or crating recipes): if turned on will load the barreli
 
 ![10: Export](https://puu.sh/Im91L/703d54d784.jpg)
 
-Graph export remains unchanged at this moment from the original Foreman. Click on the 'Export image' button to bring up the export form, browse to select where you wish to save the resulting png file, set the scale (I recommend 2x) for the image, check the transparent background if you wish to, and hit export to save the image. Keep in mind that the grid WILL be drawn in the image if it is currently visible in the graph. In fact everything will be drawn exactly as in the graph, so ensure you have the visual options set as you wish them to be before exporting.
+Graph export remains unchanged at this moment from the original Foreman. Click on the 'Export image' button to bring up the export form, browse to select where you wish to save the resulting png file, set the scale (1x should be fine) for the image, check the transparent background if you wish to, and hit export to save the image. Dont worry - the grid will not be exported.
 
 Additionally, be careful when exporting large graphs - this is a raster format instead of a vector one, so large graphs can quickly spiral out of control. It is highly recommended to plan out the factory in smaller sub-factories with a saved graph for each (that you can export as an image), and if you wish to plan the ENTIRE factory, then do so by importing the smaller graphs into the main graph, connecting all the nodes, doing your planning, and NOT exporting the final image (instead just saving the graph and navigating it within Foreman).
 

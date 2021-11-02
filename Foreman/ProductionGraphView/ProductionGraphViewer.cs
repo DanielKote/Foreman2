@@ -429,11 +429,6 @@ namespace Foreman
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
-			//update visibility of all elements
-			foreach (GraphElement element in GetPaintingOrder())
-				element.UpdateVisibility(visibleGraphBounds);
-
-			//proceed with the paint operations
 			base.OnPaint(e);
 			e.Graphics.ResetTransform();
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -442,15 +437,25 @@ namespace Foreman
 			e.Graphics.ScaleTransform(ViewScale, ViewScale);
 			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 
-			Paint(e.Graphics);
+			Paint(e.Graphics, false);
 		}
 
-		public new void Paint(Graphics graphics)
+		public new void Paint(Graphics graphics, bool FullGraph = false)
 		{
+			//update visibility of all elements
+			if (FullGraph)
+				foreach (GraphElement element in GetPaintingOrder())
+					element.UpdateVisibility(Graph.Bounds);
+			else
+				foreach (GraphElement element in GetPaintingOrder())
+					element.UpdateVisibility(visibleGraphBounds);
+
+
 			selectionPen.Width = 2 / ViewScale;
 
 			//grid
-			Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as BaseNodeElement : null);
+			if(!FullGraph)
+				Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as BaseNodeElement : null);
 
 			//process link element widths
 			if (DynamicLinkWidth)
@@ -484,24 +489,27 @@ namespace Foreman
 			//all elements (nodes & lines)
 			int visibleElements = GetPaintingOrder().Count(e => e.Visible && e is BaseNodeElement);
 			foreach (GraphElement element in GetPaintingOrder())
-				element.Paint(graphics, visibleElements > NodeCountForSimpleView || ViewScale < 0.2); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
+				element.Paint(graphics, !FullGraph && (visibleElements > NodeCountForSimpleView || ViewScale < 0.2)); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
 
 			//selection zone
-			if (currentDragOperation == DragOperation.Selection)
+			if (currentDragOperation == DragOperation.Selection && !FullGraph)
 				graphics.DrawRectangle(selectionPen, SelectionZone);
 
 			//everything below will be drawn directly on the screen instead of scaled/shifted based on graph
 			graphics.ResetTransform();
 
-			//warning/error arrows
-			ArrowRenderer.Paint(graphics, Graph);
+			if (!FullGraph)
+			{
+				//warning/error arrows
+				ArrowRenderer.Paint(graphics, Graph);
 
-			//floating tooltips
-			ToolTipRenderer.Paint(graphics, TooltipsEnabled && !SubwindowOpen && currentDragOperation == DragOperation.None && !viewBeingDragged);
+				//floating tooltips
+				ToolTipRenderer.Paint(graphics, TooltipsEnabled && !SubwindowOpen && currentDragOperation == DragOperation.None && !viewBeingDragged);
 
-			//paused border
-			if (Graph != null && Graph.PauseUpdates) //graph null check is purely for design view
-				graphics.DrawRectangle(pausedBorders, 0, 0, Width - 3, Height - 3);
+				//paused border
+				if (Graph != null && Graph.PauseUpdates) //graph null check is purely for design view
+					graphics.DrawRectangle(pausedBorders, 0, 0, Width - 3, Height - 3);
+			}
 		}
 
 		//----------------------------------------------Production Graph events

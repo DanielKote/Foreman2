@@ -64,7 +64,7 @@ namespace Foreman
 					graphics.Clear(Color.White);
 				}
 
-				graphViewer.Paint(graphics);
+				graphViewer.Paint(graphics, true);
 
 				if (!Directory.Exists(Path.GetDirectoryName(fileTextBox.Text)))
 				{
