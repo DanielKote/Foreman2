@@ -832,7 +832,7 @@ namespace Foreman
 					Clipboard.SetText(stringBuilder.ToString());
 
 					if (e.KeyCode == Keys.X) //cut
-						foreach (BaseNodeElement node in selectedNodes)
+						foreach (BaseNodeElement node in selectedNodes.ToList())
 							Graph.DeleteNode(node.DisplayedNode);
 				}
 				else if (e.KeyCode == Keys.V && (e.Modifiers & Keys.Control) == Keys.Control) //paste
