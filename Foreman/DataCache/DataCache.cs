@@ -743,7 +743,8 @@ namespace Foreman
 				((string)objJToken["fuel_type"] == "heat") ? EnergySource.Heat : EnergySource.Void;
 			EntityType etype =
 				type == "beacon" ? EntityType.Beacon :
-				type == "mining-drill" || type == "offshore-pump" ? EntityType.Miner :
+				type == "mining-drill" ? EntityType.Miner :
+				type == "offshore-pump" ? EntityType.OffshorePump :           
 				type == "furnace" || type == "assembling-machine" || type == "rocket-silo" ? EntityType.Assembler :
 				type == "boiler" ? EntityType.Boiler :
 				type == "generator" ? EntityType.Generator :
@@ -835,10 +836,10 @@ namespace Foreman
 						success = GeneratorAdditionalProcessing(objJToken, aEntity);
 						break;
 					case EntityType.Miner:
-						if (type == "mining-drill")
-							success = MinerAdditionalProcessing(objJToken, aEntity, resourceCategories);
-						else
-							success = OffshorePumpAdditionalProcessing(objJToken, aEntity);
+						success = MinerAdditionalProcessing(objJToken, aEntity, resourceCategories);
+						break;
+					case EntityType.OffshorePump:
+						success = OffshorePumpAdditionalProcessing(objJToken, aEntity);
 						break;
 					case EntityType.Reactor:
 						success = ReactorAdditionalProcessing(objJToken, aEntity);

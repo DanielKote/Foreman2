@@ -31,6 +31,7 @@ namespace Foreman
 			public AssemblerSelector.Style DefaultAssemblerStyle;
 			public ModuleSelector.Style DefaultModuleStyle;
 			
+			public bool EnableExtraProductivityForNonMiners;
 			public bool DEV_ShowUnavailableItems;
 			public bool DEV_UseRecipeBWFilters;
 
@@ -132,6 +133,7 @@ namespace Foreman
 			ModuleSelectorStyleDropDown.Items.AddRange(ModuleSelector.StyleNames);
 			ModuleSelectorStyleDropDown.SelectedIndex = (int)Options.DefaultModuleStyle;
 
+			ShowProductivityBonusOnAllCheckBox.Checked = Options.EnableExtraProductivityForNonMiners;
 			ShowUnavailablesCheckBox.Checked = Options.DEV_ShowUnavailableItems;
 			LoadBarrelingCheckBox.Checked = !Options.DEV_UseRecipeBWFilters;
 
@@ -164,7 +166,7 @@ namespace Foreman
 			IconList.Images.Add(DataCache.UnknownIcon);
 
 			LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler), unfilteredAssemblerList);
-			LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner), unfilteredMinerList);
+			LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner || a.EntityType == EntityType.OffshorePump), unfilteredMinerList);
 			LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor), unfilteredPowerList);
 			LoadUnfilteredList(Options.DCache.Beacons.Values, unfilteredBeaconList);
 			LoadUnfilteredList(Options.DCache.Modules.Values, unfilteredModuleList);
@@ -452,6 +454,7 @@ namespace Foreman
 			Options.DefaultAssemblerStyle = (AssemblerSelector.Style)AssemblerSelectorStyleDropDown.SelectedIndex;
 			Options.DefaultModuleStyle = (ModuleSelector.Style)ModuleSelectorStyleDropDown.SelectedIndex;
 
+			Options.EnableExtraProductivityForNonMiners = ShowProductivityBonusOnAllCheckBox.Checked;
 			Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
 			Options.DEV_UseRecipeBWFilters = !LoadBarrelingCheckBox.Checked;
 

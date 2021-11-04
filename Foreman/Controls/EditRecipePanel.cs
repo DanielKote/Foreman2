@@ -44,6 +44,7 @@ namespace Foreman
 			BeaconsPerAssemblerInput.Value = Math.Min(BeaconsPerAssemblerInput.Maximum, (decimal)nodeData.BeaconsPerAssembler);
 			ConstantBeaconInput.Value = Math.Min(ConstantBeaconInput.Maximum, (decimal)nodeData.BeaconsConst);
 			NeighbourInput.Value = Math.Min(NeighbourInput.Maximum, (decimal)nodeData.NeighbourCount);
+			ExtraProductivityInput.Value = Math.Min(ExtraProductivityInput.Maximum, (decimal)(nodeData.ExtraProductivity * 100));
 
 			AssemblerOptions = new List<Button>();
 			FuelOptions = new List<Button>();
@@ -85,6 +86,7 @@ namespace Foreman
 			FixedAssemblersOption.CheckedChanged += FixedAssemblerOption_CheckedChanged;
 			FixedAssemblerInput.ValueChanged += FixedAssemblerInput_ValueChanged;
 			NeighbourInput.ValueChanged += NeighbourInput_ValueChanged;
+			ExtraProductivityInput.ValueChanged += ExtraProductivityInput_ValueChanged;
 			BeaconCountInput.ValueChanged += BeaconInput_ValueChanged;
 			BeaconsPerAssemblerInput.ValueChanged += BeaconInput_ValueChanged;
 			ConstantBeaconInput.ValueChanged += BeaconInput_ValueChanged;
@@ -147,6 +149,13 @@ namespace Foreman
 			{
 				NeighbourInput.Visible = false;
 				NeighboursLabel.Visible = false;
+			}
+
+			//extra productivity bonus panel
+			if(nodeData.SelectedAssembler.EntityType != EntityType.Miner && !myGraphViewer.Graph.EnableExtraProductivityForNonMiners)
+			{
+				ExtraProductivityInput.Visible = false;
+				ExtraProductivityLabel.Visible = false;
 			}
 
 			//fuel panel
@@ -348,7 +357,7 @@ namespace Foreman
 			AssemblerProductivityPercentLabel.Text = nodeData.GetProductivityMultiplier().ToString("P0");
 			AssemblerPollutionPercentLabel.Text = nodeData.GetPollutionMultiplier().ToString("P0");
 
-			bool isAssembler = (nodeData.SelectedAssembler.EntityType == EntityType.Assembler || nodeData.SelectedAssembler.EntityType == EntityType.Miner);
+			bool isAssembler = (nodeData.SelectedAssembler.EntityType == EntityType.Assembler || nodeData.SelectedAssembler.EntityType == EntityType.Miner || nodeData.SelectedAssembler.EntityType == EntityType.OffshorePump);
 			AssemblerSpeedTitleLabel.Visible = isAssembler;
 			AssemblerSpeedLabel.Visible = isAssembler;
 			AssemblerSpeedPercentLabel.Visible = isAssembler;
@@ -580,6 +589,24 @@ namespace Foreman
 		{
 			SetNeighbourBonus();
 			UpdateFixedFlowInputDecimals(sender as NumericUpDown, 2);
+		}
+
+		//------------------------------------------------------------------------------------------------------assembler extra productivity input events
+
+		private void SetExtraProductivityBonus()
+		{
+			if (nodeData.ExtraProductivity != (double)ExtraProductivityInput.Value / 100)
+			{
+				nodeController.SetExtraProductivityBonus((double)ExtraProductivityInput.Value / 100);
+				myGraphViewer.Graph.UpdateNodeValues();
+
+				UpdateAssemblerInfo();
+			}
+		}
+
+		private void ExtraProductivityInput_ValueChanged(object sender, EventArgs e)
+		{
+			SetExtraProductivityBonus();
 		}
 
 		//------------------------------------------------------------------------------------------------------beacon input events

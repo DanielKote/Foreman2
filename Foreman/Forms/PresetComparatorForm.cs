@@ -204,7 +204,7 @@ namespace Foreman
 			ProcessObject(LeftCache.Items, RightCache.Items, unfilteredItemTabObjects);
 			ProcessObject(LeftCache.Recipes, RightCache.Recipes, unfilteredRecipeTabObjects);
 			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler).ToDictionary(a => a.Name), unfilteredAssemblerTabObjects);
-			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner).ToDictionary(a => a.Name), unfilteredMinerTabObjects);
+			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner || a.EntityType == EntityType.OffshorePump).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner || a.EntityType == EntityType.OffshorePump).ToDictionary(a => a.Name), unfilteredMinerTabObjects);
 			ProcessObject(LeftCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor).ToDictionary(a => a.Name), RightCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor).ToDictionary(a => a.Name), unfilteredPowerTabObjects);
 			ProcessObject(LeftCache.Beacons.Values.ToDictionary(a => a.Name), RightCache.Beacons.Values.ToDictionary(a => a.Name), unfilteredBeaconTabObjects);
 			ProcessObject(LeftCache.Modules, RightCache.Modules, unfilteredModuleTabObjects);

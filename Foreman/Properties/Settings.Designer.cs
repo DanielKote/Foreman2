@@ -298,5 +298,17 @@ namespace Foreman.Properties {
                 this["RoundAssemblerCount"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableExtraProductivityForNonMiners {
+            get {
+                return ((bool)(this["EnableExtraProductivityForNonMiners"]));
+            }
+            set {
+                this["EnableExtraProductivityForNonMiners"] = value;
+            }
+        }
     }
 }

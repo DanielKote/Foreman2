@@ -46,6 +46,7 @@ namespace Foreman
 		private const int YBorder = 200;
 
 		public bool PauseUpdates { get; set; }
+		public bool EnableExtraProductivityForNonMiners { get; set; }
 
 		public AssemblerSelector AssemblerSelector { get; private set; }
 		public ModuleSelector ModuleSelector { get; private set; }
@@ -143,8 +144,6 @@ namespace Foreman
 		{
 			RecipeNode node = new RecipeNode(this, lastNodeID++, recipe);
 			node.Location = location;
-			nodes.Add(node);
-			roToNode.Add(node.ReadOnlyNode, node);
 			nodeSetupAction?.Invoke(node);
 			if(nodeSetupAction == null)
 			{
@@ -152,6 +151,8 @@ namespace Foreman
 				rnController.AutoSetAssembler();
 				rnController.AutoSetAssemblerModules();
 			}
+			nodes.Add(node);
+			roToNode.Add(node.ReadOnlyNode, node);
 			node.UpdateState();
 			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
 			return (ReadOnlyRecipeNode)node.ReadOnlyNode;
@@ -441,10 +442,10 @@ namespace Foreman
 							long recipeID = (long)nodeJToken["RecipeID"];
 							newNode = roToNode[CreateRecipeNode(recipeLinks[recipeID], location, (rNode) =>
 							{
-								newNodeCollection.newNodes.Add(rNode.ReadOnlyNode);
 								RecipeNodeController rNodeController = (RecipeNodeController)rNode.Controller;
 
 								rNode.NeighbourCount = (double)nodeJToken["Neighbours"];
+								rNode.ExtraProductivityBonus = (double)nodeJToken["ExtraProductivity"];
 
 								string assemblerName = (string)nodeJToken["Assembler"];
 								if (cache.Assemblers.ContainsKey(assemblerName))
@@ -503,6 +504,8 @@ namespace Foreman
 									rNode.BeaconsPerAssembler = (double)nodeJToken["BeaconsPerAssembler"];
 									rNode.BeaconsConst = (double)nodeJToken["BeaconsConst"];
 								}
+
+								newNodeCollection.newNodes.Add(rNode.ReadOnlyNode); //done last, so as to catch any errors above first.
 							})];
 							break;
 						default:

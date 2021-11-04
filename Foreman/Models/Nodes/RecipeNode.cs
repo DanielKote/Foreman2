@@ -76,6 +76,8 @@ namespace Foreman
 		public double ActualAssemblerCount { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier()); } }
 		public override double DesiredRatePerSec { get { return DesiredAssemblerCount * SelectedAssembler.Speed * GetSpeedMultiplier() / (BaseRecipe.Time); } set { Trace.Fail("Desired rate set on a recipe node!"); } }
 
+		public double ExtraProductivityBonus { get; set; }
+
 		public override IEnumerable<Item> Inputs
 		{
 			get
@@ -230,7 +232,7 @@ namespace Foreman
 
 		public double GetProductivityMultiplier()
 		{
-			double multiplier = 1.0f + (SelectedAssembler == null ? 0 : SelectedAssembler.BaseProductivityBonus);
+			double multiplier = 1.0f + SelectedAssembler.BaseProductivityBonus + ((SelectedAssembler.EntityType == EntityType.Miner || MyGraph.EnableExtraProductivityForNonMiners)? ExtraProductivityBonus : 0);
 			foreach (Module module in AssemblerModules)
 				multiplier += module.ProductivityBonus;
 			foreach (Module beaconModule in BeaconModules)
@@ -332,18 +334,18 @@ namespace Foreman
 			info.AddValue("RecipeID", BaseRecipe.RecipeID);
 			info.AddValue("RateType", RateType);
 			info.AddValue("Neighbours", NeighbourCount);
+			info.AddValue("ExtraProductivity", ExtraProductivityBonus);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredAssemblers", DesiredAssemblerCount);
 
-			if (SelectedAssembler != null)
-			{
-				info.AddValue("Assembler", SelectedAssembler.Name);
-				info.AddValue("AssemblerModules", AssemblerModules.Select(m => m.Name));
-				if (Fuel != null)
-					info.AddValue("Fuel", Fuel.Name);
-				if (FuelRemains != null)
-					info.AddValue("Burnt", FuelRemains.Name);
-			}
+			//assembler can not be null!
+			info.AddValue("Assembler", SelectedAssembler.Name);
+			info.AddValue("AssemblerModules", AssemblerModules.Select(m => m.Name));
+			if (Fuel != null)
+				info.AddValue("Fuel", Fuel.Name);
+			if (FuelRemains != null)
+				info.AddValue("Burnt", FuelRemains.Name);
+
 			if (SelectedBeacon != null)
 			{
 				info.AddValue("Beacon", SelectedBeacon.Name);
@@ -369,6 +371,7 @@ namespace Foreman
 		public IReadOnlyList<Module> BeaconModules => MyNode.BeaconModules;
 
 		public double NeighbourCount => MyNode.NeighbourCount;
+		public double ExtraProductivity => MyNode.ExtraProductivityBonus;
 		public double BeaconCount => MyNode.BeaconCount;
 		public double BeaconsPerAssembler => MyNode.BeaconsPerAssembler;
 		public double BeaconsConst => MyNode.BeaconsConst;
@@ -735,6 +738,7 @@ namespace Foreman
 		public void SetDesiredAssemblerCount(double count) { if (MyNode.DesiredAssemblerCount != count) MyNode.DesiredAssemblerCount = count; }
 
 		public void SetNeighbourCount(double count) { if (MyNode.NeighbourCount != count) MyNode.NeighbourCount = count; }
+		public void SetExtraProductivityBonus(double bonus) { if (MyNode.ExtraProductivityBonus != bonus) MyNode.ExtraProductivityBonus = bonus; }
 		public void SetBeaconCount(double count) { if (MyNode.BeaconCount != count) MyNode.BeaconCount = count; }
 		public void SetBeaconsPerAssembler(double beacons) { if (MyNode.BeaconsPerAssembler != beacons) MyNode.BeaconsPerAssembler = beacons; }
 		public void SetBeaconsCont(double beacons) { if (MyNode.BeaconsConst != beacons) MyNode.BeaconsConst = beacons; }

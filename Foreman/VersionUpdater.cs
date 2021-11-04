@@ -15,14 +15,42 @@ namespace Foreman
 
 		public static JObject UpdateSave(JObject original)
 		{
-			MessageBox.Show("Attempt to update save to current foreman version failed.\nSorry.", "Cant load save", MessageBoxButtons.OK);
-			return null;
+			if (original["Version"] == null || original["Object"] == null || (string)original["Object"] != "ProductionGraphViewer")
+			{
+				//this is most likely the 'original' foreman graph. At the moment there isnt a conversion in place to bring it up to current standard (Feature will be added later)
+				MessageBox.Show("Attempt to update save to current foreman version failed.\nSorry.", "Cant load save", MessageBoxButtons.OK);
+				return null;
+			}
+
+			if ((int)original["Version"] == 1)
+			{
+				//graph update only - no changes to graph viewer
+				original["Version"] = 2;
+			}
+
+			return original;
 		}
 
 		public static JToken UpdateGraph(JToken original)
 		{
-			MessageBox.Show("Imported graph could not be updated to current foreman version.\nSorry.", "Cant process import", MessageBoxButtons.OK);
-			return null;
+			if (original["Version"] == null || original["Object"] == null || (string)original["Object"] != "ProductionGraph")
+			{
+				//this is most likely the 'original' foreman graph. At the moment there isnt a conversion in place to bring it up to current standard (Feature will be added later)
+				MessageBox.Show("Imported graph could not be updated to current foreman version.\nSorry.", "Cant process import", MessageBoxButtons.OK);
+				return null;
+			}
+
+			if((int)original["Version"] == 1)
+			{
+				//Version update 1 -> 2:
+				//	recipe node now has "ExtraPoductivity" value added
+				original["Version"] = 2;
+
+				foreach (JToken nodeJToken in original["Nodes"].Where(jt => (NodeType)(int)jt["NodeType"] == NodeType.Recipe).ToList())
+					nodeJToken["ExtraProductivity"] = 0;
+			}
+
+			return original;
 		}
 	}
 }

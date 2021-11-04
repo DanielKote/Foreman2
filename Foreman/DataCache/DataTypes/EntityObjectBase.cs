@@ -10,7 +10,7 @@ namespace Foreman
 	//heat types add a special 'heat' item to the recipe node they are part of (similar to burner types) -> in fact to simplify things they are handled as a burner with a specific burn item of 'heat'
 	//void are considered as electric types with 0 electricity use
 	public enum EnergySource { Burner, FluidBurner, Electric, Heat, Void }
-	public enum EntityType { Miner, Assembler, Beacon, Boiler, Generator, BurnerGenerator, Reactor, ERROR }
+	public enum EntityType { Miner, OffshorePump, Assembler, Beacon, Boiler, Generator, BurnerGenerator, Reactor, ERROR }
 
 	public interface EntityObjectBase : DataObjectBase
 	{
@@ -126,6 +126,7 @@ namespace Foreman
 					case EntityType.BurnerGenerator: return "Generators";
 					case EntityType.Generator: return "Generators";
 					case EntityType.Miner: return "Miners";
+					case EntityType.OffshorePump: return "Offshore Pumps";
 					case EntityType.Reactor: return "Reactors";
 					default: return "";
 				}
@@ -140,6 +141,7 @@ namespace Foreman
 					case EntityType.BurnerGenerator: return "Generator";
 					case EntityType.Generator: return "Generator";
 					case EntityType.Miner: return "Miner";
+					case EntityType.OffshorePump: return "Offshore Pump";
 					case EntityType.Reactor: return "Reactor";
 					default: return "";
 				}

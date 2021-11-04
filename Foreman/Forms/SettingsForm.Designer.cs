@@ -96,6 +96,7 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.RoundAssemblerCountCheckBox = new System.Windows.Forms.CheckBox();
 			this.HighLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.label6 = new System.Windows.Forms.Label();
 			this.MediumLodRadioButton = new System.Windows.Forms.RadioButton();
@@ -110,7 +111,7 @@
 			this.AbbreviateSciPackCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
-			this.RoundAssemblerCountCheckBox = new System.Windows.Forms.CheckBox();
+			this.ShowProductivityBonusOnAllCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -881,9 +882,9 @@
 			this.groupBox7.Controls.Add(this.AdvancedOptionsTable);
 			this.groupBox7.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox7.Location = new System.Drawing.Point(3, 400);
+			this.groupBox7.Location = new System.Drawing.Point(3, 377);
 			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Size = new System.Drawing.Size(464, 85);
+			this.groupBox7.Size = new System.Drawing.Size(464, 108);
 			this.groupBox7.TabIndex = 3;
 			this.groupBox7.TabStop = false;
 			this.groupBox7.Text = "Advanced";
@@ -895,23 +896,25 @@
 			this.AdvancedOptionsTable.ColumnCount = 2;
 			this.AdvancedOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.AdvancedOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.AdvancedOptionsTable.Controls.Add(this.ShowUnavailablesCheckBox, 0, 0);
-			this.AdvancedOptionsTable.Controls.Add(this.LoadBarrelingCheckBox, 0, 1);
+			this.AdvancedOptionsTable.Controls.Add(this.ShowUnavailablesCheckBox, 0, 1);
+			this.AdvancedOptionsTable.Controls.Add(this.LoadBarrelingCheckBox, 0, 2);
+			this.AdvancedOptionsTable.Controls.Add(this.ShowProductivityBonusOnAllCheckBox, 0, 0);
 			this.AdvancedOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AdvancedOptionsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.AdvancedOptionsTable.Location = new System.Drawing.Point(3, 16);
 			this.AdvancedOptionsTable.Name = "AdvancedOptionsTable";
-			this.AdvancedOptionsTable.RowCount = 3;
+			this.AdvancedOptionsTable.RowCount = 4;
+			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.AdvancedOptionsTable.Size = new System.Drawing.Size(458, 66);
+			this.AdvancedOptionsTable.Size = new System.Drawing.Size(458, 89);
 			this.AdvancedOptionsTable.TabIndex = 0;
 			// 
 			// ShowUnavailablesCheckBox
 			// 
 			this.ShowUnavailablesCheckBox.AutoSize = true;
-			this.ShowUnavailablesCheckBox.Location = new System.Drawing.Point(3, 3);
+			this.ShowUnavailablesCheckBox.Location = new System.Drawing.Point(3, 26);
 			this.ShowUnavailablesCheckBox.Name = "ShowUnavailablesCheckBox";
 			this.ShowUnavailablesCheckBox.Size = new System.Drawing.Size(168, 17);
 			this.ShowUnavailablesCheckBox.TabIndex = 0;
@@ -921,7 +924,7 @@
 			// LoadBarrelingCheckBox
 			// 
 			this.LoadBarrelingCheckBox.AutoSize = true;
-			this.LoadBarrelingCheckBox.Location = new System.Drawing.Point(3, 26);
+			this.LoadBarrelingCheckBox.Location = new System.Drawing.Point(3, 49);
 			this.LoadBarrelingCheckBox.Name = "LoadBarrelingCheckBox";
 			this.LoadBarrelingCheckBox.Size = new System.Drawing.Size(199, 17);
 			this.LoadBarrelingCheckBox.TabIndex = 1;
@@ -935,7 +938,7 @@
 			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox6.Location = new System.Drawing.Point(3, 333);
 			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(464, 61);
+			this.groupBox6.Size = new System.Drawing.Size(464, 38);
 			this.groupBox6.TabIndex = 2;
 			this.groupBox6.TabStop = false;
 			// 
@@ -951,7 +954,7 @@
 			this.tableLayoutPanel3.RowCount = 2;
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 42);
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 19);
 			this.tableLayoutPanel3.TabIndex = 1;
 			// 
 			// groupBox5
@@ -1092,6 +1095,17 @@
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 210);
 			this.NodeGraphicsTable.TabIndex = 28;
+			// 
+			// RoundAssemblerCountCheckBox
+			// 
+			this.RoundAssemblerCountCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.RoundAssemblerCountCheckBox, 4);
+			this.RoundAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 121);
+			this.RoundAssemblerCountCheckBox.Name = "RoundAssemblerCountCheckBox";
+			this.RoundAssemblerCountCheckBox.Size = new System.Drawing.Size(127, 17);
+			this.RoundAssemblerCountCheckBox.TabIndex = 17;
+			this.RoundAssemblerCountCheckBox.Text = "Round building count";
+			this.RoundAssemblerCountCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// HighLodRadioButton
 			// 
@@ -1264,16 +1278,15 @@
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
 			// 
-			// RoundAssemblerCountCheckBox
+			// ShowProductivityBonusOnAllCheckBox
 			// 
-			this.RoundAssemblerCountCheckBox.AutoSize = true;
-			this.NodeGraphicsTable.SetColumnSpan(this.RoundAssemblerCountCheckBox, 4);
-			this.RoundAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 121);
-			this.RoundAssemblerCountCheckBox.Name = "RoundAssemblerCountCheckBox";
-			this.RoundAssemblerCountCheckBox.Size = new System.Drawing.Size(127, 17);
-			this.RoundAssemblerCountCheckBox.TabIndex = 17;
-			this.RoundAssemblerCountCheckBox.Text = "Round building count";
-			this.RoundAssemblerCountCheckBox.UseVisualStyleBackColor = true;
+			this.ShowProductivityBonusOnAllCheckBox.AutoSize = true;
+			this.ShowProductivityBonusOnAllCheckBox.Location = new System.Drawing.Point(3, 3);
+			this.ShowProductivityBonusOnAllCheckBox.Name = "ShowProductivityBonusOnAllCheckBox";
+			this.ShowProductivityBonusOnAllCheckBox.Size = new System.Drawing.Size(348, 17);
+			this.ShowProductivityBonusOnAllCheckBox.TabIndex = 2;
+			this.ShowProductivityBonusOnAllCheckBox.Text = "Enable extra productivity bonus for all entities (instead of only miners)";
+			this.ShowProductivityBonusOnAllCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
@@ -1283,7 +1296,7 @@
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelButton = this.CancelSettingsButton;
-			this.ClientSize = new System.Drawing.Size(675, 568);
+			this.ClientSize = new System.Drawing.Size(519, 568);
 			this.Controls.Add(this.MainTable);
 			this.DoubleBuffered = true;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -1425,5 +1438,6 @@
 		private System.Windows.Forms.Button SetEnabledFromSciencePacksButton;
 		private System.Windows.Forms.CheckBox AbbreviateSciPackCheckBox;
 		private System.Windows.Forms.CheckBox RoundAssemblerCountCheckBox;
+		private System.Windows.Forms.CheckBox ShowProductivityBonusOnAllCheckBox;
 	}
 }

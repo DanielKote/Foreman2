@@ -37,6 +37,8 @@ namespace Foreman
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
+				Properties.Settings.Default.ForemanVersion = 2;
+
 				if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
 					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
 				GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)Properties.Settings.Default.DefaultRateUnit;
@@ -55,6 +57,7 @@ namespace Foreman
 					Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
 				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
 
+				GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
 				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
 				GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
 				GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
@@ -135,6 +138,7 @@ namespace Foreman
 			}
 
 			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
+			Properties.Settings.Default.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
 			Properties.Settings.Default.DefaultRateUnit = (int)GraphViewer.Graph.SelectedRateUnit;
 			Properties.Settings.Default.DefaultAssemblerOption = (int)GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
 			Properties.Settings.Default.DefaultModuleOption = (int)GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
@@ -225,6 +229,8 @@ namespace Foreman
 
 			options.RoundAssemblerCount = Properties.Settings.Default.RoundAssemblerCount;
 			options.AbbreviateSciPacks = Properties.Settings.Default.AbbreviateSciPacks;
+
+			options.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
 			options.DEV_ShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
 			options.DEV_UseRecipeBWFilters = Properties.Settings.Default.UseRecipeBWfilters;
 
@@ -282,11 +288,14 @@ namespace Foreman
 					Properties.Settings.Default.RoundAssemblerCount = options.RoundAssemblerCount;
 					Properties.Settings.Default.AbbreviateSciPacks = options.AbbreviateSciPacks;
 
+					GraphViewer.Graph.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
+					Properties.Settings.Default.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
+
 					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
 					Properties.Settings.Default.Save();
 
 					GraphViewer.Graph.UpdateNodeStates();
-					GraphViewer.UpdateNodeVisuals();
+					GraphViewer.Graph.UpdateNodeValues();
 
 					if (options.RequireReload)
 						SettingsButton_Click(this, EventArgs.Empty);

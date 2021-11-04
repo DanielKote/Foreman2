@@ -90,7 +90,7 @@ namespace Foreman
 
 			//assembler info + quantity
 			Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 10, (myParent.Width / 2) - this.X - (this.Width / 2) - 6, 30);
-			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Assembler || DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner))
+			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Assembler || DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner || DisplayedNode.SelectedAssembler.EntityType == EntityType.OffshorePump))
 			{
 				//info text
 				graphics.DrawString("Speed:\nProd:\nPower:", infoFont, textBrush, trans.X + Width + 2, trans.Y);
