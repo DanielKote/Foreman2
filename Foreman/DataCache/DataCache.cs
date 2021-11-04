@@ -1561,7 +1561,7 @@ namespace Foreman
 			Console.WriteLine("RECIPES: ----------------------------------------------------------------");
 			foreach(RecipePrototype recipe in recipes.Values)
 			{
-				Console.WriteLine(recipe.Name);
+				Console.WriteLine("R: " + recipe.Name);
 				foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
 					Console.WriteLine("  >" + tech.Tier.ToString("000") + ":" + tech.Name);
 				foreach(IReadOnlyList<Item> sciPackList in recipe.MyUnlockSciencePacks)

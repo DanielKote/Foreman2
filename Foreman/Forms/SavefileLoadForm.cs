@@ -87,7 +87,7 @@ namespace Foreman
 			}
 
 			var token = cts.Token;
-			DialogResult = await LoadSaveFile(token);
+			DialogResult = await LoadSaveFile(token); //OK: all good, data loaded, ABORT: error during loading, display error message, CANCEL: local error prior to load (message already displayed)
 			if (DialogResult == DialogResult.OK)
 				ProcessSaveData();
 			Close();
@@ -123,6 +123,15 @@ namespace Foreman
 						}
 					}
 
+					//test factorio version
+					FileVersionInfo factorioVersionInfo = FileVersionInfo.GetVersionInfo(factorioPath);
+					if (factorioVersionInfo.ProductMajorPart < 1 || factorioVersionInfo.ProductMinorPart < 1 || (factorioVersionInfo.ProductMinorPart == 1 && factorioVersionInfo.ProductBuildPart < 4))
+					{
+						MessageBox.Show("Factorio version (" + factorioVersionInfo.ProductVersion + ") can not be used with Foreman. Please use Factorio 1.1.4 or newer.");
+						ErrorLogging.LogLine(string.Format("Save file load: Factorio version was too old. {0} instead of 1.1.4+", factorioVersionInfo.ProductVersion));
+						return DialogResult.Cancel;
+					}
+
 					//copy the save reader mod to the mods folder
 					modsPath = Path.Combine(userDataPath, "mods");
 					if (!Directory.Exists(modsPath))
@@ -140,6 +149,23 @@ namespace Foreman
 						ErrorLogging.LogLine("copying of foreman save reader mod files failed.");
 						return DialogResult.Abort;
 					}
+
+					//ensure that the foreman save reader mod is correctly added to the mod-list and is enabled
+					string modListPath = Path.Combine(modsPath, "mod-list.json");
+					JObject modlist = null;
+					if (!File.Exists(modListPath))
+						modlist = new JObject();
+					else
+						modlist = JObject.Parse(File.ReadAllText(modListPath));
+					if (modlist["mods"] == null)
+						modlist.Add("mods", new JArray());
+
+					JToken foremansavereaderModToken = modlist["mods"].ToList().FirstOrDefault(t => t["name"] != null && (string)t["name"] == "foremansavereader");
+					if (foremansavereaderModToken == null)
+						((JArray)modlist["mods"]).Add(new JObject() { { "name", "foremansavereader" }, { "enabled", true } });
+					else
+						foremansavereaderModToken["enabled"] = true;
+					File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented));
 
 					//open the map with factorio and read the save file info (mods, technology, recipes)
 					Process process = new Process();

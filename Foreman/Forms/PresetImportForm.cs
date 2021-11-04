@@ -249,6 +249,24 @@ namespace Foreman
 					return "";
 				}
 
+				//ensure that the foreman export mod is correctly added to the mod-list and is enabled
+				string modListPath = Path.Combine(modsPath, "mod-list.json");
+				JObject modlist = null;
+				if (!File.Exists(modListPath))
+					modlist = new JObject();
+				else
+					modlist = JObject.Parse(File.ReadAllText(modListPath));
+				if (modlist["mods"] == null)
+					modlist.Add("mods", new JArray());
+
+				JToken foremanModToken = modlist["mods"].ToList().FirstOrDefault(t => t["name"] != null && (string)t["name"] == "foremanexport");
+				if (foremanModToken == null)
+					((JArray)modlist["mods"]).Add(new JObject() { { "name", "foremanexport" }, { "enabled", true } });
+				else
+					foremanModToken["enabled"] = true;
+				File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented));
+
+				//launch factorio to create the temporary save we will use for export
 				Process process = new Process();
 				process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 				process.StartInfo.FileName = exePath;
@@ -280,6 +298,7 @@ namespace Foreman
 					return "";
 				}
 
+				//launch factorio again to export the data
 				progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
 				process.StartInfo.Arguments = string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath);
 				process.Start();
