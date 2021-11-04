@@ -27,7 +27,6 @@ namespace Foreman
 		{
 			NodeState oldState = State;
 			State = (ConsumedItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean;
-			base.UpdateState();
 			if (oldState != State)
 				OnNodeStateChanged();
 		}
