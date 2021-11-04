@@ -1005,6 +1005,7 @@ namespace Foreman
 			info.AddValue("ViewScale", ViewScale);
 
 			//graph defaults (saved here instead of within the graph since they are used here, plus they arent used during copy/paste)
+			info.AddValue("ExtraProdForNonMiners", Graph.EnableExtraProductivityForNonMiners);
 			info.AddValue("AssemblerSelectorStyle", Graph.AssemblerSelector.DefaultSelectionStyle);
 			info.AddValue("ModuleSelectorStyle", Graph.ModuleSelector.DefaultSelectionStyle);
 			info.AddValue("FuelPriorityList", Graph.FuelSelector.FuelPriority.Select(i => i.Name));
@@ -1156,6 +1157,7 @@ namespace Foreman
 			foreach (string fuelType in json["FuelPriorityList"].Select(t => (string)t))
 				if (DCache.Items.ContainsKey(fuelType))
 					Graph.FuelSelector.UseFuel(DCache.Items[fuelType]);
+			Graph.EnableExtraProductivityForNonMiners = (bool)json["ExtraProdForNonMiners"];
 
 			//set up graph view options
 			string[] viewOffsetString = ((string)json["ViewOffset"]).Split(',');

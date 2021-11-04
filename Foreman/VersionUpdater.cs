@@ -24,7 +24,9 @@ namespace Foreman
 
 			if ((int)original["Version"] == 1)
 			{
-				//graph update only - no changes to graph viewer
+				//Version update 1 -> 2:
+				//	Graph now has the extra productivity for non-miners value 
+				original["ExtraProdForNonMiners"] = false;
 				original["Version"] = 2;
 			}
 
