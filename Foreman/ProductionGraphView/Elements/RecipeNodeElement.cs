@@ -16,6 +16,7 @@ namespace Foreman
 		private static readonly Brush recipeBgBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
 		private static readonly Pen productivityPen = new Pen(Brushes.DarkRed, 6);
 		private static readonly Pen productivityPlusPen = new Pen(productivityPen.Brush, 2);
+		private static readonly Pen extraProductivityPen = new Pen(Brushes.Crimson, 6);
 
 		private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
 
@@ -123,13 +124,20 @@ namespace Foreman
 				int pModules = DisplayedNode.AssemblerModules.Count(m => m.ProductivityBonus > 0);
 				pModules += (int)(DisplayedNode.BeaconModules.Count(m => m.ProductivityBonus > 0) * DisplayedNode.BeaconCount);
 
+				bool extraProductivity = DisplayedNode.ExtraProductivity > 0 && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners);
+				pModules += extraProductivity ? 1 : 0;
+
 				for (int i = 0; i < pModules && i < 6; i++)
-					graphics.DrawEllipse(productivityPen, trans.X - (Width / 2) - 3, trans.Y - (Height / 2) + 10 + i * 12, 6, 6);
+					graphics.DrawEllipse((extraProductivity && i==0)? extraProductivityPen : productivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10 + i * 12, 6, 6);
 				if (pModules > 6)
 				{
-					graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2) - 6, trans.Y - (Height / 2) + 84, trans.X - (Width / 2) + 6, trans.Y - (Height / 2) + 84);
-					graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2), trans.Y - (Height / 2) + 84 - 6, trans.X - (Width / 2), trans.Y - (Height / 2) + 84 + 6);
+					graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2) - 4, trans.Y - (Height / 2) + 84, trans.X - (Width / 2) + 8, trans.Y - (Height / 2) + 84);
+					graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2) + 2, trans.Y - (Height / 2) + 84 - 6, trans.X - (Width / 2) + 2, trans.Y - (Height / 2) + 84 + 6);
 				}
+			}
+			else if(DisplayedNode.ExtraProductivity > 0 && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners))
+			{
+				graphics.DrawEllipse(extraProductivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10, 6, 6);
 			}
 		}
 
