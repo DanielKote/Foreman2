@@ -118,7 +118,7 @@ Settings have mostly been moved to the settings form, which has been clearly bro
 
 ![7: Presets](https://puu.sh/Im6B4/0a6aef4421.jpg)
 
-All the currently saved presets (in the Preset folder) are listed here. You can check their mods & difficulty options in the list on the right by clicking on the preset you wish to see. To import a new preset you must prepare your Factorio game to the settings you wish - such that if you created a brand new game with the default options it will be the kind of preset you wish to see. Once that is done, exit out of Factorio, click 'import new preset from Factorio' browse to find the Factorio location (its the main install folder with 'bin' and 'data' folders - if using the steam version it should auto-locate for you), choose the difficulties you wish to use, give the preset a name, and click import.
+All the currently saved presets (in the Preset folder) are listed here. You can check their mods & difficulty options in the list on the right by clicking on the preset you wish to see. To import a new preset you must prepare your Factorio game to the settings you wish - such that if you created a brand new game with the default options it will be the kind of preset you wish to see. Once that is done, exit out of Factorio, click 'import new preset from Factorio' browse to find the Factorio location (its the main install folder with 'bin' and 'data' folders - if using the steam version it should auto-locate for you), choose the difficulties you wish to use, give the preset a name, and click import. If you are using advanced options (such as --mod-directory) that change the mod folder location from the default, you can manually search for the mod folder. Otherwise it is best to leave the 'Mod Folder Location' blank and the importer will auto-locate your mods for you.
 
 If you have more than 1 preset currently in your list, you can compare 2 presets to see any differences between them. Rather helpful to find what changes the newly updated mods have brought that might impact your game.
 
@@ -134,7 +134,7 @@ Recipes can also be enabled/disabled straight from the recipe selection window b
 
 ### Graph Options ###
 
-![9: Graph Options](https://puu.sh/Im6BD/48a9a818f2.jpg)
+![9: Graph Options](https://puu.sh/In2aO/c462e226a0.jpg)
 
 Level of detail: specifies how much detail you wish shown on the nodes. Low will just show the recipe name, Medium will show the assembler + beacon + modules + number of buildings, while High will add building percentages (productivity, speed, power)
 
@@ -152,7 +152,9 @@ Display arrows pointing to any node errors / warnings: Useful to find any error 
 
 Defaults: should be straight forward. You can set which type of assembler you wish to be automatically assigned to newly added nodes, as well as what type of modules to give it.
 
-Advanced: probably best to leave it alone (turned off).
+Advanced: probably best to leave it alone (turned off) unless there is a particular need for it.
+
+Advanced (Enable extra productivity bonus for all entities): to allow for miner productivity, there is an 'extra productivity' value you can set within your mining nodes. If this is turned on then all nodes (and not just the miners) will have an extra productivity that you can set. This should be used cautiously as you can accidentally copy the extra productivity to all nodes, but it is left as an option for those mods that allow mining productivity to act on non-miners (usually by creating 'invisible' beacons that apply the productivity effect)
 
 Advanced (Show unavailable items): if turned on will display those items that cant be acquired in regular play (ex: infinite pipes, coins).
 
