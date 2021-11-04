@@ -1,11 +1,24 @@
 local etable = {}
 
+
 localindex = 0
 local function ExportLocalisedString(lstring, index)
 	-- as could be expected if lstring doesnt have a working translation then we get a beauty of a mess... so that needs to be cleaned up outside of json table
 	localised_print('<#~#>')
 	localised_print(lstring)
 	localised_print('<#~#>')
+end
+
+local function ProcessTemperature(temperature)
+	if temperature == nil then
+		return nil
+	elseif temperature == -math.huge then
+		return -1e100
+	elseif temperature == math.huge then
+		return 1e100
+	else
+		return temperature
+	end
 end
 
 local function ExportModList()
@@ -82,10 +95,10 @@ local function ExportRecipes()
 			tingredient['type'] = ingredient.type
 			tingredient['amount'] = ingredient.amount
 			if ingredient.type == 'fluid' and ingredient.minimum_temperature ~= nil then
-				tingredient['minimum_temperature'] = ingredient.minimum_temperature
+				tingredient['minimum_temperature'] = ProcessTemperature(ingredient.minimum_temperature)
 			end
 			if ingredient.type == 'fluid' and ingredient.maximum_temperature ~= nil then
-				tingredient['maximum_temperature'] = ingredient.maximum_temperature
+				tingredient['maximum_temperature'] = ProcessTemperature(ingredient.maximum_temperature)
 			end
 			table.insert(trecipe['ingredients'], tingredient)
 		end
@@ -102,7 +115,7 @@ local function ExportRecipes()
 			tproduct['amount'] = amount
 
 			if product.type == 'fluid' and product.temperature ~= nil then
-				tproduct['temperature'] = product.temperature
+				tproduct['temperature'] = ProcessTemperature(product.temperature)
 			end
 			table.insert(trecipe['products'], tproduct)
 		end
@@ -152,8 +165,8 @@ local function ExportFluids()
 		tfluid['icon_name'] = 'icon.i.'..fluid.name
 		tfluid['order'] = fluid.order
 		tfluid['subgroup'] = fluid.subgroup.name
-		tfluid['default_temperature'] = fluid.default_temperature
-		tfluid['max_temperature'] = fluid.max_temperature
+		tfluid['default_temperature'] = ProcessTemperature(fluid.default_temperature)
+		tfluid['max_temperature'] = ProcessTemperature(fluid.max_temperature)
 		tfluid['heat_capacity'] = fluid.heat_capacity == nil and 0 or fluid.heat_capacity
 		
 		if fluid.fuel_value ~= 0 then
@@ -266,7 +279,7 @@ local function ExportEntities()
 			--fluid boxes for input/output of boiler & generator need to be processed (almost guaranteed to be 'steam' and 'water', but... tests have shown that we can heat up whatever we want)
 			--additinally we want count of fluid boxes in/out (for checking recipe validity)
 			if entity.type == 'boiler' then
-				tentity['target_temperature'] = entity.target_temperature
+				tentity['target_temperature'] = ProcessTemperature(entity.target_temperature)
 
 				if entity.fluidbox_prototypes[1].filter ~= nil then
 					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
@@ -275,10 +288,10 @@ local function ExportEntities()
 					tentity['fluid_product'] = entity.fluidbox_prototypes[2].filter.name
 				end
 			elseif entity.type == 'generator' then
-				tentity['full_power_temperature'] = entity.maximum_temperature
+				tentity['full_power_temperature'] = ProcessTemperature(entity.maximum_temperature)
 
-				tentity['minimum_temperature'] = entity.fluidbox_prototypes[1].minimum_temperature
-				tentity['maximum_temperature'] = entity.fluidbox_prototypes[1].maximum_temperature
+				tentity['minimum_temperature'] = ProcessTemperature(entity.fluidbox_prototypes[1].minimum_temperature)
+				tentity['maximum_temperature'] = ProcessTemperature(entity.fluidbox_prototypes[1].maximum_temperature)
 				if entity.fluidbox_prototypes[1].filter ~= nil then
 					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
 				end
@@ -335,8 +348,8 @@ local function ExportEntities()
 				if entity.fluid_energy_source_prototype.fluid_box.filter ~= nil then
 					tentity['fuel_filter'] = entity.fluid_energy_source_prototype.fluid_box.filter.name
 				end
-				tentity['minimum_fuel_temperature'] = entity.fluid_energy_source_prototype.fluid_box.minimum_temperature -- nil is accepted
-				tentity['maximum_fuel_temperature'] = entity.fluid_energy_source_prototype.fluid_box.maximum_temperature --nil is accepted
+				tentity['minimum_fuel_temperature'] = ProcessTemperature(entity.fluid_energy_source_prototype.fluid_box.minimum_temperature) -- nil is accepted
+				tentity['maximum_fuel_temperature'] = ProcessTemperature(entity.fluid_energy_source_prototype.fluid_box.maximum_temperature) --nil is accepted
 
 			elseif entity.electric_energy_source_prototype then
 				tentity['fuel_type'] = 'electricity'
@@ -394,7 +407,7 @@ local function ExportResources()
 				tproduct['amount'] = amount
 
 				if product.type == 'fluid' and product.temperate ~= nil then
-					tproduct['temperature'] = product.temperature
+					tproduct['temperature'] = ProcessTemperature(product.temperature)
 				end
 				table.insert(tresource['products'], tproduct)
 			end
