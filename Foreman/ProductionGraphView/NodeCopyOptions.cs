@@ -15,6 +15,7 @@ namespace Foreman
 		public readonly IReadOnlyList<Module> AssemblerModules;
 		public readonly Item Fuel;
 		public readonly double NeighbourCount;
+		public readonly double ExtraProductivityBonus;
 
 		public readonly Beacon Beacon;
 		public readonly IReadOnlyList<Module> BeaconModules;
@@ -33,9 +34,10 @@ namespace Foreman
 			BeaconsPerAssembler = node.BeaconsPerAssembler;
 			BeaconsConst = node.BeaconsConst;
 			NeighbourCount = node.NeighbourCount;
+			ExtraProductivityBonus = node.ExtraProductivity;
 		}
 
-		private NodeCopyOptions(Assembler assembler, List<Module> assemblerModules, double neighbourCount, Item fuel, Beacon beacon, List<Module> beaconModules, double beaconCount, double beaconsPerA, double beaconsCont)
+		private NodeCopyOptions(Assembler assembler, List<Module> assemblerModules, double neighbourCount, double extraProductivityBonus, Item fuel, Beacon beacon, List<Module> beaconModules, double beaconCount, double beaconsPerA, double beaconsCont)
 		{
 			Assembler = assembler;
 			AssemblerModules = assemblerModules;
@@ -46,6 +48,7 @@ namespace Foreman
 			BeaconsPerAssembler = beaconsPerA;
 			BeaconsConst = beaconsCont;
 			NeighbourCount = neighbourCount;
+			ExtraProductivityBonus = extraProductivityBonus;
 		}
 
 		public static NodeCopyOptions GetNodeCopyOptions(string serialized, DataCache cache)
@@ -64,6 +67,7 @@ namespace Foreman
 				cache.Assemblers.ContainsKey((string)json["Assembler"]) ? cache.Assemblers[(string)json["Assembler"]] : null,
 				new List<Module>(json["AModules"].Where(j => cache.Modules.ContainsKey((string)j)).Select(j => cache.Modules[(string)j])),
 				(double)json["Neighbours"],
+				(double)json["ExtraProductivity"],
 				(json["Fuel"] != null && cache.Items.ContainsKey((string)json["Fuel"])) ? cache.Items[(string)json["Fuel"]] : null,
 				(beacons && cache.Beacons.ContainsKey((string)json["Beacon"])) ? cache.Beacons[(string)json["Beacon"]] : null,
 				new List<Module>(json["BModules"].Where(j => cache.Modules.ContainsKey((string)j)).Select(j => cache.Modules[(string)j])),
@@ -80,6 +84,7 @@ namespace Foreman
 			info.AddValue("Assembler", Assembler.Name);
 
 			info.AddValue("Neighbours", NeighbourCount);
+			info.AddValue("ExtraProductivity", ExtraProductivityBonus);
 			info.AddValue("AModules", AssemblerModules.Select(m => m.Name));
 			info.AddValue("BModules", BeaconModules.Select(m => m.Name));
 

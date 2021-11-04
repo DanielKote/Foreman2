@@ -27,6 +27,8 @@ namespace Foreman
 		private new readonly ReadOnlyRecipeNode DisplayedNode;
 
 		private static bool OptionsCopyAssemblerDefault = true;
+		private static bool OptionsCopyExtraProductivityMinersDefault = true;
+		private static bool OptionsCopyExtraProductivityNonMinersDefault = true;
 		private static bool OptionsCopyFuelDefault = true;
 		private static bool OptionsCopyModulesDefault = true;
 		private static bool OptionsCopyBeaconDefault = true;
@@ -177,6 +179,8 @@ namespace Foreman
 				if (copiedOptions != null)
 				{
 					bool canPasteAssembler = rNodes.Any(rn => rn.BaseRecipe.Assemblers.Contains(copiedOptions.Assembler));
+					bool canPasteExtraProductivityMiners = rNodes.Any(rn => rn.SelectedAssembler.EntityType == EntityType.Miner);
+					bool canPasteExtraProductivityNonMiners = graphViewer.Graph.EnableExtraProductivityForNonMiners && rNodes.Any(rn => rn.SelectedAssembler.EntityType != EntityType.Miner);
 					bool canPasteFuel = copiedOptions.Fuel != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Assemblers.Any(a => a.Fuels.Contains(copiedOptions.Fuel))));
 					bool canPasteModules = copiedOptions.AssemblerModules.Count > 0 && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Modules.Count > 0 && rn.SelectedAssembler.Modules.Count > 0 && rn.SelectedAssembler.ModuleSlots > 0));
 					bool canPasteBeacon = copiedOptions.Beacon != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Modules.Count > 0 && rn.SelectedAssembler.Modules.Count > 0));
@@ -186,12 +190,16 @@ namespace Foreman
 						RightClickMenu.ShowCheckMargin = true;
 
 						ToolStripMenuItem assemblerCheck = new ToolStripMenuItem(copiedOptions.Assembler.GetEntityTypeName(false)) { CheckOnClick = true, Checked = canPasteAssembler && OptionsCopyAssemblerDefault, Enabled = canPasteAssembler, Tag = "CheckBox" };
+						ToolStripMenuItem extraProductivityMinersCheck = new ToolStripMenuItem("Bonus Productivity (Miners)") { CheckOnClick = true, Checked = canPasteExtraProductivityMiners && OptionsCopyExtraProductivityMinersDefault, Enabled = canPasteExtraProductivityMiners, Tag = "CheckBox" };
+						ToolStripMenuItem extraProductivityNonMinersCheck = new ToolStripMenuItem("Bonus Productivity (non-Miners)") { CheckOnClick = true, Checked = canPasteExtraProductivityNonMiners && OptionsCopyExtraProductivityNonMinersDefault, Enabled = canPasteExtraProductivityNonMiners, Tag = "CheckBox" };
 						ToolStripMenuItem fuelCheck = new ToolStripMenuItem("Fuel") { CheckOnClick = true, Checked = canPasteFuel && OptionsCopyFuelDefault, Enabled = canPasteFuel, Tag = "CheckBox" };
 						ToolStripMenuItem modulesCheck = new ToolStripMenuItem("Modules") { CheckOnClick = true, Checked = canPasteModules && OptionsCopyModulesDefault, Enabled = canPasteModules, Tag = "CheckBox" };
 						ToolStripMenuItem beaconCheck = new ToolStripMenuItem("Beacon") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
 						ToolStripMenuItem beaconModuleCheck = new ToolStripMenuItem("Beacon Modules") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconModulesDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
 
 						if (canPasteAssembler) RightClickMenu.Items.Add(assemblerCheck);
+						if (canPasteExtraProductivityMiners) RightClickMenu.Items.Add(extraProductivityMinersCheck);
+						if (canPasteExtraProductivityNonMiners) RightClickMenu.Items.Add(extraProductivityNonMinersCheck);
 						if (canPasteFuel) RightClickMenu.Items.Add(fuelCheck);
 						if (canPasteModules) RightClickMenu.Items.Add(modulesCheck);
 						if (canPasteBeacon) RightClickMenu.Items.Add(beaconCheck);
@@ -202,6 +210,8 @@ namespace Foreman
 							{
 								RightClickMenu.Close();
 								if (canPasteAssembler) OptionsCopyAssemblerDefault = assemblerCheck.Checked;
+								if (canPasteExtraProductivityMiners) OptionsCopyExtraProductivityMinersDefault = extraProductivityMinersCheck.Checked;
+								if (canPasteExtraProductivityNonMiners) OptionsCopyExtraProductivityNonMinersDefault = extraProductivityNonMinersCheck.Checked;
 								if (canPasteFuel) OptionsCopyFuelDefault = fuelCheck.Checked;
 								if (canPasteModules) OptionsCopyModulesDefault = modulesCheck.Checked;
 								if (canPasteBeacon) OptionsCopyBeaconDefault = beaconCheck.Checked;
@@ -212,13 +222,19 @@ namespace Foreman
 									RecipeNodeController controller = (RecipeNodeController)graphViewer.Graph.RequestNodeController(rNode);
 
 									bool assemblerFilter = !assemblerCheck.Checked; //if we do copy assembler, then all the other options are copied only if the assembler is. If we do not copy assembler, then paste options to everyone
-								if (assemblerCheck.Checked && rNode.BaseRecipe.Assemblers.Contains(copiedOptions.Assembler)) //assembler fits the given recipe
-								{
+									if (assemblerCheck.Checked && rNode.BaseRecipe.Assemblers.Contains(copiedOptions.Assembler)) //assembler fits the given recipe
+									{
 										controller.SetAssembler(copiedOptions.Assembler);
 										assemblerFilter = true;
 										if (rNode.SelectedAssembler.EntityType == EntityType.Reactor)
 											controller.SetNeighbourCount(copiedOptions.NeighbourCount);
 									}
+
+									if (extraProductivityMinersCheck.Checked && rNode.SelectedAssembler.EntityType == EntityType.Miner)
+										controller.SetExtraProductivityBonus(copiedOptions.ExtraProductivityBonus);
+									if (extraProductivityNonMinersCheck.Checked && rNode.SelectedAssembler.EntityType != EntityType.Miner)
+										controller.SetExtraProductivityBonus(copiedOptions.ExtraProductivityBonus);
+
 
 									if (fuelCheck.Checked && rNode.SelectedAssembler.Fuels.Contains(copiedOptions.Fuel)) //fuel fits the given recipe node
 									controller.SetFuel(copiedOptions.Fuel);
