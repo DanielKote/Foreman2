@@ -585,7 +585,7 @@ namespace Foreman
 			GraphElement clickedElement = (GraphElement)draggedLinkElement ?? GetNodeAtPoint(ScreenToGraph(e.Location));
 			clickedElement?.MouseDown(graph_location, e.Button);
 
-			if (e.Button == MouseButtons.Middle || (e.Button == MouseButtons.Right && clickedElement == null)) //scrolling - middle button always, right if not clicking on element
+			if (e.Button == MouseButtons.Middle || (e.Button == MouseButtons.Right))
 			{
 				ViewDragOriginPoint = graph_location;
 			}
