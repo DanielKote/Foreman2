@@ -97,6 +97,7 @@ namespace Foreman
 			assemblers = new HashSet<AssemblerPrototype>();
 			modules = new HashSet<ModulePrototype>();
 			myUnlockTechnologies = new HashSet<TechnologyPrototype>();
+			MyUnlockSciencePacks = new List<List<Item>>();
 		}
 
 		public string GetIngredientFriendlyName(Item item)
