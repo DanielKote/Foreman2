@@ -1059,7 +1059,7 @@ namespace Foreman
 		{
 			if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraphViewer")
 			{
-				json = VersionUpdater.UpdateSave(json);
+				json = VersionUpdater.UpdateSave(json, DCache);
 				if (json == null) //update failed
 					return;
 			}
@@ -1193,7 +1193,12 @@ namespace Foreman
 			}
 
 			//add all nodes
-			Graph.InsertNodesFromJson(DCache, json["ProductionGraph"]);
+			ProductionGraph.NewNodeCollection collection = Graph.InsertNodesFromJson(DCache, json["ProductionGraph"]);
+
+			//check for old import
+			if (json["OldImport"] != null)
+				foreach (ReadOnlyRecipeNode rNode in collection.newNodes.Where(node => node is ReadOnlyRecipeNode))
+					((RecipeNodeController)Graph.RequestNodeController(rNode)).AutoSetAssembler(AssemblerSelector.Style.BestNonBurner);
 
 			//upgrade graph & values
 			UpdateGraphBounds();
