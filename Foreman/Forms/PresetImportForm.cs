@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Foreman
 {
@@ -300,7 +301,7 @@ namespace Foreman
 
 				//launch factorio again to export the data
 				progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
-				process.StartInfo.Arguments = string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath);
+				process.StartInfo.Arguments = string.Format("--verbose --mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath);
 				process.Start();
 				resultString = "";
 				while (!process.HasExited)
@@ -342,11 +343,11 @@ namespace Foreman
 				lnamesString = lnamesString.Replace("\n", "").Replace("\r", "").Replace("<#~#>", "\n");
 
 				string iconString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P1>>>") + 23);
-				iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>") - 2);
+				iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>"));
+				iconString = Regex.Replace(iconString, ".+Script @__foremanexport__/instrument-after-data[.]lua:9:", "");
 
 				string dataString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P2>>>") + 23);
 				dataString = dataString.Substring(0, dataString.IndexOf("<<<END-EXPORT-P2>>>") - 2);
-
 
 				string[] lnames = lnamesString.Split('\n'); //keep empties - we know where they are!
 				Dictionary<string, string> localisedNames = new Dictionary<string, string>(); //this is the link between the 'lid' property and the localised names in dataString
