@@ -4,7 +4,7 @@ local function ExportLine(text, indentSize)
 		indentSize = indentSize - 1
 		indents = indents..'	'
 	end
-	localised_print(indents..text)
+	log(indents..text)
 end
 
 local function ExportParameter(paramName, paramValue, numerical, suffix, indentSize)

@@ -344,6 +344,9 @@
     <None Include="Mods\foremanexport_1.0.0\info.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Mods\foremanexport_1.0.0\data-final-fixes.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Mods\foremanexport_1.0.0\instrument-after-data.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

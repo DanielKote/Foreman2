@@ -219,37 +219,6 @@ namespace Foreman
 				if (!Directory.Exists(modsPath))
 					Directory.CreateDirectory(modsPath);
 
-				Directory.CreateDirectory(Path.Combine(modsPath, "foremanexport_1.0.0"));
-				try
-				{
-					File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "info.json" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "info.json" }), true);
-					File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-after-data.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-after-data.lua" }), true);
-
-
-					//recipe&technology difficulties each have their own lua script
-					if (NormalRecipeRButton.Checked)
-					{
-						if (NormalTechnologyRButton.Checked)
-							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - nn.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
-						else
-							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - ne.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
-					}
-					else
-					{
-						if (NormalTechnologyRButton.Checked)
-							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - en.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
-						else
-							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - ee.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-control.lua" }), true);
-					}
-				}
-				catch
-				{
-					MessageBox.Show("could not copy foreman export mod files (Mods/foremanexport_1.0.0/) to the factorio mods folder. Reinstall foreman?");
-					ErrorLogging.LogLine("copying of foreman export mod files failed.");
-					CleanupFailedImport(modsPath);
-					return "";
-				}
-
 				//ensure that the foreman export mod is correctly added to the mod-list and is enabled
 				string modListPath = Path.Combine(modsPath, "mod-list.json");
 				JObject modlist = null;
@@ -260,12 +229,56 @@ namespace Foreman
 				if (modlist["mods"] == null)
 					modlist.Add("mods", new JArray());
 
+
 				JToken foremanModToken = modlist["mods"].ToList().FirstOrDefault(t => t["name"] != null && (string)t["name"] == "foremanexport");
 				if (foremanModToken == null)
 					((JArray)modlist["mods"]).Add(new JObject() { { "name", "foremanexport" }, { "enabled", true } });
 				else
 					foremanModToken["enabled"] = true;
 				File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented));
+
+				//also grab a list of mods so we can set them as dependencies for the export mod
+				List<string> mods = modlist["mods"].ToList().Where(t => (string)t["name"] != "foremanexport" && (string)t["name"] != "base" && (string)t["name"] != "core").Select(t => (string)t["name"]).ToList();
+				JObject foremanExportInfo = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "info.json" })));
+				foreach (string mod in mods)
+					((JArray)foremanExportInfo["dependencies"]).Add(mod);
+
+				//copy the files as necessary
+				Directory.CreateDirectory(Path.Combine(modsPath, "foremanexport_1.0.0"));
+
+				try
+				{
+					File.WriteAllText(Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "info.json" }), foremanExportInfo.ToString(Formatting.Indented));
+
+					if(CompatibilityModeCheckBox.Checked)
+						File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "data-final-fixes.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "data-final-fixes.lua" }), true);
+					else
+						File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-after-data.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-after-data.lua" }), true);
+
+					//recipe&technology difficulties each have their own lua script
+					string controlFile = CompatibilityModeCheckBox.Checked ? "control.lua" : "instrument-control.lua";
+					if (NormalRecipeRButton.Checked)
+					{
+						if (NormalTechnologyRButton.Checked)
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - nn.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", controlFile }), true);
+						else
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - ne.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", controlFile }), true);
+					}
+					else
+					{
+						if (NormalTechnologyRButton.Checked)
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - en.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", controlFile }), true);
+						else
+							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - ee.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", controlFile }), true);
+					}
+				}
+				catch
+				{
+					MessageBox.Show("could not copy foreman export mod files (Mods/foremanexport_1.0.0/) to the factorio mods folder. Reinstall foreman?");
+					ErrorLogging.LogLine("copying of foreman export mod files failed.");
+					CleanupFailedImport(modsPath);
+					return "";
+				}
 
 				//launch factorio to create the temporary save we will use for export
 				Process process = new Process();
@@ -301,7 +314,10 @@ namespace Foreman
 
 				//launch factorio again to export the data
 				progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
-				process.StartInfo.Arguments = string.Format("--verbose --mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath);
+				process.StartInfo.Arguments = CompatibilityModeCheckBox.Checked ?
+					string.Format("--mod-directory \"{0}\" --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath) :
+					string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath);
+
 				process.Start();
 				resultString = "";
 				while (!process.HasExited)
@@ -343,8 +359,13 @@ namespace Foreman
 				lnamesString = lnamesString.Replace("\n", "").Replace("\r", "").Replace("<#~#>", "\n");
 
 				string iconString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P1>>>") + 23);
-				iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>"));
-				iconString = Regex.Replace(iconString, ".+Script @__foremanexport__/instrument-after-data[.]lua:9:", "");
+				if (CompatibilityModeCheckBox.Checked)
+				{
+					iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>"));
+					iconString = Regex.Replace(iconString, ".+Script @__foremanexport__/data-final-fixes[.]lua:7:", "");
+				}
+				else
+					iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>") - 2);
 
 				string dataString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P2>>>") + 23);
 				dataString = dataString.Substring(0, dataString.IndexOf("<<<END-EXPORT-P2>>>") - 2);
