@@ -243,16 +243,14 @@ namespace Foreman
 					ProcessTechnology(objJToken, iconCache);
 				foreach (var objJToken in jsonData["technologies"].ToList())
 					ProcessTechnologyP2(objJToken); //required to properly link technology prerequisites
+				foreach (var objJToken in jsonData["entities"].ToList())
+					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories);
 
-				//process launch products (done after technologies so as to properly link tech to the launches)
+				//process launch products
 				foreach (var objJToken in jsonData["items"].Where(t => t["launch_products"] != null).ToList())
 					ProcessRocketLaunch(objJToken);
 				foreach (var objJToken in jsonData["fluids"].Where(t => t["launch_products"] != null).ToList())
 					ProcessRocketLaunch(objJToken);
-
-
-				foreach (var objJToken in jsonData["entities"].ToList())
-					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories);
 
 				//process character
 				ProcessCharacter(jsonData["entities"].First(a => (string)a["name"] == "character"), craftingCategories);
@@ -544,15 +542,15 @@ namespace Foreman
 
 		private void ProcessRocketLaunch(JToken objJToken)
 		{
-			ItemPrototype rocketPart = items["rocket-part"] as ItemPrototype;
-			RecipePrototype rocketPartRecipe = recipes["rocket-part"] as RecipePrototype;
-			ItemPrototype launchItem = (ItemPrototype)items[(string)objJToken["name"]];
-
-			if (rocketPart == null || rocketPartRecipe == null || assemblers["rocket-silo"] == null) //quick check to ensure that we can actually use launch products (should always pass)
+			if(!items.ContainsKey("rocket-part") || !recipes.ContainsKey("rocket-part") || !assemblers.ContainsKey("rocket-silo"))
 			{
 				ErrorLogging.LogLine(string.Format("No Rocket silo / rocket part found! launch product for {0} will be ignored.", (string)objJToken["name"]));
 				return;
 			}
+
+			ItemPrototype rocketPart = (ItemPrototype)items["rocket-part"];
+			RecipePrototype rocketPartRecipe = (RecipePrototype)recipes["rocket-part"];
+			ItemPrototype launchItem = (ItemPrototype)items[(string)objJToken["name"]];
 
 			RecipePrototype recipe = new RecipePrototype(
 				this,
