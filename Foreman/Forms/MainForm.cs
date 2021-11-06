@@ -51,6 +51,8 @@ namespace Foreman
 					Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
 				GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
 
+				GraphViewer.DynamicLinkWidth = Properties.Settings.Default.DynamicLineWidth;
+				GraphViewer.ShowRecipeToolTip = Properties.Settings.Default.ShowRecipeToolTip;
 				GraphViewer.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
 
 				if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
@@ -74,7 +76,7 @@ namespace Foreman
 				GraphViewer.Invalidate();
 				GraphViewer.Focus();
 #if DEBUG
-				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
+				//await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
 				//GraphViewer.Invalidate();
 #endif
 			}
