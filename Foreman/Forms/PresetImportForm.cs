@@ -240,8 +240,9 @@ namespace Foreman
 				//also grab a list of mods so we can set them as dependencies for the export mod
 				List<string> mods = modlist["mods"].ToList().Where(t => (string)t["name"] != "foremanexport" && (string)t["name"] != "base" && (string)t["name"] != "core").Select(t => (string)t["name"]).ToList();
 				JObject foremanExportInfo = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "info.json" })));
-				foreach (string mod in mods)
-					((JArray)foremanExportInfo["dependencies"]).Add(mod);
+				if(CompatibilityModeCheckBox.Checked)
+					foreach (string mod in mods)
+						((JArray)foremanExportInfo["dependencies"]).Add(mod);
 
 				//copy the files as necessary
 				Directory.CreateDirectory(Path.Combine(modsPath, "foremanexport_1.0.0"));
