@@ -226,10 +226,10 @@ namespace Foreman
 					ProcessSubgroup(objJToken);
 				foreach (var objJToken in jsonData["groups"].ToList())
 					ProcessGroup(objJToken, iconCache);
-				foreach (var objJToken in jsonData["items"].ToList())
-					ProcessItem(objJToken, iconCache, fuelCategories, burnResults);
 				foreach (var objJToken in jsonData["fluids"].ToList())
 					ProcessFluid(objJToken, iconCache, fuelCategories);
+				foreach (var objJToken in jsonData["items"].ToList())
+					ProcessItem(objJToken, iconCache, fuelCategories, burnResults); //items after fluids to take care of duplicates (if name exists in fluid and in item set, then only the fluid is counted)
 				foreach (ItemPrototype item in items.Values)
 					ProcessBurnItem(item, fuelCategories, burnResults); //link up any items with burn remains
 				foreach (var objJToken in jsonData["recipes"].ToList())
@@ -254,6 +254,9 @@ namespace Foreman
 
 				//process character
 				ProcessCharacter(jsonData["entities"].First(a => (string)a["name"] == "character"), craftingCategories);
+
+				//add rocket assembler
+				assemblers.Add(rocketAssembler.Name, rocketAssembler);
 
 				//remove these temporary dictionaries (no longer necessary)
 				craftingCategories.Clear();
@@ -477,8 +480,36 @@ namespace Foreman
 			groups.Add(group.Name, group);
 		}
 
+		private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories)
+		{
+			FluidPrototype item = new FluidPrototype(
+				this,
+				(string)objJToken["name"],
+				(string)objJToken["localised_name"],
+				(SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
+				(string)objJToken["order"]);
+
+			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+				item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+
+			item.DefaultTemperature = (double)objJToken["default_temperature"];
+			item.SpecificHeatCapacity = (double)objJToken["heat_capacity"];
+
+			if (objJToken["fuel_value"] != null && (double)objJToken["fuel_value"] > 0)
+			{
+				item.FuelValue = (double)objJToken["fuel_value"];
+				item.PollutionMultiplier = (double)objJToken["pollution_multiplier"];
+				fuelCategories["§§fc:liquids"].Add(item);
+			}
+
+			items.Add(item.Name, item);
+		}
+
 		private void ProcessItem(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories, Dictionary<Item, string> burnResults)
 		{
+			if (items.ContainsKey((string)objJToken["name"])) //special handling for fluids which appear in both items & fluid lists (ex: fluid-unknown)
+				return;
+
 			ItemPrototype item = new ItemPrototype(
 				this,
 				(string)objJToken["name"],
@@ -513,88 +544,6 @@ namespace Foreman
 				item.BurnResult = items[burnResults[item]];
 				((ItemPrototype)items[burnResults[item]]).FuelOrigin = item;
 			}
-		}
-
-		private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories)
-		{
-			FluidPrototype item = new FluidPrototype(
-				this,
-				(string)objJToken["name"],
-				(string)objJToken["localised_name"],
-				(SubgroupPrototype)subgroups[(string)objJToken["subgroup"]],
-				(string)objJToken["order"]);
-
-			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
-				item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
-
-			item.DefaultTemperature = (double)objJToken["default_temperature"];
-			item.SpecificHeatCapacity = (double)objJToken["heat_capacity"];
-
-			if (objJToken["fuel_value"] != null && (double)objJToken["fuel_value"] > 0)
-			{
-				item.FuelValue = (double)objJToken["fuel_value"];
-				item.PollutionMultiplier = (double)objJToken["pollution_multiplier"];
-				fuelCategories["§§fc:liquids"].Add(item);
-			}
-
-			items.Add(item.Name, item);
-		}
-
-		private void ProcessRocketLaunch(JToken objJToken)
-		{
-			if(!items.ContainsKey("rocket-part") || !recipes.ContainsKey("rocket-part") || !assemblers.ContainsKey("rocket-silo"))
-			{
-				ErrorLogging.LogLine(string.Format("No Rocket silo / rocket part found! launch product for {0} will be ignored.", (string)objJToken["name"]));
-				return;
-			}
-
-			ItemPrototype rocketPart = (ItemPrototype)items["rocket-part"];
-			RecipePrototype rocketPartRecipe = (RecipePrototype)recipes["rocket-part"];
-			ItemPrototype launchItem = (ItemPrototype)items[(string)objJToken["name"]];
-
-			RecipePrototype recipe = new RecipePrototype(
-				this,
-				string.Format("§§r:rl:launch-{0}", launchItem.Name),
-				string.Format("Rocket Launch: {0}", launchItem.FriendlyName),
-				rocketLaunchSubgroup,
-				launchItem.Name);
-
-			recipe.Time = 1; //placeholder really...
-
-			int inputSize = launchItem.StackSize;
-			foreach (var productJToken in objJToken["launch_products"].ToList())
-			{
-				ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
-				double amount = (double)productJToken["amount"];
-				if (amount != 0)
-				{
-					if (inputSize * amount > product.StackSize)
-						inputSize = (int)(product.StackSize / amount);
-					amount = inputSize * amount;
-
-					if ((string)productJToken["type"] == "fluid")
-						recipe.InternalOneWayAddProduct(product, amount, productJToken["temperature"] == null ? ((FluidPrototype)product).DefaultTemperature : (double)productJToken["temperature"]);
-					else
-						recipe.InternalOneWayAddProduct(product, amount);
-
-					product.productionRecipes.Add(recipe);
-					recipe.SetIconAndColor(new IconColorPair(product.Icon, Color.DarkGray));
-				}
-			}
-			recipe.InternalOneWayAddIngredient(launchItem, inputSize);
-			launchItem.consumptionRecipes.Add(recipe);
-
-			recipe.InternalOneWayAddIngredient(rocketPart, 100);
-			rocketPart.consumptionRecipes.Add(recipe);
-
-			foreach (TechnologyPrototype tech in rocketPartRecipe.myUnlockTechnologies)
-			{
-				recipe.myUnlockTechnologies.Add(tech);
-				tech.unlockedRecipes.Add(recipe);
-			}
-
-			recipe.assemblers.Add(rocketAssembler);
-			rocketAssembler.recipes.Add(recipe);
 		}
 
 		private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories)
@@ -719,8 +668,12 @@ namespace Foreman
 				recipe.InternalOneWayAddProduct(product, (double)productJToken["amount"]);
 				product.productionRecipes.Add(recipe);
 			}
+
 			if (recipe.productList.Count == 0)
+			{
+				recipe.mySubgroup.recipes.Remove(recipe);
 				return;
+			}
 
 			if (objJToken["required_fluid"] != null && (double)objJToken["fluid_amount"] != 0)
 			{
@@ -1303,6 +1256,70 @@ namespace Foreman
 			return (inCount - inPipes <= ioPipes && outCount - outPipes <= ioPipes && inCount + outCount <= inPipes + outPipes + ioPipes); 
 		}
 
+		private void ProcessRocketLaunch(JToken objJToken)
+		{
+			if (!items.ContainsKey("rocket-part") || !recipes.ContainsKey("rocket-part") || !assemblers.ContainsKey("rocket-silo"))
+			{
+				ErrorLogging.LogLine(string.Format("No Rocket silo / rocket part found! launch product for {0} will be ignored.", (string)objJToken["name"]));
+				return;
+			}
+
+			ItemPrototype rocketPart = (ItemPrototype)items["rocket-part"];
+			RecipePrototype rocketPartRecipe = (RecipePrototype)recipes["rocket-part"];
+			ItemPrototype launchItem = (ItemPrototype)items[(string)objJToken["name"]];
+
+			RecipePrototype recipe = new RecipePrototype(
+				this,
+				string.Format("§§r:rl:launch-{0}", launchItem.Name),
+				string.Format("Rocket Launch: {0}", launchItem.FriendlyName),
+				rocketLaunchSubgroup,
+				launchItem.Name);
+
+			recipe.Time = 1; //placeholder really...
+
+			//process products - have to calculate what the maximum input size of the launch item is so as not to waste any products (ex: you can launch 2000 science packs, but you will only get 100 fish. so input size must be set to 100 -> 100 science packs to 100 fish)
+			int inputSize = launchItem.StackSize;
+			Dictionary<ItemPrototype, double> products = new Dictionary<ItemPrototype, double>();
+			Dictionary<ItemPrototype, double> productTemp = new Dictionary<ItemPrototype, double>();
+			foreach (var productJToken in objJToken["launch_products"].ToList())
+			{
+				ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
+				double amount = (double)productJToken["amount"];
+				if (amount != 0)
+				{
+					if (inputSize * amount > product.StackSize)
+						inputSize = (int)(product.StackSize / amount);
+
+					amount = inputSize * amount;
+
+					if ((string)productJToken["type"] == "fluid")
+						productTemp.Add(product, productJToken["temperature"] == null ? ((FluidPrototype)product).DefaultTemperature : (double)productJToken["temperature"]);
+					products.Add(product, amount);
+
+					product.productionRecipes.Add(recipe);
+					recipe.SetIconAndColor(new IconColorPair(product.Icon, Color.DarkGray));
+				}
+			}
+			foreach (ItemPrototype product in products.Keys)
+				recipe.InternalOneWayAddProduct(product, inputSize * products[product], productTemp.ContainsKey(product) ? productTemp[product] : double.NaN);
+
+			recipe.InternalOneWayAddIngredient(launchItem, inputSize);
+			launchItem.consumptionRecipes.Add(recipe);
+
+			recipe.InternalOneWayAddIngredient(rocketPart, 100);
+			rocketPart.consumptionRecipes.Add(recipe);
+
+			foreach (TechnologyPrototype tech in rocketPartRecipe.myUnlockTechnologies)
+			{
+				recipe.myUnlockTechnologies.Add(tech);
+				tech.unlockedRecipes.Add(recipe);
+			}
+
+			recipe.assemblers.Add(rocketAssembler);
+			rocketAssembler.recipes.Add(recipe);
+
+			recipes.Add(recipe.Name, recipe);
+		}
 
 		//------------------------------------------------------Finalization steps of LoadAllData (cleanup and cyclic checks)
 

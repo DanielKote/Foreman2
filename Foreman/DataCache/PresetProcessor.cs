@@ -114,6 +114,7 @@ namespace Foreman
 			presetRecipes.Add(burnerRecipe.Name, burnerRecipe);
 			//built in assemblers:
 			presetEntities.Add("§§a:player-assembler");
+			presetEntities.Add("§§a:rocket-assembler");
 
 			//read in mods, items and entities
 			foreach (var objJToken in jsonData["mods"].ToList())
@@ -228,6 +229,35 @@ namespace Foreman
 
 					if (!presetRecipes.ContainsKey(recipe.Name))
 						presetRecipes.Add(recipe.Name, recipe);
+				}
+			}
+
+			//process launch product recipes
+			if (presetItems.Contains("rocket-part") && presetRecipes.ContainsKey("rocket-part") && presetEntities.Contains("rocket-silo"))
+			{
+				foreach (var objJToken in jsonData["items"].Concat(jsonData["fluids"]).Where(t => t["launch_products"] != null))
+				{
+					RecipeShort recipe = new RecipeShort(string.Format("§§r:rl:launch-{0}", (string)objJToken["name"]));
+
+					int inputSize = (int)objJToken["stack"];
+					foreach (var productJToken in objJToken["launch_products"])
+					{
+						double amount = (double)productJToken["amount"];
+						int productStack = (int)(jsonData["items"].First(t => (string)t["name"] == (string)productJToken["name"])["stack"]?? 1);
+						if (amount != 0 && inputSize * amount > productStack)
+							inputSize = (int)(productStack / amount);
+					}
+					foreach (var productJToken in objJToken["launch_products"])
+					{
+						double amount = (double)productJToken["amount"];
+						if (amount != 0)
+							recipe.Products.Add((string)productJToken["name"], amount * inputSize);
+					}
+
+					recipe.Ingredients.Add((string)objJToken["name"], inputSize);
+					recipe.Ingredients.Add("rocket-part", 100);
+
+					presetRecipes.Add(recipe.Name, recipe);
 				}
 			}
 
