@@ -214,7 +214,9 @@ namespace Foreman
 
 			if (WarningSet != Warnings.Clean)
 				return NodeState.Warning;
-			return NodeState.Clean;
+			if(AllLinksConnected)
+				return NodeState.Clean;
+			return NodeState.MissingLink;
 
 		}
 

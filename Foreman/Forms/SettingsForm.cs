@@ -27,6 +27,7 @@ namespace Foreman
 
 			public bool ShowErrorArrows;
 			public bool ShowWarningArrows;
+			public bool ShowDisconnectedArrows;
 
 			public AssemblerSelector.Style DefaultAssemblerStyle;
 			public ModuleSelector.Style DefaultModuleStyle;
@@ -112,8 +113,9 @@ namespace Foreman
 			RoundAssemblerCountCheckBox.Checked = options.RoundAssemblerCount;
 			AbbreviateSciPackCheckBox.Checked = Options.AbbreviateSciPacks;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
-			WarningArrowsCheckBox.Checked = Options.ShowWarningArrows;
 			ErrorArrowsCheckBox.Checked = Options.ShowErrorArrows;
+			WarningArrowsCheckBox.Checked = Options.ShowWarningArrows;
+			DisconnectedArrowsCheckBox.Checked = Options.ShowDisconnectedArrows;
 
 			switch(Options.LevelOfDetail)
 			{
@@ -450,6 +452,7 @@ namespace Foreman
 			Options.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
 			Options.ShowErrorArrows = ErrorArrowsCheckBox.Checked;
 			Options.ShowWarningArrows = WarningArrowsCheckBox.Checked;
+			Options.ShowDisconnectedArrows = DisconnectedArrowsCheckBox.Checked;
 
 			Options.DefaultAssemblerStyle = (AssemblerSelector.Style)AssemblerSelectorStyleDropDown.SelectedIndex;
 			Options.DefaultModuleStyle = (ModuleSelector.Style)ModuleSelectorStyleDropDown.SelectedIndex;

@@ -65,7 +65,7 @@ namespace Foreman
 				borderPen = oversuppliedBorderPen;
 				text += "\n" + GraphicsStuff.DoubleToString(suppliedRate);
 			}
-			else if (recipeRate > 0 && !Links.Any())
+			else if (!Links.Any())
 				borderPen = disconnectedBorderPen;
 
 			int textHeight = (int)graphViewer.CreateGraphics().MeasureString(text, textFont).Height;

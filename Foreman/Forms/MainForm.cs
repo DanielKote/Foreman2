@@ -59,8 +59,9 @@ namespace Foreman
 
 				GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
 				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
-				GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
 				GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
+				GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
+				GraphViewer.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
 
 				RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
 				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
@@ -224,8 +225,9 @@ namespace Foreman
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
 			options.DefaultAssemblerStyle = GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
 			options.DefaultModuleStyle = GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
-			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
 			options.ShowErrorArrows = GraphViewer.ArrowRenderer.ShowErrorArrows;
+			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
+			options.ShowDisconnectedArrows = GraphViewer.ArrowRenderer.ShowDisconnectedArrows;
 
 			options.RoundAssemblerCount = Properties.Settings.Default.RoundAssemblerCount;
 			options.AbbreviateSciPacks = Properties.Settings.Default.AbbreviateSciPacks;
@@ -277,14 +279,18 @@ namespace Foreman
 					Properties.Settings.Default.ShowRecipeToolTip = options.ShowRecipeToolTip;
 					GraphViewer.LockedRecipeEditPanelPosition = options.LockedRecipeEditPanelPosition;
 					Properties.Settings.Default.LockedRecipeEditorPosition = options.LockedRecipeEditPanelPosition;
+
 					GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = options.DefaultAssemblerStyle;
 					Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
 					GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
 					Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
-					GraphViewer.ArrowRenderer.ShowWarningArrows = options.ShowWarningArrows;
-					Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
+
 					GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
 					Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;
+					GraphViewer.ArrowRenderer.ShowWarningArrows = options.ShowWarningArrows;
+					Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
+					GraphViewer.ArrowRenderer.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
+					Properties.Settings.Default.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
 
 					Properties.Settings.Default.RoundAssemblerCount = options.RoundAssemblerCount;
 					Properties.Settings.Default.AbbreviateSciPacks = options.AbbreviateSciPacks;

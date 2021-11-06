@@ -8,11 +8,13 @@ namespace Foreman
 	{
 		private enum Border { Top, Bottom, Left, Right }
 
-		public bool ShowWarningArrows { get; set; }
 		public bool ShowErrorArrows { get; set; }
+		public bool ShowWarningArrows { get; set; }
+		public bool ShowDisconnectedArrows { get; set; }
 
-		private static readonly Pen WarningArrowPen = new Pen(Brushes.DarkOrange, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 		private static readonly Pen ErrorArrowPen = new Pen(Brushes.DarkRed, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
+		private static readonly Pen WarningArrowPen = new Pen(Brushes.DarkOrange, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
+		private static readonly Pen DisconnectedArrowPen = new Pen(Brushes.Goldenrod, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 		
 		private const int ArrowScale = 8;
 		private const int Padding = 10;
@@ -23,12 +25,15 @@ namespace Foreman
 
 		public void Paint(Graphics graphics, ProductionGraph graph)
 		{
-			if (ShowWarningArrows)
-				foreach (Point warningPoint in graph.Nodes.Where(node => node.State == NodeState.Warning).Select(node => Viewer.GraphToScreen(node.Location)))
-					DrawArrow(graphics, warningPoint, WarningArrowPen);
 			if (ShowErrorArrows)
 				foreach (Point errorPoint in graph.Nodes.Where(node => node.State == NodeState.Error).Select(node => Viewer.GraphToScreen(node.Location)))
 					DrawArrow(graphics, errorPoint, ErrorArrowPen);
+			if (ShowWarningArrows)
+				foreach (Point warningPoint in graph.Nodes.Where(node => node.State == NodeState.Warning).Select(node => Viewer.GraphToScreen(node.Location)))
+					DrawArrow(graphics, warningPoint, WarningArrowPen);
+			if (ShowDisconnectedArrows)
+				foreach (Point errorPoint in graph.Nodes.Where(node => node.State == NodeState.MissingLink).Select(node => Viewer.GraphToScreen(node.Location)))
+					DrawArrow(graphics, errorPoint, DisconnectedArrowPen);
 		}
 
 		private void DrawArrow(Graphics graphics, Point nodeOrigin, Pen arrowPen)

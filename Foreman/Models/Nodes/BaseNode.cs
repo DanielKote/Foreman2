@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public enum RateType { Auto, Manual };
-	public enum NodeState { Clean, Warning, Error }
+	public enum NodeState { Clean, MissingLink, Warning, Error }
 
 	[Serializable]
 	public abstract partial class BaseNode : ISerializable
@@ -56,11 +56,12 @@ namespace Foreman
 		}
 
 		public bool AllLinksValid { get { return (InputLinks.Count(l => !l.IsValid) + OutputLinks.Count(l => !l.IsValid) == 0); } }
+		public bool AllLinksConnected { get { return !Inputs.Any(i => !InputLinks.Any(l => l.Item == i)) && !Outputs.Any(i => !OutputLinks.Any(l => l.Item == i)); } }
 
 		public virtual void UpdateState()
 		{
 			NodeState originalState = State;
-			State = AllLinksValid ? NodeState.Clean : NodeState.Error;
+			State = AllLinksValid ? AllLinksConnected? NodeState.Clean : NodeState.MissingLink : NodeState.Error;
 			if (State != originalState)
 				OnNodeStateChanged();
 		}

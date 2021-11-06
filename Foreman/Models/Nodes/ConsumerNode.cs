@@ -26,7 +26,7 @@ namespace Foreman
 		public override void UpdateState()
 		{
 			NodeState oldState = State;
-			State = (ConsumedItem.IsMissing || !AllLinksValid) ? NodeState.Error : NodeState.Clean;
+			State = (!ConsumedItem.IsMissing && AllLinksValid) ? AllLinksConnected ? NodeState.Clean : NodeState.MissingLink : NodeState.Error;
 			if (oldState != State)
 				OnNodeStateChanged();
 		}

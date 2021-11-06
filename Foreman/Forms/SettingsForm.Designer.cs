@@ -86,6 +86,7 @@
 			this.AdvancedOptionsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ShowUnavailablesCheckBox = new System.Windows.Forms.CheckBox();
 			this.LoadBarrelingCheckBox = new System.Windows.Forms.CheckBox();
+			this.ShowProductivityBonusOnAllCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox6 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -111,7 +112,7 @@
 			this.AbbreviateSciPackCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
-			this.ShowProductivityBonusOnAllCheckBox = new System.Windows.Forms.CheckBox();
+			this.DisconnectedArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -931,14 +932,24 @@
 			this.LoadBarrelingCheckBox.Text = "Load barreling & crating recipes (DEV)";
 			this.LoadBarrelingCheckBox.UseVisualStyleBackColor = true;
 			// 
+			// ShowProductivityBonusOnAllCheckBox
+			// 
+			this.ShowProductivityBonusOnAllCheckBox.AutoSize = true;
+			this.ShowProductivityBonusOnAllCheckBox.Location = new System.Drawing.Point(3, 3);
+			this.ShowProductivityBonusOnAllCheckBox.Name = "ShowProductivityBonusOnAllCheckBox";
+			this.ShowProductivityBonusOnAllCheckBox.Size = new System.Drawing.Size(348, 17);
+			this.ShowProductivityBonusOnAllCheckBox.TabIndex = 2;
+			this.ShowProductivityBonusOnAllCheckBox.Text = "Enable extra productivity bonus for all entities (instead of only miners)";
+			this.ShowProductivityBonusOnAllCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// groupBox6
 			// 
 			this.groupBox6.Controls.Add(this.tableLayoutPanel3);
 			this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox6.Location = new System.Drawing.Point(3, 333);
+			this.groupBox6.Location = new System.Drawing.Point(3, 356);
 			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(464, 38);
+			this.groupBox6.Size = new System.Drawing.Size(464, 15);
 			this.groupBox6.TabIndex = 2;
 			this.groupBox6.TabStop = false;
 			// 
@@ -954,7 +965,7 @@
 			this.tableLayoutPanel3.RowCount = 2;
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 19);
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 0);
 			this.tableLayoutPanel3.TabIndex = 1;
 			// 
 			// groupBox5
@@ -964,7 +975,7 @@
 			this.groupBox5.Controls.Add(this.DefaultsTable);
 			this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox5.Location = new System.Drawing.Point(3, 238);
+			this.groupBox5.Location = new System.Drawing.Point(3, 261);
 			this.groupBox5.Name = "groupBox5";
 			this.groupBox5.Size = new System.Drawing.Size(464, 89);
 			this.groupBox5.TabIndex = 1;
@@ -1050,7 +1061,7 @@
 			this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(464, 229);
+			this.groupBox3.Size = new System.Drawing.Size(464, 252);
 			this.groupBox3.TabIndex = 0;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Node Graphics:";
@@ -1065,6 +1076,7 @@
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.NodeGraphicsTable.Controls.Add(this.DisconnectedArrowsCheckBox, 0, 9);
 			this.NodeGraphicsTable.Controls.Add(this.RoundAssemblerCountCheckBox, 0, 5);
 			this.NodeGraphicsTable.Controls.Add(this.HighLodRadioButton, 3, 0);
 			this.NodeGraphicsTable.Controls.Add(this.label6, 0, 0);
@@ -1083,7 +1095,7 @@
 			this.NodeGraphicsTable.Location = new System.Drawing.Point(3, 16);
 			this.NodeGraphicsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.NodeGraphicsTable.Name = "NodeGraphicsTable";
-			this.NodeGraphicsTable.RowCount = 9;
+			this.NodeGraphicsTable.RowCount = 10;
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -1093,7 +1105,8 @@
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 210);
+			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 233);
 			this.NodeGraphicsTable.TabIndex = 28;
 			// 
 			// RoundAssemblerCountCheckBox
@@ -1278,15 +1291,16 @@
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
 			// 
-			// ShowProductivityBonusOnAllCheckBox
+			// DisconnectedArrowsCheckBox
 			// 
-			this.ShowProductivityBonusOnAllCheckBox.AutoSize = true;
-			this.ShowProductivityBonusOnAllCheckBox.Location = new System.Drawing.Point(3, 3);
-			this.ShowProductivityBonusOnAllCheckBox.Name = "ShowProductivityBonusOnAllCheckBox";
-			this.ShowProductivityBonusOnAllCheckBox.Size = new System.Drawing.Size(348, 17);
-			this.ShowProductivityBonusOnAllCheckBox.TabIndex = 2;
-			this.ShowProductivityBonusOnAllCheckBox.Text = "Enable extra productivity bonus for all entities (instead of only miners)";
-			this.ShowProductivityBonusOnAllCheckBox.UseVisualStyleBackColor = true;
+			this.DisconnectedArrowsCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.DisconnectedArrowsCheckBox, 4);
+			this.DisconnectedArrowsCheckBox.Location = new System.Drawing.Point(3, 213);
+			this.DisconnectedArrowsCheckBox.Name = "DisconnectedArrowsCheckBox";
+			this.DisconnectedArrowsCheckBox.Size = new System.Drawing.Size(276, 17);
+			this.DisconnectedArrowsCheckBox.TabIndex = 18;
+			this.DisconnectedArrowsCheckBox.Text = "Display arrows pointing to any node with missing links";
+			this.DisconnectedArrowsCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
@@ -1296,7 +1310,7 @@
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelButton = this.CancelSettingsButton;
-			this.ClientSize = new System.Drawing.Size(519, 568);
+			this.ClientSize = new System.Drawing.Size(519, 612);
 			this.Controls.Add(this.MainTable);
 			this.DoubleBuffered = true;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -1439,5 +1453,6 @@
 		private System.Windows.Forms.CheckBox AbbreviateSciPackCheckBox;
 		private System.Windows.Forms.CheckBox RoundAssemblerCountCheckBox;
 		private System.Windows.Forms.CheckBox ShowProductivityBonusOnAllCheckBox;
+		private System.Windows.Forms.CheckBox DisconnectedArrowsCheckBox;
 	}
 }

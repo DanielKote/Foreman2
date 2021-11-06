@@ -74,5 +74,8 @@
     <Setting Name="EnableExtraProductivityForNonMiners" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="ShowDisconnectedArrows" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

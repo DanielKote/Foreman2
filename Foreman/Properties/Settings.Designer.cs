@@ -310,5 +310,17 @@ namespace Foreman.Properties {
                 this["EnableExtraProductivityForNonMiners"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowDisconnectedArrows {
+            get {
+                return ((bool)(this["ShowDisconnectedArrows"]));
+            }
+            set {
+                this["ShowDisconnectedArrows"] = value;
+            }
+        }
     }
 }
