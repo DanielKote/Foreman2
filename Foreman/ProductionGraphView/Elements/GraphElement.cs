@@ -98,6 +98,7 @@ namespace Foreman
 			return Bounds.Contains(GraphToLocal(graph_point));
 		}
 
+		public virtual void PrePaint() { }
 		public void Paint(Graphics graphics, bool simple)
 		{
 			if (Visible)

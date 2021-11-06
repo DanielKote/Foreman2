@@ -17,14 +17,17 @@ namespace Foreman
 		public override int Y { get { return DisplayedNode.Location.Y; } set { Trace.Fail("Base node element location cant be set through Y parameter! Use SetLocation(Point)"); } }
 		public override Point Location { get { return DisplayedNode.Location; } set { Trace.Fail("Base node element location cant be set through Location parameter! Use SetLocation(Point)"); } }
 		public void SetLocation(Point location)
-		{ 
-			graphViewer.Graph.RequestNodeController(DisplayedNode).SetLocation(location);
+		{
+			if (location != Location)
+			{
+				graphViewer.Graph.RequestNodeController(DisplayedNode).SetLocation(location);
 
-			RequestStateUpdate();
-			foreach (BaseNodeElement linkedNode in DisplayedNode.InputLinks.Select(l => graphViewer.LinkElementDictionary[l].SupplierElement))
-				linkedNode.RequestStateUpdate();
-			foreach (BaseNodeElement linkedNode in DisplayedNode.OutputLinks.Select(l => graphViewer.LinkElementDictionary[l].ConsumerElement))
-				linkedNode.RequestStateUpdate();
+				RequestStateUpdate();
+				foreach (BaseNodeElement linkedNode in DisplayedNode.InputLinks.Select(l => graphViewer.LinkElementDictionary[l].SupplierElement))
+					linkedNode.RequestStateUpdate();
+				foreach (BaseNodeElement linkedNode in DisplayedNode.OutputLinks.Select(l => graphViewer.LinkElementDictionary[l].ConsumerElement))
+					linkedNode.RequestStateUpdate();
+			}
 		}
 
 		protected abstract Brush CleanBgBrush { get; }
@@ -174,16 +177,18 @@ namespace Foreman
 			return false;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		public override void PrePaint()
 		{
 			if (NodeStateRequiresUpdate)
 				UpdateState();
-			if(NodeStateRequiresUpdate || NodeValuesRequireUpdate)
+			if (NodeStateRequiresUpdate || NodeValuesRequireUpdate)
 				UpdateValues();
 			NodeStateRequiresUpdate = false;
 			NodeValuesRequireUpdate = false;
+		}
 
-
+		protected override void Draw(Graphics graphics, bool simple)
+		{
 			Point trans = LocalToGraph(new Point(0, 0)); //all draw operations happen in graph 0,0 origin coordinates. So we need to transform all our draw operations to the local 0,0 (center of object)
 
 			//background

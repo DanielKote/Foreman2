@@ -450,7 +450,11 @@ namespace Foreman
 				foreach (GraphElement element in GetPaintingOrder())
 					element.UpdateVisibility(visibleGraphBounds);
 
+			//run any pre-paint functions
+			foreach (GraphElement elemnent in GetPaintingOrder())
+				elemnent.PrePaint();
 
+			//ensure width of selection is correct
 			selectionPen.Width = 2 / ViewScale;
 
 			//grid
@@ -1188,6 +1192,8 @@ namespace Foreman
 			//upgrade graph & values
 			UpdateGraphBounds();
 			Graph.UpdateNodeValues();
+			this.Focus();
+			Invalidate();
 		}
 
 		//Stolen from the designer file
