@@ -229,13 +229,11 @@ namespace Foreman
 				if (modlist["mods"] == null)
 					modlist.Add("mods", new JArray());
 
-
 				JToken foremanModToken = modlist["mods"].ToList().FirstOrDefault(t => t["name"] != null && (string)t["name"] == "foremanexport");
 				if (foremanModToken == null)
 					((JArray)modlist["mods"]).Add(new JObject() { { "name", "foremanexport" }, { "enabled", true } });
 				else
 					foremanModToken["enabled"] = true;
-				File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented));
 
 				//also grab a list of mods so we can set them as dependencies for the export mod
 				List<string> mods = modlist["mods"].ToList().Where(t => (string)t["name"] != "foremanexport" && (string)t["name"] != "base" && (string)t["name"] != "core").Select(t => (string)t["name"]).ToList();
@@ -245,11 +243,11 @@ namespace Foreman
 						((JArray)foremanExportInfo["dependencies"]).Add(mod);
 
 				//copy the files as necessary
-				Directory.CreateDirectory(Path.Combine(modsPath, "foremanexport_1.0.0"));
-
 				try
 				{
-					File.WriteAllText(Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "info.json" }), foremanExportInfo.ToString(Formatting.Indented));
+					Directory.CreateDirectory(Path.Combine(modsPath, "foremanexport_1.0.0"));
+					File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented)); //updated mod list with foreman export enabled
+					File.WriteAllText(Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "info.json" }), foremanExportInfo.ToString(Formatting.Indented)); //correct mod info file with (if in compatibility mode) all other mods added as dependencies.
 
 					if(CompatibilityModeCheckBox.Checked)
 						File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "data-final-fixes.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "data-final-fixes.lua" }), true);
@@ -273,10 +271,18 @@ namespace Foreman
 							File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-control - ee.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", controlFile }), true);
 					}
 				}
-				catch
+				catch (Exception e)
 				{
-					MessageBox.Show("could not copy foreman export mod files (Mods/foremanexport_1.0.0/) to the factorio mods folder. Reinstall foreman?");
-					ErrorLogging.LogLine("copying of foreman export mod files failed.");
+					if (e is UnauthorizedAccessException)
+					{
+						MessageBox.Show("Insufficient access to copy foreman export mod files (Mods/foremanexport_1.0.0/) to the factorio mods folder. Please ensure factorio mods are in an accessible folder, or launch Foreman with Administrator privileges.");
+						ErrorLogging.LogLine("copying of foreman export mod files failed - insufficient access");
+					}
+					else
+					{
+						MessageBox.Show("could not copy foreman export mod files (Mods/foremanexport_1.0.0/) to the factorio mods folder. Reinstall foreman?");
+						ErrorLogging.LogLine("copying of foreman export mod files failed.");
+					}
 					CleanupFailedImport(modsPath);
 					return "";
 				}
