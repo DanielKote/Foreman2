@@ -357,7 +357,7 @@ namespace Foreman
 			//add the visible recipe to the right of the node
 			new FloatingTooltipControl(recipePanel, Direction.Left, new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
 			FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
-			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.UpdateState(); Graph.UpdateNodeValues(); };
+			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.RequestStateUpdate(); Graph.UpdateNodeValues(); };
 		}
 
 		//----------------------------------------------Selection functions
@@ -421,7 +421,7 @@ namespace Foreman
 			try
 			{
 				foreach (BaseNodeElement node in nodeElements)
-					node.UpdateState();
+					node.RequestStateUpdate();
 			}
 			catch (OverflowException) { }//Same as when working out node values, there's not really much to do here... Maybe I could show a tooltip saying the numbers are too big or something...
 			Invalidate();
@@ -521,10 +521,16 @@ namespace Foreman
 
 		private void Graph_LinkDeleted(object sender, NodeLinkEventArgs e)
 		{
+			BaseNodeElement supplier = nodeElementDictionary[e.nodeLink.Supplier];
+			BaseNodeElement consumer = nodeElementDictionary[e.nodeLink.Consumer];
+
 			LinkElement element = linkElementDictionary[e.nodeLink];
 			linkElementDictionary.Remove(e.nodeLink);
 			linkElements.Remove(element);
 			element.Dispose();
+
+			supplier.RequestStateUpdate();
+			consumer.RequestStateUpdate();
 			Invalidate();
 		}
 
@@ -532,12 +538,13 @@ namespace Foreman
 		{
 			BaseNodeElement supplier = nodeElementDictionary[e.nodeLink.Supplier];
 			BaseNodeElement consumer = nodeElementDictionary[e.nodeLink.Consumer];
-			supplier.UpdateState();
-			consumer.UpdateState();
 
 			LinkElement element = new LinkElement(this, e.nodeLink, supplier, consumer);
 			linkElementDictionary.Add(e.nodeLink, element);
 			linkElements.Add(element);
+
+			supplier.RequestStateUpdate();
+			consumer.RequestStateUpdate();
 			Invalidate();
 		}
 
@@ -727,30 +734,8 @@ namespace Foreman
 						{
 							Point endPoint = MouseDownElement.Location;
 							if (startPoint != endPoint)
-							{
-								HashSet<BaseNodeElement> processedNodes = new HashSet<BaseNodeElement>();
 								foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
-								{
 									node.SetLocation(new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y));
-
-									//item tab reshuffle
-									if (!processedNodes.Contains(node))
-									{
-										node.UpdateState();
-										processedNodes.Add(node);
-										foreach (BaseNodeElement linkedNode in node.DisplayedNode.InputLinks.Select(l => linkElementDictionary[l].SupplierElement).Where(se => !processedNodes.Contains(se)))
-										{
-											linkedNode.UpdateState();
-											processedNodes.Add(linkedNode);
-										}
-										foreach (BaseNodeElement linkedNode in node.DisplayedNode.OutputLinks.Select(l => linkElementDictionary[l].ConsumerElement).Where(se => !processedNodes.Contains(se)))
-										{
-											linkedNode.UpdateState();
-											processedNodes.Add(linkedNode);
-										}
-									}
-								}
-							}
 						}
 					}
 					else //dragging single item

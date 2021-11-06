@@ -48,7 +48,7 @@ namespace Foreman
 			UpdateState();
 		}
 
-		public override void UpdateState()
+		protected override void UpdateState()
 		{
 			if (InputTabs.Count == 0 && OutputTabs.Count != 0)
 			{

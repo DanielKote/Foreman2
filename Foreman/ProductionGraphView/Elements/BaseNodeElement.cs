@@ -16,8 +16,15 @@ namespace Foreman
 		public override int X { get { return DisplayedNode.Location.X; } set { Trace.Fail("Base node element location cant be set through X parameter! Use SetLocation(Point)"); } }
 		public override int Y { get { return DisplayedNode.Location.Y; } set { Trace.Fail("Base node element location cant be set through Y parameter! Use SetLocation(Point)"); } }
 		public override Point Location { get { return DisplayedNode.Location; } set { Trace.Fail("Base node element location cant be set through Location parameter! Use SetLocation(Point)"); } }
-		public void SetLocation(Point location) { 
+		public void SetLocation(Point location)
+		{ 
 			graphViewer.Graph.RequestNodeController(DisplayedNode).SetLocation(location);
+
+			RequestStateUpdate();
+			foreach (BaseNodeElement linkedNode in DisplayedNode.InputLinks.Select(l => graphViewer.LinkElementDictionary[l].SupplierElement))
+				linkedNode.RequestStateUpdate();
+			foreach (BaseNodeElement linkedNode in DisplayedNode.OutputLinks.Select(l => graphViewer.LinkElementDictionary[l].ConsumerElement))
+				linkedNode.RequestStateUpdate();
 		}
 
 		protected abstract Brush CleanBgBrush { get; }
@@ -82,7 +89,9 @@ namespace Foreman
 		private void DisplayedNode_NodeStateChanged(object sender, EventArgs e) { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
 		private void DisplayedNode_NodeValuesChanged(object sender, EventArgs e) { NodeValuesRequireUpdate = true; graphViewer.Invalidate(); }
 
-		public virtual void UpdateState()
+		public void RequestStateUpdate() { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
+
+		protected virtual void UpdateState()
 		{
 			//update error notice
 			errorNotice.SetVisibility(DisplayedNode.State != NodeState.Clean);
@@ -92,7 +101,7 @@ namespace Foreman
 			UpdateTabOrder();
 		}
 
-		public virtual void UpdateValues()
+		protected virtual void UpdateValues()
 		{
 			//update tab values
 			foreach (ItemTabElement tab in InputTabs)
