@@ -87,7 +87,7 @@ namespace Foreman
 		public bool IsOversupplied(Item item)
 		{
 			//supply & consume > 1 ---> allow for 0.1% error
-			//supply & consume [0.001 -> 1]  ---> allow for 2% error
+			//supply & consume [0.001 -> 1]  ---> allow for 1% error
 			//supply & consume [0 ->0.001] ---> allow for any errors (as long as neither are 0)
 			//supply & consume = 0 ---> no errors if both are exactly 0
 
@@ -95,7 +95,7 @@ namespace Foreman
 			double supplyRate = GetSuppliedRate(item);
 			if ((consumeRate == 0 && supplyRate == 0) || (supplyRate < 0.001 && supplyRate < 0.001))
 				return false;
-			return ((supplyRate - consumeRate) / supplyRate) > ((consumeRate > 1 && supplyRate > 1) ? 0.001f : 0.05f);
+			return ((supplyRate - consumeRate) / supplyRate) > ((consumeRate > 1 && supplyRate > 1) ? 0.001f : 0.01f);
 		}
 
 		public bool ManualRateNotMet()
