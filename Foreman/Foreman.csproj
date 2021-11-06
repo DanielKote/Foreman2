@@ -408,6 +408,9 @@
     <Content Include="Graphics\PlayerAssembler.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Graphics\RocketAssembler.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\UnknownIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

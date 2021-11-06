@@ -15,6 +15,8 @@ namespace Foreman
 
 		bool IsMissing { get; }
 
+		int StackSize { get; }
+
 		double FuelValue { get; }
 		double PollutionMultiplier { get; }
 		Item BurnResult { get; }
@@ -31,6 +33,8 @@ namespace Foreman
 		public IReadOnlyCollection<Technology> ConsumptionTechnologies { get { return consumptionTechnologies; } }
 
 		public bool IsMissing { get; private set; }
+
+		public int StackSize { get; set; }
 
 		public double FuelValue { get; internal set; }
 		public double PollutionMultiplier { get; internal set; }
@@ -49,6 +53,8 @@ namespace Foreman
 		{
 			mySubgroup = subgroup;
 			subgroup.items.Add(this);
+
+			StackSize = 1;
 
 			productionRecipes = new HashSet<RecipePrototype>();
 			consumptionRecipes = new HashSet<RecipePrototype>();

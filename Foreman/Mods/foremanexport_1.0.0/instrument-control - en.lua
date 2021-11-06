@@ -137,6 +137,7 @@ local function ExportItems()
 		titem['icon_name'] = 'icon.i.'..item.name
 		titem['order'] = item.order
 		titem['subgroup'] = item.subgroup.name
+		titem["stack"] = item.stackable and item.stack_size or 1
 
 		if item.fuel_category ~= nil then
 			titem['fuel_category'] = item.fuel_category
@@ -146,6 +147,25 @@ local function ExportItems()
 
 		if item.burnt_result ~= nil then
 			titem['burnt_result'] = item.burnt_result.name
+		end
+
+		if item.rocket_launch_products ~= nil and item.rocket_launch_products[1] ~= nil then
+			titem['launch_products'] = {}
+			for _, product in pairs(item.rocket_launch_products) do
+				tproduct = {}
+				tproduct['name'] = product.name
+				tproduct['type'] = product.type
+
+				amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
+				amount = amount * ( (product.probability == nil) and 1 or product.probability)
+
+				tproduct['amount'] = amount
+
+				if product.type == 'fluid' and product.temperature ~= nil then
+					tproduct['temperature'] = ProcessTemperature(product.temperature)
+				end
+				table.insert(titem['launch_products'], tproduct)
+			end
 		end
 
 		titem['lid'] = '$'..localindex

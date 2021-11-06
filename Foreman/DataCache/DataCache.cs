@@ -36,6 +36,7 @@ namespace Foreman
 		public IReadOnlyDictionary<Item, ICollection<Item>> SciencePackPrerequisites { get { return sciencePackPrerequisites; } }
 
 		public Assembler PlayerAssembler { get { return playerAssember; } }
+		public Assembler RocketAssembler { get { return rocketAssembler; } }
 		public Technology StartingTech { get { return startingTech; } }
 
 		//missing objects are not linked properly and just have the minimal values necessary to function. They are just placeholders, and cant actually be added to graph except while importing. They are also not solved for.
@@ -75,6 +76,7 @@ namespace Foreman
 		private SubgroupPrototype extractionSubgroupFluidsOP; //offshore pumps
 		private SubgroupPrototype energySubgroupBoiling; //water to steam (boilers)
 		private SubgroupPrototype energySubgroupEnergy; //heat production (heat consumption is processed as 'fuel'), steam consumption, burning to energy
+		private SubgroupPrototype rocketLaunchSubgroup; //any rocket launch recipes will go here
 
 		private ItemPrototype HeatItem;
 		private RecipePrototype HeatRecipe;
@@ -83,6 +85,7 @@ namespace Foreman
 		private Bitmap ElectricityIcon;
 
 		private AssemblerPrototype playerAssember; //for hand crafting. Because Fk automation, thats why.
+		private AssemblerPrototype rocketAssembler; //for those rocket recipes
 
 		private SubgroupPrototype missingSubgroup;
 		private TechnologyPrototype startingTech;
@@ -125,7 +128,7 @@ namespace Foreman
 			startingTech = new TechnologyPrototype(this, "§§t:starting_tech", "Starting Technology");
 			startingTech.Tier = 0;
 
-			extraFormanGroup = new GroupPrototype(this, "§§g:extra_group", "Resource Extraction\nPower Generation", "zzzzzzz1");
+			extraFormanGroup = new GroupPrototype(this, "§§g:extra_group", "Resource Extraction\nPower Generation\nRocket Launches", "~~~z1");
 			extraFormanGroup.SetIconAndColor(new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "ExtraGroupIcon.png"), 64), Color.Gray));
 
 			extractionSubgroupItems = new SubgroupPrototype(this, "§§sg:extraction_items", "1");
@@ -148,9 +151,14 @@ namespace Foreman
 			energySubgroupEnergy.myGroup = extraFormanGroup;
 			extraFormanGroup.subgroups.Add(energySubgroupEnergy);
 
+			rocketLaunchSubgroup = new SubgroupPrototype(this, "§§sg:rocket_launches", "6");
+			rocketLaunchSubgroup.myGroup = extraFormanGroup;
+			extraFormanGroup.subgroups.Add(rocketLaunchSubgroup);
+
 			IconColorPair heatIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "HeatIcon.png"), 64), Color.DarkRed);
 			IconColorPair burnerGeneratorIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "BurnerGeneratorIcon.png"), 64), Color.DarkRed);
 			IconColorPair playerAssemblerIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "PlayerAssembler.png"), 64), Color.Gray);
+			IconColorPair rocketAssemblerIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "RocketAssembler.png"), 64), Color.Gray);
 			HeatItem = new ItemPrototype(this, "§§i:heat", "Heat (1MJ)", new SubgroupPrototype(this, "-", "-"), "-"); //we dont want heat to appear as an item in the lists, so just give it a blank subgroup.
 			HeatItem.SetIconAndColor(heatIcon);
 			HeatItem.FuelValue = 1000000; //1MJ - nice amount
@@ -170,6 +178,12 @@ namespace Foreman
 			playerAssember.EnergyDrain = 0;
 			playerAssember.EnergyProduction = 0;
 			playerAssember.SetIconAndColor(playerAssemblerIcon);
+			
+			rocketAssembler = new AssemblerPrototype(this, "§§a:rocket-assembler", "Rocket", EntityType.Rocket, EnergySource.Void);
+			rocketAssembler.EnergyConsumption = 0;
+			rocketAssembler.EnergyDrain = 0;
+			rocketAssembler.EnergyProduction = 0;
+			rocketAssembler.SetIconAndColor(rocketAssemblerIcon);
 
 			ElectricityIcon = IconCache.GetIcon(Path.Combine("Graphics", "ElectricityIcon.png"), 64);
 
@@ -205,7 +219,7 @@ namespace Foreman
 				recipes.Add(BurnerRecipe.Name, BurnerRecipe);
 				technologies.Add(StartingTech.Name, startingTech);
 
-				//process each section
+				//process each section (order is rather important here)
 				foreach (var objJToken in jsonData["mods"].ToList())
 					ProcessMod(objJToken);
 				foreach (var objJToken in jsonData["subgroups"].ToList())
@@ -220,6 +234,7 @@ namespace Foreman
 					ProcessBurnItem(item, fuelCategories, burnResults); //link up any items with burn remains
 				foreach (var objJToken in jsonData["recipes"].ToList())
 					ProcessRecipe(objJToken, iconCache, craftingCategories);
+
 				foreach (var objJToken in jsonData["modules"].ToList())
 					ProcessModule(objJToken, iconCache);
 				foreach (var objJToken in jsonData["resources"].ToList())
@@ -228,6 +243,14 @@ namespace Foreman
 					ProcessTechnology(objJToken, iconCache);
 				foreach (var objJToken in jsonData["technologies"].ToList())
 					ProcessTechnologyP2(objJToken); //required to properly link technology prerequisites
+
+				//process launch products (done after technologies so as to properly link tech to the launches)
+				foreach (var objJToken in jsonData["items"].Where(t => t["launch_products"] != null).ToList())
+					ProcessRocketLaunch(objJToken);
+				foreach (var objJToken in jsonData["fluids"].Where(t => t["launch_products"] != null).ToList())
+					ProcessRocketLaunch(objJToken);
+
+
 				foreach (var objJToken in jsonData["entities"].ToList())
 					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories);
 
@@ -468,6 +491,8 @@ namespace Foreman
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
+			item.StackSize = (int)objJToken["stack"];
+
 			if (objJToken["fuel_category"] != null && (double)objJToken["fuel_value"] > 0) //factorio eliminates any 0fuel value fuel from the list (checked)
 			{
 				item.FuelValue = (double)objJToken["fuel_value"];
@@ -515,6 +540,63 @@ namespace Foreman
 			}
 
 			items.Add(item.Name, item);
+		}
+
+		private void ProcessRocketLaunch(JToken objJToken)
+		{
+			ItemPrototype rocketPart = items["rocket-part"] as ItemPrototype;
+			RecipePrototype rocketPartRecipe = recipes["rocket-part"] as RecipePrototype;
+			ItemPrototype launchItem = (ItemPrototype)items[(string)objJToken["name"]];
+
+			if (rocketPart == null || rocketPartRecipe == null || assemblers["rocket-silo"] == null) //quick check to ensure that we can actually use launch products (should always pass)
+			{
+				ErrorLogging.LogLine(string.Format("No Rocket silo / rocket part found! launch product for {0} will be ignored.", (string)objJToken["name"]));
+				return;
+			}
+
+			RecipePrototype recipe = new RecipePrototype(
+				this,
+				string.Format("§§r:rl:launch-{0}", launchItem.Name),
+				string.Format("Rocket Launch: {0}", launchItem.FriendlyName),
+				rocketLaunchSubgroup,
+				launchItem.Name);
+
+			recipe.Time = 1; //placeholder really...
+
+			int inputSize = launchItem.StackSize;
+			foreach (var productJToken in objJToken["launch_products"].ToList())
+			{
+				ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
+				double amount = (double)productJToken["amount"];
+				if (amount != 0)
+				{
+					if (inputSize * amount > product.StackSize)
+						inputSize = (int)(product.StackSize / amount);
+					amount = inputSize * amount;
+
+					if ((string)productJToken["type"] == "fluid")
+						recipe.InternalOneWayAddProduct(product, amount, productJToken["temperature"] == null ? ((FluidPrototype)product).DefaultTemperature : (double)productJToken["temperature"]);
+					else
+						recipe.InternalOneWayAddProduct(product, amount);
+
+					product.productionRecipes.Add(recipe);
+					recipe.SetIconAndColor(new IconColorPair(product.Icon, Color.DarkGray));
+				}
+			}
+			recipe.InternalOneWayAddIngredient(launchItem, inputSize);
+			launchItem.consumptionRecipes.Add(recipe);
+
+			recipe.InternalOneWayAddIngredient(rocketPart, 100);
+			rocketPart.consumptionRecipes.Add(recipe);
+
+			foreach (TechnologyPrototype tech in rocketPartRecipe.myUnlockTechnologies)
+			{
+				recipe.myUnlockTechnologies.Add(tech);
+				tech.unlockedRecipes.Add(recipe);
+			}
+
+			recipe.assemblers.Add(rocketAssembler);
+			rocketAssembler.recipes.Add(recipe);
 		}
 
 		private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories)
@@ -1395,7 +1477,7 @@ namespace Foreman
 				clean = true;
 
 				//4.1: mark any recipe with no available assemblers to unavailable.
-				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available || a == playerAssember)))
+				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available || a == playerAssember || a == rocketAssembler)))
 				{
 					recipe.Available = false;
 					clean = false;
@@ -1429,6 +1511,9 @@ namespace Foreman
 			foreach (BeaconPrototype beacon in beacons.Values)
 				beacon.Enabled = beacon.Available;
 			playerAssember.Enabled = true; //its enabled, so it can theoretically be used, but it is set as 'unavailable' so a warning will be issued if you use it.
+
+			rocketAssembler.Enabled = assemblers["rocket-silo"]?.Enabled?? false; //rocket assembler is set to enabled if rocket silo is enabled
+			rocketAssembler.Available = assemblers["rocket-silo"] != null; //override
 		}
 
 		private void CleanupGroups()

@@ -264,6 +264,7 @@ namespace Foreman
 							beacon.Enabled = options.EnabledObjects.Contains(beacon);
 						foreach (Module module in GraphViewer.DCache.Modules.Values)
 							module.Enabled = options.EnabledObjects.Contains(module);
+						GraphViewer.DCache.RocketAssembler.Enabled = GraphViewer.DCache.Assemblers["rocket-silo"]?.Enabled?? false;
 					}
 
 					GraphViewer.LevelOfDetail = options.LevelOfDetail;

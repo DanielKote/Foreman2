@@ -1167,6 +1167,7 @@ namespace Foreman
 				foreach (string name in json["EnabledAssemblers"].Select(t => (string)t).ToList())
 					if (DCache.Assemblers.ContainsKey(name))
 						DCache.Assemblers[name].Enabled = true;
+				DCache.RocketAssembler.Enabled = DCache.Assemblers["rocket-silo"]?.Enabled ?? false;
 
 				foreach (Module module in DCache.Modules.Values)
 					module.Enabled = false;

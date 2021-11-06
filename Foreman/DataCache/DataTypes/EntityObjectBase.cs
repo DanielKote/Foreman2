@@ -10,7 +10,7 @@ namespace Foreman
 	//heat types add a special 'heat' item to the recipe node they are part of (similar to burner types) -> in fact to simplify things they are handled as a burner with a specific burn item of 'heat'
 	//void are considered as electric types with 0 electricity use
 	public enum EnergySource { Burner, FluidBurner, Electric, Heat, Void }
-	public enum EntityType { Miner, OffshorePump, Assembler, Beacon, Boiler, Generator, BurnerGenerator, Reactor, ERROR }
+	public enum EntityType { Miner, OffshorePump, Assembler, Beacon, Boiler, Generator, BurnerGenerator, Reactor, Rocket, ERROR }
 
 	public interface EntityObjectBase : DataObjectBase
 	{
@@ -47,7 +47,8 @@ namespace Foreman
 
 	internal class EntityObjectBasePrototype : DataObjectBasePrototype, EntityObjectBase
 	{
-		public override bool Available { get { return associatedItems.Any(i => i.productionRecipes.Any(r => r.Available)); } set { } }
+		private bool availableOverride;
+		public override bool Available { get { return availableOverride || associatedItems.Any(i => i.productionRecipes.Any(r => r.Available)); } set { availableOverride = value; } }
 
 		public IReadOnlyCollection<Module> Modules { get { return modules; } }
 		public IReadOnlyCollection<Item> Fuels { get { return fuels; } }
@@ -79,6 +80,8 @@ namespace Foreman
 
 		public EntityObjectBasePrototype(DataCache dCache, string name, string friendlyName, EntityType type, EnergySource source, bool isMissing) : base(dCache, name, friendlyName, "-")
 		{
+			availableOverride = false;
+
 			modules = new HashSet<ModulePrototype>();
 			fuels = new HashSet<ItemPrototype>();
 			associatedItems = new List<ItemPrototype>();
@@ -128,6 +131,7 @@ namespace Foreman
 					case EntityType.Miner: return "Miners";
 					case EntityType.OffshorePump: return "Offshore Pumps";
 					case EntityType.Reactor: return "Reactors";
+					case EntityType.Rocket: return "Rockets";
 					default: return "";
 				}
 			}
@@ -143,6 +147,7 @@ namespace Foreman
 					case EntityType.Miner: return "Miner";
 					case EntityType.OffshorePump: return "Offshore Pump";
 					case EntityType.Reactor: return "Reactor";
+					case EntityType.Rocket: return "Rocket";
 					default: return "";
 				}
 			}

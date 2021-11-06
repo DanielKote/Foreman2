@@ -10,7 +10,7 @@
     },
     {
       "name": "base",
-      "version": "1.1.42"
+      "version": "1.1.45"
     },
     {
       "name": "foremanexport",
@@ -12641,6 +12641,7 @@
       "icon_name": "icon.i.wooden-chest",
       "order": "a[items]-a[wooden-chest]",
       "subgroup": "storage",
+      "stack": 50,
       "localised_name": "Wooden chest"
     },
     {
@@ -12648,6 +12649,7 @@
       "icon_name": "icon.i.iron-chest",
       "order": "a[items]-b[iron-chest]",
       "subgroup": "storage",
+      "stack": 50,
       "localised_name": "Iron chest"
     },
     {
@@ -12655,6 +12657,7 @@
       "icon_name": "icon.i.steel-chest",
       "order": "a[items]-c[steel-chest]",
       "subgroup": "storage",
+      "stack": 50,
       "localised_name": "Steel chest"
     },
     {
@@ -12662,6 +12665,7 @@
       "icon_name": "icon.i.storage-tank",
       "order": "b[fluid]-a[storage-tank]",
       "subgroup": "storage",
+      "stack": 50,
       "localised_name": "Storage tank"
     },
     {
@@ -12669,6 +12673,7 @@
       "icon_name": "icon.i.transport-belt",
       "order": "a[transport-belt]-a[transport-belt]",
       "subgroup": "belt",
+      "stack": 100,
       "localised_name": "Transport belt"
     },
     {
@@ -12676,6 +12681,7 @@
       "icon_name": "icon.i.fast-transport-belt",
       "order": "a[transport-belt]-b[fast-transport-belt]",
       "subgroup": "belt",
+      "stack": 100,
       "localised_name": "Fast transport belt"
     },
     {
@@ -12683,6 +12689,7 @@
       "icon_name": "icon.i.express-transport-belt",
       "order": "a[transport-belt]-c[express-transport-belt]",
       "subgroup": "belt",
+      "stack": 100,
       "localised_name": "Express transport belt"
     },
     {
@@ -12690,6 +12697,7 @@
       "icon_name": "icon.i.underground-belt",
       "order": "b[underground-belt]-a[underground-belt]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Underground belt"
     },
     {
@@ -12697,6 +12705,7 @@
       "icon_name": "icon.i.fast-underground-belt",
       "order": "b[underground-belt]-b[fast-underground-belt]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Fast underground belt"
     },
     {
@@ -12704,6 +12713,7 @@
       "icon_name": "icon.i.express-underground-belt",
       "order": "b[underground-belt]-c[express-underground-belt]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Express underground belt"
     },
     {
@@ -12711,6 +12721,7 @@
       "icon_name": "icon.i.splitter",
       "order": "c[splitter]-a[splitter]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Splitter"
     },
     {
@@ -12718,6 +12729,7 @@
       "icon_name": "icon.i.fast-splitter",
       "order": "c[splitter]-b[fast-splitter]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Fast splitter"
     },
     {
@@ -12725,6 +12737,7 @@
       "icon_name": "icon.i.express-splitter",
       "order": "c[splitter]-c[express-splitter]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Express splitter"
     },
     {
@@ -12732,6 +12745,7 @@
       "icon_name": "icon.i.loader",
       "order": "d[loader]-a[basic-loader]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Loader"
     },
     {
@@ -12739,6 +12753,7 @@
       "icon_name": "icon.i.fast-loader",
       "order": "d[loader]-b[fast-loader]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Fast loader"
     },
     {
@@ -12746,6 +12761,7 @@
       "icon_name": "icon.i.express-loader",
       "order": "d[loader]-c[express-loader]",
       "subgroup": "belt",
+      "stack": 50,
       "localised_name": "Express loader"
     },
     {
@@ -12753,6 +12769,7 @@
       "icon_name": "icon.i.burner-inserter",
       "order": "a[burner-inserter]",
       "subgroup": "inserter",
+      "stack": 50,
       "localised_name": "Burner inserter"
     },
     {
@@ -12760,6 +12777,7 @@
       "icon_name": "icon.i.inserter",
       "order": "b[inserter]",
       "subgroup": "inserter",
+      "stack": 50,
       "localised_name": "Inserter"
     },
     {
@@ -12767,6 +12785,7 @@
       "icon_name": "icon.i.long-handed-inserter",
       "order": "c[long-handed-inserter]",
       "subgroup": "inserter",
+      "stack": 50,
       "localised_name": "Long-handed inserter"
     },
     {
@@ -12774,6 +12793,7 @@
       "icon_name": "icon.i.fast-inserter",
       "order": "d[fast-inserter]",
       "subgroup": "inserter",
+      "stack": 50,
       "localised_name": "Fast inserter"
     },
     {
@@ -12781,6 +12801,7 @@
       "icon_name": "icon.i.filter-inserter",
       "order": "e[filter-inserter]",
       "subgroup": "inserter",
+      "stack": 50,
       "localised_name": "Filter inserter"
     },
     {
@@ -12788,6 +12809,7 @@
       "icon_name": "icon.i.stack-inserter",
       "order": "f[stack-inserter]",
       "subgroup": "inserter",
+      "stack": 50,
       "localised_name": "Stack inserter"
     },
     {
@@ -12795,6 +12817,7 @@
       "icon_name": "icon.i.stack-filter-inserter",
       "order": "g[stack-filter-inserter]",
       "subgroup": "inserter",
+      "stack": 50,
       "localised_name": "Stack filter inserter"
     },
     {
@@ -12802,6 +12825,7 @@
       "icon_name": "icon.i.small-electric-pole",
       "order": "a[energy]-a[small-electric-pole]",
       "subgroup": "energy-pipe-distribution",
+      "stack": 50,
       "localised_name": "Small electric pole"
     },
     {
@@ -12809,6 +12833,7 @@
       "icon_name": "icon.i.medium-electric-pole",
       "order": "a[energy]-b[medium-electric-pole]",
       "subgroup": "energy-pipe-distribution",
+      "stack": 50,
       "localised_name": "Medium electric pole"
     },
     {
@@ -12816,6 +12841,7 @@
       "icon_name": "icon.i.big-electric-pole",
       "order": "a[energy]-c[big-electric-pole]",
       "subgroup": "energy-pipe-distribution",
+      "stack": 50,
       "localised_name": "Big electric pole"
     },
     {
@@ -12823,6 +12849,7 @@
       "icon_name": "icon.i.substation",
       "order": "a[energy]-d[substation]",
       "subgroup": "energy-pipe-distribution",
+      "stack": 50,
       "localised_name": "Substation"
     },
     {
@@ -12830,6 +12857,7 @@
       "icon_name": "icon.i.pipe",
       "order": "a[pipe]-a[pipe]",
       "subgroup": "energy-pipe-distribution",
+      "stack": 100,
       "localised_name": "Pipe"
     },
     {
@@ -12837,6 +12865,7 @@
       "icon_name": "icon.i.pipe-to-ground",
       "order": "a[pipe]-b[pipe-to-ground]",
       "subgroup": "energy-pipe-distribution",
+      "stack": 50,
       "localised_name": "Pipe to ground"
     },
     {
@@ -12844,6 +12873,7 @@
       "icon_name": "icon.i.pump",
       "order": "b[pipe]-c[pump]",
       "subgroup": "energy-pipe-distribution",
+      "stack": 50,
       "localised_name": "Pump"
     },
     {
@@ -12851,6 +12881,7 @@
       "icon_name": "icon.i.rail",
       "order": "a[train-system]-a[rail]",
       "subgroup": "train-transport",
+      "stack": 100,
       "localised_name": "Rail"
     },
     {
@@ -12858,6 +12889,7 @@
       "icon_name": "icon.i.train-stop",
       "order": "a[train-system]-c[train-stop]",
       "subgroup": "train-transport",
+      "stack": 10,
       "localised_name": "Train stop"
     },
     {
@@ -12865,6 +12897,7 @@
       "icon_name": "icon.i.rail-signal",
       "order": "a[train-system]-d[rail-signal]",
       "subgroup": "train-transport",
+      "stack": 50,
       "localised_name": "Rail signal"
     },
     {
@@ -12872,6 +12905,7 @@
       "icon_name": "icon.i.rail-chain-signal",
       "order": "a[train-system]-e[rail-signal-chain]",
       "subgroup": "train-transport",
+      "stack": 50,
       "localised_name": "Rail chain signal"
     },
     {
@@ -12879,6 +12913,7 @@
       "icon_name": "icon.i.locomotive",
       "order": "a[train-system]-f[locomotive]",
       "subgroup": "train-transport",
+      "stack": 5,
       "localised_name": "Locomotive"
     },
     {
@@ -12886,6 +12921,7 @@
       "icon_name": "icon.i.cargo-wagon",
       "order": "a[train-system]-g[cargo-wagon]",
       "subgroup": "train-transport",
+      "stack": 5,
       "localised_name": "Cargo wagon"
     },
     {
@@ -12893,6 +12929,7 @@
       "icon_name": "icon.i.fluid-wagon",
       "order": "a[train-system]-h[fluid-wagon]",
       "subgroup": "train-transport",
+      "stack": 5,
       "localised_name": "Fluid wagon"
     },
     {
@@ -12900,6 +12937,7 @@
       "icon_name": "icon.i.artillery-wagon",
       "order": "a[train-system]-i[artillery-wagon]",
       "subgroup": "train-transport",
+      "stack": 5,
       "localised_name": "Artillery wagon"
     },
     {
@@ -12907,6 +12945,7 @@
       "icon_name": "icon.i.car",
       "order": "b[personal-transport]-a[car]",
       "subgroup": "transport",
+      "stack": 1,
       "localised_name": "Car"
     },
     {
@@ -12914,6 +12953,7 @@
       "icon_name": "icon.i.tank",
       "order": "b[personal-transport]-b[tank]",
       "subgroup": "transport",
+      "stack": 1,
       "localised_name": "Tank"
     },
     {
@@ -12921,6 +12961,7 @@
       "icon_name": "icon.i.spidertron",
       "order": "b[personal-transport]-c[spidertron]-a[spider]",
       "subgroup": "transport",
+      "stack": 1,
       "localised_name": "Spidertron"
     },
     {
@@ -12928,6 +12969,7 @@
       "icon_name": "icon.i.spidertron-remote",
       "order": "b[personal-transport]-c[spidertron]-b[remote]",
       "subgroup": "transport",
+      "stack": 1,
       "localised_name": "Spidertron remote"
     },
     {
@@ -12935,6 +12977,7 @@
       "icon_name": "icon.i.logistic-robot",
       "order": "a[robot]-a[logistic-robot]",
       "subgroup": "logistic-network",
+      "stack": 50,
       "localised_name": "Logistic robot"
     },
     {
@@ -12942,6 +12985,7 @@
       "icon_name": "icon.i.construction-robot",
       "order": "a[robot]-b[construction-robot]",
       "subgroup": "logistic-network",
+      "stack": 50,
       "localised_name": "Construction robot"
     },
     {
@@ -12949,6 +12993,7 @@
       "icon_name": "icon.i.logistic-chest-active-provider",
       "order": "b[storage]-c[logistic-chest-active-provider]",
       "subgroup": "logistic-network",
+      "stack": 50,
       "localised_name": "Active provider chest"
     },
     {
@@ -12956,6 +13001,7 @@
       "icon_name": "icon.i.logistic-chest-passive-provider",
       "order": "b[storage]-c[logistic-chest-passive-provider]",
       "subgroup": "logistic-network",
+      "stack": 50,
       "localised_name": "Passive provider chest"
     },
     {
@@ -12963,6 +13009,7 @@
       "icon_name": "icon.i.logistic-chest-storage",
       "order": "b[storage]-c[logistic-chest-storage]",
       "subgroup": "logistic-network",
+      "stack": 50,
       "localised_name": "Storage chest"
     },
     {
@@ -12970,6 +13017,7 @@
       "icon_name": "icon.i.logistic-chest-buffer",
       "order": "b[storage]-d[logistic-chest-buffer]",
       "subgroup": "logistic-network",
+      "stack": 50,
       "localised_name": "Buffer chest"
     },
     {
@@ -12977,6 +13025,7 @@
       "icon_name": "icon.i.logistic-chest-requester",
       "order": "b[storage]-e[logistic-chest-requester]",
       "subgroup": "logistic-network",
+      "stack": 50,
       "localised_name": "Requester chest"
     },
     {
@@ -12984,6 +13033,7 @@
       "icon_name": "icon.i.roboport",
       "order": "c[signal]-a[roboport]",
       "subgroup": "logistic-network",
+      "stack": 10,
       "localised_name": "Roboport"
     },
     {
@@ -12991,6 +13041,7 @@
       "icon_name": "icon.i.small-lamp",
       "order": "a[light]-a[small-lamp]",
       "subgroup": "circuit-network",
+      "stack": 50,
       "localised_name": "Lamp"
     },
     {
@@ -12998,6 +13049,7 @@
       "icon_name": "icon.i.red-wire",
       "order": "b[wires]-a[red-wire]",
       "subgroup": "circuit-network",
+      "stack": 200,
       "localised_name": "Red wire"
     },
     {
@@ -13005,6 +13057,7 @@
       "icon_name": "icon.i.green-wire",
       "order": "b[wires]-b[green-wire]",
       "subgroup": "circuit-network",
+      "stack": 200,
       "localised_name": "Green wire"
     },
     {
@@ -13012,6 +13065,7 @@
       "icon_name": "icon.i.arithmetic-combinator",
       "order": "c[combinators]-a[arithmetic-combinator]",
       "subgroup": "circuit-network",
+      "stack": 50,
       "localised_name": "Arithmetic combinator"
     },
     {
@@ -13019,6 +13073,7 @@
       "icon_name": "icon.i.decider-combinator",
       "order": "c[combinators]-b[decider-combinator]",
       "subgroup": "circuit-network",
+      "stack": 50,
       "localised_name": "Decider combinator"
     },
     {
@@ -13026,6 +13081,7 @@
       "icon_name": "icon.i.constant-combinator",
       "order": "c[combinators]-c[constant-combinator]",
       "subgroup": "circuit-network",
+      "stack": 50,
       "localised_name": "Constant combinator"
     },
     {
@@ -13033,6 +13089,7 @@
       "icon_name": "icon.i.power-switch",
       "order": "d[other]-a[power-switch]",
       "subgroup": "circuit-network",
+      "stack": 50,
       "localised_name": "Power switch"
     },
     {
@@ -13040,6 +13097,7 @@
       "icon_name": "icon.i.programmable-speaker",
       "order": "d[other]-b[programmable-speaker]",
       "subgroup": "circuit-network",
+      "stack": 50,
       "localised_name": "Programmable speaker"
     },
     {
@@ -13047,6 +13105,7 @@
       "icon_name": "icon.i.stone-brick",
       "order": "a[stone-brick]",
       "subgroup": "terrain",
+      "stack": 100,
       "localised_name": "Stone brick"
     },
     {
@@ -13054,6 +13113,7 @@
       "icon_name": "icon.i.concrete",
       "order": "b[concrete]-a[plain]",
       "subgroup": "terrain",
+      "stack": 100,
       "localised_name": "Concrete"
     },
     {
@@ -13061,6 +13121,7 @@
       "icon_name": "icon.i.hazard-concrete",
       "order": "b[concrete]-b[hazard]",
       "subgroup": "terrain",
+      "stack": 100,
       "localised_name": "Hazard concrete"
     },
     {
@@ -13068,6 +13129,7 @@
       "icon_name": "icon.i.refined-concrete",
       "order": "b[concrete]-c[refined]",
       "subgroup": "terrain",
+      "stack": 100,
       "localised_name": "Refined concrete"
     },
     {
@@ -13075,6 +13137,7 @@
       "icon_name": "icon.i.refined-hazard-concrete",
       "order": "b[concrete]-d[refined-hazard]",
       "subgroup": "terrain",
+      "stack": 100,
       "localised_name": "Refined hazard concrete"
     },
     {
@@ -13082,6 +13145,7 @@
       "icon_name": "icon.i.landfill",
       "order": "c[landfill]-a[dirt]",
       "subgroup": "terrain",
+      "stack": 100,
       "localised_name": "Landfill"
     },
     {
@@ -13089,6 +13153,7 @@
       "icon_name": "icon.i.cliff-explosives",
       "order": "d[cliff-explosives]",
       "subgroup": "terrain",
+      "stack": 20,
       "localised_name": "Cliff explosives"
     },
     {
@@ -13096,6 +13161,7 @@
       "icon_name": "icon.i.dummy-steel-axe",
       "order": "a[mining]-b[steel-axe]",
       "subgroup": "tool",
+      "stack": 1,
       "localised_name": "item-name.dummy-steel-axe"
     },
     {
@@ -13103,6 +13169,7 @@
       "icon_name": "icon.i.repair-pack",
       "order": "b[repair]-a[repair-pack]",
       "subgroup": "tool",
+      "stack": 100,
       "localised_name": "Repair pack"
     },
     {
@@ -13110,6 +13177,7 @@
       "icon_name": "icon.i.blueprint",
       "order": "c[automated-construction]-a[blueprint]",
       "subgroup": "tool",
+      "stack": 1,
       "localised_name": "Blueprint"
     },
     {
@@ -13117,6 +13185,7 @@
       "icon_name": "icon.i.deconstruction-planner",
       "order": "c[automated-construction]-b[deconstruction-planner]",
       "subgroup": "tool",
+      "stack": 1,
       "localised_name": "Deconstruction planner"
     },
     {
@@ -13124,6 +13193,7 @@
       "icon_name": "icon.i.upgrade-planner",
       "order": "c[automated-construction]-c[upgrade-planner]",
       "subgroup": "tool",
+      "stack": 1,
       "localised_name": "Upgrade planner"
     },
     {
@@ -13131,6 +13201,7 @@
       "icon_name": "icon.i.blueprint-book",
       "order": "c[automated-construction]-d[blueprint-book]",
       "subgroup": "tool",
+      "stack": 1,
       "localised_name": "Blueprint book"
     },
     {
@@ -13138,6 +13209,7 @@
       "icon_name": "icon.i.copy-paste-tool",
       "order": "c[automated-construction]-x",
       "subgroup": "tool",
+      "stack": 1,
       "localised_name": "Copy paste tool"
     },
     {
@@ -13145,6 +13217,7 @@
       "icon_name": "icon.i.cut-paste-tool",
       "order": "c[automated-construction]-x",
       "subgroup": "tool",
+      "stack": 1,
       "localised_name": "Cut paste tool"
     },
     {
@@ -13152,6 +13225,7 @@
       "icon_name": "icon.i.boiler",
       "order": "b[steam-power]-a[boiler]",
       "subgroup": "energy",
+      "stack": 50,
       "localised_name": "Boiler"
     },
     {
@@ -13159,6 +13233,7 @@
       "icon_name": "icon.i.steam-engine",
       "order": "b[steam-power]-b[steam-engine]",
       "subgroup": "energy",
+      "stack": 10,
       "localised_name": "Steam engine"
     },
     {
@@ -13166,6 +13241,7 @@
       "icon_name": "icon.i.solar-panel",
       "order": "d[solar-panel]-a[solar-panel]",
       "subgroup": "energy",
+      "stack": 50,
       "localised_name": "Solar panel"
     },
     {
@@ -13173,6 +13249,7 @@
       "icon_name": "icon.i.accumulator",
       "order": "e[accumulator]-a[accumulator]",
       "subgroup": "energy",
+      "stack": 50,
       "localised_name": "Accumulator"
     },
     {
@@ -13180,6 +13257,7 @@
       "icon_name": "icon.i.nuclear-reactor",
       "order": "f[nuclear-energy]-a[reactor]",
       "subgroup": "energy",
+      "stack": 10,
       "localised_name": "Nuclear reactor"
     },
     {
@@ -13187,6 +13265,7 @@
       "icon_name": "icon.i.heat-pipe",
       "order": "f[nuclear-energy]-b[heat-pipe]",
       "subgroup": "energy",
+      "stack": 50,
       "localised_name": "Heat pipe"
     },
     {
@@ -13194,6 +13273,7 @@
       "icon_name": "icon.i.heat-exchanger",
       "order": "f[nuclear-energy]-c[heat-exchanger]",
       "subgroup": "energy",
+      "stack": 50,
       "localised_name": "Heat exchanger"
     },
     {
@@ -13201,6 +13281,7 @@
       "icon_name": "icon.i.steam-turbine",
       "order": "f[nuclear-energy]-d[steam-turbine]",
       "subgroup": "energy",
+      "stack": 10,
       "localised_name": "Steam turbine"
     },
     {
@@ -13208,6 +13289,7 @@
       "icon_name": "icon.i.burner-mining-drill",
       "order": "a[items]-a[burner-mining-drill]",
       "subgroup": "extraction-machine",
+      "stack": 50,
       "localised_name": "Burner mining drill"
     },
     {
@@ -13215,6 +13297,7 @@
       "icon_name": "icon.i.electric-mining-drill",
       "order": "a[items]-b[electric-mining-drill]",
       "subgroup": "extraction-machine",
+      "stack": 50,
       "localised_name": "Electric mining drill"
     },
     {
@@ -13222,6 +13305,7 @@
       "icon_name": "icon.i.offshore-pump",
       "order": "b[fluids]-a[offshore-pump]",
       "subgroup": "extraction-machine",
+      "stack": 20,
       "localised_name": "Offshore pump"
     },
     {
@@ -13229,6 +13313,7 @@
       "icon_name": "icon.i.pumpjack",
       "order": "b[fluids]-b[pumpjack]",
       "subgroup": "extraction-machine",
+      "stack": 20,
       "localised_name": "Pumpjack"
     },
     {
@@ -13236,6 +13321,7 @@
       "icon_name": "icon.i.stone-furnace",
       "order": "a[stone-furnace]",
       "subgroup": "smelting-machine",
+      "stack": 50,
       "localised_name": "Stone furnace"
     },
     {
@@ -13243,6 +13329,7 @@
       "icon_name": "icon.i.steel-furnace",
       "order": "b[steel-furnace]",
       "subgroup": "smelting-machine",
+      "stack": 50,
       "localised_name": "Steel furnace"
     },
     {
@@ -13250,6 +13337,7 @@
       "icon_name": "icon.i.electric-furnace",
       "order": "c[electric-furnace]",
       "subgroup": "smelting-machine",
+      "stack": 50,
       "localised_name": "Electric furnace"
     },
     {
@@ -13257,6 +13345,7 @@
       "icon_name": "icon.i.assembling-machine-1",
       "order": "a[assembling-machine-1]",
       "subgroup": "production-machine",
+      "stack": 50,
       "localised_name": "Assembling machine 1"
     },
     {
@@ -13264,6 +13353,7 @@
       "icon_name": "icon.i.assembling-machine-2",
       "order": "b[assembling-machine-2]",
       "subgroup": "production-machine",
+      "stack": 50,
       "localised_name": "Assembling machine 2"
     },
     {
@@ -13271,6 +13361,7 @@
       "icon_name": "icon.i.assembling-machine-3",
       "order": "c[assembling-machine-3]",
       "subgroup": "production-machine",
+      "stack": 50,
       "localised_name": "Assembling machine 3"
     },
     {
@@ -13278,6 +13369,7 @@
       "icon_name": "icon.i.oil-refinery",
       "order": "d[refinery]",
       "subgroup": "production-machine",
+      "stack": 10,
       "localised_name": "Oil refinery"
     },
     {
@@ -13285,6 +13377,7 @@
       "icon_name": "icon.i.chemical-plant",
       "order": "e[chemical-plant]",
       "subgroup": "production-machine",
+      "stack": 10,
       "localised_name": "Chemical plant"
     },
     {
@@ -13292,6 +13385,7 @@
       "icon_name": "icon.i.centrifuge",
       "order": "g[centrifuge]",
       "subgroup": "production-machine",
+      "stack": 50,
       "localised_name": "Centrifuge"
     },
     {
@@ -13299,6 +13393,7 @@
       "icon_name": "icon.i.lab",
       "order": "g[lab]",
       "subgroup": "production-machine",
+      "stack": 10,
       "localised_name": "Lab"
     },
     {
@@ -13306,6 +13401,7 @@
       "icon_name": "icon.i.beacon",
       "order": "a[beacon]",
       "subgroup": "module",
+      "stack": 10,
       "localised_name": "Beacon"
     },
     {
@@ -13313,6 +13409,7 @@
       "icon_name": "icon.i.speed-module",
       "order": "a[speed]-a[speed-module-1]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Speed module"
     },
     {
@@ -13320,6 +13417,7 @@
       "icon_name": "icon.i.speed-module-2",
       "order": "a[speed]-b[speed-module-2]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Speed module 2"
     },
     {
@@ -13327,6 +13425,7 @@
       "icon_name": "icon.i.speed-module-3",
       "order": "a[speed]-c[speed-module-3]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Speed module 3"
     },
     {
@@ -13334,6 +13433,7 @@
       "icon_name": "icon.i.effectivity-module",
       "order": "c[effectivity]-a[effectivity-module-1]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Efficiency module"
     },
     {
@@ -13341,6 +13441,7 @@
       "icon_name": "icon.i.effectivity-module-2",
       "order": "c[effectivity]-b[effectivity-module-2]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Efficiency module 2"
     },
     {
@@ -13348,6 +13449,7 @@
       "icon_name": "icon.i.effectivity-module-3",
       "order": "c[effectivity]-c[effectivity-module-3]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Efficiency module 3"
     },
     {
@@ -13355,6 +13457,7 @@
       "icon_name": "icon.i.productivity-module",
       "order": "c[productivity]-a[productivity-module-1]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Productivity module"
     },
     {
@@ -13362,6 +13465,7 @@
       "icon_name": "icon.i.productivity-module-2",
       "order": "c[productivity]-b[productivity-module-2]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Productivity module 2"
     },
     {
@@ -13369,6 +13473,7 @@
       "icon_name": "icon.i.productivity-module-3",
       "order": "c[productivity]-c[productivity-module-3]",
       "subgroup": "module",
+      "stack": 50,
       "localised_name": "Productivity module 3"
     },
     {
@@ -13376,6 +13481,7 @@
       "icon_name": "icon.i.rocket-silo",
       "order": "e[rocket-silo]",
       "subgroup": "space-related",
+      "stack": 1,
       "localised_name": "Rocket silo"
     },
     {
@@ -13383,6 +13489,14 @@
       "icon_name": "icon.i.satellite",
       "order": "m[satellite]",
       "subgroup": "space-related",
+      "stack": 1,
+      "launch_products": [
+        {
+          "name": "space-science-pack",
+          "type": "item",
+          "amount": 1000
+        }
+      ],
       "localised_name": "Satellite"
     },
     {
@@ -13390,6 +13504,7 @@
       "icon_name": "icon.i.wood",
       "order": "a[wood]",
       "subgroup": "raw-resource",
+      "stack": 100,
       "fuel_category": "chemical",
       "fuel_value": 2000000,
       "pollution_multiplier": 1,
@@ -13400,6 +13515,7 @@
       "icon_name": "icon.i.coal",
       "order": "b[coal]",
       "subgroup": "raw-resource",
+      "stack": 50,
       "fuel_category": "chemical",
       "fuel_value": 4000000,
       "pollution_multiplier": 1,
@@ -13410,6 +13526,7 @@
       "icon_name": "icon.i.stone",
       "order": "d[stone]",
       "subgroup": "raw-resource",
+      "stack": 50,
       "localised_name": "Stone"
     },
     {
@@ -13417,6 +13534,7 @@
       "icon_name": "icon.i.iron-ore",
       "order": "e[iron-ore]",
       "subgroup": "raw-resource",
+      "stack": 50,
       "localised_name": "Iron ore"
     },
     {
@@ -13424,6 +13542,7 @@
       "icon_name": "icon.i.copper-ore",
       "order": "f[copper-ore]",
       "subgroup": "raw-resource",
+      "stack": 50,
       "localised_name": "Copper ore"
     },
     {
@@ -13431,6 +13550,7 @@
       "icon_name": "icon.i.uranium-ore",
       "order": "g[uranium-ore]",
       "subgroup": "raw-resource",
+      "stack": 50,
       "localised_name": "Uranium ore"
     },
     {
@@ -13438,6 +13558,7 @@
       "icon_name": "icon.i.raw-fish",
       "order": "h[raw-fish]",
       "subgroup": "raw-resource",
+      "stack": 100,
       "localised_name": "Raw fish"
     },
     {
@@ -13445,6 +13566,7 @@
       "icon_name": "icon.i.iron-plate",
       "order": "b[iron-plate]",
       "subgroup": "raw-material",
+      "stack": 100,
       "localised_name": "Iron plate"
     },
     {
@@ -13452,6 +13574,7 @@
       "icon_name": "icon.i.copper-plate",
       "order": "c[copper-plate]",
       "subgroup": "raw-material",
+      "stack": 100,
       "localised_name": "Copper plate"
     },
     {
@@ -13459,6 +13582,7 @@
       "icon_name": "icon.i.solid-fuel",
       "order": "c[solid-fuel]",
       "subgroup": "raw-material",
+      "stack": 50,
       "fuel_category": "chemical",
       "fuel_value": 12000000,
       "pollution_multiplier": 1,
@@ -13469,6 +13593,7 @@
       "icon_name": "icon.i.steel-plate",
       "order": "d[steel-plate]",
       "subgroup": "raw-material",
+      "stack": 100,
       "localised_name": "Steel plate"
     },
     {
@@ -13476,6 +13601,7 @@
       "icon_name": "icon.i.plastic-bar",
       "order": "f[plastic-bar]",
       "subgroup": "raw-material",
+      "stack": 100,
       "localised_name": "Plastic bar"
     },
     {
@@ -13483,6 +13609,7 @@
       "icon_name": "icon.i.sulfur",
       "order": "g[sulfur]",
       "subgroup": "raw-material",
+      "stack": 50,
       "localised_name": "Sulfur"
     },
     {
@@ -13490,6 +13617,7 @@
       "icon_name": "icon.i.battery",
       "order": "h[battery]",
       "subgroup": "raw-material",
+      "stack": 200,
       "localised_name": "Battery"
     },
     {
@@ -13497,6 +13625,7 @@
       "icon_name": "icon.i.explosives",
       "order": "j[explosives]",
       "subgroup": "raw-material",
+      "stack": 50,
       "localised_name": "Explosives"
     },
     {
@@ -13504,6 +13633,7 @@
       "icon_name": "icon.i.crude-oil-barrel",
       "order": "b[crude-oil-barrel]",
       "subgroup": "barrel",
+      "stack": 10,
       "localised_name": "Crude oil barrel"
     },
     {
@@ -13511,6 +13641,7 @@
       "icon_name": "icon.i.heavy-oil-barrel",
       "order": "b[heavy-oil-barrel]",
       "subgroup": "barrel",
+      "stack": 10,
       "localised_name": "Heavy oil barrel"
     },
     {
@@ -13518,6 +13649,7 @@
       "icon_name": "icon.i.light-oil-barrel",
       "order": "b[light-oil-barrel]",
       "subgroup": "barrel",
+      "stack": 10,
       "localised_name": "Light oil barrel"
     },
     {
@@ -13525,6 +13657,7 @@
       "icon_name": "icon.i.lubricant-barrel",
       "order": "b[lubricant-barrel]",
       "subgroup": "barrel",
+      "stack": 10,
       "localised_name": "Lubricant barrel"
     },
     {
@@ -13532,6 +13665,7 @@
       "icon_name": "icon.i.petroleum-gas-barrel",
       "order": "b[petroleum-gas-barrel]",
       "subgroup": "barrel",
+      "stack": 10,
       "localised_name": "Petroleum gas barrel"
     },
     {
@@ -13539,6 +13673,7 @@
       "icon_name": "icon.i.sulfuric-acid-barrel",
       "order": "b[sulfuric-acid-barrel]",
       "subgroup": "barrel",
+      "stack": 10,
       "localised_name": "Sulfuric acid barrel"
     },
     {
@@ -13546,6 +13681,7 @@
       "icon_name": "icon.i.water-barrel",
       "order": "b[water-barrel]",
       "subgroup": "barrel",
+      "stack": 10,
       "localised_name": "Water barrel"
     },
     {
@@ -13553,6 +13689,7 @@
       "icon_name": "icon.i.copper-cable",
       "order": "a[copper-cable]",
       "subgroup": "intermediate-product",
+      "stack": 200,
       "localised_name": "Copper cable"
     },
     {
@@ -13560,6 +13697,7 @@
       "icon_name": "icon.i.iron-stick",
       "order": "b[iron-stick]",
       "subgroup": "intermediate-product",
+      "stack": 100,
       "localised_name": "Iron stick"
     },
     {
@@ -13567,6 +13705,7 @@
       "icon_name": "icon.i.iron-gear-wheel",
       "order": "c[iron-gear-wheel]",
       "subgroup": "intermediate-product",
+      "stack": 100,
       "localised_name": "Iron gear wheel"
     },
     {
@@ -13574,6 +13713,7 @@
       "icon_name": "icon.i.empty-barrel",
       "order": "d[empty-barrel]",
       "subgroup": "intermediate-product",
+      "stack": 10,
       "localised_name": "Empty barrel"
     },
     {
@@ -13581,6 +13721,7 @@
       "icon_name": "icon.i.electronic-circuit",
       "order": "e[electronic-circuit]",
       "subgroup": "intermediate-product",
+      "stack": 200,
       "localised_name": "Electronic circuit"
     },
     {
@@ -13588,6 +13729,7 @@
       "icon_name": "icon.i.advanced-circuit",
       "order": "f[advanced-circuit]",
       "subgroup": "intermediate-product",
+      "stack": 200,
       "localised_name": "Advanced circuit"
     },
     {
@@ -13595,6 +13737,7 @@
       "icon_name": "icon.i.processing-unit",
       "order": "g[processing-unit]",
       "subgroup": "intermediate-product",
+      "stack": 100,
       "localised_name": "Processing unit"
     },
     {
@@ -13602,6 +13745,7 @@
       "icon_name": "icon.i.engine-unit",
       "order": "h[engine-unit]",
       "subgroup": "intermediate-product",
+      "stack": 50,
       "localised_name": "Engine unit"
     },
     {
@@ -13609,6 +13753,7 @@
       "icon_name": "icon.i.electric-engine-unit",
       "order": "i[electric-engine-unit]",
       "subgroup": "intermediate-product",
+      "stack": 50,
       "localised_name": "Electric engine unit"
     },
     {
@@ -13616,6 +13761,7 @@
       "icon_name": "icon.i.flying-robot-frame",
       "order": "l[flying-robot-frame]",
       "subgroup": "intermediate-product",
+      "stack": 50,
       "localised_name": "Flying robot frame"
     },
     {
@@ -13623,6 +13769,7 @@
       "icon_name": "icon.i.rocket-control-unit",
       "order": "n[rocket-control-unit]",
       "subgroup": "intermediate-product",
+      "stack": 10,
       "localised_name": "Rocket control unit"
     },
     {
@@ -13630,6 +13777,7 @@
       "icon_name": "icon.i.low-density-structure",
       "order": "o[low-density-structure]",
       "subgroup": "intermediate-product",
+      "stack": 10,
       "localised_name": "Low density structure"
     },
     {
@@ -13637,6 +13785,7 @@
       "icon_name": "icon.i.rocket-fuel",
       "order": "p[rocket-fuel]",
       "subgroup": "intermediate-product",
+      "stack": 10,
       "fuel_category": "chemical",
       "fuel_value": 100000000,
       "pollution_multiplier": 1,
@@ -13647,6 +13796,7 @@
       "icon_name": "icon.i.rocket-part",
       "order": "q[rocket-part]",
       "subgroup": "intermediate-product",
+      "stack": 5,
       "localised_name": "Rocket part"
     },
     {
@@ -13654,6 +13804,7 @@
       "icon_name": "icon.i.nuclear-fuel",
       "order": "q[uranium-rocket-fuel]",
       "subgroup": "intermediate-product",
+      "stack": 1,
       "fuel_category": "chemical",
       "fuel_value": 1210000000,
       "pollution_multiplier": 1,
@@ -13664,6 +13815,7 @@
       "icon_name": "icon.i.uranium-235",
       "order": "r[uranium-235]",
       "subgroup": "intermediate-product",
+      "stack": 100,
       "localised_name": "Uranium-235"
     },
     {
@@ -13671,6 +13823,7 @@
       "icon_name": "icon.i.uranium-238",
       "order": "r[uranium-238]",
       "subgroup": "intermediate-product",
+      "stack": 100,
       "localised_name": "Uranium-238"
     },
     {
@@ -13678,6 +13831,7 @@
       "icon_name": "icon.i.uranium-fuel-cell",
       "order": "r[uranium-processing]-a[uranium-fuel-cell]",
       "subgroup": "intermediate-product",
+      "stack": 50,
       "fuel_category": "nuclear",
       "fuel_value": 8000000000,
       "pollution_multiplier": 1,
@@ -13689,6 +13843,7 @@
       "icon_name": "icon.i.used-up-uranium-fuel-cell",
       "order": "r[used-up-uranium-fuel-cell]",
       "subgroup": "intermediate-product",
+      "stack": 50,
       "localised_name": "Used-up uranium fuel cell"
     },
     {
@@ -13696,6 +13851,7 @@
       "icon_name": "icon.i.automation-science-pack",
       "order": "a[automation-science-pack]",
       "subgroup": "science-pack",
+      "stack": 200,
       "localised_name": "Automation science pack"
     },
     {
@@ -13703,6 +13859,7 @@
       "icon_name": "icon.i.logistic-science-pack",
       "order": "b[logistic-science-pack]",
       "subgroup": "science-pack",
+      "stack": 200,
       "localised_name": "Logistic science pack"
     },
     {
@@ -13710,6 +13867,7 @@
       "icon_name": "icon.i.military-science-pack",
       "order": "c[military-science-pack]",
       "subgroup": "science-pack",
+      "stack": 200,
       "localised_name": "Military science pack"
     },
     {
@@ -13717,6 +13875,7 @@
       "icon_name": "icon.i.chemical-science-pack",
       "order": "d[chemical-science-pack]",
       "subgroup": "science-pack",
+      "stack": 200,
       "localised_name": "Chemical science pack"
     },
     {
@@ -13724,6 +13883,7 @@
       "icon_name": "icon.i.production-science-pack",
       "order": "e[production-science-pack]",
       "subgroup": "science-pack",
+      "stack": 200,
       "localised_name": "Production science pack"
     },
     {
@@ -13731,6 +13891,7 @@
       "icon_name": "icon.i.utility-science-pack",
       "order": "f[utility-science-pack]",
       "subgroup": "science-pack",
+      "stack": 200,
       "localised_name": "Utility science pack"
     },
     {
@@ -13738,6 +13899,14 @@
       "icon_name": "icon.i.space-science-pack",
       "order": "g[space-science-pack]",
       "subgroup": "science-pack",
+      "stack": 2000,
+      "launch_products": [
+        {
+          "name": "raw-fish",
+          "type": "item",
+          "amount": 1
+        }
+      ],
       "localised_name": "Space science pack"
     },
     {
@@ -13745,6 +13914,7 @@
       "icon_name": "icon.i.coin",
       "order": "y",
       "subgroup": "science-pack",
+      "stack": 100000,
       "localised_name": "Coin"
     },
     {
@@ -13752,6 +13922,7 @@
       "icon_name": "icon.i.pistol",
       "order": "a[basic-clips]-a[pistol]",
       "subgroup": "gun",
+      "stack": 5,
       "localised_name": "Pistol"
     },
     {
@@ -13759,6 +13930,7 @@
       "icon_name": "icon.i.submachine-gun",
       "order": "a[basic-clips]-b[submachine-gun]",
       "subgroup": "gun",
+      "stack": 5,
       "localised_name": "Submachine gun"
     },
     {
@@ -13766,6 +13938,7 @@
       "icon_name": "icon.i.tank-machine-gun",
       "order": "a[basic-clips]-b[tank-machine-gun]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Vehicle machine gun"
     },
     {
@@ -13773,6 +13946,7 @@
       "icon_name": "icon.i.vehicle-machine-gun",
       "order": "a[basic-clips]-b[vehicle-machine-gun]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Vehicle machine gun"
     },
     {
@@ -13780,6 +13954,7 @@
       "icon_name": "icon.i.tank-flamethrower",
       "order": "b[flamethrower]-b[tank-flamethrower]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Vehicle flamethrower"
     },
     {
@@ -13787,6 +13962,7 @@
       "icon_name": "icon.i.shotgun",
       "order": "b[shotgun]-a[basic]",
       "subgroup": "gun",
+      "stack": 5,
       "localised_name": "Shotgun"
     },
     {
@@ -13794,6 +13970,7 @@
       "icon_name": "icon.i.combat-shotgun",
       "order": "b[shotgun]-a[combat]",
       "subgroup": "gun",
+      "stack": 5,
       "localised_name": "Combat shotgun"
     },
     {
@@ -13801,6 +13978,7 @@
       "icon_name": "icon.i.rocket-launcher",
       "order": "d[rocket-launcher]",
       "subgroup": "gun",
+      "stack": 5,
       "localised_name": "Rocket launcher"
     },
     {
@@ -13808,6 +13986,7 @@
       "icon_name": "icon.i.flamethrower",
       "order": "e[flamethrower]",
       "subgroup": "gun",
+      "stack": 5,
       "localised_name": "Flamethrower"
     },
     {
@@ -13815,6 +13994,7 @@
       "icon_name": "icon.i.land-mine",
       "order": "f[land-mine]",
       "subgroup": "gun",
+      "stack": 100,
       "localised_name": "Land mine"
     },
     {
@@ -13822,6 +14002,7 @@
       "icon_name": "icon.i.artillery-wagon-cannon",
       "order": "z[artillery]-a[cannon]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Artillery cannon"
     },
     {
@@ -13829,6 +14010,7 @@
       "icon_name": "icon.i.spidertron-rocket-launcher-1",
       "order": "z[spider]-a[rocket-launcher]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -13836,6 +14018,7 @@
       "icon_name": "icon.i.spidertron-rocket-launcher-2",
       "order": "z[spider]-a[rocket-launcher]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -13843,6 +14026,7 @@
       "icon_name": "icon.i.spidertron-rocket-launcher-3",
       "order": "z[spider]-a[rocket-launcher]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -13850,6 +14034,7 @@
       "icon_name": "icon.i.spidertron-rocket-launcher-4",
       "order": "z[spider]-a[rocket-launcher]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -13857,6 +14042,7 @@
       "icon_name": "icon.i.tank-cannon",
       "order": "z[tank]-a[cannon]",
       "subgroup": "gun",
+      "stack": 1,
       "localised_name": "Tank cannon"
     },
     {
@@ -13864,6 +14050,7 @@
       "icon_name": "icon.i.firearm-magazine",
       "order": "a[basic-clips]-a[firearm-magazine]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Firearm magazine"
     },
     {
@@ -13871,6 +14058,7 @@
       "icon_name": "icon.i.piercing-rounds-magazine",
       "order": "a[basic-clips]-b[piercing-rounds-magazine]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Piercing rounds magazine"
     },
     {
@@ -13878,6 +14066,7 @@
       "icon_name": "icon.i.uranium-rounds-magazine",
       "order": "a[basic-clips]-c[uranium-rounds-magazine]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Uranium rounds magazine"
     },
     {
@@ -13885,6 +14074,7 @@
       "icon_name": "icon.i.shotgun-shell",
       "order": "b[shotgun]-a[basic]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Shotgun shells"
     },
     {
@@ -13892,6 +14082,7 @@
       "icon_name": "icon.i.piercing-shotgun-shell",
       "order": "b[shotgun]-b[piercing]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Piercing shotgun shells"
     },
     {
@@ -13899,6 +14090,7 @@
       "icon_name": "icon.i.cannon-shell",
       "order": "d[cannon-shell]-a[basic]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Cannon shell"
     },
     {
@@ -13906,6 +14098,7 @@
       "icon_name": "icon.i.explosive-cannon-shell",
       "order": "d[cannon-shell]-c[explosive]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Explosive cannon shell"
     },
     {
@@ -13913,6 +14106,7 @@
       "icon_name": "icon.i.uranium-cannon-shell",
       "order": "d[cannon-shell]-c[uranium]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Uranium cannon shell"
     },
     {
@@ -13920,6 +14114,7 @@
       "icon_name": "icon.i.explosive-uranium-cannon-shell",
       "order": "d[explosive-cannon-shell]-c[uranium]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Explosive uranium cannon shell"
     },
     {
@@ -13927,6 +14122,7 @@
       "icon_name": "icon.i.artillery-shell",
       "order": "d[explosive-cannon-shell]-d[artillery]",
       "subgroup": "ammo",
+      "stack": 1,
       "localised_name": "Artillery shell"
     },
     {
@@ -13934,6 +14130,7 @@
       "icon_name": "icon.i.rocket",
       "order": "d[rocket-launcher]-a[basic]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Rocket"
     },
     {
@@ -13941,6 +14138,7 @@
       "icon_name": "icon.i.explosive-rocket",
       "order": "d[rocket-launcher]-b[explosive]",
       "subgroup": "ammo",
+      "stack": 200,
       "localised_name": "Explosive rocket"
     },
     {
@@ -13948,6 +14146,7 @@
       "icon_name": "icon.i.atomic-bomb",
       "order": "d[rocket-launcher]-c[atomic-bomb]",
       "subgroup": "ammo",
+      "stack": 10,
       "localised_name": "Atomic bomb"
     },
     {
@@ -13955,6 +14154,7 @@
       "icon_name": "icon.i.flamethrower-ammo",
       "order": "e[flamethrower]",
       "subgroup": "ammo",
+      "stack": 100,
       "localised_name": "Flamethrower ammo"
     },
     {
@@ -13962,6 +14162,7 @@
       "icon_name": "icon.i.grenade",
       "order": "a[grenade]-a[normal]",
       "subgroup": "capsule",
+      "stack": 100,
       "localised_name": "Grenade"
     },
     {
@@ -13969,6 +14170,7 @@
       "icon_name": "icon.i.cluster-grenade",
       "order": "a[grenade]-b[cluster]",
       "subgroup": "capsule",
+      "stack": 100,
       "localised_name": "Cluster grenade"
     },
     {
@@ -13976,6 +14178,7 @@
       "icon_name": "icon.i.poison-capsule",
       "order": "b[poison-capsule]",
       "subgroup": "capsule",
+      "stack": 100,
       "localised_name": "Poison capsule"
     },
     {
@@ -13983,6 +14186,7 @@
       "icon_name": "icon.i.slowdown-capsule",
       "order": "c[slowdown-capsule]",
       "subgroup": "capsule",
+      "stack": 100,
       "localised_name": "Slowdown capsule"
     },
     {
@@ -13990,6 +14194,7 @@
       "icon_name": "icon.i.defender-capsule",
       "order": "d[defender-capsule]",
       "subgroup": "capsule",
+      "stack": 100,
       "localised_name": "Defender capsule"
     },
     {
@@ -13997,6 +14202,7 @@
       "icon_name": "icon.i.distractor-capsule",
       "order": "e[defender-capsule]",
       "subgroup": "capsule",
+      "stack": 100,
       "localised_name": "Distractor capsule"
     },
     {
@@ -14004,6 +14210,7 @@
       "icon_name": "icon.i.destroyer-capsule",
       "order": "f[destroyer-capsule]",
       "subgroup": "capsule",
+      "stack": 100,
       "localised_name": "Destroyer capsule"
     },
     {
@@ -14011,6 +14218,7 @@
       "icon_name": "icon.i.light-armor",
       "order": "a[light-armor]",
       "subgroup": "armor",
+      "stack": 1,
       "localised_name": "Light armor"
     },
     {
@@ -14018,6 +14226,7 @@
       "icon_name": "icon.i.heavy-armor",
       "order": "b[heavy-armor]",
       "subgroup": "armor",
+      "stack": 1,
       "localised_name": "Heavy armor"
     },
     {
@@ -14025,6 +14234,7 @@
       "icon_name": "icon.i.modular-armor",
       "order": "c[modular-armor]",
       "subgroup": "armor",
+      "stack": 1,
       "localised_name": "Modular armor"
     },
     {
@@ -14032,6 +14242,7 @@
       "icon_name": "icon.i.power-armor",
       "order": "d[power-armor]",
       "subgroup": "armor",
+      "stack": 1,
       "localised_name": "Power armor"
     },
     {
@@ -14039,6 +14250,7 @@
       "icon_name": "icon.i.power-armor-mk2",
       "order": "e[power-armor-mk2]",
       "subgroup": "armor",
+      "stack": 1,
       "localised_name": "Power armor MK2"
     },
     {
@@ -14046,6 +14258,7 @@
       "icon_name": "icon.i.solar-panel-equipment",
       "order": "a[energy-source]-a[solar-panel]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Portable solar panel"
     },
     {
@@ -14053,6 +14266,7 @@
       "icon_name": "icon.i.fusion-reactor-equipment",
       "order": "a[energy-source]-b[fusion-reactor]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Portable fusion reactor"
     },
     {
@@ -14060,6 +14274,7 @@
       "icon_name": "icon.i.battery-equipment",
       "order": "b[battery]-a[battery-equipment]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Personal battery"
     },
     {
@@ -14067,6 +14282,7 @@
       "icon_name": "icon.i.battery-mk2-equipment",
       "order": "b[battery]-b[battery-equipment-mk2]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Personal battery MK2"
     },
     {
@@ -14074,6 +14290,7 @@
       "icon_name": "icon.i.belt-immunity-equipment",
       "order": "c[belt-immunity]-a[belt-immunity]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Belt immunity equipment"
     },
     {
@@ -14081,6 +14298,7 @@
       "icon_name": "icon.i.exoskeleton-equipment",
       "order": "d[exoskeleton]-a[exoskeleton-equipment]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Exoskeleton"
     },
     {
@@ -14088,6 +14306,7 @@
       "icon_name": "icon.i.personal-roboport-equipment",
       "order": "e[robotics]-a[personal-roboport-equipment]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Personal roboport"
     },
     {
@@ -14095,6 +14314,7 @@
       "icon_name": "icon.i.personal-roboport-mk2-equipment",
       "order": "e[robotics]-b[personal-roboport-mk2-equipment]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Personal roboport MK2"
     },
     {
@@ -14102,6 +14322,7 @@
       "icon_name": "icon.i.night-vision-equipment",
       "order": "f[night-vision]-a[night-vision-equipment]",
       "subgroup": "equipment",
+      "stack": 20,
       "localised_name": "Nightvision"
     },
     {
@@ -14109,6 +14330,7 @@
       "icon_name": "icon.i.energy-shield-equipment",
       "order": "a[shield]-a[energy-shield-equipment]",
       "subgroup": "military-equipment",
+      "stack": 20,
       "localised_name": "Energy shield"
     },
     {
@@ -14116,6 +14338,7 @@
       "icon_name": "icon.i.energy-shield-mk2-equipment",
       "order": "a[shield]-b[energy-shield-equipment-mk2]",
       "subgroup": "military-equipment",
+      "stack": 20,
       "localised_name": "Energy shield MK2"
     },
     {
@@ -14123,6 +14346,7 @@
       "icon_name": "icon.i.personal-laser-defense-equipment",
       "order": "b[active-defense]-a[personal-laser-defense-equipment]",
       "subgroup": "military-equipment",
+      "stack": 20,
       "localised_name": "Personal laser defense"
     },
     {
@@ -14130,6 +14354,7 @@
       "icon_name": "icon.i.discharge-defense-equipment",
       "order": "b[active-defense]-b[discharge-defense-equipment]-a[equipment]",
       "subgroup": "military-equipment",
+      "stack": 20,
       "localised_name": "Discharge defense"
     },
     {
@@ -14137,6 +14362,7 @@
       "icon_name": "icon.i.discharge-defense-remote",
       "order": "b[active-defense]-b[discharge-defense-equipment]-b[remote]",
       "subgroup": "military-equipment",
+      "stack": 1,
       "localised_name": "Discharge defense remote"
     },
     {
@@ -14144,6 +14370,7 @@
       "icon_name": "icon.i.stone-wall",
       "order": "a[stone-wall]-a[stone-wall]",
       "subgroup": "defensive-structure",
+      "stack": 100,
       "localised_name": "Wall"
     },
     {
@@ -14151,6 +14378,7 @@
       "icon_name": "icon.i.gate",
       "order": "a[wall]-b[gate]",
       "subgroup": "defensive-structure",
+      "stack": 50,
       "localised_name": "Gate"
     },
     {
@@ -14158,6 +14386,7 @@
       "icon_name": "icon.i.gun-turret",
       "order": "b[turret]-a[gun-turret]",
       "subgroup": "defensive-structure",
+      "stack": 50,
       "localised_name": "Gun turret"
     },
     {
@@ -14165,6 +14394,7 @@
       "icon_name": "icon.i.laser-turret",
       "order": "b[turret]-b[laser-turret]",
       "subgroup": "defensive-structure",
+      "stack": 50,
       "localised_name": "Laser turret"
     },
     {
@@ -14172,6 +14402,7 @@
       "icon_name": "icon.i.flamethrower-turret",
       "order": "b[turret]-c[flamethrower-turret]",
       "subgroup": "defensive-structure",
+      "stack": 50,
       "localised_name": "Flamethrower turret"
     },
     {
@@ -14179,6 +14410,7 @@
       "icon_name": "icon.i.artillery-turret",
       "order": "b[turret]-d[artillery-turret]-a[turret]",
       "subgroup": "defensive-structure",
+      "stack": 10,
       "localised_name": "Artillery turret"
     },
     {
@@ -14186,6 +14418,7 @@
       "icon_name": "icon.i.artillery-targeting-remote",
       "order": "b[turret]-d[artillery-turret]-b[remote]",
       "subgroup": "defensive-structure",
+      "stack": 1,
       "localised_name": "Artillery targeting remote"
     },
     {
@@ -14193,6 +14426,7 @@
       "icon_name": "icon.i.radar",
       "order": "d[radar]-a[radar]",
       "subgroup": "defensive-structure",
+      "stack": 50,
       "localised_name": "Radar"
     },
     {
@@ -14200,6 +14434,7 @@
       "icon_name": "icon.i.player-port",
       "order": "z[not-used]",
       "subgroup": "defensive-structure",
+      "stack": 50,
       "localised_name": "Player port"
     },
     {
@@ -14207,6 +14442,7 @@
       "icon_name": "icon.i.item-unknown",
       "order": "",
       "subgroup": "other",
+      "stack": 1,
       "localised_name": "Unknown item"
     },
     {
@@ -14214,6 +14450,7 @@
       "icon_name": "icon.i.electric-energy-interface",
       "order": "a[electric-energy-interface]-b[electric-energy-interface]",
       "subgroup": "other",
+      "stack": 50,
       "localised_name": "Electric energy interface"
     },
     {
@@ -14221,6 +14458,7 @@
       "icon_name": "icon.i.linked-chest",
       "order": "a[items]-a[linked-chest]",
       "subgroup": "other",
+      "stack": 10,
       "localised_name": "Linked chest"
     },
     {
@@ -14228,6 +14466,7 @@
       "icon_name": "icon.i.heat-interface",
       "order": "b[heat-interface]",
       "subgroup": "other",
+      "stack": 20,
       "localised_name": "Heat interface"
     },
     {
@@ -14235,6 +14474,7 @@
       "icon_name": "icon.i.linked-belt",
       "order": "b[items]-b[linked-belt]",
       "subgroup": "other",
+      "stack": 10,
       "localised_name": "Linked belt"
     },
     {
@@ -14242,6 +14482,7 @@
       "icon_name": "icon.i.infinity-chest",
       "order": "c[item]-o[infinity-chest]",
       "subgroup": "other",
+      "stack": 10,
       "localised_name": "Infinity chest"
     },
     {
@@ -14249,6 +14490,7 @@
       "icon_name": "icon.i.infinity-pipe",
       "order": "d[item]-o[infinity-pipe]",
       "subgroup": "other",
+      "stack": 10,
       "localised_name": "Infinity pipe"
     },
     {
@@ -14256,6 +14498,7 @@
       "icon_name": "icon.i.selection-tool",
       "order": "e[automated-construction]-a[blueprint]",
       "subgroup": "other",
+      "stack": 1,
       "localised_name": "Selection tool"
     },
     {
@@ -14263,6 +14506,7 @@
       "icon_name": "icon.i.item-with-inventory",
       "order": "s[item-with-inventory]-o[item-with-inventory]",
       "subgroup": "other",
+      "stack": 1,
       "localised_name": "Item with inventory"
     },
     {
@@ -14270,6 +14514,7 @@
       "icon_name": "icon.i.item-with-label",
       "order": "s[item-with-label]-o[item-with-label]",
       "subgroup": "other",
+      "stack": 1,
       "localised_name": "Item with label"
     },
     {
@@ -14277,6 +14522,7 @@
       "icon_name": "icon.i.item-with-tags",
       "order": "s[item-with-tags]-o[item-with-tags]",
       "subgroup": "other",
+      "stack": 1,
       "localised_name": "Item with tags"
     },
     {
@@ -14284,6 +14530,7 @@
       "icon_name": "icon.i.simple-entity-with-force",
       "order": "s[simple-entity-with-force]-f[simple-entity-with-force]",
       "subgroup": "other",
+      "stack": 50,
       "localised_name": "Simple entity with force"
     },
     {
@@ -14291,6 +14538,7 @@
       "icon_name": "icon.i.simple-entity-with-owner",
       "order": "s[simple-entity-with-owner]-o[simple-entity-with-owner]",
       "subgroup": "other",
+      "stack": 50,
       "localised_name": "Simple entity with owner"
     },
     {
@@ -14298,6 +14546,7 @@
       "icon_name": "icon.i.burner-generator",
       "order": "t[item]-o[burner-generator]",
       "subgroup": "other",
+      "stack": 10,
       "localised_name": "Burner generator"
     }
   ],

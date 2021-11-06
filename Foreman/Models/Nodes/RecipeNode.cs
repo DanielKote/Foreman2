@@ -222,6 +222,9 @@ namespace Foreman
 
 		public double GetSpeedMultiplier()
 		{
+			if (SelectedAssembler.EntityType == EntityType.Rocket) //this is a bit of a hack - by setting the speed multiplier here like so we get the # of buildings to be the # of rockets launched no matter the time scale.
+				return 1/MyGraph.GetRateMultipler();
+
 			double multiplier = 1.0f;
 			foreach (Module module in AssemblerModules)
 				multiplier += module.SpeedBonus;
