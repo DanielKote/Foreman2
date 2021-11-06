@@ -200,7 +200,8 @@ namespace Foreman
 					picon.SetIconTint((double)iconJToken["tint"][3], (double)iconJToken["tint"][0], (double)iconJToken["tint"][1], (double)iconJToken["tint"][2]);
 					iicons.Add(picon);
 				}
-				myIconCache.Add(iconName, GetIconAndColor(iicon, iicons, defaultIconSize));
+				if(!myIconCache.ContainsKey(iconName))
+					myIconCache.Add(iconName, GetIconAndColor(iicon, iicons, defaultIconSize));
 			}
 		}
 
