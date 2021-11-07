@@ -11,7 +11,7 @@ namespace Foreman
 	public class PassthroughNodeElement : BaseNodeElement
 	{
 		protected override Brush CleanBgBrush { get { return passthroughBGBrush; } }
-		private static Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
+		private static Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(200, 200, 200));
 
 		private string ItemName { get { return DisplayedNode.PassthroughItem.FriendlyName; } }
 
