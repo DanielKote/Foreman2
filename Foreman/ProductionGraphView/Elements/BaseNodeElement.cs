@@ -153,8 +153,22 @@ namespace Foreman
 			return total;
 		}
 
-		public ItemTabElement GetOutputLineItemTab(Item item) { return OutputTabs.First(it => it.Item == item); }
-		public ItemTabElement GetInputLineItemTab(Item item) { return InputTabs.First(it => it.Item == item); }
+		public ItemTabElement GetOutputLineItemTab(Item item)
+		{
+			if (NodeStateRequiresUpdate)
+				UpdateState();
+			NodeStateRequiresUpdate = false;
+
+			return OutputTabs.First(it => it.Item == item);
+		}
+		public ItemTabElement GetInputLineItemTab(Item item)
+		{
+			if (NodeStateRequiresUpdate)
+				UpdateState();
+			NodeStateRequiresUpdate = false;
+
+			return InputTabs.First(it => it.Item == item);
+		}
 
 		public override void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0)
 		{
