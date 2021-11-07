@@ -21,9 +21,13 @@ namespace Foreman
 
 		private static StringFormat bottomFormat = new StringFormat() { LineAlignment = StringAlignment.Far, Alignment = StringAlignment.Center };
 		private static StringFormat topFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
+
+		private static Brush directionBrush = new SolidBrush(Color.FromArgb(50, Color.Black));
+
 		private static Pen regularBorderPen = new Pen(Color.DimGray, 3);
 		private static Pen oversuppliedBorderPen = new Pen(Color.DarkGoldenrod, 3);
 		private static Pen disconnectedBorderPen = new Pen(Color.DarkRed, 3);
+
 		private static Brush textBrush = Brushes.Black;
 		private static Brush fillBrush = Brushes.White;
 
@@ -49,9 +53,9 @@ namespace Foreman
 
 		public Point GetConnectionPoint() //in graph coordinates
 		{
-			if (LinkType == LinkType.Input)
+			if ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Down))
 				return LocalToGraph(new Point(0, Height / 2));
-			else //if(LinkType == LinkType.Output)
+			else //if ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.down) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Up))
 				return LocalToGraph(new Point(0, -Height / 2));
 		}
 
@@ -76,9 +80,22 @@ namespace Foreman
 		{
 			Point trans = LocalToGraph(new Point(0, 0));
 
+			//background
 			GraphicsStuff.FillRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, fillBrush);
+
+			//direction signs (only if using dynamic link width)
+			if (graphViewer.DynamicLinkWidth)
+			{
+				if (DisplayedNode.NodeDirection == NodeDirection.Up)
+					graphics.FillPolygon(directionBrush, new Point[] { new Point(trans.X - (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X + (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X, trans.Y - (Bounds.Height / 2)) });
+				else
+					graphics.FillPolygon(directionBrush, new Point[] { new Point(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2)), new Point(trans.X + (Bounds.Width / 2), trans.Y - (Bounds.Height / 2)), new Point(trans.X, trans.Y + (Bounds.Height / 2)) });
+			}
+
+			//border
 			GraphicsStuff.DrawRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, borderPen);
 
+			//text & icon
 			if (!simple)
 			{
 				if (LinkType == LinkType.Output)
@@ -92,6 +109,7 @@ namespace Foreman
 					graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y - (Bounds.Height / 2) + border, iconSize, iconSize);
 				}
 			}
+
 		}
 
 		public override List<TooltipInfo> GetToolTips(Point graph_point)

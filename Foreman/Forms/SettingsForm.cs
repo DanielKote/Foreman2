@@ -31,6 +31,7 @@ namespace Foreman
 
 			public AssemblerSelector.Style DefaultAssemblerStyle;
 			public ModuleSelector.Style DefaultModuleStyle;
+			public NodeDirection DefaultNodeDirection;
 			
 			public bool EnableExtraProductivityForNonMiners;
 			public bool DEV_ShowUnavailableItems;
@@ -130,10 +131,23 @@ namespace Foreman
 					break;
 			}
 
+			switch(Options.DefaultNodeDirection)
+			{
+				case NodeDirection.Down:
+					NodeDirectionDropDown.SelectedIndex = 1;
+					break;
+				case NodeDirection.Up:
+				default:
+					NodeDirectionDropDown.SelectedIndex = 0;
+					break;
+			}
+
 			AssemblerSelectorStyleDropDown.Items.AddRange(AssemblerSelector.StyleNames);
 			AssemblerSelectorStyleDropDown.SelectedIndex = (int)Options.DefaultAssemblerStyle;
 			ModuleSelectorStyleDropDown.Items.AddRange(ModuleSelector.StyleNames);
 			ModuleSelectorStyleDropDown.SelectedIndex = (int)Options.DefaultModuleStyle;
+
+
 
 			ShowProductivityBonusOnAllCheckBox.Checked = Options.EnableExtraProductivityForNonMiners;
 			ShowUnavailablesCheckBox.Checked = Options.DEV_ShowUnavailableItems;
@@ -456,6 +470,7 @@ namespace Foreman
 
 			Options.DefaultAssemblerStyle = (AssemblerSelector.Style)AssemblerSelectorStyleDropDown.SelectedIndex;
 			Options.DefaultModuleStyle = (ModuleSelector.Style)ModuleSelectorStyleDropDown.SelectedIndex;
+			Options.DefaultNodeDirection = NodeDirectionDropDown.SelectedIndex == 0 ? NodeDirection.Up : NodeDirection.Down;
 
 			Options.EnableExtraProductivityForNonMiners = ShowProductivityBonusOnAllCheckBox.Checked;
 			Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;

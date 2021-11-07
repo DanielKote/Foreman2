@@ -37,7 +37,7 @@ namespace Foreman
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
-				Properties.Settings.Default.ForemanVersion = 2;
+				Properties.Settings.Default.ForemanVersion = 3;
 
 				if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
 					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
@@ -58,6 +58,10 @@ namespace Foreman
 				if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
 					Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
 				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
+
+				if (!Enum.IsDefined(typeof(NodeDirection), Properties.Settings.Default.DefaultNodeDirection))
+					Properties.Settings.Default.DefaultNodeDirection = (int)NodeDirection.Up;
+				GraphViewer.Graph.DefaultNodeDirection = (NodeDirection)Properties.Settings.Default.DefaultNodeDirection;
 
 				GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
 				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
@@ -225,8 +229,11 @@ namespace Foreman
 			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
 			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
+
 			options.DefaultAssemblerStyle = GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
 			options.DefaultModuleStyle = GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
+			options.DefaultNodeDirection = GraphViewer.Graph.DefaultNodeDirection;
+
 			options.ShowErrorArrows = GraphViewer.ArrowRenderer.ShowErrorArrows;
 			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
 			options.ShowDisconnectedArrows = GraphViewer.ArrowRenderer.ShowDisconnectedArrows;
@@ -286,6 +293,8 @@ namespace Foreman
 					Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
 					GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
 					Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
+					GraphViewer.Graph.DefaultNodeDirection = options.DefaultNodeDirection;
+					Properties.Settings.Default.DefaultNodeDirection = (int)options.DefaultNodeDirection;
 
 					GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
 					Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;

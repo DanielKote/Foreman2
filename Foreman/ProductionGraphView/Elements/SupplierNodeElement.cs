@@ -29,7 +29,8 @@ namespace Foreman
 			if (simple)
 				return;
 
-			Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + 28, Width - 10, 20);
+			int yoffset = DisplayedNode.NodeDirection == NodeDirection.Up ? 28 : 5;
+			Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 20);
 			Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 20, titleSlot.Width, (Height / 2) - 5);
 			//graphics.DrawRectangle(devPen, textSlot);
 			//graphics.DrawRectangle(devPen, titleSlot);

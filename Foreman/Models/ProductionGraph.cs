@@ -41,6 +41,8 @@ namespace Foreman
 		public float GetRateMultipler() { return RateMultiplier[(int)SelectedRateUnit]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
 		public string GetRateName() { return RateUnitNames[(int)SelectedRateUnit]; }
 
+		public NodeDirection DefaultNodeDirection { get; set; }
+
 		public const double MaxSetFlow = 10000000000000; //10 trillion should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
 		private const int XBorder = 200;
 		private const int YBorder = 200;
@@ -93,6 +95,8 @@ namespace Foreman
 
 		public ProductionGraph()
 		{
+			DefaultNodeDirection = NodeDirection.Up;
+
 			nodes = new HashSet<BaseNode>();
 			nodeLinks = new HashSet<NodeLink>();
 			roToNode = new Dictionary<ReadOnlyBaseNode, BaseNode>();
@@ -110,6 +114,7 @@ namespace Foreman
 		{
 			ConsumerNode node = new ConsumerNode(this, lastNodeID++, item);
 			node.Location = location;
+			node.NodeDirection = DefaultNodeDirection;
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
 			node.UpdateState();
@@ -121,6 +126,7 @@ namespace Foreman
 		{
 			SupplierNode node = new SupplierNode(this, lastNodeID++, item);
 			node.Location = location;
+			node.NodeDirection = DefaultNodeDirection;
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
 			node.UpdateState();
@@ -132,6 +138,7 @@ namespace Foreman
 		{
 			PassthroughNode node = new PassthroughNode(this, lastNodeID++, item);
 			node.Location = location;
+			node.NodeDirection = DefaultNodeDirection;
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
 			node.UpdateState();
@@ -144,6 +151,7 @@ namespace Foreman
 		{
 			RecipeNode node = new RecipeNode(this, lastNodeID++, recipe);
 			node.Location = location;
+			node.NodeDirection = DefaultNodeDirection;
 			nodeSetupAction?.Invoke(node);
 			if(nodeSetupAction == null)
 			{
@@ -520,6 +528,7 @@ namespace Foreman
 						else
 							newNode.DesiredRatePerSec = (double)nodeJToken["DesiredRate"];
 					}
+					newNode.NodeDirection = (NodeDirection)(int)nodeJToken["Direction"];
 
 					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode.ReadOnlyNode);
 				}

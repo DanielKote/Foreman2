@@ -333,11 +333,10 @@ namespace Foreman
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
+			base.GetObjectData(info, context);
+
 			info.AddValue("NodeType", NodeType.Recipe);
-			info.AddValue("NodeID", NodeID);
-			info.AddValue("Location", Location);
 			info.AddValue("RecipeID", BaseRecipe.RecipeID);
-			info.AddValue("RateType", RateType);
 			info.AddValue("Neighbours", NeighbourCount);
 			info.AddValue("ExtraProductivity", ExtraProductivityBonus);
 			if (RateType == RateType.Manual)
@@ -720,12 +719,12 @@ namespace Foreman
 				resolutions.Add("Turn off beacon", new Action(() => SetBeacon(null)));
 
 			if ((WarningSet & (RecipeNode.Warnings.BModuleIsDisabled | RecipeNode.Warnings.BModuleIsUnavailable)) != 0)
-			resolutions.Add("Remove error modules from beacon", new Action(() =>
-			{
-				for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
-					if (!MyNode.BeaconModules[i].Enabled || !MyNode.BeaconModules[i].Available)
-						RemoveBeaconModule(i);
-			}));
+				resolutions.Add("Remove error modules from beacon", new Action(() =>
+				{
+					for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
+						if (!MyNode.BeaconModules[i].Enabled || !MyNode.BeaconModules[i].Available)
+							RemoveBeaconModule(i);
+				}));
 
 			if ((WarningSet & RecipeNode.Warnings.TemeratureFluidBurnerInvalidLinks) != 0)
 				resolutions.Add("Remove fuel links", new Action(() =>

@@ -9,6 +9,7 @@ namespace Foreman
 {
 	public enum RateType { Auto, Manual };
 	public enum NodeState { Clean, MissingLink, Warning, Error }
+	public enum NodeDirection { Up, Down }
 
 	[Serializable]
 	public abstract partial class BaseNode : ISerializable
@@ -22,6 +23,9 @@ namespace Foreman
 
 		private RateType rateType;
 		public RateType RateType { get { return rateType; } set { if (rateType != value) { rateType = value; UpdateState(); } } }
+
+		private NodeDirection nodeDirection;
+		public NodeDirection NodeDirection { get { return nodeDirection; } set { if(nodeDirection != value) { nodeDirection = value; OnNodeStateChanged(); } } }
 
 		public double ActualRatePerSec { get; private set; }
 
@@ -48,6 +52,8 @@ namespace Foreman
 			NodeID = nodeID;
 
 			rateType = RateType.Auto;
+			nodeDirection = NodeDirection.Up;
+
 			desiredRatePerSec = 0;
 			Location = new Point(0, 0);
 
@@ -104,7 +110,13 @@ namespace Foreman
 			return (RateType == RateType.Manual) && Math.Abs(ActualRatePerSec - DesiredRatePerSec) > 0.0001;
 		}
 
-		public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
+		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("NodeID", NodeID);
+			info.AddValue("Location", Location);
+			info.AddValue("RateType", RateType);
+			info.AddValue("Direction", NodeDirection);
+		}
 	}
 
 	public abstract class ReadOnlyBaseNode
@@ -121,6 +133,8 @@ namespace Foreman
 		public double ActualRate => MyNode.ActualRate;
 		public double DesiredRate => MyNode.DesiredRate;
 		public NodeState State => MyNode.State;
+
+		public NodeDirection NodeDirection => MyNode.NodeDirection;
 
 		public abstract List<string> GetErrors();
 		public abstract List<string> GetWarnings();
@@ -164,6 +178,8 @@ namespace Foreman
 
 		public void SetRateType(RateType type) { if (MyNode.RateType != type) MyNode.RateType = type; }
 		public virtual void SetDesiredRate(double rate) { if (MyNode.DesiredRate != rate) MyNode.DesiredRate = rate; }
+
+		public void SetDirection(NodeDirection direction) { if (MyNode.NodeDirection != direction) MyNode.NodeDirection = direction; }
 
 		public abstract Dictionary<string, Action> GetErrorResolutions();
 		public abstract Dictionary<string, Action> GetWarningResolutions();

@@ -119,17 +119,20 @@ namespace Foreman
 			OutputTabs = OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Name).ToList();
 
 			int x = -GetIconWidths(OutputTabs) / 2;
+			int y = DisplayedNode.NodeDirection == NodeDirection.Up ? (-Height / 2) + 1 : (Height / 2) - 1;
 			foreach (ItemTabElement tab in OutputTabs)
 			{
 				x += TabPadding;
-				tab.Location = new Point(x + (tab.Width / 2), (-Height / 2) + 1);
+				tab.Location = new Point(x + (tab.Width / 2), y);
 				x += tab.Width;
 			}
+
 			x = -GetIconWidths(InputTabs) / 2;
+			y = DisplayedNode.NodeDirection == NodeDirection.Up ? (Height / 2) - 1 : (-Height / 2) + 1;
 			foreach (ItemTabElement tab in InputTabs)
 			{
 				x += TabPadding;
-				tab.Location = new Point(x + (tab.Width / 2), (Height / 2) - 1);
+				tab.Location = new Point(x + (tab.Width / 2), y);
 				x += tab.Width;
 			}
 		}
@@ -217,7 +220,6 @@ namespace Foreman
 			if (DisplayedNode.State == NodeState.Warning)
 				GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, errorBgBrush); //warning flag
 
-
 			//draw in all the inside details for this node
 			DetailsDraw(graphics, trans, simple);
 
@@ -292,8 +294,28 @@ namespace Foreman
 							graphViewer.TryDeleteSelectedNodes();
 						})));
 				}
-				if(graphViewer.SelectedNodes.Count > 0)
+
+				RightClickMenu.Items.Add(new ToolStripSeparator());
+
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Flip node", null,
+					new EventHandler((o, e) =>
+					{
+						RightClickMenu.Close();
+						graphViewer.Graph.RequestNodeController(DisplayedNode).SetDirection(DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+					})));
+				if (graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(this))
 				{
+					RightClickMenu.Items.Add(new ToolStripMenuItem("Flip selected nodes", null,
+						new EventHandler((o, e) =>
+						{
+							RightClickMenu.Close();
+							graphViewer.FlipSelectedNodes();
+						})));
+				}
+
+				if (graphViewer.SelectedNodes.Count > 0)
+				{
+					RightClickMenu.Items.Add(new ToolStripSeparator());
 					RightClickMenu.Items.Add(new ToolStripMenuItem("Clear selection", null,
 						new EventHandler((o, e) =>
 						{

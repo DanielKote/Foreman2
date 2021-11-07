@@ -39,11 +39,10 @@ namespace Foreman
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
+			base.GetObjectData(info, context);
+
 			info.AddValue("NodeType", NodeType.Consumer);
-			info.AddValue("NodeID", NodeID);
-			info.AddValue("Location", Location);
 			info.AddValue("Item", ConsumedItem.Name);
-			info.AddValue("RateType", RateType);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredRate", DesiredRatePerSec);
 		}

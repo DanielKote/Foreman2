@@ -50,21 +50,12 @@ namespace Foreman
 
 		protected override void UpdateState()
 		{
-			if (InputTabs.Count == 0 && OutputTabs.Count != 0)
-			{
-				AssemblerElement.Location = new Point(-26, -6);
-				BeaconElement.Location = new Point(-30, 36);
-			}
-			else if (OutputTabs.Count == 0 && InputTabs.Count != 0)
-			{
-				AssemblerElement.Location = new Point(-26, -26);
-				BeaconElement.Location = new Point(-30, 16);
-			}
-			else
-			{
-				AssemblerElement.Location = new Point(-26, -16);
-				BeaconElement.Location = new Point(-30, 26);
-			}
+			int yOffset = (DisplayedNode.NodeDirection == NodeDirection.Up && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Down && OutputTabs.Count == 0 && InputTabs.Count != 0) ? 10 :
+				(DisplayedNode.NodeDirection == NodeDirection.Down && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Up && OutputTabs.Count == 0 && InputTabs.Count != 0) ? -10 : 0;
+			yOffset += DisplayedNode.NodeDirection == NodeDirection.Down ? 4 : 0;
+
+			AssemblerElement.Location = new Point(-26, -14 + yOffset);
+			BeaconElement.Location = new Point(-30, 27 + yOffset);
 
 			AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 			BeaconElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);

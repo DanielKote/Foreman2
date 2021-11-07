@@ -291,6 +291,13 @@ namespace Foreman
 			}
 		}
 
+		public void FlipSelectedNodes()
+		{
+			foreach (BaseNodeElement node in selectedNodes.ToList())
+				Graph.RequestNodeController(node.DisplayedNode).SetDirection(node.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+			Invalidate();
+		}
+
 		public void EditNode(BaseNodeElement bNodeElement)
 		{
 			if (bNodeElement is RecipeNodeElement rNodeElement)

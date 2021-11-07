@@ -87,8 +87,6 @@
 			this.ShowUnavailablesCheckBox = new System.Windows.Forms.CheckBox();
 			this.LoadBarrelingCheckBox = new System.Windows.Forms.CheckBox();
 			this.ShowProductivityBonusOnAllCheckBox = new System.Windows.Forms.CheckBox();
-			this.groupBox6 = new System.Windows.Forms.GroupBox();
-			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
 			this.DefaultsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ModuleSelectorStyleDropDown = new System.Windows.Forms.ComboBox();
@@ -97,6 +95,7 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.DisconnectedArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.RoundAssemblerCountCheckBox = new System.Windows.Forms.CheckBox();
 			this.HighLodRadioButton = new System.Windows.Forms.RadioButton();
 			this.label6 = new System.Windows.Forms.Label();
@@ -112,7 +111,8 @@
 			this.AbbreviateSciPackCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
-			this.DisconnectedArrowsCheckBox = new System.Windows.Forms.CheckBox();
+			this.label9 = new System.Windows.Forms.Label();
+			this.NodeDirectionDropDown = new System.Windows.Forms.ComboBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -136,7 +136,6 @@
 			this.GraphOptionsTable.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.AdvancedOptionsTable.SuspendLayout();
-			this.groupBox6.SuspendLayout();
 			this.groupBox5.SuspendLayout();
 			this.DefaultsTable.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -861,18 +860,17 @@
 			// 
 			this.GraphOptionsTable.ColumnCount = 1;
 			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.GraphOptionsTable.Controls.Add(this.groupBox7, 0, 3);
-			this.GraphOptionsTable.Controls.Add(this.groupBox6, 0, 2);
+			this.GraphOptionsTable.Controls.Add(this.groupBox7, 0, 2);
 			this.GraphOptionsTable.Controls.Add(this.groupBox5, 0, 1);
 			this.GraphOptionsTable.Controls.Add(this.groupBox3, 0, 0);
 			this.GraphOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.GraphOptionsTable.Location = new System.Drawing.Point(0, 0);
 			this.GraphOptionsTable.Name = "GraphOptionsTable";
-			this.GraphOptionsTable.RowCount = 4;
+			this.GraphOptionsTable.RowCount = 3;
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
 			this.GraphOptionsTable.Size = new System.Drawing.Size(470, 488);
 			this.GraphOptionsTable.TabIndex = 0;
 			// 
@@ -883,9 +881,9 @@
 			this.groupBox7.Controls.Add(this.AdvancedOptionsTable);
 			this.groupBox7.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox7.Location = new System.Drawing.Point(3, 377);
+			this.groupBox7.Location = new System.Drawing.Point(3, 376);
 			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Size = new System.Drawing.Size(464, 108);
+			this.groupBox7.Size = new System.Drawing.Size(464, 109);
 			this.groupBox7.TabIndex = 3;
 			this.groupBox7.TabStop = false;
 			this.groupBox7.Text = "Advanced";
@@ -909,7 +907,7 @@
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.AdvancedOptionsTable.Size = new System.Drawing.Size(458, 89);
+			this.AdvancedOptionsTable.Size = new System.Drawing.Size(458, 90);
 			this.AdvancedOptionsTable.TabIndex = 0;
 			// 
 			// ShowUnavailablesCheckBox
@@ -942,32 +940,6 @@
 			this.ShowProductivityBonusOnAllCheckBox.Text = "Enable extra productivity bonus for all entities (instead of only miners)";
 			this.ShowProductivityBonusOnAllCheckBox.UseVisualStyleBackColor = true;
 			// 
-			// groupBox6
-			// 
-			this.groupBox6.Controls.Add(this.tableLayoutPanel3);
-			this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox6.Location = new System.Drawing.Point(3, 356);
-			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(464, 15);
-			this.groupBox6.TabIndex = 2;
-			this.groupBox6.TabStop = false;
-			// 
-			// tableLayoutPanel3
-			// 
-			this.tableLayoutPanel3.ColumnCount = 2;
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
-			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-			this.tableLayoutPanel3.RowCount = 2;
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(458, 0);
-			this.tableLayoutPanel3.TabIndex = 1;
-			// 
 			// groupBox5
 			// 
 			this.groupBox5.AutoSize = true;
@@ -977,7 +949,7 @@
 			this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox5.Location = new System.Drawing.Point(3, 261);
 			this.groupBox5.Name = "groupBox5";
-			this.groupBox5.Size = new System.Drawing.Size(464, 89);
+			this.groupBox5.Size = new System.Drawing.Size(464, 109);
 			this.groupBox5.TabIndex = 1;
 			this.groupBox5.TabStop = false;
 			this.groupBox5.Text = "Defaults";
@@ -990,20 +962,23 @@
 			this.DefaultsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.DefaultsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
 			this.DefaultsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 271F));
+			this.DefaultsTable.Controls.Add(this.NodeDirectionDropDown, 1, 2);
 			this.DefaultsTable.Controls.Add(this.ModuleSelectorStyleDropDown, 1, 1);
 			this.DefaultsTable.Controls.Add(this.AssemblerSelectorStyleDropDown, 1, 0);
 			this.DefaultsTable.Controls.Add(this.label5, 0, 0);
 			this.DefaultsTable.Controls.Add(this.label7, 0, 1);
+			this.DefaultsTable.Controls.Add(this.label9, 0, 2);
 			this.DefaultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.DefaultsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.DefaultsTable.Location = new System.Drawing.Point(3, 16);
 			this.DefaultsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.DefaultsTable.Name = "DefaultsTable";
-			this.DefaultsTable.RowCount = 3;
+			this.DefaultsTable.RowCount = 4;
 			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.DefaultsTable.Size = new System.Drawing.Size(458, 70);
+			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.DefaultsTable.Size = new System.Drawing.Size(458, 90);
 			this.DefaultsTable.TabIndex = 28;
 			// 
 			// ModuleSelectorStyleDropDown
@@ -1011,7 +986,7 @@
 			this.ModuleSelectorStyleDropDown.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ModuleSelectorStyleDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ModuleSelectorStyleDropDown.FormattingEnabled = true;
-			this.ModuleSelectorStyleDropDown.Location = new System.Drawing.Point(69, 27);
+			this.ModuleSelectorStyleDropDown.Location = new System.Drawing.Point(87, 27);
 			this.ModuleSelectorStyleDropDown.Margin = new System.Windows.Forms.Padding(2);
 			this.ModuleSelectorStyleDropDown.Name = "ModuleSelectorStyleDropDown";
 			this.ModuleSelectorStyleDropDown.Size = new System.Drawing.Size(116, 21);
@@ -1022,7 +997,7 @@
 			this.AssemblerSelectorStyleDropDown.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AssemblerSelectorStyleDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.AssemblerSelectorStyleDropDown.FormattingEnabled = true;
-			this.AssemblerSelectorStyleDropDown.Location = new System.Drawing.Point(69, 2);
+			this.AssemblerSelectorStyleDropDown.Location = new System.Drawing.Point(87, 2);
 			this.AssemblerSelectorStyleDropDown.Margin = new System.Windows.Forms.Padding(2);
 			this.AssemblerSelectorStyleDropDown.Name = "AssemblerSelectorStyleDropDown";
 			this.AssemblerSelectorStyleDropDown.Size = new System.Drawing.Size(116, 21);
@@ -1035,7 +1010,7 @@
 			this.label5.Location = new System.Drawing.Point(2, 0);
 			this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(63, 25);
+			this.label5.Size = new System.Drawing.Size(81, 25);
 			this.label5.TabIndex = 4;
 			this.label5.Text = "Assemblers:";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1047,7 +1022,7 @@
 			this.label7.Location = new System.Drawing.Point(2, 25);
 			this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(63, 25);
+			this.label7.Size = new System.Drawing.Size(81, 25);
 			this.label7.TabIndex = 2;
 			this.label7.Text = "Modules:";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1108,6 +1083,17 @@
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.Size = new System.Drawing.Size(458, 233);
 			this.NodeGraphicsTable.TabIndex = 28;
+			// 
+			// DisconnectedArrowsCheckBox
+			// 
+			this.DisconnectedArrowsCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.DisconnectedArrowsCheckBox, 4);
+			this.DisconnectedArrowsCheckBox.Location = new System.Drawing.Point(3, 213);
+			this.DisconnectedArrowsCheckBox.Name = "DisconnectedArrowsCheckBox";
+			this.DisconnectedArrowsCheckBox.Size = new System.Drawing.Size(276, 17);
+			this.DisconnectedArrowsCheckBox.TabIndex = 18;
+			this.DisconnectedArrowsCheckBox.Text = "Display arrows pointing to any node with missing links";
+			this.DisconnectedArrowsCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// RoundAssemblerCountCheckBox
 			// 
@@ -1291,16 +1277,31 @@
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
 			// 
-			// DisconnectedArrowsCheckBox
+			// label9
 			// 
-			this.DisconnectedArrowsCheckBox.AutoSize = true;
-			this.NodeGraphicsTable.SetColumnSpan(this.DisconnectedArrowsCheckBox, 4);
-			this.DisconnectedArrowsCheckBox.Location = new System.Drawing.Point(3, 213);
-			this.DisconnectedArrowsCheckBox.Name = "DisconnectedArrowsCheckBox";
-			this.DisconnectedArrowsCheckBox.Size = new System.Drawing.Size(276, 17);
-			this.DisconnectedArrowsCheckBox.TabIndex = 18;
-			this.DisconnectedArrowsCheckBox.Text = "Display arrows pointing to any node with missing links";
-			this.DisconnectedArrowsCheckBox.UseVisualStyleBackColor = true;
+			this.label9.AutoSize = true;
+			this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label9.Location = new System.Drawing.Point(2, 50);
+			this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(81, 20);
+			this.label9.TabIndex = 5;
+			this.label9.Text = "Node Direction:";
+			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// NodeDirectionDropDown
+			// 
+			this.NodeDirectionDropDown.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.NodeDirectionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.NodeDirectionDropDown.FormattingEnabled = true;
+			this.NodeDirectionDropDown.Items.AddRange(new object[] {
+            "Up (default)",
+            "Down"});
+			this.NodeDirectionDropDown.Location = new System.Drawing.Point(87, 52);
+			this.NodeDirectionDropDown.Margin = new System.Windows.Forms.Padding(2);
+			this.NodeDirectionDropDown.Name = "NodeDirectionDropDown";
+			this.NodeDirectionDropDown.Size = new System.Drawing.Size(116, 21);
+			this.NodeDirectionDropDown.TabIndex = 6;
 			// 
 			// SettingsForm
 			// 
@@ -1353,7 +1354,6 @@
 			this.groupBox7.PerformLayout();
 			this.AdvancedOptionsTable.ResumeLayout(false);
 			this.AdvancedOptionsTable.PerformLayout();
-			this.groupBox6.ResumeLayout(false);
 			this.groupBox5.ResumeLayout(false);
 			this.groupBox5.PerformLayout();
 			this.DefaultsTable.ResumeLayout(false);
@@ -1426,7 +1426,6 @@
 		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.GroupBox groupBox7;
-		private System.Windows.Forms.GroupBox groupBox6;
 		private System.Windows.Forms.GroupBox groupBox5;
 		private System.Windows.Forms.TableLayoutPanel AdvancedOptionsTable;
 		private System.Windows.Forms.CheckBox ShowUnavailablesCheckBox;
@@ -1443,7 +1442,6 @@
 		private System.Windows.Forms.RadioButton MediumLodRadioButton;
 		private System.Windows.Forms.RadioButton LowLodRadioButton;
 		private System.Windows.Forms.CheckBox RecipeEditPanelPositionLockCheckBox;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.NumericUpDown NodeCountForSimpleViewInput;
 		private System.Windows.Forms.CheckBox LoadBarrelingCheckBox;
@@ -1454,5 +1452,7 @@
 		private System.Windows.Forms.CheckBox RoundAssemblerCountCheckBox;
 		private System.Windows.Forms.CheckBox ShowProductivityBonusOnAllCheckBox;
 		private System.Windows.Forms.CheckBox DisconnectedArrowsCheckBox;
+		private System.Windows.Forms.ComboBox NodeDirectionDropDown;
+		private System.Windows.Forms.Label label9;
 	}
 }

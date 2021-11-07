@@ -238,8 +238,16 @@ namespace Foreman
 			{
 				//Version update 1 -> 2:
 				//	Graph now has the extra productivity for non-miners value 
-				original["ExtraProdForNonMiners"] = false;
 				original["Version"] = 2;
+
+				original["ExtraProdForNonMiners"] = false;
+			}
+
+			if ((int)original["Version"] == 2)
+			{
+				//Version update 2 -> 3:
+				//	Nodes now have Direction parameter
+				original["Version"] = 3;
 			}
 
 			return original;
@@ -262,6 +270,16 @@ namespace Foreman
 
 				foreach (JToken nodeJToken in original["Nodes"].Where(jt => (NodeType)(int)jt["NodeType"] == NodeType.Recipe).ToList())
 					nodeJToken["ExtraProductivity"] = 0;
+			}
+
+			if ((int)original["Version"] == 2)
+			{
+				//Version update 2 -> 3:
+				//	Nodes now have Direction parameter
+				original["Version"] = 3;
+
+				foreach (JToken nodeJToken in original["Nodes"].ToList())
+					nodeJToken["Direction"] = (int)NodeDirection.Up;
 			}
 
 			return original;

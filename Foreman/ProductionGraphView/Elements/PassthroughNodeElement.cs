@@ -31,10 +31,11 @@ namespace Foreman
 
 			if (DisplayedNode.RateType == RateType.Manual)
 			{
-				Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + 26, Width - 10, 18);
+				int yoffset = DisplayedNode.NodeDirection == NodeDirection.Up ? 28 : 32;
+				Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 18);
 				Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 18, titleSlot.Width, 20);
-				//graphics.DrawRectangle(devPen, textSlot);
-				//graphics.DrawRectangle(devPen, titleSlot);
+				graphics.DrawRectangle(devPen, textSlot);
+				graphics.DrawRectangle(devPen, titleSlot);
 
 				graphics.DrawString("-Limit-", TitleFont, TextBrush, titleSlot, TitleFormat);
 				GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.DoubleToString(DisplayedNode.DesiredRate), BaseFont, textSlot);

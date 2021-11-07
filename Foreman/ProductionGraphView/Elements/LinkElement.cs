@@ -32,11 +32,13 @@ namespace Foreman
 			UpdateCurve();
 		}
 
-		protected override Point[] GetCurveEndpoints()
+		protected override Tuple<Point,Point> GetCurveEndpoints()
 		{
-			Point pointMupdate = ConsumerTab.GetConnectionPoint();
-			Point pointNupdate = SupplierTab.GetConnectionPoint();
-			return new Point[] { pointMupdate, pointNupdate };
+			return new Tuple<Point, Point>(SupplierTab.GetConnectionPoint(), ConsumerTab.GetConnectionPoint());
+		}
+		protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections()
+		{
+			return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
 		}
 	}
 }

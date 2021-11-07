@@ -48,6 +48,10 @@ namespace Foreman
 	{
 		public ReadOnlyBaseNode Supplier => MyLink.SupplierNode.ReadOnlyNode;
 		public ReadOnlyBaseNode Consumer => MyLink.ConsumerNode.ReadOnlyNode;
+
+		public NodeDirection SupplierDirection => MyLink.SupplierNode.NodeDirection;
+		public NodeDirection ConsumerDirection => MyLink.ConsumerNode.NodeDirection;
+
 		public Item Item => MyLink.Item;
 		public double Throughput => MyLink.Throughput;
 		public bool IsValid => MyLink.IsValid;

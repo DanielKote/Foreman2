@@ -16,6 +16,9 @@ namespace Foreman
 
 		public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item) : base(graphViewer)
 		{
+			if (startNode == null)
+				Trace.Fail("Cant create a dragged link element with a null startNode!");
+
 			if (startConnectionType == LinkType.Input)
 				ConsumerElement = startNode;
 			else
@@ -29,29 +32,38 @@ namespace Foreman
 
 		public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder) { Visible = true; } //always visible.
 
-		protected override Point[] GetCurveEndpoints()
+		protected override Tuple<Point,Point> GetCurveEndpoints()
 		{
 			if (dragEnded)
 				return null; //no update
 
-			Point pointNUpdate = graphViewer.ScreenToGraph(graphViewer.PointToClient(Cursor.Position));
-			Point pointMUpdate = pointNUpdate;
-			newObjectLocation = pointNUpdate;
+			Point pointMUpdate = graphViewer.ScreenToGraph(graphViewer.PointToClient(Cursor.Position));
+			Point pointNUpdate = pointMUpdate;
+			newObjectLocation = pointMUpdate;
 
 			//only snap to grid if grid exists and its a free link (not linking 2 existing objects)
 			if ((SupplierElement == null || ConsumerElement == null) && graphViewer.Grid.ShowGrid && graphViewer.Grid.CurrentGridUnit > 0)
 			{
-				pointNUpdate = graphViewer.Grid.AlignToGrid(pointNUpdate);
-				pointMUpdate = pointNUpdate;
-				newObjectLocation = pointNUpdate;
+				pointMUpdate = graphViewer.Grid.AlignToGrid(pointMUpdate);
+				pointNUpdate = pointMUpdate;
+				newObjectLocation = pointMUpdate;
 			}
 
 			if (SupplierElement != null)
-				pointNUpdate = SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
+				pointMUpdate = SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
 			if (ConsumerElement != null)
-				pointMUpdate = ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
+				pointNUpdate = ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
 
-			return new Point[] { pointMUpdate, pointNUpdate };
+			return new Tuple<Point,Point>(pointMUpdate, pointNUpdate);
+		}
+		protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections()
+		{
+			if (SupplierElement == null)
+				return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+			if (ConsumerElement == null)
+				return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
+
+			return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
 		}
 
 		private void EndDrag(Point graph_point)
