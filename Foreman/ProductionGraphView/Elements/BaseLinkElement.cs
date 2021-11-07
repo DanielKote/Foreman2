@@ -42,7 +42,7 @@ namespace Foreman
 			}
 
 			Visible =
-					 	CalculatedBounds.X + CalculatedBounds.Width > graph_zone.X - xborder &&
+						 CalculatedBounds.X + CalculatedBounds.Width > graph_zone.X - xborder &&
 						CalculatedBounds.X < graph_zone.X + graph_zone.Width + xborder &&
 						CalculatedBounds.Y + CalculatedBounds.Height > graph_zone.Y - yborder &&
 						CalculatedBounds.Y < graph_zone.Y + graph_zone.Height + yborder;
@@ -107,8 +107,20 @@ namespace Foreman
 		{
 			UpdateCurve();
 
-			using (Pen pen = new Pen(Item.AverageColor, LinkWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
+			using (Pen pen = new Pen(Item.AverageColor, LinkWidth))
 			{
+
+				if (SupplierElement?.DisplayedNode.IsFlipped == true || ConsumerElement?.DisplayedNode.IsFlipped == true)
+				{
+					pen.CustomStartCap = new System.Drawing.Drawing2D.AdjustableArrowCap(LinkWidth, LinkWidth);
+					pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
+				}
+				else
+				{
+					pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
+					pen.CustomEndCap = new System.Drawing.Drawing2D.AdjustableArrowCap(LinkWidth, LinkWidth);
+				}
+
 				if (linkingUp)
 					graphics.DrawBeziers(pen, new Point[] {
 						pointN,

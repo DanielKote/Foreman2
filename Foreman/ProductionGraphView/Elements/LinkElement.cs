@@ -36,7 +36,15 @@ namespace Foreman
 		{
 			Point pointMupdate = ConsumerTab.GetConnectionPoint();
 			Point pointNupdate = SupplierTab.GetConnectionPoint();
-			return new Point[] { pointMupdate, pointNupdate };
+
+			if (SupplierElement.DisplayedNode.IsFlipped || ConsumerElement.DisplayedNode.IsFlipped)
+			{
+				return new Point[] { pointNupdate, pointMupdate };
+			}
+			else
+			{
+				return new Point[] { pointMupdate, pointNupdate };
+			}
 		}
 	}
 }

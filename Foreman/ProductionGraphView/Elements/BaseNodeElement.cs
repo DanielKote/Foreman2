@@ -118,18 +118,23 @@ namespace Foreman
 			InputTabs = InputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Name).ToList(); //then by ensures same result no matter who came first
 			OutputTabs = OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Name).ToList();
 
+			int topRow = (-Height / 2) + 1;
+			int bottomRow = (Height / 2) - 1;
+			int outputRow = DisplayedNode.IsFlipped ? bottomRow : topRow;
+			int inputRow = DisplayedNode.IsFlipped ? topRow : bottomRow;
+
 			int x = -GetIconWidths(OutputTabs) / 2;
 			foreach (ItemTabElement tab in OutputTabs)
 			{
 				x += TabPadding;
-				tab.Location = new Point(x + (tab.Width / 2), (-Height / 2) + 1);
+				tab.Location = new Point(x + (tab.Width / 2), outputRow);
 				x += tab.Width;
 			}
 			x = -GetIconWidths(InputTabs) / 2;
 			foreach (ItemTabElement tab in InputTabs)
 			{
 				x += TabPadding;
-				tab.Location = new Point(x + (tab.Width / 2), (Height / 2) - 1);
+				tab.Location = new Point(x + (tab.Width / 2), inputRow);
 				x += tab.Width;
 			}
 		}
@@ -269,6 +274,14 @@ namespace Foreman
 							graphViewer.Graph.DeleteNode(DisplayedNode);
 							graphViewer.Graph.UpdateNodeValues();
 						})));
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Flip node", null,
+					new EventHandler((o, e) =>
+					{
+						RightClickMenu.Close();
+						graphViewer.Graph.FlipNode(DisplayedNode);
+						graphViewer.Graph.UpdateNodeValues();
+
+					})));
 				if (graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(this))
 				{
 					RightClickMenu.Items.Add(new ToolStripMenuItem("Delete selected nodes", null,

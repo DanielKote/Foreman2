@@ -23,6 +23,8 @@ namespace Foreman
 		private RateType rateType;
 		public RateType RateType { get { return rateType; } set { if (rateType != value) { rateType = value; UpdateState(); } } }
 
+		public bool IsFlipped { get; set; }
+
 		public double ActualRatePerSec { get; private set; }
 
 		private double desiredRatePerSec;
@@ -121,6 +123,8 @@ namespace Foreman
 		public double ActualRate => MyNode.ActualRate;
 		public double DesiredRate => MyNode.DesiredRate;
 		public NodeState State => MyNode.State;
+
+		public bool IsFlipped => MyNode.IsFlipped;
 
 		public abstract List<string> GetErrors();
 		public abstract List<string> GetWarnings();

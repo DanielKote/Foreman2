@@ -359,6 +359,7 @@ namespace Foreman
 				info.AddValue("BeaconsPerAssembler", BeaconsPerAssembler);
 				info.AddValue("BeaconsConst", BeaconsConst);
 			}
+			info.AddValue("IsFlipped", IsFlipped);
 		}
 
 		public override string ToString() { return string.Format("Recipe node for: {0}", BaseRecipe.Name); }
@@ -720,12 +721,12 @@ namespace Foreman
 				resolutions.Add("Turn off beacon", new Action(() => SetBeacon(null)));
 
 			if ((WarningSet & (RecipeNode.Warnings.BModuleIsDisabled | RecipeNode.Warnings.BModuleIsUnavailable)) != 0)
-			resolutions.Add("Remove error modules from beacon", new Action(() =>
-			{
-				for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
-					if (!MyNode.BeaconModules[i].Enabled || !MyNode.BeaconModules[i].Available)
-						RemoveBeaconModule(i);
-			}));
+				resolutions.Add("Remove error modules from beacon", new Action(() =>
+				{
+					for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
+						if (!MyNode.BeaconModules[i].Enabled || !MyNode.BeaconModules[i].Available)
+							RemoveBeaconModule(i);
+				}));
 
 			if ((WarningSet & RecipeNode.Warnings.TemeratureFluidBurnerInvalidLinks) != 0)
 				resolutions.Add("Remove fuel links", new Action(() =>
@@ -854,7 +855,7 @@ namespace Foreman
 		{
 			MyNode.AssemblerModules.Clear();
 			if (modules != null)
-			{ 
+			{
 				if(filterModules)
 				{
 					HashSet<Module> acceptableModules = new HashSet<Module>(MyNode.BaseRecipe.Modules.Intersect(MyNode.SelectedAssembler.Modules));

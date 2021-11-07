@@ -45,6 +45,7 @@ namespace Foreman
 			info.AddValue("RateType", RateType);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredRate", DesiredRatePerSec);
+			info.AddValue("IsFlipped", IsFlipped);
 		}
 
 		public override string ToString() { return string.Format("Supply node for: {0}", SuppliedItem.Name); }

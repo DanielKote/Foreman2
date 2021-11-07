@@ -238,6 +238,11 @@ namespace Foreman
 						 break;
 				 }
 
+				 if (originElement != null && originElement.DisplayedNode.IsFlipped != newNode.IsFlipped)
+				 {
+					 Graph.FlipNode(newNode);
+				 }
+
 				 //this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
 				 //should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
 				 BaseNodeElement newNodeElement = NodeElementDictionary[newNode];

@@ -49,10 +49,13 @@ namespace Foreman
 
 		public Point GetConnectionPoint() //in graph coordinates
 		{
+			int topRow = (-Height / 2);
+			int bottomRow = (Height / 2);
+
 			if (LinkType == LinkType.Input)
-				return LocalToGraph(new Point(0, Height / 2));
+				return LocalToGraph(new Point(0, DisplayedNode.IsFlipped ? topRow : bottomRow));
 			else //if(LinkType == LinkType.Output)
-				return LocalToGraph(new Point(0, -Height / 2));
+				return LocalToGraph(new Point(0, DisplayedNode.IsFlipped ? bottomRow : topRow));
 		}
 
 		public void UpdateValues(double recipeRate, double suppliedRate, bool isOversupplied) //if input then: recipe rate = consume rate; if output then recipe rate = production rate

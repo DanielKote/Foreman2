@@ -195,6 +195,12 @@ namespace Foreman
 			NodeDeleted?.Invoke(this, new NodeEventArgs(node));
 		}
 
+		public void FlipNode(ReadOnlyBaseNode node)
+		{
+			BaseNode realNode = roToNode[node];
+			realNode.IsFlipped = !realNode.IsFlipped;
+		}
+
 		public void DeleteNodes(IEnumerable<ReadOnlyBaseNode> nodes)
 		{
 			foreach (ReadOnlyBaseNode node in nodes)
@@ -520,6 +526,10 @@ namespace Foreman
 						else
 							newNode.DesiredRatePerSec = (double)nodeJToken["DesiredRate"];
 					}
+
+
+
+					newNode.IsFlipped = (bool)(nodeJToken["IsFlipped"] ?? false);
 
 					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode.ReadOnlyNode);
 				}
