@@ -217,6 +217,8 @@ namespace Foreman
 			if (DisplayedNode.RateType == RateType.Manual)
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, ManualRateBGFilterBrush); //darken background if its a manual rate set
 
+			if(graphViewer.FlagOUSuppliedNodes && borderBrush != equalFlowBorderBrush)
+				GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, borderBrush); //supply flag
 			if (DisplayedNode.State == NodeState.Warning)
 				GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, errorBgBrush); //warning flag
 

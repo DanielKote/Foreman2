@@ -24,10 +24,12 @@ namespace Foreman
 			public bool ShowRecipeToolTip;
 			public bool RoundAssemblerCount;
 			public bool LockedRecipeEditPanelPosition;
+			public bool FlagOUSuppliedNodes;
 
 			public bool ShowErrorArrows;
 			public bool ShowWarningArrows;
 			public bool ShowDisconnectedArrows;
+			public bool ShowOUSuppliedArrows;
 
 			public AssemblerSelector.Style DefaultAssemblerStyle;
 			public ModuleSelector.Style DefaultModuleStyle;
@@ -114,9 +116,12 @@ namespace Foreman
 			RoundAssemblerCountCheckBox.Checked = options.RoundAssemblerCount;
 			AbbreviateSciPackCheckBox.Checked = Options.AbbreviateSciPacks;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
+			FlagOUSupplyNodesCheckBox.Checked = Options.FlagOUSuppliedNodes;
+
 			ErrorArrowsCheckBox.Checked = Options.ShowErrorArrows;
 			WarningArrowsCheckBox.Checked = Options.ShowWarningArrows;
 			DisconnectedArrowsCheckBox.Checked = Options.ShowDisconnectedArrows;
+			OUSuppliedArrowsCheckBox.Checked = Options.ShowOUSuppliedArrows;
 
 			switch(Options.LevelOfDetail)
 			{
@@ -464,9 +469,12 @@ namespace Foreman
 			Options.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;
 			Options.RoundAssemblerCount = RoundAssemblerCountCheckBox.Checked;
 			Options.LockedRecipeEditPanelPosition = RecipeEditPanelPositionLockCheckBox.Checked;
+			Options.FlagOUSuppliedNodes = FlagOUSupplyNodesCheckBox.Checked;
+
 			Options.ShowErrorArrows = ErrorArrowsCheckBox.Checked;
 			Options.ShowWarningArrows = WarningArrowsCheckBox.Checked;
 			Options.ShowDisconnectedArrows = DisconnectedArrowsCheckBox.Checked;
+			Options.ShowOUSuppliedArrows = OUSuppliedArrowsCheckBox.Checked;
 
 			Options.DefaultAssemblerStyle = (AssemblerSelector.Style)AssemblerSelectorStyleDropDown.SelectedIndex;
 			Options.DefaultModuleStyle = (ModuleSelector.Style)ModuleSelectorStyleDropDown.SelectedIndex;

@@ -65,9 +65,12 @@ namespace Foreman
 
 				GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
 				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
+				GraphViewer.FlagOUSuppliedNodes = Properties.Settings.Default.FlagOUSuppliedNodes;
+
 				GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
 				GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
 				GraphViewer.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
+				GraphViewer.ArrowRenderer.ShowOUSuppliedArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
 
 				RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
 				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
@@ -229,6 +232,7 @@ namespace Foreman
 			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
 			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
+			options.FlagOUSuppliedNodes = GraphViewer.FlagOUSuppliedNodes;
 
 			options.DefaultAssemblerStyle = GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
 			options.DefaultModuleStyle = GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
@@ -237,6 +241,7 @@ namespace Foreman
 			options.ShowErrorArrows = GraphViewer.ArrowRenderer.ShowErrorArrows;
 			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
 			options.ShowDisconnectedArrows = GraphViewer.ArrowRenderer.ShowDisconnectedArrows;
+			options.ShowOUSuppliedArrows = GraphViewer.ArrowRenderer.ShowOUSuppliedArrows;
 
 			options.RoundAssemblerCount = Properties.Settings.Default.RoundAssemblerCount;
 			options.AbbreviateSciPacks = Properties.Settings.Default.AbbreviateSciPacks;
@@ -288,6 +293,8 @@ namespace Foreman
 					Properties.Settings.Default.ShowRecipeToolTip = options.ShowRecipeToolTip;
 					GraphViewer.LockedRecipeEditPanelPosition = options.LockedRecipeEditPanelPosition;
 					Properties.Settings.Default.LockedRecipeEditorPosition = options.LockedRecipeEditPanelPosition;
+					GraphViewer.FlagOUSuppliedNodes = options.FlagOUSuppliedNodes;
+					Properties.Settings.Default.FlagOUSuppliedNodes = options.FlagOUSuppliedNodes;
 
 					GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = options.DefaultAssemblerStyle;
 					Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
@@ -302,6 +309,8 @@ namespace Foreman
 					Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
 					GraphViewer.ArrowRenderer.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
 					Properties.Settings.Default.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
+					GraphViewer.ArrowRenderer.ShowOUSuppliedArrows = options.ShowOUSuppliedArrows;
+					Properties.Settings.Default.ShowOUSuppliedArrows = options.ShowOUSuppliedArrows;
 
 					Properties.Settings.Default.RoundAssemblerCount = options.RoundAssemblerCount;
 					Properties.Settings.Default.AbbreviateSciPacks = options.AbbreviateSciPacks;

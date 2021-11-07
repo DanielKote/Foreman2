@@ -334,5 +334,29 @@ namespace Foreman.Properties {
                 this["DefaultNodeDirection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FlagOUSuppliedNodes {
+            get {
+                return ((bool)(this["FlagOUSuppliedNodes"]));
+            }
+            set {
+                this["FlagOUSuppliedNodes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowOUSuppliedArrows {
+            get {
+                return ((bool)(this["ShowOUSuppliedArrows"]));
+            }
+            set {
+                this["ShowOUSuppliedArrows"] = value;
+            }
+        }
     }
 }

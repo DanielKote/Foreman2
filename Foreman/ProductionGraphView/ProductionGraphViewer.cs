@@ -30,6 +30,7 @@ namespace Foreman
 		private bool SubwindowOpen; //used together with tooltip enabled -> if we open up an item/recipe/assembler window, this will halt tooltip show.
 		public bool DynamicLinkWidth = false;
 		public bool LockedRecipeEditPanelPosition = true;
+		public bool FlagOUSuppliedNodes = false; //if true, will add a flag for over or under supplied nodes
 
 		public DataCache DCache { get; set; }
 		public ProductionGraph Graph { get; private set; }
