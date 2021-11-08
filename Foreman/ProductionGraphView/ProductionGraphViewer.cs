@@ -190,85 +190,85 @@ namespace Foreman
 			ReadOnlyBaseNode newNode = null;
 			int lastNodeWidth = 0;
 			recipeChooser.RecipeRequested += (o, recipeRequestArgs) =>
-			 {
-				 switch (recipeRequestArgs.NodeType)
-				 {
-					 case NodeType.Consumer:
-						 newNode = Graph.CreateConsumerNode(baseItem, newLocation);
-						 break;
-					 case NodeType.Supplier:
-						 newNode = Graph.CreateSupplierNode(baseItem, newLocation);
-						 break;
-					 case NodeType.Passthrough:
-						 newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
-						 break;
-					 case NodeType.Recipe:
-						 ReadOnlyRecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
-						 newNode = rNode;
-						 if ((nNodeType == NewNodeType.Consumer && !recipeRequestArgs.Recipe.IngredientSet.ContainsKey(baseItem)) || (nNodeType == NewNodeType.Supplier && !recipeRequestArgs.Recipe.ProductSet.ContainsKey(baseItem))) 
-						 {
-							 AssemblerSelector.Style style;
-							 switch (Graph.AssemblerSelector.DefaultSelectionStyle)
-							 {
-								 case AssemblerSelector.Style.Best:
-								 case AssemblerSelector.Style.BestBurner:
-								 case AssemblerSelector.Style.BestNonBurner:
-									 style = AssemblerSelector.Style.BestBurner;
-									 break;
-								 case AssemblerSelector.Style.Worst:
-								 case AssemblerSelector.Style.WorstBurner:
-								 case AssemblerSelector.Style.WorstNonBurner:
-								 default:
-									 style = AssemblerSelector.Style.WorstBurner;
-									 break;
-							 }
-							 List<Assembler> assemblerOptions = Graph.AssemblerSelector.GetOrderedAssemblerList(recipeRequestArgs.Recipe, style);
+			{
+				switch (recipeRequestArgs.NodeType)
+				{
+					case NodeType.Consumer:
+						newNode = Graph.CreateConsumerNode(baseItem, newLocation);
+						break;
+					case NodeType.Supplier:
+						newNode = Graph.CreateSupplierNode(baseItem, newLocation);
+						break;
+					case NodeType.Passthrough:
+						newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
+						break;
+					case NodeType.Recipe:
+						ReadOnlyRecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
+						newNode = rNode;
+						if ((nNodeType == NewNodeType.Consumer && !recipeRequestArgs.Recipe.IngredientSet.ContainsKey(baseItem)) || (nNodeType == NewNodeType.Supplier && !recipeRequestArgs.Recipe.ProductSet.ContainsKey(baseItem)))
+						{
+							AssemblerSelector.Style style;
+							switch (Graph.AssemblerSelector.DefaultSelectionStyle)
+							{
+								case AssemblerSelector.Style.Best:
+								case AssemblerSelector.Style.BestBurner:
+								case AssemblerSelector.Style.BestNonBurner:
+									style = AssemblerSelector.Style.BestBurner;
+									break;
+								case AssemblerSelector.Style.Worst:
+								case AssemblerSelector.Style.WorstBurner:
+								case AssemblerSelector.Style.WorstNonBurner:
+								default:
+									style = AssemblerSelector.Style.WorstBurner;
+									break;
+							}
+							List<Assembler> assemblerOptions = Graph.AssemblerSelector.GetOrderedAssemblerList(recipeRequestArgs.Recipe, style);
 
-							 RecipeNodeController controller = (RecipeNodeController)Graph.RequestNodeController(rNode);
-							 if(nNodeType == NewNodeType.Consumer)
-							 {
-								 controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem)));
-								 controller.SetFuel(baseItem);
-							 }
-							 else // if(nNodeType == NewNodeType.Supplier)
-							 {
-								 controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem.FuelOrigin)));
-								 controller.SetFuel(baseItem.FuelOrigin);
-							 }
-						 }
-						 break;
-				 }
+							RecipeNodeController controller = (RecipeNodeController)Graph.RequestNodeController(rNode);
+							if (nNodeType == NewNodeType.Consumer)
+							{
+								controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem)));
+								controller.SetFuel(baseItem);
+							}
+							else // if(nNodeType == NewNodeType.Supplier)
+							{
+								controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem.FuelOrigin)));
+								controller.SetFuel(baseItem.FuelOrigin);
+							}
+						}
+						break;
+				}
 
-				 //this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
-				 //should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
-				 BaseNodeElement newNodeElement = NodeElementDictionary[newNode];
-				 int offsetDistance = lastNodeWidth / 2;
-				 lastNodeWidth = newNodeElement.Width; //effectively: this recipe width
-				 if (offsetDistance > 0)
-				 {
-					 offsetDistance += (lastNodeWidth / 2);
-					 int newOffsetDistance = Grid.AlignToGrid(offsetDistance);
-					 if (newOffsetDistance < offsetDistance)
-						 newOffsetDistance += Grid.CurrentGridUnit;
-					 offsetDistance = newOffsetDistance;
-				 }
-				 newLocation = new Point(newLocation.X + offsetDistance, newLocation.Y);
+				//this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
+				//should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
+				BaseNodeElement newNodeElement = NodeElementDictionary[newNode];
+				int offsetDistance = lastNodeWidth / 2;
+				lastNodeWidth = newNodeElement.Width; //effectively: this recipe width
+				if (offsetDistance > 0)
+				{
+					offsetDistance += (lastNodeWidth / 2);
+					int newOffsetDistance = Grid.AlignToGrid(offsetDistance);
+					if (newOffsetDistance < offsetDistance)
+						newOffsetDistance += Grid.CurrentGridUnit;
+					offsetDistance = newOffsetDistance;
+				}
+				newLocation = new Point(newLocation.X + offsetDistance, newLocation.Y);
 
-				 int yoffset = offsetLocationToItemTabLevel ? (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0) : 0;
-				 yoffset *= originElement == null ? (Graph.DefaultNodeDirection == NodeDirection.Up ? 1 : -1) : (originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? 1 : -1);
-				 Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, newLocation.Y + yoffset));
+				int yoffset = offsetLocationToItemTabLevel ? (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0) : 0;
+				yoffset *= originElement == null ? (Graph.DefaultNodeDirection == NodeDirection.Up ? 1 : -1) : (originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? 1 : -1);
+				Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, newLocation.Y + yoffset));
 
-				 if (originElement != null)
-					 Graph.RequestNodeController(newNode).SetDirection(originElement.DisplayedNode.NodeDirection);
+				if (originElement != null)
+					Graph.RequestNodeController(newNode).SetDirection(originElement.DisplayedNode.NodeDirection);
 
-				 if (nNodeType == NewNodeType.Consumer)
-					 Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
-				 else if (nNodeType == NewNodeType.Supplier)
-					 Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
+				if (nNodeType == NewNodeType.Consumer)
+					Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
+				else if (nNodeType == NewNodeType.Supplier)
+					Graph.CreateLink(newNode, originElement.DisplayedNode, baseItem);
 
-				 DisposeLinkDrag();
-				 Graph.UpdateNodeValues();
-			 };
+				DisposeLinkDrag();
+				Graph.UpdateNodeValues();
+			};
 
 			recipeChooser.PanelClosed += (o, e) =>
 			{
