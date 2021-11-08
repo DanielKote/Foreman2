@@ -81,7 +81,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (style == NodeDrawingStyle.IconsOnly || style == NodeDrawingStyle.Simple || HideItemTab)
+			if (style == NodeDrawingStyle.IconsOnly || HideItemTab)
 				return;
 
 			Point trans = LocalToGraph(new Point(0, 0));
