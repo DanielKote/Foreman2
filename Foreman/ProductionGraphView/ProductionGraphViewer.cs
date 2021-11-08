@@ -44,6 +44,10 @@ namespace Foreman
 		public IReadOnlyDictionary<ReadOnlyNodeLink, LinkElement> LinkElementDictionary { get { return linkElementDictionary; } }
 
 		public IReadOnlyCollection<BaseNodeElement> SelectedNodes { get { return selectedNodes; } }
+		
+		public float ViewScale { get; private set; }
+
+		public bool InAltDisplayMode { get; private set; }
 
 		private const int minDragDiff = 30;
 		private const int minLinkWidth = 3;
@@ -67,7 +71,6 @@ namespace Foreman
 		private DragOperation currentDragOperation = DragOperation.None;
 
 		private Point ViewOffset;
-		private float ViewScale = 1f;
 		private Rectangle visibleGraphBounds;
 
 		private Rectangle SelectionZone;
@@ -809,6 +812,9 @@ namespace Foreman
 
 		private void ProductionGraphViewer_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Alt)
+				this.InAltDisplayMode = !this.InAltDisplayMode;
+
 			if (currentDragOperation == DragOperation.None)
 			{
 				if ((e.KeyCode == Keys.C || e.KeyCode == Keys.X) && (e.Modifiers & Keys.Control) == Keys.Control) //copy or cut

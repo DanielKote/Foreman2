@@ -131,6 +131,11 @@ namespace Foreman
 				graphics.DrawEllipse(extraProductivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10, 6, 6);
 			}
 		}
+		
+		protected override Bitmap GetAltDisplayIcon()
+		{
+			return DisplayedNode.BaseRecipe.Icon;
+		}
 
 		protected override void AddRClickMenuOptions(bool nodeInSelection)
 		{

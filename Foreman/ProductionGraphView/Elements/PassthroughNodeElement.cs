@@ -41,6 +41,11 @@ namespace Foreman
 				GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.DoubleToString(DisplayedNode.DesiredRate), BaseFont, textSlot);
 			}
 		}
+		
+		protected override Bitmap GetAltDisplayIcon()
+		{
+			return null;;
+		}
 
 		protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive)
 		{

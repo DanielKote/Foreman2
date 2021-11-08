@@ -38,6 +38,11 @@ namespace Foreman
 			graphics.DrawString(DisplayedNode.RateType == RateType.Auto ? "Infinite Source:" : "Exact Input:", TitleFont, TextBrush, titleSlot, TitleFormat);
 			GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, ItemName, BaseFont, textSlot);
 		}
+		
+		protected override Bitmap GetAltDisplayIcon()
+		{
+			return DisplayedNode.SuppliedItem.Icon;;
+		}
 
 		protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive)
 		{

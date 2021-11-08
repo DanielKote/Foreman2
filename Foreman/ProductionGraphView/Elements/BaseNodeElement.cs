@@ -228,9 +228,21 @@ namespace Foreman
 			//highlight
 			if (Highlighted)
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, selectionOverlayBrush);
+
+			if (graphViewer.InAltDisplayMode && graphViewer.ViewScale < 0.25)
+			{
+				Bitmap icon = this.GetAltDisplayIcon();
+				if (icon != null)
+				{
+					float iconSize = 32f / graphViewer.ViewScale;
+					graphics.DrawImage(this.GetAltDisplayIcon(), trans.X - (iconSize / 2), trans.Y - (iconSize / 2), iconSize, iconSize);
+				}
+			}
 		}
 
 		protected abstract void DetailsDraw(Graphics graphics, Point trans, bool simple); //draw the inside of the node.
+
+		protected abstract Bitmap GetAltDisplayIcon();
 
 		public override List<TooltipInfo> GetToolTips(Point graph_point)
 		{
