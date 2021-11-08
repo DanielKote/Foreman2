@@ -48,7 +48,6 @@
 			this.PresetNameTextBox = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.MainTable = new System.Windows.Forms.TableLayoutPanel();
-			this.CompatibilityModeCheckBox = new System.Windows.Forms.CheckBox();
 			this.FactorioModLocationGroup = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.ModsBrowseButton = new System.Windows.Forms.Button();
@@ -336,40 +335,25 @@
 			this.MainTable.ColumnCount = 2;
 			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.MainTable.Controls.Add(this.CompatibilityModeCheckBox, 0, 4);
 			this.MainTable.Controls.Add(this.FactorioModLocationGroup, 0, 1);
-			this.MainTable.Controls.Add(this.OKButton, 0, 5);
-			this.MainTable.Controls.Add(this.CancelImportButtonB, 1, 6);
-			this.MainTable.Controls.Add(this.ImportProgressBar, 0, 6);
-			this.MainTable.Controls.Add(this.CancelImportButton, 1, 5);
+			this.MainTable.Controls.Add(this.OKButton, 0, 4);
+			this.MainTable.Controls.Add(this.CancelImportButtonB, 1, 5);
+			this.MainTable.Controls.Add(this.ImportProgressBar, 0, 5);
+			this.MainTable.Controls.Add(this.CancelImportButton, 1, 4);
 			this.MainTable.Controls.Add(this.FactorioLocationGroup, 0, 0);
 			this.MainTable.Controls.Add(this.FactorioSettingsGroup, 0, 2);
 			this.MainTable.Controls.Add(this.PresetNameGroup, 0, 3);
 			this.MainTable.Location = new System.Drawing.Point(0, 0);
 			this.MainTable.Name = "MainTable";
-			this.MainTable.RowCount = 7;
+			this.MainTable.RowCount = 6;
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MainTable.Size = new System.Drawing.Size(458, 320);
+			this.MainTable.Size = new System.Drawing.Size(458, 297);
 			this.MainTable.TabIndex = 8;
-			// 
-			// CompatibilityModeCheckBox
-			// 
-			this.CompatibilityModeCheckBox.AutoSize = true;
-			this.MainTable.SetColumnSpan(this.CompatibilityModeCheckBox, 2);
-			this.CompatibilityModeCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.CompatibilityModeCheckBox.Location = new System.Drawing.Point(10, 242);
-			this.CompatibilityModeCheckBox.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
-			this.CompatibilityModeCheckBox.Name = "CompatibilityModeCheckBox";
-			this.CompatibilityModeCheckBox.Size = new System.Drawing.Size(445, 17);
-			this.CompatibilityModeCheckBox.TabIndex = 9;
-			this.CompatibilityModeCheckBox.Text = "Compatibility Mode (use only if regular import fails)";
-			this.CompatibilityModeCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// FactorioModLocationGroup
 			// 
@@ -429,7 +413,7 @@
 			this.OKButton.AutoSize = true;
 			this.OKButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.OKButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.OKButton.Location = new System.Drawing.Point(3, 265);
+			this.OKButton.Location = new System.Drawing.Point(3, 242);
 			this.OKButton.Name = "OKButton";
 			this.OKButton.Size = new System.Drawing.Size(396, 23);
 			this.OKButton.TabIndex = 2;
@@ -443,7 +427,7 @@
 			this.CancelImportButtonB.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelImportButtonB.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.CancelImportButtonB.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.CancelImportButtonB.Location = new System.Drawing.Point(405, 294);
+			this.CancelImportButtonB.Location = new System.Drawing.Point(405, 271);
 			this.CancelImportButtonB.Name = "CancelImportButtonB";
 			this.CancelImportButtonB.Size = new System.Drawing.Size(50, 23);
 			this.CancelImportButtonB.TabIndex = 8;
@@ -456,7 +440,7 @@
 			// 
 			this.ImportProgressBar.CustomText = null;
 			this.ImportProgressBar.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ImportProgressBar.Location = new System.Drawing.Point(4, 295);
+			this.ImportProgressBar.Location = new System.Drawing.Point(4, 272);
 			this.ImportProgressBar.Margin = new System.Windows.Forms.Padding(4);
 			this.ImportProgressBar.Name = "ImportProgressBar";
 			this.ImportProgressBar.Size = new System.Drawing.Size(394, 21);
@@ -469,7 +453,7 @@
 			this.CancelImportButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelImportButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.CancelImportButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.CancelImportButton.Location = new System.Drawing.Point(405, 265);
+			this.CancelImportButton.Location = new System.Drawing.Point(405, 242);
 			this.CancelImportButton.Name = "CancelImportButton";
 			this.CancelImportButton.Size = new System.Drawing.Size(50, 23);
 			this.CancelImportButton.TabIndex = 6;
@@ -485,7 +469,7 @@
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelButton = this.CancelImportButton;
-			this.ClientSize = new System.Drawing.Size(466, 332);
+			this.ClientSize = new System.Drawing.Size(468, 303);
 			this.Controls.Add(this.MainTable);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.KeyPreview = true;
@@ -548,6 +532,5 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.Button ModsBrowseButton;
 		private System.Windows.Forms.ComboBox ModsLocationComboBox;
-		private System.Windows.Forms.CheckBox CompatibilityModeCheckBox;
 	}
 }
