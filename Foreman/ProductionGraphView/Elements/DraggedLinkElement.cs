@@ -59,9 +59,9 @@ namespace Foreman
 		protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections()
 		{
 			if (SupplierElement == null)
-				return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+				return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
 			if (ConsumerElement == null)
-				return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
+				return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection);
 
 			return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
 		}

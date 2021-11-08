@@ -253,10 +253,13 @@ namespace Foreman
 					 offsetDistance = newOffsetDistance;
 				 }
 				 newLocation = new Point(newLocation.X + offsetDistance, newLocation.Y);
-				 if (offsetLocationToItemTabLevel)
-					Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, Grid.AlignToGrid(newLocation.Y + ((Graph.DefaultNodeDirection == NodeDirection.Up? 1 : -1) * (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0)))));
-				 else
-					Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, newLocation.Y));
+
+				 int yoffset = offsetLocationToItemTabLevel ? (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0) : 0;
+				 yoffset *= originElement == null ? (Graph.DefaultNodeDirection == NodeDirection.Up ? 1 : -1) : (originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? 1 : -1);
+				 Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, newLocation.Y + yoffset));
+
+				 if (originElement != null)
+					 Graph.RequestNodeController(newNode).SetDirection(originElement.DisplayedNode.NodeDirection);
 
 				 if (nNodeType == NewNodeType.Consumer)
 					 Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
