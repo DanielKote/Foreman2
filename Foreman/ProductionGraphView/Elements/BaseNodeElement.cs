@@ -229,7 +229,7 @@ namespace Foreman
 					GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, errorBgBrush); //warning flag
 
 				//draw in all the inside details for this node
-				if(style == NodeDrawingStyle.Regular)
+				if (style == NodeDrawingStyle.Regular || style == NodeDrawingStyle.PrintStyle)
 					DetailsDraw(graphics, trans);
 
 				//highlight

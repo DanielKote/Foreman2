@@ -81,7 +81,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (style == NodeDrawingStyle.IconsOnly || HideItemTab)
+			if (style == NodeDrawingStyle.IconsOnly || style == NodeDrawingStyle.Simple || HideItemTab)
 				return;
 
 			Point trans = LocalToGraph(new Point(0, 0));
@@ -102,7 +102,7 @@ namespace Foreman
 			GraphicsStuff.DrawRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, borderPen);
 
 			//text & icon
-			if (style == NodeDrawingStyle.Regular)
+			if (style == NodeDrawingStyle.Regular || style == NodeDrawingStyle.PrintStyle)
 			{
 				if (LinkType == LinkType.Output)
 				{

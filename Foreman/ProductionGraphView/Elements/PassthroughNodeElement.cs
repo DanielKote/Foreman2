@@ -28,7 +28,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (graphViewer.SimplePassthroughNodes && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.IsOversupplied() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any())
+			if (style != NodeDrawingStyle.IconsOnly && graphViewer.SimplePassthroughNodes && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.IsOversupplied() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any())
 			{
 				InputTabs[0].HideItemTab = true;
 				OutputTabs[0].HideItemTab = true;
@@ -38,15 +38,17 @@ namespace Foreman
 				Point outputPoint = OutputTabs[0].GetConnectionPoint();
 				using (Pen pen = new Pen(DisplayedNode.PassthroughItem.AverageColor, maxLineWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
 					graphics.DrawLine(pen, inputPoint, outputPoint);
-				using(Brush brush = new SolidBrush(DisplayedNode.PassthroughItem.AverageColor))
-				{ 
-					graphics.FillEllipse(brush, inputPoint.X - 6, Math.Min(outputPoint.Y, inputPoint.Y) - 6 + (ItemTabElement.TabWidth / 2), 12, 12);
-					graphics.FillEllipse(brush, inputPoint.X - 6, Math.Max(outputPoint.Y, inputPoint.Y) - 6 - (ItemTabElement.TabWidth / 2), 12, 12);
+				if (style == NodeDrawingStyle.Regular)
+				{
+					using (Brush brush = new SolidBrush(DisplayedNode.PassthroughItem.AverageColor))
+					{
+						graphics.FillEllipse(brush, inputPoint.X - 6, Math.Min(outputPoint.Y, inputPoint.Y) - 6 + (ItemTabElement.TabWidth / 2), 12, 12);
+						graphics.FillEllipse(brush, inputPoint.X - 6, Math.Max(outputPoint.Y, inputPoint.Y) - 6 - (ItemTabElement.TabWidth / 2), 12, 12);
+					}
+					if (Highlighted)
+						using (Pen pen = new Pen(selectionOverlayBrush, Math.Max(30, maxLineWidth + 10)) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
+							graphics.DrawLine(pen, inputPoint, outputPoint);
 				}
-				if(Highlighted)
-					using (Pen pen = new Pen(selectionOverlayBrush, Math.Max(30, maxLineWidth + 10)) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
-						graphics.DrawLine(pen, inputPoint, outputPoint);
-
 			}
 			else
 			{

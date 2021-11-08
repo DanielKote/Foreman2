@@ -45,7 +45,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (DisplayedNode.SelectedBeacon == null || style != NodeDrawingStyle.Regular)
+			if (DisplayedNode.SelectedBeacon == null || style == NodeDrawingStyle.IconsOnly || style == NodeDrawingStyle.Simple)
 				return;
 
 			Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
