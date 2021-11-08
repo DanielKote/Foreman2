@@ -21,6 +21,7 @@ namespace Foreman
 			public int NodeCountForSimpleView;
 			public int IconsOnlyIconSize;
 
+			public bool SimplePassthroughNodes;
 			public bool DynamicLinkWidth;
 			public bool AbbreviateSciPacks;
 			public bool ShowRecipeToolTip;
@@ -112,13 +113,14 @@ namespace Foreman
 
 			//settings
 			DynamicLWCheckBox.Checked = Options.DynamicLinkWidth;
-			NodeCountForSimpleViewInput.Maximum = Math.Max(NodeCountForSimpleViewInput.Maximum, options.NodeCountForSimpleView);
-			NodeCountForSimpleViewInput.Value = options.NodeCountForSimpleView;
+			NodeCountForSimpleViewInput.Maximum = Math.Max(NodeCountForSimpleViewInput.Maximum, Options.NodeCountForSimpleView);
+			NodeCountForSimpleViewInput.Value = Options.NodeCountForSimpleView;
 
-			IconsSizeInput.Value = options.IconsOnlyIconSize;
+			IconsSizeInput.Value = Options.IconsOnlyIconSize;
 
+			SimplePassthroughNodesCheckBox.Checked = Options.SimplePassthroughNodes;
 			ShowNodeRecipeCheckBox.Checked = Options.ShowRecipeToolTip;
-			RoundAssemblerCountCheckBox.Checked = options.RoundAssemblerCount;
+			RoundAssemblerCountCheckBox.Checked = Options.RoundAssemblerCount;
 			AbbreviateSciPackCheckBox.Checked = Options.AbbreviateSciPacks;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
 			FlagOUSupplyNodesCheckBox.Checked = Options.FlagOUSuppliedNodes;
@@ -471,6 +473,7 @@ namespace Foreman
 			Options.NodeCountForSimpleView = (int)NodeCountForSimpleViewInput.Value;
 			Options.IconsOnlyIconSize = (int)IconsSizeInput.Value;
 
+			Options.SimplePassthroughNodes = SimplePassthroughNodesCheckBox.Checked;
 			Options.DynamicLinkWidth = DynamicLWCheckBox.Checked;
 			Options.AbbreviateSciPacks = AbbreviateSciPackCheckBox.Checked;
 			Options.ShowRecipeToolTip = ShowNodeRecipeCheckBox.Checked;

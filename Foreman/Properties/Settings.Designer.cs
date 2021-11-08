@@ -382,5 +382,17 @@ namespace Foreman.Properties {
                 this["IconsSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SimplePassthroughNodes {
+            get {
+                return ((bool)(this["SimplePassthroughNodes"]));
+            }
+            set {
+                this["SimplePassthroughNodes"] = value;
+            }
+        }
     }
 }

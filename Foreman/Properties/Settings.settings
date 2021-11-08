@@ -92,5 +92,8 @@
     <Setting Name="IconsSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">24</Value>
     </Setting>
+    <Setting Name="SimplePassthroughNodes" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

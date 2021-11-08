@@ -38,7 +38,7 @@ namespace Foreman
 		private static readonly Brush oversuppliedFlowBorderBrush = Brushes.DarkGoldenrod;
 		private static readonly Brush undersuppliedFlowBorderBrush = Brushes.DarkRed;
 
-		private static readonly Brush selectionOverlayBrush = new SolidBrush(Color.FromArgb(100, 100, 100, 200));
+		protected static readonly Brush selectionOverlayBrush = new SolidBrush(Color.FromArgb(100, 100, 100, 200));
 
 		protected static readonly Brush TextBrush = Brushes.Black;
 		protected static readonly Font BaseFont = new Font(FontFamily.GenericSansSerif, 10f);

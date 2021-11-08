@@ -78,6 +78,8 @@ namespace Foreman
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
+				GraphViewer.SimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
+
 				GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
 				IconViewCheckBox.Checked = GraphViewer.IconsOnly;
 				if (Properties.Settings.Default.IconsSize < 8) Properties.Settings.Default.IconsSize = 8;
@@ -237,6 +239,7 @@ namespace Foreman
 			options.NodeCountForSimpleView = GraphViewer.NodeCountForSimpleView;
 			options.IconsOnlyIconSize = GraphViewer.IconsSize;
 
+			options.SimplePassthroughNodes = GraphViewer.SimplePassthroughNodes;
 			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
 			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
@@ -298,6 +301,9 @@ namespace Foreman
 					GraphViewer.IconsSize = options.IconsOnlyIconSize;
 					Properties.Settings.Default.IconsSize = options.IconsOnlyIconSize;
 
+
+					GraphViewer.SimplePassthroughNodes = options.SimplePassthroughNodes;
+					Properties.Settings.Default.SimplePassthroughNodes = options.SimplePassthroughNodes;
 					GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
 					Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
 					GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;

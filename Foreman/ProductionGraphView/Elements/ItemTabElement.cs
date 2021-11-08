@@ -15,6 +15,8 @@ namespace Foreman
 		public Item Item { get; private set; }
 		public IEnumerable<ReadOnlyNodeLink> Links { get { return LinkType == LinkType.Input ? DisplayedNode.InputLinks.Where(l => l.Item == Item) : DisplayedNode.OutputLinks.Where(l => l.Item == Item); } }
 
+		public bool HideItemTab { get; set; }
+
 		private const int iconSize = 32;
 		private const int border = 3;
 		private int textHeight = 11;
@@ -41,8 +43,9 @@ namespace Foreman
 		public ItemTabElement(Item item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) : base(graphViewer, node)
 		{
 			DisplayedNode = node.DisplayedNode;
-			this.Item = item;
-			this.LinkType = type;
+			Item = item;
+			LinkType = type;
+			HideItemTab = false;
 
 			borderPen = regularBorderPen;
 			int textHeight = (int)base.graphViewer.CreateGraphics().MeasureString("a", textFont).Height;
@@ -78,7 +81,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (style == NodeDrawingStyle.IconsOnly)
+			if (style == NodeDrawingStyle.IconsOnly || HideItemTab)
 				return;
 
 			Point trans = LocalToGraph(new Point(0, 0));
