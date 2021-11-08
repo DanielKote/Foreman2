@@ -13,11 +13,14 @@ namespace Foreman
 		public virtual Item Item { get; protected set; }
 
 		private Point consumerOrigin, supplierOrigin;
-		private Point consumerPull, supplierPull;
 		private NodeDirection consumerDirection, supplierDirection;
 
 		private LineType lineType;
-		private Point pointMidA, pointMidAPull, pointMidB, pointMidBPull; //for the U and N shape links
+
+		private Point consumerPull, supplierPull; //for basic links
+		private Point midUA, midUB, midUC, midUD, pullU1, pullU2, pullU3, pullU4; //for U shape links
+		private Point midNA, midNB, midNC, midND, midNE, midNF, pullN1, pullN2, pullN3, pullN4, pullN5, pullN6, pullN7, pullN8; //for N shape links
+		//private Point pointMidA, pointMidAPull, pointMidB, pointMidBPull; //for the U and N shape links
 
 		public float LinkWidth { get; set; }
 
@@ -96,19 +99,30 @@ namespace Foreman
 						break;
 					case LineType.UShape: //supplier and consumer directions are different
 
+						int xOffset = Math.Min(circlePull * 2, Math.Abs(consumerOrigin.X - supplierOrigin.X)) * Math.Sign(consumerOrigin.X - supplierOrigin.X) / 2;
 						if(supplierDirection == NodeDirection.Up)
 						{
-							pointMidA = new Point(supplierOrigin.X, Math.Min(supplierOrigin.Y, consumerOrigin.Y));
-							pointMidAPull = new Point(pointMidA.X, pointMidA.Y - circlePull);
-							pointMidB = new Point(consumerOrigin.X, Math.Min(supplierOrigin.Y, consumerOrigin.Y));
-							pointMidBPull = new Point(pointMidB.X, pointMidB.Y - circlePull);
+							midUA = new Point(supplierOrigin.X, Math.Min(supplierOrigin.Y, consumerOrigin.Y));
+							midUB = new Point(midUA.X + xOffset, midUA.Y - circlePull);
+							midUD = new Point(consumerOrigin.X, midUA.Y);
+							midUC = new Point(midUD.X - xOffset, midUB.Y);
+
+							pullU1 = new Point(supplierOrigin.X, midUA.Y - (circlePull / 2));
+							pullU2 = new Point(supplierOrigin.X + (xOffset / 2), midUB.Y);
+							pullU3 = new Point(consumerOrigin.X - (xOffset / 2), midUB.Y);
+							pullU4 = new Point(consumerOrigin.X, midUD.Y - (circlePull / 2));
 						}
 						else
 						{
-							pointMidA = new Point(supplierOrigin.X, Math.Max(supplierOrigin.Y, consumerOrigin.Y));
-							pointMidAPull = new Point(pointMidA.X, pointMidA.Y + circlePull);
-							pointMidB = new Point(consumerOrigin.X, Math.Max(supplierOrigin.Y, consumerOrigin.Y));
-							pointMidBPull = new Point(pointMidB.X, pointMidB.Y + circlePull);
+							midUA = new Point(supplierOrigin.X, Math.Max(supplierOrigin.Y, consumerOrigin.Y));
+							midUB = new Point(midUA.X + xOffset, midUA.Y + circlePull);
+							midUD = new Point(consumerOrigin.X, midUA.Y);
+							midUC = new Point(midUD.X - xOffset, midUB.Y);
+
+							pullU1 = new Point(supplierOrigin.X, midUA.Y + (circlePull / 2));
+							pullU2 = new Point(supplierOrigin.X + (xOffset / 2), midUB.Y);
+							pullU3 = new Point(consumerOrigin.X - (xOffset / 2), midUB.Y);
+							pullU4 = new Point(consumerOrigin.X, midUD.Y + (circlePull / 2));
 						}
 
 						CalculatedBounds = new Rectangle(
@@ -118,23 +132,46 @@ namespace Foreman
 							Math.Abs(supplierOrigin.Y - consumerOrigin.Y) + circlePull);
 						break;
 					case LineType.NShape: //supplier and consumer directions are same, but the link direction is wrong (consumer is above supplier if direction is up, and below supplier if direction is down)
-						int midX = Math.Abs(supplierOrigin.X - consumerOrigin.X) > 200 ? (supplierOrigin.X + consumerOrigin.X) / 2 : supplierOrigin.X > consumerOrigin.X ? supplierOrigin.X + 150 : supplierOrigin.X - 150;
-						pointMidA = new Point(midX, supplierOrigin.Y);
-						pointMidB = new Point(midX, consumerOrigin.Y);
+						int midX = Math.Abs(supplierOrigin.X - consumerOrigin.X) > 2 * circlePull ? (supplierOrigin.X + consumerOrigin.X) / 2 : supplierOrigin.X > consumerOrigin.X ? supplierOrigin.X + circlePull : supplierOrigin.X - circlePull;
+						int xOffsetA = Math.Min(circlePull * 2, Math.Abs(supplierOrigin.X - midX)) * Math.Sign(midX - supplierOrigin.X) / 2;
+						int xOffsetB = Math.Min(circlePull * 2, Math.Abs(midX - consumerOrigin.X)) * Math.Sign(consumerOrigin.X - midX) / 2;
+
+						midNC = new Point(midX, supplierOrigin.Y);
+						midND = new Point(midX, consumerOrigin.Y);
 
 						if(supplierDirection == NodeDirection.Up)
 						{
-							supplierPull = new Point(supplierOrigin.X, supplierOrigin.Y - circlePull);
-							pointMidAPull = new Point(pointMidA.X, pointMidA.Y - circlePull);
-							pointMidBPull = new Point(pointMidB.X, pointMidB.Y + circlePull);
-							consumerPull = new Point(consumerOrigin.X, consumerOrigin.Y + circlePull);
+							midNA = new Point(supplierOrigin.X + xOffsetA, supplierOrigin.Y - circlePull);
+							midNB = new Point(midNC.X - xOffsetA, midNA.Y);
+
+							midNE = new Point(midND.X + xOffsetB, consumerOrigin.Y + circlePull);
+							midNF = new Point(consumerOrigin.X - xOffsetB, midNE.Y);
+
+							pullN1 = new Point(supplierOrigin.X, supplierOrigin.Y - (circlePull / 2));
+							pullN2 = new Point(supplierOrigin.X + (xOffsetA / 2), midNA.Y);
+							pullN3 = new Point(midNC.X - (xOffsetA / 2), midNA.Y);
+							pullN4 = new Point(midNC.X, pullN1.Y);
+							pullN5 = new Point(midNC.X, consumerOrigin.Y + (circlePull / 2));
+							pullN6 = new Point(midNC.X + (xOffsetB / 2), midNE.Y);
+							pullN7 = new Point(consumerOrigin.X - (xOffsetB / 2), midNE.Y);
+							pullN8 = new Point(consumerOrigin.X, pullN5.Y);
 						}
 						else
 						{
-							supplierPull = new Point(supplierOrigin.X, supplierOrigin.Y + circlePull);
-							pointMidAPull = new Point(pointMidA.X, pointMidA.Y + circlePull);
-							pointMidBPull = new Point(pointMidB.X, pointMidB.Y - circlePull);
-							consumerPull = new Point(consumerOrigin.X, consumerOrigin.Y - circlePull);
+							midNA = new Point(supplierOrigin.X + xOffsetA, supplierOrigin.Y + circlePull);
+							midNB = new Point(midNC.X - xOffsetA, midNA.Y);
+
+							midNE = new Point(midND.X + xOffsetB, consumerOrigin.Y - circlePull);
+							midNF = new Point(consumerOrigin.X - xOffsetB, midNE.Y);
+
+							pullN1 = new Point(supplierOrigin.X, supplierOrigin.Y + (circlePull / 2));
+							pullN2 = new Point(supplierOrigin.X + (xOffsetA / 2), midNA.Y);
+							pullN3 = new Point(midNC.X - (xOffsetA / 2), midNA.Y);
+							pullN4 = new Point(midNC.X, pullN1.Y);
+							pullN5 = new Point(midNC.X, consumerOrigin.Y - (circlePull / 2));
+							pullN6 = new Point(midNC.X + (xOffsetB / 2), midNE.Y);
+							pullN7 = new Point(consumerOrigin.X - (xOffsetB / 2), midNE.Y);
+							pullN8 = new Point(consumerOrigin.X, pullN5.Y);
 						}
 
 						CalculatedBounds = new Rectangle(
@@ -168,6 +205,7 @@ namespace Foreman
 						{
 							supplierOrigin,
 							supplierPull,
+
 							consumerPull,
 							consumerOrigin
 						});
@@ -177,12 +215,23 @@ namespace Foreman
 						{
 							supplierOrigin,
 							supplierOrigin,
-							pointMidA,
-							pointMidA,
-							pointMidAPull,
-							pointMidBPull,
-							pointMidB,
-							pointMidB,
+
+							midUA,
+							midUA,
+							pullU1,
+
+							pullU2,
+							midUB,
+							midUB,
+
+							midUC,
+							midUC,
+							pullU3,
+
+							pullU4,
+							midUD,
+							midUD,
+
 							consumerOrigin,
 							consumerOrigin
 						});
@@ -191,16 +240,35 @@ namespace Foreman
 						graphics.DrawBeziers(pen, new Point[]
 						{
 							supplierOrigin,
-							supplierPull,
-							pointMidAPull,
-							pointMidA,
-							pointMidA,
-							pointMidB,
-							pointMidB,
-							pointMidBPull,
-							consumerPull,
+							pullN1,
+
+							pullN2,
+							midNA,
+							midNA,
+
+							midNB,
+							midNB,
+							pullN3,
+
+							pullN4,
+							midNC,
+							midNC,
+							
+							midND,
+							midND,
+							pullN5,
+
+							pullN6,
+							midNE,
+							midNE,
+
+							midNF,
+							midNF,
+							pullN7,
+
+							pullN8,
 							consumerOrigin
-						});
+						}); ;
 						break;
 				}
 			}
