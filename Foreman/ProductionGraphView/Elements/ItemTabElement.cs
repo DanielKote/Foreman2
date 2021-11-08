@@ -76,8 +76,11 @@ namespace Foreman
 			Height = iconSize + textHeight + border + 3;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
+			if (style == NodeDrawingStyle.IconsOnly)
+				return;
+
 			Point trans = LocalToGraph(new Point(0, 0));
 
 			//background
@@ -96,7 +99,7 @@ namespace Foreman
 			GraphicsStuff.DrawRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, borderPen);
 
 			//text & icon
-			if (!simple)
+			if (style == NodeDrawingStyle.Regular)
 			{
 				if (LinkType == LinkType.Output)
 				{
@@ -109,7 +112,6 @@ namespace Foreman
 					graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y - (Bounds.Height / 2) + border, iconSize, iconSize);
 				}
 			}
-
 		}
 
 		public override List<TooltipInfo> GetToolTips(Point graph_point)

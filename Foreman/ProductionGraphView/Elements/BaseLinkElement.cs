@@ -23,6 +23,8 @@ namespace Foreman
 
 		public Rectangle CalculatedBounds { get; private set; }
 
+		protected bool iconOnlyDraw;
+
 		private const int circlePull = 100;
 		private static CustomLineCap arrowCap = new AdjustableArrowCap(4,3);
 
@@ -149,13 +151,14 @@ namespace Foreman
 			return false;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
+			iconOnlyDraw = (style == NodeDrawingStyle.IconsOnly);
 			UpdateCurve();
 
 			using (Pen pen = new Pen(Item.AverageColor, LinkWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
 			{
-				if (!graphViewer.DynamicLinkWidth)
+				if (!graphViewer.DynamicLinkWidth && !iconOnlyDraw)
 					pen.CustomEndCap = arrowCap;
 
 				switch(lineType)

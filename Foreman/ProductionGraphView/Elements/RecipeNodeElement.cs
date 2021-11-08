@@ -95,21 +95,20 @@ namespace Foreman
 			base.UpdateState();
 		}
 
-		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
+		protected override Bitmap NodeIcon() { return DisplayedNode.BaseRecipe.Icon; }
+
+		protected override void DetailsDraw(Graphics graphics, Point trans)
 		{
 			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
 			{
-				if (!simple)
-				{
-					//text
-					bool oversupplied = DisplayedNode.IsOversupplied();
-					Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (oversupplied ? 32 : 27), (Width - 10 - 40), Height - (oversupplied ? 64 : 54));
-					//graphics.DrawRectangle(devPen, textSlot);
-					int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
+				//text
+				bool oversupplied = DisplayedNode.IsOversupplied();
+				Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (oversupplied ? 32 : 27), (Width - 10 - 40), Height - (oversupplied ? 64 : 54));
+				//graphics.DrawRectangle(devPen, textSlot);
+				int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
 
-					//assembler icon
-					graphics.DrawImage(DisplayedNode.SelectedAssembler == null ? DataCache.UnknownIcon : DisplayedNode.SelectedAssembler.Icon, trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);
-				}
+				//assembler icon
+				graphics.DrawImage(DisplayedNode.SelectedAssembler == null ? DataCache.UnknownIcon : DisplayedNode.SelectedAssembler.Icon, trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);
 
 				//productivity ticks
 				int pModules = DisplayedNode.AssemblerModules.Count(m => m.ProductivityBonus > 0);
@@ -119,14 +118,14 @@ namespace Foreman
 				pModules += extraProductivity ? 1 : 0;
 
 				for (int i = 0; i < pModules && i < 6; i++)
-					graphics.DrawEllipse((extraProductivity && i==0)? extraProductivityPen : productivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10 + i * 12, 6, 6);
+					graphics.DrawEllipse((extraProductivity && i == 0) ? extraProductivityPen : productivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10 + i * 12, 6, 6);
 				if (pModules > 6)
 				{
 					graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2) - 4, trans.Y - (Height / 2) + 84, trans.X - (Width / 2) + 8, trans.Y - (Height / 2) + 84);
 					graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2) + 2, trans.Y - (Height / 2) + 84 - 6, trans.X - (Width / 2) + 2, trans.Y - (Height / 2) + 84 + 6);
 				}
 			}
-			else if(DisplayedNode.ExtraProductivity > 0 && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners))
+			else if (DisplayedNode.ExtraProductivity > 0 && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners))
 			{
 				graphics.DrawEllipse(extraProductivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10, 6, 6);
 			}

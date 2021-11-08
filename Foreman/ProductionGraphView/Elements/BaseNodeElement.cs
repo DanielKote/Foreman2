@@ -204,33 +204,42 @@ namespace Foreman
 			NodeValuesRequireUpdate = false;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
 			Point trans = LocalToGraph(new Point(0, 0)); //all draw operations happen in graph 0,0 origin coordinates. So we need to transform all our draw operations to the local 0,0 (center of object)
+			if (style == NodeDrawingStyle.IconsOnly)
+			{
+				int iconSize = graphViewer.IconsDrawSize;
+				if(NodeIcon() != null) graphics.DrawImage(NodeIcon(), trans.X - (iconSize / 2), trans.Y - (iconSize / 2), iconSize, iconSize);
+			}
+			else
+			{
+				//background
+				Brush bgBrush = DisplayedNode.State == NodeState.Error ? errorBgBrush : CleanBgBrush;
+				Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOversupplied() ? oversuppliedFlowBorderBrush : equalFlowBorderBrush;
 
-			//background
-			Brush bgBrush = DisplayedNode.State == NodeState.Error ? errorBgBrush : CleanBgBrush;
-			Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOversupplied() ? oversuppliedFlowBorderBrush : equalFlowBorderBrush;
+				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing, trans.Y - (Height / 2) + BorderSpacing, Width - (2 * BorderSpacing), Height - (2 * BorderSpacing), 10, graphics, borderBrush); //flow status border
+				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing + 3, trans.Y - (Height / 2) + BorderSpacing + 3, Width - (2 * BorderSpacing) - 6, Height - (2 * BorderSpacing) - 6, 7, graphics, bgBrush); //basic background (with given background brush)
+				if (DisplayedNode.RateType == RateType.Manual)
+					GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, ManualRateBGFilterBrush); //darken background if its a manual rate set
 
-			GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing, trans.Y - (Height / 2) + BorderSpacing, Width - (2 * BorderSpacing), Height - (2 * BorderSpacing), 10, graphics, borderBrush); //flow status border
-			GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing + 3, trans.Y - (Height / 2) + BorderSpacing + 3, Width - (2 * BorderSpacing) - 6, Height - (2 * BorderSpacing) - 6, 7, graphics, bgBrush); //basic background (with given background brush)
-			if (DisplayedNode.RateType == RateType.Manual)
-				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, ManualRateBGFilterBrush); //darken background if its a manual rate set
+				if (graphViewer.FlagOUSuppliedNodes && borderBrush != equalFlowBorderBrush)
+					GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, borderBrush); //supply flag
+				if (DisplayedNode.State == NodeState.Warning)
+					GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, errorBgBrush); //warning flag
 
-			if(graphViewer.FlagOUSuppliedNodes && borderBrush != equalFlowBorderBrush)
-				GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, borderBrush); //supply flag
-			if (DisplayedNode.State == NodeState.Warning)
-				GraphicsStuff.FillRoundRectTLFlag(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width / 2 - 6, Height / 2 - 6, 7, graphics, errorBgBrush); //warning flag
+				//draw in all the inside details for this node
+				if(style == NodeDrawingStyle.Regular)
+					DetailsDraw(graphics, trans);
 
-			//draw in all the inside details for this node
-			DetailsDraw(graphics, trans, simple);
-
-			//highlight
-			if (Highlighted)
-				GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, selectionOverlayBrush);
+				//highlight
+				if (Highlighted)
+					GraphicsStuff.FillRoundRect(trans.X - (Width / 2), trans.Y - (Height / 2), Width, Height, 8, graphics, selectionOverlayBrush);
+			}
 		}
 
-		protected abstract void DetailsDraw(Graphics graphics, Point trans, bool simple); //draw the inside of the node.
+		protected abstract void DetailsDraw(Graphics graphics, Point trans); //draw the inside of the node.
+		protected abstract Bitmap NodeIcon();
 
 		public override List<TooltipInfo> GetToolTips(Point graph_point)
 		{

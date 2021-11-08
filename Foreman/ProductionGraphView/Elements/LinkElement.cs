@@ -34,7 +34,7 @@ namespace Foreman
 
 		protected override Tuple<Point,Point> GetCurveEndpoints()
 		{
-			return new Tuple<Point, Point>(SupplierTab.GetConnectionPoint(), ConsumerTab.GetConnectionPoint());
+			return new Tuple<Point, Point>(iconOnlyDraw? SupplierElement.Location : SupplierTab.GetConnectionPoint(), iconOnlyDraw? ConsumerElement.Location : ConsumerTab.GetConnectionPoint());
 		}
 		protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections()
 		{

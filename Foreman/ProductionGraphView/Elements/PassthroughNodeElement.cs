@@ -24,11 +24,10 @@ namespace Foreman
 			DisplayedNode = node;
 		}
 
-		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
-		{
-			if (simple)
-				return;
+		protected override Bitmap NodeIcon() { return null; }
 
+		protected override void DetailsDraw(Graphics graphics, Point trans)
+		{
 			if (DisplayedNode.RateType == RateType.Manual)
 			{
 				int yoffset = DisplayedNode.NodeDirection == NodeDirection.Up ? 28 : 32;

@@ -358,5 +358,29 @@ namespace Foreman.Properties {
                 this["ShowOUSuppliedArrows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IconsOnlyView {
+            get {
+                return ((bool)(this["IconsOnlyView"]));
+            }
+            set {
+                this["IconsOnlyView"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("24")]
+        public int IconsSize {
+            get {
+                return ((int)(this["IconsSize"]));
+            }
+            set {
+                this["IconsSize"] = value;
+            }
+        }
     }
 }

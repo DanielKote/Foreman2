@@ -15,15 +15,19 @@ using System.Threading.Tasks;
 namespace Foreman
 {
 	public enum NewNodeType { Disconnected, Supplier, Consumer }
+	public enum NodeDrawingStyle { Regular, Simple, IconsOnly } //simple will only draw the node boxes (no icons or text) and link lines, iconsonly will draw node icons instead of nodes (for zoomed view)
 
 	[Serializable]
 	public partial class ProductionGraphViewer : UserControl, ISerializable
 	{
-
 		private enum DragOperation { None, Item, Selection }
 		public enum LOD { Low, Medium, High } //low: only names. medium: assemblers, beacons, etc. high: include assembler percentages
 
 		public LOD LevelOfDetail { get; set; }
+		public bool IconsOnly { get; set; }
+		public int IconsSize { get; set; }
+		public int IconsDrawSize { get { return ViewScale > 1? IconsSize : (int)(IconsSize / ViewScale); } }
+
 		public int NodeCountForSimpleView { get; set; } //if the number of elements to draw is over this amount then the drawing functions will switch to simple view draws (mostly for FPS during zoomed out views)
 		public bool ShowRecipeToolTip { get; set; }
 		public bool TooltipsEnabled { get; set; }
@@ -87,6 +91,9 @@ namespace Foreman
 			ViewOffset = new Point(Width / -2, Height / -2);
 			ViewScale = 1f;
 			NodeCountForSimpleView = 200;
+
+			IconsOnly = false;
+			IconsSize = 32;
 
 			TooltipsEnabled = true;
 			SubwindowOpen = false;
@@ -504,7 +511,7 @@ namespace Foreman
 			//all elements (nodes & lines)
 			int visibleElements = GetPaintingOrder().Count(e => e.Visible && e is BaseNodeElement);
 			foreach (GraphElement element in GetPaintingOrder())
-				element.Paint(graphics, !FullGraph && (visibleElements > NodeCountForSimpleView || ViewScale < 0.2)); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
+				element.Paint(graphics, FullGraph? NodeDrawingStyle.Regular : IconsOnly? NodeDrawingStyle.IconsOnly : (visibleElements > NodeCountForSimpleView || ViewScale < 0.2)? NodeDrawingStyle.Simple : NodeDrawingStyle.Regular); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
 
 			//selection zone
 			if (currentDragOperation == DragOperation.Selection && !FullGraph)

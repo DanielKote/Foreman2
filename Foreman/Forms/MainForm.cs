@@ -78,6 +78,12 @@ namespace Foreman
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
+				GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
+				IconViewCheckBox.Checked = GraphViewer.IconsOnly;
+				if (Properties.Settings.Default.IconsSize < 8) Properties.Settings.Default.IconsSize = 8;
+				if (Properties.Settings.Default.IconsSize > 256) Properties.Settings.Default.IconsSize = 256;
+				GraphViewer.IconsSize = Properties.Settings.Default.IconsSize;
+
 				Properties.Settings.Default.Save();
 
 				GraphViewer.Invalidate();
@@ -229,6 +235,8 @@ namespace Foreman
 
 			options.LevelOfDetail = GraphViewer.LevelOfDetail;
 			options.NodeCountForSimpleView = GraphViewer.NodeCountForSimpleView;
+			options.IconsOnlyIconSize = GraphViewer.IconsSize;
+
 			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
 			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
@@ -287,6 +295,9 @@ namespace Foreman
 					Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
 					GraphViewer.NodeCountForSimpleView = options.NodeCountForSimpleView;
 					Properties.Settings.Default.NodeCountForSimpleView = options.NodeCountForSimpleView;
+					GraphViewer.IconsSize = options.IconsOnlyIconSize;
+					Properties.Settings.Default.IconsSize = options.IconsOnlyIconSize;
+
 					GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
 					Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
 					GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;
@@ -368,6 +379,15 @@ namespace Foreman
 				GraphViewer.Graph.UpdateNodeValues();
 			else
 				GraphViewer.Invalidate();
+		}
+
+		private void IconViewCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.IconsOnly = IconViewCheckBox.Checked;
+			Properties.Settings.Default.IconsOnlyView = IconViewCheckBox.Checked;
+			Properties.Settings.Default.Save();
+			GraphViewer.Invalidate();
+
 		}
 
 		private void GraphSummaryButton_Click(object sender, EventArgs e)

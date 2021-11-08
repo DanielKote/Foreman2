@@ -43,9 +43,9 @@ namespace Foreman
 			Visible = visible;
 		}
 
-		protected override void Draw(Graphics graphics, bool simple)
+		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (DisplayedNode.SelectedBeacon == null || simple)
+			if (DisplayedNode.SelectedBeacon == null || style != NodeDrawingStyle.Regular)
 				return;
 
 			Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));

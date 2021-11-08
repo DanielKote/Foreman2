@@ -50,9 +50,9 @@ namespace Foreman
 			}
 
 			if (SupplierElement != null)
-				pointMUpdate = SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
+				pointMUpdate = iconOnlyDraw? SupplierElement.Location : SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
 			if (ConsumerElement != null)
-				pointNUpdate = ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
+				pointNUpdate = iconOnlyDraw? ConsumerElement.Location : ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
 
 			return new Tuple<Point,Point>(pointMUpdate, pointNUpdate);
 		}

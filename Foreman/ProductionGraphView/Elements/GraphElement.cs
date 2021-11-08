@@ -99,20 +99,20 @@ namespace Foreman
 		}
 
 		public virtual void PrePaint() { }
-		public void Paint(Graphics graphics, bool simple)
+		public void Paint(Graphics graphics, NodeDrawingStyle style)
 		{
 			if (Visible)
 			{
 				//call own draw operation
-				Draw(graphics, simple);
+				Draw(graphics, style);
 
 				//call paint operations (this function) for each of the sub-elements owned by this element (who will call their own draw and further paint operations on their own sub elements)
 				foreach (GraphElement element in SubElements)
-					element.Paint(graphics, simple);
+					element.Paint(graphics, style);
 			}
 		}
 
-		protected abstract void Draw(Graphics graphics, bool simple);
+		protected abstract void Draw(Graphics graphics, NodeDrawingStyle style);
 
 		public virtual List<TooltipInfo> GetToolTips(Point graph_point) { return new List<TooltipInfo>(); }
 		public virtual void MouseMoved(Point graph_point) { }

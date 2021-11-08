@@ -24,11 +24,10 @@ namespace Foreman
 			DisplayedNode = node;
 		}
 
-		protected override void DetailsDraw(Graphics graphics, Point trans, bool simple)
-		{
-			if (simple)
-				return;
+		protected override Bitmap NodeIcon() { return DisplayedNode.ConsumedItem.Icon; }
 
+		protected override void DetailsDraw(Graphics graphics, Point trans)
+		{
 			int yoffset = DisplayedNode.NodeDirection == NodeDirection.Up ? 5 : 28;
 			Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 20);
 			Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 20, titleSlot.Width, (Height / 2) - 5);

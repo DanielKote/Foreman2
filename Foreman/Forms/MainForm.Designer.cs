@@ -54,6 +54,7 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.GraphSummaryButton = new System.Windows.Forms.Button();
+			this.IconViewCheckBox = new System.Windows.Forms.CheckBox();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MenuTable.SuspendLayout();
 			this.MenuButtonsTable.SuspendLayout();
@@ -89,13 +90,13 @@
 			this.GraphViewer.DCache = null;
 			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
-			this.GraphViewer.Location = new System.Drawing.Point(3, 124);
+			this.GraphViewer.Location = new System.Drawing.Point(3, 136);
 			this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
 			this.GraphViewer.MouseDownElement = null;
 			this.GraphViewer.Name = "GraphViewer";
 			this.GraphViewer.NodeCountForSimpleView = 200;
 			this.GraphViewer.ShowRecipeToolTip = false;
-			this.GraphViewer.Size = new System.Drawing.Size(928, 634);
+			this.GraphViewer.Size = new System.Drawing.Size(928, 622);
 			this.GraphViewer.TabIndex = 12;
 			this.GraphViewer.TooltipsEnabled = true;
 			this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
@@ -119,7 +120,7 @@
 			this.MenuTable.Name = "MenuTable";
 			this.MenuTable.RowCount = 1;
 			this.MenuTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MenuTable.Size = new System.Drawing.Size(928, 118);
+			this.MenuTable.Size = new System.Drawing.Size(928, 130);
 			this.MenuTable.TabIndex = 18;
 			// 
 			// MenuButtonsTable
@@ -146,7 +147,7 @@
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.MenuButtonsTable.Size = new System.Drawing.Size(169, 108);
+			this.MenuButtonsTable.Size = new System.Drawing.Size(169, 120);
 			this.MenuButtonsTable.TabIndex = 0;
 			// 
 			// AddItemButton
@@ -155,10 +156,10 @@
 			this.AddItemButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AddItemButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.AddItemButton.Location = new System.Drawing.Point(84, 56);
+			this.AddItemButton.Location = new System.Drawing.Point(84, 62);
 			this.AddItemButton.Margin = new System.Windows.Forms.Padding(2);
 			this.AddItemButton.Name = "AddItemButton";
-			this.AddItemButton.Size = new System.Drawing.Size(83, 23);
+			this.AddItemButton.Size = new System.Drawing.Size(83, 26);
 			this.AddItemButton.TabIndex = 11;
 			this.AddItemButton.Text = "Add Item";
 			this.AddItemButton.UseVisualStyleBackColor = true;
@@ -170,10 +171,10 @@
 			this.AddRecipeButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AddRecipeButton.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AddRecipeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.AddRecipeButton.Location = new System.Drawing.Point(84, 83);
+			this.AddRecipeButton.Location = new System.Drawing.Point(84, 92);
 			this.AddRecipeButton.Margin = new System.Windows.Forms.Padding(2);
 			this.AddRecipeButton.Name = "AddRecipeButton";
-			this.AddRecipeButton.Size = new System.Drawing.Size(83, 23);
+			this.AddRecipeButton.Size = new System.Drawing.Size(83, 26);
 			this.AddRecipeButton.TabIndex = 10;
 			this.AddRecipeButton.Text = "Add Recipe";
 			this.AddRecipeButton.UseVisualStyleBackColor = true;
@@ -184,10 +185,10 @@
 			this.ExportImageButton.AutoSize = true;
 			this.ExportImageButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ExportImageButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ExportImageButton.Location = new System.Drawing.Point(84, 29);
+			this.ExportImageButton.Location = new System.Drawing.Point(84, 32);
 			this.ExportImageButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ExportImageButton.Name = "ExportImageButton";
-			this.ExportImageButton.Size = new System.Drawing.Size(83, 23);
+			this.ExportImageButton.Size = new System.Drawing.Size(83, 26);
 			this.ExportImageButton.TabIndex = 8;
 			this.ExportImageButton.Text = "Export Image";
 			this.ExportImageButton.UseVisualStyleBackColor = true;
@@ -201,7 +202,7 @@
 			this.EnableDisableButton.Location = new System.Drawing.Point(84, 2);
 			this.EnableDisableButton.Margin = new System.Windows.Forms.Padding(2);
 			this.EnableDisableButton.Name = "EnableDisableButton";
-			this.EnableDisableButton.Size = new System.Drawing.Size(83, 23);
+			this.EnableDisableButton.Size = new System.Drawing.Size(83, 26);
 			this.EnableDisableButton.TabIndex = 7;
 			this.EnableDisableButton.Text = "Settings";
 			this.EnableDisableButton.UseVisualStyleBackColor = true;
@@ -212,10 +213,10 @@
 			this.ImportGraphButton.AutoSize = true;
 			this.ImportGraphButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ImportGraphButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ImportGraphButton.Location = new System.Drawing.Point(2, 56);
+			this.ImportGraphButton.Location = new System.Drawing.Point(2, 62);
 			this.ImportGraphButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ImportGraphButton.Name = "ImportGraphButton";
-			this.ImportGraphButton.Size = new System.Drawing.Size(78, 23);
+			this.ImportGraphButton.Size = new System.Drawing.Size(78, 26);
 			this.ImportGraphButton.TabIndex = 9;
 			this.ImportGraphButton.Text = "Import Graph";
 			this.ImportGraphButton.UseVisualStyleBackColor = true;
@@ -226,10 +227,10 @@
 			this.ClearButton.AutoSize = true;
 			this.ClearButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ClearButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ClearButton.Location = new System.Drawing.Point(2, 83);
+			this.ClearButton.Location = new System.Drawing.Point(2, 92);
 			this.ClearButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ClearButton.Name = "ClearButton";
-			this.ClearButton.Size = new System.Drawing.Size(78, 23);
+			this.ClearButton.Size = new System.Drawing.Size(78, 26);
 			this.ClearButton.TabIndex = 6;
 			this.ClearButton.Text = "Clear Graph";
 			this.ClearButton.UseVisualStyleBackColor = true;
@@ -240,10 +241,10 @@
 			this.LoadGraphButton.AutoSize = true;
 			this.LoadGraphButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.LoadGraphButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.LoadGraphButton.Location = new System.Drawing.Point(2, 29);
+			this.LoadGraphButton.Location = new System.Drawing.Point(2, 32);
 			this.LoadGraphButton.Margin = new System.Windows.Forms.Padding(2);
 			this.LoadGraphButton.Name = "LoadGraphButton";
-			this.LoadGraphButton.Size = new System.Drawing.Size(78, 23);
+			this.LoadGraphButton.Size = new System.Drawing.Size(78, 26);
 			this.LoadGraphButton.TabIndex = 10;
 			this.LoadGraphButton.Text = "Load";
 			this.LoadGraphButton.UseVisualStyleBackColor = true;
@@ -257,7 +258,7 @@
 			this.SaveGraphButton.Location = new System.Drawing.Point(2, 2);
 			this.SaveGraphButton.Margin = new System.Windows.Forms.Padding(2);
 			this.SaveGraphButton.Name = "SaveGraphButton";
-			this.SaveGraphButton.Size = new System.Drawing.Size(78, 23);
+			this.SaveGraphButton.Size = new System.Drawing.Size(78, 26);
 			this.SaveGraphButton.TabIndex = 9;
 			this.SaveGraphButton.Text = "Save";
 			this.SaveGraphButton.UseVisualStyleBackColor = true;
@@ -273,7 +274,7 @@
 			this.GridLinesGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.GridLinesGroupBox.Name = "GridLinesGroupBox";
 			this.GridLinesGroupBox.Padding = new System.Windows.Forms.Padding(0);
-			this.GridLinesGroupBox.Size = new System.Drawing.Size(208, 110);
+			this.GridLinesGroupBox.Size = new System.Drawing.Size(208, 122);
 			this.GridLinesGroupBox.TabIndex = 17;
 			this.GridLinesGroupBox.TabStop = false;
 			this.GridLinesGroupBox.Text = "Gridlines (2n scaling)";
@@ -410,7 +411,7 @@
 			this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.ProductionGroupBox.Name = "ProductionGroupBox";
 			this.ProductionGroupBox.Padding = new System.Windows.Forms.Padding(0);
-			this.ProductionGroupBox.Size = new System.Drawing.Size(190, 110);
+			this.ProductionGroupBox.Size = new System.Drawing.Size(190, 122);
 			this.ProductionGroupBox.TabIndex = 4;
 			this.ProductionGroupBox.TabStop = false;
 			this.ProductionGroupBox.Text = "Graph Options:";
@@ -422,18 +423,20 @@
 			this.GraphOptionsTable.ColumnCount = 2;
 			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphOptionsTable.Controls.Add(this.IconViewCheckBox, 0, 2);
 			this.GraphOptionsTable.Controls.Add(this.RateOptionsDropDown, 1, 0);
 			this.GraphOptionsTable.Controls.Add(this.label4, 0, 0);
-			this.GraphOptionsTable.Controls.Add(this.PauseUpdatesCheckbox, 0, 2);
+			this.GraphOptionsTable.Controls.Add(this.PauseUpdatesCheckbox, 0, 3);
 			this.GraphOptionsTable.Controls.Add(this.GraphSummaryButton, 0, 1);
 			this.GraphOptionsTable.Location = new System.Drawing.Point(3, 16);
 			this.GraphOptionsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.GraphOptionsTable.Name = "GraphOptionsTable";
-			this.GraphOptionsTable.RowCount = 3;
+			this.GraphOptionsTable.RowCount = 4;
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.Size = new System.Drawing.Size(184, 79);
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.GraphOptionsTable.Size = new System.Drawing.Size(184, 93);
 			this.GraphOptionsTable.TabIndex = 2;
 			// 
 			// RateOptionsDropDown
@@ -465,9 +468,10 @@
 			this.GraphOptionsTable.SetColumnSpan(this.PauseUpdatesCheckbox, 2);
 			this.PauseUpdatesCheckbox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.PauseUpdatesCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 59);
+			this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 73);
+			this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
 			this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
-			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(178, 17);
+			this.PauseUpdatesCheckbox.Size = new System.Drawing.Size(178, 20);
 			this.PauseUpdatesCheckbox.TabIndex = 3;
 			this.PauseUpdatesCheckbox.Text = "Pause all calculations";
 			this.PauseUpdatesCheckbox.UseVisualStyleBackColor = true;
@@ -484,6 +488,20 @@
 			this.GraphSummaryButton.Text = "Show Graph Summary";
 			this.GraphSummaryButton.UseVisualStyleBackColor = true;
 			this.GraphSummaryButton.Click += new System.EventHandler(this.GraphSummaryButton_Click);
+			// 
+			// IconViewCheckBox
+			// 
+			this.IconViewCheckBox.AutoSize = true;
+			this.GraphOptionsTable.SetColumnSpan(this.IconViewCheckBox, 2);
+			this.IconViewCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IconViewCheckBox.Location = new System.Drawing.Point(3, 56);
+			this.IconViewCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+			this.IconViewCheckBox.Name = "IconViewCheckBox";
+			this.IconViewCheckBox.Size = new System.Drawing.Size(178, 17);
+			this.IconViewCheckBox.TabIndex = 7;
+			this.IconViewCheckBox.Text = "Icon View";
+			this.IconViewCheckBox.UseVisualStyleBackColor = true;
+			this.IconViewCheckBox.CheckedChanged += new System.EventHandler(this.IconViewCheckBox_CheckedChanged);
 			// 
 			// MainForm
 			// 
@@ -543,6 +561,7 @@
 		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
 		private System.Windows.Forms.TableLayoutPanel GridlinesTable;
 		private System.Windows.Forms.Button GraphSummaryButton;
+		private System.Windows.Forms.CheckBox IconViewCheckBox;
 	}
 }
 
