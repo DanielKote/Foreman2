@@ -175,9 +175,9 @@ namespace Foreman
 						}
 
 						CalculatedBounds = new Rectangle(
-							Math.Min(supplierOrigin.X, consumerOrigin.X),
+							Math.Min(Math.Min(midX, supplierOrigin.X), consumerOrigin.X),
 							Math.Min(supplierOrigin.Y, consumerOrigin.Y) - circlePull,
-							Math.Abs(supplierOrigin.X - consumerOrigin.X),
+							Math.Max(Math.Max(midX, supplierOrigin.X), consumerOrigin.X) - Math.Min(Math.Min(midX, supplierOrigin.X), consumerOrigin.X),
 							Math.Abs(supplierOrigin.Y - consumerOrigin.Y) + (2 * circlePull));
 						break;
 				}
