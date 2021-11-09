@@ -21,6 +21,7 @@ namespace Foreman
 			public int NodeCountForSimpleView;
 			public int IconsOnlyIconSize;
 
+			public bool ArrowsOnLinks;
 			public bool SimplePassthroughNodes;
 			public bool DynamicLinkWidth;
 			public bool AbbreviateSciPacks;
@@ -118,6 +119,7 @@ namespace Foreman
 
 			IconsSizeInput.Value = Options.IconsOnlyIconSize;
 
+			ArrowsOnLinksCheckBox.Checked = Options.ArrowsOnLinks;
 			SimplePassthroughNodesCheckBox.Checked = Options.SimplePassthroughNodes;
 			ShowNodeRecipeCheckBox.Checked = Options.ShowRecipeToolTip;
 			RoundAssemblerCountCheckBox.Checked = Options.RoundAssemblerCount;
@@ -473,6 +475,7 @@ namespace Foreman
 			Options.NodeCountForSimpleView = (int)NodeCountForSimpleViewInput.Value;
 			Options.IconsOnlyIconSize = (int)IconsSizeInput.Value;
 
+			Options.ArrowsOnLinks = ArrowsOnLinksCheckBox.Checked;
 			Options.SimplePassthroughNodes = SimplePassthroughNodesCheckBox.Checked;
 			Options.DynamicLinkWidth = DynamicLWCheckBox.Checked;
 			Options.AbbreviateSciPacks = AbbreviateSciPackCheckBox.Checked;

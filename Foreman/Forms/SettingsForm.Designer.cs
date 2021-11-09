@@ -97,6 +97,7 @@
 			this.label9 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.ArrowsOnLinksCheckBox = new System.Windows.Forms.CheckBox();
 			this.SimplePassthroughNodesCheckBox = new System.Windows.Forms.CheckBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.IconsSizeInput = new System.Windows.Forms.NumericUpDown();
@@ -885,7 +886,7 @@
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 607);
+			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 630);
 			this.GraphOptionsTable.TabIndex = 0;
 			// 
 			// groupBox7
@@ -895,7 +896,7 @@
 			this.groupBox7.Controls.Add(this.AdvancedOptionsTable);
 			this.groupBox7.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox7.Location = new System.Drawing.Point(3, 496);
+			this.groupBox7.Location = new System.Drawing.Point(3, 519);
 			this.groupBox7.Name = "groupBox7";
 			this.groupBox7.Size = new System.Drawing.Size(447, 108);
 			this.groupBox7.TabIndex = 3;
@@ -961,7 +962,7 @@
 			this.groupBox5.Controls.Add(this.DefaultsTable);
 			this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox5.Location = new System.Drawing.Point(3, 381);
+			this.groupBox5.Location = new System.Drawing.Point(3, 404);
 			this.groupBox5.Name = "groupBox5";
 			this.groupBox5.Size = new System.Drawing.Size(447, 109);
 			this.groupBox5.TabIndex = 1;
@@ -1076,7 +1077,7 @@
 			this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(447, 255);
+			this.groupBox3.Size = new System.Drawing.Size(447, 278);
 			this.groupBox3.TabIndex = 0;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Node Graphics:";
@@ -1091,27 +1092,28 @@
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.NodeGraphicsTable.Controls.Add(this.ArrowsOnLinksCheckBox, 0, 4);
 			this.NodeGraphicsTable.Controls.Add(this.SimplePassthroughNodesCheckBox, 0, 3);
 			this.NodeGraphicsTable.Controls.Add(this.label10, 0, 2);
 			this.NodeGraphicsTable.Controls.Add(this.IconsSizeInput, 1, 2);
-			this.NodeGraphicsTable.Controls.Add(this.RoundAssemblerCountCheckBox, 0, 7);
+			this.NodeGraphicsTable.Controls.Add(this.RoundAssemblerCountCheckBox, 0, 8);
 			this.NodeGraphicsTable.Controls.Add(this.HighLodRadioButton, 3, 0);
 			this.NodeGraphicsTable.Controls.Add(this.label6, 0, 0);
 			this.NodeGraphicsTable.Controls.Add(this.MediumLodRadioButton, 2, 0);
 			this.NodeGraphicsTable.Controls.Add(this.LowLodRadioButton, 1, 0);
-			this.NodeGraphicsTable.Controls.Add(this.RecipeEditPanelPositionLockCheckBox, 0, 8);
-			this.NodeGraphicsTable.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 6);
-			this.NodeGraphicsTable.Controls.Add(this.DynamicLWCheckBox, 0, 4);
+			this.NodeGraphicsTable.Controls.Add(this.RecipeEditPanelPositionLockCheckBox, 0, 9);
+			this.NodeGraphicsTable.Controls.Add(this.ShowNodeRecipeCheckBox, 0, 7);
+			this.NodeGraphicsTable.Controls.Add(this.DynamicLWCheckBox, 0, 5);
 			this.NodeGraphicsTable.Controls.Add(this.label8, 0, 1);
 			this.NodeGraphicsTable.Controls.Add(this.NodeCountForSimpleViewInput, 1, 1);
-			this.NodeGraphicsTable.Controls.Add(this.AbbreviateSciPackCheckBox, 0, 5);
-			this.NodeGraphicsTable.Controls.Add(this.FlagOUSupplyNodesCheckBox, 0, 9);
+			this.NodeGraphicsTable.Controls.Add(this.AbbreviateSciPackCheckBox, 0, 6);
+			this.NodeGraphicsTable.Controls.Add(this.FlagOUSupplyNodesCheckBox, 0, 10);
 			this.NodeGraphicsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.NodeGraphicsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.NodeGraphicsTable.Location = new System.Drawing.Point(3, 16);
 			this.NodeGraphicsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.NodeGraphicsTable.Name = "NodeGraphicsTable";
-			this.NodeGraphicsTable.RowCount = 10;
+			this.NodeGraphicsTable.RowCount = 11;
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -1122,8 +1124,20 @@
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.NodeGraphicsTable.Size = new System.Drawing.Size(441, 236);
+			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.NodeGraphicsTable.Size = new System.Drawing.Size(441, 259);
 			this.NodeGraphicsTable.TabIndex = 28;
+			// 
+			// ArrowsOnLinksCheckBox
+			// 
+			this.ArrowsOnLinksCheckBox.AutoSize = true;
+			this.NodeGraphicsTable.SetColumnSpan(this.ArrowsOnLinksCheckBox, 4);
+			this.ArrowsOnLinksCheckBox.Location = new System.Drawing.Point(3, 101);
+			this.ArrowsOnLinksCheckBox.Name = "ArrowsOnLinksCheckBox";
+			this.ArrowsOnLinksCheckBox.Size = new System.Drawing.Size(342, 17);
+			this.ArrowsOnLinksCheckBox.TabIndex = 22;
+			this.ArrowsOnLinksCheckBox.Text = "Draw arrows to show direction on link lines (non-dynamic link-width)";
+			this.ArrowsOnLinksCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SimplePassthroughNodesCheckBox
 			// 
@@ -1176,7 +1190,7 @@
 			// 
 			this.RoundAssemblerCountCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.RoundAssemblerCountCheckBox, 4);
-			this.RoundAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 170);
+			this.RoundAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 193);
 			this.RoundAssemblerCountCheckBox.Name = "RoundAssemblerCountCheckBox";
 			this.RoundAssemblerCountCheckBox.Size = new System.Drawing.Size(127, 17);
 			this.RoundAssemblerCountCheckBox.TabIndex = 17;
@@ -1235,7 +1249,7 @@
 			// 
 			this.RecipeEditPanelPositionLockCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.RecipeEditPanelPositionLockCheckBox, 4);
-			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 193);
+			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 216);
 			this.RecipeEditPanelPositionLockCheckBox.Name = "RecipeEditPanelPositionLockCheckBox";
 			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(191, 17);
 			this.RecipeEditPanelPositionLockCheckBox.TabIndex = 11;
@@ -1246,7 +1260,7 @@
 			// 
 			this.ShowNodeRecipeCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.ShowNodeRecipeCheckBox, 4);
-			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 147);
+			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 170);
 			this.ShowNodeRecipeCheckBox.Name = "ShowNodeRecipeCheckBox";
 			this.ShowNodeRecipeCheckBox.Size = new System.Drawing.Size(119, 17);
 			this.ShowNodeRecipeCheckBox.TabIndex = 6;
@@ -1257,7 +1271,7 @@
 			// 
 			this.DynamicLWCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.DynamicLWCheckBox, 4);
-			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 101);
+			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 124);
 			this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
 			this.DynamicLWCheckBox.Size = new System.Drawing.Size(114, 17);
 			this.DynamicLWCheckBox.TabIndex = 4;
@@ -1299,7 +1313,7 @@
 			// 
 			this.AbbreviateSciPackCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.AbbreviateSciPackCheckBox, 4);
-			this.AbbreviateSciPackCheckBox.Location = new System.Drawing.Point(3, 124);
+			this.AbbreviateSciPackCheckBox.Location = new System.Drawing.Point(3, 147);
 			this.AbbreviateSciPackCheckBox.Name = "AbbreviateSciPackCheckBox";
 			this.AbbreviateSciPackCheckBox.Size = new System.Drawing.Size(149, 17);
 			this.AbbreviateSciPackCheckBox.TabIndex = 16;
@@ -1309,7 +1323,7 @@
 			// FlagOUSupplyNodesCheckBox
 			// 
 			this.FlagOUSupplyNodesCheckBox.AutoSize = true;
-			this.FlagOUSupplyNodesCheckBox.Location = new System.Drawing.Point(3, 216);
+			this.FlagOUSupplyNodesCheckBox.Location = new System.Drawing.Point(3, 239);
 			this.FlagOUSupplyNodesCheckBox.Name = "FlagOUSupplyNodesCheckBox";
 			this.FlagOUSupplyNodesCheckBox.Size = new System.Drawing.Size(186, 17);
 			this.FlagOUSupplyNodesCheckBox.TabIndex = 18;
@@ -1323,7 +1337,7 @@
 			this.groupBox6.Controls.Add(this.tableLayoutPanel1);
 			this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox6.Location = new System.Drawing.Point(3, 264);
+			this.groupBox6.Location = new System.Drawing.Point(3, 287);
 			this.groupBox6.Name = "groupBox6";
 			this.groupBox6.Size = new System.Drawing.Size(447, 111);
 			this.groupBox6.TabIndex = 4;
@@ -1582,5 +1596,6 @@
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.NumericUpDown IconsSizeInput;
 		private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
+		private System.Windows.Forms.CheckBox ArrowsOnLinksCheckBox;
 	}
 }

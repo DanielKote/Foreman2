@@ -24,6 +24,7 @@ namespace Foreman
 		public enum LOD { Low, Medium, High } //low: only names. medium: assemblers, beacons, etc. high: include assembler percentages
 
 		public LOD LevelOfDetail { get; set; }
+		public bool ArrowsOnLinks { get; set; }
 		public bool SimplePassthroughNodes { get; set; }
 		public bool IconsOnly { get; set; }
 		public int IconsSize { get; set; }

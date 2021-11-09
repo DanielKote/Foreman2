@@ -24,7 +24,7 @@ namespace Foreman
 		private static StringFormat bottomFormat = new StringFormat() { LineAlignment = StringAlignment.Far, Alignment = StringAlignment.Center };
 		private static StringFormat topFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
 
-		private static Brush directionBrush = new SolidBrush(Color.FromArgb(50, Color.Black));
+		private static Brush directionBrush = new SolidBrush(Color.FromArgb(40, Color.Black));
 
 		private static Pen regularBorderPen = new Pen(Color.DimGray, 3);
 		private static Pen oversuppliedBorderPen = new Pen(Color.DarkGoldenrod, 3);
@@ -89,8 +89,8 @@ namespace Foreman
 			//background
 			GraphicsStuff.FillRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, fillBrush);
 
-			//direction signs (only if using dynamic link width)
-			if (graphViewer.DynamicLinkWidth)
+			//direction signs (only if using dynamic link width or not using arrows on links)
+			if (graphViewer.DynamicLinkWidth || !graphViewer.ArrowsOnLinks)
 			{
 				if (DisplayedNode.NodeDirection == NodeDirection.Up)
 					graphics.FillPolygon(directionBrush, new Point[] { new Point(trans.X - (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X + (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X, trans.Y - (Bounds.Height / 2)) });

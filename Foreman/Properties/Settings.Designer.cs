@@ -394,5 +394,17 @@ namespace Foreman.Properties {
                 this["SimplePassthroughNodes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ArrowsOnLinks {
+            get {
+                return ((bool)(this["ArrowsOnLinks"]));
+            }
+            set {
+                this["ArrowsOnLinks"] = value;
+            }
+        }
     }
 }

@@ -195,7 +195,7 @@ namespace Foreman
 
 			using (Pen pen = new Pen(Item.AverageColor, LinkWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
 			{
-				if (!graphViewer.DynamicLinkWidth && !iconOnlyDraw)
+				if (graphViewer.ArrowsOnLinks && !graphViewer.DynamicLinkWidth && !iconOnlyDraw)
 					pen.CustomEndCap = arrowCap;
 
 				switch(lineType)

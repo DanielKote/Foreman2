@@ -51,6 +51,7 @@ namespace Foreman
 					Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
 				GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
 
+				GraphViewer.ArrowsOnLinks = Properties.Settings.Default.ArrowsOnLinks;
 				GraphViewer.DynamicLinkWidth = Properties.Settings.Default.DynamicLineWidth;
 				GraphViewer.ShowRecipeToolTip = Properties.Settings.Default.ShowRecipeToolTip;
 				GraphViewer.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
@@ -239,6 +240,7 @@ namespace Foreman
 			options.NodeCountForSimpleView = GraphViewer.NodeCountForSimpleView;
 			options.IconsOnlyIconSize = GraphViewer.IconsSize;
 
+			options.ArrowsOnLinks = GraphViewer.ArrowsOnLinks;
 			options.SimplePassthroughNodes = GraphViewer.SimplePassthroughNodes;
 			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
 			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
@@ -301,7 +303,8 @@ namespace Foreman
 					GraphViewer.IconsSize = options.IconsOnlyIconSize;
 					Properties.Settings.Default.IconsSize = options.IconsOnlyIconSize;
 
-
+					GraphViewer.ArrowsOnLinks = options.ArrowsOnLinks;
+					Properties.Settings.Default.ArrowsOnLinks = options.ArrowsOnLinks;
 					GraphViewer.SimplePassthroughNodes = options.SimplePassthroughNodes;
 					Properties.Settings.Default.SimplePassthroughNodes = options.SimplePassthroughNodes;
 					GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
