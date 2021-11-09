@@ -140,7 +140,7 @@ namespace Foreman
 			else
 				tti.Text = Item.FriendlyName;
 
-			tti.Direction = (LinkType == LinkType.Input) ? Direction.Up : Direction.Down;
+			tti.Direction = ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Down)) ? Direction.Up : Direction.Down;
 			tti.ScreenLocation = graphViewer.GraphToScreen(GetConnectionPoint());
 			toolTips.Add(tti);
 
