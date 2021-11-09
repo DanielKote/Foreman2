@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO.Compression;
+using System.Text.RegularExpressions;
 
 namespace Foreman
 {
@@ -74,22 +75,45 @@ namespace Foreman
 			archiveFileLinks.Clear();
 			bitmapCache.Clear();
 
-			bool success = true;
 			//factorio checks for foldeer <name>_<version>, then folder <name> then zip <name>_<version>
 			//if zip, then the actual files can either be in the root of zip, or in <name> foler, or in <name>_<version> folder
+			//NOTE: versions are of type v1.v2.v3 where each number can have any amount of leading zeros
 			foreach (KeyValuePair<string, string> mod in modSet)
 			{
 				if (token.IsCancellationRequested)
 					return false;
 
-				if (Directory.Exists(Path.Combine(modsPath, mod.Key + "_" + mod.Value)))
-					folderLinks.Add("__" + mod.Key.ToLower() + "__", Path.Combine(modsPath, mod.Key + "_" + mod.Value));
-				else if (Directory.Exists(Path.Combine(modsPath, mod.Key)))
-					folderLinks.Add("__" + mod.Key.ToLower() + "__", Path.Combine(modsPath, mod.Key));
-				else if (File.Exists(Path.Combine(modsPath, mod.Key + "_" + mod.Value + ".zip")))
+				string versionMatch = string.Join(".", mod.Value.Split('.').Select(s => "0*"+int.Parse(s).ToString()));
+
+				string[] folders = Directory.GetDirectories(modsPath);
+				string[] files = Directory.GetFiles(modsPath);
+
+				string foundFolder = folders.FirstOrDefault(f => Regex.IsMatch(Path.GetFileName(f).ToLower(), string.Format("{0}_{1}", mod.Key, versionMatch)));
+				if (foundFolder == null)
+					foundFolder = folders.FirstOrDefault(f => Path.GetFileName(f).ToLower() == mod.Key);
+
+				if (foundFolder != null)
+					folderLinks.Add("__" + mod.Key.ToLower() + "__", foundFolder);
+				else
 				{
+					foreach(string file in files)
+					{
+						string filename = Path.GetFileName(file).ToLower();
+						string match = string.Format("{0}_{1}.zip", mod.Key, versionMatch);
+						bool test = Regex.IsMatch(filename, match);
+						if (test)
+							;
+					}	
+					string foundFile = files.FirstOrDefault(f => Regex.IsMatch(Path.GetFileName(f).ToLower(), string.Format("{0}_{1}.zip", mod.Key, versionMatch)));
+					if (foundFile == null)
+					{
+						if (mod.Key.ToLower() != "core" && mod.Key.ToLower() != "base" && mod.Key.ToLower() != "foremanexport")
+							return false;
+						continue;
+					}
+
 					//for zip files, since we have to iterate through them for each file we might as well make a full link of every possible filepath to given entry
-					ZipArchive zip = ZipFile.Open(Path.Combine(modsPath, mod.Key + "_" + mod.Value + ".zip"), ZipArchiveMode.Read);
+					ZipArchive zip = ZipFile.Open(foundFile, ZipArchiveMode.Read);
 					openedArchives.Add(zip);
 					foreach (ZipArchiveEntry zentity in zip.Entries)
 					{
@@ -107,11 +131,10 @@ namespace Foreman
 						archiveFileLinks.Add(Path.Combine(brokenPath.ToArray()).ToLower(), zentity);
 					}
 				}
-				else if (mod.Key.ToLower() != "core" && mod.Key.ToLower() != "base" && mod.Key.ToLower() != "foremanexport") success = false;
 			}
 			folderLinks.Add("__core__", Path.Combine(dataPath, "core"));
 			folderLinks.Add("__base__", Path.Combine(dataPath, "base"));
-			return success;
+			return true;
 		}
 
 		public bool CreateIconCache(JObject iconJObject, string cachePath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token, int startingPercent, int endingPercent)

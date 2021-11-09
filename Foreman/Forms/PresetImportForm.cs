@@ -434,7 +434,7 @@ namespace Foreman
 				//now we need to process icons. This is done by the IconProcessor.
 				Dictionary<string, string> modSet = new Dictionary<string, string>();
 				foreach (var objJToken in dataJObject["mods"].ToList())
-					modSet.Add((string)objJToken["name"], (string)objJToken["version"]);
+					modSet.Add(((string)objJToken["name"]).ToLower(), (string)objJToken["version"]);
 
 				using (IconCacheProcessor icProcessor = new IconCacheProcessor())
 				{
