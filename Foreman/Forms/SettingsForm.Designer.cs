@@ -869,6 +869,8 @@
 			// 
 			// GraphOptionsTable
 			// 
+			this.GraphOptionsTable.AutoSize = true;
+			this.GraphOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.GraphOptionsTable.ColumnCount = 1;
 			this.GraphOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.GraphOptionsTable.Controls.Add(this.groupBox7, 0, 3);
@@ -883,7 +885,7 @@
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 567);
+			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 607);
 			this.GraphOptionsTable.TabIndex = 0;
 			// 
 			// groupBox7
@@ -1461,6 +1463,7 @@
 			this.PresetsTab.ResumeLayout(false);
 			this.EnabledObjectsTab.ResumeLayout(false);
 			this.OptionsTab.ResumeLayout(false);
+			this.OptionsTab.PerformLayout();
 			this.GraphOptionsTable.ResumeLayout(false);
 			this.GraphOptionsTable.PerformLayout();
 			this.groupBox7.ResumeLayout(false);
