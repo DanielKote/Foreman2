@@ -90,7 +90,10 @@ namespace Foreman
 			// results depending on which the user is wanting. Need to figure out concrete examples
 			// of where this would happen. With sufficiently large error co-efficients it's probably
 			// fine for most real world recipes?
-			objective.SetCoefficient(x, rateObjectiveCoefficient);
+			if(node is RecipeNode rNode && node.OutputLinks.Count == 0 && !rNode.BaseRecipe.Name.StartsWith("§§"))
+				objective.SetCoefficient(x, rateObjectiveCoefficient * 10000); //a bit of a hack in order to ensure that any 'void' recipes are considered more costry (and thus are less likely to hog item flow)
+			else
+				objective.SetCoefficient(x, rateObjectiveCoefficient);
 		}
 
 		// Returns null if no optimal solution can be found. Technically GLOP can return non-optimal
