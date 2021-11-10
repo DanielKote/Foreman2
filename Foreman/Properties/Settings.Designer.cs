@@ -406,5 +406,17 @@ namespace Foreman.Properties {
                 this["ForemanVersion"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SmartNodeDirection {
+            get {
+                return ((bool)(this["SmartNodeDirection"]));
+            }
+            set {
+                this["SmartNodeDirection"] = value;
+            }
+        }
     }
 }

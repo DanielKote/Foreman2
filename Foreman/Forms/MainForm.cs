@@ -64,6 +64,8 @@ namespace Foreman
 					Properties.Settings.Default.DefaultNodeDirection = (int)NodeDirection.Up;
 				GraphViewer.Graph.DefaultNodeDirection = (NodeDirection)Properties.Settings.Default.DefaultNodeDirection;
 
+				GraphViewer.SmartNodeDirection = Properties.Settings.Default.SmartNodeDirection;
+
 				GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
 				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
 				GraphViewer.FlagOUSuppliedNodes = Properties.Settings.Default.FlagOUSuppliedNodes;
@@ -250,6 +252,7 @@ namespace Foreman
 			options.DefaultAssemblerStyle = GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
 			options.DefaultModuleStyle = GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
 			options.DefaultNodeDirection = GraphViewer.Graph.DefaultNodeDirection;
+			options.SmartNodeDirection = GraphViewer.SmartNodeDirection;
 
 			options.ShowErrorArrows = GraphViewer.ArrowRenderer.ShowErrorArrows;
 			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
@@ -322,6 +325,8 @@ namespace Foreman
 					Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
 					GraphViewer.Graph.DefaultNodeDirection = options.DefaultNodeDirection;
 					Properties.Settings.Default.DefaultNodeDirection = (int)options.DefaultNodeDirection;
+					GraphViewer.SmartNodeDirection = options.SmartNodeDirection;
+					Properties.Settings.Default.SmartNodeDirection = options.SmartNodeDirection;
 
 					GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
 					Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;

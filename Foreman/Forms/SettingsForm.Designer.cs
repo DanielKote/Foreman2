@@ -90,6 +90,7 @@
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
 			this.DefaultsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.NodeDirectionDropDown = new System.Windows.Forms.ComboBox();
+			this.SimplePassthroughNodesCheckBox = new System.Windows.Forms.CheckBox();
 			this.ModuleSelectorStyleDropDown = new System.Windows.Forms.ComboBox();
 			this.AssemblerSelectorStyleDropDown = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
@@ -98,7 +99,6 @@
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ArrowsOnLinksCheckBox = new System.Windows.Forms.CheckBox();
-			this.SimplePassthroughNodesCheckBox = new System.Windows.Forms.CheckBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.IconsSizeInput = new System.Windows.Forms.NumericUpDown();
 			this.RoundAssemblerCountCheckBox = new System.Windows.Forms.CheckBox();
@@ -121,6 +121,7 @@
 			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
+			this.SmartNodeDirectionCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -984,6 +985,7 @@
 			this.DefaultsTable.Controls.Add(this.label5, 0, 0);
 			this.DefaultsTable.Controls.Add(this.label7, 0, 1);
 			this.DefaultsTable.Controls.Add(this.label9, 0, 2);
+			this.DefaultsTable.Controls.Add(this.SmartNodeDirectionCheckBox, 2, 2);
 			this.DefaultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.DefaultsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.DefaultsTable.Location = new System.Drawing.Point(3, 16);
@@ -1010,6 +1012,17 @@
 			this.NodeDirectionDropDown.Name = "NodeDirectionDropDown";
 			this.NodeDirectionDropDown.Size = new System.Drawing.Size(116, 21);
 			this.NodeDirectionDropDown.TabIndex = 6;
+			// 
+			// SimplePassthroughNodesCheckBox
+			// 
+			this.SimplePassthroughNodesCheckBox.AutoSize = true;
+			this.DefaultsTable.SetColumnSpan(this.SimplePassthroughNodesCheckBox, 3);
+			this.SimplePassthroughNodesCheckBox.Location = new System.Drawing.Point(3, 78);
+			this.SimplePassthroughNodesCheckBox.Name = "SimplePassthroughNodesCheckBox";
+			this.SimplePassthroughNodesCheckBox.Size = new System.Drawing.Size(245, 17);
+			this.SimplePassthroughNodesCheckBox.TabIndex = 21;
+			this.SimplePassthroughNodesCheckBox.Text = "Use simple-draw passthrough nodes as default";
+			this.SimplePassthroughNodesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// ModuleSelectorStyleDropDown
 			// 
@@ -1138,17 +1151,6 @@
 			this.ArrowsOnLinksCheckBox.TabIndex = 22;
 			this.ArrowsOnLinksCheckBox.Text = "Draw arrows to show direction on link lines (non-dynamic link-width)";
 			this.ArrowsOnLinksCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// SimplePassthroughNodesCheckBox
-			// 
-			this.SimplePassthroughNodesCheckBox.AutoSize = true;
-			this.DefaultsTable.SetColumnSpan(this.SimplePassthroughNodesCheckBox, 3);
-			this.SimplePassthroughNodesCheckBox.Location = new System.Drawing.Point(3, 78);
-			this.SimplePassthroughNodesCheckBox.Name = "SimplePassthroughNodesCheckBox";
-			this.SimplePassthroughNodesCheckBox.Size = new System.Drawing.Size(245, 17);
-			this.SimplePassthroughNodesCheckBox.TabIndex = 21;
-			this.SimplePassthroughNodesCheckBox.Text = "Use simple-draw passthrough nodes as default";
-			this.SimplePassthroughNodesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// label10
 			// 
@@ -1432,6 +1434,16 @@
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
 			// 
+			// SmartNodeDirectionCheckBox
+			// 
+			this.SmartNodeDirectionCheckBox.AutoSize = true;
+			this.SmartNodeDirectionCheckBox.Location = new System.Drawing.Point(208, 53);
+			this.SmartNodeDirectionCheckBox.Name = "SmartNodeDirectionCheckBox";
+			this.SmartNodeDirectionCheckBox.Size = new System.Drawing.Size(98, 17);
+			this.SmartNodeDirectionCheckBox.TabIndex = 22;
+			this.SmartNodeDirectionCheckBox.Text = "Smart Direction";
+			this.SmartNodeDirectionCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.ConfirmButton;
@@ -1597,5 +1609,6 @@
 		private System.Windows.Forms.NumericUpDown IconsSizeInput;
 		private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
 		private System.Windows.Forms.CheckBox ArrowsOnLinksCheckBox;
+		private System.Windows.Forms.CheckBox SmartNodeDirectionCheckBox;
 	}
 }

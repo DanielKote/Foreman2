@@ -6,7 +6,7 @@ namespace Foreman
 {
 	public abstract class BaseLinkElement : GraphElement
 	{
-		private enum LineType { Simple, UShape, NShape }
+		public enum LineType { Simple, UShape, NShape }
 
 		public BaseNodeElement SupplierElement { get; protected set; }
 		public BaseNodeElement ConsumerElement { get; protected set; }
@@ -15,7 +15,7 @@ namespace Foreman
 		private Point consumerOrigin, supplierOrigin;
 		private NodeDirection consumerDirection, supplierDirection;
 
-		private LineType lineType;
+		public LineType Type { get; private set; }
 
 		private Point consumerPull, supplierPull; //for basic links
 		private Point midUA, midUB, midUC, midUD, pullU1, pullU2, pullU3, pullU4; //for U shape links
@@ -73,10 +73,10 @@ namespace Foreman
 				consumerOrigin = endpoints.Item2;
 				consumerDirection = endpointDirections.Item2;
 
-				lineType = (supplierDirection != consumerDirection) ? LineType.UShape :
+				Type = (supplierDirection != consumerDirection) ? LineType.UShape :
 					((supplierDirection == NodeDirection.Up && consumerOrigin.Y > supplierOrigin.Y) || (supplierDirection == NodeDirection.Down && consumerOrigin.Y < supplierOrigin.Y)) ? LineType.NShape : LineType.Simple;
 
-				switch(lineType)
+				switch(Type)
 				{
 					case LineType.Simple: //supplier and consumer directions are same, link direction is regular (consumer is below supplier if direction is up, and above supplier if direction is down)
 						if (supplierDirection == NodeDirection.Up)
@@ -198,7 +198,7 @@ namespace Foreman
 				if (graphViewer.ArrowsOnLinks && !graphViewer.DynamicLinkWidth && !iconOnlyDraw)
 					pen.CustomEndCap = arrowCap;
 
-				switch(lineType)
+				switch(Type)
 				{
 					case LineType.Simple:
 						graphics.DrawBeziers(pen, new Point[]

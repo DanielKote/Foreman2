@@ -58,9 +58,25 @@ namespace Foreman
 		protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections()
 		{
 			if (SupplierElement == null)
+			{
+				if (!graphViewer.SmartNodeDirection)
+					return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+
+				Point consumerPoint = iconOnlyDraw ? ConsumerElement.Location : ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
+				if ((ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up && consumerPoint.Y > EndpointLocation.Y) || (ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Down && consumerPoint.Y < EndpointLocation.Y))
+					return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
 				return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+			}
 			if (ConsumerElement == null)
+			{
+				if (!graphViewer.SmartNodeDirection)
+					return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
+
+				Point supplierPoint = iconOnlyDraw ? SupplierElement.Location : SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
+				if ((SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up && supplierPoint.Y < EndpointLocation.Y) || (SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Down && supplierPoint.Y > EndpointLocation.Y))
+					return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
 				return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection);
+			}
 
 			return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
 		}

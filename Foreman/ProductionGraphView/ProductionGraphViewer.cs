@@ -37,6 +37,8 @@ namespace Foreman
 		public bool LockedRecipeEditPanelPosition = true;
 		public bool FlagOUSuppliedNodes = false; //if true, will add a flag for over or under supplied nodes
 
+		public bool SmartNodeDirection { get; set; }
+
 		public DataCache DCache { get; set; }
 		public ProductionGraph Graph { get; private set; }
 		public GridManager Grid { get; private set; }
@@ -197,6 +199,9 @@ namespace Foreman
 			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
 			ReadOnlyBaseNode newNode = null;
 			int lastNodeWidth = 0;
+			NodeDirection newNodeDirection = (originElement == null || !SmartNodeDirection) ? Graph.DefaultNodeDirection :
+				draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? originElement.DisplayedNode.NodeDirection :
+				originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
 			recipeChooser.RecipeRequested += (o, recipeRequestArgs) =>
 			{
 				switch (recipeRequestArgs.NodeType)
@@ -263,11 +268,11 @@ namespace Foreman
 				newLocation = new Point(newLocation.X + offsetDistance, newLocation.Y);
 
 				int yoffset = offsetLocationToItemTabLevel ? (nNodeType == NewNodeType.Consumer ? -newNodeElement.Height / 2 : nNodeType == NewNodeType.Supplier ? newNodeElement.Height / 2 : 0) : 0;
-				yoffset *= originElement == null ? (Graph.DefaultNodeDirection == NodeDirection.Up ? 1 : -1) : (originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? 1 : -1);
+				yoffset *= newNodeDirection == NodeDirection.Up ? 1 : -1;
 				Graph.RequestNodeController(newNode).SetLocation(new Point(newLocation.X, newLocation.Y + yoffset));
 
 				if (originElement != null)
-					Graph.RequestNodeController(newNode).SetDirection(originElement.DisplayedNode.NodeDirection);
+					Graph.RequestNodeController(newNode).SetDirection(newNodeDirection);
 
 				if (nNodeType == NewNodeType.Consumer)
 					Graph.CreateLink(originElement.DisplayedNode, newNode, baseItem);
