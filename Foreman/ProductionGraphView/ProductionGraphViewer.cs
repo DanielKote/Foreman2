@@ -289,6 +289,36 @@ namespace Foreman
 			recipeChooser.Show();
 		}
 
+		public void AddPassthroughNodesFromSelection(LinkType linkType, Size offset)
+		{
+			List<BaseNodeElement> newPassthroughNodes = new List<BaseNodeElement>();
+			foreach(PassthroughNodeElement passthroughNode in selectedNodes)
+			{
+				Item passthroughItem = ((ReadOnlyPassthroughNode)passthroughNode.DisplayedNode).PassthroughItem;
+
+				int yoffset = linkType == LinkType.Input ? passthroughNode.Height / 2 : -passthroughNode.Height / 2;
+				yoffset *= passthroughNode.DisplayedNode.NodeDirection == NodeDirection.Up ? 1 : -1;
+				yoffset += offset.Height;
+
+				ReadOnlyPassthroughNode newNode = Graph.CreatePassthroughNode(passthroughItem, new Point(passthroughNode.Location.X + offset.Width, passthroughNode.Location.Y + yoffset));
+				PassthroughNodeController controller = (PassthroughNodeController)Graph.RequestNodeController(newNode);
+				controller.SetDirection(passthroughNode.DisplayedNode.NodeDirection);
+				controller.SetSimpleDraw(((ReadOnlyPassthroughNode)passthroughNode.DisplayedNode).SimpleDraw);
+
+				if (linkType == LinkType.Input)
+					Graph.CreateLink(newNode, passthroughNode.DisplayedNode, passthroughItem );
+				else
+					Graph.CreateLink(passthroughNode.DisplayedNode, newNode, passthroughItem );
+
+				newPassthroughNodes.Add(nodeElementDictionary[newNode]);
+			}
+			SetSelection(newPassthroughNodes);
+
+			DisposeLinkDrag();
+			Graph.UpdateNodeStates();
+			Invalidate();
+		}
+
 		public void TryDeleteSelectedNodes()
 		{
 			bool proceed = true;
@@ -387,6 +417,18 @@ namespace Foreman
 		}
 
 		//----------------------------------------------Selection functions
+
+		private void SetSelection(IEnumerable<BaseNodeElement> newSelection)
+		{
+			foreach (BaseNodeElement element in selectedNodes)
+				element.Highlighted = false;
+
+			selectedNodes.Clear();
+			selectedNodes.UnionWith(newSelection);
+
+			foreach (BaseNodeElement element in selectedNodes)
+				element.Highlighted = true;
+		}
 
 		private void UpdateSelection()
 		{
