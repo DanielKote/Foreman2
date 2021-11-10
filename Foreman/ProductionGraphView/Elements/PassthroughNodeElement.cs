@@ -28,7 +28,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (style != NodeDrawingStyle.IconsOnly && graphViewer.SimplePassthroughNodes && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.IsOversupplied() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any())
+			if (style != NodeDrawingStyle.IconsOnly && DisplayedNode.SimpleDraw && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.IsOversupplied() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any())
 			{
 				InputTabs[0].HideItemTab = true;
 				OutputTabs[0].HideItemTab = true;
@@ -87,6 +87,51 @@ namespace Foreman
 			}
 
 			return tooltips;
+		}
+
+		protected override void AddRClickMenuOptions(bool nodeInSelection)
+		{
+			RightClickMenu.Items.Add(new ToolStripSeparator());
+			if (DisplayedNode.SimpleDraw)
+			{
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Dont simple-draw node", null,
+					new EventHandler((o, e) =>
+					{
+						RightClickMenu.Close();
+						((PassthroughNodeController)graphViewer.Graph.RequestNodeController(DisplayedNode)).SetSimpleDraw(false);
+						graphViewer.Invalidate();
+					})));
+				if (graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(this))
+				{
+					RightClickMenu.Items.Add(new ToolStripMenuItem("Dont simple-draw selected nodes", null,
+						new EventHandler((o, e) =>
+						{
+							RightClickMenu.Close();
+							graphViewer.SetSelectedPassthroughNodesSimpleDraw(false);
+							graphViewer.Invalidate();
+						})));
+				}
+			}
+			else
+			{
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Simple-draw node", null,
+					new EventHandler((o, e) =>
+					{
+						RightClickMenu.Close();
+						((PassthroughNodeController)graphViewer.Graph.RequestNodeController(DisplayedNode)).SetSimpleDraw(true);
+						graphViewer.Invalidate();
+					})));
+				if (graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(this))
+				{
+					RightClickMenu.Items.Add(new ToolStripMenuItem("Simple-draw selected nodes", null,
+						new EventHandler((o, e) =>
+						{
+							RightClickMenu.Close();
+							graphViewer.SetSelectedPassthroughNodesSimpleDraw(true);
+							graphViewer.Invalidate();
+						})));
+				}
+			}
 		}
 	}
 }

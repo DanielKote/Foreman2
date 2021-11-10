@@ -25,7 +25,6 @@ namespace Foreman
 
 		public LOD LevelOfDetail { get; set; }
 		public bool ArrowsOnLinks { get; set; }
-		public bool SimplePassthroughNodes { get; set; }
 		public bool IconsOnly { get; set; }
 		public int IconsSize { get; set; }
 		public int IconsDrawSize { get { return ViewScale > 1? IconsSize : (int)(IconsSize / ViewScale); } }
@@ -94,7 +93,6 @@ namespace Foreman
 			ViewScale = 1f;
 			NodeCountForSimpleView = 200;
 
-			SimplePassthroughNodes = false;
 			IconsOnly = false;
 			IconsSize = 32;
 
@@ -309,6 +307,13 @@ namespace Foreman
 		{
 			foreach (BaseNodeElement node in selectedNodes.ToList())
 				Graph.RequestNodeController(node.DisplayedNode).SetDirection(node.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+			Invalidate();
+		}
+
+		public void SetSelectedPassthroughNodesSimpleDraw(bool simpleDraw)
+		{
+			foreach (PassthroughNodeElement node in selectedNodes.Where(n => n is PassthroughNodeElement).ToList())
+				((PassthroughNodeController)Graph.RequestNodeController(node.DisplayedNode)).SetSimpleDraw(simpleDraw);
 			Invalidate();
 		}
 

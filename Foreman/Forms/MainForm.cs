@@ -37,7 +37,7 @@ namespace Foreman
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
-				Properties.Settings.Default.ForemanVersion = 3;
+				Properties.Settings.Default.ForemanVersion = 4;
 
 				if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
 					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
@@ -79,7 +79,7 @@ namespace Foreman
 				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
-				GraphViewer.SimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
+				GraphViewer.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
 
 				GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
 				IconViewCheckBox.Checked = GraphViewer.IconsOnly;
@@ -241,7 +241,7 @@ namespace Foreman
 			options.IconsOnlyIconSize = GraphViewer.IconsSize;
 
 			options.ArrowsOnLinks = GraphViewer.ArrowsOnLinks;
-			options.SimplePassthroughNodes = GraphViewer.SimplePassthroughNodes;
+			options.SimplePassthroughNodes = GraphViewer.Graph.DefaultToSimplePassthroughNodes;
 			options.DynamicLinkWidth = GraphViewer.DynamicLinkWidth;
 			options.ShowRecipeToolTip = GraphViewer.ShowRecipeToolTip;
 			options.LockedRecipeEditPanelPosition = GraphViewer.LockedRecipeEditPanelPosition;
@@ -305,7 +305,7 @@ namespace Foreman
 
 					GraphViewer.ArrowsOnLinks = options.ArrowsOnLinks;
 					Properties.Settings.Default.ArrowsOnLinks = options.ArrowsOnLinks;
-					GraphViewer.SimplePassthroughNodes = options.SimplePassthroughNodes;
+					GraphViewer.Graph.DefaultToSimplePassthroughNodes = options.SimplePassthroughNodes;
 					Properties.Settings.Default.SimplePassthroughNodes = options.SimplePassthroughNodes;
 					GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
 					Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;

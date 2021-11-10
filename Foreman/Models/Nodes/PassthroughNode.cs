@@ -15,9 +15,12 @@ namespace Foreman
 		public override IEnumerable<Item> Inputs { get { yield return PassthroughItem; } }
 		public override IEnumerable<Item> Outputs { get { yield return PassthroughItem; } }
 
+		public bool SimpleDraw;
+
 		public PassthroughNode(ProductionGraph graph, int nodeID, Item item) : base(graph, nodeID)
 		{
 			PassthroughItem = item;
+			SimpleDraw = true;
 			controller = PassthroughNodeController.GetController(this);
 			ReadOnlyNode = new ReadOnlyPassthroughNode(this);
 		}
@@ -42,6 +45,7 @@ namespace Foreman
 
 			info.AddValue("NodeType", NodeType.Passthrough);
 			info.AddValue("Item", PassthroughItem.Name);
+			info.AddValue("SDraw", SimpleDraw);
 			if (RateType == RateType.Manual)
 				info.AddValue("DesiredRate", DesiredRatePerSec);
 		}
@@ -56,6 +60,8 @@ namespace Foreman
 		private readonly PassthroughNode MyNode;
 
 		public ReadOnlyPassthroughNode(PassthroughNode node) : base(node) { MyNode = node; }
+
+		public bool SimpleDraw => MyNode.SimpleDraw;
 
 		public override List<string> GetErrors()
 		{
@@ -82,6 +88,8 @@ namespace Foreman
 				return (PassthroughNodeController)node.Controller;
 			return new PassthroughNodeController(node);
 		}
+
+		public void SetSimpleDraw(bool alwaysRegularDraw) { MyNode.SimpleDraw = alwaysRegularDraw; }
 
 		public override Dictionary<string, Action> GetErrorResolutions()
 		{

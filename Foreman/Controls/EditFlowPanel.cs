@@ -20,6 +20,13 @@ namespace Foreman
 			myGraphViewer = graphViewer;
 			RateLabel.Text = string.Format("Item Flowrate (per {0})", myGraphViewer.Graph.GetRateName());
 
+			if(node is ReadOnlyPassthroughNode pNode)
+			{
+				SimplePassthroughNodesCheckBox.Checked = pNode.SimpleDraw;
+				SimplePassthroughNodesCheckBox.Visible = true;
+			}
+			SimplePassthroughNodesCheckBox.CheckedChanged += SimplePassthroughNodesCheckBox_CheckedChanged;
+
 			InitializeRates();
 		}
 
@@ -72,6 +79,12 @@ namespace Foreman
 		private void FixedFlowInput_ValueChanged(object sender, EventArgs e)
 		{
 			SetFixedRate();
+		}
+
+		private void SimplePassthroughNodesCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			(nodeController as PassthroughNodeController).SetSimpleDraw(SimplePassthroughNodesCheckBox.Checked);
+			myGraphViewer.Invalidate();
 		}
 	}
 }

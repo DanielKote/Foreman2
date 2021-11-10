@@ -42,6 +42,7 @@ namespace Foreman
 		public string GetRateName() { return RateUnitNames[(int)SelectedRateUnit]; }
 
 		public NodeDirection DefaultNodeDirection { get; set; }
+		public bool DefaultToSimplePassthroughNodes { get; set; }
 
 		public const double MaxSetFlow = 10000000000000; //10 trillion should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
 		private const int XBorder = 200;
@@ -139,6 +140,7 @@ namespace Foreman
 			PassthroughNode node = new PassthroughNode(this, lastNodeID++, item);
 			node.Location = location;
 			node.NodeDirection = DefaultNodeDirection;
+			node.SimpleDraw = DefaultToSimplePassthroughNodes;
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
 			node.UpdateState();
@@ -444,6 +446,7 @@ namespace Foreman
 								newNode = roToNode[CreatePassthroughNode(cache.Items[itemName], location)];
 							else
 								newNode = roToNode[CreatePassthroughNode(cache.MissingItems[itemName], location)];
+							((PassthroughNode)newNode).SimpleDraw = (bool)nodeJToken["SDraw"];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Recipe:

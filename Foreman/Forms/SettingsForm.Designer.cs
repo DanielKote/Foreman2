@@ -886,7 +886,7 @@
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 630);
+			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 615);
 			this.GraphOptionsTable.TabIndex = 0;
 			// 
 			// groupBox7
@@ -896,7 +896,7 @@
 			this.groupBox7.Controls.Add(this.AdvancedOptionsTable);
 			this.groupBox7.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox7.Location = new System.Drawing.Point(3, 519);
+			this.groupBox7.Location = new System.Drawing.Point(3, 504);
 			this.groupBox7.Name = "groupBox7";
 			this.groupBox7.Size = new System.Drawing.Size(447, 108);
 			this.groupBox7.TabIndex = 3;
@@ -962,9 +962,9 @@
 			this.groupBox5.Controls.Add(this.DefaultsTable);
 			this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox5.Location = new System.Drawing.Point(3, 404);
+			this.groupBox5.Location = new System.Drawing.Point(3, 381);
 			this.groupBox5.Name = "groupBox5";
-			this.groupBox5.Size = new System.Drawing.Size(447, 109);
+			this.groupBox5.Size = new System.Drawing.Size(447, 117);
 			this.groupBox5.TabIndex = 1;
 			this.groupBox5.TabStop = false;
 			this.groupBox5.Text = "Defaults";
@@ -978,6 +978,7 @@
 			this.DefaultsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
 			this.DefaultsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.DefaultsTable.Controls.Add(this.NodeDirectionDropDown, 1, 2);
+			this.DefaultsTable.Controls.Add(this.SimplePassthroughNodesCheckBox, 0, 3);
 			this.DefaultsTable.Controls.Add(this.ModuleSelectorStyleDropDown, 1, 1);
 			this.DefaultsTable.Controls.Add(this.AssemblerSelectorStyleDropDown, 1, 0);
 			this.DefaultsTable.Controls.Add(this.label5, 0, 0);
@@ -991,9 +992,9 @@
 			this.DefaultsTable.RowCount = 4;
 			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.DefaultsTable.Size = new System.Drawing.Size(441, 90);
+			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.DefaultsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.DefaultsTable.Size = new System.Drawing.Size(441, 98);
 			this.DefaultsTable.TabIndex = 28;
 			// 
 			// NodeDirectionDropDown
@@ -1063,7 +1064,7 @@
 			this.label9.Location = new System.Drawing.Point(2, 50);
 			this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(81, 20);
+			this.label9.Size = new System.Drawing.Size(81, 25);
 			this.label9.TabIndex = 5;
 			this.label9.Text = "Node Direction:";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1077,7 +1078,7 @@
 			this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(447, 278);
+			this.groupBox3.Size = new System.Drawing.Size(447, 255);
 			this.groupBox3.TabIndex = 0;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Node Graphics:";
@@ -1093,7 +1094,6 @@
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.NodeGraphicsTable.Controls.Add(this.ArrowsOnLinksCheckBox, 0, 4);
-			this.NodeGraphicsTable.Controls.Add(this.SimplePassthroughNodesCheckBox, 0, 3);
 			this.NodeGraphicsTable.Controls.Add(this.label10, 0, 2);
 			this.NodeGraphicsTable.Controls.Add(this.IconsSizeInput, 1, 2);
 			this.NodeGraphicsTable.Controls.Add(this.RoundAssemblerCountCheckBox, 0, 8);
@@ -1125,14 +1125,14 @@
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.NodeGraphicsTable.Size = new System.Drawing.Size(441, 259);
+			this.NodeGraphicsTable.Size = new System.Drawing.Size(441, 236);
 			this.NodeGraphicsTable.TabIndex = 28;
 			// 
 			// ArrowsOnLinksCheckBox
 			// 
 			this.ArrowsOnLinksCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.ArrowsOnLinksCheckBox, 4);
-			this.ArrowsOnLinksCheckBox.Location = new System.Drawing.Point(3, 101);
+			this.ArrowsOnLinksCheckBox.Location = new System.Drawing.Point(3, 78);
 			this.ArrowsOnLinksCheckBox.Name = "ArrowsOnLinksCheckBox";
 			this.ArrowsOnLinksCheckBox.Size = new System.Drawing.Size(342, 17);
 			this.ArrowsOnLinksCheckBox.TabIndex = 22;
@@ -1142,12 +1142,12 @@
 			// SimplePassthroughNodesCheckBox
 			// 
 			this.SimplePassthroughNodesCheckBox.AutoSize = true;
-			this.NodeGraphicsTable.SetColumnSpan(this.SimplePassthroughNodesCheckBox, 4);
+			this.DefaultsTable.SetColumnSpan(this.SimplePassthroughNodesCheckBox, 3);
 			this.SimplePassthroughNodesCheckBox.Location = new System.Drawing.Point(3, 78);
 			this.SimplePassthroughNodesCheckBox.Name = "SimplePassthroughNodesCheckBox";
-			this.SimplePassthroughNodesCheckBox.Size = new System.Drawing.Size(176, 17);
+			this.SimplePassthroughNodesCheckBox.Size = new System.Drawing.Size(245, 17);
 			this.SimplePassthroughNodesCheckBox.TabIndex = 21;
-			this.SimplePassthroughNodesCheckBox.Text = "Simple-draw passthrough nodes";
+			this.SimplePassthroughNodesCheckBox.Text = "Use simple-draw passthrough nodes as default";
 			this.SimplePassthroughNodesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// label10
@@ -1190,7 +1190,7 @@
 			// 
 			this.RoundAssemblerCountCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.RoundAssemblerCountCheckBox, 4);
-			this.RoundAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 193);
+			this.RoundAssemblerCountCheckBox.Location = new System.Drawing.Point(3, 170);
 			this.RoundAssemblerCountCheckBox.Name = "RoundAssemblerCountCheckBox";
 			this.RoundAssemblerCountCheckBox.Size = new System.Drawing.Size(127, 17);
 			this.RoundAssemblerCountCheckBox.TabIndex = 17;
@@ -1249,7 +1249,7 @@
 			// 
 			this.RecipeEditPanelPositionLockCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.RecipeEditPanelPositionLockCheckBox, 4);
-			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 216);
+			this.RecipeEditPanelPositionLockCheckBox.Location = new System.Drawing.Point(3, 193);
 			this.RecipeEditPanelPositionLockCheckBox.Name = "RecipeEditPanelPositionLockCheckBox";
 			this.RecipeEditPanelPositionLockCheckBox.Size = new System.Drawing.Size(191, 17);
 			this.RecipeEditPanelPositionLockCheckBox.TabIndex = 11;
@@ -1260,7 +1260,7 @@
 			// 
 			this.ShowNodeRecipeCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.ShowNodeRecipeCheckBox, 4);
-			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 170);
+			this.ShowNodeRecipeCheckBox.Location = new System.Drawing.Point(3, 147);
 			this.ShowNodeRecipeCheckBox.Name = "ShowNodeRecipeCheckBox";
 			this.ShowNodeRecipeCheckBox.Size = new System.Drawing.Size(119, 17);
 			this.ShowNodeRecipeCheckBox.TabIndex = 6;
@@ -1271,7 +1271,7 @@
 			// 
 			this.DynamicLWCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.DynamicLWCheckBox, 4);
-			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 124);
+			this.DynamicLWCheckBox.Location = new System.Drawing.Point(3, 101);
 			this.DynamicLWCheckBox.Name = "DynamicLWCheckBox";
 			this.DynamicLWCheckBox.Size = new System.Drawing.Size(114, 17);
 			this.DynamicLWCheckBox.TabIndex = 4;
@@ -1313,7 +1313,7 @@
 			// 
 			this.AbbreviateSciPackCheckBox.AutoSize = true;
 			this.NodeGraphicsTable.SetColumnSpan(this.AbbreviateSciPackCheckBox, 4);
-			this.AbbreviateSciPackCheckBox.Location = new System.Drawing.Point(3, 147);
+			this.AbbreviateSciPackCheckBox.Location = new System.Drawing.Point(3, 124);
 			this.AbbreviateSciPackCheckBox.Name = "AbbreviateSciPackCheckBox";
 			this.AbbreviateSciPackCheckBox.Size = new System.Drawing.Size(149, 17);
 			this.AbbreviateSciPackCheckBox.TabIndex = 16;
@@ -1323,7 +1323,7 @@
 			// FlagOUSupplyNodesCheckBox
 			// 
 			this.FlagOUSupplyNodesCheckBox.AutoSize = true;
-			this.FlagOUSupplyNodesCheckBox.Location = new System.Drawing.Point(3, 239);
+			this.FlagOUSupplyNodesCheckBox.Location = new System.Drawing.Point(3, 216);
 			this.FlagOUSupplyNodesCheckBox.Name = "FlagOUSupplyNodesCheckBox";
 			this.FlagOUSupplyNodesCheckBox.Size = new System.Drawing.Size(186, 17);
 			this.FlagOUSupplyNodesCheckBox.TabIndex = 18;
@@ -1337,7 +1337,7 @@
 			this.groupBox6.Controls.Add(this.tableLayoutPanel1);
 			this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox6.Location = new System.Drawing.Point(3, 287);
+			this.groupBox6.Location = new System.Drawing.Point(3, 264);
 			this.groupBox6.Name = "groupBox6";
 			this.groupBox6.Size = new System.Drawing.Size(447, 111);
 			this.groupBox6.TabIndex = 4;

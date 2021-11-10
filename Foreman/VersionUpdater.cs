@@ -250,6 +250,13 @@ namespace Foreman
 				original["Version"] = 3;
 			}
 
+			if ((int)original["Version"] == 3)
+			{
+				//Version update 3 -> 4:
+				//	Passthrough nodes now have SDraw parameter
+				original["Version"] = 4;
+			}
+
 			return original;
 		}
 
@@ -280,6 +287,16 @@ namespace Foreman
 
 				foreach (JToken nodeJToken in original["Nodes"].ToList())
 					nodeJToken["Direction"] = (int)NodeDirection.Up;
+			}
+
+			if ((int)original["Version"] == 3)
+			{
+				//Version update 3 -> 4:
+				//	Passthrough nodes now have SDraw parameter
+				original["Version"] = 4;
+
+				foreach (JToken nodeJToken in original["Nodes"].Where(n => (NodeType)(int)n["NodeType"] == NodeType.Passthrough).ToList())
+					nodeJToken["SDraw"] = true;
 			}
 
 			return original;

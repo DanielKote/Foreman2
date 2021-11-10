@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
 			this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.SimplePassthroughNodesCheckBox = new System.Windows.Forms.CheckBox();
 			this.FixedOption = new System.Windows.Forms.RadioButton();
 			this.AutoOption = new System.Windows.Forms.RadioButton();
 			this.RateLabel = new System.Windows.Forms.Label();
@@ -46,17 +47,31 @@
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.RateOptionsTable.Controls.Add(this.SimplePassthroughNodesCheckBox, 0, 2);
 			this.RateOptionsTable.Controls.Add(this.FixedOption, 1, 1);
 			this.RateOptionsTable.Controls.Add(this.AutoOption, 0, 1);
 			this.RateOptionsTable.Controls.Add(this.RateLabel, 0, 0);
 			this.RateOptionsTable.Controls.Add(this.FixedFlowInput, 2, 1);
 			this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
 			this.RateOptionsTable.Name = "RateOptionsTable";
-			this.RateOptionsTable.RowCount = 2;
+			this.RateOptionsTable.RowCount = 3;
 			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.RateOptionsTable.Size = new System.Drawing.Size(225, 47);
+			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.RateOptionsTable.Size = new System.Drawing.Size(225, 70);
 			this.RateOptionsTable.TabIndex = 19;
+			// 
+			// SimplePassthroughNodesCheckBox
+			// 
+			this.SimplePassthroughNodesCheckBox.AutoSize = true;
+			this.RateOptionsTable.SetColumnSpan(this.SimplePassthroughNodesCheckBox, 3);
+			this.SimplePassthroughNodesCheckBox.Location = new System.Drawing.Point(3, 50);
+			this.SimplePassthroughNodesCheckBox.Name = "SimplePassthroughNodesCheckBox";
+			this.SimplePassthroughNodesCheckBox.Size = new System.Drawing.Size(142, 17);
+			this.SimplePassthroughNodesCheckBox.TabIndex = 20;
+			this.SimplePassthroughNodesCheckBox.Text = "Simplify throughput node";
+			this.SimplePassthroughNodesCheckBox.UseVisualStyleBackColor = true;
+			this.SimplePassthroughNodesCheckBox.Visible = false;
 			// 
 			// FixedOption
 			// 
@@ -125,7 +140,7 @@
 			this.DoubleBuffered = true;
 			this.ForeColor = System.Drawing.Color.White;
 			this.Name = "EditFlowPanel";
-			this.Size = new System.Drawing.Size(231, 53);
+			this.Size = new System.Drawing.Size(231, 76);
 			this.RateOptionsTable.ResumeLayout(false);
 			this.RateOptionsTable.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.FixedFlowInput)).EndInit();
@@ -141,5 +156,6 @@
 		public System.Windows.Forms.RadioButton AutoOption;
 		private System.Windows.Forms.Label RateLabel;
 		private System.Windows.Forms.NumericUpDown FixedFlowInput;
+		private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
 	}
 }
