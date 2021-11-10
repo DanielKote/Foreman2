@@ -43,6 +43,7 @@ namespace Foreman
 		{
 			LinkWidth = 3f;
 		}
+		protected BaseLinkElement(ProductionGraphViewer graphViewer, BaseLinkElement masterLink) : base(graphViewer, masterLink) { LinkWidth = masterLink.Width; }
 
 		public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder)
 		{

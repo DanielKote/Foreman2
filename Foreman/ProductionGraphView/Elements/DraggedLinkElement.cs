@@ -16,7 +16,10 @@ namespace Foreman
 		private bool dragEnded;
 		private BaseNodeElement originElement;
 
-		public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item) : base(graphViewer)
+		public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item) : base(graphViewer) { Init(graphViewer, startNode, startConnectionType, item); }
+		protected DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item, DraggedLinkElement masterLink) : base(graphViewer, masterLink) { Init(graphViewer, startNode, startConnectionType, item); }
+
+		protected void Init(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item)
 		{
 			if (startNode == null)
 				Trace.Fail("Cant create a dragged link element with a null startNode!");
@@ -33,11 +36,14 @@ namespace Foreman
 			dragEnded = false;
 		}
 
+
 		public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder) { Visible = true; } //always visible.
 
 		public override void PrePaint()
 		{
 			UpdateSlaveLinks();
+			foreach (DraggedLinkElement slaveLink in SubElements.Where(e => e is DraggedLinkElement))
+				slaveLink.LinkWidth = this.LinkWidth;
 		}
 
 		protected override Tuple<Point,Point> GetCurveEndpoints()
@@ -57,8 +63,17 @@ namespace Foreman
 
 		protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections()
 		{
+
 			if (SupplierElement == null)
 			{
+				if (myParent is DraggedLinkElement masterLinkElement)
+				{
+					Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
+					if (masterDirections.Item2 == ConsumerElement.DisplayedNode.NodeDirection)
+						return masterDirections;
+					return new Tuple<NodeDirection, NodeDirection>(masterLinkElement.GetEndpointDirections().Item1 == NodeDirection.Up? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
+				}
+
 				if (!graphViewer.SmartNodeDirection)
 					return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
 
@@ -69,6 +84,14 @@ namespace Foreman
 			}
 			if (ConsumerElement == null)
 			{
+				if (myParent is DraggedLinkElement masterLinkElement)
+				{
+					Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
+					if (masterDirections.Item1 == SupplierElement.DisplayedNode.NodeDirection)
+						return masterDirections;
+					return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, masterLinkElement.GetEndpointDirections().Item2 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+				}
+
 				if (!graphViewer.SmartNodeDirection)
 					return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
 
@@ -94,7 +117,7 @@ namespace Foreman
 				graphViewer.Invalidate();
 				graphViewer.DisposeLinkDrag();
 			}
-			else if(SubElements.Count > 0) //at least one null + sub-elements -> this is an 'add new passthrough nodes operation
+			else if(SubElements.Any(e => e is DraggedLinkElement)) //at least one null + sub-link -> this is an 'add new passthrough nodes operation
 			{
 				graphViewer.AddPassthroughNodesFromSelection(StartConnectionType, (Size)Point.Subtract(EndpointLocation, (Size)originElement.Location));
 			}
@@ -150,12 +173,9 @@ namespace Foreman
 						ConsumerElement = null;
 				}
 
-				if(SupplierElement != null && ConsumerElement != null && SubElements.Count > 0)
-				{
-					foreach (DraggedLinkElement link in SubElements)
+				if(SupplierElement != null && ConsumerElement != null && SubElements.Any(e => e is DraggedLinkElement))
+					foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
 						link.Dispose();
-					SubElements.Clear();
-				}
 			}
 			else //no node under mouse, break any previously established connections (ex:when mouse drag leaves a possible connection)
 			{
@@ -171,17 +191,16 @@ namespace Foreman
 		{
 			if (SupplierElement == null || ConsumerElement == null)
 			{
-				if ((Control.ModifierKeys & Keys.Control) == Keys.Control && SubElements.Count == 0 && originElement is PassthroughNodeElement && graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(originElement) && !graphViewer.SelectedNodes.Any(e => !(e is PassthroughNodeElement)))
+				if ((Control.ModifierKeys & Keys.Control) == Keys.Control && !SubElements.Any(e => e is DraggedLinkElement) && originElement is PassthroughNodeElement && graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(originElement) && !graphViewer.SelectedNodes.Any(e => !(e is PassthroughNodeElement)))
 				{
 					foreach (PassthroughNodeElement node in graphViewer.SelectedNodes.Where(e => e != originElement))
-						SubElements.Add(new DraggedLinkElement(graphViewer, node, StartConnectionType, ((ReadOnlyPassthroughNode)node.DisplayedNode).PassthroughItem));
+						new DraggedLinkElement(graphViewer, node, StartConnectionType, ((ReadOnlyPassthroughNode)node.DisplayedNode).PassthroughItem, this);
 					UpdateEndpoint();
 				}
 				else if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
 				{
-					foreach (DraggedLinkElement link in SubElements)
+					foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
 						link.Dispose();
-					SubElements.Clear();
 					UpdateEndpoint();
 				}
 			}
@@ -193,9 +212,9 @@ namespace Foreman
 			if (graphViewer.Grid.ShowGrid && graphViewer.Grid.CurrentGridUnit > 0)
 				EndpointLocation = graphViewer.Grid.AlignToGrid(EndpointLocation);
 
-			if (SubElements.Count > 0)
+			if (SubElements.Any(e => e is DraggedLinkElement))
 			{
-				foreach (DraggedLinkElement slaveLink in SubElements)
+				foreach (DraggedLinkElement slaveLink in SubElements.Where(e => e is DraggedLinkElement))
 					slaveLink.EndpointLocation = Point.Add((StartConnectionType == LinkType.Input ? slaveLink.ConsumerElement : slaveLink.SupplierElement).Location, (Size)Point.Subtract(EndpointLocation, (Size)originElement.Location));
 			}
 		}

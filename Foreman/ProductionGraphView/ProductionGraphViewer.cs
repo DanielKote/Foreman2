@@ -299,15 +299,19 @@ namespace Foreman
 			List<BaseNodeElement> newPassthroughNodes = new List<BaseNodeElement>();
 			foreach(PassthroughNodeElement passthroughNode in selectedNodes)
 			{
+				NodeDirection newNodeDirection = !SmartNodeDirection ? Graph.DefaultNodeDirection :
+					draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? passthroughNode.DisplayedNode.NodeDirection :
+					passthroughNode.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
+
 				Item passthroughItem = ((ReadOnlyPassthroughNode)passthroughNode.DisplayedNode).PassthroughItem;
 
 				int yoffset = linkType == LinkType.Input ? passthroughNode.Height / 2 : -passthroughNode.Height / 2;
-				yoffset *= passthroughNode.DisplayedNode.NodeDirection == NodeDirection.Up ? 1 : -1;
+				yoffset *= newNodeDirection == NodeDirection.Up ? 1 : -1;
 				yoffset += offset.Height;
 
 				ReadOnlyPassthroughNode newNode = Graph.CreatePassthroughNode(passthroughItem, new Point(passthroughNode.Location.X + offset.Width, passthroughNode.Location.Y + yoffset));
 				PassthroughNodeController controller = (PassthroughNodeController)Graph.RequestNodeController(newNode);
-				controller.SetDirection(passthroughNode.DisplayedNode.NodeDirection);
+				controller.SetDirection(newNodeDirection);
 				controller.SetSimpleDraw(((ReadOnlyPassthroughNode)passthroughNode.DisplayedNode).SimpleDraw);
 
 				if (linkType == LinkType.Input)
@@ -523,10 +527,6 @@ namespace Foreman
 				foreach (GraphElement element in GetPaintingOrder())
 					element.UpdateVisibility(visibleGraphBounds);
 
-			//run any pre-paint functions
-			foreach (GraphElement elemnent in GetPaintingOrder())
-				elemnent.PrePaint();
-
 			//ensure width of selection is correct
 			selectionPen.Width = 2 / ViewScale;
 
@@ -563,7 +563,11 @@ namespace Foreman
 					element.LinkWidth = minLinkWidth;
 			}
 
-			//all elements (nodes & lines)
+			//run any pre-paint functions
+			foreach (GraphElement elemnent in GetPaintingOrder())
+				elemnent.PrePaint();
+
+			//paint all elements (nodes & lines)
 			int visibleElements = GetPaintingOrder().Count(e => e.Visible && e is BaseNodeElement);
 			foreach (GraphElement element in GetPaintingOrder())
 				element.Paint(graphics, FullGraph? NodeDrawingStyle.PrintStyle : IconsOnly? NodeDrawingStyle.IconsOnly : (visibleElements > NodeCountForSimpleView || ViewScale < 0.2)? NodeDrawingStyle.Simple : NodeDrawingStyle.Regular); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
