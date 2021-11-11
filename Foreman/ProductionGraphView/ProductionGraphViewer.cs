@@ -182,7 +182,6 @@ namespace Foreman
 		{
 			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
-			if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
 			
 			if (Grid.ShowGrid)
 				newLocation = Grid.AlignToGrid(newLocation);
