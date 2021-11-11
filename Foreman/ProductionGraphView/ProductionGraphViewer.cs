@@ -817,11 +817,13 @@ namespace Foreman
 							if (startPoint != endPoint)
 								foreach (BaseNodeElement node in selectedNodes.Where(node => node != MouseDownElement))
 									node.SetLocation(new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y));
+							Invalidate();
 						}
 					}
 					else //dragging single item
 					{
 						MouseDownElement.Dragged(graph_location);
+						Invalidate();
 					}
 
 					//accept middle mouse button for view dragging purposes (while dragging item or selection)

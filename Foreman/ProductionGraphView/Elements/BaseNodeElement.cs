@@ -92,7 +92,7 @@ namespace Foreman
 		private void DisplayedNode_NodeStateChanged(object sender, EventArgs e) { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
 		private void DisplayedNode_NodeValuesChanged(object sender, EventArgs e) { NodeValuesRequireUpdate = true; graphViewer.Invalidate(); }
 
-		public void RequestStateUpdate() { NodeStateRequiresUpdate = true; graphViewer.Invalidate(); }
+		public void RequestStateUpdate() { NodeStateRequiresUpdate = true; }
 
 		protected virtual void UpdateState()
 		{
