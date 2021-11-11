@@ -10,7 +10,7 @@
     },
     {
       "name": "base",
-      "version": "1.1.45"
+      "version": "1.1.46"
     },
     {
       "name": "foremanexport",
@@ -6604,7 +6604,8 @@
         {
           "name": "heavy-oil",
           "type": "fluid",
-          "amount": 90
+          "amount": 90,
+          "catalyst": true
         },
         {
           "name": "light-oil",
@@ -12624,7 +12625,8 @@
         {
           "name": "uranium-235",
           "type": "item",
-          "amount": 41
+          "amount": 41,
+          "catalyst": true
         },
         {
           "name": "uranium-238",

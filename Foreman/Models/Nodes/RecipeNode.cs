@@ -290,15 +290,15 @@ namespace Foreman
 			if (item != FuelRemains)
 			{
 				if (SelectedAssembler.EntityType == EntityType.Reactor)
-					return BaseRecipe.ProductSet[item] * (1 + SelectedAssembler.NeighbourBonus * NeighbourCount) * GetProductivityMultiplier();
+					return BaseRecipe.ProductSet[item] * (1 + SelectedAssembler.NeighbourBonus * NeighbourCount) * (BaseRecipe.ProductCatalysts.Contains(item) ? 1 : GetProductivityMultiplier());
 				else
-					return BaseRecipe.ProductSet[item] * GetProductivityMultiplier();
+					return BaseRecipe.ProductSet[item] * (BaseRecipe.ProductCatalysts.Contains(item) ? 1 : GetProductivityMultiplier());
 			}
 			else
 			{
 				if (SelectedAssembler == null || !SelectedAssembler.IsBurner)
 					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
-				return (BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] * GetProductivityMultiplier() : 0) + inputRateForFuel();
+				return (BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] * (BaseRecipe.ProductCatalysts.Contains(item) ? 1 : GetProductivityMultiplier()) : 0) + inputRateForFuel();
 			}
 		}
 
