@@ -17,7 +17,11 @@ To download the latest version of Foreman 2.0 please visit the "Releases" tab he
 
 Run Foreman.exe. It will already have the default Factorio 1.1 preset loaded so you can start graphing right away. Click on 'add item' or 'add recipe' button to begin.
 
-Once you have your first node, you can drag from the ingredients/products of the node to add more nodes, or just click on add item/add recipe to add a disconnected node..
+Once you have your first node, you can drag from the ingredients/products of the node to add more nodes, or just click on add item/add recipe to add a disconnected node.
+
+If you are dragging from the ingredients/products of the node and let go, you will have an option to choose which recipe you wish to use for the new node, or if you wish to create an input/passthrough/output node. If however you are holding Ctrl when you let go you will automatically create a passthrough node without any options.
+
+If you are dragging from the ingredients/products of a selected passthrough node while holding down Ctrl and have multiple passthrough nodes selected (and only passthrough nodes), you will automatically place down a set of new passthrough nodes connected to the old ones. This should enable for quickly laying down a bus for larger graphs.
 
 Movement around the graph can be done by dragging with the middle mouse button, or by dragging with the right mouse button (assuming you werent pressing down on a node when you started). Dragging with the middle mouse button is recommended, and is possible even while doing other operations such as selecting / moving modes, or dragging a new connection.
 
@@ -64,7 +68,7 @@ The item and recipe selection have been modeled after the Factorio window, so sh
 
 ![5: Node examples](https://puu.sh/Im8AG/5924f95fa4.jpg)
 
-Nodes come in 4 varieties; source nodes that act as inputs, sink nodes that act as outputs, throughput nodes that can be used as limiters or just to tidy up the graph, and recipe nodes that actually do stuff. The first 3 can have a specific flow set that would specify the amount of items coming in/out/through the node, while the last (recipe node) can specify the number of buildings (among many other options) that will be utilized. Any of the 4 can be set to automatic (and in fact are thus set when first placed), meaning that their flow/building count is calculated based on the optimized flow of the graph. Those nodes with set flow/building count will have a darker background, and should thus be easy to visually identify.
+Nodes come in 4 varieties; source nodes that act as inputs, sink nodes that act as outputs, passthrough nodes that can be used as limiters or just to tidy up the graph, and recipe nodes that actually do stuff. The first 3 can have a specific flow set that would specify the amount of items coming in/out/through the node, while the last (recipe node) can specify the number of buildings (among many other options) that will be utilized. Any of the 4 can be set to automatic (and in fact are thus set when first placed), meaning that their flow/building count is calculated based on the optimized flow of the graph. Those nodes with set flow/building count will have a darker background, and should thus be easy to visually identify.
 
 The item input/output boxes are usually drawn with a grey border, but appear as red if they are not connected to anything, or golden if they are receiving too much input You can drag from them to quickly establish a new linked node, or right click for options (delete all links).
 
@@ -78,11 +82,15 @@ The nodes themselves are usually colored in light green with a dark green border
 
 (4) If the node has errors (such as a recipe / item / building from another mod, assembler / fuel / module assigned that cant be used, or anything else of similar severity), then the background will be fully colored in orange with a warning sign on the top left.
 
+For passthrough nodes, they can be set to be simply drawn, meaning they will appear as a line with two circles you can drag connections from. When you export the graph to an image the circles will not be visible, leaving the passthrough node virtually unrecognizable from a simple connection. This should allow for cleaner graphs. You can also set it to be fully drawn, which will draw the full node with item input/output boxes and flow values.
+
 Hovering over the warning sign will list the issues, clicking on the warning sign will auto-resolve issues (WARNING: in case of errors this will quite often lead to the deletion of the node!), while right clicking on the warning sign will give a menu of possible solutions. You can of-course resolve the issue yourself, or just ignore it if you know what you are doing.
 
-Right clicking on the node itself will give you several options, including deleting the node, copying its properties (so you can later paste it to a node / selection), and applying default assembler/ modules. If you already copied a node's properties you can also paste them to the given node/selection while specifying what exactly you wish copied (assembler, modules, fuel, beacon).
+Right clicking on the node itself will give you several options, including deleting the node, copying its properties (so you can later paste it to a node / selection), and applying default assembler/ modules. If you already copied a node's properties you can also paste them to the given node/selection while specifying what exactly you wish copied (assembler, modules, fuel, beacon). You can also set the 'simple draw' options for passthrough nodes.
 
 Left clicking on the node will lead you to the flow or recipe editor.
+
+Left clicking on a passthrough node will also allow you to set its 'simple draw' option.
 
 ### Recipe Node Options ###
 
@@ -136,29 +144,41 @@ Recipes can also be enabled/disabled straight from the recipe selection window b
 
 ![9: Graph Options](https://puu.sh/In2aO/c462e226a0.jpg)
 
-Level of detail: specifies how much detail you wish shown on the nodes. Low will just show the recipe name, Medium will show the assembler + beacon + modules + number of buildings, while High will add building percentages (productivity, speed, power)
+**Level of detail:** specifies how much detail you wish shown on the nodes. Low will just show the recipe name, Medium will show the assembler + beacon + modules + number of buildings, while High will add building percentages (productivity, speed, power)
 
-Dynamic link width: if enabled the width of the item flow between nodes will be proportional to the amounts being moved around (so expect really beefy lines from your miners to the smelters, and really thin ones from your high end electronics). Fluids and items are considered separately.
+**Maximum number of graphical objects:** when more than this number of nodes is visible on the screen, the graphics shift to a simple view where you will no longer see any node information or item icons. The same thing happens if you zoom out too far. If your computer can handle it, crank it up! Keep in mind that the default (300) should be more than enough for most users. On the other hand if you have a meh computer decreasing this value to 200 or 150 may help performance (visual only).
 
-Abbreviate science packs: If the mod pack you are graphing for has too many science packs (ex: space exploration), using this option is recommended. It will hide any science packs from the 'required science packs' of any recipe that is required to craft a higher tier science pack required by said recipe. So for example a red+green science will be abbreviated to just green since red science is necessary to research green science.
+**Draw arrows to show direction on link lines**: if enabled each throughput line will have a direction arrow at the end showing the direction of flow. If dynamic link width is used (or the option is disabled), the item tabs will have a light arrow drawn inside them instead.
 
-Show recipe tool-tip: If turned on will show the recipe of a given node when you hover over it.
+**Dynamic link width:** if enabled the width of the item flow between nodes will be proportional to the amounts being moved around (so expect really beefy lines from your miners to the smelters, and really thin ones from your high end electronics). Fluids and items are considered separately.
 
-Round building count: If turned on will round up buildings to the nearest integer (so instead of 0.2 buildings you will see 1 building). This is visual only and doesnt impact the power consumption of the buildings!
+**Abbreviate science packs:** If the mod pack you are graphing for has too many science packs (ex: space exploration), using this option is recommended. It will hide any science packs from the 'required science packs' of any recipe that is required to craft a higher tier science pack required by said recipe. So for example a red+green science will be abbreviated to just green since red science is necessary to research green science.
 
-Lock recipe editor to top left corner: If turned on the recipe editor panel will always show up in the top left corner, otherwise it will show up next to the node being edited.
+**Show recipe tool-tip:** If turned on will show the recipe of a given node when you hover over it.
 
-Display arrows pointing to any node errors / warnings: Useful to find any error nodes (recipe from another mod save for example), or warning nodes (disabled assemblers, uncraftable fuel, etc). If any exist outside the currently viewed area (where they are rather obvious, having an orange flag/background to them), there will be an arrow pointing in their direction.
+**Round building count:** If turned on will round up buildings to the nearest integer (so instead of 0.2 buildings you will see 1 building). This is visual only and doesnt impact the power consumption of the buildings!
 
-Defaults: should be straight forward. You can set which type of assembler you wish to be automatically assigned to newly added nodes, as well as what type of modules to give it.
+**Lock recipe editor to top left corner:** If turned on the recipe editor panel will always show up in the top left corner, otherwise it will show up next to the node being edited.
 
-Advanced: probably best to leave it alone (turned off) unless there is a particular need for it.
+**Flag over or under supplied nodes** If enabled, any over or under supplied nodes will have not just the border set to the appropriate color (red or gold), but also a flag will be visible in the top left corner similar to warning/error flags. Turn this on for better visibility of over/under supplied nodes.
 
-Advanced (Enable extra productivity bonus for all entities): to allow for miner productivity, there is an 'extra productivity' value you can set within your mining nodes. If this is turned on then all nodes (and not just the miners) will have an extra productivity that you can set. This should be used cautiously as you can accidentally copy the extra productivity to all nodes, but it is left as an option for those mods that allow mining productivity to act on non-miners (usually by creating 'invisible' beacons that apply the productivity effect)
+**Guide Arrows** Useful to find any error nodes (recipe from another mod save for example), or warning nodes (disabled assemblers, uncraftable fuel, etc). Can also be used for missing link nodes (nodes where some of the inputs/outputs are not connected to anything), or over/under supplied nodes. If any exist outside the currently viewed area (where they are rather obvious, having an orange flag/background to them), there will be an arrow pointing in their direction.
 
-Advanced (Show unavailable items): if turned on will display those items that cant be acquired in regular play (ex: infinite pipes, coins).
+**Defaults (assemblers & modules):** Should be straight forward. You can set which type of assembler you wish to be automatically assigned to newly added nodes, as well as what type of modules to give it.
 
-Advanced (Load barreling or crating recipes): if turned on will load the barreling / crating recipes from the preset (instead of just ignoring them). In most cases you really dont want them, so its best to just keep it off. NOTE: if you are planning on crating and wish to find the flows, please - by all means turn it on.
+**Defaults (node direction)** Placed nodes can either have inputs at the bottom and outputs at the top (Up direction), or inputs at the top and outputs at the bottom (Down direction). The set default will be applied to newly placed nodes.
+
+**Defaults (smart direction)** If enabled, the direction of a new node placed by dragging from an item tab (which will be linked to said item tab) will be set automatically - if the new node is below the node you dragged from, then it will be pointing down, and if it is placed above the node you dragged from then it will be pointing up.
+
+**Defaults (Simple draw passthrough nodes)** Passthrough nodes have 2 drawing options - regular and simple. Regular draw will draw the passthrough node as all other nodes - with a rounded border, input & output item boxes, and flow values. Simple draw will draw the passthrough node as a single line connecting the inputs to the outputs with no item boxes - virtually indistinguishable from a regular link line. This could be helpful in organizing the graph without unduly splitting the viewer's attention away from the nodes that actually do something (as opposed to directing flow). Passthrough nodes with set flow (instead of automatic), or passthrough nodes that are over/under supplied will be fully drawn no matter what.
+
+**Advanced:** probably best to leave it alone (turned off) unless there is a particular need for it.
+
+**Advanced (Enable extra productivity bonus for all entities):** to allow for miner productivity, there is an 'extra productivity' value you can set within your mining nodes. If this is turned on then all nodes (and not just the miners) will have an extra productivity that you can set. This should be used cautiously as you can accidentally copy the extra productivity to all nodes, but it is left as an option for those mods that allow mining productivity to act on non-miners (usually by creating 'invisible' beacons that apply the productivity effect)
+
+**Advanced (Show unavailable items):** if turned on will display those items that cant be acquired in regular play (ex: infinite pipes, coins).
+
+**Advanced (Load barreling or crating recipes):** if turned on will load the barreling / crating recipes from the preset (instead of just ignoring them). In most cases you really dont want them, so its best to just keep it off. NOTE: if you are planning on crating and wish to find the flows, please - by all means turn it on.
 
 ## Exporting the graph ##
 
