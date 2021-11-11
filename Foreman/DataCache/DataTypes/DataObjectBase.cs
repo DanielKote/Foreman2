@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 
 namespace Foreman
 {
@@ -47,7 +48,7 @@ namespace Foreman
 			Icon = DataCache.UnknownIcon;
 			AverageColor = Color.Black;
 
-			OrderCompareArray = order.Split(orderSeparators);
+			OrderCompareArray = order.Split(orderSeparators).Where(s => !string.IsNullOrEmpty(s)).ToArray();
 		}
 
 		public void SetIconAndColor(IconColorPair icp)
@@ -92,7 +93,7 @@ namespace Foreman
 
 				//order comparison is apparently quite convoluted - any time we have brackets ([ or ]), it signifies a different order part.
 				//each part is compared char-by-char, and in the case of the longer string it goes first.
-				//same thing for sections?
+				//in terms of sections, the sorter section goes first (ex: a[0] goes before a[0]-1)
 				for (int i = 0; i < this.OrderCompareArray.Length && i < otherP.OrderCompareArray.Length; i++)
 				{
 					for (int j = 0; j < this.OrderCompareArray[i].Length && j < otherP.OrderCompareArray[i].Length; j++)
@@ -105,7 +106,7 @@ namespace Foreman
 						return (this.OrderCompareArray[i].Length > otherP.OrderCompareArray[i].Length) ? -1 : 1;
 				}
 				if (this.OrderCompareArray.Length != otherP.OrderCompareArray.Length)
-					return (this.OrderCompareArray.Length > otherP.OrderCompareArray.Length) ? -1 : 1;
+					return (this.OrderCompareArray.Length < otherP.OrderCompareArray.Length) ? -1 : 1;
 
 				return LFriendlyName.CompareTo(otherP.LFriendlyName);
 			}
