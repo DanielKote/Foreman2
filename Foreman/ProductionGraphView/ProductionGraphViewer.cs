@@ -180,30 +180,21 @@ namespace Foreman
 
 		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null, bool offsetLocationToItemTabLevel = false)
 		{
-			SubwindowOpen = true;
 			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
-
+			if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+			
 			if (Grid.ShowGrid)
 				newLocation = Grid.AlignToGrid(newLocation);
 
-			fRange tempRange = new fRange(0, 0, true);
-			if (baseItem != null && baseItem is Fluid fluid && fluid.IsTemperatureDependent)
-			{
-				if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
-					tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Output, true);
-				else if (nNodeType == NewNodeType.Supplier) //need to check all nodes up to recipes for range of temperatures being consumed (guaranteed to be in a SINGLE [] range)
-					tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Input, true);
-			}
-
-			RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
-			ReadOnlyBaseNode newNode = null;
 			int lastNodeWidth = 0;
 			NodeDirection newNodeDirection = (originElement == null || !SmartNodeDirection) ? Graph.DefaultNodeDirection :
 				draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? originElement.DisplayedNode.NodeDirection :
 				originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
-			recipeChooser.RecipeRequested += (o, recipeRequestArgs) =>
+
+			void ProcessNodeRequest(object o, RecipeRequestArgs recipeRequestArgs)
 			{
+				ReadOnlyBaseNode newNode = null;
 				switch (recipeRequestArgs.NodeType)
 				{
 					case NodeType.Consumer:
@@ -281,17 +272,39 @@ namespace Foreman
 
 				DisposeLinkDrag();
 				Graph.UpdateNodeValues();
-			};
+			}
 
-			recipeChooser.PanelClosed += (o, e) =>
+			if ((Control.ModifierKeys & Keys.Control) == Keys.Control) //control key pressed -> we are making a passthrough node.
 			{
-				SubwindowOpen = false;
+				ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Passthrough, null));
 				DisposeLinkDrag();
 				Graph.UpdateNodeStates();
 				Invalidate();
-			};
+			}
+			else
+			{
+				fRange tempRange = new fRange(0, 0, true);
+				if (baseItem != null && baseItem is Fluid fluid && fluid.IsTemperatureDependent)
+				{
+					if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
+						tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Output, true);
+					else if (nNodeType == NewNodeType.Supplier) //need to check all nodes up to recipes for range of temperatures being consumed (guaranteed to be in a SINGLE [] range)
+						tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Input, true);
+				}
 
-			recipeChooser.Show();
+				RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
+				recipeChooser.RecipeRequested += ProcessNodeRequest;
+				recipeChooser.PanelClosed += (o, e) =>
+				{
+					SubwindowOpen = false;
+					DisposeLinkDrag();
+					Graph.UpdateNodeStates();
+					Invalidate();
+				};
+
+				SubwindowOpen = true;
+				recipeChooser.Show();
+			}
 		}
 
 		public void AddPassthroughNodesFromSelection(LinkType linkType, Size offset)
