@@ -324,7 +324,6 @@ namespace Foreman
 				ReadOnlyPassthroughNode newNode = Graph.CreatePassthroughNode(passthroughItem, new Point(passthroughNode.Location.X + offset.Width, passthroughNode.Location.Y + yoffset));
 				PassthroughNodeController controller = (PassthroughNodeController)Graph.RequestNodeController(newNode);
 				controller.SetDirection(newNodeDirection);
-				controller.SetSimpleDraw(((ReadOnlyPassthroughNode)passthroughNode.DisplayedNode).SimpleDraw);
 
 				if (linkType == LinkType.Input)
 					Graph.CreateLink(newNode, passthroughNode.DisplayedNode, passthroughItem );
