@@ -192,17 +192,12 @@ namespace Foreman
 			if (SupplierElement == null || ConsumerElement == null)
 			{
 				if ((Control.ModifierKeys & Keys.Control) == Keys.Control && !SubElements.Any(e => e is DraggedLinkElement) && originElement is PassthroughNodeElement && graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(originElement) && !graphViewer.SelectedNodes.Any(e => !(e is PassthroughNodeElement)))
-				{
 					foreach (PassthroughNodeElement node in graphViewer.SelectedNodes.Where(e => e != originElement))
 						new DraggedLinkElement(graphViewer, node, StartConnectionType, ((ReadOnlyPassthroughNode)node.DisplayedNode).PassthroughItem, this);
-					UpdateEndpoint();
-				}
 				else if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
-				{
 					foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
 						link.Dispose();
-					UpdateEndpoint();
-				}
+				UpdateEndpoint();
 			}
 		}
 
