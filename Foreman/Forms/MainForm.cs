@@ -73,7 +73,7 @@ namespace Foreman
 				GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
 				GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
 				GraphViewer.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
-				GraphViewer.ArrowRenderer.ShowOUSuppliedArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
+				GraphViewer.ArrowRenderer.ShowOUNodeArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
 
 				RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
 				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
@@ -94,8 +94,8 @@ namespace Foreman
 				GraphViewer.Invalidate();
 				GraphViewer.Focus();
 #if DEBUG
-				//await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
-				//GraphViewer.Invalidate();
+				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
+				GraphViewer.Invalidate();
 #endif
 			}
 		}
@@ -257,7 +257,7 @@ namespace Foreman
 			options.ShowErrorArrows = GraphViewer.ArrowRenderer.ShowErrorArrows;
 			options.ShowWarningArrows = GraphViewer.ArrowRenderer.ShowWarningArrows;
 			options.ShowDisconnectedArrows = GraphViewer.ArrowRenderer.ShowDisconnectedArrows;
-			options.ShowOUSuppliedArrows = GraphViewer.ArrowRenderer.ShowOUSuppliedArrows;
+			options.ShowOUSuppliedArrows = GraphViewer.ArrowRenderer.ShowOUNodeArrows;
 
 			options.RoundAssemblerCount = Properties.Settings.Default.RoundAssemblerCount;
 			options.AbbreviateSciPacks = Properties.Settings.Default.AbbreviateSciPacks;
@@ -334,7 +334,7 @@ namespace Foreman
 					Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
 					GraphViewer.ArrowRenderer.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
 					Properties.Settings.Default.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
-					GraphViewer.ArrowRenderer.ShowOUSuppliedArrows = options.ShowOUSuppliedArrows;
+					GraphViewer.ArrowRenderer.ShowOUNodeArrows = options.ShowOUSuppliedArrows;
 					Properties.Settings.Default.ShowOUSuppliedArrows = options.ShowOUSuppliedArrows;
 
 					Properties.Settings.Default.RoundAssemblerCount = options.RoundAssemblerCount;

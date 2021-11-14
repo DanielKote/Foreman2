@@ -52,7 +52,7 @@ namespace Foreman
 		{
 			int yOffset = (DisplayedNode.NodeDirection == NodeDirection.Up && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Down && OutputTabs.Count == 0 && InputTabs.Count != 0) ? 10 :
 				(DisplayedNode.NodeDirection == NodeDirection.Down && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Up && OutputTabs.Count == 0 && InputTabs.Count != 0) ? -10 : 0;
-			yOffset += DisplayedNode.NodeDirection == NodeDirection.Down ? 4 : 0;
+			yOffset += DisplayedNode.NodeDirection == NodeDirection.Up ? 4 : 0;
 
 			AssemblerElement.Location = new Point(-26, -14 + yOffset);
 			BeaconElement.Location = new Point(-30, 27 + yOffset);
@@ -102,8 +102,8 @@ namespace Foreman
 			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
 			{
 				//text
-				bool oversupplied = DisplayedNode.IsOversupplied();
-				Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (oversupplied ? 32 : 27), (Width - 10 - 40), Height - (oversupplied ? 64 : 54));
+				bool overproducing = DisplayedNode.IsOverproducing();
+				Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (overproducing ? 32 : 27), (Width - 10 - 40), Height - (overproducing ? 64 : 54));
 				//graphics.DrawRectangle(devPen, textSlot);
 				int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
 

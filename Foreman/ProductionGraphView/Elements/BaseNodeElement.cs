@@ -35,7 +35,7 @@ namespace Foreman
 		private static readonly Brush ManualRateBGFilterBrush = new SolidBrush(Color.FromArgb(50, 0, 0, 0));
 
 		private static readonly Brush equalFlowBorderBrush = Brushes.DarkGreen;
-		private static readonly Brush oversuppliedFlowBorderBrush = Brushes.DarkGoldenrod;
+		private static readonly Brush overproducingFlowBorderBrush = Brushes.DarkGoldenrod;
 		private static readonly Brush undersuppliedFlowBorderBrush = Brushes.DarkRed;
 
 		protected static readonly Brush selectionOverlayBrush = new SolidBrush(Color.FromArgb(100, 100, 100, 200));
@@ -108,9 +108,9 @@ namespace Foreman
 		{
 			//update tab values
 			foreach (ItemTabElement tab in InputTabs)
-				tab.UpdateValues(DisplayedNode.GetConsumeRate(tab.Item), DisplayedNode.GetSuppliedRate(tab.Item), DisplayedNode.IsOversupplied(tab.Item)); //for inputs we want the consumption/supply/oversupply values
+				tab.UpdateValues(DisplayedNode.GetConsumeRate(tab.Item), 0, false); //for inputs we only care to display the supply rate (guaranteed by solver to be equal to the amount consumed by recipe)
 			foreach (ItemTabElement tab in OutputTabs)
-				tab.UpdateValues(DisplayedNode.GetSupplyRate(tab.Item), 0, false); //for outputs we only care to display the supply rate
+				tab.UpdateValues(DisplayedNode.GetSupplyRate(tab.Item), DisplayedNode.GetSupplyUsedRate(tab.Item), DisplayedNode.IsOverproducing(tab.Item)); //for outputs we want the amount produced by the node, the amount supplied to other nodes, and true if we are supplying less than producing.
 		}
 
 		private void UpdateTabOrder()
@@ -216,7 +216,7 @@ namespace Foreman
 			{
 				//background
 				Brush bgBrush = DisplayedNode.State == NodeState.Error ? errorBgBrush : CleanBgBrush;
-				Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOversupplied() ? oversuppliedFlowBorderBrush : equalFlowBorderBrush;
+				Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOverproducing() ? overproducingFlowBorderBrush : equalFlowBorderBrush;
 
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing, trans.Y - (Height / 2) + BorderSpacing, Width - (2 * BorderSpacing), Height - (2 * BorderSpacing), 10, graphics, borderBrush); //flow status border
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing + 3, trans.Y - (Height / 2) + BorderSpacing + 3, Width - (2 * BorderSpacing) - 6, Height - (2 * BorderSpacing) - 6, 7, graphics, bgBrush); //basic background (with given background brush)

@@ -123,7 +123,7 @@ namespace Foreman
 
 			var linkSolutions = nodes
 				.SelectMany(x => x.OutputLinks)
-				.ToDictionary(x => x, x => solutionFor(Tuple.Create(x, LinkType.LINK)));
+				.ToDictionary(x => x, x => solutionFor(x));
 
 			return new Solution(nodeSolutions, linkSolutions);
 		}

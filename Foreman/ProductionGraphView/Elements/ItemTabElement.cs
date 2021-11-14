@@ -27,7 +27,7 @@ namespace Foreman
 		private static Brush directionBrush = new SolidBrush(Color.FromArgb(40, Color.Black));
 
 		private static Pen regularBorderPen = new Pen(Color.DimGray, 3);
-		private static Pen oversuppliedBorderPen = new Pen(Color.DarkGoldenrod, 3);
+		private static Pen overproducedBorderPen = new Pen(Color.DarkGoldenrod, 3);
 		private static Pen disconnectedBorderPen = new Pen(Color.DarkRed, 3);
 
 		private static Brush textBrush = Brushes.Black;
@@ -62,15 +62,15 @@ namespace Foreman
 				return LocalToGraph(new Point(0, -Height / 2));
 		}
 
-		public void UpdateValues(double recipeRate, double suppliedRate, bool isOversupplied) //if input then: recipe rate = consume rate; if output then recipe rate = production rate
+		public void UpdateValues(double recipeRate, double outputRate, bool isOverproduced) //if input then: recipe rate = consume rate; if output then recipe rate = production rate
 		{
 			borderPen = regularBorderPen;
 			text = GraphicsStuff.DoubleToString(recipeRate);
 
-			if (isOversupplied)
+			if (isOverproduced)
 			{
-				borderPen = oversuppliedBorderPen;
-				text += "\n" + GraphicsStuff.DoubleToString(suppliedRate);
+				borderPen = overproducedBorderPen;
+				text = GraphicsStuff.DoubleToString(outputRate) + "\n" + text;
 			}
 			else if (!Links.Any())
 				borderPen = disconnectedBorderPen;

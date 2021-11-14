@@ -78,31 +78,31 @@ namespace Foreman
 		public abstract double GetConsumeRate(Item item); //calculated rate a given item is consumed by this node (may not match desired amount)
 		public abstract double GetSupplyRate(Item item); //calculated rate a given item is supplied by this note (may not match desired amount)
 
-		public double GetSuppliedRate(Item item)
+		public double GetSupplyUsedRate(Item item)
 		{
-			return (double)InputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
+			return (double)OutputLinks.Where(x => x.Item == item).Sum(x => x.Throughput);
 		}
 
-		public bool IsOversupplied()
+		public bool IsOverproducing()
 		{
-			foreach (Item item in Inputs)
-				if (IsOversupplied(item))
+			foreach (Item item in Outputs)
+				if (IsOverproducing(item))
 					return true;
 			return false;
 		}
 
-		public bool IsOversupplied(Item item)
+		public bool IsOverproducing(Item item)
 		{
-			//supply & consume > 1 ---> allow for 0.1% error
-			//supply & consume [0.001 -> 1]  ---> allow for 1% error
-			//supply & consume [0 ->0.001] ---> allow for any errors (as long as neither are 0)
-			//supply & consume = 0 ---> no errors if both are exactly 0
+			//supplied & produced > 1 ---> allow for 0.1% error
+			//supplied & produced [0.0001 -> 1]  ---> allow for 1% error
+			//supplied & produced [0 ->0.0001] ---> allow for any errors (as long as neither are 0)
+			//supplied & produced = 0 ---> no errors if both are exactly 0
 
-			double consumeRate = GetConsumeRate(item);
-			double supplyRate = GetSuppliedRate(item);
-			if ((consumeRate == 0 && supplyRate == 0) || (supplyRate < 0.001 && supplyRate < 0.001))
+			double producedRate = GetSupplyRate(item);
+			double supplyUsedRate = GetSupplyUsedRate(item);
+			if ((producedRate == 0 && supplyUsedRate == 0) || (supplyUsedRate < 0.0001 && supplyUsedRate < 0.0001))
 				return false;
-			return ((supplyRate - consumeRate) / supplyRate) > ((consumeRate > 1 && supplyRate > 1) ? 0.001f : 0.01f);
+			return ((producedRate - supplyUsedRate) / supplyUsedRate) > ((producedRate > 1 && supplyUsedRate > 1) ? 0.001f : 0.01f);
 		}
 
 		public bool ManualRateNotMet()
@@ -141,9 +141,9 @@ namespace Foreman
 
 		public double GetConsumeRate(Item item) => MyNode.GetConsumeRate(item);
 		public double GetSupplyRate(Item item) => MyNode.GetSupplyRate(item);
-		public double GetSuppliedRate(Item item) => MyNode.GetSuppliedRate(item);
-		public bool IsOversupplied() => MyNode.IsOversupplied();
-		public bool IsOversupplied(Item item) => MyNode.IsOversupplied(item);
+		public double GetSupplyUsedRate(Item item) => MyNode.GetSupplyUsedRate(item);
+		public bool IsOverproducing() => MyNode.IsOverproducing();
+		public bool IsOverproducing(Item item) => MyNode.IsOverproducing(item);
 		public bool ManualRateNotMet() => MyNode.ManualRateNotMet();
 
 		private readonly BaseNode MyNode;

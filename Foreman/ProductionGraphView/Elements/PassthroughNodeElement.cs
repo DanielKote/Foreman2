@@ -28,7 +28,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (style != NodeDrawingStyle.IconsOnly && DisplayedNode.SimpleDraw && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.IsOversupplied() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any())
+			if (style != NodeDrawingStyle.IconsOnly && DisplayedNode.SimpleDraw && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.IsOverproducing() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any())
 			{
 				InputTabs[0].HideItemTab = true;
 				OutputTabs[0].HideItemTab = true;
