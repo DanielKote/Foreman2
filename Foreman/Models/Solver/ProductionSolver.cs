@@ -104,15 +104,16 @@ namespace Foreman
 		// safety by treating those as non-solutions.
 		public Solution Solve()
 		{
-			// TODO: Can we return an empty solution instead?
 			if (nodes.Count == 0)
-				return null;
+				return new Solution(new Dictionary<BaseNode, double>(), new Dictionary<NodeLink, double>()); //no nodes mean empty solution (no errors)
 
 			objective.SetMinimization();
 
-			//solver.Solve(); //<<------------------------------------------------------------------------------------------------------------- Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
+			//solver.Solve(); //<<---------------------------------- Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
+			//ex: coal liquifaction produces more heavy oil than is required (25->90) -> solution will be found (if it is connected back to itself only), but there will be an over-production of heavy oil.
+			//    Kovarex enrichment produces less Uranium 238 than is required (5->2) -> solution will be 0 (if it is connected back to itself only), as there is no way to satisfy the inputs. In a more complicated case with multiple nodes (instead of one recipe looped back to itself), this can lead to a null-solution (error)
 			if (solver.Solve() != Solver.ResultStatus.OPTIMAL)
-				return null;
+				return null; //error solution -> sets all values to 0 and records the error
 
 			Dictionary<BaseNode, double> nodeSolutions = nodes
 				.ToDictionary(x => x, x => solutionFor(Tuple.Create(x, RateType.ACTUAL)));
@@ -142,36 +143,38 @@ namespace Foreman
 			objective.SetCoefficient(errorVar, errorObjectiveCoefficient);
 		}
 
-		//we want to maximize the amount of output items, so we add a negative weight to the objective for the given consumer node. Only done if asked for.
+		//we want to maximize the amount of output items, so we add a negative weight to the objective for the given consumer node.
+		//Only done if asked for, and can easily lead to unbound solutions (where due to -ve weighting an 'infinite' amount of output at the expense of 'infinite' number
+		//of factories is considered the 'optimal' solution
 		public void AddOutputObjective(ConsumerNode node)
 		{
 			if(outputObjectiveCoefficient > 0)
 				objective.SetCoefficient(variableFor(node), -outputObjectiveCoefficient);
 		}
 
+		//set the node to be zero (used for passthrough nodes with no outputs)
+		public void SetZero(PassthroughNode node)
+		{
+			Variable nodeVar = variableFor(node);
+			Constraint constraint = MakeConstraint(0, 0);
+			constraint.SetCoefficient(nodeVar, 1);
+		}
+
 		// Constrain a ratio on the output side of a node. This is done for each unique item, and constrains the producted item (based on the node rate) to be equal to the amount of the item transported away by the links
-		// this is only done if there are any links -> in the case of 0 links we leave it unbound.
 		// Due to the possibility of an overflow, we introduce an 'overflow' variable here that accounts for any extra items produced that cant be consumed by the nodes above.
 		//	BUT! this is done only for recipe nodes! all other nodes cant have overflows!
 		public void AddOutputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
 		{
-			if (links.Any())
-			{
-				Debug.Assert(links.All(x => x.SupplierNode == node));
-				AddIORatio(node, item, links, rate, node is RecipeNode);
-			}
+			Debug.Assert(links.All(x => x.SupplierNode == node));
+			AddIORatio(node, item, links, rate, node is RecipeNode);
 		}
 
 		// Constrain a ratio on the input side of a node. Done for each unique item, and constrains the consumed item (based on the node rate) to be equal to the amount of the item provided by the links.
-		// as with outputs, this is only done if there are any links -> in the case of 0 links we leave it unbound.
 		// unlike with the outputs, we dont have any error/overflow variables here. the numbers MUST equal
 		public void AddInputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
 		{
-			if (links.Any())
-			{
-				Debug.Assert(links.All(x => x.ConsumerNode == node));
-				AddIORatio(node, item, links, rate, false);
-			}
+			Debug.Assert(links.All(x => x.ConsumerNode == node));
+			AddIORatio(node, item, links, rate, false);
 		}
 
 		private void AddIORatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate, bool includeErrorVariable)

@@ -61,6 +61,7 @@ namespace Foreman
 	{
 		internal virtual void SetSolvedRate(double rate)
 		{
+			//this is for all nodes but the recipe node. Recipe node overwrites this to set the factory count instead (as that is what the solver was solving for)
 			ActualRatePerSec = rate;
 			NodeValuesChanged?.Invoke(this, EventArgs.Empty);
 		}
@@ -68,27 +69,32 @@ namespace Foreman
 		internal void AddConstraints(ProductionSolver solver)
 		{
 			if (this is RecipeNode rNode)
-				solver.AddRecipeNode(rNode, rNode.factoryRate());
+				solver.AddRecipeNode(rNode, rNode.factoryRate()); //add node with minimization requirement on number of buildings
 			else
-				solver.AddNode(this);
+				solver.AddNode(this); //add node without any minimization requirements
 
 			if (this is ConsumerNode cNode && rateType == RateType.Auto)
-				solver.AddOutputObjective(cNode);
+				solver.AddOutputObjective(cNode); //pull up consumer node
+			else if (RateType == RateType.Manual)
+				solver.AddTarget(this, DesiredRatePerSec); //set manual requrement
 
-			if (RateType == RateType.Manual)
-				solver.AddTarget(this, DesiredRatePerSec);
-
+			//add in the connections from the inputs of the node to any links connected to those inputs, grouped by item. There is no errors allowed here -> sum of link throughputs MUST equal the amount consumed.
 			foreach (var itemInputs in InputLinks.GroupBy(x => x.Item))
 			{
 				Item item = itemInputs.Key;
 				solver.AddInputRatio(this, item, itemInputs, inputRateFor(item));
 			}
 
+			//add in the connections for the outputs of the node to any links connected to those outputs, grouped by item. Errors are only allowed for recipe nodes (too much produced -> accumulating in node), though it will be marked as 'overproducing'. All other nodes allow no errors (sum of link thorughputs MUST equal the amount produced)
 			foreach (var itemOutputs in OutputLinks.GroupBy(x => x.Item))
 			{
 				Item item = itemOutputs.Key;
 				solver.AddOutputRatio(this, item, itemOutputs, outputRateFor(item));
 			}
+
+			//specific for passthrough nodes, we set the throughput to zero if there are no outputs. This guarantees no accumulation of resources at endpoint passthrough nodes (which dont link to anything) without the explicit requiement to connect them to output nodes manually set to 0.
+			if (this is PassthroughNode && !OutputLinks.Any())
+				solver.SetZero(this as PassthroughNode);
 		}
 
 		internal abstract double inputRateFor(Item item);
