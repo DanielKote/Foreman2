@@ -108,7 +108,7 @@ namespace Foreman
 			objective.SetMinimization();
 
 			//solver.Solve(); //<<------------------------------------------------------------------------------------------------------------- Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
-			if (solver.Solve() != Solver.OPTIMAL)
+			if (solver.Solve() != Solver.ResultStatus.OPTIMAL)
 				return null;
 
 			var nodeSolutions = nodes

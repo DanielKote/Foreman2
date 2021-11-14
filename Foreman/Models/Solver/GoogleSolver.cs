@@ -19,7 +19,7 @@ namespace Foreman
 
 		public GoogleSolver()
 		{
-			this.solver = Solver.CreateSolver("Foreman", "GLOP_LINEAR_PROGRAMMING");
+			this.solver = Solver.CreateSolver("GLOP");
 			this.variables = new List<Variable>();
 			this.constraints = new List<Constraint>();
 		}
@@ -59,7 +59,7 @@ namespace Foreman
 			return solver.Objective();
 		}
 
-		internal int Solve()
+		internal Solver.ResultStatus Solve()
 		{
 			return solver.Solve();
 		}

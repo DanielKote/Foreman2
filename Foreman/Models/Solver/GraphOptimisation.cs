@@ -1,4 +1,4 @@
-﻿//#define VERBOSEDEBUG
+﻿#define VERBOSEDEBUG
 
 using System;
 using System.Collections.Generic;

@@ -96,9 +96,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Google.OrTools, Version=5.1.4075.23203, Culture=neutral, PublicKeyToken=e5e5a4177ad79658, processorArchitecture=AMD64">
-      <HintPath>..\packages\Google.OrTools.5.1.4077\lib\net40\Google.OrTools.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Google.OrTools.9.1.9490\lib\net452\Google.OrTools.dll</HintPath>
     </Reference>
     <Reference Include="Google.Protobuf, Version=3.6.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Google.Protobuf.3.6.1\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -390,6 +392,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="google-ortools-native.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\BurnerGeneratorIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
