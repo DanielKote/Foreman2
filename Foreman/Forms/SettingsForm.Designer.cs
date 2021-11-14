@@ -96,6 +96,7 @@
 			this.label5 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
+			this.SmartNodeDirectionCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ArrowsOnLinksCheckBox = new System.Windows.Forms.CheckBox();
@@ -121,7 +122,6 @@
 			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
-			this.SmartNodeDirectionCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -1082,6 +1082,16 @@
 			this.label9.Text = "Node Direction:";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// SmartNodeDirectionCheckBox
+			// 
+			this.SmartNodeDirectionCheckBox.AutoSize = true;
+			this.SmartNodeDirectionCheckBox.Location = new System.Drawing.Point(208, 53);
+			this.SmartNodeDirectionCheckBox.Name = "SmartNodeDirectionCheckBox";
+			this.SmartNodeDirectionCheckBox.Size = new System.Drawing.Size(98, 17);
+			this.SmartNodeDirectionCheckBox.TabIndex = 22;
+			this.SmartNodeDirectionCheckBox.Text = "Smart Direction";
+			this.SmartNodeDirectionCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// groupBox3
 			// 
 			this.groupBox3.AutoSize = true;
@@ -1373,9 +1383,9 @@
 			this.OUSuppliedArrowsCheckBox.AutoSize = true;
 			this.OUSuppliedArrowsCheckBox.Location = new System.Drawing.Point(3, 72);
 			this.OUSuppliedArrowsCheckBox.Name = "OUSuppliedArrowsCheckBox";
-			this.OUSuppliedArrowsCheckBox.Size = new System.Drawing.Size(301, 17);
+			this.OUSuppliedArrowsCheckBox.Size = new System.Drawing.Size(351, 17);
 			this.OUSuppliedArrowsCheckBox.TabIndex = 19;
-			this.OUSuppliedArrowsCheckBox.Text = "Display arrows pointing to any over or under supplied node";
+			this.OUSuppliedArrowsCheckBox.Text = "Display arrows pointing to any under-supplied or over-producing node";
 			this.OUSuppliedArrowsCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// DisconnectedArrowsCheckBox
@@ -1433,16 +1443,6 @@
 			this.RecipeToolTip.InitialDelay = 100000;
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
-			// 
-			// SmartNodeDirectionCheckBox
-			// 
-			this.SmartNodeDirectionCheckBox.AutoSize = true;
-			this.SmartNodeDirectionCheckBox.Location = new System.Drawing.Point(208, 53);
-			this.SmartNodeDirectionCheckBox.Name = "SmartNodeDirectionCheckBox";
-			this.SmartNodeDirectionCheckBox.Size = new System.Drawing.Size(98, 17);
-			this.SmartNodeDirectionCheckBox.TabIndex = 22;
-			this.SmartNodeDirectionCheckBox.Text = "Smart Direction";
-			this.SmartNodeDirectionCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
