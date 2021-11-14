@@ -128,14 +128,14 @@ namespace Foreman
 		public static string DoubleToEnergy(double value, string unit)
 		{
 			if (Math.Abs(value) >= 1000000000000)
-				return (value / 1000000000000).ToString("0.##") + "P" + unit;
+				return (value / 1000000000000).ToString("0.##") + " P" + unit;
 			if (Math.Abs(value) >= 1000000000)
-				return (value / 1000000000).ToString("0.##") + "G" + unit;
+				return (value / 1000000000).ToString("0.##") + " G" + unit;
 			if (Math.Abs(value) >= 1000000)
-				return (value / 1000000).ToString("0.##") + "M" + unit;
+				return (value / 1000000).ToString("0.##") + " M" + unit;
 			if (Math.Abs(value) >= 1000)
-				return (value / 1000).ToString("0.##") + "K" + unit;
-			return (value).ToString("0.##") + "" + unit;
+				return (value / 1000).ToString("0.##") + " K" + unit;
+			return (value).ToString("0.##") + " " + unit;
 		}
 	}
 

@@ -600,7 +600,7 @@ namespace Foreman
 			return MyNode.MyGraph.GetRateMultipler() * MyNode.inputRateForFuel();
 		}
 
-		public double GetTotalAssemblerElectricalConsumption() // J/time unit
+		public double GetTotalAssemblerElectricalConsumption() // J/sec (W)
 		{
 			if (MyNode.SelectedAssembler.EnergySource != EnergySource.Electric)
 				return 0;
@@ -608,26 +608,26 @@ namespace Foreman
 			double partialAssembler = MyNode.ActualAssemblerCount % 1;
 			double entireAssemblers = MyNode.ActualAssemblerCount - partialAssembler;
 
-			return MyNode.MyGraph.GetRateMultipler() * (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * MyNode.SelectedAssembler.EnergyDrain) + (MyNode.ActualAssemblerCount * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
+			return (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * MyNode.SelectedAssembler.EnergyDrain) + (MyNode.ActualAssemblerCount * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
 		}
 
-		public double GetTotalGeneratorElectricalProduction() // J/time unit ; this is also when the temperature range of incoming fuel is taken into account
+		public double GetTotalGeneratorElectricalProduction() // J/sec (W) ; this is also when the temperature range of incoming fuel is taken into account
 		{
-			return MyNode.MyGraph.GetRateMultipler() * GetGeneratorElectricalProduction() * MyNode.ActualAssemblerCount;
+			return GetGeneratorElectricalProduction() * MyNode.ActualAssemblerCount;
 		}
 
-		public double GetTotalBeacons()
-		{
-			if (MyNode.SelectedBeacon == null)
-				return 0;
-			return Math.Ceiling(((int)(MyNode.ActualAssemblerCount + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
-		}
-
-		public double GetTotalBeaconElectricalConsumption() // J/time unit
+		public int GetTotalBeacons()
 		{
 			if (MyNode.SelectedBeacon == null)
 				return 0;
-			return MyNode.MyGraph.GetRateMultipler() * GetTotalBeacons() * GetBeaconEnergyConsumption();
+			return (int)Math.Ceiling(((int)(MyNode.ActualAssemblerCount + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
+		}
+
+		public double GetTotalBeaconElectricalConsumption() // J/sec (W)
+		{
+			if (MyNode.SelectedBeacon == null)
+				return 0;
+			return GetTotalBeacons() * GetBeaconEnergyConsumption();
 		}
 
 		private readonly RecipeNode MyNode;

@@ -215,7 +215,7 @@ namespace Foreman
 
 		private void LoadUnfilteredList(IEnumerable<DataObjectBase> origin, List<ListViewItem> lviList)
 		{
-			foreach (DataObjectBase dObject in origin)
+			foreach (DataObjectBase dObject in origin.OrderByDescending(a => a.Available).ThenBy(a => a.FriendlyName))
 			{
 				ListViewItem lvItem = new ListViewItem();
 				if (dObject.Icon != null)
@@ -236,16 +236,6 @@ namespace Foreman
 				lvItem.BackColor = dObject.Available ? AvailableObjectColor : UnavailableObjectColor;
 				lviList.Add(lvItem);
 			}
-			unfilteredRecipeList.Sort(delegate (ListViewItem a, ListViewItem b)
-			{
-				DataObjectBase dobA = (DataObjectBase)a.Tag;
-				DataObjectBase dobB = (DataObjectBase)b.Tag;
-
-				int availableDiff = dobA.Available.CompareTo(dobB.Available);
-				if (availableDiff != 0) return -availableDiff;
-				return dobA.FriendlyName.CompareTo(dobB.FriendlyName);
-			});
-
 		}
 
 		private void UpdateFilteredLists()

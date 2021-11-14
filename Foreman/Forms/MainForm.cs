@@ -420,7 +420,7 @@ namespace Foreman
 
 		private void GraphSummaryButton_Click(object sender, EventArgs e)
 		{
-			using (GraphSummaryForm form = new GraphSummaryForm())
+			using (GraphSummaryForm form = new GraphSummaryForm(GraphViewer.Graph.Nodes, GraphViewer.Graph.NodeLinks, GraphViewer.Graph.GetRateName()))
 			{
 				form.StartPosition = FormStartPosition.Manual;
 				form.Left = this.Left + 50;
