@@ -1,4 +1,4 @@
-﻿#define VERBOSEDEBUG
+﻿//#define VERBOSEDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -21,11 +21,12 @@ namespace Foreman
 
 		private void OptimiseNodeGroup(IEnumerable<BaseNode> nodeGroup)
 		{
-			double maxRatio = 1;
+			double minRatio = 0.1;
 			foreach (RecipeNode node in nodeGroup.Where(n => n is RecipeNode))
-				maxRatio = Math.Max(maxRatio, node.GetMaxIORatio());
+				minRatio = Math.Min(minRatio, node.GetMinOutputRatio());
 
-			ProductionSolver solver = new ProductionSolver(maxRatio);
+			ProductionSolver solver = new ProductionSolver(PullOutputNodes, minRatio);
+			solver.LowPriorityMultiplier = LowPriorityMultiplier;
 
 			foreach (BaseNode node in nodeGroup)
 				node.AddConstraints(solver);
@@ -47,7 +48,8 @@ namespace Foreman
 				//removed the exception raising since this can actually happen now.
 				//throw new Exception("Solver failed but that shouldn't happen.\n" + solver.ToString());
 				ErrorLogging.LogLine(solver.ToString());
-				Console.WriteLine(solver.ToString());
+				//Console.WriteLine(solver.ToString());
+				Console.WriteLine("Solver failed");
 			}
 
 			foreach (BaseNode node in nodeGroup)
@@ -74,7 +76,13 @@ namespace Foreman
 
 		internal void AddConstraints(ProductionSolver solver)
 		{
-			solver.AddNode(this);
+			if (this is RecipeNode rNode)
+				solver.AddRecipeNode(rNode, rNode.factoryRate());
+			else
+				solver.AddNode(this);
+
+			if (this is ConsumerNode cNode && rateType == RateType.Auto)
+				solver.AddOutputObjective(cNode);
 
 			if (RateType == RateType.Manual)
 				solver.AddTarget(this, DesiredRatePerSec);
@@ -82,18 +90,13 @@ namespace Foreman
 			foreach (var itemInputs in InputLinks.GroupBy(x => x.Item))
 			{
 				var item = itemInputs.Key;
-
 				solver.AddInputRatio(this, item, itemInputs, inputRateFor(item));
-				solver.AddInputLink(this, item, itemInputs);
 			}
 
 			foreach (var itemOutputs in OutputLinks.GroupBy(x => x.Item))
 			{
 				var item = itemOutputs.Key;
-
 				solver.AddOutputRatio(this, item, itemOutputs, outputRateFor(item));
-				// Output links do not need to constrained, since they are already covered by adding
-				// the input link above.
 			}
 		}
 

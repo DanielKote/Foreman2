@@ -49,6 +49,8 @@ namespace Foreman
 		private const int YBorder = 200;
 
 		public bool PauseUpdates { get; set; }
+		public bool PullOutputNodes { get; set; } //if true, the solver will add a 'pull' for output nodes so as to prioritize them over lowering factory count. WARNING: this can lead to '0' solutions if there is any production path that can go to infinity (aka: ensure enough nodes are constrained!)
+		public double LowPriorityMultiplier { get; set; } //this is the multiplier of the factory cost function for low priority nodes. aka: low priority recipes will be picked if the alternative involves this much more factories (10,000 is a nice value here)
 		public bool EnableExtraProductivityForNonMiners { get; set; }
 
 		public AssemblerSelector AssemblerSelector { get; private set; }
@@ -97,6 +99,8 @@ namespace Foreman
 		public ProductionGraph()
 		{
 			DefaultNodeDirection = NodeDirection.Up;
+			PullOutputNodes = false;
+			LowPriorityMultiplier = 1e5;
 
 			nodes = new HashSet<BaseNode>();
 			nodeLinks = new HashSet<NodeLink>();

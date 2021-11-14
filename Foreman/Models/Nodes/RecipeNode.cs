@@ -312,21 +312,17 @@ namespace Foreman
 			return (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * SelectedAssembler.GetBaseFuelConsumptionRate(Fuel, temperature) * GetConsumptionMultiplier();
 		}
 
-		internal double GetMaxIORatio()
+		internal double factoryRate()
 		{
-			double maxValue = 0;
+			return BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier());
+		}
+
+		internal double GetMinOutputRatio()
+		{
 			double minValue = double.MaxValue;
-			foreach (Item item in Inputs)
-			{
-				maxValue = Math.Max(maxValue, inputRateFor(item));
-				minValue = Math.Min(minValue, inputRateFor(item));
-			}
 			foreach (Item item in Outputs)
-			{
-				maxValue = Math.Max(maxValue, outputRateFor(item));
 				minValue = Math.Min(minValue, outputRateFor(item));
-			}
-			return maxValue / minValue;
+			return minValue;
 		}
 
 		//------------------------------------------------------------------------object save & string

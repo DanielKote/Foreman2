@@ -66,7 +66,7 @@ namespace Foreman
 
 		public override bool Equals(object obj)
 		{
-			return (obj as DataObjectBase) == this;
+			return (obj as DataObjectBasePrototype) == this;
 		}
 
 		public static bool operator ==(DataObjectBasePrototype doBase1, DataObjectBasePrototype doBase2)

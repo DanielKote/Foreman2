@@ -16,9 +16,12 @@ namespace Foreman
 	// https://developers.google.com/optimization/lp/glop
 	public class ProductionSolver
 	{
+		public double LowPriorityMultiplier { get; set; }
 
-		private double rateObjectiveCoefficient; //we want to minimize the rates of each node, but not at the expense of oversupply or errors
-		private double oversupplyObjectiveCoefficient; //cost of oversupply needs to be great enough that the solver doesnt choose to 0 rate and swallow that error. This is higher than previously due to some fuels being extremely high value (
+		private double outputObjectiveCoefficient; //we want to maximize the output of each automatic consumer node.
+		private double factoryObjectiveCoefficient; //we want to minimize the number of buildings (of all recipe nodes), but not at the expense of oversupply or errors
+
+		private double overflowObjectiveCoefficient; //cost of oversupply needs to be great enough that the solver doesnt choose to 0 all recipe nodes and swallow any produced items as 'oversupply'. This needs to take into account the current nodes output ratios (ex: if item is produced extremely slowly, this value needs to be high enough for the solver not to decide to 0 its use)
 		private double absErrorObjectiveCoefficient; //errors should be avoided at all cost (if possible)
 
 		public class Solution
@@ -61,14 +64,17 @@ namespace Foreman
 		// Used to ensure uniqueness of variables names
 		private int counter;
 
-		enum EndpointType { SUPPLY, CONSUME, ERROR }
+		enum LinkType { LINK, ERROR }
+		enum RateType { ACTUAL, ERROR }
 
-		public ProductionSolver(double maxRecipeIORatio = 1200000) : this(1, maxRecipeIORatio * 10, maxRecipeIORatio * 10000) { } //io ratio is the maximum input : output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat, so the maxRecipeIORatio should be 120000)
+		public ProductionSolver(bool pullOutputNodes, double minRecipeOutRate = 1e-3) : this(pullOutputNodes, 5, 1e-2, 1e1 / minRecipeOutRate, 1e4 / minRecipeOutRate) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/1200 per sec?, so the minRecipeOutRate should be 1/1200)
 
-		public ProductionSolver(double rateObjectiveC, double supplyObjectiveC, double errorObjectiveC)
+		public ProductionSolver(bool pullOutputNodes, double outputObjectiveC, double rateObjectiveC, double supplyObjectiveC, double errorObjectiveC)
 		{
-			rateObjectiveCoefficient = rateObjectiveC;
-			oversupplyObjectiveCoefficient = supplyObjectiveC;
+			LowPriorityMultiplier = 10000;
+			outputObjectiveCoefficient =  pullOutputNodes? outputObjectiveC : 0;
+			factoryObjectiveCoefficient = rateObjectiveC;
+			overflowObjectiveCoefficient = supplyObjectiveC;
 			absErrorObjectiveCoefficient = errorObjectiveC;
 
 			this.solver = GoogleSolver.Create();
@@ -79,21 +85,22 @@ namespace Foreman
 
 		public void AddNode(BaseNode node)
 		{
-			var x = variableFor(node);
+			var nodeRate = variableFor(node);
+			this.nodes.Add(node);
+		}
 
+		//we want to minimize the number of buildings (so recipe nodes only). For all other nodes we dont care about the rates, since their flows will be dictated by other factors.
+		//this does mean that we prefer paths with least number of buildings, which may mean more source items consumed (ex: a base oil process with speed modules will be prefered over an advanced oil process without speed modules)
+		//however since there is a cost associated with providing those items (through more buildings for resource extraction), this should be OK for most use-cases.
+		public void AddRecipeNode(RecipeNode node, double factoryRateCoefficient)
+		{
+			var nodeRate = variableFor(node);
 			this.nodes.Add(node);
 
-			// The rate of all nodes should be minimized.
-			//
-			// TODO: There is a tension between minimizing supply and minimizing time to produce that
-			// I suspect is not explicitly handled well here. That will likely result in "unexpected"
-			// results depending on which the user is wanting. Need to figure out concrete examples
-			// of where this would happen. With sufficiently large error co-efficients it's probably
-			// fine for most real world recipes?
-			if(node is RecipeNode rNode && node.OutputLinks.Count == 0 && !rNode.BaseRecipe.Name.StartsWith("§§"))
-				objective.SetCoefficient(x, rateObjectiveCoefficient * 10000); //a bit of a hack in order to ensure that any 'void' recipes are considered more costry (and thus are less likely to hog item flow)
+			if (!node.OutputLinks.Any() && !node.BaseRecipe.Name.StartsWith("§§")) // pure consume node -> we assume this is part of the void recipe node groups and try to give it a higher 'cost' per building to decentivise its use.
+				objective.SetCoefficient(nodeRate, factoryObjectiveCoefficient * factoryRateCoefficient * LowPriorityMultiplier);
 			else
-				objective.SetCoefficient(x, rateObjectiveCoefficient);
+				objective.SetCoefficient(nodeRate, factoryObjectiveCoefficient * factoryRateCoefficient);
 		}
 
 		// Returns null if no optimal solution can be found. Technically GLOP can return non-optimal
@@ -114,141 +121,81 @@ namespace Foreman
 			var nodeSolutions = nodes
 				.ToDictionary(x => x, x => solutionFor(Tuple.Create(x, RateType.ACTUAL)));
 
-			// Link throughput is the maximum, i.e. the supply solution. The consumer solution may be
-			// less than this if the consumer is buffering.
 			var linkSolutions = nodes
 				.SelectMany(x => x.OutputLinks)
-				.ToDictionary(x => x, x => solutionFor(Tuple.Create(x, EndpointType.SUPPLY)));
+				.ToDictionary(x => x, x => solutionFor(Tuple.Create(x, LinkType.LINK)));
 
 			return new Solution(nodeSolutions, linkSolutions);
 		}
 
-		public enum RateType { ACTUAL, ERROR, ABS_ERROR }
-
 		// Ensure that the solution has a rate matching desired for this node. Typically there will
 		// one of these on the ultimate output node, though multiple are supported, on any node. If
 		// there is a conflict, a 'best effort' solution will be returned, where some nodes actual
-		// rates will not match the desired asked for here.
+		// rates will be less than the desired asked for here.
 		public void AddTarget(BaseNode node, double desiredRate)
 		{
 			var nodeVar = variableFor(node, RateType.ACTUAL);
 			var errorVar = variableFor(node, RateType.ERROR);
 
 			// The sum of the rate for this node, plus an error variable, must be equal to
-			// desiredRate. In normal scenarios, the error variable will be zero.
+			// desiredRate. In normal scenarios, the error variable will be zero. In error scenarios the error variable will be +ve non-zero.
 			var constraint = MakeConstraint(desiredRate, desiredRate);
 			constraint.SetCoefficient(nodeVar, 1);
 			constraint.SetCoefficient(errorVar, 1);
 
-			minimizeError(node, errorVar);
+			objective.SetCoefficient(errorVar, absErrorObjectiveCoefficient);
 		}
 
-		// Constrain a ratio on the output side of a node
+		//we want to maximize the amount of output items, so we add a negative weight to the objective for the given consumer node. Only done if asked for.
+		public void AddOutputObjective(ConsumerNode node)
+		{
+			if(outputObjectiveCoefficient > 0)
+				objective.SetCoefficient(variableFor(node), -outputObjectiveCoefficient);
+		}
+
+		// Constrain a ratio on the output side of a node. This is done for each unique item, and constrains the producted item (based on the node rate) to be equal to the amount of the item transported away by the links
+		// this is only done if there are any links -> in the case of 0 links we leave it unbound.
+		// Due to the possibility of an overflow, we introduce an 'overflow' variable here that accounts for any extra items produced that cant be consumed by the nodes above.
+		//	BUT! this is done only for recipe nodes! all other nodes cant have overflows!
 		public void AddOutputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
 		{
-			Debug.Assert(links.All(x => x.SupplierNode == node));
-
-			addRatio(node, item, links, rate, EndpointType.SUPPLY);
-		}
-
-		// Constrain a ratio on the input side of a node
-		public void AddInputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
-		{
-			Debug.Assert(links.All(x => x.ConsumerNode == node));
-
-			addRatio(node, item, links, rate, EndpointType.CONSUME);
-		}
-
-		// Constrain input to a node for a particular item so that the node does not consume more
-		// than is being produced by the supplier.
-		// 
-		// Consuming less than is being produced is fine. This represents a backup.
-		public void AddInputLink(BaseNode node, Item item, IEnumerable<NodeLink> links)
-		{
-			Debug.Assert(links.All(x => x.ConsumerNode == node));
-
-			// Each item input/output to a recipe has one varible per link. These variables should be
-			// related to one another using one of the other Ratio methods.
-			foreach (var link in links)
+			if (links.Any())
 			{
-				var supplierVariable = variableFor(link, EndpointType.SUPPLY);
-				var consumerVariable = variableFor(link, EndpointType.CONSUME);
-				var errorVariable = variableFor(link, EndpointType.ERROR);
-
-				{
-					// The consuming end of the link must be no greater than the supplying end.
-					var constraint = MakeConstraint(0, double.PositiveInfinity);
-					constraint.SetCoefficient(supplierVariable, 1);
-					constraint.SetCoefficient(consumerVariable, -1);
-				}
-
-				// Minimize over-supply. Necessary for unbalanced diamond recipe chains (such as
-				// Yuoki smelting - this doesn't occur in Vanilla) where the deficit is made up by an
-				// infinite supplier, in order to not just grab everything from that supplier and let
-				// produced materials backup. Also, this is needed so that resources don't "pool" in
-				// pass-through nodes.
-				//
-				// TODO: A more correct solution for pass-through would be to forbid over-supply on them.
-				{
-					var constraint = MakeConstraint(0, 0);
-					constraint.SetCoefficient(errorVariable, 1);
-					constraint.SetCoefficient(supplierVariable, -1);
-					constraint.SetCoefficient(consumerVariable, 1);
-
-					// The cost of over-supply needs to be greater than benefit of minimizing rate,
-					// other-wise pure consumption nodes won't consume anything.
-					objective.SetCoefficient(errorVariable, oversupplyObjectiveCoefficient);
-				}
+				Debug.Assert(links.All(x => x.SupplierNode == node));
+				AddIORatio(node, item, links, rate, node is RecipeNode);
 			}
 		}
 
-		// Ensure that the sum on the end of all the links is in relation to the rate of the recipe.
-		// The given rate is always for a single execution of the recipe, so the ratio is always (X1
-		// + X2 + ... + XN)*Rate:1
-		//
-		// For example, if a copper wire recipe (1 plate makes 2 wires) is connected to two different
-		// consumers, then the sum of the wire rate flowing over those two links must be equal to 2
-		// time the rate of the recipe.
-		private void addRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate, EndpointType type)
+		// Constrain a ratio on the input side of a node. Done for each unique item, and constrains the consumed item (based on the node rate) to be equal to the amount of the item provided by the links.
+		// as with outputs, this is only done if there are any links -> in the case of 0 links we leave it unbound.
+		// unlike with the outputs, we dont have any error/overflow variables here. the numbers MUST equal
+		public void AddInputRatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate)
 		{
-			// Ensure that the sum of all inputs for this type of item is in relation to the rate of the recipe
-			// So for the steel input to a solar panel, the sum of every input variable to this node must equal 5 * rate.
+			if (links.Any())
+			{
+				Debug.Assert(links.All(x => x.ConsumerNode == node));
+				AddIORatio(node, item, links, rate, false);
+			}
+		}
+
+		private void AddIORatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate, bool includeErrorVariable)
+		{
 			var constraint = MakeConstraint(0, 0);
 			var rateVariable = variableFor(node);
 
 			constraint.SetCoefficient(rateVariable, rate);
 			foreach (var link in links)
 			{
-				var variable = variableFor(link, type);
+				var variable = variableFor(link);
 				constraint.SetCoefficient(variable, -1);
 			}
-		}
 
-		private void minimizeError(BaseNode node, Variable errorVar)
-		{
-			var absErrorVar = variableFor(node, RateType.ABS_ERROR);
-
-			// These constraints translate the minimization of the absolute variable:
-			//
-			//     min(|e|)
-			//
-			// To a form that is expressible directly to the solver, by introducing a shadow variable z:
-			//
-			//     z - e >= 0
-			//     z + e >= 0
-			//     min(z)
-			//
-			// This is counter-intuitive at first! Key insight: only one constraint will be relevant,
-			// depending on whether e is positive or negative.
-			var abs1 = MakeConstraint(0, double.PositiveInfinity);
-			abs1.SetCoefficient(absErrorVar, 1);
-			abs1.SetCoefficient(errorVar, 1);
-
-			var abs2 = MakeConstraint(0, double.PositiveInfinity);
-			abs2.SetCoefficient(absErrorVar, 1);
-			abs2.SetCoefficient(errorVar, -1);
-
-			objective.SetCoefficient(absErrorVar, absErrorObjectiveCoefficient);
+			if (includeErrorVariable)
+			{
+				var errorVariable = VariableForOverflow(node, item);
+				constraint.SetCoefficient(errorVariable, -1);
+				objective.SetCoefficient(errorVariable, overflowObjectiveCoefficient);
+			}
 		}
 
 		private Constraint MakeConstraint(double low, double high)
@@ -256,9 +203,9 @@ namespace Foreman
 			return solver.MakeConstraint(low, high);
 		}
 
-		private Variable variableFor(NodeLink inputLink, EndpointType type)
+		private Variable variableFor(NodeLink inputLink)
 		{
-			return variableFor(Tuple.Create(inputLink, type), makeName("link", type, inputLink.ConsumerNode.ToString(), inputLink.Item.FriendlyName));
+			return variableFor(inputLink, makeName("link", "S(" + inputLink.ConsumerNode.NodeID + ")", "C(" + inputLink.ConsumerNode.NodeID + ")", inputLink.Item.FriendlyName));
 		}
 
 		private string makeName(params object[] components)
@@ -268,7 +215,12 @@ namespace Foreman
 
 		private Variable variableFor(BaseNode node, RateType type = RateType.ACTUAL)
 		{
-			return variableFor(Tuple.Create(node, type), makeName("node", type, node.ToString()));
+			return variableFor(Tuple.Create(node, type), makeName("node", type, node.NodeID, node.ToString()));
+		}
+
+		private Variable VariableForOverflow(BaseNode node, Item item)
+		{
+			return variableFor(Tuple.Create(node, item), makeName("node-overflow", node.NodeID, node.ToString(), item.ToString()));
 		}
 
 		private Variable variableFor(object key, string name)
