@@ -44,7 +44,8 @@ namespace Foreman
 		public NodeDirection DefaultNodeDirection { get; set; }
 		public bool DefaultToSimplePassthroughNodes { get; set; }
 
-		public const double MaxSetFlow = 10000000000000; //10 trillion should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
+		public const double MaxSetFlow = 1e7; //10 million (per second) item flow should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
+		public const double MaxFactories = 1e6; //1 million factories should be good enough as well. NOTE: the auto values can go higher, you just cant set more than 1 million on the manual setting.
 		private const int XBorder = 200;
 		private const int YBorder = 200;
 

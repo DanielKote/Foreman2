@@ -26,6 +26,7 @@ namespace Foreman
 		private readonly ProductionGraphViewer myGraphViewer;
 		private readonly RecipeNodeController nodeController;
 		private readonly ReadOnlyRecipeNode nodeData;
+
 		private double RateMultiplier { get { return myGraphViewer.Graph.GetRateMultipler(); } }
 		private string RateName { get { return myGraphViewer.Graph.GetRateName(); } }
 
@@ -41,7 +42,8 @@ namespace Foreman
 
 			LowPriorityCheckBox.Checked = nodeData.LowPriority;
 
-			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxSetFlow / (1000 * RateMultiplier));
+			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxFactories);
+
 			BeaconCountInput.Value = Math.Min(BeaconCountInput.Maximum, (decimal)nodeData.BeaconCount);
 			BeaconsPerAssemblerInput.Value = Math.Min(BeaconsPerAssemblerInput.Maximum, (decimal)nodeData.BeaconsPerAssembler);
 			ConstantBeaconInput.Value = Math.Min(ConstantBeaconInput.Maximum, (decimal)nodeData.BeaconsConst);
@@ -569,6 +571,7 @@ namespace Foreman
 			if (nodeData.RateType != updatedRateType)
 			{
 				nodeController.SetRateType(updatedRateType);
+				nodeController.SetDesiredAssemblerCount((double)FixedAssemblerInput.Value);
 				myGraphViewer.Graph.UpdateNodeValues();
 
 				UpdateAssemblerInfo();

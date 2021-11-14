@@ -13,12 +13,13 @@ namespace Foreman
 		{
 			InitializeComponent();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-			FixedFlowInput.Maximum = (decimal)ProductionGraph.MaxSetFlow;
 
 			nodeData = node;
 			nodeController = graphViewer.Graph.RequestNodeController(node);
 			myGraphViewer = graphViewer;
+
 			RateLabel.Text = string.Format("Item Flowrate (per {0})", myGraphViewer.Graph.GetRateName());
+			FixedFlowInput.Maximum = (decimal)(ProductionGraph.MaxSetFlow * myGraphViewer.Graph.GetRateMultipler());
 
 			if(node is ReadOnlyPassthroughNode pNode)
 			{
