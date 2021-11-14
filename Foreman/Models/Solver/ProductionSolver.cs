@@ -22,7 +22,7 @@ namespace Foreman
 		private double factoryObjectiveCoefficient; //we want to minimize the number of buildings (of all recipe nodes), but not at the expense of oversupply or errors
 
 		private double overflowObjectiveCoefficient; //cost of oversupply needs to be great enough that the solver doesnt choose to 0 all recipe nodes and swallow any produced items as 'oversupply'. This needs to take into account the current nodes output ratios (ex: if item is produced extremely slowly, this value needs to be high enough for the solver not to decide to 0 its use)
-		private double absErrorObjectiveCoefficient; //errors should be avoided at all cost (if possible)
+		private double errorObjectiveCoefficient; //errors should be avoided at all cost (if possible)
 
 		public class Solution
 		{
@@ -67,15 +67,15 @@ namespace Foreman
 		enum LinkType { LINK, ERROR }
 		enum RateType { ACTUAL, ERROR }
 
-		public ProductionSolver(bool pullOutputNodes, double minRecipeOutRate, double lowPriorityMultiplier) : this(pullOutputNodes, 5, 1e-2, 1e1 / minRecipeOutRate, 1e4 / minRecipeOutRate, lowPriorityMultiplier) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/120000 per sec, so the minRecipeOutRate should be 1/120000)
+		public ProductionSolver(bool pullOutputNodes, double minRecipeOutRate, double lowPriorityMultiplier) : this(pullOutputNodes, 5, 1e-2, 1e-1 / Math.Min(1e-3, minRecipeOutRate), 1e2 / Math.Min(1e-3, minRecipeOutRate), lowPriorityMultiplier) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/120000 per sec, so the minRecipeOutRate should be 1/120000)
 
-		public ProductionSolver(bool pullOutputNodes, double outputObjectiveC, double rateObjectiveC, double supplyObjectiveC, double errorObjectiveC, double lowPriorityMultiplier)
+		public ProductionSolver(bool pullOutputNodes, double outputObjectiveC, double factoryObjectiveC, double overflowObjectiveC, double errorObjectiveC, double lowPriorityMultiplier)
 		{
 			LowPriorityMultiplier = lowPriorityMultiplier;
 			outputObjectiveCoefficient =  pullOutputNodes? outputObjectiveC : 0;
-			factoryObjectiveCoefficient = rateObjectiveC;
-			overflowObjectiveCoefficient = supplyObjectiveC;
-			absErrorObjectiveCoefficient = errorObjectiveC;
+			factoryObjectiveCoefficient = factoryObjectiveC;
+			overflowObjectiveCoefficient = overflowObjectiveC;
+			errorObjectiveCoefficient = errorObjectiveC;
 
 			solver = GoogleSolver.Create();
 			objective = solver.Objective();
@@ -139,7 +139,7 @@ namespace Foreman
 			constraint.SetCoefficient(nodeVar, 1);
 			constraint.SetCoefficient(errorVar, 1);
 
-			objective.SetCoefficient(errorVar, absErrorObjectiveCoefficient);
+			objective.SetCoefficient(errorVar, errorObjectiveCoefficient);
 		}
 
 		//we want to maximize the amount of output items, so we add a negative weight to the objective for the given consumer node. Only done if asked for.
