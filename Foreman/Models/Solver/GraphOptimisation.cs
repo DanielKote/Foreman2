@@ -25,8 +25,7 @@ namespace Foreman
 			foreach (RecipeNode node in nodeGroup.Where(n => n is RecipeNode))
 				minRatio = Math.Min(minRatio, node.GetMinOutputRatio());
 
-			ProductionSolver solver = new ProductionSolver(PullOutputNodes, minRatio);
-			solver.LowPriorityMultiplier = LowPriorityMultiplier;
+			ProductionSolver solver = new ProductionSolver(PullOutputNodes, minRatio, LowPriorityMultiplier);
 
 			foreach (BaseNode node in nodeGroup)
 				node.AddConstraints(solver);
@@ -37,17 +36,12 @@ namespace Foreman
         Debug.WriteLine(solver.ToString());
 #endif
 
-			// TODO: Handle BIG NUMBERS
-			// TODO: Return error in solution!?
 			if (solution == null)
 			{
 				//Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
-				//have to check for cyclic recipes currently in the graph, and see if we can somehow find which one is causing issues and display it.
-				//work in the solver is kind of necessary here....
+				//using the pulloutputnodes option can result in an unbound solution (also null).
 
-				//removed the exception raising since this can actually happen now.
-				//throw new Exception("Solver failed but that shouldn't happen.\n" + solver.ToString());
-				ErrorLogging.LogLine(solver.ToString());
+				//ErrorLogging.LogLine(solver.ToString());
 				//Console.WriteLine(solver.ToString());
 				Console.WriteLine("Solver failed");
 			}
@@ -86,13 +80,13 @@ namespace Foreman
 
 			foreach (var itemInputs in InputLinks.GroupBy(x => x.Item))
 			{
-				var item = itemInputs.Key;
+				Item item = itemInputs.Key;
 				solver.AddInputRatio(this, item, itemInputs, inputRateFor(item));
 			}
 
 			foreach (var itemOutputs in OutputLinks.GroupBy(x => x.Item))
 			{
-				var item = itemOutputs.Key;
+				Item item = itemOutputs.Key;
 				solver.AddOutputRatio(this, item, itemOutputs, outputRateFor(item));
 			}
 		}

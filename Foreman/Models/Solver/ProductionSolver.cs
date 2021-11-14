@@ -28,8 +28,8 @@ namespace Foreman
 		{
 			public Solution(Dictionary<BaseNode, double> nodes, Dictionary<NodeLink, double> links)
 			{
-				this.Nodes = nodes;
-				this.Links = links;
+				Nodes = nodes;
+				Links = links;
 			}
 
 			public Dictionary<BaseNode, double> Nodes { get; private set; }
@@ -67,26 +67,26 @@ namespace Foreman
 		enum LinkType { LINK, ERROR }
 		enum RateType { ACTUAL, ERROR }
 
-		public ProductionSolver(bool pullOutputNodes, double minRecipeOutRate = 1e-3) : this(pullOutputNodes, 5, 1e-2, 1e1 / minRecipeOutRate, 1e4 / minRecipeOutRate) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/1200 per sec?, so the minRecipeOutRate should be 1/1200)
+		public ProductionSolver(bool pullOutputNodes, double minRecipeOutRate, double lowPriorityMultiplier) : this(pullOutputNodes, 5, 1e-2, 1e1 / minRecipeOutRate, 1e4 / minRecipeOutRate, lowPriorityMultiplier) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/120000 per sec, so the minRecipeOutRate should be 1/120000)
 
-		public ProductionSolver(bool pullOutputNodes, double outputObjectiveC, double rateObjectiveC, double supplyObjectiveC, double errorObjectiveC)
+		public ProductionSolver(bool pullOutputNodes, double outputObjectiveC, double rateObjectiveC, double supplyObjectiveC, double errorObjectiveC, double lowPriorityMultiplier)
 		{
-			LowPriorityMultiplier = 10000;
+			LowPriorityMultiplier = lowPriorityMultiplier;
 			outputObjectiveCoefficient =  pullOutputNodes? outputObjectiveC : 0;
 			factoryObjectiveCoefficient = rateObjectiveC;
 			overflowObjectiveCoefficient = supplyObjectiveC;
 			absErrorObjectiveCoefficient = errorObjectiveC;
 
-			this.solver = GoogleSolver.Create();
-			this.objective = solver.Objective();
-			this.allVariables = new Dictionary<object, Variable>();
-			this.nodes = new List<BaseNode>();
+			solver = GoogleSolver.Create();
+			objective = solver.Objective();
+			allVariables = new Dictionary<object, Variable>();
+			nodes = new List<BaseNode>();
 		}
 
 		public void AddNode(BaseNode node)
 		{
-			var nodeRate = variableFor(node);
-			this.nodes.Add(node);
+			Variable nodeRate = variableFor(node);
+			nodes.Add(node);
 		}
 
 		//we want to minimize the number of buildings (so recipe nodes only). For all other nodes we dont care about the rates, since their flows will be dictated by other factors.
@@ -94,13 +94,9 @@ namespace Foreman
 		//however since there is a cost associated with providing those items (through more buildings for resource extraction), this should be OK for most use-cases.
 		public void AddRecipeNode(RecipeNode node, double factoryRateCoefficient)
 		{
-			var nodeRate = variableFor(node);
-			this.nodes.Add(node);
-
-			if (!node.OutputLinks.Any() && !node.BaseRecipe.Name.StartsWith("§§")) // pure consume node -> we assume this is part of the void recipe node groups and try to give it a higher 'cost' per building to decentivise its use.
-				objective.SetCoefficient(nodeRate, factoryObjectiveCoefficient * factoryRateCoefficient * LowPriorityMultiplier);
-			else
-				objective.SetCoefficient(nodeRate, factoryObjectiveCoefficient * factoryRateCoefficient);
+			Variable nodeRate = variableFor(node);
+			nodes.Add(node);
+			objective.SetCoefficient(nodeRate, factoryObjectiveCoefficient * factoryRateCoefficient * (node.LowPriority ? LowPriorityMultiplier : 1));
 		}
 
 		// Returns null if no optimal solution can be found. Technically GLOP can return non-optimal
@@ -118,10 +114,10 @@ namespace Foreman
 			if (solver.Solve() != Solver.ResultStatus.OPTIMAL)
 				return null;
 
-			var nodeSolutions = nodes
+			Dictionary<BaseNode, double> nodeSolutions = nodes
 				.ToDictionary(x => x, x => solutionFor(Tuple.Create(x, RateType.ACTUAL)));
 
-			var linkSolutions = nodes
+			Dictionary<NodeLink, double> linkSolutions = nodes
 				.SelectMany(x => x.OutputLinks)
 				.ToDictionary(x => x, x => solutionFor(x));
 
@@ -134,12 +130,12 @@ namespace Foreman
 		// rates will be less than the desired asked for here.
 		public void AddTarget(BaseNode node, double desiredRate)
 		{
-			var nodeVar = variableFor(node, RateType.ACTUAL);
-			var errorVar = variableFor(node, RateType.ERROR);
+			Variable nodeVar = variableFor(node, RateType.ACTUAL);
+			Variable errorVar = variableFor(node, RateType.ERROR);
 
 			// The sum of the rate for this node, plus an error variable, must be equal to
 			// desiredRate. In normal scenarios, the error variable will be zero. In error scenarios the error variable will be +ve non-zero.
-			var constraint = MakeConstraint(desiredRate, desiredRate);
+			Constraint constraint = MakeConstraint(desiredRate, desiredRate);
 			constraint.SetCoefficient(nodeVar, 1);
 			constraint.SetCoefficient(errorVar, 1);
 
@@ -180,19 +176,19 @@ namespace Foreman
 
 		private void AddIORatio(BaseNode node, Item item, IEnumerable<NodeLink> links, double rate, bool includeErrorVariable)
 		{
-			var constraint = MakeConstraint(0, 0);
-			var rateVariable = variableFor(node);
+			Constraint constraint = MakeConstraint(0, 0);
+			Variable rateVariable = variableFor(node);
 
 			constraint.SetCoefficient(rateVariable, rate);
 			foreach (var link in links)
 			{
-				var variable = variableFor(link);
+				Variable variable = variableFor(link);
 				constraint.SetCoefficient(variable, -1);
 			}
 
 			if (includeErrorVariable)
 			{
-				var errorVariable = VariableForOverflow(node, item);
+				Variable errorVariable = VariableForOverflow(node, item);
 				constraint.SetCoefficient(errorVariable, -1);
 				objective.SetCoefficient(errorVariable, overflowObjectiveCoefficient);
 			}
@@ -226,10 +222,9 @@ namespace Foreman
 		private Variable variableFor(object key, string name)
 		{
 			if (allVariables.ContainsKey(key))
-			{
 				return allVariables[key];
-			}
-			var newVar = solver.MakeNumVar(0.0, double.PositiveInfinity, name + ":" + GetSequence());
+
+			Variable newVar = solver.MakeNumVar(0.0, double.PositiveInfinity, name + ":" + GetSequence());
 			allVariables[key] = newVar;
 			return newVar;
 		}
@@ -237,13 +232,8 @@ namespace Foreman
 		private double solutionFor(object key)
 		{
 			if (allVariables.ContainsKey(key))
-			{
 				return allVariables[key].SolutionValue();
-			}
-			else
-			{
-				return 0.0;
-			}
+			return 0.0;
 		}
 
 		private int GetSequence()

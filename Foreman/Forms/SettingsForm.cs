@@ -44,6 +44,10 @@ namespace Foreman
 			public bool DEV_ShowUnavailableItems;
 			public bool DEV_UseRecipeBWFilters;
 
+			public double Solver_LowPriorityMultiplier;
+			public bool Solver_SmartLowPriorityFilter;
+			public bool Solver_PullConsumerNodes;
+
 			public HashSet<DataObjectBase> EnabledObjects;
 
 			public SettingsFormOptions(DataCache cache)
@@ -167,6 +171,11 @@ namespace Foreman
 			ShowProductivityBonusOnAllCheckBox.Checked = Options.EnableExtraProductivityForNonMiners;
 			ShowUnavailablesCheckBox.Checked = Options.DEV_ShowUnavailableItems;
 			LoadBarrelingCheckBox.Checked = !Options.DEV_UseRecipeBWFilters;
+
+			LowPriorityMultiplierInput.Maximum = Math.Max(LowPriorityMultiplierInput.Maximum, (decimal)Options.Solver_LowPriorityMultiplier);
+			LowPriorityMultiplierInput.Value = (decimal)Options.Solver_LowPriorityMultiplier;
+			SmartLowPriorityCheckBox.Checked = Options.Solver_SmartLowPriorityFilter;
+			PullConsumerNodesCheckBox.Checked = Options.Solver_PullConsumerNodes;
 
 			//lists
 			LoadUnfilteredLists();
@@ -499,7 +508,10 @@ namespace Foreman
 			Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
 			Options.DEV_UseRecipeBWFilters = !LoadBarrelingCheckBox.Checked;
 
-			//Options.EnabledObjects auto set by check/uncheck of lists
+			Options.Solver_LowPriorityMultiplier = (double)LowPriorityMultiplierInput.Value;
+			Options.Solver_SmartLowPriorityFilter = SmartLowPriorityCheckBox.Checked;
+			Options.Solver_PullConsumerNodes = PullConsumerNodesCheckBox.Checked;
+
 		}
 
 		//PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------
@@ -562,6 +574,8 @@ namespace Foreman
 			}
 		}
 
+		//SET ENABLED STATUS------------------------------------------------------------------------------------------
+
 		private void LoadEnabledFromSaveButton_Click(object sender, EventArgs e)
 		{
 			using (SaveFileLoadForm form = new SaveFileLoadForm(Options.DCache, Options.EnabledObjects))
@@ -590,6 +604,23 @@ namespace Foreman
 				if (result == DialogResult.OK)
 					UpdateEnabledStatus();
 			}
+		}
+
+		private void EnableAllButton_Click(object sender, EventArgs e)
+		{
+			Options.EnabledObjects.Clear();
+			Options.EnabledObjects.Add(Options.DCache.PlayerAssembler);
+
+			foreach (Assembler assembler in Options.DCache.Assemblers.Values)
+				Options.EnabledObjects.Add(assembler);
+
+			foreach (Beacon beacon in Options.DCache.Beacons.Values)
+				Options.EnabledObjects.Add(beacon);
+
+			foreach (Module module in Options.DCache.Modules.Values)
+				Options.EnabledObjects.Add(module);
+
+			UpdateEnabledStatus();
 		}
 
 		private void UpdateEnabledStatus()

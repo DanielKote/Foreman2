@@ -33,6 +33,7 @@ namespace Foreman
 			this.AutoAssemblersOption = new System.Windows.Forms.RadioButton();
 			this.FixedAssemblersOption = new System.Windows.Forms.RadioButton();
 			this.AssemblerInfoTable = new System.Windows.Forms.TableLayoutPanel();
+			this.ExtraProductivityLabel = new System.Windows.Forms.Label();
 			this.AssemblerPollutionLabel = new System.Windows.Forms.Label();
 			this.AssemblerEnergyTitleLabel = new System.Windows.Forms.Label();
 			this.AssemblerPollutionPercentLabel = new System.Windows.Forms.Label();
@@ -48,6 +49,7 @@ namespace Foreman
 			this.GeneratorTemperatureLabel = new System.Windows.Forms.Label();
 			this.NeighbourInput = new System.Windows.Forms.NumericUpDown();
 			this.GeneratorTemperatureRangeLabel = new System.Windows.Forms.Label();
+			this.ExtraProductivityInput = new System.Windows.Forms.NumericUpDown();
 			this.AModuleOptionsLabel = new System.Windows.Forms.Label();
 			this.AModulesLabel = new System.Windows.Forms.Label();
 			this.AssemblerRateLabel = new System.Windows.Forms.Label();
@@ -96,11 +98,11 @@ namespace Foreman
 			this.SelectedFuelIcon = new System.Windows.Forms.PictureBox();
 			this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.FixedAssemblerInput = new System.Windows.Forms.NumericUpDown();
+			this.LowPriorityCheckBox = new System.Windows.Forms.CheckBox();
 			this.ToolTip = new Foreman.CustomToolTip();
-			this.ExtraProductivityLabel = new System.Windows.Forms.Label();
-			this.ExtraProductivityInput = new System.Windows.Forms.NumericUpDown();
 			this.AssemblerInfoTable.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).BeginInit();
 			this.MainTable.SuspendLayout();
 			this.BeaconTable.SuspendLayout();
 			this.BModulesChoicePanel.SuspendLayout();
@@ -121,7 +123,6 @@ namespace Foreman
 			((System.ComponentModel.ISupportInitialize)(this.SelectedFuelIcon)).BeginInit();
 			this.RateOptionsTable.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.FixedAssemblerInput)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// AutoAssemblersOption
@@ -189,6 +190,20 @@ namespace Foreman
 			this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AssemblerInfoTable.Size = new System.Drawing.Size(310, 127);
 			this.AssemblerInfoTable.TabIndex = 9;
+			// 
+			// ExtraProductivityLabel
+			// 
+			this.ExtraProductivityLabel.AutoSize = true;
+			this.AssemblerInfoTable.SetColumnSpan(this.ExtraProductivityLabel, 3);
+			this.ExtraProductivityLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ExtraProductivityLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+			this.ExtraProductivityLabel.Location = new System.Drawing.Point(3, 101);
+			this.ExtraProductivityLabel.Name = "ExtraProductivityLabel";
+			this.ExtraProductivityLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+			this.ExtraProductivityLabel.Size = new System.Drawing.Size(234, 26);
+			this.ExtraProductivityLabel.TabIndex = 17;
+			this.ExtraProductivityLabel.Text = "Extra Productivity Bonus (%):";
+			this.ExtraProductivityLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// AssemblerPollutionLabel
 			// 
@@ -366,6 +381,23 @@ namespace Foreman
 			this.GeneratorTemperatureRangeLabel.Text = "100*c - 150*c";
 			this.GeneratorTemperatureRangeLabel.Visible = false;
 			// 
+			// ExtraProductivityInput
+			// 
+			this.ExtraProductivityInput.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.ExtraProductivityInput.Location = new System.Drawing.Point(243, 104);
+			this.ExtraProductivityInput.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+			this.ExtraProductivityInput.Name = "ExtraProductivityInput";
+			this.ExtraProductivityInput.Size = new System.Drawing.Size(64, 20);
+			this.ExtraProductivityInput.TabIndex = 18;
+			// 
 			// AModuleOptionsLabel
 			// 
 			this.AModuleOptionsLabel.AutoSize = true;
@@ -439,7 +471,7 @@ namespace Foreman
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MainTable.Size = new System.Drawing.Size(472, 615);
+			this.MainTable.Size = new System.Drawing.Size(472, 638);
 			this.MainTable.TabIndex = 17;
 			// 
 			// BeaconTable
@@ -462,7 +494,7 @@ namespace Foreman
 			this.BeaconTable.Controls.Add(this.BeaconValuesTable, 2, 1);
 			this.BeaconTable.Controls.Add(this.SelectedBeaconIcon, 3, 0);
 			this.BeaconTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.BeaconTable.Location = new System.Drawing.Point(3, 390);
+			this.BeaconTable.Location = new System.Drawing.Point(3, 413);
 			this.BeaconTable.Name = "BeaconTable";
 			this.BeaconTable.RowCount = 4;
 			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -881,7 +913,7 @@ namespace Foreman
 			this.AssemblerTable.Controls.Add(this.SelectedAssemblerIcon, 2, 0);
 			this.AssemblerTable.Controls.Add(this.SelectedFuelIcon, 2, 2);
 			this.AssemblerTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerTable.Location = new System.Drawing.Point(3, 35);
+			this.AssemblerTable.Location = new System.Drawing.Point(3, 58);
 			this.AssemblerTable.Name = "AssemblerTable";
 			this.AssemblerTable.RowCount = 6;
 			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -1073,12 +1105,14 @@ namespace Foreman
 			this.RateOptionsTable.Controls.Add(this.FixedAssemblersOption, 2, 0);
 			this.RateOptionsTable.Controls.Add(this.AutoAssemblersOption, 1, 0);
 			this.RateOptionsTable.Controls.Add(this.FixedAssemblerInput, 3, 0);
+			this.RateOptionsTable.Controls.Add(this.LowPriorityCheckBox, 0, 1);
 			this.RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
 			this.RateOptionsTable.Name = "RateOptionsTable";
-			this.RateOptionsTable.RowCount = 1;
+			this.RateOptionsTable.RowCount = 2;
 			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.RateOptionsTable.Size = new System.Drawing.Size(466, 26);
+			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.RateOptionsTable.Size = new System.Drawing.Size(466, 49);
 			this.RateOptionsTable.TabIndex = 18;
 			// 
 			// FixedAssemblerInput
@@ -1089,6 +1123,17 @@ namespace Foreman
 			this.FixedAssemblerInput.Size = new System.Drawing.Size(94, 20);
 			this.FixedAssemblerInput.TabIndex = 4;
 			// 
+			// LowPriorityCheckBox
+			// 
+			this.LowPriorityCheckBox.AutoSize = true;
+			this.LowPriorityCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.LowPriorityCheckBox.Location = new System.Drawing.Point(3, 29);
+			this.LowPriorityCheckBox.Name = "LowPriorityCheckBox";
+			this.LowPriorityCheckBox.Size = new System.Drawing.Size(251, 17);
+			this.LowPriorityCheckBox.TabIndex = 5;
+			this.LowPriorityCheckBox.Text = "Low Priority Recipe";
+			this.LowPriorityCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// ToolTip
 			// 
 			this.ToolTip.AutoPopDelay = 100000;
@@ -1098,37 +1143,6 @@ namespace Foreman
 			this.ToolTip.OwnerDraw = true;
 			this.ToolTip.ReshowDelay = 100;
 			this.ToolTip.TextFont = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-			// 
-			// ExtraProductivityLabel
-			// 
-			this.ExtraProductivityLabel.AutoSize = true;
-			this.AssemblerInfoTable.SetColumnSpan(this.ExtraProductivityLabel, 3);
-			this.ExtraProductivityLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ExtraProductivityLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.ExtraProductivityLabel.Location = new System.Drawing.Point(3, 101);
-			this.ExtraProductivityLabel.Name = "ExtraProductivityLabel";
-			this.ExtraProductivityLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-			this.ExtraProductivityLabel.Size = new System.Drawing.Size(234, 26);
-			this.ExtraProductivityLabel.TabIndex = 17;
-			this.ExtraProductivityLabel.Text = "Extra Productivity Bonus (%):";
-			this.ExtraProductivityLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// ExtraProductivityInput
-			// 
-			this.ExtraProductivityInput.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-			this.ExtraProductivityInput.Location = new System.Drawing.Point(243, 104);
-			this.ExtraProductivityInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-			this.ExtraProductivityInput.Name = "ExtraProductivityInput";
-			this.ExtraProductivityInput.Size = new System.Drawing.Size(64, 20);
-			this.ExtraProductivityInput.TabIndex = 18;
 			// 
 			// EditRecipePanel
 			// 
@@ -1141,10 +1155,11 @@ namespace Foreman
 			this.DoubleBuffered = true;
 			this.ForeColor = System.Drawing.Color.White;
 			this.Name = "EditRecipePanel";
-			this.Size = new System.Drawing.Size(472, 615);
+			this.Size = new System.Drawing.Size(472, 638);
 			this.AssemblerInfoTable.ResumeLayout(false);
 			this.AssemblerInfoTable.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).EndInit();
 			this.MainTable.ResumeLayout(false);
 			this.MainTable.PerformLayout();
 			this.BeaconTable.ResumeLayout(false);
@@ -1178,7 +1193,6 @@ namespace Foreman
 			this.RateOptionsTable.ResumeLayout(false);
 			this.RateOptionsTable.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.FixedAssemblerInput)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1255,5 +1269,6 @@ namespace Foreman
 		private System.Windows.Forms.Label GeneratorTemperatureRangeLabel;
 		private System.Windows.Forms.Label ExtraProductivityLabel;
 		private System.Windows.Forms.NumericUpDown ExtraProductivityInput;
+		private System.Windows.Forms.CheckBox LowPriorityCheckBox;
 	}
 }

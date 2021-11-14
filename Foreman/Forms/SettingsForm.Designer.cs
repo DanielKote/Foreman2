@@ -122,6 +122,13 @@
 			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.RecipeToolTip = new Foreman.RecipeToolTip();
+			this.groupBox8 = new System.Windows.Forms.GroupBox();
+			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+			this.SmartLowPriorityCheckBox = new System.Windows.Forms.CheckBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.LowPriorityMultiplierInput = new System.Windows.Forms.NumericUpDown();
+			this.PullConsumerNodesCheckBox = new System.Windows.Forms.CheckBox();
+			this.EnableAllButton = new System.Windows.Forms.Button();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -154,6 +161,9 @@
 			this.groupBox6.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.FormButtonsTable.SuspendLayout();
+			this.groupBox8.SuspendLayout();
+			this.tableLayoutPanel2.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.LowPriorityMultiplierInput)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// groupBox4
@@ -288,16 +298,18 @@
 			this.EnabledObjectsTable.ColumnCount = 2;
 			this.EnabledObjectsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.EnabledObjectsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.EnabledObjectsTable.Controls.Add(this.ShowUnavailablesFilterCheckBox, 1, 3);
-			this.EnabledObjectsTable.Controls.Add(this.label4, 0, 2);
+			this.EnabledObjectsTable.Controls.Add(this.EnableAllButton, 0, 2);
+			this.EnabledObjectsTable.Controls.Add(this.ShowUnavailablesFilterCheckBox, 1, 4);
+			this.EnabledObjectsTable.Controls.Add(this.label4, 0, 3);
 			this.EnabledObjectsTable.Controls.Add(this.LoadEnabledFromSaveButton, 0, 0);
-			this.EnabledObjectsTable.Controls.Add(this.EnabledObjectsTabControl, 0, 4);
-			this.EnabledObjectsTable.Controls.Add(this.FilterTextBox, 1, 2);
+			this.EnabledObjectsTable.Controls.Add(this.EnabledObjectsTabControl, 0, 5);
+			this.EnabledObjectsTable.Controls.Add(this.FilterTextBox, 1, 3);
 			this.EnabledObjectsTable.Controls.Add(this.SetEnabledFromSciencePacksButton, 0, 1);
 			this.EnabledObjectsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.EnabledObjectsTable.Location = new System.Drawing.Point(2, 18);
 			this.EnabledObjectsTable.Name = "EnabledObjectsTable";
-			this.EnabledObjectsTable.RowCount = 5;
+			this.EnabledObjectsTable.RowCount = 6;
+			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.EnabledObjectsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -311,7 +323,7 @@
 			this.ShowUnavailablesFilterCheckBox.AutoSize = true;
 			this.ShowUnavailablesFilterCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ShowUnavailablesFilterCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.ShowUnavailablesFilterCheckBox.Location = new System.Drawing.Point(43, 80);
+			this.ShowUnavailablesFilterCheckBox.Location = new System.Drawing.Point(43, 107);
 			this.ShowUnavailablesFilterCheckBox.Margin = new System.Windows.Forms.Padding(2);
 			this.ShowUnavailablesFilterCheckBox.Name = "ShowUnavailablesFilterCheckBox";
 			this.ShowUnavailablesFilterCheckBox.Size = new System.Drawing.Size(415, 17);
@@ -325,7 +337,7 @@
 			this.label4.AutoSize = true;
 			this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.label4.Location = new System.Drawing.Point(7, 54);
+			this.label4.Location = new System.Drawing.Point(7, 81);
 			this.label4.Margin = new System.Windows.Forms.Padding(7, 0, 2, 0);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(32, 24);
@@ -360,12 +372,12 @@
 			this.EnabledObjectsTabControl.Controls.Add(this.RecipesPage);
 			this.EnabledObjectsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.EnabledObjectsTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.EnabledObjectsTabControl.Location = new System.Drawing.Point(4, 103);
+			this.EnabledObjectsTabControl.Location = new System.Drawing.Point(4, 130);
 			this.EnabledObjectsTabControl.Margin = new System.Windows.Forms.Padding(4);
 			this.EnabledObjectsTabControl.Multiline = true;
 			this.EnabledObjectsTabControl.Name = "EnabledObjectsTabControl";
 			this.EnabledObjectsTabControl.SelectedIndex = 0;
-			this.EnabledObjectsTabControl.Size = new System.Drawing.Size(452, 355);
+			this.EnabledObjectsTabControl.Size = new System.Drawing.Size(452, 328);
 			this.EnabledObjectsTabControl.TabIndex = 27;
 			// 
 			// AssemblersPage
@@ -375,7 +387,7 @@
 			this.AssemblersPage.Location = new System.Drawing.Point(4, 22);
 			this.AssemblersPage.Margin = new System.Windows.Forms.Padding(2);
 			this.AssemblersPage.Name = "AssemblersPage";
-			this.AssemblersPage.Size = new System.Drawing.Size(444, 329);
+			this.AssemblersPage.Size = new System.Drawing.Size(444, 302);
 			this.AssemblersPage.TabIndex = 0;
 			this.AssemblersPage.Text = "Assemblers";
 			this.AssemblersPage.UseVisualStyleBackColor = true;
@@ -394,7 +406,7 @@
 			this.AssemblerListView.LabelWrap = false;
 			this.AssemblerListView.Location = new System.Drawing.Point(0, 0);
 			this.AssemblerListView.Name = "AssemblerListView";
-			this.AssemblerListView.Size = new System.Drawing.Size(444, 329);
+			this.AssemblerListView.Size = new System.Drawing.Size(444, 302);
 			this.AssemblerListView.SmallImageList = this.IconList;
 			this.AssemblerListView.TabIndex = 17;
 			this.AssemblerListView.UseCompatibleStateImageBehavior = false;
@@ -625,7 +637,7 @@
 			// 
 			this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.FilterTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.FilterTextBox.Location = new System.Drawing.Point(43, 56);
+			this.FilterTextBox.Location = new System.Drawing.Point(43, 83);
 			this.FilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 7, 2);
 			this.FilterTextBox.Name = "FilterTextBox";
 			this.FilterTextBox.Size = new System.Drawing.Size(410, 20);
@@ -879,15 +891,17 @@
 			this.GraphOptionsTable.Controls.Add(this.groupBox5, 0, 2);
 			this.GraphOptionsTable.Controls.Add(this.groupBox3, 0, 0);
 			this.GraphOptionsTable.Controls.Add(this.groupBox6, 0, 1);
+			this.GraphOptionsTable.Controls.Add(this.groupBox8, 0, 4);
 			this.GraphOptionsTable.Dock = System.Windows.Forms.DockStyle.Top;
 			this.GraphOptionsTable.Location = new System.Drawing.Point(0, 0);
 			this.GraphOptionsTable.Name = "GraphOptionsTable";
-			this.GraphOptionsTable.RowCount = 4;
+			this.GraphOptionsTable.RowCount = 5;
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 615);
+			this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphOptionsTable.Size = new System.Drawing.Size(453, 686);
 			this.GraphOptionsTable.TabIndex = 0;
 			// 
 			// groupBox7
@@ -899,7 +913,7 @@
 			this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
 			this.groupBox7.Location = new System.Drawing.Point(3, 504);
 			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Size = new System.Drawing.Size(447, 108);
+			this.groupBox7.Size = new System.Drawing.Size(447, 88);
 			this.groupBox7.TabIndex = 3;
 			this.groupBox7.TabStop = false;
 			this.groupBox7.Text = "Advanced";
@@ -910,7 +924,6 @@
 			this.AdvancedOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.AdvancedOptionsTable.ColumnCount = 1;
 			this.AdvancedOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.AdvancedOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
 			this.AdvancedOptionsTable.Controls.Add(this.ShowUnavailablesCheckBox, 0, 1);
 			this.AdvancedOptionsTable.Controls.Add(this.LoadBarrelingCheckBox, 0, 2);
 			this.AdvancedOptionsTable.Controls.Add(this.ShowProductivityBonusOnAllCheckBox, 0, 0);
@@ -918,12 +931,12 @@
 			this.AdvancedOptionsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.AdvancedOptionsTable.Location = new System.Drawing.Point(3, 16);
 			this.AdvancedOptionsTable.Name = "AdvancedOptionsTable";
-			this.AdvancedOptionsTable.RowCount = 4;
+			this.AdvancedOptionsTable.RowCount = 3;
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.AdvancedOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.AdvancedOptionsTable.Size = new System.Drawing.Size(441, 89);
+			this.AdvancedOptionsTable.Size = new System.Drawing.Size(441, 69);
 			this.AdvancedOptionsTable.TabIndex = 0;
 			// 
 			// ShowUnavailablesCheckBox
@@ -1444,6 +1457,112 @@
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
 			// 
+			// groupBox8
+			// 
+			this.groupBox8.AutoSize = true;
+			this.groupBox8.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.groupBox8.Controls.Add(this.tableLayoutPanel2);
+			this.groupBox8.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.groupBox8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+			this.groupBox8.Location = new System.Drawing.Point(3, 598);
+			this.groupBox8.Name = "groupBox8";
+			this.groupBox8.Size = new System.Drawing.Size(447, 85);
+			this.groupBox8.TabIndex = 5;
+			this.groupBox8.TabStop = false;
+			this.groupBox8.Text = "Advanced (Solver options)";
+			// 
+			// tableLayoutPanel2
+			// 
+			this.tableLayoutPanel2.AutoSize = true;
+			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.tableLayoutPanel2.ColumnCount = 2;
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel2.Controls.Add(this.PullConsumerNodesCheckBox, 0, 2);
+			this.tableLayoutPanel2.Controls.Add(this.label11, 0, 0);
+			this.tableLayoutPanel2.Controls.Add(this.SmartLowPriorityCheckBox, 0, 1);
+			this.tableLayoutPanel2.Controls.Add(this.LowPriorityMultiplierInput, 1, 0);
+			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tableLayoutPanel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 16);
+			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+			this.tableLayoutPanel2.RowCount = 3;
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(441, 66);
+			this.tableLayoutPanel2.TabIndex = 1;
+			// 
+			// SmartLowPriorityCheckBox
+			// 
+			this.SmartLowPriorityCheckBox.AutoSize = true;
+			this.tableLayoutPanel2.SetColumnSpan(this.SmartLowPriorityCheckBox, 2);
+			this.SmartLowPriorityCheckBox.Location = new System.Drawing.Point(3, 23);
+			this.SmartLowPriorityCheckBox.Name = "SmartLowPriorityCheckBox";
+			this.SmartLowPriorityCheckBox.Size = new System.Drawing.Size(189, 17);
+			this.SmartLowPriorityCheckBox.TabIndex = 0;
+			this.SmartLowPriorityCheckBox.Text = "Auto-set void recipes to low priority";
+			this.SmartLowPriorityCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label11.Location = new System.Drawing.Point(2, 0);
+			this.label11.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(196, 20);
+			this.label11.TabIndex = 5;
+			this.label11.Text = "Low priority multiplier (10,000 default):";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// LowPriorityMultiplierInput
+			// 
+			this.LowPriorityMultiplierInput.Location = new System.Drawing.Point(203, 3);
+			this.LowPriorityMultiplierInput.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+			this.LowPriorityMultiplierInput.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.LowPriorityMultiplierInput.Name = "LowPriorityMultiplierInput";
+			this.LowPriorityMultiplierInput.Size = new System.Drawing.Size(120, 20);
+			this.LowPriorityMultiplierInput.TabIndex = 6;
+			this.LowPriorityMultiplierInput.Value = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+			// 
+			// PullConsumerNodesCheckBox
+			// 
+			this.PullConsumerNodesCheckBox.AutoSize = true;
+			this.tableLayoutPanel2.SetColumnSpan(this.PullConsumerNodesCheckBox, 2);
+			this.PullConsumerNodesCheckBox.Location = new System.Drawing.Point(3, 46);
+			this.PullConsumerNodesCheckBox.Name = "PullConsumerNodesCheckBox";
+			this.PullConsumerNodesCheckBox.Size = new System.Drawing.Size(134, 17);
+			this.PullConsumerNodesCheckBox.TabIndex = 7;
+			this.PullConsumerNodesCheckBox.Text = "Maximize output nodes";
+			this.PullConsumerNodesCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// EnableAllButton
+			// 
+			this.EnabledObjectsTable.SetColumnSpan(this.EnableAllButton, 2);
+			this.EnableAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.EnableAllButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.EnableAllButton.Location = new System.Drawing.Point(4, 56);
+			this.EnableAllButton.Margin = new System.Windows.Forms.Padding(4, 2, 7, 2);
+			this.EnableAllButton.Name = "EnableAllButton";
+			this.EnableAllButton.Size = new System.Drawing.Size(449, 23);
+			this.EnableAllButton.TabIndex = 33;
+			this.EnableAllButton.Text = "Enable All";
+			this.EnableAllButton.UseVisualStyleBackColor = true;
+			this.EnableAllButton.Click += new System.EventHandler(this.EnableAllButton_Click);
+			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.ConfirmButton;
@@ -1512,6 +1631,11 @@
 			this.tableLayoutPanel1.PerformLayout();
 			this.FormButtonsTable.ResumeLayout(false);
 			this.FormButtonsTable.PerformLayout();
+			this.groupBox8.ResumeLayout(false);
+			this.groupBox8.PerformLayout();
+			this.tableLayoutPanel2.ResumeLayout(false);
+			this.tableLayoutPanel2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.LowPriorityMultiplierInput)).EndInit();
 			this.ResumeLayout(false);
 
         }
@@ -1610,5 +1734,12 @@
 		private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
 		private System.Windows.Forms.CheckBox ArrowsOnLinksCheckBox;
 		private System.Windows.Forms.CheckBox SmartNodeDirectionCheckBox;
+		private System.Windows.Forms.GroupBox groupBox8;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+		private System.Windows.Forms.CheckBox PullConsumerNodesCheckBox;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.CheckBox SmartLowPriorityCheckBox;
+		private System.Windows.Forms.NumericUpDown LowPriorityMultiplierInput;
+		private System.Windows.Forms.Button EnableAllButton;
 	}
 }

@@ -39,6 +39,8 @@ namespace Foreman
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			RateOptionsTable.AutoSize = false; //simplest way of ensuring the width of the panel remains constant (it needs to be autosized during initialization due to DPI & font scaling)
 
+			LowPriorityCheckBox.Checked = nodeData.LowPriority;
+
 			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxSetFlow / (1000 * RateMultiplier));
 			BeaconCountInput.Value = Math.Min(BeaconCountInput.Maximum, (decimal)nodeData.BeaconCount);
 			BeaconsPerAssemblerInput.Value = Math.Min(BeaconsPerAssemblerInput.Maximum, (decimal)nodeData.BeaconsPerAssembler);
@@ -83,6 +85,7 @@ namespace Foreman
 			SetupAssemblerOptions();
 
 			//set these event handlers last - after we have set up all the values / settings
+			LowPriorityCheckBox.CheckedChanged += LowPriorityCheckBox_CheckedChanged;
 			FixedAssemblersOption.CheckedChanged += FixedAssemblerOption_CheckedChanged;
 			FixedAssemblerInput.ValueChanged += FixedAssemblerInput_ValueChanged;
 			NeighbourInput.ValueChanged += NeighbourInput_ValueChanged;
@@ -535,6 +538,13 @@ namespace Foreman
 		private void Button_MouseLeave(object sender, EventArgs e)
 		{
 			ToolTip.Hide((Control)sender);
+		}
+
+		//------------------------------------------------------------------------------------------------------Priority Checkbox
+		private void LowPriorityCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			nodeController.SetPriority(LowPriorityCheckBox.Checked);
+			myGraphViewer.Graph.UpdateNodeValues();
 		}
 
 		//------------------------------------------------------------------------------------------------------Rate input events

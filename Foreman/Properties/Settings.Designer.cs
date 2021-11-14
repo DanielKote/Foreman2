@@ -418,5 +418,41 @@ namespace Foreman.Properties {
                 this["SmartNodeDirection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10000")]
+        public double Solver_LowPriorityMultiplier {
+            get {
+                return ((double)(this["Solver_LowPriorityMultiplier"]));
+            }
+            set {
+                this["Solver_LowPriorityMultiplier"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Solver_SmartLowPriorityFilter {
+            get {
+                return ((bool)(this["Solver_SmartLowPriorityFilter"]));
+            }
+            set {
+                this["Solver_SmartLowPriorityFilter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Solver_PullConsumerNodes {
+            get {
+                return ((bool)(this["Solver_PullConsumerNodes"]));
+            }
+            set {
+                this["Solver_PullConsumerNodes"] = value;
+            }
+        }
     }
 }
