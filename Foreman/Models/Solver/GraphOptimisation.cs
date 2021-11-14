@@ -25,7 +25,7 @@ namespace Foreman
 			foreach (RecipeNode node in nodeGroup.Where(n => n is RecipeNode))
 				minRatio = Math.Min(minRatio, node.GetMinOutputRatio());
 
-			ProductionSolver solver = new ProductionSolver(PullOutputNodes, minRatio, LowPriorityMultiplier);
+			ProductionSolver solver = new ProductionSolver(PullOutputNodes, Math.Pow(10, PullOutputNodesPower), minRatio, Math.Pow(10, LowPriorityPower));
 
 			foreach (BaseNode node in nodeGroup)
 				node.AddConstraints(solver);

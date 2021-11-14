@@ -100,8 +100,10 @@ namespace Foreman
 
 			double producedRate = GetSupplyRate(item);
 			double supplyUsedRate = GetSupplyUsedRate(item);
-			if ((producedRate == 0 && supplyUsedRate == 0) || (supplyUsedRate < 0.0001 && supplyUsedRate < 0.0001))
+			if ((producedRate == 0 && supplyUsedRate == 0) || (producedRate < 0.0001 && supplyUsedRate < 0.0001))
 				return false;
+			if (supplyUsedRate == 0 && producedRate != 0)
+				return true;
 			return ((producedRate - supplyUsedRate) / supplyUsedRate) > ((producedRate > 1 && supplyUsedRate > 1) ? 0.001f : 0.01f);
 		}
 

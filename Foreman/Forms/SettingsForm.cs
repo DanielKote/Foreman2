@@ -44,8 +44,8 @@ namespace Foreman
 			public bool DEV_ShowUnavailableItems;
 			public bool DEV_UseRecipeBWFilters;
 
-			public double Solver_LowPriorityMultiplier;
-			public bool Solver_SmartLowPriorityFilter;
+			public double Solver_LowPriorityPower;
+			public double Solver_PullConsumerNodesPower;
 			public bool Solver_PullConsumerNodes;
 
 			public HashSet<DataObjectBase> EnabledObjects;
@@ -119,8 +119,7 @@ namespace Foreman
 
 			//settings
 			DynamicLWCheckBox.Checked = Options.DynamicLinkWidth;
-			NodeCountForSimpleViewInput.Maximum = Math.Max(NodeCountForSimpleViewInput.Maximum, Options.NodeCountForSimpleView);
-			NodeCountForSimpleViewInput.Value = Options.NodeCountForSimpleView;
+			NodeCountForSimpleViewInput.Value = Math.Min(NodeCountForSimpleViewInput.Maximum, Options.NodeCountForSimpleView);
 
 			IconsSizeInput.Value = Options.IconsOnlyIconSize;
 
@@ -172,10 +171,9 @@ namespace Foreman
 			ShowUnavailablesCheckBox.Checked = Options.DEV_ShowUnavailableItems;
 			LoadBarrelingCheckBox.Checked = !Options.DEV_UseRecipeBWFilters;
 
-			LowPriorityMultiplierInput.Maximum = Math.Max(LowPriorityMultiplierInput.Maximum, (decimal)Options.Solver_LowPriorityMultiplier);
-			LowPriorityMultiplierInput.Value = (decimal)Options.Solver_LowPriorityMultiplier;
-			SmartLowPriorityCheckBox.Checked = Options.Solver_SmartLowPriorityFilter;
+			LowPriorityPowerInput.Value = Math.Min(LowPriorityPowerInput.Maximum, (decimal)Options.Solver_LowPriorityPower);
 			PullConsumerNodesCheckBox.Checked = Options.Solver_PullConsumerNodes;
+			PullConsumerNodesPowerInput.Value = Math.Min(PullConsumerNodesPowerInput.Maximum, (decimal)Options.Solver_PullConsumerNodesPower);
 
 			//lists
 			LoadUnfilteredLists();
@@ -508,9 +506,9 @@ namespace Foreman
 			Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
 			Options.DEV_UseRecipeBWFilters = !LoadBarrelingCheckBox.Checked;
 
-			Options.Solver_LowPriorityMultiplier = (double)LowPriorityMultiplierInput.Value;
-			Options.Solver_SmartLowPriorityFilter = SmartLowPriorityCheckBox.Checked;
+			Options.Solver_LowPriorityPower = (double)LowPriorityPowerInput.Value;
 			Options.Solver_PullConsumerNodes = PullConsumerNodesCheckBox.Checked;
+			Options.Solver_PullConsumerNodesPower = (double)PullConsumerNodesPowerInput.Value;
 
 		}
 

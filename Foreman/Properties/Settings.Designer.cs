@@ -421,25 +421,13 @@ namespace Foreman.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10000")]
-        public double Solver_LowPriorityMultiplier {
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public double Solver_LowPriorityPower {
             get {
-                return ((double)(this["Solver_LowPriorityMultiplier"]));
+                return ((double)(this["Solver_LowPriorityPower"]));
             }
             set {
-                this["Solver_LowPriorityMultiplier"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool Solver_SmartLowPriorityFilter {
-            get {
-                return ((bool)(this["Solver_SmartLowPriorityFilter"]));
-            }
-            set {
-                this["Solver_SmartLowPriorityFilter"] = value;
+                this["Solver_LowPriorityPower"] = value;
             }
         }
         
@@ -452,6 +440,18 @@ namespace Foreman.Properties {
             }
             set {
                 this["Solver_PullConsumerNodes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double Solver_PullConsumerNodesPower {
+            get {
+                return ((double)(this["Solver_PullConsumerNodesPower"]));
+            }
+            set {
+                this["Solver_PullConsumerNodesPower"] = value;
             }
         }
     }

@@ -51,8 +51,8 @@ namespace Foreman
 
 		public bool PauseUpdates { get; set; }
 		public bool PullOutputNodes { get; set; } //if true, the solver will add a 'pull' for output nodes so as to prioritize them over lowering factory count. WARNING: this can lead to '0' solutions if there is any production path that can go to infinity (aka: ensure enough nodes are constrained!)
-		public double LowPriorityMultiplier { get; set; } //this is the multiplier of the factory cost function for low priority nodes. aka: low priority recipes will be picked if the alternative involves this much more factories (10,000 is a nice value here)
-		public bool SmartLowPriorityFilter { get; set; } //if true, we will assign any newly created recipe node with 0 outputs as a low priority node.
+		public double PullOutputNodesPower { get; set; }
+		public double LowPriorityPower { get; set; } //this is the multiplier of the factory cost function for low priority nodes. aka: low priority recipes will be picked if the alternative involves this much more factories (10,000 is a nice value here)
 		public bool EnableExtraProductivityForNonMiners { get; set; }
 
 		public AssemblerSelector AssemblerSelector { get; private set; }
@@ -102,7 +102,8 @@ namespace Foreman
 		{
 			DefaultNodeDirection = NodeDirection.Up;
 			PullOutputNodes = false;
-			LowPriorityMultiplier = 1e5;
+			PullOutputNodesPower = 10;
+			LowPriorityPower = 1e5;
 
 			nodes = new HashSet<BaseNode>();
 			nodeLinks = new HashSet<NodeLink>();
@@ -158,9 +159,6 @@ namespace Foreman
 		private ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location, Action<RecipeNode> nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
 		{
 			RecipeNode node = new RecipeNode(this, lastNodeID++, recipe);
-			if (SmartLowPriorityFilter && !node.BaseRecipe.ProductList.Any() && !node.BaseRecipe.Name.StartsWith("§§"))
-				node.LowPriority = true;
-
 			node.Location = location;
 			node.NodeDirection = DefaultNodeDirection;
 			nodeSetupAction?.Invoke(node);

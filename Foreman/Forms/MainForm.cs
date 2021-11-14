@@ -82,9 +82,9 @@ namespace Foreman
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
 				GraphViewer.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
-				GraphViewer.Graph.LowPriorityMultiplier = Properties.Settings.Default.Solver_LowPriorityMultiplier;
-				GraphViewer.Graph.SmartLowPriorityFilter = Properties.Settings.Default.Solver_SmartLowPriorityFilter;
+				GraphViewer.Graph.LowPriorityPower = Properties.Settings.Default.Solver_LowPriorityPower;
 				GraphViewer.Graph.PullOutputNodes = Properties.Settings.Default.Solver_PullConsumerNodes;
+				GraphViewer.Graph.PullOutputNodesPower = Properties.Settings.Default.Solver_PullConsumerNodesPower;
 
 				GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
 				IconViewCheckBox.Checked = GraphViewer.IconsOnly;
@@ -269,9 +269,9 @@ namespace Foreman
 			options.DEV_ShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
 			options.DEV_UseRecipeBWFilters = Properties.Settings.Default.UseRecipeBWfilters;
 
-			options.Solver_LowPriorityMultiplier = GraphViewer.Graph.LowPriorityMultiplier;
+			options.Solver_LowPriorityPower = GraphViewer.Graph.LowPriorityPower;
 			options.Solver_PullConsumerNodes = GraphViewer.Graph.PullOutputNodes;
-			options.Solver_SmartLowPriorityFilter = GraphViewer.Graph.SmartLowPriorityFilter;
+			options.Solver_PullConsumerNodesPower = GraphViewer.Graph.PullOutputNodesPower;
 
 			options.EnabledObjects.UnionWith(GraphViewer.DCache.Recipes.Values.Where(r => r.Enabled));
 			options.EnabledObjects.UnionWith(GraphViewer.DCache.Assemblers.Values.Where(r => r.Enabled));
@@ -350,10 +350,10 @@ namespace Foreman
 					GraphViewer.Graph.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
 					Properties.Settings.Default.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
 
-					GraphViewer.Graph.LowPriorityMultiplier = options.Solver_LowPriorityMultiplier;
-					Properties.Settings.Default.Solver_LowPriorityMultiplier = options.Solver_LowPriorityMultiplier;
-					GraphViewer.Graph.SmartLowPriorityFilter = options.Solver_SmartLowPriorityFilter;
-					Properties.Settings.Default.Solver_SmartLowPriorityFilter = options.Solver_SmartLowPriorityFilter;
+					GraphViewer.Graph.LowPriorityPower = options.Solver_LowPriorityPower;
+					Properties.Settings.Default.Solver_LowPriorityPower = options.Solver_LowPriorityPower;
+					GraphViewer.Graph.PullOutputNodesPower = options.Solver_PullConsumerNodesPower;
+					Properties.Settings.Default.Solver_PullConsumerNodesPower = options.Solver_PullConsumerNodesPower;
 					GraphViewer.Graph.PullOutputNodes = options.Solver_PullConsumerNodes;
 					Properties.Settings.Default.Solver_PullConsumerNodes = options.Solver_PullConsumerNodes;
 

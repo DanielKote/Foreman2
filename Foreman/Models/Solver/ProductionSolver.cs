@@ -67,7 +67,7 @@ namespace Foreman
 		enum LinkType { LINK, ERROR }
 		enum RateType { ACTUAL, ERROR }
 
-		public ProductionSolver(bool pullOutputNodes, double minRecipeOutRate, double lowPriorityMultiplier) : this(pullOutputNodes, 5, 1e-2, 1e-1 / Math.Min(1e-3, minRecipeOutRate), 1e2 / Math.Min(1e-3, minRecipeOutRate), lowPriorityMultiplier) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/120000 per sec, so the minRecipeOutRate should be 1/120000)
+		public ProductionSolver(bool pullOutputNodes, double pullPower, double minRecipeOutRate, double lowPriorityMultiplier) : this(pullOutputNodes, pullPower, 1e-2, 1e-1 / Math.Min(1e-3, minRecipeOutRate), 1e2 / Math.Min(1e-3, minRecipeOutRate), lowPriorityMultiplier) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/120000 per sec, so the minRecipeOutRate should be 1/120000)
 
 		public ProductionSolver(bool pullOutputNodes, double outputObjectiveC, double factoryObjectiveC, double overflowObjectiveC, double errorObjectiveC, double lowPriorityMultiplier)
 		{

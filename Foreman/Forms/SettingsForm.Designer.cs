@@ -39,6 +39,7 @@
 			this.RecipeDifficultyLabel = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.EnabledObjectsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.EnableAllButton = new System.Windows.Forms.Button();
 			this.ShowUnavailablesFilterCheckBox = new System.Windows.Forms.CheckBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.LoadEnabledFromSaveButton = new System.Windows.Forms.Button();
@@ -120,15 +121,14 @@
 			this.DisconnectedArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.WarningArrowsCheckBox = new System.Windows.Forms.CheckBox();
 			this.ErrorArrowsCheckBox = new System.Windows.Forms.CheckBox();
-			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
-			this.RecipeToolTip = new Foreman.RecipeToolTip();
 			this.groupBox8 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-			this.SmartLowPriorityCheckBox = new System.Windows.Forms.CheckBox();
 			this.label11 = new System.Windows.Forms.Label();
-			this.LowPriorityMultiplierInput = new System.Windows.Forms.NumericUpDown();
+			this.LowPriorityPowerInput = new System.Windows.Forms.NumericUpDown();
+			this.PullConsumerNodesPowerInput = new System.Windows.Forms.NumericUpDown();
 			this.PullConsumerNodesCheckBox = new System.Windows.Forms.CheckBox();
-			this.EnableAllButton = new System.Windows.Forms.Button();
+			this.FormButtonsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.RecipeToolTip = new Foreman.RecipeToolTip();
 			this.groupBox4.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.DifficultyTable.SuspendLayout();
@@ -160,10 +160,11 @@
 			((System.ComponentModel.ISupportInitialize)(this.NodeCountForSimpleViewInput)).BeginInit();
 			this.groupBox6.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
-			this.FormButtonsTable.SuspendLayout();
 			this.groupBox8.SuspendLayout();
 			this.tableLayoutPanel2.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.LowPriorityMultiplierInput)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.LowPriorityPowerInput)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.PullConsumerNodesPowerInput)).BeginInit();
+			this.FormButtonsTable.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupBox4
@@ -318,6 +319,20 @@
 			this.EnabledObjectsTable.Size = new System.Drawing.Size(460, 462);
 			this.EnabledObjectsTable.TabIndex = 0;
 			// 
+			// EnableAllButton
+			// 
+			this.EnabledObjectsTable.SetColumnSpan(this.EnableAllButton, 2);
+			this.EnableAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.EnableAllButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.EnableAllButton.Location = new System.Drawing.Point(4, 56);
+			this.EnableAllButton.Margin = new System.Windows.Forms.Padding(4, 2, 7, 2);
+			this.EnableAllButton.Name = "EnableAllButton";
+			this.EnableAllButton.Size = new System.Drawing.Size(449, 23);
+			this.EnableAllButton.TabIndex = 33;
+			this.EnableAllButton.Text = "Enable All";
+			this.EnableAllButton.UseVisualStyleBackColor = true;
+			this.EnableAllButton.Click += new System.EventHandler(this.EnableAllButton_Click);
+			// 
 			// ShowUnavailablesFilterCheckBox
 			// 
 			this.ShowUnavailablesFilterCheckBox.AutoSize = true;
@@ -435,7 +450,7 @@
 			this.MinersPage.Location = new System.Drawing.Point(4, 22);
 			this.MinersPage.Margin = new System.Windows.Forms.Padding(2);
 			this.MinersPage.Name = "MinersPage";
-			this.MinersPage.Size = new System.Drawing.Size(444, 329);
+			this.MinersPage.Size = new System.Drawing.Size(444, 302);
 			this.MinersPage.TabIndex = 2;
 			this.MinersPage.Text = "Miners";
 			this.MinersPage.UseVisualStyleBackColor = true;
@@ -454,7 +469,7 @@
 			this.MinerListView.LabelWrap = false;
 			this.MinerListView.Location = new System.Drawing.Point(0, 0);
 			this.MinerListView.Name = "MinerListView";
-			this.MinerListView.Size = new System.Drawing.Size(444, 329);
+			this.MinerListView.Size = new System.Drawing.Size(444, 302);
 			this.MinerListView.SmallImageList = this.IconList;
 			this.MinerListView.TabIndex = 17;
 			this.MinerListView.UseCompatibleStateImageBehavior = false;
@@ -475,7 +490,7 @@
 			this.PowersPage.Controls.Add(this.PowerListView);
 			this.PowersPage.Location = new System.Drawing.Point(4, 22);
 			this.PowersPage.Name = "PowersPage";
-			this.PowersPage.Size = new System.Drawing.Size(444, 329);
+			this.PowersPage.Size = new System.Drawing.Size(444, 302);
 			this.PowersPage.TabIndex = 5;
 			this.PowersPage.Text = "Power";
 			this.PowersPage.UseVisualStyleBackColor = true;
@@ -494,7 +509,7 @@
 			this.PowerListView.LabelWrap = false;
 			this.PowerListView.Location = new System.Drawing.Point(0, 0);
 			this.PowerListView.Name = "PowerListView";
-			this.PowerListView.Size = new System.Drawing.Size(444, 329);
+			this.PowerListView.Size = new System.Drawing.Size(444, 302);
 			this.PowerListView.SmallImageList = this.IconList;
 			this.PowerListView.TabIndex = 18;
 			this.PowerListView.UseCompatibleStateImageBehavior = false;
@@ -515,7 +530,7 @@
 			this.BeaconsPage.Controls.Add(this.BeaconListView);
 			this.BeaconsPage.Location = new System.Drawing.Point(4, 22);
 			this.BeaconsPage.Name = "BeaconsPage";
-			this.BeaconsPage.Size = new System.Drawing.Size(444, 329);
+			this.BeaconsPage.Size = new System.Drawing.Size(444, 302);
 			this.BeaconsPage.TabIndex = 6;
 			this.BeaconsPage.Text = "Beacons";
 			this.BeaconsPage.UseVisualStyleBackColor = true;
@@ -534,7 +549,7 @@
 			this.BeaconListView.LabelWrap = false;
 			this.BeaconListView.Location = new System.Drawing.Point(0, 0);
 			this.BeaconListView.Name = "BeaconListView";
-			this.BeaconListView.Size = new System.Drawing.Size(444, 329);
+			this.BeaconListView.Size = new System.Drawing.Size(444, 302);
 			this.BeaconListView.SmallImageList = this.IconList;
 			this.BeaconListView.TabIndex = 19;
 			this.BeaconListView.UseCompatibleStateImageBehavior = false;
@@ -557,7 +572,7 @@
 			this.ModulesPage.Location = new System.Drawing.Point(4, 22);
 			this.ModulesPage.Margin = new System.Windows.Forms.Padding(2);
 			this.ModulesPage.Name = "ModulesPage";
-			this.ModulesPage.Size = new System.Drawing.Size(444, 329);
+			this.ModulesPage.Size = new System.Drawing.Size(444, 302);
 			this.ModulesPage.TabIndex = 3;
 			this.ModulesPage.Text = "Modules";
 			this.ModulesPage.UseVisualStyleBackColor = true;
@@ -576,7 +591,7 @@
 			this.ModuleListView.LabelWrap = false;
 			this.ModuleListView.Location = new System.Drawing.Point(0, 0);
 			this.ModuleListView.Name = "ModuleListView";
-			this.ModuleListView.Size = new System.Drawing.Size(444, 329);
+			this.ModuleListView.Size = new System.Drawing.Size(444, 302);
 			this.ModuleListView.SmallImageList = this.IconList;
 			this.ModuleListView.TabIndex = 17;
 			this.ModuleListView.UseCompatibleStateImageBehavior = false;
@@ -598,7 +613,7 @@
 			this.RecipesPage.Location = new System.Drawing.Point(4, 22);
 			this.RecipesPage.Margin = new System.Windows.Forms.Padding(2);
 			this.RecipesPage.Name = "RecipesPage";
-			this.RecipesPage.Size = new System.Drawing.Size(444, 329);
+			this.RecipesPage.Size = new System.Drawing.Size(444, 302);
 			this.RecipesPage.TabIndex = 4;
 			this.RecipesPage.Text = "Recipes";
 			this.RecipesPage.UseVisualStyleBackColor = true;
@@ -617,7 +632,7 @@
 			this.RecipeListView.LabelWrap = false;
 			this.RecipeListView.Location = new System.Drawing.Point(0, 0);
 			this.RecipeListView.Name = "RecipeListView";
-			this.RecipeListView.Size = new System.Drawing.Size(444, 329);
+			this.RecipeListView.Size = new System.Drawing.Size(444, 302);
 			this.RecipeListView.SmallImageList = this.IconList;
 			this.RecipeListView.TabIndex = 16;
 			this.RecipeListView.UseCompatibleStateImageBehavior = false;
@@ -1431,6 +1446,116 @@
 			this.ErrorArrowsCheckBox.Text = "Display arrows pointing to any node errors";
 			this.ErrorArrowsCheckBox.UseVisualStyleBackColor = true;
 			// 
+			// groupBox8
+			// 
+			this.groupBox8.AutoSize = true;
+			this.groupBox8.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.groupBox8.Controls.Add(this.tableLayoutPanel2);
+			this.groupBox8.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.groupBox8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+			this.groupBox8.Location = new System.Drawing.Point(3, 598);
+			this.groupBox8.Name = "groupBox8";
+			this.groupBox8.Size = new System.Drawing.Size(447, 85);
+			this.groupBox8.TabIndex = 5;
+			this.groupBox8.TabStop = false;
+			this.groupBox8.Text = "Advanced (Solver options)";
+			// 
+			// tableLayoutPanel2
+			// 
+			this.tableLayoutPanel2.AutoSize = true;
+			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.tableLayoutPanel2.ColumnCount = 2;
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 219F));
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 222F));
+			this.tableLayoutPanel2.Controls.Add(this.label11, 0, 0);
+			this.tableLayoutPanel2.Controls.Add(this.LowPriorityPowerInput, 1, 0);
+			this.tableLayoutPanel2.Controls.Add(this.PullConsumerNodesPowerInput, 1, 1);
+			this.tableLayoutPanel2.Controls.Add(this.PullConsumerNodesCheckBox, 0, 1);
+			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tableLayoutPanel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 16);
+			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+			this.tableLayoutPanel2.RowCount = 4;
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(441, 66);
+			this.tableLayoutPanel2.TabIndex = 1;
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label11.Location = new System.Drawing.Point(2, 0);
+			this.label11.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(215, 20);
+			this.label11.TabIndex = 5;
+			this.label11.Text = "Low priority multiplier   (10^n, 2 default):";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// LowPriorityPowerInput
+			// 
+			this.LowPriorityPowerInput.DecimalPlaces = 1;
+			this.LowPriorityPowerInput.Increment = new decimal(new int[] {
+            2,
+            0,
+            0,
+            65536});
+			this.LowPriorityPowerInput.Location = new System.Drawing.Point(222, 3);
+			this.LowPriorityPowerInput.Maximum = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
+			this.LowPriorityPowerInput.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.LowPriorityPowerInput.Name = "LowPriorityPowerInput";
+			this.LowPriorityPowerInput.Size = new System.Drawing.Size(120, 20);
+			this.LowPriorityPowerInput.TabIndex = 6;
+			this.LowPriorityPowerInput.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+			// 
+			// PullConsumerNodesPowerInput
+			// 
+			this.PullConsumerNodesPowerInput.DecimalPlaces = 1;
+			this.PullConsumerNodesPowerInput.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.PullConsumerNodesPowerInput.Location = new System.Drawing.Point(222, 23);
+			this.PullConsumerNodesPowerInput.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+			this.PullConsumerNodesPowerInput.Name = "PullConsumerNodesPowerInput";
+			this.PullConsumerNodesPowerInput.Size = new System.Drawing.Size(120, 20);
+			this.PullConsumerNodesPowerInput.TabIndex = 8;
+			this.PullConsumerNodesPowerInput.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			// 
+			// PullConsumerNodesCheckBox
+			// 
+			this.PullConsumerNodesCheckBox.AutoSize = true;
+			this.PullConsumerNodesCheckBox.Location = new System.Drawing.Point(3, 23);
+			this.PullConsumerNodesCheckBox.Name = "PullConsumerNodesCheckBox";
+			this.PullConsumerNodesCheckBox.Size = new System.Drawing.Size(212, 17);
+			this.PullConsumerNodesCheckBox.TabIndex = 7;
+			this.PullConsumerNodesCheckBox.Text = "Maximize output nodes:   Power (10^n):";
+			this.PullConsumerNodesCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// FormButtonsTable
 			// 
 			this.FormButtonsTable.AutoSize = true;
@@ -1456,112 +1581,6 @@
 			this.RecipeToolTip.InitialDelay = 100000;
 			this.RecipeToolTip.OwnerDraw = true;
 			this.RecipeToolTip.ReshowDelay = 100000;
-			// 
-			// groupBox8
-			// 
-			this.groupBox8.AutoSize = true;
-			this.groupBox8.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.groupBox8.Controls.Add(this.tableLayoutPanel2);
-			this.groupBox8.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.groupBox8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-			this.groupBox8.Location = new System.Drawing.Point(3, 598);
-			this.groupBox8.Name = "groupBox8";
-			this.groupBox8.Size = new System.Drawing.Size(447, 85);
-			this.groupBox8.TabIndex = 5;
-			this.groupBox8.TabStop = false;
-			this.groupBox8.Text = "Advanced (Solver options)";
-			// 
-			// tableLayoutPanel2
-			// 
-			this.tableLayoutPanel2.AutoSize = true;
-			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel2.ColumnCount = 2;
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.tableLayoutPanel2.Controls.Add(this.PullConsumerNodesCheckBox, 0, 2);
-			this.tableLayoutPanel2.Controls.Add(this.label11, 0, 0);
-			this.tableLayoutPanel2.Controls.Add(this.SmartLowPriorityCheckBox, 0, 1);
-			this.tableLayoutPanel2.Controls.Add(this.LowPriorityMultiplierInput, 1, 0);
-			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 16);
-			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-			this.tableLayoutPanel2.RowCount = 3;
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(441, 66);
-			this.tableLayoutPanel2.TabIndex = 1;
-			// 
-			// SmartLowPriorityCheckBox
-			// 
-			this.SmartLowPriorityCheckBox.AutoSize = true;
-			this.tableLayoutPanel2.SetColumnSpan(this.SmartLowPriorityCheckBox, 2);
-			this.SmartLowPriorityCheckBox.Location = new System.Drawing.Point(3, 23);
-			this.SmartLowPriorityCheckBox.Name = "SmartLowPriorityCheckBox";
-			this.SmartLowPriorityCheckBox.Size = new System.Drawing.Size(189, 17);
-			this.SmartLowPriorityCheckBox.TabIndex = 0;
-			this.SmartLowPriorityCheckBox.Text = "Auto-set void recipes to low priority";
-			this.SmartLowPriorityCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// label11
-			// 
-			this.label11.AutoSize = true;
-			this.label11.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label11.Location = new System.Drawing.Point(2, 0);
-			this.label11.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(196, 20);
-			this.label11.TabIndex = 5;
-			this.label11.Text = "Low priority multiplier (10,000 default):";
-			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// LowPriorityMultiplierInput
-			// 
-			this.LowPriorityMultiplierInput.Location = new System.Drawing.Point(203, 3);
-			this.LowPriorityMultiplierInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-			this.LowPriorityMultiplierInput.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.LowPriorityMultiplierInput.Name = "LowPriorityMultiplierInput";
-			this.LowPriorityMultiplierInput.Size = new System.Drawing.Size(120, 20);
-			this.LowPriorityMultiplierInput.TabIndex = 6;
-			this.LowPriorityMultiplierInput.Value = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-			// 
-			// PullConsumerNodesCheckBox
-			// 
-			this.PullConsumerNodesCheckBox.AutoSize = true;
-			this.tableLayoutPanel2.SetColumnSpan(this.PullConsumerNodesCheckBox, 2);
-			this.PullConsumerNodesCheckBox.Location = new System.Drawing.Point(3, 46);
-			this.PullConsumerNodesCheckBox.Name = "PullConsumerNodesCheckBox";
-			this.PullConsumerNodesCheckBox.Size = new System.Drawing.Size(134, 17);
-			this.PullConsumerNodesCheckBox.TabIndex = 7;
-			this.PullConsumerNodesCheckBox.Text = "Maximize output nodes";
-			this.PullConsumerNodesCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// EnableAllButton
-			// 
-			this.EnabledObjectsTable.SetColumnSpan(this.EnableAllButton, 2);
-			this.EnableAllButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.EnableAllButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.EnableAllButton.Location = new System.Drawing.Point(4, 56);
-			this.EnableAllButton.Margin = new System.Windows.Forms.Padding(4, 2, 7, 2);
-			this.EnableAllButton.Name = "EnableAllButton";
-			this.EnableAllButton.Size = new System.Drawing.Size(449, 23);
-			this.EnableAllButton.TabIndex = 33;
-			this.EnableAllButton.Text = "Enable All";
-			this.EnableAllButton.UseVisualStyleBackColor = true;
-			this.EnableAllButton.Click += new System.EventHandler(this.EnableAllButton_Click);
 			// 
 			// SettingsForm
 			// 
@@ -1629,13 +1648,14 @@
 			this.groupBox6.PerformLayout();
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
-			this.FormButtonsTable.ResumeLayout(false);
-			this.FormButtonsTable.PerformLayout();
 			this.groupBox8.ResumeLayout(false);
 			this.groupBox8.PerformLayout();
 			this.tableLayoutPanel2.ResumeLayout(false);
 			this.tableLayoutPanel2.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.LowPriorityMultiplierInput)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.LowPriorityPowerInput)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.PullConsumerNodesPowerInput)).EndInit();
+			this.FormButtonsTable.ResumeLayout(false);
+			this.FormButtonsTable.PerformLayout();
 			this.ResumeLayout(false);
 
         }
@@ -1738,8 +1758,8 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		private System.Windows.Forms.CheckBox PullConsumerNodesCheckBox;
 		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.CheckBox SmartLowPriorityCheckBox;
-		private System.Windows.Forms.NumericUpDown LowPriorityMultiplierInput;
+		private System.Windows.Forms.NumericUpDown LowPriorityPowerInput;
 		private System.Windows.Forms.Button EnableAllButton;
+		private System.Windows.Forms.NumericUpDown PullConsumerNodesPowerInput;
 	}
 }
