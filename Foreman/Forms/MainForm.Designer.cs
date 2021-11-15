@@ -29,7 +29,6 @@
 		private void InitializeComponent()
 		{
 			this.MainLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.MenuTable = new System.Windows.Forms.TableLayoutPanel();
 			this.MenuButtonsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.AddItemButton = new System.Windows.Forms.Button();
@@ -50,11 +49,13 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.ProductionGroupBox = new System.Windows.Forms.GroupBox();
 			this.GraphOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.IconViewCheckBox = new System.Windows.Forms.CheckBox();
 			this.RateOptionsDropDown = new System.Windows.Forms.ComboBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.GraphSummaryButton = new System.Windows.Forms.Button();
-			this.IconViewCheckBox = new System.Windows.Forms.CheckBox();
+			this.VersionLabel = new System.Windows.Forms.Label();
+			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MenuTable.SuspendLayout();
 			this.MenuButtonsTable.SuspendLayout();
@@ -80,27 +81,6 @@
 			this.MainLayoutPanel.Size = new System.Drawing.Size(934, 761);
 			this.MainLayoutPanel.TabIndex = 1;
 			// 
-			// GraphViewer
-			// 
-			this.GraphViewer.AllowDrop = true;
-			this.GraphViewer.AutoSize = true;
-			this.GraphViewer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.GraphViewer.BackColor = System.Drawing.Color.White;
-			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.GraphViewer.DCache = null;
-			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
-			this.GraphViewer.Location = new System.Drawing.Point(3, 136);
-			this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-			this.GraphViewer.MouseDownElement = null;
-			this.GraphViewer.Name = "GraphViewer";
-			this.GraphViewer.NodeCountForSimpleView = 200;
-			this.GraphViewer.ShowRecipeToolTip = false;
-			this.GraphViewer.Size = new System.Drawing.Size(928, 622);
-			this.GraphViewer.TabIndex = 12;
-			this.GraphViewer.TooltipsEnabled = true;
-			this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
-			// 
 			// MenuTable
 			// 
 			this.MenuTable.AutoSize = true;
@@ -109,12 +89,13 @@
 			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuTable.Controls.Add(this.MenuButtonsTable, 0, 0);
 			this.MenuTable.Controls.Add(this.GridLinesGroupBox, 1, 0);
 			this.MenuTable.Controls.Add(this.ProductionGroupBox, 2, 0);
+			this.MenuTable.Controls.Add(this.VersionLabel, 5, 0);
 			this.MenuTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MenuTable.Location = new System.Drawing.Point(3, 3);
 			this.MenuTable.Name = "MenuTable";
@@ -439,6 +420,20 @@
 			this.GraphOptionsTable.Size = new System.Drawing.Size(184, 93);
 			this.GraphOptionsTable.TabIndex = 2;
 			// 
+			// IconViewCheckBox
+			// 
+			this.IconViewCheckBox.AutoSize = true;
+			this.GraphOptionsTable.SetColumnSpan(this.IconViewCheckBox, 2);
+			this.IconViewCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IconViewCheckBox.Location = new System.Drawing.Point(3, 56);
+			this.IconViewCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+			this.IconViewCheckBox.Name = "IconViewCheckBox";
+			this.IconViewCheckBox.Size = new System.Drawing.Size(178, 17);
+			this.IconViewCheckBox.TabIndex = 7;
+			this.IconViewCheckBox.Text = "Icon View";
+			this.IconViewCheckBox.UseVisualStyleBackColor = true;
+			this.IconViewCheckBox.CheckedChanged += new System.EventHandler(this.IconViewCheckBox_CheckedChanged);
+			// 
 			// RateOptionsDropDown
 			// 
 			this.RateOptionsDropDown.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -489,19 +484,41 @@
 			this.GraphSummaryButton.UseVisualStyleBackColor = true;
 			this.GraphSummaryButton.Click += new System.EventHandler(this.GraphSummaryButton_Click);
 			// 
-			// IconViewCheckBox
+			// VersionLabel
 			// 
-			this.IconViewCheckBox.AutoSize = true;
-			this.GraphOptionsTable.SetColumnSpan(this.IconViewCheckBox, 2);
-			this.IconViewCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.IconViewCheckBox.Location = new System.Drawing.Point(3, 56);
-			this.IconViewCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-			this.IconViewCheckBox.Name = "IconViewCheckBox";
-			this.IconViewCheckBox.Size = new System.Drawing.Size(178, 17);
-			this.IconViewCheckBox.TabIndex = 7;
-			this.IconViewCheckBox.Text = "Icon View";
-			this.IconViewCheckBox.UseVisualStyleBackColor = true;
-			this.IconViewCheckBox.CheckedChanged += new System.EventHandler(this.IconViewCheckBox_CheckedChanged);
+			this.VersionLabel.AutoSize = true;
+			this.VersionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.VersionLabel.Location = new System.Drawing.Point(810, 0);
+			this.VersionLabel.Name = "VersionLabel";
+			this.VersionLabel.Size = new System.Drawing.Size(115, 130);
+			this.VersionLabel.TabIndex = 18;
+			this.VersionLabel.Text = "Foreman v2.0 - dev.11";
+			this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// GraphViewer
+			// 
+			this.GraphViewer.AllowDrop = true;
+			this.GraphViewer.ArrowsOnLinks = false;
+			this.GraphViewer.AutoSize = true;
+			this.GraphViewer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.GraphViewer.BackColor = System.Drawing.Color.White;
+			this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.GraphViewer.DCache = null;
+			this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphViewer.IconsOnly = false;
+			this.GraphViewer.IconsSize = 32;
+			this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
+			this.GraphViewer.Location = new System.Drawing.Point(3, 136);
+			this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
+			this.GraphViewer.MouseDownElement = null;
+			this.GraphViewer.Name = "GraphViewer";
+			this.GraphViewer.NodeCountForSimpleView = 200;
+			this.GraphViewer.ShowRecipeToolTip = false;
+			this.GraphViewer.Size = new System.Drawing.Size(928, 622);
+			this.GraphViewer.SmartNodeDirection = false;
+			this.GraphViewer.TabIndex = 12;
+			this.GraphViewer.TooltipsEnabled = true;
+			this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
 			// 
 			// MainForm
 			// 
@@ -562,6 +579,7 @@
 		private System.Windows.Forms.TableLayoutPanel GridlinesTable;
 		private System.Windows.Forms.Button GraphSummaryButton;
 		private System.Windows.Forms.CheckBox IconViewCheckBox;
+		private System.Windows.Forms.Label VersionLabel;
 	}
 }
 
