@@ -227,6 +227,7 @@ namespace Foreman
 			this.AssemblerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.AssemblerListView.FullRowSelect = true;
 			this.AssemblerListView.GridLines = true;
+			this.AssemblerListView.HideSelection = false;
 			this.AssemblerListView.LabelWrap = false;
 			this.AssemblerListView.Location = new System.Drawing.Point(0, 0);
 			this.AssemblerListView.MultiSelect = false;
@@ -289,6 +290,7 @@ namespace Foreman
 			this.MinerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.MinerListView.FullRowSelect = true;
 			this.MinerListView.GridLines = true;
+			this.MinerListView.HideSelection = false;
 			this.MinerListView.LabelWrap = false;
 			this.MinerListView.Location = new System.Drawing.Point(0, 0);
 			this.MinerListView.MultiSelect = false;
@@ -343,6 +345,7 @@ namespace Foreman
 			this.PowerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.PowerListView.FullRowSelect = true;
 			this.PowerListView.GridLines = true;
+			this.PowerListView.HideSelection = false;
 			this.PowerListView.LabelWrap = false;
 			this.PowerListView.Location = new System.Drawing.Point(0, 0);
 			this.PowerListView.MultiSelect = false;
@@ -381,7 +384,7 @@ namespace Foreman
 			this.BeaconsPage.Controls.Add(this.BeaconListView);
 			this.BeaconsPage.Location = new System.Drawing.Point(4, 24);
 			this.BeaconsPage.Name = "BeaconsPage";
-			this.BeaconsPage.Size = new System.Drawing.Size(728, 373);
+			this.BeaconsPage.Size = new System.Drawing.Size(728, 369);
 			this.BeaconsPage.TabIndex = 6;
 			this.BeaconsPage.Text = "Beacons";
 			this.BeaconsPage.UseVisualStyleBackColor = true;
@@ -396,11 +399,12 @@ namespace Foreman
 			this.BeaconListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.BeaconListView.FullRowSelect = true;
 			this.BeaconListView.GridLines = true;
+			this.BeaconListView.HideSelection = false;
 			this.BeaconListView.LabelWrap = false;
 			this.BeaconListView.Location = new System.Drawing.Point(0, 0);
 			this.BeaconListView.MultiSelect = false;
 			this.BeaconListView.Name = "BeaconListView";
-			this.BeaconListView.Size = new System.Drawing.Size(728, 373);
+			this.BeaconListView.Size = new System.Drawing.Size(728, 369);
 			this.BeaconListView.SmallImageList = this.IconList;
 			this.BeaconListView.TabIndex = 19;
 			this.BeaconListView.UseCompatibleStateImageBehavior = false;
@@ -559,6 +563,7 @@ namespace Foreman
 			this.ItemsListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.ItemsListView.FullRowSelect = true;
 			this.ItemsListView.GridLines = true;
+			this.ItemsListView.HideSelection = false;
 			this.ItemsListView.LabelWrap = false;
 			this.ItemsListView.Location = new System.Drawing.Point(0, 0);
 			this.ItemsListView.MultiSelect = false;
@@ -639,6 +644,7 @@ namespace Foreman
 			this.FluidsListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.FluidsListView.FullRowSelect = true;
 			this.FluidsListView.GridLines = true;
+			this.FluidsListView.HideSelection = false;
 			this.FluidsListView.LabelWrap = false;
 			this.FluidsListView.Location = new System.Drawing.Point(0, 0);
 			this.FluidsListView.MultiSelect = false;
@@ -885,6 +891,7 @@ namespace Foreman
 			this.KeyNodesListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.KeyNodesListView.FullRowSelect = true;
 			this.KeyNodesListView.GridLines = true;
+			this.KeyNodesListView.HideSelection = false;
 			this.KeyNodesListView.LabelWrap = false;
 			this.KeyNodesListView.Location = new System.Drawing.Point(7, 31);
 			this.KeyNodesListView.Margin = new System.Windows.Forms.Padding(7);
@@ -955,6 +962,9 @@ namespace Foreman
 			this.MinimumSize = new System.Drawing.Size(780, 540);
 			this.Name = "GraphSummaryForm";
 			this.Padding = new System.Windows.Forms.Padding(3);
+			this.ShowIcon = false;
+			this.ShowInTaskbar = false;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Factory summary:";
 			this.MainTabControl.ResumeLayout(false);
 			this.BuildingsTabPage.ResumeLayout(false);

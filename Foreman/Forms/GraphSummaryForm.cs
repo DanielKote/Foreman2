@@ -57,6 +57,13 @@ namespace Foreman
 		public GraphSummaryForm(IEnumerable<ReadOnlyBaseNode> nodes, IEnumerable<ReadOnlyNodeLink> links, string rateString)
 		{
 			InitializeComponent();
+			MainForm.SetDoubleBuffered(AssemblerListView);
+			MainForm.SetDoubleBuffered(MinerListView);
+			MainForm.SetDoubleBuffered(PowerListView);
+			MainForm.SetDoubleBuffered(BeaconListView);
+			MainForm.SetDoubleBuffered(ItemsListView);
+			MainForm.SetDoubleBuffered(FluidsListView);
+			MainForm.SetDoubleBuffered(KeyNodesListView);
 
 			unfilteredAssemblerList = new List<ListViewItem>();
 			unfilteredMinerList = new List<ListViewItem>();
@@ -446,7 +453,7 @@ namespace Foreman
 				new string[][]
 				{
 					new string[] {"Item", "Input (per "+rateString+")", "Input through un-linked recipe ingredients (per "+rateString+")", "Output (per " + rateString + ")", "Output through un-linked recipe products (per " + rateString + ")", "Output through overproduction (per " + rateString + ")", "Produced by recipe nodes (per " + rateString + ")", "Consumed by recipe nodes (per " + rateString + ")" },
-					new string[] {"Item", "Input (per "+rateString+")", "Input through un-linked recipe ingredients (per "+rateString+")", "Output (per " + rateString + ")", "Output through un-linked recipe products (per " + rateString + ")", "Output through overproduction (per " + rateString + ")", "Produced by recipe nodes (per " + rateString + ")", "Consumed by recipe nodes (per " + rateString + ")" }
+					new string[] {"Fluid", "Input (per "+rateString+")", "Input through un-linked recipe ingredients (per "+rateString+")", "Output (per " + rateString + ")", "Output through un-linked recipe products (per " + rateString + ")", "Output through overproduction (per " + rateString + ")", "Produced by recipe nodes (per " + rateString + ")", "Consumed by recipe nodes (per " + rateString + ")" }
 				});
 		}
 
@@ -471,7 +478,28 @@ namespace Foreman
 
 				if (result == DialogResult.OK)
 				{
+					List<string[]> csvLines = new List<string[]>();
+
+					for(int i = 0; i < inputList.Length; i++)
+					{
+						csvLines.Add(columnNames[i]);
+						foreach (ListViewItem lvi in inputList[i])
+						{
+							string[] cLine = new string[columnNames[i].Length];
+							for (int j = 0; j < cLine.Length; j++)
+								cLine[j] = (lvi.SubItems[j].Tag?? lvi.SubItems[j].Text).ToString().Replace(",", "").Replace("\n", "; ").Replace("\t", "");
+							csvLines.Add(cLine);
+						}
+						csvLines.Add(new string[] { "" });
+					}
+					if (csvLines.Count > 0)
+						csvLines.RemoveAt(csvLines.Count - 1);
+
 					//export to csv.
+					StringBuilder csvBuilder = new StringBuilder();
+					csvLines.ForEach(line => { csvBuilder.AppendLine(string.Join(",", line)); });
+
+					File.WriteAllText(dialog.FileName, csvBuilder.ToString());
 				}
 			}
 		}
