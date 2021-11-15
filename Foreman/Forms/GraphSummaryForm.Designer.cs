@@ -59,7 +59,6 @@ namespace Foreman
 			this.BeaconsHeaderCounter = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.BeaconsHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.BeaconsHeaderPower = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.BuildingsFilterTextBox = new System.Windows.Forms.TextBox();
 			this.PowerConsumptionLabel = new System.Windows.Forms.Label();
 			this.PowerProductionLabel = new System.Windows.Forms.Label();
 			this.BuildingsExportButton = new System.Windows.Forms.Button();
@@ -101,8 +100,10 @@ namespace Foreman
 			this.KeyNodesTable = new System.Windows.Forms.TableLayoutPanel();
 			this.KeyNodesListView = new System.Windows.Forms.ListView();
 			this.KeyNodesHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.KeyNodesHeaderDetails = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.KeyNodesHeaderTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.KeyNodesHeaderFlow = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.KeyNodesHeaderBuildings = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.label2 = new System.Windows.Forms.Label();
 			this.KeyNodesFilterTextBox = new System.Windows.Forms.TextBox();
 			this.keyNodesExportButton = new System.Windows.Forms.Button();
@@ -112,8 +113,10 @@ namespace Foreman
 			this.SupplierNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
 			this.RecipeNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.KeyNodesHeaderDetails = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.KeyNodesHeaderBuildings = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+			this.BuildingCountLabel = new System.Windows.Forms.Label();
+			this.BeaconCountLabel = new System.Windows.Forms.Label();
+			this.BuildingsFilterTextBox = new System.Windows.Forms.TextBox();
 			this.MainTabControl.SuspendLayout();
 			this.BuildingsTabPage.SuspendLayout();
 			this.BuildingsTable.SuspendLayout();
@@ -131,6 +134,7 @@ namespace Foreman
 			this.KeyNodesTabPage.SuspendLayout();
 			this.KeyNodesTable.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
+			this.tableLayoutPanel2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// MainTabControl
@@ -162,17 +166,16 @@ namespace Foreman
 			// 
 			this.BuildingsTable.AutoSize = true;
 			this.BuildingsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.BuildingsTable.ColumnCount = 4;
+			this.BuildingsTable.ColumnCount = 3;
 			this.BuildingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.BuildingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.BuildingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.BuildingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.BuildingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 141F));
+			this.BuildingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.BuildingsTable.Controls.Add(this.BuildingsFilterTextBox, 1, 1);
 			this.BuildingsTable.Controls.Add(this.label4, 0, 1);
 			this.BuildingsTable.Controls.Add(this.BuildingsTabControl, 0, 2);
-			this.BuildingsTable.Controls.Add(this.BuildingsFilterTextBox, 1, 1);
-			this.BuildingsTable.Controls.Add(this.PowerConsumptionLabel, 1, 0);
-			this.BuildingsTable.Controls.Add(this.PowerProductionLabel, 2, 0);
-			this.BuildingsTable.Controls.Add(this.BuildingsExportButton, 3, 1);
+			this.BuildingsTable.Controls.Add(this.BuildingsExportButton, 2, 1);
+			this.BuildingsTable.Controls.Add(this.tableLayoutPanel2, 1, 0);
 			this.BuildingsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.BuildingsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.BuildingsTable.Location = new System.Drawing.Point(3, 3);
@@ -188,7 +191,7 @@ namespace Foreman
 			// 
 			this.label4.AutoSize = true;
 			this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label4.Location = new System.Drawing.Point(7, 27);
+			this.label4.Location = new System.Drawing.Point(7, 31);
 			this.label4.Margin = new System.Windows.Forms.Padding(7, 0, 2, 0);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(32, 24);
@@ -198,20 +201,20 @@ namespace Foreman
 			// 
 			// BuildingsTabControl
 			// 
-			this.BuildingsTable.SetColumnSpan(this.BuildingsTabControl, 4);
+			this.BuildingsTable.SetColumnSpan(this.BuildingsTabControl, 3);
 			this.BuildingsTabControl.Controls.Add(this.AssemblersPage);
 			this.BuildingsTabControl.Controls.Add(this.MinersPage);
 			this.BuildingsTabControl.Controls.Add(this.PowersPage);
 			this.BuildingsTabControl.Controls.Add(this.BeaconsPage);
 			this.BuildingsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.BuildingsTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-			this.BuildingsTabControl.Location = new System.Drawing.Point(4, 55);
+			this.BuildingsTabControl.Location = new System.Drawing.Point(4, 59);
 			this.BuildingsTabControl.Margin = new System.Windows.Forms.Padding(4);
 			this.BuildingsTabControl.Multiline = true;
 			this.BuildingsTabControl.Name = "BuildingsTabControl";
 			this.BuildingsTabControl.Padding = new System.Drawing.Point(12, 3);
 			this.BuildingsTabControl.SelectedIndex = 0;
-			this.BuildingsTabControl.Size = new System.Drawing.Size(736, 397);
+			this.BuildingsTabControl.Size = new System.Drawing.Size(736, 393);
 			this.BuildingsTabControl.TabIndex = 27;
 			// 
 			// AssemblersPage
@@ -221,7 +224,7 @@ namespace Foreman
 			this.AssemblersPage.Location = new System.Drawing.Point(4, 24);
 			this.AssemblersPage.Margin = new System.Windows.Forms.Padding(2);
 			this.AssemblersPage.Name = "AssemblersPage";
-			this.AssemblersPage.Size = new System.Drawing.Size(728, 369);
+			this.AssemblersPage.Size = new System.Drawing.Size(728, 365);
 			this.AssemblersPage.TabIndex = 0;
 			this.AssemblersPage.Text = "Assemblers";
 			this.AssemblersPage.UseVisualStyleBackColor = true;
@@ -242,7 +245,7 @@ namespace Foreman
 			this.AssemblerListView.Location = new System.Drawing.Point(0, 0);
 			this.AssemblerListView.MultiSelect = false;
 			this.AssemblerListView.Name = "AssemblerListView";
-			this.AssemblerListView.Size = new System.Drawing.Size(728, 369);
+			this.AssemblerListView.Size = new System.Drawing.Size(728, 365);
 			this.AssemblerListView.SmallImageList = this.IconList;
 			this.AssemblerListView.TabIndex = 17;
 			this.AssemblerListView.UseCompatibleStateImageBehavior = false;
@@ -438,43 +441,30 @@ namespace Foreman
 			this.BeaconsHeaderPower.Text = "Power (Beacon)";
 			this.BeaconsHeaderPower.Width = 100;
 			// 
-			// BuildingsFilterTextBox
-			// 
-			this.BuildingsTable.SetColumnSpan(this.BuildingsFilterTextBox, 2);
-			this.BuildingsFilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.BuildingsFilterTextBox.Location = new System.Drawing.Point(43, 29);
-			this.BuildingsFilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 7, 2);
-			this.BuildingsFilterTextBox.Name = "BuildingsFilterTextBox";
-			this.BuildingsFilterTextBox.Size = new System.Drawing.Size(553, 20);
-			this.BuildingsFilterTextBox.TabIndex = 29;
-			this.BuildingsFilterTextBox.TextChanged += new System.EventHandler(this.BuildingsFilterTextBox_TextChanged);
-			// 
 			// PowerConsumptionLabel
 			// 
 			this.PowerConsumptionLabel.AutoSize = true;
-			this.PowerConsumptionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.PowerConsumptionLabel.Location = new System.Drawing.Point(48, 5);
-			this.PowerConsumptionLabel.Margin = new System.Windows.Forms.Padding(7, 5, 5, 5);
+			this.PowerConsumptionLabel.Location = new System.Drawing.Point(190, 5);
+			this.PowerConsumptionLabel.Margin = new System.Windows.Forms.Padding(7, 5, 15, 5);
 			this.PowerConsumptionLabel.Name = "PowerConsumptionLabel";
-			this.PowerConsumptionLabel.Size = new System.Drawing.Size(137, 17);
+			this.PowerConsumptionLabel.Size = new System.Drawing.Size(124, 15);
 			this.PowerConsumptionLabel.TabIndex = 31;
-			this.PowerConsumptionLabel.Text = "Power Consumption:";
+			this.PowerConsumptionLabel.Text = "Power Consumption: ";
 			// 
 			// PowerProductionLabel
 			// 
 			this.PowerProductionLabel.AutoSize = true;
-			this.PowerProductionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-			this.PowerProductionLabel.Location = new System.Drawing.Point(329, 5);
-			this.PowerProductionLabel.Margin = new System.Windows.Forms.Padding(7, 5, 5, 5);
+			this.PowerProductionLabel.Location = new System.Drawing.Point(336, 5);
+			this.PowerProductionLabel.Margin = new System.Windows.Forms.Padding(7, 5, 15, 5);
 			this.PowerProductionLabel.Name = "PowerProductionLabel";
-			this.PowerProductionLabel.Size = new System.Drawing.Size(123, 17);
+			this.PowerProductionLabel.Size = new System.Drawing.Size(110, 15);
 			this.PowerProductionLabel.TabIndex = 32;
-			this.PowerProductionLabel.Text = "Power Production:";
+			this.PowerProductionLabel.Text = "Power Production: ";
 			// 
 			// BuildingsExportButton
 			// 
 			this.BuildingsExportButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.BuildingsExportButton.Location = new System.Drawing.Point(603, 27);
+			this.BuildingsExportButton.Location = new System.Drawing.Point(603, 31);
 			this.BuildingsExportButton.Margin = new System.Windows.Forms.Padding(0, 0, 7, 0);
 			this.BuildingsExportButton.Name = "BuildingsExportButton";
 			this.BuildingsExportButton.Size = new System.Drawing.Size(134, 24);
@@ -926,6 +916,11 @@ namespace Foreman
 			this.KeyNodesHeaderType.Text = "Node Type";
 			this.KeyNodesHeaderType.Width = 100;
 			// 
+			// KeyNodesHeaderDetails
+			// 
+			this.KeyNodesHeaderDetails.Text = "Node Details";
+			this.KeyNodesHeaderDetails.Width = 200;
+			// 
 			// KeyNodesHeaderTitle
 			// 
 			this.KeyNodesHeaderTitle.Text = "Node Title";
@@ -935,6 +930,11 @@ namespace Foreman
 			// 
 			this.KeyNodesHeaderFlow.Text = "Throughput";
 			this.KeyNodesHeaderFlow.Width = 80;
+			// 
+			// KeyNodesHeaderBuildings
+			// 
+			this.KeyNodesHeaderBuildings.Text = "Factories";
+			this.KeyNodesHeaderBuildings.Width = 80;
 			// 
 			// label2
 			// 
@@ -1054,15 +1054,58 @@ namespace Foreman
 			this.columnHeader1.Text = "Name";
 			this.columnHeader1.Width = 290;
 			// 
-			// KeyNodesHeaderDetails
+			// tableLayoutPanel2
 			// 
-			this.KeyNodesHeaderDetails.Text = "Node Details";
-			this.KeyNodesHeaderDetails.Width = 200;
+			this.tableLayoutPanel2.AutoSize = true;
+			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.tableLayoutPanel2.ColumnCount = 4;
+			this.BuildingsTable.SetColumnSpan(this.tableLayoutPanel2, 2);
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel2.Controls.Add(this.BeaconCountLabel, 1, 0);
+			this.tableLayoutPanel2.Controls.Add(this.BuildingCountLabel, 0, 0);
+			this.tableLayoutPanel2.Controls.Add(this.PowerConsumptionLabel, 2, 0);
+			this.tableLayoutPanel2.Controls.Add(this.PowerProductionLabel, 3, 0);
+			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tableLayoutPanel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+			this.tableLayoutPanel2.Location = new System.Drawing.Point(44, 3);
+			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+			this.tableLayoutPanel2.RowCount = 1;
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(697, 25);
+			this.tableLayoutPanel2.TabIndex = 34;
 			// 
-			// KeyNodesHeaderBuildings
+			// BuildingCountLabel
 			// 
-			this.KeyNodesHeaderBuildings.Text = "Factories";
-			this.KeyNodesHeaderBuildings.Width = 80;
+			this.BuildingCountLabel.AutoSize = true;
+			this.BuildingCountLabel.Location = new System.Drawing.Point(7, 5);
+			this.BuildingCountLabel.Margin = new System.Windows.Forms.Padding(7, 5, 15, 5);
+			this.BuildingCountLabel.Name = "BuildingCountLabel";
+			this.BuildingCountLabel.Size = new System.Drawing.Size(71, 15);
+			this.BuildingCountLabel.TabIndex = 33;
+			this.BuildingCountLabel.Text = "#Buildings: ";
+			// 
+			// BeaconCountLabel
+			// 
+			this.BeaconCountLabel.AutoSize = true;
+			this.BeaconCountLabel.Location = new System.Drawing.Point(100, 5);
+			this.BeaconCountLabel.Margin = new System.Windows.Forms.Padding(7, 5, 15, 5);
+			this.BeaconCountLabel.Name = "BeaconCountLabel";
+			this.BeaconCountLabel.Size = new System.Drawing.Size(68, 15);
+			this.BeaconCountLabel.TabIndex = 34;
+			this.BeaconCountLabel.Text = "#Beacons: ";
+			// 
+			// BuildingsFilterTextBox
+			// 
+			this.BuildingsFilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.BuildingsFilterTextBox.Location = new System.Drawing.Point(43, 33);
+			this.BuildingsFilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 7, 2);
+			this.BuildingsFilterTextBox.Name = "BuildingsFilterTextBox";
+			this.BuildingsFilterTextBox.Size = new System.Drawing.Size(553, 20);
+			this.BuildingsFilterTextBox.TabIndex = 35;
+			this.BuildingsFilterTextBox.TextChanged += new System.EventHandler(this.BuildingsFilterTextBox_TextChanged);
 			// 
 			// GraphSummaryForm
 			// 
@@ -1104,6 +1147,8 @@ namespace Foreman
 			this.KeyNodesTable.PerformLayout();
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
+			this.tableLayoutPanel2.ResumeLayout(false);
+			this.tableLayoutPanel2.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -1129,7 +1174,6 @@ namespace Foreman
 		private System.Windows.Forms.TabPage BeaconsPage;
 		private System.Windows.Forms.ListView BeaconListView;
 		private System.Windows.Forms.ColumnHeader BeaconsHeaderName;
-		private System.Windows.Forms.TextBox BuildingsFilterTextBox;
 		private System.Windows.Forms.Label PowerConsumptionLabel;
 		private System.Windows.Forms.Label PowerProductionLabel;
 		private System.Windows.Forms.TableLayoutPanel ItemsTable;
@@ -1194,5 +1238,9 @@ namespace Foreman
 		private System.Windows.Forms.ColumnHeader KeyNodesHeaderFlow;
 		private System.Windows.Forms.ColumnHeader KeyNodesHeaderDetails;
 		private System.Windows.Forms.ColumnHeader KeyNodesHeaderBuildings;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+		private System.Windows.Forms.Label BeaconCountLabel;
+		private System.Windows.Forms.Label BuildingCountLabel;
+		private System.Windows.Forms.TextBox BuildingsFilterTextBox;
 	}
 }

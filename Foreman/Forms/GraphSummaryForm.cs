@@ -108,11 +108,17 @@ namespace Foreman
 
 			LoadUnfilteredKeyNodesList(nodes.Where(n => n.KeyNode), unfilteredKeyNodesList);
 
+			//building totals
+			double buildingTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => Math.Ceiling(((ReadOnlyRecipeNode)n).ActualAssemblerCount));
+			double beaconTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalBeacons());
+			BuildingCountLabel.Text += GraphicsStuff.DoubleToString(buildingTotal);
+			BeaconCountLabel.Text += GraphicsStuff.DoubleToString(beaconTotal);
+
 			//power totals
 			double powerConsumption = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalAssemblerElectricalConsumption() + ((ReadOnlyRecipeNode)n).GetTotalBeaconElectricalConsumption());
 			double powerProduction = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalGeneratorElectricalProduction());
-			PowerConsumptionLabel.Text = PowerConsumptionLabel.Text += " " + GraphicsStuff.DoubleToEnergy(powerConsumption, "W");
-			PowerProductionLabel.Text = PowerProductionLabel.Text += " " + GraphicsStuff.DoubleToEnergy(powerProduction, "W");
+			PowerConsumptionLabel.Text += GraphicsStuff.DoubleToEnergy(powerConsumption, "W");
+			PowerProductionLabel.Text += GraphicsStuff.DoubleToEnergy(powerProduction, "W");
 
 			//update filtered
 			UpdateFilteredBuildingLists();

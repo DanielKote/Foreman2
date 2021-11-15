@@ -208,12 +208,6 @@
     <Compile Include="Forms\SciencePacksLoadForm.Designer.cs">
       <DependentUpon>SciencePacksLoadForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TEST_FORM.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\TEST_FORM.Designer.cs">
-      <DependentUpon>TEST_FORM.cs</DependentUpon>
-    </Compile>
     <Compile Include="Models\AssemblerSelector.cs" />
     <Compile Include="Models\FuelSelector.cs" />
     <Compile Include="Models\LinkChecker.cs" />
@@ -324,9 +318,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DataReloadForm.resx">
       <DependentUpon>DataReloadForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TEST_FORM.resx">
-      <DependentUpon>TEST_FORM.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
