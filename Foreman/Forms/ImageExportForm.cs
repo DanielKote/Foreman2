@@ -56,11 +56,23 @@ namespace Foreman
 				else if (Scale3xCheckBox.Checked)
 					scale = 3;
 
-				Bitmap image = new Bitmap(graphViewer.Graph.Bounds.Width * scale, graphViewer.Graph.Bounds.Height * scale);
+				Bitmap image = ViewLimitCheckBox.Checked? new Bitmap((int)(graphViewer.Width * scale / graphViewer.ViewScale), (int)(graphViewer.Height * scale / graphViewer.ViewScale)) : new Bitmap(graphViewer.Graph.Bounds.Width * scale, graphViewer.Graph.Bounds.Height * scale);
 				using (Graphics graphics = Graphics.FromImage(image))
 				{
-					graphics.ScaleTransform(scale, scale);
-					graphics.TranslateTransform(-graphViewer.Graph.Bounds.X, -graphViewer.Graph.Bounds.Y);
+					graphics.ResetTransform();
+
+					if (ViewLimitCheckBox.Checked)
+					{
+						graphics.TranslateTransform(graphViewer.Width / (graphViewer.ViewScale * 2), graphViewer.Height / ( graphViewer.ViewScale * 2));
+						graphics.TranslateTransform(graphViewer.ViewOffset.X, graphViewer.ViewOffset.Y);
+						graphics.ScaleTransform(scale, scale);
+					}
+					else
+					{
+						graphics.ScaleTransform(scale, scale);
+						graphics.TranslateTransform(-graphViewer.Graph.Bounds.X, -graphViewer.Graph.Bounds.Y);
+					}
+
 					graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
 					if (!TransparencyCheckBox.Checked)

@@ -97,8 +97,8 @@ namespace Foreman
 				GraphViewer.Invalidate();
 				GraphViewer.Focus();
 #if DEBUG
-				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
-				GraphViewer.Invalidate();
+				//await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
+				//GraphViewer.Invalidate();
 #endif
 			}
 		}

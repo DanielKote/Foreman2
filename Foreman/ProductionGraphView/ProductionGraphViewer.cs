@@ -27,7 +27,7 @@ namespace Foreman
 		public bool ArrowsOnLinks { get; set; }
 		public bool IconsOnly { get; set; }
 		public int IconsSize { get; set; }
-		public int IconsDrawSize { get { return ViewScale > 1? IconsSize : (int)(IconsSize / ViewScale); } }
+		public int IconsDrawSize { get { return ViewScale > ((double)IconsSize / 96)? 96 : (int)(IconsSize / ViewScale); } }
 
 		public int NodeCountForSimpleView { get; set; } //if the number of elements to draw is over this amount then the drawing functions will switch to simple view draws (mostly for FPS during zoomed out views)
 		public bool ShowRecipeToolTip { get; set; }
@@ -52,6 +52,10 @@ namespace Foreman
 
 		public IReadOnlyCollection<BaseNodeElement> SelectedNodes { get { return selectedNodes; } }
 
+		public Point ViewOffset { get; private set; }
+		public float ViewScale { get; private set; }
+		public Rectangle VisibleGraphBounds { get; private set; }
+
 		private const int minDragDiff = 30;
 		private const int minLinkWidth = 3;
 		private const int maxLinkWidth = 35;
@@ -72,10 +76,6 @@ namespace Foreman
 		private bool viewBeingDragged = false; //separate from dragOperation due to being able to drag view at all stages of dragOperation
 
 		private DragOperation currentDragOperation = DragOperation.None;
-
-		private Point ViewOffset;
-		private float ViewScale = 1f;
-		private Rectangle visibleGraphBounds;
 
 		private Rectangle SelectionZone;
 		private Point SelectionZoneOriginPoint;
@@ -536,14 +536,14 @@ namespace Foreman
 					element.UpdateVisibility(Graph.Bounds);
 			else
 				foreach (GraphElement element in GetPaintingOrder())
-					element.UpdateVisibility(visibleGraphBounds);
+					element.UpdateVisibility(VisibleGraphBounds);
 
 			//ensure width of selection is correct
 			selectionPen.Width = 2 / ViewScale;
 
 			//grid
 			if(!FullGraph)
-				Grid.Paint(graphics, ViewScale, visibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as BaseNodeElement : null);
+				Grid.Paint(graphics, ViewScale, VisibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as BaseNodeElement : null);
 
 			//process link element widths
 			if (DynamicLinkWidth)
@@ -883,7 +883,7 @@ namespace Foreman
 			ViewScale = Math.Min(ViewScale, 2f);
 
 			Point newZoomCenter = ScreenToGraph(e.Location);
-			ViewOffset.Offset(newZoomCenter.X - oldZoomCenter.X, newZoomCenter.Y - oldZoomCenter.Y);
+			ViewOffset = new Point(ViewOffset.X + newZoomCenter.X - oldZoomCenter.X, ViewOffset.Y + newZoomCenter.Y - oldZoomCenter.Y);
 
 			UpdateGraphBounds();
 			Invalidate();
@@ -1027,19 +1027,21 @@ namespace Foreman
 				Point screenCentre = ScreenToGraph(new Point(Width / 2, Height / 2));
 				if (bounds.Width == 0 || bounds.Height == 0)
 				{
-					ViewOffset.X = 0;
-					ViewOffset.Y = 0;
+					ViewOffset = new Point(0, 0);
 				}
 				else
 				{
-					if (screenCentre.X < bounds.X) { ViewOffset.X -= bounds.X - screenCentre.X; }
-					if (screenCentre.Y < bounds.Y) { ViewOffset.Y -= bounds.Y - screenCentre.Y; }
-					if (screenCentre.X > bounds.X + bounds.Width) { ViewOffset.X -= bounds.X + bounds.Width - screenCentre.X; }
-					if (screenCentre.Y > bounds.Y + bounds.Height) { ViewOffset.Y -= bounds.Y + bounds.Height - screenCentre.Y; }
+					int newX = ViewOffset.X;
+					int newY = ViewOffset.Y;
+					if (screenCentre.X < bounds.X) { newX -= bounds.X - screenCentre.X; }
+					if (screenCentre.Y < bounds.Y) { newY -= bounds.Y - screenCentre.Y; }
+					if (screenCentre.X > bounds.X + bounds.Width) { newX -= bounds.X + bounds.Width - screenCentre.X; }
+					if (screenCentre.Y > bounds.Y + bounds.Height) { newY -= bounds.Y + bounds.Height - screenCentre.Y; }
+					ViewOffset = new Point(newX, newY);
 				}
 			}
 
-			visibleGraphBounds = new Rectangle(
+			VisibleGraphBounds = new Rectangle(
 				(int)(-Width / (2 * ViewScale) - ViewOffset.X),
 				(int)(-Height / (2 * ViewScale) - ViewOffset.Y),
 				(int)(Width / ViewScale),
