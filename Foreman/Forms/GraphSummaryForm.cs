@@ -380,6 +380,7 @@ namespace Foreman
 		private void ItemFilterCheckBox_CheckedChanged(object sender, EventArgs e) { UpdateFilteredItemsLists(); }
 
 		private void KeyNodesFilterTextBox_TextChanged(object sender, EventArgs e) { UpdateFilteredKeyNodesList(); }
+		private void KeyNodesFilterCheckBox_CheckedChanged(object sender, EventArgs e) { UpdateFilteredKeyNodesList(); }
 
 		//-------------------------------------------------------------------------------------------------------Column clicked events
 
