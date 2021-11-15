@@ -390,6 +390,13 @@ namespace Foreman
 			//serialize
 			info.AddValue("Version", Properties.Settings.Default.ForemanVersion);
 			info.AddValue("Object", "ProductionGraph");
+
+			info.AddValue("EnableExtraProductivityForNonMiners", EnableExtraProductivityForNonMiners);
+			info.AddValue("DefaultNodeDirection", (int)DefaultNodeDirection);
+			info.AddValue("Solver_PullOutputNodes", PullOutputNodes);
+			info.AddValue("Solver_PullOutputNodesPower", PullOutputNodesPower);
+			info.AddValue("Solver_LowPriorityPower", LowPriorityPower);
+
 			info.AddValue("IncludedItems", includedItems);
 			info.AddValue("IncludedRecipes", includedRecipeShorts);
 			info.AddValue("IncludedAssemblers", includedAssemblers);
@@ -414,6 +421,12 @@ namespace Foreman
 
 			try
 			{
+				EnableExtraProductivityForNonMiners = (bool)json["EnableExtraProductivityForNonMiners"];
+				DefaultNodeDirection = (NodeDirection)(int)json["DefaultNodeDirection"];
+				PullOutputNodes = (bool)json["Solver_PullOutputNodes"];
+				PullOutputNodesPower = (double)json["Solver_PullOutputNodesPower"];
+				LowPriorityPower = (double)json["Solver_LowPriorityPower"];
+
 				//check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
 				cache.ProcessImportedItemsSet(json["IncludedItems"].Select(t => (string)t));
 				cache.ProcessImportedAssemblersSet(json["IncludedAssemblers"].Select(t => (string)t));

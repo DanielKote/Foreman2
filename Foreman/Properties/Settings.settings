@@ -96,19 +96,10 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ForemanVersion" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">4</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="SmartNodeDirection" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="Solver_LowPriorityPower" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">2</Value>
-    </Setting>
-    <Setting Name="Solver_PullConsumerNodes" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="Solver_PullConsumerNodesPower" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -243,18 +243,11 @@ namespace Foreman
 				original["ExtraProdForNonMiners"] = false;
 			}
 
-			if ((int)original["Version"] == 2)
+			if ((int)original["Version"] < 5)
 			{
-				//Version update 2 -> 3:
-				//	Nodes now have Direction parameter
-				original["Version"] = 3;
-			}
-
-			if ((int)original["Version"] == 3)
-			{
-				//Version update 3 -> 4:
-				//	Passthrough nodes now have SDraw parameter
-				original["Version"] = 4;
+				//Version update 2 -> 5:
+				//	No changes in main save (all changes are within the graph)
+				original["Version"] = 5;
 			}
 
 			return original;
@@ -297,6 +290,24 @@ namespace Foreman
 
 				foreach (JToken nodeJToken in original["Nodes"].Where(n => (NodeType)(int)n["NodeType"] == NodeType.Passthrough).ToList())
 					nodeJToken["SDraw"] = true;
+			}
+
+			if ((int)original["Version"] == 4)
+			{
+				//Version update 4 -> 5:
+				//	ProductionGraph gained new properties:
+				//		EnableExtraProductivityForNonMiners
+				//		DefaultNodeDirection
+				//		Solver_PullOutputNodes
+				//		Solver_PullOutputNodesPower
+				//		Solver_LowPriorityPower
+				original["Version"] = 5;
+
+				original["EnableExtraProductivityForNonMiners"] = false;
+				original["DefaultNodeDirection"] = (int)NodeDirection.Up;
+				original["Solver_PullOutputNodes"] = false;
+				original["Solver_PullOutputNodesPower"] = 1f;
+				original["Solver_LowPriorityPower"] = 2f;
 			}
 
 			return original;

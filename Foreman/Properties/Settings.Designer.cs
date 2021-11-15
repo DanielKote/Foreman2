@@ -397,7 +397,7 @@ namespace Foreman.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int ForemanVersion {
             get {
                 return ((int)(this["ForemanVersion"]));
@@ -416,42 +416,6 @@ namespace Foreman.Properties {
             }
             set {
                 this["SmartNodeDirection"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public double Solver_LowPriorityPower {
-            get {
-                return ((double)(this["Solver_LowPriorityPower"]));
-            }
-            set {
-                this["Solver_LowPriorityPower"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Solver_PullConsumerNodes {
-            get {
-                return ((bool)(this["Solver_PullConsumerNodes"]));
-            }
-            set {
-                this["Solver_PullConsumerNodes"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double Solver_PullConsumerNodesPower {
-            get {
-                return ((double)(this["Solver_PullConsumerNodesPower"]));
-            }
-            set {
-                this["Solver_PullConsumerNodesPower"] = value;
             }
         }
     }

@@ -37,7 +37,7 @@ namespace Foreman
 					//gc collection is unnecessary - first data cache to be created.
 				}
 
-				Properties.Settings.Default.ForemanVersion = 4;
+				Properties.Settings.Default.ForemanVersion = 5;
 
 				if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
 					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
@@ -82,9 +82,9 @@ namespace Foreman
 				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
 				GraphViewer.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
-				GraphViewer.Graph.LowPriorityPower = Properties.Settings.Default.Solver_LowPriorityPower;
-				GraphViewer.Graph.PullOutputNodes = Properties.Settings.Default.Solver_PullConsumerNodes;
-				GraphViewer.Graph.PullOutputNodesPower = Properties.Settings.Default.Solver_PullConsumerNodesPower;
+				GraphViewer.Graph.LowPriorityPower = 2f;
+				GraphViewer.Graph.PullOutputNodes = false;
+				GraphViewer.Graph.PullOutputNodesPower = 1f;
 
 				GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
 				IconViewCheckBox.Checked = GraphViewer.IconsOnly;
@@ -166,6 +166,10 @@ namespace Foreman
 			Properties.Settings.Default.DefaultRateUnit = (int)GraphViewer.Graph.SelectedRateUnit;
 			Properties.Settings.Default.DefaultAssemblerOption = (int)GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
 			Properties.Settings.Default.DefaultModuleOption = (int)GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
+			Properties.Settings.Default.DefaultNodeDirection = (int)GraphViewer.Graph.DefaultNodeDirection;
+
+			Properties.Settings.Default.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
+
 			Properties.Settings.Default.Save();
 			GraphViewer.Invalidate();
 		}
@@ -351,11 +355,8 @@ namespace Foreman
 					Properties.Settings.Default.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
 
 					GraphViewer.Graph.LowPriorityPower = options.Solver_LowPriorityPower;
-					Properties.Settings.Default.Solver_LowPriorityPower = options.Solver_LowPriorityPower;
 					GraphViewer.Graph.PullOutputNodesPower = options.Solver_PullConsumerNodesPower;
-					Properties.Settings.Default.Solver_PullConsumerNodesPower = options.Solver_PullConsumerNodesPower;
 					GraphViewer.Graph.PullOutputNodes = options.Solver_PullConsumerNodes;
-					Properties.Settings.Default.Solver_PullConsumerNodes = options.Solver_PullConsumerNodes;
 
 					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
 					Properties.Settings.Default.Save();
