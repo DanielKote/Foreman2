@@ -525,7 +525,7 @@ namespace Foreman
 			unfilteredKeyNodesList.Sort((a, b) =>
 			{
 				if (e.Column < 3)
-					return reverseSortLamda * a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
+					return reverseSortLamda * a.SubItems[e.Column].Text.ToLower().CompareTo(b.SubItems[e.Column].Text.ToLower());
 				else
 					return reverseSortLamda * -((double)a.SubItems[e.Column].Tag).CompareTo((double)b.SubItems[e.Column].Tag);
 			});
