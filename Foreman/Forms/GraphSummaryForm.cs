@@ -106,7 +106,7 @@ namespace Foreman
 			LoadUnfilteredItemLists(nodes, links, false, unfilteredItemsList);
 			LoadUnfilteredItemLists(nodes, links, true, unfilteredFluidsList);
 
-			LoadUnfilteredKeyNodesList(nodes.Where(n => true), unfilteredKeyNodesList); //need to add in key node info to the nodes (export name, bool if key node)
+			LoadUnfilteredKeyNodesList(nodes.Where(n => n.KeyNode), unfilteredKeyNodesList);
 
 			//power totals
 			double powerConsumption = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalAssemblerElectricalConsumption() + ((ReadOnlyRecipeNode)n).GetTotalBeaconElectricalConsumption());
@@ -288,7 +288,69 @@ namespace Foreman
 
 		private void LoadUnfilteredKeyNodesList(IEnumerable<ReadOnlyBaseNode> origin, List<ListViewItem> lviList)
 		{
-			//TBD later (when key nodes are added to graph)
+			foreach (ReadOnlyBaseNode node in origin)
+			{
+				ListViewItem lvItem = new ListViewItem();
+
+				Bitmap icon;
+				string nodeText;
+				string nodeType;
+				if (node is ReadOnlyConsumerNode cNode)
+				{
+					icon = cNode.ConsumedItem.Icon;
+					nodeText = cNode.ConsumedItem.FriendlyName;
+					nodeType = "Consumer";
+				}
+				else if (node is ReadOnlySupplierNode sNode)
+				{
+					icon = sNode.SuppliedItem.Icon;
+					nodeText = sNode.SuppliedItem.FriendlyName;
+					nodeType = "Supplier";
+				}
+				else if (node is ReadOnlyPassthroughNode pNode)
+				{
+					icon = pNode.PassthroughItem.Icon;
+					nodeText = pNode.PassthroughItem.FriendlyName;
+					nodeType = "Passthrough";
+				}
+				else if (node is ReadOnlyRecipeNode rNode)
+				{
+					icon = rNode.BaseRecipe.Icon;
+					nodeText = rNode.BaseRecipe.FriendlyName;
+					nodeType = "Recipe";
+				}
+				else
+					continue;
+
+				if (icon != null)
+				{
+					IconList.Images.Add(icon);
+					lvItem.ImageIndex = IconList.Images.Count - 1;
+				}
+				else
+				{
+					lvItem.ImageIndex = 0;
+				}
+
+				lvItem.Text = nodeType;
+				lvItem.Tag = node;
+				lvItem.Name = nodeText; //key
+				lvItem.BackColor = AvailableObjectColor;
+				lvItem.SubItems.Add(nodeText);
+				lvItem.SubItems.Add(node.KeyNodeTitle);
+
+				if(node is ReadOnlyRecipeNode rrNode)
+				{
+					lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = "-", Tag = (double)0 });
+					lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = GraphicsStuff.DoubleToString(rrNode.ActualAssemblerCount), Tag = rrNode.ActualAssemblerCount });
+				}
+				else
+				{
+					lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = GraphicsStuff.DoubleToString(node.ActualRate), Tag = node.ActualRate });
+					lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = "-", Tag = (double)0 });
+				}
+				lviList.Add(lvItem);
+			}
 		}
 
 		//-------------------------------------------------------------------------------------------------------Filter functions
@@ -357,10 +419,31 @@ namespace Foreman
 
 		private void UpdateFilteredKeyNodesList()
 		{
-			//TODO (when key nodes are added)
+			string filterString = KeyNodesFilterTextBox.Text.ToLower();
+			bool includeSuppliers = SupplierNodeFilterCheckBox.Checked;
+			bool includeConsumers = ConsumerNodeFilterCheckBox.Checked;
+			bool includePassthrough = PassthroughNodeFilterCheckBox.Checked;
+			bool includeRecipe = RecipeNodeFilterCheckBox.Checked;
+
+			filteredKeyNodesList.Clear();
+
+			foreach (ListViewItem lvItem in unfilteredKeyNodesList)
+			{
+				if (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString) || lvItem.SubItems[1].Text.ToLower().Contains(filterString) || lvItem.SubItems[2].Text.ToLower().Contains(filterString))
+				{
+					if ((includeSuppliers && (lvItem.Tag is ReadOnlySupplierNode)) ||
+						(includeConsumers && (lvItem.Tag is ReadOnlyConsumerNode)) ||
+						(includePassthrough && (lvItem.Tag is ReadOnlyPassthroughNode)) ||
+						(includeRecipe && (lvItem.Tag is ReadOnlyRecipeNode)))
+					{
+						filteredKeyNodesList.Add(lvItem);
+					}
+				}
+			}
+
+			KeyNodesListView.VirtualListSize = filteredKeyNodesList.Count;
+			KeyNodesListView.Invalidate();
 		}
-
-
 
 		//-------------------------------------------------------------------------------------------------------Virtual item retrieval for all list views
 
@@ -430,7 +513,19 @@ namespace Foreman
 
 		private void KeyNodesListView_ColumnClick(object sender, ColumnClickEventArgs e)
 		{
-			Console.WriteLine(e.Column);
+			int reverseSortLamda = (lastSortOrder[KeyNodesListView] == e.Column + 1) ? -1 : 1; //last sort was this very column -> this is now a reverse sort
+			lastSortOrder[KeyNodesListView] = reverseSortLamda * (e.Column + 1);
+
+			unfilteredKeyNodesList.Sort((a, b) =>
+			{
+				if (e.Column < 3)
+					return reverseSortLamda * a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
+				else
+					return reverseSortLamda * -((double)a.SubItems[e.Column].Tag).CompareTo((double)b.SubItems[e.Column].Tag);
+			});
+
+			UpdateFilteredKeyNodesList();
+			KeyNodesListView.Invalidate();
 		}
 
 		//-------------------------------------------------------------------------------------------------------Export CSV functions
@@ -460,7 +555,12 @@ namespace Foreman
 
 		private void keyNodesExportButton_Click(object sender, EventArgs e)
 		{
-			//TBD (after key nodes are added)
+			ExportCSV(
+				new List<ListViewItem>[] { filteredKeyNodesList },
+				new string[][]
+				{
+					new string[] {"Node Type", "Node Details (item / recipe name)", "Node Title", "Throughput (for non-recipe nodes) (per " + rateString + ")", "Building Count (for recipe nodes)" }
+				});
 		}
 
 		private void ExportCSV(List<ListViewItem>[] inputList, string[][] columnNames)
@@ -469,7 +569,7 @@ namespace Foreman
 			{
 				dialog.AddExtension = true;
 				dialog.Filter = "CSV (*.csv)|*.csv";
-				dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Exported Graphs");
+				dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Exported CSVs");
 				if (!Directory.Exists(dialog.InitialDirectory))
 					Directory.CreateDirectory(dialog.InitialDirectory);
 				dialog.FileName = "foreman data.csv";
@@ -499,7 +599,6 @@ namespace Foreman
 					//export to csv.
 					StringBuilder csvBuilder = new StringBuilder();
 					csvLines.ForEach(line => { csvBuilder.AppendLine(string.Join(",", line)); });
-
 					File.WriteAllText(dialog.FileName, csvBuilder.ToString());
 				}
 			}

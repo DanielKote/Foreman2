@@ -19,6 +19,9 @@ namespace Foreman
 		public readonly ProductionGraph MyGraph;
 		public readonly int NodeID;
 
+		public bool KeyNode { get; set; }
+		public string KeyNodeTitle { get; set; }
+
 		public Point Location { get; set; }
 
 		private RateType rateType;
@@ -50,6 +53,9 @@ namespace Foreman
 		{
 			MyGraph = graph;
 			NodeID = nodeID;
+
+			KeyNode = false;
+			KeyNodeTitle = "";
 
 			rateType = RateType.Auto;
 			nodeDirection = NodeDirection.Up;
@@ -118,6 +124,8 @@ namespace Foreman
 			info.AddValue("Location", Location);
 			info.AddValue("RateType", RateType);
 			info.AddValue("Direction", NodeDirection);
+			if (KeyNode)
+				info.AddValue("KeyNode", KeyNodeTitle);
 		}
 	}
 
@@ -125,6 +133,10 @@ namespace Foreman
 	{
 		public int NodeID => MyNode.NodeID;
 		public Point Location => MyNode.Location;
+
+		public bool KeyNode => MyNode.KeyNode;
+		public string KeyNodeTitle => MyNode.KeyNodeTitle;
+
 		public IEnumerable<Item> Inputs => MyNode.Inputs;
 		public IEnumerable<Item> Outputs => MyNode.Outputs;
 
@@ -175,6 +187,9 @@ namespace Foreman
 		{
 			MyNode = myNode;
 		}
+
+		public void SetKeyNode(bool keyNode) { MyNode.KeyNode = keyNode; if (keyNode) MyNode.KeyNodeTitle = MyNode.NodeID.ToString(); else MyNode.KeyNodeTitle = ""; }
+		public void SetKeyNodeTitle(string title) { if(MyNode.KeyNode) MyNode.KeyNodeTitle = title; }
 
 		public void SetLocation(Point location) { if(MyNode.Location != location) MyNode.Location = location; }
 

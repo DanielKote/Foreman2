@@ -26,9 +26,17 @@ namespace Foreman
 				SimplePassthroughNodesCheckBox.Checked = pNode.SimpleDraw;
 				SimplePassthroughNodesCheckBox.Visible = true;
 			}
-			SimplePassthroughNodesCheckBox.CheckedChanged += SimplePassthroughNodesCheckBox_CheckedChanged;
+
+			KeyNodeCheckBox.Checked = nodeData.KeyNode;
+			KeyNodeTitleLabel.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Text = nodeData.KeyNodeTitle;
 
 			InitializeRates();
+
+			SimplePassthroughNodesCheckBox.CheckedChanged += SimplePassthroughNodesCheckBox_CheckedChanged;
+			KeyNodeCheckBox.CheckedChanged += KeyNodeCheckBox_CheckedChanged;
+			KeyNodeTitleInput.TextChanged += KeyNodeTitleInput_TextChanged;
 		}
 
 		private void InitializeRates()
@@ -86,6 +94,20 @@ namespace Foreman
 		{
 			(nodeController as PassthroughNodeController).SetSimpleDraw(SimplePassthroughNodesCheckBox.Checked);
 			myGraphViewer.Invalidate();
+		}
+
+		private void KeyNodeCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			nodeController.SetKeyNode(KeyNodeCheckBox.Checked);
+			KeyNodeTitleLabel.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Text = nodeData.KeyNodeTitle;
+			myGraphViewer.Invalidate();
+		}
+
+		private void KeyNodeTitleInput_TextChanged(object sender, EventArgs e)
+		{
+			nodeController.SetKeyNodeTitle(KeyNodeTitleInput.Text);
 		}
 	}
 }

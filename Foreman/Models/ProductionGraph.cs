@@ -540,7 +540,14 @@ namespace Foreman
 						else
 							newNode.DesiredRatePerSec = (double)nodeJToken["DesiredRate"];
 					}
+
 					newNode.NodeDirection = (NodeDirection)(int)nodeJToken["Direction"];
+
+					if(nodeJToken["KeyNode"] != null)
+					{
+						newNode.KeyNode = true;
+						newNode.KeyNodeTitle = (string)nodeJToken["KeyNode"];
+					}
 
 					oldNodeIndices.Add((int)nodeJToken["NodeID"], newNode.ReadOnlyNode);
 				}

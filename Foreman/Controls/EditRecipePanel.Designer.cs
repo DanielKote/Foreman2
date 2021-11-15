@@ -97,8 +97,11 @@ namespace Foreman
 			this.SelectedAssemblerIcon = new System.Windows.Forms.PictureBox();
 			this.SelectedFuelIcon = new System.Windows.Forms.PictureBox();
 			this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.KeyNodeTitleInput = new System.Windows.Forms.TextBox();
+			this.KeyNodeCheckBox = new System.Windows.Forms.CheckBox();
 			this.FixedAssemblerInput = new System.Windows.Forms.NumericUpDown();
 			this.LowPriorityCheckBox = new System.Windows.Forms.CheckBox();
+			this.KeyNodeTitleLabel = new System.Windows.Forms.Label();
 			this.ToolTip = new Foreman.CustomToolTip();
 			this.AssemblerInfoTable.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).BeginInit();
@@ -435,7 +438,7 @@ namespace Foreman
 			this.AssemblerRateLabel.Location = new System.Drawing.Point(3, 1);
 			this.AssemblerRateLabel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
 			this.AssemblerRateLabel.Name = "AssemblerRateLabel";
-			this.AssemblerRateLabel.Size = new System.Drawing.Size(251, 22);
+			this.AssemblerRateLabel.Size = new System.Drawing.Size(215, 22);
 			this.AssemblerRateLabel.TabIndex = 3;
 			this.AssemblerRateLabel.Text = "# of Assemblers:";
 			this.AssemblerRateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -471,7 +474,7 @@ namespace Foreman
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.MainTable.Size = new System.Drawing.Size(472, 638);
+			this.MainTable.Size = new System.Drawing.Size(472, 665);
 			this.MainTable.TabIndex = 17;
 			// 
 			// BeaconTable
@@ -494,7 +497,7 @@ namespace Foreman
 			this.BeaconTable.Controls.Add(this.BeaconValuesTable, 2, 1);
 			this.BeaconTable.Controls.Add(this.SelectedBeaconIcon, 3, 0);
 			this.BeaconTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.BeaconTable.Location = new System.Drawing.Point(3, 413);
+			this.BeaconTable.Location = new System.Drawing.Point(3, 440);
 			this.BeaconTable.Name = "BeaconTable";
 			this.BeaconTable.RowCount = 4;
 			this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -913,7 +916,7 @@ namespace Foreman
 			this.AssemblerTable.Controls.Add(this.SelectedAssemblerIcon, 2, 0);
 			this.AssemblerTable.Controls.Add(this.SelectedFuelIcon, 2, 2);
 			this.AssemblerTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.AssemblerTable.Location = new System.Drawing.Point(3, 58);
+			this.AssemblerTable.Location = new System.Drawing.Point(3, 85);
 			this.AssemblerTable.Name = "AssemblerTable";
 			this.AssemblerTable.RowCount = 6;
 			this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -1096,24 +1099,51 @@ namespace Foreman
 			this.RateOptionsTable.AutoSize = true;
 			this.RateOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.RateOptionsTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-			this.RateOptionsTable.ColumnCount = 4;
+			this.RateOptionsTable.ColumnCount = 5;
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+			this.RateOptionsTable.Controls.Add(this.KeyNodeTitleInput, 2, 1);
+			this.RateOptionsTable.Controls.Add(this.KeyNodeCheckBox, 0, 1);
 			this.RateOptionsTable.Controls.Add(this.AssemblerRateLabel, 0, 0);
-			this.RateOptionsTable.Controls.Add(this.FixedAssemblersOption, 2, 0);
-			this.RateOptionsTable.Controls.Add(this.AutoAssemblersOption, 1, 0);
-			this.RateOptionsTable.Controls.Add(this.FixedAssemblerInput, 3, 0);
-			this.RateOptionsTable.Controls.Add(this.LowPriorityCheckBox, 0, 1);
+			this.RateOptionsTable.Controls.Add(this.FixedAssemblersOption, 3, 0);
+			this.RateOptionsTable.Controls.Add(this.AutoAssemblersOption, 2, 0);
+			this.RateOptionsTable.Controls.Add(this.FixedAssemblerInput, 4, 0);
+			this.RateOptionsTable.Controls.Add(this.LowPriorityCheckBox, 0, 2);
+			this.RateOptionsTable.Controls.Add(this.KeyNodeTitleLabel, 1, 1);
 			this.RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
 			this.RateOptionsTable.Name = "RateOptionsTable";
-			this.RateOptionsTable.RowCount = 2;
+			this.RateOptionsTable.RowCount = 3;
 			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.RateOptionsTable.Size = new System.Drawing.Size(466, 49);
+			this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.RateOptionsTable.Size = new System.Drawing.Size(466, 76);
 			this.RateOptionsTable.TabIndex = 18;
+			// 
+			// KeyNodeTitleInput
+			// 
+			this.RateOptionsTable.SetColumnSpan(this.KeyNodeTitleInput, 3);
+			this.KeyNodeTitleInput.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.KeyNodeTitleInput.Location = new System.Drawing.Point(260, 29);
+			this.KeyNodeTitleInput.MaxLength = 200;
+			this.KeyNodeTitleInput.Name = "KeyNodeTitleInput";
+			this.KeyNodeTitleInput.Size = new System.Drawing.Size(203, 20);
+			this.KeyNodeTitleInput.TabIndex = 23;
+			// 
+			// KeyNodeCheckBox
+			// 
+			this.KeyNodeCheckBox.AutoSize = true;
+			this.KeyNodeCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.KeyNodeCheckBox.Location = new System.Drawing.Point(23, 31);
+			this.KeyNodeCheckBox.Margin = new System.Windows.Forms.Padding(23, 5, 3, 5);
+			this.KeyNodeCheckBox.Name = "KeyNodeCheckBox";
+			this.KeyNodeCheckBox.Size = new System.Drawing.Size(195, 17);
+			this.KeyNodeCheckBox.TabIndex = 22;
+			this.KeyNodeCheckBox.Text = "Key Node";
+			this.KeyNodeCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// FixedAssemblerInput
 			// 
@@ -1127,12 +1157,24 @@ namespace Foreman
 			// 
 			this.LowPriorityCheckBox.AutoSize = true;
 			this.LowPriorityCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.LowPriorityCheckBox.Location = new System.Drawing.Point(3, 29);
+			this.LowPriorityCheckBox.Location = new System.Drawing.Point(23, 56);
+			this.LowPriorityCheckBox.Margin = new System.Windows.Forms.Padding(23, 3, 3, 3);
 			this.LowPriorityCheckBox.Name = "LowPriorityCheckBox";
-			this.LowPriorityCheckBox.Size = new System.Drawing.Size(251, 17);
+			this.LowPriorityCheckBox.Size = new System.Drawing.Size(195, 17);
 			this.LowPriorityCheckBox.TabIndex = 5;
 			this.LowPriorityCheckBox.Text = "Low Priority Recipe";
 			this.LowPriorityCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// KeyNodeTitleLabel
+			// 
+			this.KeyNodeTitleLabel.AutoSize = true;
+			this.KeyNodeTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.KeyNodeTitleLabel.Location = new System.Drawing.Point(224, 26);
+			this.KeyNodeTitleLabel.Name = "KeyNodeTitleLabel";
+			this.KeyNodeTitleLabel.Size = new System.Drawing.Size(30, 27);
+			this.KeyNodeTitleLabel.TabIndex = 24;
+			this.KeyNodeTitleLabel.Text = "Title:";
+			this.KeyNodeTitleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// ToolTip
 			// 
@@ -1155,7 +1197,7 @@ namespace Foreman
 			this.DoubleBuffered = true;
 			this.ForeColor = System.Drawing.Color.White;
 			this.Name = "EditRecipePanel";
-			this.Size = new System.Drawing.Size(472, 638);
+			this.Size = new System.Drawing.Size(472, 665);
 			this.AssemblerInfoTable.ResumeLayout(false);
 			this.AssemblerInfoTable.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).EndInit();
@@ -1270,5 +1312,8 @@ namespace Foreman
 		private System.Windows.Forms.Label ExtraProductivityLabel;
 		private System.Windows.Forms.NumericUpDown ExtraProductivityInput;
 		private System.Windows.Forms.CheckBox LowPriorityCheckBox;
+		private System.Windows.Forms.CheckBox KeyNodeCheckBox;
+		private System.Windows.Forms.TextBox KeyNodeTitleInput;
+		private System.Windows.Forms.Label KeyNodeTitleLabel;
 	}
 }

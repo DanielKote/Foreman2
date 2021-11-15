@@ -40,6 +40,11 @@ namespace Foreman
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			RateOptionsTable.AutoSize = false; //simplest way of ensuring the width of the panel remains constant (it needs to be autosized during initialization due to DPI & font scaling)
 
+			KeyNodeCheckBox.Checked = nodeData.KeyNode;
+			KeyNodeTitleLabel.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Text = nodeData.KeyNodeTitle;
+
 			LowPriorityCheckBox.Checked = nodeData.LowPriority;
 
 			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxFactories);
@@ -88,6 +93,9 @@ namespace Foreman
 
 			//set these event handlers last - after we have set up all the values / settings
 			LowPriorityCheckBox.CheckedChanged += LowPriorityCheckBox_CheckedChanged;
+			KeyNodeCheckBox.CheckedChanged += KeyNodeCheckBox_CheckedChanged;
+			KeyNodeTitleInput.TextChanged += KeyNodeTitleInput_TextChanged;
+
 			FixedAssemblersOption.CheckedChanged += FixedAssemblerOption_CheckedChanged;
 			FixedAssemblerInput.ValueChanged += FixedAssemblerInput_ValueChanged;
 			NeighbourInput.ValueChanged += NeighbourInput_ValueChanged;
@@ -549,7 +557,7 @@ namespace Foreman
 			myGraphViewer.Graph.UpdateNodeValues();
 		}
 
-		//------------------------------------------------------------------------------------------------------Rate input events
+		//------------------------------------------------------------------------------------------------------Rate input & keynode events
 
 		private void SetFixedRate()
 		{
@@ -583,6 +591,20 @@ namespace Foreman
 		{
 			SetFixedRate();
 			UpdateFixedFlowInputDecimals(sender as NumericUpDown, 2);
+		}
+
+		private void KeyNodeCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			nodeController.SetKeyNode(KeyNodeCheckBox.Checked);
+			KeyNodeTitleLabel.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Visible = nodeData.KeyNode;
+			KeyNodeTitleInput.Text = nodeData.KeyNodeTitle;
+			myGraphViewer.Invalidate();
+		}
+
+		private void KeyNodeTitleInput_TextChanged(object sender, EventArgs e)
+		{
+			nodeController.SetKeyNodeTitle(KeyNodeTitleInput.Text);
 		}
 
 		//------------------------------------------------------------------------------------------------------assembler neighbour bonus input events

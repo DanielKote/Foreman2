@@ -101,17 +101,19 @@ namespace Foreman
 			this.KeyNodesTable = new System.Windows.Forms.TableLayoutPanel();
 			this.KeyNodesListView = new System.Windows.Forms.ListView();
 			this.KeyNodesHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.KeyNodesHeaderTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.KeyNodesHeaderFlow = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.label2 = new System.Windows.Forms.Label();
 			this.KeyNodesFilterTextBox = new System.Windows.Forms.TextBox();
 			this.keyNodesExportButton = new System.Windows.Forms.Button();
-			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.RecipeNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
-			this.SupplierNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
-			this.ConsumerNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
 			this.PassthroughNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
-			this.KeyNodesHeaderTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.KeyNodesHeaderFlow = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ConsumerNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
+			this.SupplierNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
+			this.RecipeNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
+			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.KeyNodesHeaderDetails = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.KeyNodesHeaderBuildings = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.MainTabControl.SuspendLayout();
 			this.BuildingsTabPage.SuspendLayout();
 			this.BuildingsTable.SuspendLayout();
@@ -895,8 +897,10 @@ namespace Foreman
 			// 
 			this.KeyNodesListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.KeyNodesHeaderType,
+            this.KeyNodesHeaderDetails,
             this.KeyNodesHeaderTitle,
-            this.KeyNodesHeaderFlow});
+            this.KeyNodesHeaderFlow,
+            this.KeyNodesHeaderBuildings});
 			this.KeyNodesTable.SetColumnSpan(this.KeyNodesListView, 3);
 			this.KeyNodesListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.KeyNodesListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
@@ -921,6 +925,16 @@ namespace Foreman
 			// 
 			this.KeyNodesHeaderType.Text = "Node Type";
 			this.KeyNodesHeaderType.Width = 100;
+			// 
+			// KeyNodesHeaderTitle
+			// 
+			this.KeyNodesHeaderTitle.Text = "Node Title";
+			this.KeyNodesHeaderTitle.Width = 200;
+			// 
+			// KeyNodesHeaderFlow
+			// 
+			this.KeyNodesHeaderFlow.Text = "Throughput";
+			this.KeyNodesHeaderFlow.Width = 80;
 			// 
 			// label2
 			// 
@@ -956,12 +970,6 @@ namespace Foreman
 			this.keyNodesExportButton.UseVisualStyleBackColor = true;
 			this.keyNodesExportButton.Click += new System.EventHandler(this.keyNodesExportButton_Click);
 			// 
-			// columnHeader1
-			// 
-			this.columnHeader1.DisplayIndex = 0;
-			this.columnHeader1.Text = "Name";
-			this.columnHeader1.Width = 290;
-			// 
 			// tableLayoutPanel1
 			// 
 			this.tableLayoutPanel1.AutoSize = true;
@@ -984,33 +992,19 @@ namespace Foreman
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(738, 23);
 			this.tableLayoutPanel1.TabIndex = 33;
 			// 
-			// RecipeNodeFilterCheckBox
+			// PassthroughNodeFilterCheckBox
 			// 
-			this.RecipeNodeFilterCheckBox.AutoSize = true;
-			this.RecipeNodeFilterCheckBox.Checked = true;
-			this.RecipeNodeFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.RecipeNodeFilterCheckBox.Location = new System.Drawing.Point(366, 3);
-			this.RecipeNodeFilterCheckBox.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
-			this.RecipeNodeFilterCheckBox.Name = "RecipeNodeFilterCheckBox";
-			this.RecipeNodeFilterCheckBox.Size = new System.Drawing.Size(94, 17);
-			this.RecipeNodeFilterCheckBox.TabIndex = 0;
-			this.RecipeNodeFilterCheckBox.Text = "Recipe Nodes";
-			this.RecipeNodeFilterCheckBox.UseVisualStyleBackColor = true;
-			this.RecipeNodeFilterCheckBox.CheckedChanged += new System.EventHandler(this.KeyNodesFilterCheckBox_CheckedChanged);
-			// 
-			// SupplierNodeFilterCheckBox
-			// 
-			this.SupplierNodeFilterCheckBox.AutoSize = true;
-			this.SupplierNodeFilterCheckBox.Checked = true;
-			this.SupplierNodeFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.SupplierNodeFilterCheckBox.Location = new System.Drawing.Point(6, 3);
-			this.SupplierNodeFilterCheckBox.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
-			this.SupplierNodeFilterCheckBox.Name = "SupplierNodeFilterCheckBox";
-			this.SupplierNodeFilterCheckBox.Size = new System.Drawing.Size(98, 17);
-			this.SupplierNodeFilterCheckBox.TabIndex = 1;
-			this.SupplierNodeFilterCheckBox.Text = "Supplier Nodes";
-			this.SupplierNodeFilterCheckBox.UseVisualStyleBackColor = true;
-			this.SupplierNodeFilterCheckBox.CheckedChanged += new System.EventHandler(this.KeyNodesFilterCheckBox_CheckedChanged);
+			this.PassthroughNodeFilterCheckBox.AutoSize = true;
+			this.PassthroughNodeFilterCheckBox.Checked = true;
+			this.PassthroughNodeFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.PassthroughNodeFilterCheckBox.Location = new System.Drawing.Point(235, 3);
+			this.PassthroughNodeFilterCheckBox.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
+			this.PassthroughNodeFilterCheckBox.Name = "PassthroughNodeFilterCheckBox";
+			this.PassthroughNodeFilterCheckBox.Size = new System.Drawing.Size(119, 17);
+			this.PassthroughNodeFilterCheckBox.TabIndex = 3;
+			this.PassthroughNodeFilterCheckBox.Text = "Passthrough Nodes";
+			this.PassthroughNodeFilterCheckBox.UseVisualStyleBackColor = true;
+			this.PassthroughNodeFilterCheckBox.CheckedChanged += new System.EventHandler(this.KeyNodesFilterCheckBox_CheckedChanged);
 			// 
 			// ConsumerNodeFilterCheckBox
 			// 
@@ -1026,29 +1020,49 @@ namespace Foreman
 			this.ConsumerNodeFilterCheckBox.UseVisualStyleBackColor = true;
 			this.ConsumerNodeFilterCheckBox.CheckedChanged += new System.EventHandler(this.KeyNodesFilterCheckBox_CheckedChanged);
 			// 
-			// PassthroughNodeFilterCheckBox
+			// SupplierNodeFilterCheckBox
 			// 
-			this.PassthroughNodeFilterCheckBox.AutoSize = true;
-			this.PassthroughNodeFilterCheckBox.Checked = true;
-			this.PassthroughNodeFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.PassthroughNodeFilterCheckBox.Location = new System.Drawing.Point(235, 3);
-			this.PassthroughNodeFilterCheckBox.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
-			this.PassthroughNodeFilterCheckBox.Name = "PassthroughNodeFilterCheckBox";
-			this.PassthroughNodeFilterCheckBox.Size = new System.Drawing.Size(119, 17);
-			this.PassthroughNodeFilterCheckBox.TabIndex = 3;
-			this.PassthroughNodeFilterCheckBox.Text = "Passthrough Nodes";
-			this.PassthroughNodeFilterCheckBox.UseVisualStyleBackColor = true;
-			this.PassthroughNodeFilterCheckBox.CheckedChanged += new System.EventHandler(this.KeyNodesFilterCheckBox_CheckedChanged);
+			this.SupplierNodeFilterCheckBox.AutoSize = true;
+			this.SupplierNodeFilterCheckBox.Checked = true;
+			this.SupplierNodeFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.SupplierNodeFilterCheckBox.Location = new System.Drawing.Point(6, 3);
+			this.SupplierNodeFilterCheckBox.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
+			this.SupplierNodeFilterCheckBox.Name = "SupplierNodeFilterCheckBox";
+			this.SupplierNodeFilterCheckBox.Size = new System.Drawing.Size(98, 17);
+			this.SupplierNodeFilterCheckBox.TabIndex = 1;
+			this.SupplierNodeFilterCheckBox.Text = "Supplier Nodes";
+			this.SupplierNodeFilterCheckBox.UseVisualStyleBackColor = true;
+			this.SupplierNodeFilterCheckBox.CheckedChanged += new System.EventHandler(this.KeyNodesFilterCheckBox_CheckedChanged);
 			// 
-			// KeyNodesHeaderTitle
+			// RecipeNodeFilterCheckBox
 			// 
-			this.KeyNodesHeaderTitle.Text = "Node Title";
-			this.KeyNodesHeaderTitle.Width = 250;
+			this.RecipeNodeFilterCheckBox.AutoSize = true;
+			this.RecipeNodeFilterCheckBox.Checked = true;
+			this.RecipeNodeFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.RecipeNodeFilterCheckBox.Location = new System.Drawing.Point(366, 3);
+			this.RecipeNodeFilterCheckBox.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
+			this.RecipeNodeFilterCheckBox.Name = "RecipeNodeFilterCheckBox";
+			this.RecipeNodeFilterCheckBox.Size = new System.Drawing.Size(94, 17);
+			this.RecipeNodeFilterCheckBox.TabIndex = 0;
+			this.RecipeNodeFilterCheckBox.Text = "Recipe Nodes";
+			this.RecipeNodeFilterCheckBox.UseVisualStyleBackColor = true;
+			this.RecipeNodeFilterCheckBox.CheckedChanged += new System.EventHandler(this.KeyNodesFilterCheckBox_CheckedChanged);
 			// 
-			// KeyNodesHeaderFlow
+			// columnHeader1
 			// 
-			this.KeyNodesHeaderFlow.Text = "Throughput / Factory count";
-			this.KeyNodesHeaderFlow.Width = 150;
+			this.columnHeader1.DisplayIndex = 0;
+			this.columnHeader1.Text = "Name";
+			this.columnHeader1.Width = 290;
+			// 
+			// KeyNodesHeaderDetails
+			// 
+			this.KeyNodesHeaderDetails.Text = "Node Details";
+			this.KeyNodesHeaderDetails.Width = 200;
+			// 
+			// KeyNodesHeaderBuildings
+			// 
+			this.KeyNodesHeaderBuildings.Text = "Factories";
+			this.KeyNodesHeaderBuildings.Width = 80;
 			// 
 			// GraphSummaryForm
 			// 
@@ -1178,5 +1192,7 @@ namespace Foreman
 		private System.Windows.Forms.CheckBox RecipeNodeFilterCheckBox;
 		private System.Windows.Forms.ColumnHeader KeyNodesHeaderTitle;
 		private System.Windows.Forms.ColumnHeader KeyNodesHeaderFlow;
+		private System.Windows.Forms.ColumnHeader KeyNodesHeaderDetails;
+		private System.Windows.Forms.ColumnHeader KeyNodesHeaderBuildings;
 	}
 }

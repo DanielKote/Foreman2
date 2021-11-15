@@ -219,7 +219,10 @@ namespace Foreman
 				Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOverproducing() ? overproducingFlowBorderBrush : equalFlowBorderBrush;
 
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing, trans.Y - (Height / 2) + BorderSpacing, Width - (2 * BorderSpacing), Height - (2 * BorderSpacing), 10, graphics, borderBrush); //flow status border
-				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing + 3, trans.Y - (Height / 2) + BorderSpacing + 3, Width - (2 * BorderSpacing) - 6, Height - (2 * BorderSpacing) - 6, 7, graphics, bgBrush); //basic background (with given background brush)
+
+				int yoffset = (DisplayedNode.KeyNode && !(this is ConsumerNodeElement)) ? 15 : 0;
+				int heightOffset = DisplayedNode.KeyNode ? (this is ConsumerNodeElement || this is SupplierNodeElement) ? 15 : 30 : 0;
+				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing + 3, trans.Y - (Height / 2) + BorderSpacing + 3 + yoffset, Width - (2 * BorderSpacing) - 6, Height - (2 * BorderSpacing) - 6 - heightOffset, 7, graphics, bgBrush); //basic background (with given background brush)
 				if (DisplayedNode.RateType == RateType.Manual)
 					GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + 3, trans.Y - (Height / 2) + 3, Width - 6, Height - 6, 7, graphics, ManualRateBGFilterBrush); //darken background if its a manual rate set
 
