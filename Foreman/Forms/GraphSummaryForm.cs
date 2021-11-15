@@ -485,12 +485,20 @@ namespace Foreman
 
 			unfilteredList.Sort((a, b) =>
 			{
+				int result;
 				if (column == 0)
-					return reverseSortLamda * -double.Parse(a.Text).CompareTo(double.Parse(b.Text));
+					result = -double.Parse(a.Text).CompareTo(double.Parse(b.Text));
 				else if (column == 1)
-					return reverseSortLamda * a.SubItems[1].Text.ToLower().CompareTo(b.SubItems[1].Text.ToLower());
+					result = a.SubItems[1].Text.ToLower().CompareTo(b.SubItems[1].Text.ToLower());
 				else
-					return reverseSortLamda * -((double)a.SubItems[column].Tag).CompareTo((double)b.SubItems[column].Tag);
+					result = -((double)a.SubItems[column].Tag).CompareTo((double)b.SubItems[column].Tag);
+
+				if (result == 0)
+					result = ((DataObjectBase)a.Tag).LFriendlyName.CompareTo(((DataObjectBase)b.Tag).LFriendlyName);
+				if (result == 0)
+					result = ((DataObjectBase)a.Tag).Name.CompareTo(((DataObjectBase)b.Tag).Name);
+				return result * reverseSortLamda;
+
 			});
 
 			UpdateFilteredBuildingList(unfilteredList, filteredList, owner);
@@ -507,10 +515,17 @@ namespace Foreman
 
 			unfilteredList.Sort((a, b) =>
 			{
+				int result;
 				if (column == 0)
-					return reverseSortLamda * a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
+					result = a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
 				else
-					return reverseSortLamda * -((double)a.SubItems[column].Tag).CompareTo((double)b.SubItems[column].Tag);
+					result = -((double)a.SubItems[column].Tag).CompareTo((double)b.SubItems[column].Tag);
+
+				if (result == 0)
+					result = ((DataObjectBase)a.Tag).LFriendlyName.CompareTo(((DataObjectBase)b.Tag).LFriendlyName);
+				if (result == 0)
+					result = ((DataObjectBase)a.Tag).Name.CompareTo(((DataObjectBase)b.Tag).Name);
+				return result * reverseSortLamda;
 			});
 
 			UpdateFilteredItemsList(unfilteredList, filteredList, owner);
@@ -524,10 +539,19 @@ namespace Foreman
 
 			unfilteredKeyNodesList.Sort((a, b) =>
 			{
+				int result;
 				if (e.Column < 3)
-					return reverseSortLamda * a.SubItems[e.Column].Text.ToLower().CompareTo(b.SubItems[e.Column].Text.ToLower());
+					result = a.SubItems[e.Column].Text.ToLower().CompareTo(b.SubItems[e.Column].Text.ToLower());
 				else
-					return reverseSortLamda * -((double)a.SubItems[e.Column].Tag).CompareTo((double)b.SubItems[e.Column].Tag);
+					result =  -((double)a.SubItems[e.Column].Tag).CompareTo((double)b.SubItems[e.Column].Tag);
+
+				if(result == 0)
+					result = a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
+				if(result == 0)
+					result = a.SubItems[1].Text.ToLower().CompareTo(b.SubItems[1].Text.ToLower());
+				if (result == 0)
+					result = ((ReadOnlyBaseNode)a.Tag).NodeID.CompareTo(((ReadOnlyBaseNode)b.Tag).NodeID);
+				return result * reverseSortLamda;
 			});
 
 			UpdateFilteredKeyNodesList();
