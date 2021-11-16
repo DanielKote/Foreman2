@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -534,20 +535,37 @@ namespace Foreman
 
 		private void KeyNodesListView_ColumnClick(object sender, ColumnClickEventArgs e)
 		{
+			const int maxDigits = 20;
+			Regex comparerRegex = new Regex(@"\d+", RegexOptions.Compiled);
+			Dictionary<string, string> stringComparerProcessedStrings = new Dictionary<string, string>();
+			int NaturalCompareStrings(string a, string b)
+			{
+				if (!stringComparerProcessedStrings.ContainsKey(a))
+					stringComparerProcessedStrings.Add(a, comparerRegex.Replace(a.ToLower(), matcha => matcha.Value.PadLeft(maxDigits, '0')));
+				if (!stringComparerProcessedStrings.ContainsKey(b))
+					stringComparerProcessedStrings.Add(b, comparerRegex.Replace(b.ToLower(), matcha => matcha.Value.PadLeft(maxDigits, '0')));
+
+				return stringComparerProcessedStrings[a].CompareTo(stringComparerProcessedStrings[b]);
+			}
+
 			int reverseSortLamda = (lastSortOrder[KeyNodesListView] == e.Column + 1) ? -1 : 1; //last sort was this very column -> this is now a reverse sort
 			lastSortOrder[KeyNodesListView] = reverseSortLamda * (e.Column + 1);
 
 			unfilteredKeyNodesList.Sort((a, b) =>
 			{
 				int result;
-				if (e.Column < 3)
+				if (e.Column == 2)
+					result = NaturalCompareStrings(a.SubItems[2].Text, b.SubItems[2].Text);
+				else if(e.Column < 3)
 					result = a.SubItems[e.Column].Text.ToLower().CompareTo(b.SubItems[e.Column].Text.ToLower());
 				else
 					result =  -((double)a.SubItems[e.Column].Tag).CompareTo((double)b.SubItems[e.Column].Tag);
 
-				if(result == 0)
+				if(result == 0 && e.Column != 2)
+					result = NaturalCompareStrings(a.SubItems[2].Text, b.SubItems[2].Text);
+				if(result == 0 && e.Column != 0)
 					result = a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
-				if(result == 0)
+				if (result == 0 && e.Column != 1)
 					result = a.SubItems[1].Text.ToLower().CompareTo(b.SubItems[1].Text.ToLower());
 				if (result == 0)
 					result = ((ReadOnlyBaseNode)a.Tag).NodeID.CompareTo(((ReadOnlyBaseNode)b.Tag).NodeID);
