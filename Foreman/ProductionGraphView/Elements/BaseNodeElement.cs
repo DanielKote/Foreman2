@@ -5,6 +5,10 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Newtonsoft.Json;
+using System.Text;
+using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace Foreman
 {
@@ -339,6 +343,49 @@ namespace Foreman
 				}
 
 				AddRClickMenuOptions(graphViewer.SelectedNodes.Count == 0 || graphViewer.SelectedNodes.Contains(this));
+
+				RightClickMenu.Items.Add(new ToolStripSeparator());
+				RightClickMenu.Items.Add(new ToolStripMenuItem("Copy key node status", null,
+					new EventHandler((o, e) =>
+					{
+						RightClickMenu.Close();
+						StringBuilder stringBuilder = new StringBuilder();
+						var writer = new JsonTextWriter(new StringWriter(stringBuilder));
+
+						JsonSerializer serialiser = JsonSerializer.Create();
+						serialiser.Formatting = Formatting.None;
+						serialiser.Serialize(writer, new Tuple<bool, string>(DisplayedNode.KeyNode, DisplayedNode.KeyNodeTitle));
+
+						Clipboard.SetText(stringBuilder.ToString());
+
+					})));
+
+				if (graphViewer.SelectedNodes.Count == 0 || graphViewer.SelectedNodes.Contains(this))
+				{
+					try
+					{
+						JObject keyNodeStatus = JObject.Parse(Clipboard.GetText());
+						if (keyNodeStatus["Item1"] != null && keyNodeStatus["Item2"] != null)
+						{
+							bool keyNode = (bool)keyNodeStatus["Item1"];
+							string keyNodeTitle = (string)keyNodeStatus["Item2"];
+							RightClickMenu.Items.Add(new ToolStripMenuItem("Paste key node status", null,
+								new EventHandler((o, e) =>
+								{
+									RightClickMenu.Close();
+									foreach (BaseNodeElement node in graphViewer.SelectedNodes)
+									{
+										BaseNodeController controller = graphViewer.Graph.RequestNodeController(node.DisplayedNode);
+										controller.SetKeyNode(keyNode);
+										controller.SetKeyNodeTitle(keyNodeTitle);
+									}
+								})));
+						}
+					}
+					catch { }
+				}
+
+
 				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
 			}
 		}
