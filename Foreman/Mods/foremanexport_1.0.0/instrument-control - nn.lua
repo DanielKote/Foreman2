@@ -116,11 +116,11 @@ local function ExportRecipes()
 
 			for _, ingredient in pairs(recipe.ingredients) do
 				if ingredient.name == product.name then
-					if product.catalyst_amount ~= nil and product.catalyst_amount >= ingredient.amount then
-						tproduct["catalyst"] = true
+					if (product.catalyst_amount ~= nil) and (product.catalyst_amount >= ingredient.amount) then
+						tproduct['catalyst'] = true
 					end
-					if product.amount ~= nil and product.amount_min == nil and product.amount_max == nil and product.probability == nil and product.amount <= ingredient.amount then
-						tproduct["catalyst"] = true
+					if (product.amount ~= nil) and (product.amount_min == nil) and (product.amount_max == nil) and (product.probability == 1) and (product.amount <= ingredient.amount) then
+						tproduct['catalyst'] = true
 					end
 				end
 			end

@@ -12631,7 +12631,8 @@
         {
           "name": "uranium-238",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "catalyst": true
         }
       ],
       "localised_name": "Kovarex enrichment process"
