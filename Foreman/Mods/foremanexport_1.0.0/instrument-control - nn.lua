@@ -110,17 +110,28 @@ local function ExportRecipes()
 			tproduct['type'] = product.type
 
 			amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-			amount = amount * ( (product.probability == nil) and 1 or product.probability)
+			amount = amount * product.probability
 
 			tproduct['amount'] = amount
+			tproduct['p_amount'] = amount
 
-			for _, ingredient in pairs(recipe.ingredients) do
-				if ingredient.name == product.name then
-					if (product.catalyst_amount ~= nil) and (product.catalyst_amount >= ingredient.amount) then
-						tproduct['catalyst'] = true
-					end
-					if (product.amount ~= nil) and (product.amount_min == nil) and (product.amount_max == nil) and (product.probability == 1) and (product.amount <= ingredient.amount) then
-						tproduct['catalyst'] = true
+			if (product.catalyst_amount ~= nil) then
+
+				if product.amount ~= nil then
+					tproduct['p_amount'] = product.amount - math.max(0, math.min(product.amount, product.catalyst_amount))
+				elseif product.catalyst_amount <= product.amount_min then
+					tproduct['p_amount'] = ((product.amount_max + product.amount_min)/2) - math.max(0, product.catalyst_amount)
+				else
+					catalyst_amount = math.min(product.amount_max, product.catalyst_amount)
+					tproduct['p_amount'] = ((product.amount_max - catalyst_amount) * (product.amount_max + 1 - catalyst_amount) / 2) / (product.amount_max + 1 - product.amount_min)
+				end
+
+				tproduct['p_amount'] = tproduct['p_amount'] * product.probability
+
+			elseif product.amount ~= nil and product.probability == 1 then
+				for _, ingredient in pairs(recipe.ingredients) do
+					if ingredient.name == product.name then
+						tproduct['p_amount'] = math.max(0, product.amount - ingredient.amount)
 					end
 				end
 			end

@@ -16,9 +16,9 @@ namespace Foreman
 		bool IsMissing { get; }
 
 		IReadOnlyDictionary<Item, double> ProductSet { get; }
+		IReadOnlyDictionary<Item, double> ProductPSet { get; } //extra productivity amounts [ actual amount = productSet + (productPSet * productivity bonus) ]
 		IReadOnlyList<Item> ProductList { get; }
 		IReadOnlyDictionary<Item, double> ProductTemperatureMap { get; }
-		IReadOnlyCollection<Item> ProductCatalysts { get; }
 
 		IReadOnlyDictionary<Item, double> IngredientSet { get; }
 		IReadOnlyList<Item> IngredientList { get; }
@@ -43,9 +43,9 @@ namespace Foreman
 		public double Time { get; set; }
 
 		public IReadOnlyDictionary<Item, double> ProductSet { get { return productSet; } }
+		public IReadOnlyDictionary<Item, double> ProductPSet { get { return productPSet; } }
 		public IReadOnlyList<Item> ProductList { get { return productList; } }
 		public IReadOnlyDictionary<Item, double> ProductTemperatureMap { get { return productTemperatureMap; } }
-		public IReadOnlyCollection<Item> ProductCatalysts { get { return productCatalysts; } }
 
 		public IReadOnlyDictionary<Item, double> IngredientSet { get { return ingredientSet; } }
 		public IReadOnlyList<Item> IngredientList { get { return ingredientList; } }
@@ -60,8 +60,8 @@ namespace Foreman
 		internal SubgroupPrototype mySubgroup;
 
 		internal Dictionary<Item, double> productSet { get; private set; }
+		internal Dictionary<Item, double> productPSet { get; private set; }
 		internal Dictionary<Item, double> productTemperatureMap { get; private set; }
-		internal HashSet<Item> productCatalysts { get; private set; }
 		internal List<ItemPrototype> productList { get; private set; }
 
 		internal Dictionary<Item, double> ingredientSet { get; private set; }
@@ -96,7 +96,7 @@ namespace Foreman
 			productSet = new Dictionary<Item, double>();
 			productList = new List<ItemPrototype>();
 			productTemperatureMap = new Dictionary<Item, double>();
-			productCatalysts = new HashSet<Item>();
+			productPSet = new Dictionary<Item, double>();
 
 			assemblers = new HashSet<AssemblerPrototype>();
 			modules = new HashSet<ModulePrototype>();
@@ -148,28 +148,30 @@ namespace Foreman
 			ingredientTemperatureMap.Remove(item);
 		}
 
-		public void InternalOneWayAddProduct(ItemPrototype item, double quantity, bool catalyst, double temperature = double.NaN)
+		public void InternalOneWayAddProduct(ItemPrototype item, double quantity, double pquantity, double temperature = double.NaN)
 		{
 			if (productSet.ContainsKey(item))
+			{
 				productSet[item] += quantity;
+				productPSet[item] += pquantity;
+			}
 			else
 			{
 				productSet.Add(item, quantity);
+				productPSet.Add(item, pquantity);
 				productList.Add(item);
 
 				temperature = (item is Fluid fluid && double.IsNaN(temperature)) ? fluid.DefaultTemperature : temperature;
 				productTemperatureMap.Add(item, temperature);
 			}
-			if (catalyst)
-				productCatalysts.Add(item);
 		}
 
 		internal void InternalOneWayDeleteProduct(ItemPrototype item) //only from delete calls
 		{
 			productSet.Remove(item);
+			productPSet.Remove(item);
 			productList.Remove(item);
 			productTemperatureMap.Remove(item);
-			productCatalysts.Remove(item);
 		}
 
 		public override string ToString() { return String.Format("Recipe: {0} Id:{1}", Name, RecipeID); }

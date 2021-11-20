@@ -195,22 +195,22 @@ namespace Foreman
 			RecipePrototype a = new RecipePrototype(null, "a", "a", sg, "-");
 			a.InternalOneWayAddIngredient(i1, 1);
 			a.InternalOneWayAddIngredient(i2, 1);
-			a.InternalOneWayAddProduct(i5, 1, false);
+			a.InternalOneWayAddProduct(i5, 1, 1);
 
 			RecipePrototype b = new RecipePrototype(null, "a", "a", sg, "-");
 			b.InternalOneWayAddIngredient(i1, 1);
 			b.InternalOneWayAddIngredient(i2, 1);
-			b.InternalOneWayAddProduct(i5, 1, false);
+			b.InternalOneWayAddProduct(i5, 1, 1);
 
 			RecipePrototype c = new RecipePrototype(null, "a", "a", sg, "-");
 			c.InternalOneWayAddIngredient(i1, 10);
 			c.InternalOneWayAddIngredient(i2, 10);
-			c.InternalOneWayAddProduct(i5, 1, false);
+			c.InternalOneWayAddProduct(i5, 1, 1);
 
 			RecipePrototype d = new RecipePrototype(null, "a", "a", sg, "-");
 			d.InternalOneWayAddIngredient(i3, 1);
 			d.InternalOneWayAddIngredient(i4, 1);
-			d.InternalOneWayAddProduct(i5, 1, false);
+			d.InternalOneWayAddProduct(i5, 1, 1);
 
 			HashSet<Recipe> recipes = new HashSet<Recipe>();
 			HashSet<Recipe> missingRecipes = new HashSet<Recipe>(new RecipeNaInPrComparer());

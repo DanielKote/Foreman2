@@ -165,7 +165,7 @@ namespace Foreman
 
 			HeatRecipe = new RecipePrototype(this, "§§r:h:heat-generation", "Heat Generation", energySubgroupEnergy, "1");
 			HeatRecipe.SetIconAndColor(heatIcon);
-			HeatRecipe.InternalOneWayAddProduct(HeatItem, 1, true);
+			HeatRecipe.InternalOneWayAddProduct(HeatItem, 1, 0);
 			HeatItem.productionRecipes.Add(HeatRecipe);
 			HeatRecipe.Time = 1;
 
@@ -428,9 +428,9 @@ namespace Foreman
 						foreach (var product in recipeShort.Products)
 						{
 							if (items.ContainsKey(product.Key))
-								missingRecipe.InternalOneWayAddProduct((ItemPrototype)items[product.Key], product.Value, false);
+								missingRecipe.InternalOneWayAddProduct((ItemPrototype)items[product.Key], product.Value, 0);
 							else
-								missingRecipe.InternalOneWayAddProduct((ItemPrototype)missingItems[product.Key], product.Value, false);
+								missingRecipe.InternalOneWayAddProduct((ItemPrototype)missingItems[product.Key], product.Value, 0);
 						}
 						missingRecipe.assemblers.Add(missingAssembler);
 						missingAssembler.recipes.Add(missingRecipe);
@@ -579,9 +579,9 @@ namespace Foreman
 				if (amount != 0)
 				{
 					if ((string)productJToken["type"] == "fluid")
-						recipe.InternalOneWayAddProduct(product, amount, (productJToken["catalyst"] != null && (bool)productJToken["catalyst"]), productJToken["temperature"] == null ? ((FluidPrototype)product).DefaultTemperature : (double)productJToken["temperature"]);
+						recipe.InternalOneWayAddProduct(product, amount, (double)productJToken["p_amount"], productJToken["temperature"] == null ? ((FluidPrototype)product).DefaultTemperature : (double)productJToken["temperature"]);
 					else
-						recipe.InternalOneWayAddProduct(product, amount, (productJToken["catalyst"] != null && (bool)productJToken["catalyst"]));
+						recipe.InternalOneWayAddProduct(product, amount, (double)productJToken["p_amount"]);
 
 					product.productionRecipes.Add(recipe);
 				}
@@ -665,7 +665,7 @@ namespace Foreman
 				if (!items.ContainsKey((string)productJToken["name"]) || (double)productJToken["amount"] <= 0)
 					continue;
 				ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
-				recipe.InternalOneWayAddProduct(product, (double)productJToken["amount"], false);
+				recipe.InternalOneWayAddProduct(product, (double)productJToken["amount"], (double)productJToken["amount"]);
 				product.productionRecipes.Add(recipe);
 			}
 
@@ -1027,7 +1027,7 @@ namespace Foreman
 				recipe.SetIconAndColor(new IconColorPair(fluid.Icon, fluid.AverageColor));
 				recipe.Time = 1;
 
-				recipe.InternalOneWayAddProduct(fluid, 60, false);
+				recipe.InternalOneWayAddProduct(fluid, 60, 60);
 				fluid.productionRecipes.Add(recipe);
 
 
@@ -1086,7 +1086,7 @@ namespace Foreman
 
 				recipe.InternalOneWayAddIngredient(ingredient, 60);
 				ingredient.consumptionRecipes.Add(recipe);
-				recipe.InternalOneWayAddProduct(product, 60, true, temp);
+				recipe.InternalOneWayAddProduct(product, 60, 60, temp);
 				product.productionRecipes.Add(recipe);
 
 
@@ -1301,7 +1301,7 @@ namespace Foreman
 				}
 			}
 			foreach (ItemPrototype product in products.Keys)
-				recipe.InternalOneWayAddProduct(product, inputSize * products[product], false, productTemp.ContainsKey(product) ? productTemp[product] : double.NaN);
+				recipe.InternalOneWayAddProduct(product, inputSize * products[product], 0, productTemp.ContainsKey(product) ? productTemp[product] : double.NaN);
 
 			recipe.InternalOneWayAddIngredient(launchItem, inputSize);
 			launchItem.consumptionRecipes.Add(recipe);

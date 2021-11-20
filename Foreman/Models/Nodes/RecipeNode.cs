@@ -238,9 +238,9 @@ namespace Foreman
 			return multiplier;
 		}
 
-		public double GetProductivityMultiplier()
+		public double GetProductivityBonus() //unlike the others, this is the bonus (aka: starts from 0%, not 100%)
 		{
-			double multiplier = 1.0f + SelectedAssembler.BaseProductivityBonus + ((SelectedAssembler.EntityType == EntityType.Miner || MyGraph.EnableExtraProductivityForNonMiners)? ExtraProductivityBonus : 0);
+			double multiplier = SelectedAssembler.BaseProductivityBonus + ((SelectedAssembler.EntityType == EntityType.Miner || MyGraph.EnableExtraProductivityForNonMiners)? ExtraProductivityBonus : 0);
 			foreach (Module module in AssemblerModules)
 				multiplier += module.ProductivityBonus;
 			foreach (Module beaconModule in BeaconModules)
@@ -293,15 +293,15 @@ namespace Foreman
 			if (item != FuelRemains)
 			{
 				if (SelectedAssembler.EntityType == EntityType.Reactor)
-					return BaseRecipe.ProductSet[item] * (1 + SelectedAssembler.NeighbourBonus * NeighbourCount) * (BaseRecipe.ProductCatalysts.Contains(item) ? 1 : GetProductivityMultiplier());
+					return BaseRecipe.ProductSet[item] * (1 + SelectedAssembler.NeighbourBonus * NeighbourCount); //no productivity
 				else
-					return BaseRecipe.ProductSet[item] * (BaseRecipe.ProductCatalysts.Contains(item) ? 1 : GetProductivityMultiplier());
+					return BaseRecipe.ProductSet[item] + (BaseRecipe.ProductPSet[item] * GetProductivityBonus());
 			}
 			else
 			{
 				if (SelectedAssembler == null || !SelectedAssembler.IsBurner)
 					Trace.Fail(string.Format("input rate requested for {0} fuel while the assembler was either null or not a burner!", item));
-				return (BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] * (BaseRecipe.ProductCatalysts.Contains(item) ? 1 : GetProductivityMultiplier()) : 0) + inputRateForFuel();
+				return (BaseRecipe.ProductSet.ContainsKey(item) ? BaseRecipe.ProductSet[item] + (BaseRecipe.ProductPSet[item] * GetProductivityBonus()) : 0) + inputRateForFuel();
 			}
 		}
 
@@ -388,7 +388,7 @@ namespace Foreman
 
 		public double GetConsumptionMultiplier() => MyNode.GetConsumptionMultiplier();
 		public double GetSpeedMultiplier() => MyNode.GetSpeedMultiplier();
-		public double GetProductivityMultiplier() => MyNode.GetProductivityMultiplier();
+		public double GetProductivityMultiplier() => MyNode.GetProductivityBonus() + 1;
 		public double GetPollutionMultiplier() => MyNode.GetPollutionMultiplier();
 
 		//------------------------------------------------------------------------ warning / errors functions

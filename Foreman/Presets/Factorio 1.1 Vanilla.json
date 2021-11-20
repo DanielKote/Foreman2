@@ -5689,7 +5689,8 @@
         {
           "name": "assembling-machine-1",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Assembling machine 1"
@@ -5719,7 +5720,8 @@
         {
           "name": "automation-science-pack",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Automation science pack"
@@ -5744,7 +5746,8 @@
         {
           "name": "firearm-magazine",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Firearm magazine"
@@ -5774,7 +5777,8 @@
         {
           "name": "pistol",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Pistol"
@@ -5809,7 +5813,8 @@
         {
           "name": "piercing-rounds-magazine",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Piercing rounds magazine"
@@ -5844,7 +5849,8 @@
         {
           "name": "submachine-gun",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Submachine gun"
@@ -5874,7 +5880,8 @@
         {
           "name": "uranium-rounds-magazine",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Uranium rounds magazine"
@@ -5914,7 +5921,8 @@
         {
           "name": "beacon",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Beacon"
@@ -5944,7 +5952,8 @@
         {
           "name": "burner-inserter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Burner inserter"
@@ -5969,7 +5978,8 @@
         {
           "name": "copper-cable",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Copper cable"
@@ -5999,7 +6009,8 @@
         {
           "name": "electric-energy-interface",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Electric energy interface"
@@ -6034,7 +6045,8 @@
         {
           "name": "solar-panel-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Portable solar panel"
@@ -6064,7 +6076,8 @@
         {
           "name": "fusion-reactor-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Portable fusion reactor"
@@ -6094,7 +6107,8 @@
         {
           "name": "small-electric-pole",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Small electric pole"
@@ -6129,7 +6143,8 @@
         {
           "name": "medium-electric-pole",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Medium electric pole"
@@ -6164,7 +6179,8 @@
         {
           "name": "big-electric-pole",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Big electric pole"
@@ -6199,7 +6215,8 @@
         {
           "name": "substation",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Substation"
@@ -6234,7 +6251,8 @@
         {
           "name": "sulfuric-acid",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Sulfuric acid"
@@ -6264,7 +6282,8 @@
         {
           "name": "grenade",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Grenade"
@@ -6299,7 +6318,8 @@
         {
           "name": "cluster-grenade",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Cluster grenade"
@@ -6334,7 +6354,8 @@
         {
           "name": "burner-mining-drill",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Burner mining drill"
@@ -6359,7 +6380,8 @@
         {
           "name": "wooden-chest",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Wooden chest"
@@ -6394,7 +6416,8 @@
         {
           "name": "electric-mining-drill",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Electric mining drill"
@@ -6419,7 +6442,8 @@
         {
           "name": "iron-chest",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Iron chest"
@@ -6444,7 +6468,8 @@
         {
           "name": "steel-chest",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Steel chest"
@@ -6469,7 +6494,8 @@
         {
           "name": "light-armor",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Light armor"
@@ -6504,7 +6530,8 @@
         {
           "name": "small-lamp",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Lamp"
@@ -6529,7 +6556,8 @@
         {
           "name": "petroleum-gas",
           "type": "fluid",
-          "amount": 45
+          "amount": 45,
+          "p_amount": 45
         }
       ],
       "localised_name": "Basic oil processing"
@@ -6559,17 +6587,20 @@
         {
           "name": "heavy-oil",
           "type": "fluid",
-          "amount": 25
+          "amount": 25,
+          "p_amount": 25
         },
         {
           "name": "light-oil",
           "type": "fluid",
-          "amount": 45
+          "amount": 45,
+          "p_amount": 45
         },
         {
           "name": "petroleum-gas",
           "type": "fluid",
-          "amount": 55
+          "amount": 55,
+          "p_amount": 55
         }
       ],
       "localised_name": "Advanced oil processing"
@@ -6605,17 +6636,19 @@
           "name": "heavy-oil",
           "type": "fluid",
           "amount": 90,
-          "catalyst": true
+          "p_amount": 65
         },
         {
           "name": "light-oil",
           "type": "fluid",
-          "amount": 20
+          "amount": 20,
+          "p_amount": 20
         },
         {
           "name": "petroleum-gas",
           "type": "fluid",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Coal liquefaction"
@@ -6640,7 +6673,8 @@
         {
           "name": "pipe",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Pipe"
@@ -6670,7 +6704,8 @@
         {
           "name": "pipe-to-ground",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Pipe to ground"
@@ -6700,7 +6735,8 @@
         {
           "name": "logistic-robot",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Logistic robot"
@@ -6730,7 +6766,8 @@
         {
           "name": "construction-robot",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Construction robot"
@@ -6760,7 +6797,8 @@
         {
           "name": "energy-shield-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Energy shield"
@@ -6795,7 +6833,8 @@
         {
           "name": "energy-shield-mk2-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Energy shield MK2"
@@ -6825,7 +6864,8 @@
         {
           "name": "speed-module",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Speed module"
@@ -6860,7 +6900,8 @@
         {
           "name": "speed-module-2",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Speed module 2"
@@ -6895,7 +6936,8 @@
         {
           "name": "speed-module-3",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Speed module 3"
@@ -6920,7 +6962,8 @@
         {
           "name": "stone-brick",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Stone brick"
@@ -6945,7 +6988,8 @@
         {
           "name": "stone-furnace",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Stone furnace"
@@ -6970,7 +7014,8 @@
         {
           "name": "stone-wall",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Wall"
@@ -7005,7 +7050,8 @@
         {
           "name": "rail",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Rail"
@@ -7045,7 +7091,8 @@
         {
           "name": "train-stop",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Train stop"
@@ -7075,7 +7122,8 @@
         {
           "name": "rail-signal",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rail signal"
@@ -7105,7 +7153,8 @@
         {
           "name": "rail-chain-signal",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rail chain signal"
@@ -7140,7 +7189,8 @@
         {
           "name": "locomotive",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Locomotive"
@@ -7175,7 +7225,8 @@
         {
           "name": "cargo-wagon",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Cargo wagon"
@@ -7215,7 +7266,8 @@
         {
           "name": "fluid-wagon",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fluid wagon"
@@ -7260,7 +7312,8 @@
         {
           "name": "artillery-wagon",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Artillery wagon"
@@ -7290,7 +7343,8 @@
         {
           "name": "transport-belt",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Transport belt"
@@ -7320,7 +7374,8 @@
         {
           "name": "fast-transport-belt",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fast transport belt"
@@ -7355,7 +7410,8 @@
         {
           "name": "express-transport-belt",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Express transport belt"
@@ -7390,7 +7446,8 @@
         {
           "name": "gate",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Gate"
@@ -7425,7 +7482,8 @@
         {
           "name": "personal-laser-defense-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Personal laser defense"
@@ -7460,7 +7518,8 @@
         {
           "name": "discharge-defense-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Discharge defense"
@@ -7485,7 +7544,8 @@
         {
           "name": "discharge-defense-remote",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Discharge defense remote"
@@ -7525,7 +7585,8 @@
         {
           "name": "assembling-machine-2",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Assembling machine 2"
@@ -7555,7 +7616,8 @@
         {
           "name": "battery-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Personal battery"
@@ -7590,7 +7652,8 @@
         {
           "name": "battery-mk2-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Personal battery MK2"
@@ -7625,7 +7688,8 @@
         {
           "name": "concrete",
           "type": "item",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Concrete"
@@ -7650,7 +7714,8 @@
         {
           "name": "hazard-concrete",
           "type": "item",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Hazard concrete"
@@ -7690,7 +7755,8 @@
         {
           "name": "refined-concrete",
           "type": "item",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Refined concrete"
@@ -7715,7 +7781,8 @@
         {
           "name": "refined-hazard-concrete",
           "type": "item",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Refined hazard concrete"
@@ -7745,7 +7812,8 @@
         {
           "name": "crude-oil-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fill Crude oil barrel"
@@ -7775,7 +7843,8 @@
         {
           "name": "heavy-oil-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fill Heavy oil barrel"
@@ -7805,7 +7874,8 @@
         {
           "name": "light-oil-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fill Light oil barrel"
@@ -7835,7 +7905,8 @@
         {
           "name": "lubricant-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fill Lubricant barrel"
@@ -7865,7 +7936,8 @@
         {
           "name": "petroleum-gas-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fill Petroleum gas barrel"
@@ -7895,7 +7967,8 @@
         {
           "name": "sulfuric-acid-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fill Sulfuric acid barrel"
@@ -7925,7 +7998,8 @@
         {
           "name": "water-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fill Water barrel"
@@ -7955,7 +8029,8 @@
         {
           "name": "light-oil",
           "type": "fluid",
-          "amount": 30
+          "amount": 30,
+          "p_amount": 30
         }
       ],
       "localised_name": "Heavy oil cracking to light oil"
@@ -7985,7 +8060,8 @@
         {
           "name": "petroleum-gas",
           "type": "fluid",
-          "amount": 20
+          "amount": 20,
+          "p_amount": 20
         }
       ],
       "localised_name": "Light oil cracking to petroleum gas"
@@ -8010,7 +8086,8 @@
         {
           "name": "solid-fuel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Solid fuel"
@@ -8035,7 +8112,8 @@
         {
           "name": "solid-fuel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Solid fuel"
@@ -8060,7 +8138,8 @@
         {
           "name": "solid-fuel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Solid fuel"
@@ -8090,7 +8169,8 @@
         {
           "name": "storage-tank",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Storage tank"
@@ -8125,7 +8205,8 @@
         {
           "name": "offshore-pump",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Offshore pump"
@@ -8165,7 +8246,8 @@
         {
           "name": "pumpjack",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Pumpjack"
@@ -8195,7 +8277,8 @@
         {
           "name": "heavy-armor",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Heavy armor"
@@ -8230,7 +8313,8 @@
         {
           "name": "inserter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Inserter"
@@ -8255,7 +8339,8 @@
         {
           "name": "iron-plate",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Iron plate"
@@ -8280,7 +8365,8 @@
         {
           "name": "iron-stick",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Iron stick"
@@ -8310,7 +8396,8 @@
         {
           "name": "logistic-science-pack",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Logistic science pack"
@@ -8345,7 +8432,8 @@
         {
           "name": "car",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Car"
@@ -8385,7 +8473,8 @@
         {
           "name": "tank",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Tank"
@@ -8445,7 +8534,8 @@
         {
           "name": "spidertron",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Spidertron"
@@ -8475,7 +8565,8 @@
         {
           "name": "spidertron-remote",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Spidertron remote"
@@ -8510,7 +8601,8 @@
         {
           "name": "pump",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Pump"
@@ -8545,7 +8637,8 @@
         {
           "name": "poison-capsule",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Poison capsule"
@@ -8575,7 +8668,8 @@
         {
           "name": "repair-pack",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Repair pack"
@@ -8615,7 +8709,8 @@
         {
           "name": "shotgun",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Shotgun"
@@ -8645,7 +8740,8 @@
         {
           "name": "shotgun-shell",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Shotgun shells"
@@ -8685,7 +8781,8 @@
         {
           "name": "combat-shotgun",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Combat shotgun"
@@ -8720,7 +8817,8 @@
         {
           "name": "piercing-shotgun-shell",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Piercing shotgun shells"
@@ -8750,7 +8848,8 @@
         {
           "name": "boiler",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Boiler"
@@ -8785,7 +8884,8 @@
         {
           "name": "steam-engine",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Steam engine"
@@ -8815,7 +8915,8 @@
         {
           "name": "steel-furnace",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Steel furnace"
@@ -8850,7 +8951,8 @@
         {
           "name": "logistic-chest-active-provider",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Active provider chest"
@@ -8885,7 +8987,8 @@
         {
           "name": "logistic-chest-passive-provider",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Passive provider chest"
@@ -8920,7 +9023,8 @@
         {
           "name": "logistic-chest-storage",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Storage chest"
@@ -8955,7 +9059,8 @@
         {
           "name": "logistic-chest-buffer",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Buffer chest"
@@ -8990,7 +9095,8 @@
         {
           "name": "logistic-chest-requester",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Requester chest"
@@ -9025,7 +9131,8 @@
         {
           "name": "gun-turret",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Gun turret"
@@ -9060,7 +9167,8 @@
         {
           "name": "laser-turret",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Laser turret"
@@ -9100,7 +9208,8 @@
         {
           "name": "flamethrower-turret",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Flamethrower turret"
@@ -9140,7 +9249,8 @@
         {
           "name": "artillery-turret",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Artillery turret"
@@ -9170,7 +9280,8 @@
         {
           "name": "artillery-targeting-remote",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Artillery targeting remote"
@@ -9200,7 +9311,8 @@
         {
           "name": "underground-belt",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Underground belt"
@@ -9230,7 +9342,8 @@
         {
           "name": "fast-underground-belt",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Fast underground belt"
@@ -9265,7 +9378,8 @@
         {
           "name": "express-underground-belt",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Express underground belt"
@@ -9295,7 +9409,8 @@
         {
           "name": "red-wire",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Red wire"
@@ -9325,7 +9440,8 @@
         {
           "name": "green-wire",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Green wire"
@@ -9355,7 +9471,8 @@
         {
           "name": "assembling-machine-3",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Assembling machine 3"
@@ -9385,7 +9502,8 @@
         {
           "name": "belt-immunity-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Belt immunity equipment"
@@ -9415,7 +9533,8 @@
         {
           "name": "arithmetic-combinator",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Arithmetic combinator"
@@ -9445,7 +9564,8 @@
         {
           "name": "decider-combinator",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Decider combinator"
@@ -9475,7 +9595,8 @@
         {
           "name": "constant-combinator",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Constant combinator"
@@ -9500,7 +9621,8 @@
         {
           "name": "copper-plate",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Copper plate"
@@ -9530,7 +9652,8 @@
         {
           "name": "effectivity-module",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Efficiency module"
@@ -9565,7 +9688,8 @@
         {
           "name": "effectivity-module-2",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Efficiency module 2"
@@ -9600,7 +9724,8 @@
         {
           "name": "effectivity-module-3",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Efficiency module 3"
@@ -9635,7 +9760,8 @@
         {
           "name": "electric-furnace",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Electric furnace"
@@ -9660,12 +9786,14 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "crude-oil",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Empty Crude oil barrel"
@@ -9690,12 +9818,14 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "heavy-oil",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Empty Heavy oil barrel"
@@ -9720,12 +9850,14 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "light-oil",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Empty Light oil barrel"
@@ -9750,12 +9882,14 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "lubricant",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Empty Lubricant barrel"
@@ -9780,12 +9914,14 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "petroleum-gas",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Empty Petroleum gas barrel"
@@ -9810,12 +9946,14 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "sulfuric-acid",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Empty Sulfuric acid barrel"
@@ -9840,12 +9978,14 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "water",
           "type": "fluid",
-          "amount": 50
+          "amount": 50,
+          "p_amount": 50
         }
       ],
       "localised_name": "Empty Water barrel"
@@ -9870,7 +10010,8 @@
         {
           "name": "iron-gear-wheel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Iron gear wheel"
@@ -9895,7 +10036,8 @@
         {
           "name": "landfill",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Landfill"
@@ -9930,7 +10072,8 @@
         {
           "name": "long-handed-inserter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Long-handed inserter"
@@ -9965,7 +10108,8 @@
         {
           "name": "military-science-pack",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Military science pack"
@@ -9995,7 +10139,8 @@
         {
           "name": "modular-armor",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Modular armor"
@@ -10025,7 +10170,8 @@
         {
           "name": "productivity-module",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Productivity module"
@@ -10060,7 +10206,8 @@
         {
           "name": "productivity-module-2",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Productivity module 2"
@@ -10095,7 +10242,8 @@
         {
           "name": "productivity-module-3",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Productivity module 3"
@@ -10130,7 +10278,8 @@
         {
           "name": "roboport",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Roboport"
@@ -10165,7 +10314,8 @@
         {
           "name": "slowdown-capsule",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Slowdown capsule"
@@ -10200,7 +10350,8 @@
         {
           "name": "splitter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Splitter"
@@ -10235,7 +10386,8 @@
         {
           "name": "fast-splitter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fast splitter"
@@ -10275,7 +10427,8 @@
         {
           "name": "express-splitter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Express splitter"
@@ -10310,7 +10463,8 @@
         {
           "name": "cannon-shell",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Cannon shell"
@@ -10345,7 +10499,8 @@
         {
           "name": "explosive-cannon-shell",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Explosive cannon shell"
@@ -10375,7 +10530,8 @@
         {
           "name": "uranium-cannon-shell",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Uranium cannon shell"
@@ -10410,7 +10566,8 @@
         {
           "name": "chemical-science-pack",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Chemical science pack"
@@ -10445,7 +10602,8 @@
         {
           "name": "cliff-explosives",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Cliff explosives"
@@ -10480,7 +10638,8 @@
         {
           "name": "defender-capsule",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Defender capsule"
@@ -10505,7 +10664,8 @@
         {
           "name": "empty-barrel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Empty barrel"
@@ -10540,7 +10700,8 @@
         {
           "name": "exoskeleton-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Exoskeleton"
@@ -10570,7 +10731,8 @@
         {
           "name": "explosive-uranium-cannon-shell",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Explosive uranium cannon shell"
@@ -10605,7 +10767,8 @@
         {
           "name": "artillery-shell",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Artillery shell"
@@ -10640,7 +10803,8 @@
         {
           "name": "fast-inserter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fast inserter"
@@ -10685,7 +10849,8 @@
         {
           "name": "loader",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Loader"
@@ -10715,7 +10880,8 @@
         {
           "name": "fast-loader",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Fast loader"
@@ -10745,7 +10911,8 @@
         {
           "name": "express-loader",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Express loader"
@@ -10780,7 +10947,8 @@
         {
           "name": "power-switch",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Power switch"
@@ -10820,7 +10988,8 @@
         {
           "name": "programmable-speaker",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Programmable speaker"
@@ -10855,7 +11024,8 @@
         {
           "name": "power-armor",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Power armor"
@@ -10890,7 +11060,8 @@
         {
           "name": "radar",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Radar"
@@ -10935,7 +11106,8 @@
         {
           "name": "oil-refinery",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Oil refinery"
@@ -10970,7 +11142,8 @@
         {
           "name": "rocket-launcher",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rocket launcher"
@@ -11005,7 +11178,8 @@
         {
           "name": "rocket",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rocket"
@@ -11035,7 +11209,8 @@
         {
           "name": "explosive-rocket",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Explosive rocket"
@@ -11070,7 +11245,8 @@
         {
           "name": "atomic-bomb",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Atomic bomb"
@@ -11105,7 +11281,8 @@
         {
           "name": "solar-panel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Solar panel"
@@ -11130,7 +11307,8 @@
         {
           "name": "steel-plate",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Steel plate"
@@ -11160,7 +11338,8 @@
         {
           "name": "accumulator",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Accumulator"
@@ -11200,7 +11379,8 @@
         {
           "name": "chemical-plant",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Chemical plant"
@@ -11230,7 +11410,8 @@
         {
           "name": "distractor-capsule",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Distractor capsule"
@@ -11260,7 +11441,8 @@
         {
           "name": "electronic-circuit",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Electronic circuit"
@@ -11290,7 +11472,8 @@
         {
           "name": "filter-inserter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Filter inserter"
@@ -11320,7 +11503,8 @@
         {
           "name": "flamethrower",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Flamethrower"
@@ -11350,7 +11534,8 @@
         {
           "name": "flamethrower-ammo",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Flamethrower ammo"
@@ -11375,7 +11560,8 @@
         {
           "name": "lubricant",
           "type": "fluid",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Lubricant"
@@ -11420,7 +11606,8 @@
         {
           "name": "power-armor-mk2",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Power armor MK2"
@@ -11455,7 +11642,8 @@
         {
           "name": "production-science-pack",
           "type": "item",
-          "amount": 3
+          "amount": 3,
+          "p_amount": 3
         }
       ],
       "localised_name": "Production science pack"
@@ -11495,7 +11683,8 @@
         {
           "name": "personal-roboport-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Personal roboport"
@@ -11530,7 +11719,8 @@
         {
           "name": "personal-roboport-mk2-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Personal roboport MK2"
@@ -11575,7 +11765,8 @@
         {
           "name": "rocket-silo",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rocket silo"
@@ -11610,7 +11801,8 @@
         {
           "name": "advanced-circuit",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Advanced circuit"
@@ -11640,7 +11832,8 @@
         {
           "name": "destroyer-capsule",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Destroyer capsule"
@@ -11670,7 +11863,8 @@
         {
           "name": "land-mine",
           "type": "item",
-          "amount": 4
+          "amount": 4,
+          "p_amount": 4
         }
       ],
       "localised_name": "Land mine"
@@ -11700,7 +11894,8 @@
         {
           "name": "night-vision-equipment",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Nightvision"
@@ -11740,7 +11935,8 @@
         {
           "name": "nuclear-reactor",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Nuclear reactor"
@@ -11770,7 +11966,8 @@
         {
           "name": "heat-pipe",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Heat pipe"
@@ -11805,7 +12002,8 @@
         {
           "name": "heat-exchanger",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Heat exchanger"
@@ -11840,7 +12038,8 @@
         {
           "name": "steam-turbine",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Steam turbine"
@@ -11870,7 +12069,8 @@
         {
           "name": "plastic-bar",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Plastic bar"
@@ -11910,7 +12110,8 @@
         {
           "name": "stack-inserter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Stack inserter"
@@ -11945,7 +12146,8 @@
         {
           "name": "utility-science-pack",
           "type": "item",
-          "amount": 3
+          "amount": 3,
+          "p_amount": 3
         }
       ],
       "localised_name": "Utility science pack"
@@ -11985,7 +12187,8 @@
         {
           "name": "centrifuge",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Centrifuge"
@@ -12020,7 +12223,8 @@
         {
           "name": "lab",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Lab"
@@ -12055,7 +12259,8 @@
         {
           "name": "processing-unit",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Processing unit"
@@ -12085,7 +12290,8 @@
         {
           "name": "stack-filter-inserter",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Stack filter inserter"
@@ -12115,7 +12321,8 @@
         {
           "name": "sulfur",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Sulfur"
@@ -12150,7 +12357,8 @@
         {
           "name": "battery",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Battery"
@@ -12185,7 +12393,8 @@
         {
           "name": "engine-unit",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Engine unit"
@@ -12220,7 +12429,8 @@
         {
           "name": "electric-engine-unit",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Electric engine unit"
@@ -12255,7 +12465,8 @@
         {
           "name": "explosives",
           "type": "item",
-          "amount": 2
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Explosives"
@@ -12280,12 +12491,14 @@
         {
           "name": "uranium-235",
           "type": "item",
-          "amount": 0.007000000000000001
+          "amount": 0.007000000000000001,
+          "p_amount": 0.007000000000000001
         },
         {
           "name": "uranium-238",
           "type": "item",
-          "amount": 0.993
+          "amount": 0.993,
+          "p_amount": 0.993
         }
       ],
       "localised_name": "Uranium processing"
@@ -12325,7 +12538,8 @@
         {
           "name": "flying-robot-frame",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Flying robot frame"
@@ -12375,7 +12589,8 @@
         {
           "name": "satellite",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Satellite"
@@ -12405,7 +12620,8 @@
         {
           "name": "rocket-control-unit",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rocket control unit"
@@ -12440,7 +12656,8 @@
         {
           "name": "low-density-structure",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Low density structure"
@@ -12470,7 +12687,8 @@
         {
           "name": "rocket-fuel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rocket fuel"
@@ -12505,7 +12723,8 @@
         {
           "name": "rocket-part",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Rocket part"
@@ -12535,7 +12754,8 @@
         {
           "name": "nuclear-fuel",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Nuclear fuel"
@@ -12570,7 +12790,8 @@
         {
           "name": "uranium-fuel-cell",
           "type": "item",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Uranium fuel cell"
@@ -12595,7 +12816,8 @@
         {
           "name": "uranium-238",
           "type": "item",
-          "amount": 3
+          "amount": 3,
+          "p_amount": 3
         }
       ],
       "localised_name": "Nuclear fuel reprocessing"
@@ -12626,13 +12848,13 @@
           "name": "uranium-235",
           "type": "item",
           "amount": 41,
-          "catalyst": true
+          "p_amount": 1
         },
         {
           "name": "uranium-238",
           "type": "item",
           "amount": 2,
-          "catalyst": true
+          "p_amount": 0
         }
       ],
       "localised_name": "Kovarex enrichment process"
