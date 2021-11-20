@@ -32,6 +32,7 @@
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.MenuTable = new System.Windows.Forms.TableLayoutPanel();
 			this.MenuButtonsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.SaveButton = new System.Windows.Forms.Button();
 			this.AddItemButton = new System.Windows.Forms.Button();
 			this.AddRecipeButton = new System.Windows.Forms.Button();
 			this.ExportImageButton = new System.Windows.Forms.Button();
@@ -56,7 +57,6 @@
 			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.GraphSummaryButton = new System.Windows.Forms.Button();
 			this.VersionLabel = new System.Windows.Forms.Label();
-			this.SaveButton = new System.Windows.Forms.Button();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MenuTable.SuspendLayout();
 			this.MenuButtonsTable.SuspendLayout();
@@ -158,6 +158,20 @@
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.MenuButtonsTable.Size = new System.Drawing.Size(245, 120);
 			this.MenuButtonsTable.TabIndex = 0;
+			// 
+			// SaveButton
+			// 
+			this.SaveButton.AutoSize = true;
+			this.SaveButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.SaveButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.SaveButton.Location = new System.Drawing.Point(2, 32);
+			this.SaveButton.Margin = new System.Windows.Forms.Padding(2);
+			this.SaveButton.Name = "SaveButton";
+			this.SaveButton.Size = new System.Drawing.Size(71, 26);
+			this.SaveButton.TabIndex = 12;
+			this.SaveButton.Text = "Save";
+			this.SaveButton.UseVisualStyleBackColor = true;
+			this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
 			// 
 			// AddItemButton
 			// 
@@ -520,22 +534,8 @@
 			this.VersionLabel.Name = "VersionLabel";
 			this.VersionLabel.Size = new System.Drawing.Size(115, 130);
 			this.VersionLabel.TabIndex = 18;
-			this.VersionLabel.Text = "Foreman v2.0 - dev.11";
+			this.VersionLabel.Text = "Foreman v2.0 - dev.12";
 			this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// SaveButton
-			// 
-			this.SaveButton.AutoSize = true;
-			this.SaveButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.SaveButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.SaveButton.Location = new System.Drawing.Point(2, 32);
-			this.SaveButton.Margin = new System.Windows.Forms.Padding(2);
-			this.SaveButton.Name = "SaveButton";
-			this.SaveButton.Size = new System.Drawing.Size(71, 26);
-			this.SaveButton.TabIndex = 12;
-			this.SaveButton.Text = "Save";
-			this.SaveButton.UseVisualStyleBackColor = true;
-			this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
 			// 
 			// MainForm
 			// 
