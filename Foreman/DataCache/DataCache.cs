@@ -316,6 +316,8 @@ namespace Foreman
 
 		public void Clear()
 		{
+			RecipePrototype.ResetRecipeIDCounter();
+
 			includedMods.Clear();
 			technologies.Clear();
 			groups.Clear();

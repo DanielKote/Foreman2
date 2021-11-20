@@ -6,12 +6,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 
 namespace Foreman
 {
 	public partial class MainForm : Form
 	{
 		internal const string DefaultPreset = "Factorio 1.1 Vanilla";
+		private string savefilePath = null;
 
 		public MainForm()
 		{
@@ -24,88 +26,103 @@ namespace Foreman
 		{
 			WindowState = FormWindowState.Maximized;
 
-			List<Preset> validPresets = GetValidPresetsList();
-			if (validPresets != null && validPresets.Count > 0)
-			{
-				using (DataLoadForm form = new DataLoadForm(validPresets[0]))
-				{
-					form.StartPosition = FormStartPosition.Manual;
-					form.Left = this.Left + 150;
-					form.Top = this.Top + 200;
-					form.ShowDialog(); //LOAD FACTORIO DATA
-					GraphViewer.DCache = form.GetDataCache();
-					//gc collection is unnecessary - first data cache to be created.
-				}
+			Properties.Settings.Default.ForemanVersion = 5;
 
-				Properties.Settings.Default.ForemanVersion = 5;
+			if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
+				Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
+			GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)Properties.Settings.Default.DefaultRateUnit;
 
-				if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
-					Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
-				GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)Properties.Settings.Default.DefaultRateUnit;
+			if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
+				Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
+			GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
 
-				if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
-					Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
-				GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
+			if (!Enum.IsDefined(typeof(AssemblerSelector.Style), Properties.Settings.Default.DefaultAssemblerOption))
+				Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
+			GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
 
-				if (!Enum.IsDefined(typeof(AssemblerSelector.Style), Properties.Settings.Default.DefaultAssemblerOption))
-					Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
-				GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
+			GraphViewer.ArrowsOnLinks = Properties.Settings.Default.ArrowsOnLinks;
+			GraphViewer.DynamicLinkWidth = Properties.Settings.Default.DynamicLineWidth;
+			GraphViewer.ShowRecipeToolTip = Properties.Settings.Default.ShowRecipeToolTip;
+			GraphViewer.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
 
-				GraphViewer.ArrowsOnLinks = Properties.Settings.Default.ArrowsOnLinks;
-				GraphViewer.DynamicLinkWidth = Properties.Settings.Default.DynamicLineWidth;
-				GraphViewer.ShowRecipeToolTip = Properties.Settings.Default.ShowRecipeToolTip;
-				GraphViewer.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
+			if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
+				Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
+			GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
 
-				if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
-					Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
-				GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
+			if (!Enum.IsDefined(typeof(NodeDirection), Properties.Settings.Default.DefaultNodeDirection))
+				Properties.Settings.Default.DefaultNodeDirection = (int)NodeDirection.Up;
+			GraphViewer.Graph.DefaultNodeDirection = (NodeDirection)Properties.Settings.Default.DefaultNodeDirection;
 
-				if (!Enum.IsDefined(typeof(NodeDirection), Properties.Settings.Default.DefaultNodeDirection))
-					Properties.Settings.Default.DefaultNodeDirection = (int)NodeDirection.Up;
-				GraphViewer.Graph.DefaultNodeDirection = (NodeDirection)Properties.Settings.Default.DefaultNodeDirection;
+			GraphViewer.SmartNodeDirection = Properties.Settings.Default.SmartNodeDirection;
 
-				GraphViewer.SmartNodeDirection = Properties.Settings.Default.SmartNodeDirection;
+			GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
+			GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
+			GraphViewer.FlagOUSuppliedNodes = Properties.Settings.Default.FlagOUSuppliedNodes;
 
-				GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
-				GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
-				GraphViewer.FlagOUSuppliedNodes = Properties.Settings.Default.FlagOUSuppliedNodes;
+			GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
+			GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
+			GraphViewer.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
+			GraphViewer.ArrowRenderer.ShowOUNodeArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
 
-				GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
-				GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
-				GraphViewer.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
-				GraphViewer.ArrowRenderer.ShowOUNodeArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
+			RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
+			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
+			MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
+			MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
+			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
-				RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
-				RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
-				MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
-				MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
-				GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
+			GraphViewer.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
 
-				GraphViewer.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
-				GraphViewer.Graph.LowPriorityPower = 2f;
-				GraphViewer.Graph.PullOutputNodes = false;
-				GraphViewer.Graph.PullOutputNodesPower = 1f;
+			GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
+			IconViewCheckBox.Checked = GraphViewer.IconsOnly;
+			if (Properties.Settings.Default.IconsSize < 8) Properties.Settings.Default.IconsSize = 8;
+			if (Properties.Settings.Default.IconsSize > 256) Properties.Settings.Default.IconsSize = 256;
+			GraphViewer.IconsSize = Properties.Settings.Default.IconsSize;
 
-				GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
-				IconViewCheckBox.Checked = GraphViewer.IconsOnly;
-				if (Properties.Settings.Default.IconsSize < 8) Properties.Settings.Default.IconsSize = 8;
-				if (Properties.Settings.Default.IconsSize > 256) Properties.Settings.Default.IconsSize = 256;
-				GraphViewer.IconsSize = Properties.Settings.Default.IconsSize;
+			Properties.Settings.Default.Save();
 
-				Properties.Settings.Default.Save();
-
-				GraphViewer.Invalidate();
-				GraphViewer.Focus();
+			NewGraph();
+			GraphViewer.Invalidate();
+			GraphViewer.Focus();
 #if DEBUG
-				//await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }))), false, true);
-				//GraphViewer.Invalidate();
+			//LoadGraph(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }));
 #endif
-			}
 		}
 
-		//---------------------------------------------------------Save/Load/Clear/Help
+		//---------------------------------------------------------Save/Load/New/Exit
 
-		private void SaveGraphButton_Click(object sender, EventArgs e)
+
+		private void SaveButton_Click(object sender, EventArgs e)
+		{
+			if (savefilePath == null || !SaveGraph(savefilePath))
+				SaveGraphAs();
+		}
+
+		private void SaveAsGraphButton_Click(object sender, EventArgs e)
+		{
+			SaveGraphAs();
+		}
+
+		private void LoadGraphButton_Click(object sender, EventArgs e)
+		{
+			LoadGraph();
+		}
+
+		private void ImportGraphButton_Click(object sender, EventArgs e)
+		{
+			ImportGraph();
+		}
+
+		private void NewGraphButton_Click(object sender, EventArgs e)
+		{
+			NewGraph();
+		}
+
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			e.Cancel = !TestGraphSavedStatus();
+		}
+
+		private void SaveGraphAs()
 		{
 			SaveFileDialog dialog = new SaveFileDialog();
 			dialog.DefaultExt = ".fjson";
@@ -119,19 +136,28 @@ namespace Foreman
 			if (dialog.ShowDialog() != DialogResult.OK)
 				return;
 
+			SaveGraph(dialog.FileName);
+		}
+
+		private bool SaveGraph(string path)
+		{
 			var serialiser = JsonSerializer.Create();
 			serialiser.Formatting = Formatting.Indented;
-			var writer = new JsonTextWriter(new StreamWriter(dialog.FileName));
+			var writer = new JsonTextWriter(new StreamWriter(path));
 			try
 			{
 				GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
 				serialiser.Serialize(writer, GraphViewer);
+				savefilePath = path;
+				this.Text = "Foreman 2.0 - " + savefilePath;
+				return true;
 			}
 			catch (Exception exception)
 			{
 				MessageBox.Show("Could not save this file. See log for more details");
-				ErrorLogging.LogLine(String.Format("Error saving file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine(String.Format("Error saving file '{0}'. Error: '{1}'", path, exception.Message));
 				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
+				return false;
 			}
 			finally
 			{
@@ -139,8 +165,11 @@ namespace Foreman
 			}
 		}
 
-		private async void LoadGraphButton_Click(object sender, EventArgs e)
+		private void LoadGraph()
 		{
+			if (!TestGraphSavedStatus())
+				return;
+
 			OpenFileDialog dialog = new OpenFileDialog();
 			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
 			if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
@@ -150,14 +179,20 @@ namespace Foreman
 			if (dialog.ShowDialog() != DialogResult.OK)
 				return;
 
+			LoadGraph(dialog.FileName);
+		}
+
+		private async void LoadGraph(string path)
+		{
 			try
 			{
-				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(dialog.FileName)), false, true);
+				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(path)), false, true);
+				savefilePath = path;
 			}
 			catch (Exception exception)
 			{
 				MessageBox.Show("Could not load this file. See log for more details");
-				ErrorLogging.LogLine(String.Format("Error loading file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine(string.Format("Error loading file '{0}'. Error: '{1}'", path, exception.Message));
 				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
 			}
 
@@ -172,9 +207,47 @@ namespace Foreman
 
 			Properties.Settings.Default.Save();
 			GraphViewer.Invalidate();
+			this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 		}
 
-		private void ImportGraphButton_Click(object sender, EventArgs e)
+		private void NewGraph()
+		{
+			if (!TestGraphSavedStatus())
+				return;
+
+			GraphViewer.ClearGraph();
+			GraphViewer.Graph.LowPriorityPower = 2f;
+			GraphViewer.Graph.PullOutputNodes = false;
+			GraphViewer.Graph.PullOutputNodesPower = 1f;
+
+			List<Preset> validPresets = GetValidPresetsList();
+			if (validPresets != null && validPresets.Count > 0)
+			{
+				Properties.Settings.Default.CurrentPresetName = validPresets[0].Name;
+
+				using (DataLoadForm form = new DataLoadForm(validPresets[0]))
+				{
+					form.StartPosition = FormStartPosition.Manual;
+					form.Left = this.Left + 150;
+					form.Top = this.Top + 200;
+					form.ShowDialog(); //LOAD FACTORIO DATA
+					GraphViewer.DCache = form.GetDataCache();
+					GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
+				}
+
+				GraphViewer.Invalidate();
+				savefilePath = null;
+			}
+			else
+			{
+				Properties.Settings.Default.CurrentPresetName = "No Preset!";
+			}
+
+			Properties.Settings.Default.Save();
+			this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+		}
+
+		private void ImportGraph()
 		{
 			OpenFileDialog dialog = new OpenFileDialog();
 			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
@@ -185,22 +258,54 @@ namespace Foreman
 			if (dialog.ShowDialog() != DialogResult.OK)
 				return;
 
+			ImportGraph(dialog.FileName);
+		}
+
+		private void ImportGraph(string path)
+		{
 			try
 			{
-				GraphViewer.ImportNodesFromJson((JObject)JObject.Parse(File.ReadAllText(dialog.FileName))["ProductionGraph"], GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2)));
+				GraphViewer.ImportNodesFromJson((JObject)JObject.Parse(File.ReadAllText(path))["ProductionGraph"], GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2)));
 			}
 			catch (Exception exception)
 			{
 				MessageBox.Show("Could not import from this file. See log for more details");
-				ErrorLogging.LogLine(string.Format("Error importing from file '{0}'. Error: '{1}'", dialog.FileName, exception.Message));
+				ErrorLogging.LogLine(string.Format("Error importing from file '{0}'. Error: '{1}'", path, exception.Message));
 				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
 			}
 		}
 
-		private void ClearButton_Click(object sender, EventArgs e)
+		private bool TestGraphSavedStatus()
 		{
-			GraphViewer.ClearGraph();
-			GraphViewer.Invalidate();
+			if (savefilePath == null)
+			{
+				if (GraphViewer.Graph.Nodes.Any())
+					return MessageBox.Show("The current graph hasnt been saved!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+				else
+					return true;
+			}
+
+			if (!File.Exists(savefilePath))
+				return MessageBox.Show("The current graph's save file has been deleted!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+
+			StringBuilder stringBuilder = new StringBuilder();
+			var writer = new JsonTextWriter(new StringWriter(stringBuilder));
+
+			JsonSerializer serialiser = JsonSerializer.Create();
+			serialiser.Formatting = Formatting.Indented;
+			GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
+			serialiser.Serialize(writer, GraphViewer);
+
+			if (File.ReadAllText(savefilePath) != stringBuilder.ToString())
+			{
+				DialogResult result = MessageBox.Show("The current graph has been modified!\nDo you wish to save before continuing?", "Are you sure?", MessageBoxButtons.YesNoCancel);
+				if (result == DialogResult.Cancel)
+					return false;
+				if (result == DialogResult.OK)
+					SaveGraph(savefilePath);
+			}
+
+			return true;
 		}
 
 		//---------------------------------------------------------Settings/export/additem/addrecipe
@@ -389,6 +494,13 @@ namespace Foreman
 		{
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 			GraphViewer.AddItem(new Point(15, 15), location);
+		}
+
+		//---------------------------------------------------------Key & Mouse events
+
+		private void MainForm_KeyDown(object sender, KeyEventArgs e)
+		{
+			Console.WriteLine(e.KeyValue);
 		}
 
 		//---------------------------------------------------------Production Graph properties
