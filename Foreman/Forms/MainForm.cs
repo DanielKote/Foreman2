@@ -500,7 +500,9 @@ namespace Foreman
 
 		private void MainForm_KeyDown(object sender, KeyEventArgs e)
 		{
-			Console.WriteLine(e.KeyValue);
+			if(e.KeyCode == Keys.S && (Control.ModifierKeys & Keys.Control) == Keys.Control)
+				if (savefilePath == null || !SaveGraph(savefilePath))
+					SaveGraphAs();
 		}
 
 		//---------------------------------------------------------Production Graph properties
