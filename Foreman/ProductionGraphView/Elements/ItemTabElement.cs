@@ -66,16 +66,16 @@ namespace Foreman
 		{
 			borderPen = regularBorderPen;
 			text = GraphicsStuff.DoubleToString(recipeRate);
-
+			int textHeight = 10;
 			if (isOverproduced)
 			{
 				borderPen = overproducedBorderPen;
 				text = GraphicsStuff.DoubleToString(outputRate) + "\n" + text;
+				textHeight += 10;
 			}
 			else if (!Links.Any())
 				borderPen = disconnectedBorderPen;
 
-			int textHeight = (int)graphViewer.CreateGraphics().MeasureString(text, textFont).Height;
 			Height = iconSize + textHeight + border + 3;
 		}
 
