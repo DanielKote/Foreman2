@@ -419,11 +419,13 @@ namespace Foreman
 				}
 
 				//save new preset (data)
-				File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".json"), dataJObject.ToString(Formatting.Indented));
+				File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".pjson"), dataJObject.ToString(Formatting.Indented));
+				File.Copy(Path.Combine(Application.StartupPath, "baseCustom.json"), Path.Combine(Application.StartupPath, presetPath + ".json"), true);
 #if DEBUG
 				File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconJObject.ToString(Formatting.Indented));
 				File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataJObject.ToString(Formatting.Indented));
 #endif
+
 				if (token.IsCancellationRequested)
 				{
 					process.Close();
@@ -482,6 +484,8 @@ namespace Foreman
 			if (modsPath != "" && Directory.Exists(Path.Combine(modsPath, "foremanexport_1.0.0")))
 				Directory.Delete(Path.Combine(modsPath, "foremanexport_1.0.0"), true);
 
+			if (presetPath != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".pjson")))
+				File.Delete(Path.Combine(Application.StartupPath, presetPath + ".pjson"));
 			if (presetPath != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".json")))
 				File.Delete(Path.Combine(Application.StartupPath, presetPath + ".json"));
 			if (presetPath != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".dat")))

@@ -13,7 +13,7 @@ namespace Foreman
 		public static PresetInfo ReadPresetInfo(Preset preset)
 		{
 			Dictionary<string, string> mods = new Dictionary<string, string>();
-			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
 			if (!File.Exists(presetPath))
 				return new PresetInfo(null, false, false);
 
@@ -43,7 +43,7 @@ namespace Foreman
 		//but on the +ve side any changes to preset json format is incorporated into data cache and requires no update to this function.
 		private static async Task<PresetErrorPackage> TestPresetThroughDataCache(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
 		{
-			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
 			if (!File.Exists(presetPath))
 				return null;
 
@@ -101,13 +101,27 @@ namespace Foreman
 		//any changes to preset json style have to be reflected here though (unlike for a full data cache loader above, which just incorporates any changes to data cache as long as they dont impact the outputs)
 		private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
 		{
-
-			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
+			string presetCustomPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
 			if (!File.Exists(presetPath))
 				return null;
 
 			//parse preset (note: this is preset data, so we are guaranteed to only have one name per item/recipe/mod/etc.)
 			JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
+			if (File.Exists(presetCustomPath))
+			{
+				JObject cjsonData = JObject.Parse(File.ReadAllText(presetCustomPath));
+				foreach (var groupToken in cjsonData)
+				{
+					foreach (JObject itemToken in groupToken.Value)
+					{
+						JObject presetItemToken = (JObject)jsonData[groupToken.Key].First(t => (string)t["name"] == (string)itemToken["name"]);
+						foreach (var parameter in itemToken)
+							presetItemToken[parameter.Key] = parameter.Value;
+					}
+				}
+			}
+
 			HashSet<string> presetItems = new HashSet<string>();
 			HashSet<string> presetEntities = new HashSet<string>();
 			Dictionary<string, RecipeShort> presetRecipes = new Dictionary<string, RecipeShort>();

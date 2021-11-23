@@ -333,6 +333,9 @@
       <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="baseCustom.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Foreman_TemporaryKey.pfx" />
     <None Include="Mods\foremanexport_1.0.0\info.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -365,7 +368,7 @@
     <None Include="Presets\Factorio 1.1 Vanilla.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Presets\Factorio 1.1 Vanilla.json">
+    <None Include="Presets\Factorio 1.1 Vanilla.pjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />

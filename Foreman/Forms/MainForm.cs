@@ -303,7 +303,7 @@ namespace Foreman
 		{
 			List<Preset> presets = new List<Preset>();
 			List<string> existingPresetFiles = new List<string>();
-			foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.json"))
+			foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.pjson"))
 				if (File.Exists(Path.ChangeExtension(presetFile, "dat")))
 					existingPresetFiles.Add(Path.GetFileNameWithoutExtension(presetFile));
 			existingPresetFiles.Sort();

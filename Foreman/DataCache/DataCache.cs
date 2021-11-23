@@ -205,7 +205,26 @@ namespace Foreman
 			Dictionary<Item, string> burnResults = new Dictionary<Item, string>();
 
 			PresetName = preset.Name;
-			JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
+
+
+			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
+			string presetCustomPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+
+			JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
+			if (File.Exists(presetCustomPath))
+			{
+				JObject cjsonData = JObject.Parse(File.ReadAllText(presetCustomPath));
+				foreach (var groupToken in cjsonData)
+				{
+					foreach (JObject itemToken in groupToken.Value)
+					{
+						JObject presetItemToken = (JObject)jsonData[groupToken.Key].First(t => (string)t["name"] == (string)itemToken["name"]);
+						foreach (var parameter in itemToken)
+							presetItemToken[parameter.Key] = parameter.Value;
+					}
+				}
+			}
+
 			Dictionary<string, IconColorPair> iconCache = loadIcons ? await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, 0, 90) : new Dictionary<string, IconColorPair>();
 
 			await Task.Run(() =>

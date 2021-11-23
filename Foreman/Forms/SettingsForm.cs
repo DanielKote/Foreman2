@@ -336,11 +336,14 @@ namespace Foreman
 			{
 				if (MessageBox.Show("Are you sure you wish to delete the \"" + selectedPreset.Name + "\" preset? This is irreversible.", "Confirm Delete", MessageBoxButtons.YesNo) == DialogResult.Yes)
 				{
-					string jsonPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".json" });
+					string jsonPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".pjson" });
+					string customjsonPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".json" });
 					string iconPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".dat" });
 
 					if (File.Exists(jsonPath))
 						File.Delete(jsonPath);
+					if (File.Exists(customjsonPath))
+						File.Delete(customjsonPath);
 					if (File.Exists(iconPath))
 						File.Delete(iconPath);
 
