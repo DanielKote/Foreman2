@@ -149,7 +149,7 @@ namespace Foreman
 				GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
 				serialiser.Serialize(writer, GraphViewer);
 				savefilePath = path;
-				this.Text = "Foreman 2.0 - " + savefilePath;
+				this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 				return true;
 			}
 			catch (Exception exception)
@@ -224,18 +224,7 @@ namespace Foreman
 			if (validPresets != null && validPresets.Count > 0)
 			{
 				Properties.Settings.Default.CurrentPresetName = validPresets[0].Name;
-
-				using (DataLoadForm form = new DataLoadForm(validPresets[0]))
-				{
-					form.StartPosition = FormStartPosition.Manual;
-					form.Left = this.Left + 150;
-					form.Top = this.Top + 200;
-					form.ShowDialog(); //LOAD FACTORIO DATA
-					GraphViewer.DCache = form.GetDataCache();
-					GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
-				}
-
-				GraphViewer.Invalidate();
+				GraphViewer.LoadPreset(validPresets[0]);
 				savefilePath = null;
 			}
 			else

@@ -17,11 +17,20 @@ namespace Foreman
 			if (!File.Exists(presetPath))
 				return new PresetInfo(null, false, false);
 
-			JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
-			foreach (var objJToken in jsonData["mods"].ToList())
-				mods.Add((string)objJToken["name"], (string)objJToken["version"]);
+			try
+			{
+				JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
+				foreach (var objJToken in jsonData["mods"].ToList())
+					mods.Add((string)objJToken["name"], (string)objJToken["version"]);
+				return new PresetInfo(mods, (int)jsonData["difficulty"][0] == 1, (int)jsonData["difficulty"][1] == 1);
+			}
+			catch
+			{
+				mods.Clear();
+				mods.Add("ERROR READING PRESET!", "");
+				return new PresetInfo(mods, false, false);
+			}
 
-			return new PresetInfo(mods, (int)jsonData["difficulty"][0] == 1, (int)jsonData["difficulty"][1] == 1);
 		}
 
 		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)

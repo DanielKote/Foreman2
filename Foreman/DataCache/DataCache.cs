@@ -121,6 +121,7 @@ namespace Foreman
 			missingRecipes = new Dictionary<RecipeShort, Recipe>(new RecipeShortNaInPrComparer());
 
 			GenerateHelperObjects();
+			Clear();
 		}
 
 		private void GenerateHelperObjects()
@@ -196,28 +197,20 @@ namespace Foreman
 		public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress, bool loadIcons = true)
 		{
 			Clear();
+
 			Dictionary<string, List<RecipePrototype>> craftingCategories = new Dictionary<string, List<RecipePrototype>>();
 			Dictionary<string, List<RecipePrototype>> resourceCategories = new Dictionary<string, List<RecipePrototype>>();
 			Dictionary<string, List<ItemPrototype>> fuelCategories = new Dictionary<string, List<ItemPrototype>>();
 			fuelCategories.Add("§§fc:liquids", new List<ItemPrototype>()); //the liquid fuels category
 			Dictionary<Item, string> burnResults = new Dictionary<Item, string>();
 
+			PresetName = preset.Name;
 			JObject jsonData = JObject.Parse(File.ReadAllText(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" })));
 			Dictionary<string, IconColorPair> iconCache = loadIcons ? await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, 0, 90) : new Dictionary<string, IconColorPair>();
-			PresetName = preset.Name;
 
 			await Task.Run(() =>
 			{
 				progress.Report(new KeyValuePair<int, string>(90, "Processing Data...")); //this is SUPER quick, so we dont need to worry about timing stuff here
-
-				groups.Add(extraFormanGroup.Name, extraFormanGroup);
-				subgroups.Add(extractionSubgroupItems.Name, extractionSubgroupItems);
-				subgroups.Add(extractionSubgroupFluids.Name, extractionSubgroupFluids);
-				subgroups.Add(extractionSubgroupFluidsOP.Name, extractionSubgroupFluidsOP);
-				items.Add(HeatItem.Name, HeatItem);
-				recipes.Add(HeatRecipe.Name, HeatRecipe);
-				recipes.Add(BurnerRecipe.Name, BurnerRecipe);
-				technologies.Add(StartingTech.Name, startingTech);
 
 				//process each section (order is rather important here)
 				foreach (var objJToken in jsonData["mods"].ToList())
@@ -333,6 +326,15 @@ namespace Foreman
 			missingModules.Clear();
 			missingBeacons.Clear();
 			missingRecipes.Clear();
+
+			groups.Add(extraFormanGroup.Name, extraFormanGroup);
+			subgroups.Add(extractionSubgroupItems.Name, extractionSubgroupItems);
+			subgroups.Add(extractionSubgroupFluids.Name, extractionSubgroupFluids);
+			subgroups.Add(extractionSubgroupFluidsOP.Name, extractionSubgroupFluidsOP);
+			items.Add(HeatItem.Name, HeatItem);
+			recipes.Add(HeatRecipe.Name, HeatRecipe);
+			recipes.Add(BurnerRecipe.Name, BurnerRecipe);
+			technologies.Add(StartingTech.Name, startingTech);
 		}
 
 		//------------------------------------------------------Import processing

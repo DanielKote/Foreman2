@@ -167,6 +167,12 @@ namespace Foreman
 
 		public void AddItem(Point drawOrigin, Point newLocation)
 		{
+			if (string.IsNullOrEmpty(DCache.PresetName))
+			{
+				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt.");
+				return;
+			}
+
 			SubwindowOpen = true;
 			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
 			itemChooser.ItemRequested += (o, itemRequestArgs) =>
@@ -180,6 +186,13 @@ namespace Foreman
 
 		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null, bool offsetLocationToItemTabLevel = false)
 		{
+			if(string.IsNullOrEmpty(DCache.PresetName))
+			{
+				DisposeLinkDrag();
+				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt.");
+				return;
+			}
+
 			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
 			
@@ -1136,6 +1149,35 @@ namespace Foreman
 			Graph.UpdateNodeValues();
 		}
 
+		public void LoadPreset(Preset preset)
+		{
+			using (DataLoadForm form = new DataLoadForm(preset))
+			{
+				form.StartPosition = FormStartPosition.Manual;
+				form.Left = ParentForm.Left + 150;
+				form.Top = ParentForm.Top + 200;
+				DialogResult result = form.ShowDialog(); //LOAD FACTORIO DATA
+				DCache = form.GetDataCache();
+				if (result == DialogResult.Abort)
+				{
+					MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 1.1 Vanilla)");
+					Properties.Settings.Default.CurrentPresetName = MainForm.DefaultPreset;
+					using (DataLoadForm form2 = new DataLoadForm(new Preset(MainForm.DefaultPreset, false, true)))
+					{
+						form2.StartPosition = FormStartPosition.Manual;
+						form2.Left = ParentForm.Left + 150;
+						form2.Top = ParentForm.Top + 200;
+						DialogResult result2 = form2.ShowDialog(); //LOAD default preset
+						DCache = form2.GetDataCache();
+						if (result2 == DialogResult.Abort)
+							MessageBox.Show("The default preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. No Preset is loaded!");
+					}
+				}
+				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
+			}
+			Invalidate();
+		}
+
 		public async Task LoadFromJson(JObject json, bool useFirstPreset, bool setEnablesFromJson)
 		{
 			if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraphViewer")
@@ -1221,15 +1263,7 @@ namespace Foreman
 			ClearGraph();
 
 			//load new preset
-			using (DataLoadForm form = new DataLoadForm(chosenPreset))
-			{
-				form.StartPosition = FormStartPosition.Manual;
-				form.Left = ParentForm.Left + 150;
-				form.Top = ParentForm.Top + 200;
-				form.ShowDialog(); //LOAD FACTORIO DATA
-				DCache = form.GetDataCache();
-				GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
-			}
+			LoadPreset(chosenPreset);
 
 			//set up graph options
 			Graph.SelectedRateUnit = (ProductionGraph.RateUnit)(int)json["Unit"];
