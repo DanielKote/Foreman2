@@ -608,6 +608,9 @@ namespace Foreman
 			foreach (Module module in Options.DCache.Modules.Values)
 				Options.EnabledObjects.Add(module);
 
+			foreach (Recipe recipe in Options.DCache.Recipes.Values.Where(r => r.Available))
+				Options.EnabledObjects.Add(recipe);
+
 			UpdateEnabledStatus();
 		}
 
