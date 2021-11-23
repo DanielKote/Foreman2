@@ -235,7 +235,7 @@ namespace Foreman
 				if (!moduleOptions[i].Available)
 					button.BackColor = ErrorColor;
 
-				button.Click += new EventHandler(AModuleOptionButton_Click);
+				button.MouseUp += new MouseEventHandler(AModuleOptionButton_Click);
 
 				AModulesChoiceTable.Controls.Add(button, AModuleOptions.Count % (AModulesChoiceTable.ColumnCount - 1), AModuleOptions.Count / (AModulesChoiceTable.ColumnCount - 1));
 				AModuleOptions.Add(button);
@@ -259,7 +259,7 @@ namespace Foreman
 				Button button = InitializeBaseButton(nodeData.AssemblerModules[i]);
 				if (nodeData.AssemblerModules[i].IsMissing || !nodeData.AssemblerModules[i].Available || !nodeData.AssemblerModules[i].Enabled || !moduleOptions.Contains(nodeData.AssemblerModules[i]) || i >= nodeData.SelectedAssembler.ModuleSlots)
 					button.BackColor = ErrorColor;
-				button.Click += new EventHandler(AModuleButton_Click);
+				button.MouseUp += new MouseEventHandler(AModuleButton_Click);
 
 				SelectedAModulesTable.Controls.Add(button, AssemblerModules.Count % (SelectedAModulesTable.ColumnCount - 1), AssemblerModules.Count / (SelectedAModulesTable.ColumnCount - 1));
 				AssemblerModules.Add(button);
@@ -322,7 +322,7 @@ namespace Foreman
 				if (!moduleOptions[i].Available)
 					button.BackColor = ErrorColor;
 
-				button.Click += new EventHandler(BModuleOptionButton_Click);
+				button.MouseUp += new MouseEventHandler(BModuleOptionButton_Click);
 
 				BModulesChoiceTable.Controls.Add(button, BModuleOptions.Count % (BModulesChoiceTable.ColumnCount - 1), BModuleOptions.Count / (BModulesChoiceTable.ColumnCount - 1));
 				BModuleOptions.Add(button);
@@ -347,7 +347,7 @@ namespace Foreman
 				Button button = InitializeBaseButton(nodeData.BeaconModules[i]);
 				if (nodeData.BeaconModules[i].IsMissing || !nodeData.BeaconModules[i].Available || !nodeData.BeaconModules[i].Enabled || !moduleOptions.Contains(nodeData.BeaconModules[i]) || i >= moduleSlots)
 					button.BackColor = ErrorColor;
-				button.Click += new EventHandler(BModuleButton_Click);
+				button.MouseUp += new MouseEventHandler(BModuleButton_Click);
 
 				SelectedBModulesTable.Controls.Add(button, BeaconModules.Count % (SelectedBModulesTable.ColumnCount - 1), BeaconModules.Count / (SelectedBModulesTable.ColumnCount - 1));
 				BeaconModules.Add(button);
@@ -486,18 +486,38 @@ namespace Foreman
 			myGraphViewer.Graph.UpdateNodeValues();
 			UpdateFuel();
 		}
-		private void AModuleButton_Click(object sender, EventArgs e)
+		private void AModuleButton_Click(object sender, MouseEventArgs e)
 		{
+			if (!new Rectangle(new Point(0,0),((Button)sender).Size).Contains(e.Location))
+				return;
+
 			ToolTip.Hide((Control)sender);
 			int index = AssemblerModules.IndexOf((Button)sender);
-			nodeController.RemoveAssemblerModule(index);
+
+			if (e.Button == MouseButtons.Left)
+				nodeController.RemoveAssemblerModule(index);
+			else if (e.Button == MouseButtons.Right)
+				nodeController.RemoveAssemblerModules(nodeData.AssemblerModules[index]);
+			else
+				return;
+
 			myGraphViewer.Graph.UpdateNodeValues();
 			UpdateAssemblerModules();
 		}
-		private void AModuleOptionButton_Click(object sender, EventArgs e)
+		private void AModuleOptionButton_Click(object sender, MouseEventArgs e)
 		{
+			if (!new Rectangle(new Point(0, 0), ((Button)sender).Size).Contains(e.Location))
+				return;
+
 			Module newModule = ((Button)sender).Tag as Module;
-			nodeController.AddAssemblerModule(newModule);
+
+			if (e.Button == MouseButtons.Left)
+				nodeController.AddAssemblerModule(newModule);
+			else if (e.Button == MouseButtons.Right)
+				nodeController.AddAssemblerModules(newModule);
+			else
+				return;
+
 			myGraphViewer.Graph.UpdateNodeValues();
 			UpdateAssemblerModules();
 		}
@@ -511,18 +531,38 @@ namespace Foreman
 			myGraphViewer.Graph.UpdateNodeValues();
 			UpdateBeacon();
 		}
-		private void BModuleButton_Click(object sender, EventArgs e)
+		private void BModuleButton_Click(object sender, MouseEventArgs e)
 		{
+			if (!new Rectangle(new Point(0, 0), ((Button)sender).Size).Contains(e.Location))
+				return;
+
 			ToolTip.Hide((Control)sender);
 			int index = BeaconModules.IndexOf((Button)sender);
+
+			if (e.Button == MouseButtons.Left)
+				nodeController.RemoveBeaconModule(index);
+			else if (e.Button == MouseButtons.Right)
+				nodeController.RemoveBeaconModules(nodeData.BeaconModules[index]);
+			else
+				return;
+
 			myGraphViewer.Graph.UpdateNodeValues();
-			nodeController.RemoveBeaconModule(index);
 			UpdateBeaconModules();
 		}
-		private void BModuleOptionButton_Click(object sender, EventArgs e)
+		private void BModuleOptionButton_Click(object sender, MouseEventArgs e)
 		{
+			if (!new Rectangle(new Point(0, 0), ((Button)sender).Size).Contains(e.Location))
+				return;
+
 			Module newModule = ((Button)sender).Tag as Module;
-			nodeController.AddBeaconModule(newModule);
+
+			if (e.Button == MouseButtons.Left)
+				nodeController.AddBeaconModule(newModule);
+			else if (e.Button == MouseButtons.Right)
+				nodeController.AddBeaconModules(newModule);
+			else
+				return;
+
 			myGraphViewer.Graph.UpdateNodeValues();
 			UpdateBeaconModules();
 		}

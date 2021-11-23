@@ -847,10 +847,23 @@ namespace Foreman
 			MyNode.UpdateState();
 		}
 
+		public void AddAssemblerModules(Module module)
+		{
+			while (MyNode.AssemblerModules.Count < MyNode.SelectedAssembler.ModuleSlots)
+				MyNode.AssemblerModules.Add(module);
+			MyNode.UpdateState();
+		}
+
 		public void RemoveAssemblerModule(int index)
 		{
 			if (index >= 0 && index < MyNode.AssemblerModules.Count)
 				MyNode.AssemblerModules.RemoveAt(index);
+			MyNode.UpdateState();
+		}
+
+		public void RemoveAssemblerModules(Module module)
+		{
+			MyNode.AssemblerModules.RemoveAll(m => m == module);
 			MyNode.UpdateState();
 		}
 
@@ -892,10 +905,23 @@ namespace Foreman
 			MyNode.UpdateState();
 		}
 
+		public void AddBeaconModules(Module module)
+		{
+			while(MyNode.BeaconModules.Count < MyNode.SelectedBeacon.ModuleSlots)
+				MyNode.BeaconModules.Add(module);
+			MyNode.UpdateState();
+		}
+
 		public void RemoveBeaconModule(int index)
 		{
 			if (index >= 0 && index < MyNode.BeaconModules.Count)
 				MyNode.BeaconModules.RemoveAt(index);
+			MyNode.UpdateState();
+		}
+
+		public void RemoveBeaconModules(Module module)
+		{
+			MyNode.BeaconModules.RemoveAll(m => m == module);
 			MyNode.UpdateState();
 		}
 
