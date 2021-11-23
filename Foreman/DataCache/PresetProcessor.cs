@@ -106,7 +106,6 @@ namespace Foreman
 			if (!File.Exists(presetPath))
 				return null;
 
-			//parse preset (note: this is preset data, so we are guaranteed to only have one name per item/recipe/mod/etc.)
 			JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
 			if (File.Exists(presetCustomPath))
 			{
@@ -122,6 +121,7 @@ namespace Foreman
 				}
 			}
 
+			//parse preset (note: this is preset data, so we are guaranteed to only have one name per item/recipe/mod/etc.)
 			HashSet<string> presetItems = new HashSet<string>();
 			HashSet<string> presetEntities = new HashSet<string>();
 			Dictionary<string, RecipeShort> presetRecipes = new Dictionary<string, RecipeShort>();
