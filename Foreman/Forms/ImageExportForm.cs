@@ -13,12 +13,19 @@ namespace Foreman
 {
 	public partial class ImageExportForm : Form
 	{
+		private readonly float[] multipliers = new float[] { 0.05f, 0.1f, 0.2f, 0.5f, 1f, 2f, 3f };
+		private readonly string[] multiplierNames = new string[] { "1/20", "1/10", "1/5", "1/2", "1", "2", "3" };
+		private readonly int initialIndex = 4;
+
 		private readonly ProductionGraphViewer graphViewer;
 
 		public ImageExportForm(ProductionGraphViewer graphViewer)
 		{
 			InitializeComponent();
 			this.graphViewer = graphViewer;
+
+			ScaleSelectionBox.Items.AddRange(multiplierNames);
+			ScaleSelectionBox.SelectedIndex = initialIndex;
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -50,13 +57,9 @@ namespace Foreman
 			}
 			else
 			{
-				int scale = 1;
-				if (Scale2xCheckBox.Checked)
-					scale = 2;
-				else if (Scale3xCheckBox.Checked)
-					scale = 3;
+				float scale = multipliers[ScaleSelectionBox.SelectedIndex];
 
-				Bitmap image = ViewLimitCheckBox.Checked? new Bitmap((int)(graphViewer.Width * scale / graphViewer.ViewScale), (int)(graphViewer.Height * scale / graphViewer.ViewScale)) : new Bitmap(graphViewer.Graph.Bounds.Width * scale, graphViewer.Graph.Bounds.Height * scale);
+				Bitmap image = ViewLimitCheckBox.Checked? new Bitmap((int)(graphViewer.Width * scale / graphViewer.ViewScale), (int)(graphViewer.Height * scale / graphViewer.ViewScale)) : new Bitmap((int)(graphViewer.Graph.Bounds.Width * scale), (int)(graphViewer.Graph.Bounds.Height * scale));
 				using (Graphics graphics = Graphics.FromImage(image))
 				{
 					graphics.ResetTransform();

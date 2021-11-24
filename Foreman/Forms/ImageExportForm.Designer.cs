@@ -32,11 +32,9 @@
 			this.button1 = new System.Windows.Forms.Button();
 			this.ExportButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.Scale3xCheckBox = new System.Windows.Forms.RadioButton();
-			this.Scale2xCheckBox = new System.Windows.Forms.RadioButton();
-			this.Scale1xCheckBox = new System.Windows.Forms.RadioButton();
 			this.TransparencyCheckBox = new System.Windows.Forms.CheckBox();
 			this.ViewLimitCheckBox = new System.Windows.Forms.CheckBox();
+			this.ScaleSelectionBox = new System.Windows.Forms.ComboBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -70,47 +68,13 @@
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.Scale3xCheckBox);
-			this.groupBox1.Controls.Add(this.Scale2xCheckBox);
-			this.groupBox1.Controls.Add(this.Scale1xCheckBox);
+			this.groupBox1.Controls.Add(this.ScaleSelectionBox);
 			this.groupBox1.Location = new System.Drawing.Point(13, 42);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(138, 52);
 			this.groupBox1.TabIndex = 3;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Scale";
-			// 
-			// Scale3xCheckBox
-			// 
-			this.Scale3xCheckBox.AutoSize = true;
-			this.Scale3xCheckBox.Location = new System.Drawing.Point(91, 19);
-			this.Scale3xCheckBox.Name = "Scale3xCheckBox";
-			this.Scale3xCheckBox.Size = new System.Drawing.Size(36, 17);
-			this.Scale3xCheckBox.TabIndex = 2;
-			this.Scale3xCheckBox.Text = "3x";
-			this.Scale3xCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// Scale2xCheckBox
-			// 
-			this.Scale2xCheckBox.AutoSize = true;
-			this.Scale2xCheckBox.Location = new System.Drawing.Point(49, 20);
-			this.Scale2xCheckBox.Name = "Scale2xCheckBox";
-			this.Scale2xCheckBox.Size = new System.Drawing.Size(36, 17);
-			this.Scale2xCheckBox.TabIndex = 1;
-			this.Scale2xCheckBox.Text = "2x";
-			this.Scale2xCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// Scale1xCheckBox
-			// 
-			this.Scale1xCheckBox.AutoSize = true;
-			this.Scale1xCheckBox.Checked = true;
-			this.Scale1xCheckBox.Location = new System.Drawing.Point(7, 20);
-			this.Scale1xCheckBox.Name = "Scale1xCheckBox";
-			this.Scale1xCheckBox.Size = new System.Drawing.Size(36, 17);
-			this.Scale1xCheckBox.TabIndex = 0;
-			this.Scale1xCheckBox.TabStop = true;
-			this.Scale1xCheckBox.Text = "1x";
-			this.Scale1xCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// TransparencyCheckBox
 			// 
@@ -132,11 +96,18 @@
 			this.ViewLimitCheckBox.Text = "Limit to View";
 			this.ViewLimitCheckBox.UseVisualStyleBackColor = true;
 			// 
+			// ScaleSelectionBox
+			// 
+			this.ScaleSelectionBox.Location = new System.Drawing.Point(6, 19);
+			this.ScaleSelectionBox.Name = "ScaleSelectionBox";
+			this.ScaleSelectionBox.Size = new System.Drawing.Size(121, 21);
+			this.ScaleSelectionBox.TabIndex = 6;
+			// 
 			// ImageExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(348, 149);
+			this.ClientSize = new System.Drawing.Size(348, 191);
 			this.Controls.Add(this.ViewLimitCheckBox);
 			this.Controls.Add(this.TransparencyCheckBox);
 			this.Controls.Add(this.groupBox1);
@@ -153,7 +124,6 @@
 			this.Text = "Export an Image";
 			this.TopMost = true;
 			this.groupBox1.ResumeLayout(false);
-			this.groupBox1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -165,10 +135,8 @@
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button ExportButton;
 		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.RadioButton Scale3xCheckBox;
-		private System.Windows.Forms.RadioButton Scale2xCheckBox;
-		private System.Windows.Forms.RadioButton Scale1xCheckBox;
 		private System.Windows.Forms.CheckBox TransparencyCheckBox;
 		private System.Windows.Forms.CheckBox ViewLimitCheckBox;
+		private System.Windows.Forms.ComboBox ScaleSelectionBox;
 	}
 }
