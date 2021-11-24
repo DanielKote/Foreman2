@@ -457,11 +457,20 @@ namespace Foreman
 								new EventHandler((o, e) =>
 								{
 									RightClickMenu.Close();
-									foreach (BaseNodeElement node in graphViewer.SelectedNodes)
+									if(graphViewer.SelectedNodes.Count == 0)
 									{
-										BaseNodeController controller = graphViewer.Graph.RequestNodeController(node.DisplayedNode);
+										BaseNodeController controller = graphViewer.Graph.RequestNodeController(this.DisplayedNode);
 										controller.SetKeyNode(keyNode);
 										controller.SetKeyNodeTitle(keyNodeTitle);
+									}
+									else if (graphViewer.SelectedNodes.Contains(this))
+									{
+										foreach (BaseNodeElement node in graphViewer.SelectedNodes)
+										{
+											BaseNodeController controller = graphViewer.Graph.RequestNodeController(node.DisplayedNode);
+											controller.SetKeyNode(keyNode);
+											controller.SetKeyNodeTitle(keyNodeTitle);
+										}
 									}
 								})));
 						}
