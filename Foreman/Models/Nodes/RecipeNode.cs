@@ -235,7 +235,7 @@ namespace Foreman
 				multiplier += module.SpeedBonus;
 			foreach (Module beaconModule in BeaconModules)
 				multiplier += beaconModule.SpeedBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
-			return multiplier;
+			return Math.Max(0.2f, multiplier);
 		}
 
 		public double GetProductivityBonus() //unlike the others, this is the bonus (aka: starts from 0%, not 100%)
@@ -245,7 +245,7 @@ namespace Foreman
 				multiplier += module.ProductivityBonus;
 			foreach (Module beaconModule in BeaconModules)
 				multiplier += beaconModule.ProductivityBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
-			return multiplier;
+			return Math.Max(0, multiplier);
 		}
 
 		public double GetConsumptionMultiplier()
@@ -255,7 +255,7 @@ namespace Foreman
 				multiplier += module.ConsumptionBonus;
 			foreach (Module beaconModule in BeaconModules)
 				multiplier += beaconModule.ConsumptionBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
-			return multiplier > 0.2f ? multiplier : 0.2f;
+			return Math.Max(0.2f, multiplier);
 		}
 
 		public double GetPollutionMultiplier()
@@ -265,7 +265,7 @@ namespace Foreman
 				multiplier += module.PollutionBonus;
 			foreach (Module beaconModule in BeaconModules)
 				multiplier += beaconModule.PollutionBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
-			return multiplier > 0.2f ? multiplier : 0.2f;
+			return Math.Max(0.2f, multiplier);
 		}
 
 		public override double GetConsumeRate(Item item) { return inputRateFor(item) * ActualRate; }
