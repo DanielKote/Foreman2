@@ -96,14 +96,6 @@ namespace Foreman
 					folderLinks.Add("__" + mod.Key.ToLower() + "__", foundFolder);
 				else
 				{
-					foreach(string file in files)
-					{
-						string filename = Path.GetFileName(file).ToLower();
-						string match = string.Format("{0}_{1}.zip", mod.Key, versionMatch);
-						bool test = Regex.IsMatch(filename, match);
-						if (test)
-							;
-					}	
 					string foundFile = files.FirstOrDefault(f => Regex.IsMatch(Path.GetFileName(f).ToLower(), string.Format("{0}_{1}.zip", mod.Key, versionMatch)));
 					if (foundFile == null)
 					{
