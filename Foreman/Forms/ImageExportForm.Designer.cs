@@ -32,9 +32,10 @@
 			this.button1 = new System.Windows.Forms.Button();
 			this.ExportButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.ScaleSelectionBox = new System.Windows.Forms.ComboBox();
 			this.TransparencyCheckBox = new System.Windows.Forms.CheckBox();
 			this.ViewLimitCheckBox = new System.Windows.Forms.CheckBox();
-			this.ScaleSelectionBox = new System.Windows.Forms.ComboBox();
+			this.ImageSizeLabel = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -58,9 +59,9 @@
 			// 
 			// ExportButton
 			// 
-			this.ExportButton.Location = new System.Drawing.Point(157, 42);
+			this.ExportButton.Location = new System.Drawing.Point(157, 100);
 			this.ExportButton.Name = "ExportButton";
-			this.ExportButton.Size = new System.Drawing.Size(179, 98);
+			this.ExportButton.Size = new System.Drawing.Size(179, 40);
 			this.ExportButton.TabIndex = 2;
 			this.ExportButton.Text = "Export";
 			this.ExportButton.UseVisualStyleBackColor = true;
@@ -68,13 +69,22 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.ImageSizeLabel);
 			this.groupBox1.Controls.Add(this.ScaleSelectionBox);
 			this.groupBox1.Location = new System.Drawing.Point(13, 42);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(138, 52);
+			this.groupBox1.Size = new System.Drawing.Size(323, 52);
 			this.groupBox1.TabIndex = 3;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Scale";
+			// 
+			// ScaleSelectionBox
+			// 
+			this.ScaleSelectionBox.Location = new System.Drawing.Point(6, 19);
+			this.ScaleSelectionBox.Name = "ScaleSelectionBox";
+			this.ScaleSelectionBox.Size = new System.Drawing.Size(121, 21);
+			this.ScaleSelectionBox.TabIndex = 6;
+			this.ScaleSelectionBox.SelectedIndexChanged += new System.EventHandler(this.ScaleSelectionBox_SelectedIndexChanged);
 			// 
 			// TransparencyCheckBox
 			// 
@@ -95,19 +105,22 @@
 			this.ViewLimitCheckBox.TabIndex = 5;
 			this.ViewLimitCheckBox.Text = "Limit to View";
 			this.ViewLimitCheckBox.UseVisualStyleBackColor = true;
+			this.ViewLimitCheckBox.CheckedChanged += new System.EventHandler(this.ViewLimitCheckBox_CheckedChanged);
 			// 
-			// ScaleSelectionBox
+			// ImageSizeLabel
 			// 
-			this.ScaleSelectionBox.Location = new System.Drawing.Point(6, 19);
-			this.ScaleSelectionBox.Name = "ScaleSelectionBox";
-			this.ScaleSelectionBox.Size = new System.Drawing.Size(121, 21);
-			this.ScaleSelectionBox.TabIndex = 6;
+			this.ImageSizeLabel.AutoSize = true;
+			this.ImageSizeLabel.Location = new System.Drawing.Point(141, 22);
+			this.ImageSizeLabel.Name = "ImageSizeLabel";
+			this.ImageSizeLabel.Size = new System.Drawing.Size(86, 13);
+			this.ImageSizeLabel.TabIndex = 7;
+			this.ImageSizeLabel.Text = "Image Size: x x y";
 			// 
 			// ImageExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(348, 191);
+			this.ClientSize = new System.Drawing.Size(348, 151);
 			this.Controls.Add(this.ViewLimitCheckBox);
 			this.Controls.Add(this.TransparencyCheckBox);
 			this.Controls.Add(this.groupBox1);
@@ -124,6 +137,7 @@
 			this.Text = "Export an Image";
 			this.TopMost = true;
 			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -138,5 +152,6 @@
 		private System.Windows.Forms.CheckBox TransparencyCheckBox;
 		private System.Windows.Forms.CheckBox ViewLimitCheckBox;
 		private System.Windows.Forms.ComboBox ScaleSelectionBox;
+		private System.Windows.Forms.Label ImageSizeLabel;
 	}
 }

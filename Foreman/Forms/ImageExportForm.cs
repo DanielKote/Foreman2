@@ -26,6 +26,7 @@ namespace Foreman
 
 			ScaleSelectionBox.Items.AddRange(multiplierNames);
 			ScaleSelectionBox.SelectedIndex = initialIndex;
+			UpdateSizeLabel();
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -97,6 +98,35 @@ namespace Foreman
 					}
 				}
 			}
+		}
+
+		private void UpdateSizeLabel()
+		{
+			float scale = multipliers[ScaleSelectionBox.SelectedIndex];
+			int x, y;
+
+			if (ViewLimitCheckBox.Checked)
+			{
+				x = (int)(graphViewer.Width * scale / graphViewer.ViewScale);
+				y = (int)(graphViewer.Height * scale / graphViewer.ViewScale);
+			}
+			else
+			{
+				x = (int)(graphViewer.Graph.Bounds.Width * scale);
+				y = (int)(graphViewer.Graph.Bounds.Height * scale);
+			}
+
+			ImageSizeLabel.Text = string.Format("Image Size: {0} x {1}", x.ToString("N0"), y.ToString("N0"));
+		}
+
+		private void ViewLimitCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			UpdateSizeLabel();
+		}
+
+		private void ScaleSelectionBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			UpdateSizeLabel();
 		}
 	}
 }
