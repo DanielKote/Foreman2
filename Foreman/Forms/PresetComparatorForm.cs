@@ -140,27 +140,32 @@ namespace Foreman
 			//helpful inner function to process items, recipes, assemblers, miners, and modules (so... everything but mods)
 			void ProcessObject<T>(IReadOnlyDictionary<string, T> leftCacheDictionary, IReadOnlyDictionary<string, T> rightCacheDictionary, List<object>[] outputLists) where T : DataObjectBase
 			{
-				foreach (var kvp in leftCacheDictionary)
+				List<Tuple<T, T>> tempCenterSet = new List<Tuple<T, T>>();
+				foreach (var kvp in leftCacheDictionary.OrderByDescending(k => ((DataObjectBase)k.Value).Available).ThenBy(k => k.Key))
 				{
-					if (rightCacheDictionary.ContainsKey(kvp.Key))
-						outputLists[1].Add(kvp.Value);
-					else
+					if (!rightCacheDictionary.ContainsKey(kvp.Key))
 						outputLists[0].Add(kvp.Value);
-				}
-				foreach (var kvp in rightCacheDictionary)
-				{
-					if (leftCacheDictionary.ContainsKey(kvp.Key))
-						outputLists[2].Add(kvp.Value);
 					else
+						tempCenterSet.Add(new Tuple<T, T>(kvp.Value, rightCacheDictionary[kvp.Key]));
+				}
+				foreach (var kvp in rightCacheDictionary.OrderByDescending(k => ((DataObjectBase)k.Value).Available).ThenBy(k => k.Key))
+				{
+					if (!leftCacheDictionary.ContainsKey(kvp.Key))
 						outputLists[3].Add(kvp.Value);
 				}
-				for (int i = 0; i < 4; i++)
-					outputLists[i].Sort(delegate (object a, object b)
-					{
-						int availableDiff = ((DataObjectBase)a).Available.CompareTo(((DataObjectBase)b).Available);
-						if (availableDiff != 0) return -availableDiff;
-						return ((DataObjectBase)a).Name.CompareTo(((DataObjectBase)b).Name);
-					});
+
+				//sort the combined center lists together (since they must align)
+				tempCenterSet.Sort(delegate (Tuple<T, T> a, Tuple<T, T> b)
+				{
+					int availableDiff = (a.Item1.Available || a.Item2.Available).CompareTo((b.Item1.Available || b.Item2.Available));
+					if (availableDiff != 0) return -availableDiff;
+					return a.Item1.Name.CompareTo(b.Item1.Name);
+				});
+				foreach(Tuple<T,T> pair in tempCenterSet)
+				{
+					outputLists[1].Add(pair.Item1);
+					outputLists[2].Add(pair.Item2);
+				}
 			}
 
 			//step 1: load in left and right caches
@@ -280,7 +285,8 @@ namespace Foreman
 						similarInternals = similarNames; //if the are different, mark as red.
 						break;
 					case 1: //items
-						break; //everything has already been done (name comparsion)
+						similarInternals &= ((Item)l.Tag).Available == ((Item)r.Tag).Available;
+						break;
 
 					case 2: //recipes
 						Recipe lRecipe = (Recipe)l.Tag;
