@@ -390,6 +390,7 @@ namespace Foreman
 
 						List<Preset> validPresets = GetValidPresetsList();
 						await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
+						this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 					}
 					else //not loading a new preset -> update the enabled statuses
 					{
