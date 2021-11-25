@@ -158,15 +158,8 @@ namespace Foreman
 
 		public static Size GetSize(ICollection<Recipe> recipes)
 		{
-			int height = 0;
 			int width = ((SectionWidth + 10) * recipes.Count) - 10;
-			foreach (Recipe recipe in recipes)
-			{
-				height = Math.Max(height, 110 + 20 + recipe.IngredientList.Count * 40 + recipe.ProductList.Count * 40 + recipe.MyUnlockSciencePacks.Count * (Properties.Settings.Default.AbbreviateSciPacks? 40 : 30));
-			}
-
-
-
+			int height = 110 + 20 + recipes.Max(r => r.IngredientList.Count) * 40 + recipes.Max(r => r.ProductList.Count) * 40 + recipes.Max(r => r.MyUnlockSciencePacks.Count) * (Properties.Settings.Default.AbbreviateSciPacks ? 40 : 30);
 			return new Size(width, height);
 		}
 
