@@ -57,6 +57,8 @@ namespace Foreman
 			}
 			else
 			{
+				graphViewer.ClearSelection();
+
 				float scale = multipliers[ScaleSelectionBox.SelectedIndex];
 
 				Bitmap image = ViewLimitCheckBox.Checked? new Bitmap((int)(graphViewer.Width * scale / graphViewer.ViewScale), (int)(graphViewer.Height * scale / graphViewer.ViewScale)) : new Bitmap((int)(graphViewer.Graph.Bounds.Width * scale), (int)(graphViewer.Graph.Bounds.Height * scale));
