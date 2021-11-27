@@ -259,6 +259,8 @@ namespace Foreman
 											controller.SetBeaconModules(copiedOptions.BeaconModules, true);
 									}
 								}
+
+								graphViewer.Graph.UpdateNodeValues();
 							})));
 
 						RightClickMenu.Items.Add(new ToolStripSeparator());
