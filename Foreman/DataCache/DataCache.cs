@@ -305,11 +305,11 @@ namespace Foreman
 					Console.WriteLine(string.Format("Removal of {0} due to having no assemblers associated with it.", recipe));
 				}
 
-				//calculate the science packs for each technology (based on both their listed science packs, the science packs of their prerequisites, and the science packs required to research the science packs)
-				ProcessSciencePacks();
-
 				//calculate the availability of various recipes and entities (based on their unlock technologies + entity place objects' unlock technologies)
 				ProcessAvailableStatuses();
+
+				//calculate the science packs for each technology (based on both their listed science packs, the science packs of their prerequisites, and the science packs required to research the science packs)
+				ProcessSciencePacks();
 
 				//delete any groups/subgroups without any items/recipes within them, and sort by order
 				CleanupGroups();
@@ -1348,31 +1348,7 @@ namespace Foreman
 
 		private void ProcessSciencePacks()
 		{
-			//quick function to depth-first search the tech tree to calculate the availability of the technology. Hashset used to keep track of visited tech and not have to re-check them.
-			//NOTE: factorio ensures no cyclic, so we are guaranteed to have a directed acyclic graph (may be disconnected)
-			HashSet<TechnologyPrototype> unlockableTechSet = new HashSet<TechnologyPrototype>();
-			bool IsUnlockable(TechnologyPrototype tech)
-			{
-				if (!tech.Available)
-					return false;
-				else if (unlockableTechSet.Contains(tech))
-					return true;
-				else if (tech.prerequisites.Count == 0)
-					return true;
-				else
-				{
-					bool available = true;
-					foreach (TechnologyPrototype preTech in tech.prerequisites)
-						available = available && IsUnlockable(preTech);
-					tech.Available = available;
-
-					if (available)
-						unlockableTechSet.Add(tech);
-					return available;
-				}
-			}
-
-			//very similar to above, but for processing the required sci packs of each technology. Basically some research only requires 1 sci pack, but to unlock it requires researching tech with many sci packs. Need to account for that
+			//DFS for processing the required sci packs of each technology. Basically some research only requires 1 sci pack, but to unlock it requires researching tech with many sci packs. Need to account for that
 			Dictionary<TechnologyPrototype, HashSet<Item>> techRequirements = new Dictionary<TechnologyPrototype, HashSet<Item>>();
 			HashSet<Item> sciPacks = new HashSet<Item>();
 			HashSet<Item> TechRequiredSciPacks(TechnologyPrototype tech)
@@ -1414,7 +1390,7 @@ namespace Foreman
 				if (visitedPacks.Contains(sciPack))
 					return;
 
-				HashSet<Item> prerequisites = new HashSet<Item>(sciPack.ProductionRecipes.FirstOrDefault()?.MyUnlockTechnologies.FirstOrDefault()?.SciPackList ?? new Item[0]);
+				HashSet<Item> prerequisites = new HashSet<Item>(sciPack.ProductionRecipes.FirstOrDefault(r => r.Available)?.MyUnlockTechnologies.FirstOrDefault(t => t.Available)?.SciPackList ?? new Item[0]);
 				foreach (Recipe r in sciPack.ProductionRecipes)
 					foreach (Technology t in r.MyUnlockTechnologies)
 						prerequisites.IntersectWith(t.SciPackList);
@@ -1432,7 +1408,6 @@ namespace Foreman
 			//step 1: update tech unlock status & science packs (add a 0 cost pack to the tech if it has no such requirement but its prerequisites do), set tech tier
 			foreach (TechnologyPrototype tech in technologies.Values)
 			{
-				IsUnlockable(tech);
 				TechRequiredSciPacks(tech);
 				GetTechnologyTier(tech);
 				foreach (ItemPrototype sciPack in techRequirements[tech])
@@ -1493,9 +1468,37 @@ namespace Foreman
 
 		private void ProcessAvailableStatuses()
 		{
+			//quick function to depth-first search the tech tree to calculate the availability of the technology. Hashset used to keep track of visited tech and not have to re-check them.
+			//NOTE: factorio ensures no cyclic, so we are guaranteed to have a directed acyclic graph (may be disconnected)
+			HashSet<TechnologyPrototype> unlockableTechSet = new HashSet<TechnologyPrototype>();
+			bool IsUnlockable(TechnologyPrototype tech)
+			{
+				if (!tech.Available)
+					return false;
+				else if (unlockableTechSet.Contains(tech))
+					return true;
+				else if (tech.prerequisites.Count == 0)
+					return true;
+				else
+				{
+					bool available = true;
+					foreach (TechnologyPrototype preTech in tech.prerequisites)
+						available = available && IsUnlockable(preTech);
+					tech.Available = available;
+
+					if (available)
+						unlockableTechSet.Add(tech);
+					return available;
+				}
+			}
+
+			//step 0: check availability of technologies
+			foreach (TechnologyPrototype tech in technologies.Values)
+				IsUnlockable(tech);
+
 			//step 1: update recipe unlock status
 			foreach (RecipePrototype recipe in recipes.Values)
-				recipe.Available = recipe.myUnlockTechnologies.Any(t => t.Available);
+			recipe.Available = recipe.myUnlockTechnologies.Any(t => t.Available);
 
 			//step 2: mark any recipe for barelling / crating as unavailable
 			if(UseRecipeBWLists)
