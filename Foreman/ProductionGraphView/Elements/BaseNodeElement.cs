@@ -364,7 +364,7 @@ namespace Foreman
 									openInputNodes.Add(node.DisplayedNode, node.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item).ToList());
 
 								Dictionary<Item, List<ReadOnlyBaseNode>> availableOutputNodes = new Dictionary<Item, List<ReadOnlyBaseNode>>();
-								foreach(ReadOnlyBaseNode node in graphViewer.SelectedNodes.Where(n => !n.InputTabs.Any(t => !t.Links.Any())).Select(n => n.DisplayedNode)) //discount nodes with open inputs to prevent loops
+								foreach(ReadOnlyBaseNode node in graphViewer.SelectedNodes.Select(n => n.DisplayedNode).Where(n => !openInputNodes.ContainsKey(n)))
 								{
 									foreach(Item output in node.Outputs)
 									{
@@ -386,6 +386,8 @@ namespace Foreman
 										}
 									}
 								}
+
+								graphViewer.Graph.UpdateNodeValues();
 							})));
 					}
 					if (matchedOI)
@@ -400,7 +402,7 @@ namespace Foreman
 									openOutputNodes.Add(node.DisplayedNode, node.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item).ToList());
 
 								Dictionary<Item, List<ReadOnlyBaseNode>> availableInputNodes = new Dictionary<Item, List<ReadOnlyBaseNode>>();
-								foreach (ReadOnlyBaseNode node in graphViewer.SelectedNodes.Where(n => !n.OutputTabs.Any(t => !t.Links.Any())).Select(n => n.DisplayedNode)) //discount nodes with open outputs to prevent loops
+								foreach (ReadOnlyBaseNode node in graphViewer.SelectedNodes.Select(n => n.DisplayedNode).Where(n => !openOutputNodes.ContainsKey(n)))
 								{
 									foreach (Item input in node.Inputs)
 									{
@@ -422,6 +424,8 @@ namespace Foreman
 										}
 									}
 								}
+
+								graphViewer.Graph.UpdateNodeValues();
 							})));
 					}
 				}
