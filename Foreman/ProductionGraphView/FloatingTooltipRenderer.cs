@@ -21,6 +21,7 @@ namespace Foreman
 		private static readonly StringFormat stringFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Near };
 
 		private Dictionary<FloatingTooltipControl, bool> floatingTooltipControls;
+		private List<TooltipInfo> extraTooltips;
 
 		private ProductionGraphViewer parent;
 
@@ -29,10 +30,13 @@ namespace Foreman
 			parent = graphViewer;
 
 			floatingTooltipControls = new Dictionary<FloatingTooltipControl, bool>();
+			extraTooltips = new List<TooltipInfo>();
 		}
 
 		public void AddToolTip(FloatingTooltipControl tt, bool showOverride) { floatingTooltipControls.Add(tt, showOverride); }
 		public void RemoveToolTip(FloatingTooltipControl tt) { floatingTooltipControls.Remove(tt); }
+		public void AddExtraToolTip(TooltipInfo tt) { extraTooltips.Add(tt); }
+		public void ClearExtraToolTips() { extraTooltips.Clear(); }
 
 		public void ClearFloatingControls()
 		{
@@ -46,6 +50,8 @@ namespace Foreman
 			{
 				foreach (FloatingTooltipControl fttp in floatingTooltipControls.Keys)
 					DrawTooltip(parent.GraphToScreen(fttp.GraphLocation), fttp.Control.Size, fttp.Direction, graphics, null);
+				foreach(TooltipInfo tti in extraTooltips)
+					DrawTooltip(tti.ScreenLocation, tti.ScreenSize, tti.Direction, graphics, tti.Text, tti.CustomDraw);
 
 				BaseNodeElement element = parent.GetNodeAtPoint(parent.ScreenToGraph(parent.PointToClient(Control.MousePosition)));
 				if (element != null)
@@ -58,7 +64,8 @@ namespace Foreman
 			{
 				foreach (FloatingTooltipControl fttp in floatingTooltipControls.Where(kvp => kvp.Value).Select(kvp => kvp.Key))
 					DrawTooltip(parent.GraphToScreen(fttp.GraphLocation), fttp.Control.Bounds, fttp.Direction, graphics, null);
-
+				foreach (TooltipInfo tti in extraTooltips)
+					DrawTooltip(tti.ScreenLocation, tti.ScreenSize, tti.Direction, graphics, tti.Text, tti.CustomDraw);
 			}
 		}
 
