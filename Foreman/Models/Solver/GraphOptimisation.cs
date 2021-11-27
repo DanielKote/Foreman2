@@ -84,6 +84,9 @@ namespace Foreman
 				Item item = itemInputs.Key;
 				solver.AddInputRatio(this, item, itemInputs, inputRateFor(item));
 			}
+			//add in a forced 0 for passthrough nodes that have no inputs (prevents such nodes from acting as 'free' inputs)
+			if (this is PassthroughNode pNode && !InputLinks.Any())
+				solver.AddInputRatio(this, pNode.PassthroughItem, InputLinks, inputRateFor(pNode.PassthroughItem));
 
 			//add in the connections for the outputs of the node to any links connected to those outputs, grouped by item. Errors are only allowed for recipe nodes (too much produced -> accumulating in node), though it will be marked as 'overproducing'. All other nodes allow no errors (sum of link thorughputs MUST equal the amount produced)
 			foreach (var itemOutputs in OutputLinks.GroupBy(x => x.Item))
