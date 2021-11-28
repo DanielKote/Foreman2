@@ -33,10 +33,42 @@ namespace Foreman
 
 		}
 
+		public static JObject PrepPreset(Preset preset)
+		{
+			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
+			string presetCustomPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+
+			JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
+			if (File.Exists(presetCustomPath))
+			{
+				JObject cjsonData = JObject.Parse(File.ReadAllText(presetCustomPath));
+				foreach (var groupToken in cjsonData)
+				{
+					foreach (JObject itemToken in groupToken.Value)
+					{
+						JObject presetItemToken = (JObject)jsonData[groupToken.Key].FirstOrDefault(t => (string)t["name"] == (string)itemToken["name"]);
+						if (presetItemToken != null)
+							foreach (var parameter in itemToken)
+								presetItemToken[parameter.Key] = parameter.Value;
+						else
+							((JArray)jsonData[groupToken.Key]).Add(itemToken);
+					}
+				}
+			}
+			return jsonData;
+		}
+
 		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
 		{
-			//return await TestPresetThroughDataCache(preset, modList, itemList, entityList, recipeShorts);
-			return await TestPresetStreamlined(preset, modList, itemList, entityList, recipeShorts);
+			try
+			{
+				//return await TestPresetThroughDataCache(preset, modList, itemList, entityList, recipeShorts);
+				return await TestPresetStreamlined(preset, modList, itemList, entityList, recipeShorts);
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		//full load of data cache and comparison. This is naturally slower than the streamlined version, since we load all the extras that arent necessary for comparison (like energy types, technologies, availability calculations, etc)
@@ -101,25 +133,7 @@ namespace Foreman
 		//any changes to preset json style have to be reflected here though (unlike for a full data cache loader above, which just incorporates any changes to data cache as long as they dont impact the outputs)
 		private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
 		{
-			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
-			string presetCustomPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
-			if (!File.Exists(presetPath))
-				return null;
-
-			JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
-			if (File.Exists(presetCustomPath))
-			{
-				JObject cjsonData = JObject.Parse(File.ReadAllText(presetCustomPath));
-				foreach (var groupToken in cjsonData)
-				{
-					foreach (JObject itemToken in groupToken.Value)
-					{
-						JObject presetItemToken = (JObject)jsonData[groupToken.Key].First(t => (string)t["name"] == (string)itemToken["name"]);
-						foreach (var parameter in itemToken)
-							presetItemToken[parameter.Key] = parameter.Value;
-					}
-				}
-			}
+			JObject jsonData = PrepPreset(preset);
 
 			//parse preset (note: this is preset data, so we are guaranteed to only have one name per item/recipe/mod/etc.)
 			HashSet<string> presetItems = new HashSet<string>();

@@ -205,25 +205,9 @@ namespace Foreman
 			Dictionary<Item, string> burnResults = new Dictionary<Item, string>();
 
 			PresetName = preset.Name;
-
-
-			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
-			string presetCustomPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
-
-			JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
-			if (File.Exists(presetCustomPath))
-			{
-				JObject cjsonData = JObject.Parse(File.ReadAllText(presetCustomPath));
-				foreach (var groupToken in cjsonData)
-				{
-					foreach (JObject itemToken in groupToken.Value)
-					{
-						JObject presetItemToken = (JObject)jsonData[groupToken.Key].First(t => (string)t["name"] == (string)itemToken["name"]);
-						foreach (var parameter in itemToken)
-							presetItemToken[parameter.Key] = parameter.Value;
-					}
-				}
-			}
+			JObject jsonData = PresetProcessor.PrepPreset(preset);
+			if (jsonData == null)
+				return;
 
 			Dictionary<string, IconColorPair> iconCache = loadIcons ? await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, 0, 90) : new Dictionary<string, IconColorPair>();
 
@@ -1390,12 +1374,13 @@ namespace Foreman
 				if (visitedPacks.Contains(sciPack))
 					return;
 
-				HashSet<Item> prerequisites = new HashSet<Item>(sciPack.ProductionRecipes.FirstOrDefault(r => r.Available)?.MyUnlockTechnologies.FirstOrDefault(t => t.Available)?.SciPackList ?? new Item[0]);
+				//for simplicities sake we will only account for prerequisites of the first available production recipe (or first non-available if no available production recipes exist). This means that if (for who knows what reason) there are multiple valid production recipes only the first one will count!
+				HashSet<Item> prerequisites = new HashSet<Item>(sciPack.ProductionRecipes.OrderByDescending(r => r.Available).FirstOrDefault()?.MyUnlockTechnologies.OrderByDescending(t => t.Available).FirstOrDefault()?.SciPackList ?? new Item[0]);
 				foreach (Recipe r in sciPack.ProductionRecipes)
 					foreach (Technology t in r.MyUnlockTechnologies)
 						prerequisites.IntersectWith(t.SciPackList);
 
-				//prerequisites now contains all the immediate required sci packs. we will not Update their prerequisites via this function, then add their prerequisites to our own set before finalizing it.
+				//prerequisites now contains all the immediate required sci packs. we will now Update their prerequisites via this function, then add their prerequisites to our own set before finalizing it.
 				foreach (Item prereq in prerequisites.ToList())
 				{
 					UpdateSciencePackPrerequisites(prereq);

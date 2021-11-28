@@ -1232,7 +1232,8 @@ namespace Foreman
 					else
 					{
 						//errors found. even though the name fits, but the preset seems to be the wrong one. Proceed with searching for best-fit
-						presetErrors.Add(errors);
+						if(errors != null)
+							presetErrors.Add(errors);
 						allPresets.Remove(savedWPreset);
 					}
 				}
