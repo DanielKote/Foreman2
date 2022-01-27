@@ -1042,25 +1042,27 @@ namespace Foreman
             {
 				if (((keyData & Keys.KeyCode) == Keys.Left) ^ ((keyData & Keys.KeyCode) == KeyLeftCode)) 
 				{
-					hor = -1;
+					hor = 1;
 				}
 
 				if (((keyData & Keys.KeyCode) == Keys.Right) ^ ((keyData & Keys.KeyCode) == KeyRightCode))
 				{
-					hor = 1;
+					hor = -1;
 				}
 
 				if (((keyData & Keys.KeyCode) == Keys.Up) ^ ((keyData & Keys.KeyCode) == KeyUpCode))
 				{
-					ver = -1;
+					ver = 1;
 				}
 
 				if (((keyData & Keys.KeyCode) == Keys.Down) ^ ((keyData & Keys.KeyCode) == KeyDownCode))
 				{
-					ver = 1;
+					ver = -1;
 				}
 
 				ViewOffset = Point.Add(ViewOffset, new Size(hor * (int)KeyScrollRatio, ver * (int)KeyScrollRatio));
+				UpdateGraphBounds(false);
+				Invalidate();
 			}
 			return base.ProcessCmdKey(ref msg, keyData);
 		}

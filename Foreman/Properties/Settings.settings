@@ -114,7 +114,7 @@
       <Value Profile="(Default)">D</Value>
     </Setting>
     <Setting Name="KeyScrollRatio" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">50</Value>
     </Setting>
   </Settings>
 </SettingsFile>
