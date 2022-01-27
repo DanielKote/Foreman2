@@ -12,7 +12,7 @@ namespace Foreman.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -416,6 +416,66 @@ namespace Foreman.Properties {
             }
             set {
                 this["SmartNodeDirection"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("W")]
+        public global::System.Windows.Forms.Keys KeyUpCode {
+            get {
+                return ((global::System.Windows.Forms.Keys)(this["KeyUpCode"]));
+            }
+            set {
+                this["KeyUpCode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("S")]
+        public global::System.Windows.Forms.Keys KeyDownCode {
+            get {
+                return ((global::System.Windows.Forms.Keys)(this["KeyDownCode"]));
+            }
+            set {
+                this["KeyDownCode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("A")]
+        public global::System.Windows.Forms.Keys KeyLeftCode {
+            get {
+                return ((global::System.Windows.Forms.Keys)(this["KeyLeftCode"]));
+            }
+            set {
+                this["KeyLeftCode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D")]
+        public global::System.Windows.Forms.Keys KeyRightCode {
+            get {
+                return ((global::System.Windows.Forms.Keys)(this["KeyRightCode"]));
+            }
+            set {
+                this["KeyRightCode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int KeyScrollRatio {
+            get {
+                return ((int)(this["KeyScrollRatio"]));
+            }
+            set {
+                this["KeyScrollRatio"] = value;
             }
         }
     }

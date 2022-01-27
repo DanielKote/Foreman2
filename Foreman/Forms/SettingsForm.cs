@@ -50,6 +50,13 @@ namespace Foreman
 
 			public HashSet<DataObjectBase> EnabledObjects;
 
+			//scroll keys
+			public Keys KeyUpCode;
+			public Keys KeyDownCode;
+			public Keys KeyLeftCode;
+			public Keys KeyRightCode;
+			public decimal KeyScrollRatio;
+
 			public SettingsFormOptions(DataCache cache)
 			{
 				DCache = cache;
@@ -175,6 +182,13 @@ namespace Foreman
 			PullConsumerNodesCheckBox.Checked = Options.Solver_PullConsumerNodes;
 			PullConsumerNodesPowerInput.Value = Math.Min(PullConsumerNodesPowerInput.Maximum, (decimal)Options.Solver_PullConsumerNodesPower);
 
+			//scroll keys
+			KeyDownInput.Text = Options.KeyDownCode.ToString();
+			KeyUpInput.Text = Options.KeyUpCode.ToString();
+			KeyLeftInput.Text = Options.KeyLeftCode.ToString();
+			KeyRightInput.Text = Options.KeyRightCode.ToString();
+			KeyScrollRatioInput.Value = Options.KeyScrollRatio;
+			
 			//lists
 			LoadUnfilteredLists();
 			UpdateModList();
@@ -503,6 +517,17 @@ namespace Foreman
 			Options.Solver_PullConsumerNodes = PullConsumerNodesCheckBox.Checked;
 			Options.Solver_PullConsumerNodesPower = (double)PullConsumerNodesPowerInput.Value;
 
+			//scroll keys
+			try
+			{
+				Options.KeyDownCode = (Keys)Enum.Parse(typeof(Keys), KeyDownInput.Text.ToUpper());
+				Options.KeyUpCode = (Keys)Enum.Parse(typeof(Keys), KeyUpInput.Text.ToUpper());
+				Options.KeyLeftCode = (Keys)Enum.Parse(typeof(Keys), KeyLeftInput.Text.ToUpper());
+				Options.KeyRightCode = (Keys)Enum.Parse(typeof(Keys), KeyRightInput.Text.ToUpper());
+				Options.KeyScrollRatio = KeyScrollRatioInput.Value;
+			} catch { 
+			// wrong input => no save.. maybe later some will fix it...
+			}
 		}
 
 		//PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------
@@ -661,5 +686,5 @@ namespace Foreman
 
 			UpdateFilteredLists();
 		}
-	}
+    }
 }

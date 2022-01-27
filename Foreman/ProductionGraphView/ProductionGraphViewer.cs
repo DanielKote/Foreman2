@@ -56,6 +56,13 @@ namespace Foreman
 		public float ViewScale { get; private set; }
 		public Rectangle VisibleGraphBounds { get; private set; }
 
+		//scroll keys
+		public Keys KeyUpCode;
+		public Keys KeyDownCode;
+		public Keys KeyLeftCode;
+		public Keys KeyRightCode;
+		public decimal KeyScrollRatio = 10;
+
 		private const int minDragDiff = 30;
 		private const int minLinkWidth = 3;
 		private const int maxLinkWidth = 35;
@@ -993,38 +1000,67 @@ namespace Foreman
 		{
 			bool processed = false;
 			int moveUnit = (Grid.CurrentGridUnit > 0) ? Grid.CurrentGridUnit : 6;
+			int hor = 0;
+			int ver = 0;
+
 			if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) //large move
 				moveUnit = (Grid.CurrentMajorGridUnit > Grid.CurrentGridUnit) ? Grid.CurrentMajorGridUnit : moveUnit * 4;
 
-			if ((keyData & Keys.KeyCode) == Keys.Left)
+			if (selectedNodes.Count>0)
 			{
-				foreach (BaseNodeElement node in selectedNodes)
-					node.SetLocation(new Point(node.X - moveUnit, node.Y));
-				processed = true;
-			}
-			else if ((keyData & Keys.KeyCode) == Keys.Right)
-			{
-				foreach (BaseNodeElement node in selectedNodes)
-					node.SetLocation(new Point(node.X + moveUnit, node.Y));
-				processed = true;
-			}
-			else if ((keyData & Keys.KeyCode) == Keys.Up)
-			{
-				foreach (BaseNodeElement node in selectedNodes)
-					node.SetLocation(new Point(node.X, node.Y - moveUnit));
-				processed = true;
-			}
-			else if ((keyData & Keys.KeyCode) == Keys.Down)
-			{
-				foreach (BaseNodeElement node in selectedNodes)
-					node.SetLocation(new Point(node.X, node.Y + moveUnit));
-				processed = true;
-			}
+				if ((keyData & Keys.KeyCode) == Keys.Left)
+				{
+					foreach (BaseNodeElement node in selectedNodes)
+						node.SetLocation(new Point(node.X - moveUnit, node.Y));
+					processed = true;
+				}
+				else if ((keyData & Keys.KeyCode) == Keys.Right)
+				{
+					foreach (BaseNodeElement node in selectedNodes)
+						node.SetLocation(new Point(node.X + moveUnit, node.Y));
+					processed = true;
+				}
+				else if ((keyData & Keys.KeyCode) == Keys.Up)
+				{
+					foreach (BaseNodeElement node in selectedNodes)
+						node.SetLocation(new Point(node.X, node.Y - moveUnit));
+					processed = true;
+				}
+				else if ((keyData & Keys.KeyCode) == Keys.Down)
+				{
+					foreach (BaseNodeElement node in selectedNodes)
+						node.SetLocation(new Point(node.X, node.Y + moveUnit));
+					processed = true;
+				}
 
-			if (processed)
-			{
-				Invalidate();
-				return true;
+				if (processed)
+				{
+					Invalidate();
+					return true;
+				}
+			} else
+            {
+				if (((keyData & Keys.KeyCode) == Keys.Left) ^ ((keyData & Keys.KeyCode) == KeyLeftCode)) 
+				{
+					hor = -1;
+				}
+
+				if (((keyData & Keys.KeyCode) == Keys.Right) ^ ((keyData & Keys.KeyCode) == KeyRightCode))
+				{
+					hor = 1;
+				}
+
+				if (((keyData & Keys.KeyCode) == Keys.Up) ^ ((keyData & Keys.KeyCode) == KeyUpCode))
+				{
+					ver = -1;
+				}
+
+				if (((keyData & Keys.KeyCode) == Keys.Down) ^ ((keyData & Keys.KeyCode) == KeyDownCode))
+				{
+					ver = 1;
+				}
+
+				ViewOffset = Point.Add(ViewOffset, new Size(hor * (int)KeyScrollRatio, ver * (int)KeyScrollRatio));
 			}
 			return base.ProcessCmdKey(ref msg, keyData);
 		}

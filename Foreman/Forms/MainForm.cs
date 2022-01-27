@@ -78,6 +78,13 @@ namespace Foreman
 			if (Properties.Settings.Default.IconsSize > 256) Properties.Settings.Default.IconsSize = 256;
 			GraphViewer.IconsSize = Properties.Settings.Default.IconsSize;
 
+			//scrolling keys
+			GraphViewer.KeyDownCode = Properties.Settings.Default.KeyDownCode;
+			GraphViewer.KeyUpCode = Properties.Settings.Default.KeyUpCode;
+			GraphViewer.KeyRightCode = Properties.Settings.Default.KeyRightCode;
+			GraphViewer.KeyLeftCode = Properties.Settings.Default.KeyLeftCode;
+			GraphViewer.KeyScrollRatio = Properties.Settings.Default.KeyScrollRatio;
+
 			Properties.Settings.Default.Save();
 
 			NewGraph();
@@ -376,6 +383,13 @@ namespace Foreman
 			options.EnabledObjects.UnionWith(GraphViewer.DCache.Beacons.Values.Where(r => r.Enabled));
 			options.EnabledObjects.UnionWith(GraphViewer.DCache.Modules.Values.Where(r => r.Enabled));
 
+			//scroll keys
+			options.KeyDownCode = GraphViewer.KeyDownCode;
+			options.KeyUpCode = GraphViewer.KeyUpCode;
+			options.KeyLeftCode = GraphViewer.KeyLeftCode;
+			options.KeyRightCode = GraphViewer.KeyRightCode;
+			options.KeyScrollRatio = GraphViewer.KeyScrollRatio;
+
 			using (SettingsForm form = new SettingsForm(options))
 			{
 				form.StartPosition = FormStartPosition.Manual;
@@ -452,6 +466,13 @@ namespace Foreman
 					GraphViewer.Graph.LowPriorityPower = options.Solver_LowPriorityPower;
 					GraphViewer.Graph.PullOutputNodesPower = options.Solver_PullConsumerNodesPower;
 					GraphViewer.Graph.PullOutputNodes = options.Solver_PullConsumerNodes;
+
+					//scroll keys
+					GraphViewer.KeyDownCode = options.KeyDownCode;
+					GraphViewer.KeyUpCode = options.KeyUpCode;
+					GraphViewer.KeyLeftCode = options.KeyLeftCode;
+					GraphViewer.KeyRightCode = options.KeyRightCode;
+					GraphViewer.KeyScrollRatio = options.KeyScrollRatio;
 
 					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
 					Properties.Settings.Default.Save();
