@@ -367,9 +367,20 @@ namespace Foreman
 			Properties.Settings.Default.Save();
 			PanelClosed?.Invoke(this, EventArgs.Empty);
 		}
-	}
 
-	public class ItemChooserPanel : IRChooserPanel
+		//quit with Esc key
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData) 
+		{
+			if (keyData == Keys.Escape)
+			{
+				Dispose();
+			};
+			return base.ProcessCmdKey(ref msg, keyData);
+		}
+			// quit with ESC or KeyQuitCode
+    }
+
+    public class ItemChooserPanel : IRChooserPanel
 	{
 		public event EventHandler<ItemRequestArgs> ItemRequested;
 
