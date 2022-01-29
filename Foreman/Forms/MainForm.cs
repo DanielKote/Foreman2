@@ -14,6 +14,7 @@ namespace Foreman
 	{
 		internal const string DefaultPreset = "Factorio 1.1 Vanilla";
 		private string savefilePath = null;
+		private ProductionGraphViewer GraphViewer;
 
 		public MainForm()
 		{
@@ -22,74 +23,119 @@ namespace Foreman
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
+		private void GraphViewerCollection_AddTab()
+		{ 
+			TabPage tabPage = new TabPage();
+			GraphViewerTabContainer.Controls.Add(tabPage);
+
+			
+			ProductionGraphViewer pgv = new ProductionGraphViewer();
+			tabPage.Controls.Add(pgv);
+
+			pgv.AllowDrop = true;
+			pgv.ArrowsOnLinks = false;
+			pgv.AutoSize = true;
+			pgv.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			pgv.BackColor = System.Drawing.Color.White;
+			pgv.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			pgv.DCache = null;
+			pgv.Dock = System.Windows.Forms.DockStyle.Fill;
+			pgv.IconsOnly = false;
+			pgv.IconsSize = 32;
+			pgv.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
+			pgv.Location = new System.Drawing.Point(3, 3);
+			pgv.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
+			pgv.MouseDownElement = null;
+			pgv.NodeCountForSimpleView = 200;
+			pgv.ShowRecipeToolTip = false;
+			pgv.Size = new System.Drawing.Size(914, 587);
+			pgv.SmartNodeDirection = false;
+			pgv.TabIndex = 12;
+			pgv.TooltipsEnabled = true;
+			pgv.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
+
+			GraphViewerCollection.Add(pgv);
+			GraphViewer = pgv;
+
+			if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
+				Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
+			pgv.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)Properties.Settings.Default.DefaultRateUnit;
+
+			if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
+				Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
+			pgv.Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
+
+			if (!Enum.IsDefined(typeof(AssemblerSelector.Style), Properties.Settings.Default.DefaultAssemblerOption))
+				Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
+			pgv.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
+
+			pgv.ArrowsOnLinks = Properties.Settings.Default.ArrowsOnLinks;
+			pgv.DynamicLinkWidth = Properties.Settings.Default.DynamicLineWidth;
+			pgv.ShowRecipeToolTip = Properties.Settings.Default.ShowRecipeToolTip;
+			pgv.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
+
+			if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
+				Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
+			pgv.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
+
+			if (!Enum.IsDefined(typeof(NodeDirection), Properties.Settings.Default.DefaultNodeDirection))
+				Properties.Settings.Default.DefaultNodeDirection = (int)NodeDirection.Up;
+			pgv.Graph.DefaultNodeDirection = (NodeDirection)Properties.Settings.Default.DefaultNodeDirection;
+
+			pgv.SmartNodeDirection = Properties.Settings.Default.SmartNodeDirection;
+
+			pgv.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
+			pgv.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
+			pgv.FlagOUSuppliedNodes = Properties.Settings.Default.FlagOUSuppliedNodes;
+
+			pgv.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
+			pgv.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
+			pgv.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
+			pgv.ArrowRenderer.ShowOUNodeArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
+			pgv.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
+
+			pgv.IconsOnly = Properties.Settings.Default.IconsOnlyView;
+			IconViewCheckBox.Checked = pgv.IconsOnly;
+			if (Properties.Settings.Default.IconsSize < 8) Properties.Settings.Default.IconsSize = 8;
+			if (Properties.Settings.Default.IconsSize > 256) Properties.Settings.Default.IconsSize = 256;
+			pgv.IconsSize = Properties.Settings.Default.IconsSize;
+
+			//scrolling keys
+			pgv.KeyDownCode = Properties.Settings.Default.KeyDownCode;
+			pgv.KeyUpCode = Properties.Settings.Default.KeyUpCode;
+			pgv.KeyRightCode = Properties.Settings.Default.KeyRightCode;
+			pgv.KeyLeftCode = Properties.Settings.Default.KeyLeftCode;
+			pgv.KeyScrollRatio = Properties.Settings.Default.KeyScrollRatio;
+
+			//MR: rework to init - not new
+			NewGraph();
+
+			GraphViewerTabContainer.SelectedTab = tabPage;
+		}
+
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			WindowState = FormWindowState.Maximized;
 
 			Properties.Settings.Default.ForemanVersion = 5;
 
-			if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
-				Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
-			GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)Properties.Settings.Default.DefaultRateUnit;
-
-			if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
-				Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
-			GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
-
-			if (!Enum.IsDefined(typeof(AssemblerSelector.Style), Properties.Settings.Default.DefaultAssemblerOption))
-				Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
-			GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
-
-			GraphViewer.ArrowsOnLinks = Properties.Settings.Default.ArrowsOnLinks;
-			GraphViewer.DynamicLinkWidth = Properties.Settings.Default.DynamicLineWidth;
-			GraphViewer.ShowRecipeToolTip = Properties.Settings.Default.ShowRecipeToolTip;
-			GraphViewer.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
-
-			if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
-				Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
-			GraphViewer.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
-
-			if (!Enum.IsDefined(typeof(NodeDirection), Properties.Settings.Default.DefaultNodeDirection))
-				Properties.Settings.Default.DefaultNodeDirection = (int)NodeDirection.Up;
-			GraphViewer.Graph.DefaultNodeDirection = (NodeDirection)Properties.Settings.Default.DefaultNodeDirection;
-
-			GraphViewer.SmartNodeDirection = Properties.Settings.Default.SmartNodeDirection;
-
-			GraphViewer.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
-			GraphViewer.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
-			GraphViewer.FlagOUSuppliedNodes = Properties.Settings.Default.FlagOUSuppliedNodes;
-
-			GraphViewer.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
-			GraphViewer.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
-			GraphViewer.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
-			GraphViewer.ArrowRenderer.ShowOUNodeArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
-
+			// new collection
+			GraphViewerCollection = new System.Collections.ObjectModel.Collection<ProductionGraphViewer>();
+			
 			RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
-			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
+			RateOptionsDropDown.SelectedIndex = Properties.Settings.Default.DefaultRateUnit; ;
 			MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
 			MajorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MajorGridlines;
 			GridlinesCheckbox.Checked = Properties.Settings.Default.AltGridlines;
 
-			GraphViewer.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
-
-			GraphViewer.IconsOnly = Properties.Settings.Default.IconsOnlyView;
-			IconViewCheckBox.Checked = GraphViewer.IconsOnly;
-			if (Properties.Settings.Default.IconsSize < 8) Properties.Settings.Default.IconsSize = 8;
-			if (Properties.Settings.Default.IconsSize > 256) Properties.Settings.Default.IconsSize = 256;
-			GraphViewer.IconsSize = Properties.Settings.Default.IconsSize;
-
-			//scrolling keys
-			GraphViewer.KeyDownCode = Properties.Settings.Default.KeyDownCode;
-			GraphViewer.KeyUpCode = Properties.Settings.Default.KeyUpCode;
-			GraphViewer.KeyRightCode = Properties.Settings.Default.KeyRightCode;
-			GraphViewer.KeyLeftCode = Properties.Settings.Default.KeyLeftCode;
-			GraphViewer.KeyScrollRatio = Properties.Settings.Default.KeyScrollRatio;
-
 			Properties.Settings.Default.Save();
 
-			NewGraph();
-			GraphViewer.Invalidate();
-			GraphViewer.Focus();
+			//MR_TEST
+			if (GraphViewer != null)
+			{
+				GraphViewer.Invalidate();
+				GraphViewer.Focus();
+			}
 #if DEBUG
 			//LoadGraph(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }));
 #endif
@@ -174,8 +220,9 @@ namespace Foreman
 
 		private void LoadGraph()
 		{
-			if (!TestGraphSavedStatus())
-				return;
+			//MR: Do not need to check if saved
+			//if (!TestGraphSavedStatus())
+			//	return;
 
 			OpenFileDialog dialog = new OpenFileDialog();
 			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
@@ -186,11 +233,13 @@ namespace Foreman
 			if (dialog.ShowDialog() != DialogResult.OK)
 				return;
 
-			LoadGraph(dialog.FileName);
+			LoadGraph(dialog.FileName, dialog.SafeFileName);
 		}
 
-		private async void LoadGraph(string path)
+		private async void LoadGraph(string path, string name)
 		{
+			GraphViewerCollection_AddTab();
+
 			try
 			{
 				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(path)), false, true);
@@ -215,12 +264,15 @@ namespace Foreman
 			Properties.Settings.Default.Save();
 			GraphViewer.Invalidate();
 			this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+			
+			GraphViewerTabContainer.SelectedTab.Text = name;
+			GraphViewerTabContainer.Invalidate();
 		}
 
 		private void NewGraph()
 		{
-			if (!TestGraphSavedStatus())
-				return;
+			//if (!TestGraphSavedStatus())
+			//	return;
 
 			GraphViewer.ClearGraph();
 			GraphViewer.Graph.LowPriorityPower = 2f;
@@ -520,10 +572,13 @@ namespace Foreman
 
 		private void RateOptionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			Properties.Settings.Default.DefaultRateUnit = RateOptionsDropDown.SelectedIndex;
-			GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)RateOptionsDropDown.SelectedIndex;
-			Properties.Settings.Default.Save();
-			GraphViewer.Graph.UpdateNodeValues();
+			if (GraphViewer != null)
+			{
+				Properties.Settings.Default.DefaultRateUnit = RateOptionsDropDown.SelectedIndex;
+				GraphViewer.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)RateOptionsDropDown.SelectedIndex;
+				Properties.Settings.Default.Save();
+				GraphViewer.Graph.UpdateNodeValues();
+			}
 		}
 
 		private void PauseUpdatesCheckbox_CheckedChanged(object sender, EventArgs e)
@@ -564,12 +619,14 @@ namespace Foreman
 			if (MinorGridlinesDropDown.SelectedIndex > 0)
 				updatedGridUnit = 6 * (int)(Math.Pow(2, MinorGridlinesDropDown.SelectedIndex - 1));
 
-			if (GraphViewer.Grid.CurrentGridUnit != updatedGridUnit)
+			if (GraphViewer != null)
 			{
-				GraphViewer.Grid.CurrentGridUnit = updatedGridUnit;
-				GraphViewer.Invalidate();
+				if (GraphViewer.Grid.CurrentGridUnit != updatedGridUnit)
+				{
+					GraphViewer.Grid.CurrentGridUnit = updatedGridUnit;
+					GraphViewer.Invalidate();
+				}
 			}
-
 			Properties.Settings.Default.MinorGridlines = MinorGridlinesDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
 		}
@@ -580,12 +637,14 @@ namespace Foreman
 			if (MajorGridlinesDropDown.SelectedIndex > 0)
 				updatedGridUnit = 6 * (int)(Math.Pow(2, MajorGridlinesDropDown.SelectedIndex - 1));
 
-			if (GraphViewer.Grid.CurrentMajorGridUnit != updatedGridUnit)
+			if (GraphViewer != null)
 			{
-				GraphViewer.Grid.CurrentMajorGridUnit = updatedGridUnit;
-				GraphViewer.Invalidate();
+				if (GraphViewer.Grid.CurrentMajorGridUnit != updatedGridUnit)
+				{
+					GraphViewer.Grid.CurrentMajorGridUnit = updatedGridUnit;
+					GraphViewer.Invalidate();
+				}
 			}
-
 			Properties.Settings.Default.MajorGridlines = MajorGridlinesDropDown.SelectedIndex;
 			Properties.Settings.Default.Save();
 		}
@@ -637,9 +696,14 @@ namespace Foreman
 				return cp;
 			}
 		}
-	}
 
-	public class Preset : IEquatable<Preset>
+        private void GraphViewerTabContainer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			GraphViewer = GraphViewerCollection[GraphViewerTabContainer.SelectedIndex];
+        }
+    }
+
+    public class Preset : IEquatable<Preset>
 	{
 		public string Name { get; set; }
 		public bool IsCurrentlySelected { get; set; }

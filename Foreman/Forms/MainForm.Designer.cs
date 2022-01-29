@@ -58,8 +58,6 @@
             this.VersionLabel = new System.Windows.Forms.Label();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.GraphViewerTabContainer = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.GraphViewer = new Foreman.ProductionGraphViewer();
             this.MainLayoutPanel.SuspendLayout();
             this.MenuTable.SuspendLayout();
             this.MenuButtonsTable.SuspendLayout();
@@ -70,8 +68,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).BeginInit();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
-            this.GraphViewerTabContainer.SuspendLayout();
-            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainLayoutPanel
@@ -536,49 +532,13 @@
             // 
             // GraphViewerTabContainer
             // 
-            this.GraphViewerTabContainer.Controls.Add(this.tabPage1);
             this.GraphViewerTabContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GraphViewerTabContainer.Location = new System.Drawing.Point(0, 0);
             this.GraphViewerTabContainer.Name = "GraphViewerTabContainer";
             this.GraphViewerTabContainer.SelectedIndex = 0;
             this.GraphViewerTabContainer.Size = new System.Drawing.Size(928, 619);
             this.GraphViewerTabContainer.TabIndex = 13;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Controls.Add(this.GraphViewer);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(920, 593);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "ActiveProject";
-            this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // GraphViewer
-            // 
-            this.GraphViewer.AllowDrop = true;
-            this.GraphViewer.ArrowsOnLinks = false;
-            this.GraphViewer.AutoSize = true;
-            this.GraphViewer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.GraphViewer.BackColor = System.Drawing.Color.White;
-            this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GraphViewer.DCache = null;
-            this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GraphViewer.IconsOnly = false;
-            this.GraphViewer.IconsSize = 32;
-            this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
-            this.GraphViewer.Location = new System.Drawing.Point(3, 3);
-            this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.GraphViewer.MouseDownElement = null;
-            this.GraphViewer.Name = "GraphViewer";
-            this.GraphViewer.NodeCountForSimpleView = 200;
-            this.GraphViewer.ShowRecipeToolTip = false;
-            this.GraphViewer.Size = new System.Drawing.Size(914, 587);
-            this.GraphViewer.SmartNodeDirection = false;
-            this.GraphViewer.TabIndex = 12;
-            this.GraphViewer.TooltipsEnabled = true;
-            this.GraphViewer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
+            this.GraphViewerTabContainer.SelectedIndexChanged += new System.EventHandler(this.GraphViewerTabContainer_SelectedIndexChanged);
             // 
             // MainForm
             // 
@@ -612,9 +572,6 @@
             this.MainSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).EndInit();
             this.MainSplitContainer.ResumeLayout(false);
-            this.GraphViewerTabContainer.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -637,7 +594,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox MajorGridlinesDropDown;
         private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
-        private ProductionGraphViewer GraphViewer;
+        private System.Collections.ObjectModel.Collection<ProductionGraphViewer> GraphViewerCollection;
         private System.Windows.Forms.Button AddItemButton;
         private System.Windows.Forms.Button AddRecipeButton;
         private System.Windows.Forms.Label label4;
@@ -651,7 +608,6 @@
 		private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.SplitContainer MainSplitContainer;
         private System.Windows.Forms.TabControl GraphViewerTabContainer;
-        private System.Windows.Forms.TabPage tabPage1;
     }
 }
 
