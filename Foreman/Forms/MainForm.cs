@@ -13,8 +13,8 @@ namespace Foreman
 	public partial class MainForm : Form
 	{
 		internal const string DefaultPreset = "Factorio 1.1 Vanilla";
-		private string savefilePath = null;
-		private ProductionGraphViewer GraphViewer;
+
+		public ProductionGraphViewer GraphViewer { get; set; }
 
 		public MainForm()
 		{
@@ -23,105 +23,12 @@ namespace Foreman
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
-		private void GraphViewerCollection_AddTab()
-		{ 
-			TabPage tabPage = new TabPage();
-			GraphViewerTabContainer.Controls.Add(tabPage);
-
-			
-			ProductionGraphViewer pgv = new ProductionGraphViewer();
-			tabPage.Controls.Add(pgv);
-
-			pgv.AllowDrop = true;
-			pgv.ArrowsOnLinks = false;
-			pgv.AutoSize = true;
-			pgv.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			pgv.BackColor = System.Drawing.Color.White;
-			pgv.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			pgv.DCache = null;
-			pgv.Dock = System.Windows.Forms.DockStyle.Fill;
-			pgv.IconsOnly = false;
-			pgv.IconsSize = 32;
-			pgv.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
-			pgv.Location = new System.Drawing.Point(3, 3);
-			pgv.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-			pgv.MouseDownElement = null;
-			pgv.NodeCountForSimpleView = 200;
-			pgv.ShowRecipeToolTip = false;
-			pgv.Size = new System.Drawing.Size(914, 587);
-			pgv.SmartNodeDirection = false;
-			pgv.TabIndex = 12;
-			pgv.TooltipsEnabled = true;
-			pgv.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GraphViewer_KeyDown);
-
-			GraphViewerCollection.Add(pgv);
-			GraphViewer = pgv;
-
-			if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
-				Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
-			pgv.Graph.SelectedRateUnit = (ProductionGraph.RateUnit)Properties.Settings.Default.DefaultRateUnit;
-
-			if (!Enum.IsDefined(typeof(ModuleSelector.Style), Properties.Settings.Default.DefaultModuleOption))
-				Properties.Settings.Default.DefaultModuleOption = (int)ModuleSelector.Style.None;
-			pgv.Graph.ModuleSelector.DefaultSelectionStyle = (ModuleSelector.Style)Properties.Settings.Default.DefaultModuleOption;
-
-			if (!Enum.IsDefined(typeof(AssemblerSelector.Style), Properties.Settings.Default.DefaultAssemblerOption))
-				Properties.Settings.Default.DefaultAssemblerOption = (int)AssemblerSelector.Style.WorstNonBurner;
-			pgv.Graph.AssemblerSelector.DefaultSelectionStyle = (AssemblerSelector.Style)Properties.Settings.Default.DefaultAssemblerOption;
-
-			pgv.ArrowsOnLinks = Properties.Settings.Default.ArrowsOnLinks;
-			pgv.DynamicLinkWidth = Properties.Settings.Default.DynamicLineWidth;
-			pgv.ShowRecipeToolTip = Properties.Settings.Default.ShowRecipeToolTip;
-			pgv.LockedRecipeEditPanelPosition = Properties.Settings.Default.LockedRecipeEditorPosition;
-
-			if (!Enum.IsDefined(typeof(ProductionGraphViewer.LOD), Properties.Settings.Default.LevelOfDetail))
-				Properties.Settings.Default.LevelOfDetail = (int)ProductionGraphViewer.LOD.Medium;
-			pgv.LevelOfDetail = (ProductionGraphViewer.LOD)Properties.Settings.Default.LevelOfDetail;
-
-			if (!Enum.IsDefined(typeof(NodeDirection), Properties.Settings.Default.DefaultNodeDirection))
-				Properties.Settings.Default.DefaultNodeDirection = (int)NodeDirection.Up;
-			pgv.Graph.DefaultNodeDirection = (NodeDirection)Properties.Settings.Default.DefaultNodeDirection;
-
-			pgv.SmartNodeDirection = Properties.Settings.Default.SmartNodeDirection;
-
-			pgv.Graph.EnableExtraProductivityForNonMiners = Properties.Settings.Default.EnableExtraProductivityForNonMiners;
-			pgv.NodeCountForSimpleView = Properties.Settings.Default.NodeCountForSimpleView;
-			pgv.FlagOUSuppliedNodes = Properties.Settings.Default.FlagOUSuppliedNodes;
-
-			pgv.ArrowRenderer.ShowErrorArrows = Properties.Settings.Default.ShowErrorArrows;
-			pgv.ArrowRenderer.ShowWarningArrows = Properties.Settings.Default.ShowWarningArrows;
-			pgv.ArrowRenderer.ShowDisconnectedArrows = Properties.Settings.Default.ShowDisconnectedArrows;
-			pgv.ArrowRenderer.ShowOUNodeArrows = Properties.Settings.Default.ShowOUSuppliedArrows;
-			pgv.Graph.DefaultToSimplePassthroughNodes = Properties.Settings.Default.SimplePassthroughNodes;
-
-			pgv.IconsOnly = Properties.Settings.Default.IconsOnlyView;
-			IconViewCheckBox.Checked = pgv.IconsOnly;
-			if (Properties.Settings.Default.IconsSize < 8) Properties.Settings.Default.IconsSize = 8;
-			if (Properties.Settings.Default.IconsSize > 256) Properties.Settings.Default.IconsSize = 256;
-			pgv.IconsSize = Properties.Settings.Default.IconsSize;
-
-			//scrolling keys
-			pgv.KeyDownCode = Properties.Settings.Default.KeyDownCode;
-			pgv.KeyUpCode = Properties.Settings.Default.KeyUpCode;
-			pgv.KeyRightCode = Properties.Settings.Default.KeyRightCode;
-			pgv.KeyLeftCode = Properties.Settings.Default.KeyLeftCode;
-			pgv.KeyScrollRatio = Properties.Settings.Default.KeyScrollRatio;
-
-			//MR: rework to init - not new
-			NewGraph();
-
-			GraphViewerTabContainer.SelectedTab = tabPage;
-		}
-
-		private void MainForm_Load(object sender, EventArgs e)
+        private void MainForm_Load(object sender, EventArgs e)
 		{
 			WindowState = FormWindowState.Maximized;
 
 			Properties.Settings.Default.ForemanVersion = 5;
 
-			// new collection
-			GraphViewerCollection = new System.Collections.ObjectModel.Collection<ProductionGraphViewer>();
-			
 			RateOptionsDropDown.Items.AddRange(ProductionGraph.RateUnitNames);
 			RateOptionsDropDown.SelectedIndex = Properties.Settings.Default.DefaultRateUnit; ;
 			MinorGridlinesDropDown.SelectedIndex = Properties.Settings.Default.MinorGridlines;
@@ -130,7 +37,6 @@ namespace Foreman
 
 			Properties.Settings.Default.Save();
 
-			//MR_TEST
 			if (GraphViewer != null)
 			{
 				GraphViewer.Invalidate();
@@ -146,18 +52,20 @@ namespace Foreman
 
 		private void SaveButton_Click(object sender, EventArgs e)
 		{
-			if (savefilePath == null || !SaveGraph(savefilePath))
-				SaveGraphAs();
+			Controls.TabPageGV pg = (Controls.TabPageGV)GraphViewerTabContainer.SelectedTab;
+
+			if (pg.savefilePath == null || !pg.SaveGraph(pg.savefilePath))
+				pg.SaveGraphAs();
 		}
 
 		private void SaveAsGraphButton_Click(object sender, EventArgs e)
 		{
-			SaveGraphAs();
+			((Controls.TabPageGV)GraphViewerTabContainer.SelectedTab).SaveGraphAs();
 		}
 
 		private void LoadGraphButton_Click(object sender, EventArgs e)
 		{
-			LoadGraph();
+			GraphViewerTabContainer.LoadGraph();
 		}
 
 		private void ImportGraphButton_Click(object sender, EventArgs e)
@@ -167,133 +75,17 @@ namespace Foreman
 
 		private void NewGraphButton_Click(object sender, EventArgs e)
 		{
-			NewGraph();
+			GraphViewerTabContainer.NewGraph();
 		}
 
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			e.Cancel = !TestGraphSavedStatus();
+			//MR_TODO: e.Cancel = !TestGraphSavedStatus();
 		}
 
-		private void SaveGraphAs()
-		{
-			SaveFileDialog dialog = new SaveFileDialog();
-			dialog.DefaultExt = ".fjson";
-			dialog.Filter = "Foreman files (*.fjson)|*.fjson|All files|*.*";
-			if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
-				Directory.CreateDirectory(Path.Combine(Application.StartupPath, "Saved Graphs"));
-			dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Saved Graphs");
-			dialog.AddExtension = true;
-			dialog.OverwritePrompt = true;
-			dialog.FileName = "Flowchart.fjson";
-			if (dialog.ShowDialog() != DialogResult.OK)
-				return;
 
-			SaveGraph(dialog.FileName);
-		}
 
-		private bool SaveGraph(string path)
-		{
-			var serialiser = JsonSerializer.Create();
-			serialiser.Formatting = Formatting.Indented;
-			var writer = new JsonTextWriter(new StreamWriter(path));
-			try
-			{
-				GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
-				serialiser.Serialize(writer, GraphViewer);
-				savefilePath = path;
-				this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
-				return true;
-			}
-			catch (Exception exception)
-			{
-				MessageBox.Show("Could not save this file. See log for more details");
-				ErrorLogging.LogLine(String.Format("Error saving file '{0}'. Error: '{1}'", path, exception.Message));
-				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
-				return false;
-			}
-			finally
-			{
-				writer.Close();
-			}
-		}
 
-		private void LoadGraph()
-		{
-			//MR: Do not need to check if saved
-			//if (!TestGraphSavedStatus())
-			//	return;
-
-			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
-			if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
-				Directory.CreateDirectory(Path.Combine(Application.StartupPath, "Saved Graphs"));
-			dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Saved Graphs");
-			dialog.CheckFileExists = true;
-			if (dialog.ShowDialog() != DialogResult.OK)
-				return;
-
-			LoadGraph(dialog.FileName, dialog.SafeFileName);
-		}
-
-		private async void LoadGraph(string path, string name)
-		{
-			GraphViewerCollection_AddTab();
-
-			try
-			{
-				await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(path)), false, true);
-				savefilePath = path;
-			}
-			catch (Exception exception)
-			{
-				MessageBox.Show("Could not load this file. See log for more details");
-				ErrorLogging.LogLine(string.Format("Error loading file '{0}'. Error: '{1}'", path, exception.Message));
-				ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
-			}
-
-			RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
-			Properties.Settings.Default.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
-			Properties.Settings.Default.DefaultRateUnit = (int)GraphViewer.Graph.SelectedRateUnit;
-			Properties.Settings.Default.DefaultAssemblerOption = (int)GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
-			Properties.Settings.Default.DefaultModuleOption = (int)GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
-			Properties.Settings.Default.DefaultNodeDirection = (int)GraphViewer.Graph.DefaultNodeDirection;
-
-			Properties.Settings.Default.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
-
-			Properties.Settings.Default.Save();
-			GraphViewer.Invalidate();
-			this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
-			
-			GraphViewerTabContainer.SelectedTab.Text = name;
-			GraphViewerTabContainer.Invalidate();
-		}
-
-		private void NewGraph()
-		{
-			//if (!TestGraphSavedStatus())
-			//	return;
-
-			GraphViewer.ClearGraph();
-			GraphViewer.Graph.LowPriorityPower = 2f;
-			GraphViewer.Graph.PullOutputNodes = false;
-			GraphViewer.Graph.PullOutputNodesPower = 1f;
-
-			List<Preset> validPresets = GetValidPresetsList();
-			if (validPresets != null && validPresets.Count > 0)
-			{
-				Properties.Settings.Default.CurrentPresetName = validPresets[0].Name;
-				GraphViewer.LoadPreset(validPresets[0]);
-				savefilePath = null;
-			}
-			else
-			{
-				Properties.Settings.Default.CurrentPresetName = "No Preset!";
-			}
-
-			Properties.Settings.Default.Save();
-			this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
-		}
 
 		private void ImportGraph()
 		{
@@ -323,38 +115,7 @@ namespace Foreman
 			}
 		}
 
-		private bool TestGraphSavedStatus()
-		{
-			if (savefilePath == null)
-			{
-				if (GraphViewer.Graph.Nodes.Any())
-					return MessageBox.Show("The current graph hasnt been saved!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
-				else
-					return true;
-			}
 
-			if (!File.Exists(savefilePath))
-				return MessageBox.Show("The current graph's save file has been deleted!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
-
-			StringBuilder stringBuilder = new StringBuilder();
-			var writer = new JsonTextWriter(new StringWriter(stringBuilder));
-
-			JsonSerializer serialiser = JsonSerializer.Create();
-			serialiser.Formatting = Formatting.Indented;
-			GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
-			serialiser.Serialize(writer, GraphViewer);
-
-			if (File.ReadAllText(savefilePath) != stringBuilder.ToString())
-			{
-				DialogResult result = MessageBox.Show("The current graph has been modified!\nDo you wish to save before continuing?", "Are you sure?", MessageBoxButtons.YesNoCancel);
-				if (result == DialogResult.Cancel)
-					return false;
-				if (result == DialogResult.OK)
-					SaveGraph(savefilePath);
-			}
-
-			return true;
-		}
 
 		//---------------------------------------------------------Settings/export/additem/addrecipe
 
@@ -456,7 +217,7 @@ namespace Foreman
 
 						List<Preset> validPresets = GetValidPresetsList();
 						await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
-						this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+						//MR_TODO: this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 					}
 					else //not loading a new preset -> update the enabled statuses
 					{
@@ -563,9 +324,12 @@ namespace Foreman
 
 		private void MainForm_KeyDown(object sender, KeyEventArgs e)
 		{
-			if(e.KeyCode == Keys.S && (Control.ModifierKeys & Keys.Control) == Keys.Control)
-				if (savefilePath == null || !SaveGraph(savefilePath))
-					SaveGraphAs();
+			if (e.KeyCode == Keys.S && (Control.ModifierKeys & Keys.Control) == Keys.Control)
+			{ 
+				Controls.TabPageGV pg = (Controls.TabPageGV)GraphViewerTabContainer.SelectedTab;
+				if (pg.savefilePath == null || !pg.SaveGraph(pg.savefilePath))
+					pg.SaveGraphAs(); 
+			}
 		}
 
 		//---------------------------------------------------------Production Graph properties
@@ -696,11 +460,6 @@ namespace Foreman
 				return cp;
 			}
 		}
-
-        private void GraphViewerTabContainer_SelectedIndexChanged(object sender, EventArgs e)
-        {
-			GraphViewer = GraphViewerCollection[GraphViewerTabContainer.SelectedIndex];
-        }
     }
 
     public class Preset : IEquatable<Preset>

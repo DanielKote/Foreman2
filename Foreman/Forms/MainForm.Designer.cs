@@ -57,7 +57,7 @@
             this.GraphSummaryButton = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.GraphViewerTabContainer = new System.Windows.Forms.TabControl();
+            this.GraphViewerTabContainer = new Controls.TabControlGV(this);
             this.MainLayoutPanel.SuspendLayout();
             this.MenuTable.SuspendLayout();
             this.MenuButtonsTable.SuspendLayout();
@@ -533,12 +533,12 @@
             // GraphViewerTabContainer
             // 
             this.GraphViewerTabContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GraphViewerTabContainer.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
             this.GraphViewerTabContainer.Location = new System.Drawing.Point(0, 0);
             this.GraphViewerTabContainer.Name = "GraphViewerTabContainer";
             this.GraphViewerTabContainer.SelectedIndex = 0;
             this.GraphViewerTabContainer.Size = new System.Drawing.Size(928, 619);
             this.GraphViewerTabContainer.TabIndex = 13;
-            this.GraphViewerTabContainer.SelectedIndexChanged += new System.EventHandler(this.GraphViewerTabContainer_SelectedIndexChanged);
             // 
             // MainForm
             // 
@@ -586,7 +586,7 @@
         private System.Windows.Forms.Button ImportGraphButton;
         private System.Windows.Forms.GroupBox ProductionGroupBox;
         private System.Windows.Forms.CheckBox PauseUpdatesCheckbox;
-        private System.Windows.Forms.ComboBox RateOptionsDropDown;
+        public System.Windows.Forms.ComboBox RateOptionsDropDown;
         private System.Windows.Forms.GroupBox GridLinesGroupBox;
         private System.Windows.Forms.Button AlignSelectionButton;
         private System.Windows.Forms.CheckBox GridlinesCheckbox;
@@ -594,7 +594,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox MajorGridlinesDropDown;
         private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
-        private System.Collections.ObjectModel.Collection<ProductionGraphViewer> GraphViewerCollection;
         private System.Windows.Forms.Button AddItemButton;
         private System.Windows.Forms.Button AddRecipeButton;
         private System.Windows.Forms.Label label4;
@@ -603,11 +602,11 @@
 		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
 		private System.Windows.Forms.TableLayoutPanel GridlinesTable;
 		private System.Windows.Forms.Button GraphSummaryButton;
-		private System.Windows.Forms.CheckBox IconViewCheckBox;
+		public System.Windows.Forms.CheckBox IconViewCheckBox;
 		private System.Windows.Forms.Label VersionLabel;
 		private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.SplitContainer MainSplitContainer;
-        private System.Windows.Forms.TabControl GraphViewerTabContainer;
+        private Controls.TabControlGV GraphViewerTabContainer;
     }
 }
 

@@ -159,6 +159,18 @@
     <Compile Include="Controls\SyncListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\TabControlGV.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabControlGV.Designer.cs">
+      <DependentUpon>TabControlGV.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TabPageGV.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabPageGV.Designer.cs">
+      <DependentUpon>TabPageGV.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataCache\DataTypes\EntityObjectBase.cs" />
     <Compile Include="DataCache\DataTypes\Fluid.cs" />
     <Compile Include="DataCache\DataTypes\RecipeShort.cs" />
@@ -416,6 +428,7 @@
     <Content Include="Licences.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\icon_close.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">
