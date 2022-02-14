@@ -37,6 +37,8 @@ namespace Foreman
 
 			Properties.Settings.Default.Save();
 
+			GraphViewerTabContainer.NewGraph();
+
 			if (GraphViewer != null)
 			{
 				GraphViewer.Invalidate();
@@ -53,14 +55,20 @@ namespace Foreman
 		private void SaveButton_Click(object sender, EventArgs e)
 		{
 			Controls.TabPageGV pg = (Controls.TabPageGV)GraphViewerTabContainer.SelectedTab;
-
-			if (pg.savefilePath == null || !pg.SaveGraph(pg.savefilePath))
-				pg.SaveGraphAs();
+			if (pg != null) 
+			{ 
+				if (pg.savefilePath == null || !pg.SaveGraph(pg.savefilePath))
+					pg.SaveGraphAs();
+			}
 		}
 
 		private void SaveAsGraphButton_Click(object sender, EventArgs e)
 		{
-			((Controls.TabPageGV)GraphViewerTabContainer.SelectedTab).SaveGraphAs();
+			Controls.TabPageGV pg = (Controls.TabPageGV)GraphViewerTabContainer.SelectedTab;
+			if (pg != null)
+            {
+				pg.SaveGraphAs();
+            }				
 		}
 
 		private void LoadGraphButton_Click(object sender, EventArgs e)
@@ -310,14 +318,20 @@ namespace Foreman
 
 		private void AddRecipeButton_Click(object sender, EventArgs e)
 		{
-			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-			GraphViewer.AddRecipe(new Point(15, 15), null, location, NewNodeType.Disconnected);
+			if (GraphViewer != null)
+			{
+				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
+				GraphViewer.AddRecipe(new Point(15, 15), null, location, NewNodeType.Disconnected);
+			}
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)
 		{
-			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-			GraphViewer.AddItem(new Point(15, 15), location);
+			if (GraphViewer != null)
+			{
+				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
+				GraphViewer.AddItem(new Point(15, 15), location);
+			}
 		}
 
 		//---------------------------------------------------------Key & Mouse events
@@ -415,14 +429,17 @@ namespace Foreman
 
 		private void GridlinesCheckbox_CheckedChanged(object sender, EventArgs e)
 		{
-			if (GraphViewer.Grid.ShowGrid != GridlinesCheckbox.Checked)
+			if (GraphViewer != null)
 			{
-				GraphViewer.Grid.ShowGrid = GridlinesCheckbox.Checked;
-				GraphViewer.Invalidate();
-			}
+				if (GraphViewer.Grid.ShowGrid != GridlinesCheckbox.Checked)
+				{
+					GraphViewer.Grid.ShowGrid = GridlinesCheckbox.Checked;
+					GraphViewer.Invalidate();
+				}
 
-			Properties.Settings.Default.AltGridlines = (GridlinesCheckbox.Checked);
-			Properties.Settings.Default.Save();
+				Properties.Settings.Default.AltGridlines = (GridlinesCheckbox.Checked);
+				Properties.Settings.Default.Save();
+			}
 		}
 
 		private void AlignSelectionButton_Click(object sender, EventArgs e)
