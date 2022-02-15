@@ -45,6 +45,8 @@ namespace Foreman
 				GraphViewer.Focus();
 			}
 #if DEBUG
+			string str = Application.StartupPath + "\\Saved Graphs" + "\\SB_Alien.fjson";
+			GraphViewerTabContainer.LoadGraph(str, str);
 			//LoadGraph(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }));
 #endif
 		}

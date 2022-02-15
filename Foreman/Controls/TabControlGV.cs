@@ -146,7 +146,7 @@ namespace Foreman.Controls
             LoadGraph(dialog.FileName, dialog.SafeFileName);
         }
 
-        private async void LoadGraph(string path, string name)
+        public async void LoadGraph(string path, string name)
         {
             TabControlGV_AddTab();
 
