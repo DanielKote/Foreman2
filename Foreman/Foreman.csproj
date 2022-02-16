@@ -143,6 +143,12 @@
     <Compile Include="Controls\EditFlowPanel.Designer.cs">
       <DependentUpon>EditFlowPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\GraphSummary.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\GraphSummary.Designer.cs">
+      <DependentUpon>GraphSummary.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\IRChooserPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -297,6 +303,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\EditFlowPanel.resx">
       <DependentUpon>EditFlowPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GraphSummary.resx">
+      <DependentUpon>GraphSummary.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
