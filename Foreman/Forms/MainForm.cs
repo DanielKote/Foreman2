@@ -19,6 +19,7 @@ namespace Foreman
 		public MainForm()
 		{
 			InitializeComponent();
+			GraphViewerTabContainer.ParentForm = this;
 			this.DoubleBuffered = true;
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}

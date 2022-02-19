@@ -17,13 +17,11 @@ namespace Foreman.Controls
     {
         private Image closeX;
 
-        private MainForm ParentForm;
+        public MainForm ParentForm;
 
-        public TabControlGV(Form parent)
+        public TabControlGV()
         {
             InitializeComponent();
-
-            ParentForm = (MainForm)parent;
 
             closeX = Properties.Resources.icon_close;
 

@@ -1,6 +1,6 @@
 ﻿namespace Foreman
 {
-	partial class MainForm
+	partial class MainForm : System.Windows.Forms.Form
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -57,7 +57,7 @@
             this.GraphSummaryButton = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.GraphViewerTabContainer = new Controls.TabControlGV(this);
+            this.GraphViewerTabContainer = new Controls.TabControlGV();
             this.MainLayoutPanel.SuspendLayout();
             this.MenuTable.SuspendLayout();
             this.MenuButtonsTable.SuspendLayout();
@@ -521,7 +521,7 @@
             this.MainSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainSplitContainer.Location = new System.Drawing.Point(3, 139);
             this.MainSplitContainer.Name = "MainSplitContainer";
-            this.MainSplitContainer.Panel1Collapsed = true;
+            this.MainSplitContainer.Panel1Collapsed = false;
             // 
             // MainSplitContainer.Panel2
             // 
