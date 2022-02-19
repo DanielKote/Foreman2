@@ -162,6 +162,12 @@
     <Compile Include="Controls\RecipeToolTip.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\SchemaList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SchemaList.Designer.cs">
+      <DependentUpon>SchemaList.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SyncListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -309,6 +315,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\IRChooserPanel.resx">
       <DependentUpon>IRChooserPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SchemaList.resx">
+      <DependentUpon>SchemaList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\GraphSummaryForm.resx">
       <DependentUpon>GraphSummaryForm.cs</DependentUpon>

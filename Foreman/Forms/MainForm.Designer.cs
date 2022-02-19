@@ -57,7 +57,8 @@
             this.GraphSummaryButton = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.GraphViewerTabContainer = new Controls.TabControlGV();
+            this.schemaList = new Foreman.Controls.SchemaList();
+            this.GraphViewerTabContainer = new Foreman.Controls.TabControlGV();
             this.MainLayoutPanel.SuspendLayout();
             this.MenuTable.SuspendLayout();
             this.MenuButtonsTable.SuspendLayout();
@@ -66,6 +67,7 @@
             this.ProductionGroupBox.SuspendLayout();
             this.GraphOptionsTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).BeginInit();
+            this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
             this.SuspendLayout();
@@ -521,14 +523,26 @@
             this.MainSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainSplitContainer.Location = new System.Drawing.Point(3, 139);
             this.MainSplitContainer.Name = "MainSplitContainer";
-            this.MainSplitContainer.Panel1Collapsed = false;
+            // 
+            // MainSplitContainer.Panel1
+            // 
+            this.MainSplitContainer.Panel1.Controls.Add(this.schemaList);
             // 
             // MainSplitContainer.Panel2
             // 
             this.MainSplitContainer.Panel2.Controls.Add(this.GraphViewerTabContainer);
             this.MainSplitContainer.Size = new System.Drawing.Size(928, 619);
-            this.MainSplitContainer.SplitterDistance = 309;
+            this.MainSplitContainer.SplitterDistance = 158;
+            this.MainSplitContainer.SplitterWidth = 8;
             this.MainSplitContainer.TabIndex = 19;
+            // 
+            // schemaList
+            // 
+            this.schemaList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.schemaList.Location = new System.Drawing.Point(0, 0);
+            this.schemaList.Name = "schemaList";
+            this.schemaList.Size = new System.Drawing.Size(158, 619);
+            this.schemaList.TabIndex = 0;
             // 
             // GraphViewerTabContainer
             // 
@@ -537,7 +551,7 @@
             this.GraphViewerTabContainer.Location = new System.Drawing.Point(0, 0);
             this.GraphViewerTabContainer.Name = "GraphViewerTabContainer";
             this.GraphViewerTabContainer.SelectedIndex = 0;
-            this.GraphViewerTabContainer.Size = new System.Drawing.Size(928, 619);
+            this.GraphViewerTabContainer.Size = new System.Drawing.Size(762, 619);
             this.GraphViewerTabContainer.TabIndex = 13;
             // 
             // MainForm
@@ -569,6 +583,7 @@
             this.ProductionGroupBox.PerformLayout();
             this.GraphOptionsTable.ResumeLayout(false);
             this.GraphOptionsTable.PerformLayout();
+            this.MainSplitContainer.Panel1.ResumeLayout(false);
             this.MainSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).EndInit();
             this.MainSplitContainer.ResumeLayout(false);
@@ -606,7 +621,8 @@
 		private System.Windows.Forms.Label VersionLabel;
 		private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.SplitContainer MainSplitContainer;
-        private Controls.TabControlGV GraphViewerTabContainer;
+        public Controls.TabControlGV GraphViewerTabContainer;
+        public Controls.SchemaList schemaList;
     }
 }
 

@@ -19,7 +19,12 @@ namespace Foreman
 		public MainForm()
 		{
 			InitializeComponent();
+			
 			GraphViewerTabContainer.ParentForm = this;
+			
+			schemaList.mainForm = this;
+			schemaList.LoadSchemas();
+
 			this.DoubleBuffered = true;
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
