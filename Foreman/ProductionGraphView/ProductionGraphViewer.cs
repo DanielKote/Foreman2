@@ -300,6 +300,17 @@ namespace Foreman
 				Graph.UpdateNodeStates();
 				Invalidate();
 			}
+			else if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
+			{
+				if (nNodeType == NewNodeType.Consumer)
+				{
+					ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Consumer, null));
+				}
+				else
+				{
+					ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Supplier, null));
+				}
+			}
 			else
 			{
 				fRange tempRange = new fRange(0, 0, true);
