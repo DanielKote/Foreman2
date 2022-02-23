@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Foreman
 {
-	public enum NewNodeType { Disconnected, Supplier, Consumer }
+	public enum NewNodeType { Disconnected, Supplier, Consumer, Label}
 	public enum NodeDrawingStyle { Regular, PrintStyle, Simple, IconsOnly } //printstyle is meant for any additional chages (from regular) for exporting to image format, simple will only draw the node boxes (no icons or text) and link lines, iconsonly will draw node icons instead of nodes (for zoomed view)
 
 	[Serializable]
@@ -172,6 +172,11 @@ namespace Foreman
 			draggedLinkElement = null;
 		}
 
+		public void AddLabel(Point drawOrigin, Point newLocation)
+		{
+			AddRecipe(drawOrigin, null, newLocation, NewNodeType.Label);
+		}
+
 		public void AddItem(Point drawOrigin, Point newLocation)
 		{
 			if (string.IsNullOrEmpty(DCache.PresetName))
@@ -200,8 +205,8 @@ namespace Foreman
 				return;
 			}
 
-			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
-				Trace.Fail("Origin element or base item not provided for a new (linked) node");
+			//MR: if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
+			//MR:	Trace.Fail("Origin element or base item not provided for a new (linked) node");
 			
 			if (Grid.ShowGrid)
 				newLocation = Grid.AlignToGrid(newLocation);
@@ -216,6 +221,9 @@ namespace Foreman
 				ReadOnlyBaseNode newNode = null;
 				switch (recipeRequestArgs.NodeType)
 				{
+					case NodeType.Label:
+						newNode = Graph.CreateLabelNode(baseItem, newLocation);
+						break;
 					case NodeType.Consumer:
 						newNode = Graph.CreateConsumerNode(baseItem, newLocation);
 						break;
@@ -310,6 +318,10 @@ namespace Foreman
 				{
 					ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Supplier, null));
 				}
+			}
+			else if (nNodeType == NewNodeType.Label)
+			{ 
+				ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Label, null));
 			}
 			else
 			{
@@ -702,6 +714,8 @@ namespace Foreman
 				element = new PassthroughNodeElement(this, pnode);
 			else if (e.node is ReadOnlyRecipeNode rnode)
 				element = new RecipeNodeElement(this, rnode);
+			else if (e.node is ReadOnlyLabelNode lnode)
+				element = new LabelNodeElement(this, lnode);
 			else
 				Trace.Fail("Unexpected node type created in graph.");
 

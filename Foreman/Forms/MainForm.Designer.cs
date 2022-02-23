@@ -59,6 +59,7 @@
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.schemaList = new Foreman.Controls.SchemaList();
             this.GraphViewerTabContainer = new Foreman.Controls.TabControlGV();
+            this.AddLabelButton = new System.Windows.Forms.Button();
             this.MainLayoutPanel.SuspendLayout();
             this.MenuTable.SuspendLayout();
             this.MenuButtonsTable.SuspendLayout();
@@ -119,6 +120,7 @@
             this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.MenuButtonsTable.Controls.Add(this.AddLabelButton, 1, 3);
             this.MenuButtonsTable.Controls.Add(this.SaveButton, 0, 1);
             this.MenuButtonsTable.Controls.Add(this.AddItemButton, 1, 1);
             this.MenuButtonsTable.Controls.Add(this.AddRecipeButton, 1, 2);
@@ -554,6 +556,21 @@
             this.GraphViewerTabContainer.Size = new System.Drawing.Size(762, 619);
             this.GraphViewerTabContainer.TabIndex = 13;
             // 
+            // AddLabelButton
+            // 
+            this.AddLabelButton.AutoSize = true;
+            this.AddLabelButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.AddLabelButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AddLabelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AddLabelButton.Location = new System.Drawing.Point(77, 92);
+            this.AddLabelButton.Margin = new System.Windows.Forms.Padding(2);
+            this.AddLabelButton.Name = "AddLabelButton";
+            this.AddLabelButton.Size = new System.Drawing.Size(83, 26);
+            this.AddLabelButton.TabIndex = 13;
+            this.AddLabelButton.Text = "Add Label";
+            this.AddLabelButton.UseVisualStyleBackColor = true;
+            this.AddLabelButton.Click += new System.EventHandler(this.AddLabelButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -623,6 +640,7 @@
         private System.Windows.Forms.SplitContainer MainSplitContainer;
         public Controls.TabControlGV GraphViewerTabContainer;
         public Controls.SchemaList schemaList;
+        private System.Windows.Forms.Button AddLabelButton;
     }
 }
 

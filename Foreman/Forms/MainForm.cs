@@ -485,6 +485,15 @@ namespace Foreman
 				return cp;
 			}
 		}
+
+        private void AddLabelButton_Click(object sender, EventArgs e)
+        {
+			if (GraphViewer != null)
+			{
+				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
+				GraphViewer.AddLabel(new Point(15, 15), location);
+			}
+		}
     }
 
     public class Preset : IEquatable<Preset>

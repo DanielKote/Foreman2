@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Foreman
 {
-	public enum NodeType { Supplier, Consumer, Passthrough, Recipe }
+	public enum NodeType { Supplier, Consumer, Passthrough, Recipe, Label }
 	public enum LinkType { Input, Output }
 
 	public class NodeEventArgs : EventArgs
@@ -118,6 +118,18 @@ namespace Foreman
 
 		public BaseNodeController RequestNodeController(ReadOnlyBaseNode node) { if(roToNode.ContainsKey(node)) return roToNode[node].Controller; return null; }
 
+		public ReadOnlyLabelNode CreateLabelNode(Item item, Point location)
+        {
+			LabelNode node = new LabelNode(this, lastNodeID++, item);
+			node.Location = location;
+			node.NodeDirection = DefaultNodeDirection;
+			nodes.Add(node);
+			roToNode.Add(node.ReadOnlyNode, node);
+			node.UpdateState();
+			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
+			return (ReadOnlyLabelNode)node.ReadOnlyNode;
+			
+        }
 		public ReadOnlyConsumerNode CreateConsumerNode(Item item, Point location)
 		{
 			ConsumerNode node = new ConsumerNode(this, lastNodeID++, item);

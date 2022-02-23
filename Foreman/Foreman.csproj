@@ -237,6 +237,7 @@
     <Compile Include="Models\LinkChecker.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\Nodes\ConsumerNode.cs" />
+    <Compile Include="Models\Nodes\LabelNode.cs" />
     <Compile Include="Models\Nodes\PassthroughNode.cs" />
     <Compile Include="Models\Nodes\RecipeNode.cs" />
     <Compile Include="Models\Nodes\SupplierNode.cs" />
@@ -253,6 +254,7 @@
     <Compile Include="ProductionGraphView\Elements\BeaconElement.cs" />
     <Compile Include="ProductionGraphView\Elements\ConsumerNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\ErrorNoticeElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\LabelNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\PassthroughNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\RecipeNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\SupplierNodeElement.cs" />
