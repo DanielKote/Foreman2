@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 
 namespace Foreman
 {
@@ -24,6 +25,14 @@ namespace Foreman
 			LabelItem = item;
 			controller = LabelNodeController.GetController(this);
 			ReadOnlyNode = new ReadOnlyLabelNode(this);
+		}
+
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			base.GetObjectData(info, context);
+
+			info.AddValue("NodeType", NodeType.Label);
+			info.AddValue("LabelText", LabelItem.Name);
 		}
 	}
 	public class ReadOnlyLabelNode : ReadOnlyBaseNode

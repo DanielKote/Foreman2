@@ -51,8 +51,8 @@ namespace Foreman
 				GraphViewer.Focus();
 			}
 #if DEBUG
-			string str = Application.StartupPath + "\\Saved Graphs" + "\\SB_Alien.fjson";
-			GraphViewerTabContainer.LoadGraph(str, str);
+			string str = Application.StartupPath + "\\Saved Graphs" + "\\test.fjson";
+			//GraphViewerTabContainer.LoadGraph(str, str);
 			//LoadGraph(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }));
 #endif
 		}
@@ -393,8 +393,8 @@ namespace Foreman
 				form.Left = this.Left + 50;
 				form.Top = this.Top + 50;
 				form.ShowDialog();
-
 			}
+			//graphSummaryRight.InitGraphSummary(GraphViewer.Graph.Nodes, GraphViewer.Graph.NodeLinks, GraphViewer.Graph.GetRateName());
 		}
 
 		//---------------------------------------------------------Gridlines
@@ -493,6 +493,13 @@ namespace Foreman
 				Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
 				GraphViewer.AddLabel(new Point(15, 15), location);
 			}
+		}
+
+        private void btnFindSupply_Click(object sender, EventArgs e)
+        {
+			//ListViewItem lvItem = graphSummaryRight.ItemsListView.SelectedItems[0];
+			graphSummaryRight.Visible = true;
+			graphSummaryRight.InitGraphSummary(GraphViewer.Graph.Nodes, GraphViewer.Graph.NodeLinks, GraphViewer.Graph.GetRateName());
 		}
     }
 

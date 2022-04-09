@@ -99,7 +99,7 @@ namespace Foreman.Controls
 			IconList.Images.Clear();
 			IconList.Images.Add(DataCache.UnknownIcon);
 
-			ItemsTabPage.Text += " ( per " + rateString + ")";
+			ItemsTabPage.Text = "Items/Fluids ( per " + rateString + ")";
 			this.rateString = rateString;
 			
 			//lists
@@ -118,14 +118,14 @@ namespace Foreman.Controls
 			
 			double buildingTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => Math.Ceiling(((ReadOnlyRecipeNode)n).ActualAssemblerCount));
 			double beaconTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalBeacons());
-			BuildingCountLabel.Text += GraphicsStuff.DoubleToString(buildingTotal);
-			BeaconCountLabel.Text += GraphicsStuff.DoubleToString(beaconTotal);
+			BuildingCountLabel.Text = "#Buildings: " + GraphicsStuff.DoubleToString(buildingTotal);
+			BeaconCountLabel.Text = "#Beacons: " + GraphicsStuff.DoubleToString(beaconTotal);
 
 			//power totals
 			double powerConsumption = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalAssemblerElectricalConsumption() + ((ReadOnlyRecipeNode)n).GetTotalBeaconElectricalConsumption());
 			double powerProduction = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalGeneratorElectricalProduction());
-			PowerConsumptionLabel.Text += GraphicsStuff.DoubleToEnergy(powerConsumption, "W");
-			PowerProductionLabel.Text += GraphicsStuff.DoubleToEnergy(powerProduction, "W");
+			PowerConsumptionLabel.Text = "Power Consumption:" + GraphicsStuff.DoubleToEnergy(powerConsumption, "W");
+			PowerProductionLabel.Text = "Power Production: " + GraphicsStuff.DoubleToEnergy(powerProduction, "W");
 			
 			//update filtered
 			UpdateFilteredBuildingLists();
@@ -646,7 +646,7 @@ namespace Foreman.Controls
 						{
 							string[] cLine = new string[columnNames[i].Length];
 							for (int j = 0; j < cLine.Length; j++)
-								cLine[j] = (lvi.SubItems[j].Tag ?? lvi.SubItems[j].Text).ToString().Replace(",", "").Replace("\n", "; ").Replace("\t", "");
+								cLine[j] = lvi.SubItems[j].Name  + "," + (lvi.SubItems[j].Tag ?? lvi.SubItems[j].Text).ToString().Replace(",", "").Replace("\n", "; ").Replace("\t", "");
 							csvLines.Add(cLine);
 						}
 						csvLines.Add(new string[] { "" });
@@ -661,5 +661,10 @@ namespace Foreman.Controls
 				}
 			}
 		}
-	}
+
+        private void ItemsListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
 }

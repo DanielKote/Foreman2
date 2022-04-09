@@ -101,7 +101,7 @@ namespace Foreman
 		protected virtual void UpdateState()
 		{
 			//update error notice
-			errorNotice.SetVisibility(DisplayedNode.State == NodeState.Error || DisplayedNode.State == NodeState.Warning);
+			errorNotice.SetVisibility(DisplayedNode.State == NodeState.Error || DisplayedNode.State == NodeState.Warning || DisplayedNode.State == NodeState.Search);
 			errorNotice.X = -Width / 2;
 			errorNotice.Y = -Height / 2;
 

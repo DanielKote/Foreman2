@@ -10,6 +10,9 @@ namespace Foreman
     public class LabelNodeElement : BaseNodeElement
     {
         private new readonly ReadOnlyLabelNode DisplayedNode;
+        public string LabelText;
+
+        private static readonly Font labelFont = new Font(FontFamily.GenericSansSerif, 15, FontStyle.Bold);
 
         protected override Brush CleanBgBrush { get { return labelBgBrush; } }
         private static Brush labelBgBrush = new SolidBrush(Color.FromArgb(249, 237, 195));
@@ -17,19 +20,16 @@ namespace Foreman
 
         public LabelNodeElement(ProductionGraphViewer graphViewer, ReadOnlyLabelNode parent) : base(graphViewer, parent)
         {
-            Width = 20;
-            Height = 20;
+            Width = 50;
+            Height = 50;
         }
 
-        protected override void Draw(Graphics graphics, NodeDrawingStyle style)
-        {
-            Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
-            graphics.DrawRectangle(devPen, trans.X, trans.Y, Width, Height);
-        }
 
         protected override void DetailsDraw(Graphics graphics, Point trans)
         {
-            //MR:
+            //Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
+            graphics.DrawRectangle(devPen, trans.X, trans.Y, Width, Height);
+            graphics.DrawString(LabelText, labelFont, Brushes.Black, trans.X, trans.Y + 5);
         }
 
         protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive)

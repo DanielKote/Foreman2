@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 namespace Foreman
 {
 	public enum RateType { Auto, Manual };
-	public enum NodeState { Clean, MissingLink, Warning, Error }
+	public enum NodeState { Clean, MissingLink, Warning, Error, Search }
 	public enum NodeDirection { Up, Down }
 
 	[Serializable]

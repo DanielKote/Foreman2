@@ -29,25 +29,25 @@ namespace Foreman
 		/// </summary>
 		private void InitializeComponent()
 		{
-
             this.GS = new Foreman.Controls.GraphSummary();
-
             this.SuspendLayout();
-
+            // 
             // GS
             // 
             this.GS.AutoSize = true;
             this.GS.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GS.Location = new System.Drawing.Point(3, 3);
+            this.GS.MinimumSize = new System.Drawing.Size(780, 540);
             this.GS.Name = "GS";
-            this.GS.Size = new System.Drawing.Size(758, 495);
+            this.GS.Padding = new System.Windows.Forms.Padding(3);
+            this.GS.Size = new System.Drawing.Size(782, 556);
             this.GS.TabIndex = 0;
             // 
             // GraphSummaryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(764, 501);
+            this.ClientSize = new System.Drawing.Size(788, 562);
             this.Controls.Add(this.GS);
             this.DoubleBuffered = true;
             this.MinimizeBox = false;

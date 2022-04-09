@@ -34,8 +34,8 @@ namespace Foreman
 		}
 
 		public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
-		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
-		private static readonly float[] RateMultiplier = new float[] { 1f, 60f, 300f, 600f, 1800f, 3600f }; //, 21600f, 43200f, 86400f };
+		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" , "6 hours", "12 hours", "24 hours", "240 hours" };
+		private static readonly float[] RateMultiplier = new float[] { 1f, 60f, 300f, 600f, 1800f, 3600f, 21600f, 43200f, 86400f, 864000f};
 
 		public RateUnit SelectedRateUnit { get; set; }
 		public float GetRateMultipler() { return RateMultiplier[(int)SelectedRateUnit]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
@@ -456,6 +456,10 @@ namespace Foreman
 
 					switch ((NodeType)(int)nodeJToken["NodeType"])
 					{
+						case NodeType.Label:
+							newNode = roToNode[CreateLabelNode(null, location)];
+							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
+							break;
 						case NodeType.Consumer:
 							itemName = (string)nodeJToken["Item"];
 							if (cache.Items.ContainsKey(itemName))

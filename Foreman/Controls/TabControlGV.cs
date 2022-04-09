@@ -71,6 +71,7 @@ namespace Foreman.Controls
             {
                this.TabPages.RemoveAt(i);
             }
+            Invalidate();
         }
         private void TabControlGV_MouseClick(object sender, MouseEventArgs e)
         {
