@@ -646,7 +646,7 @@ namespace Foreman.Controls
 						{
 							string[] cLine = new string[columnNames[i].Length];
 							for (int j = 0; j < cLine.Length; j++)
-								cLine[j] = lvi.SubItems[j].Name  + "," + (lvi.SubItems[j].Tag ?? lvi.SubItems[j].Text).ToString().Replace(",", "").Replace("\n", "; ").Replace("\t", "");
+								cLine[j] = lvi.SubItems[j].Name  + "," + (lvi.SubItems[j].Tag ?? lvi.SubItems[j].Text).ToString().Replace(",", ".").Replace("\n", "; ").Replace("\t", "");
 							csvLines.Add(cLine);
 						}
 						csvLines.Add(new string[] { "" });
