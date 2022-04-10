@@ -147,18 +147,20 @@ namespace Foreman.Controls
 
         public async void LoadGraph(string path, string name)
         {
-            TabControlGV_AddTab();
-
             try
             {
+                TabControlGV_AddTab();
                 await ParentForm.GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(path)), false, true);
                 ((TabPageGV)SelectedTab).savefilePath = path;
             }
             catch (Exception exception)
             {
+                this.TabPages.RemoveAt(this.SelectedIndex);
                 MessageBox.Show("Could not load this file. See log for more details");
                 ErrorLogging.LogLine(string.Format("Error loading file '{0}'. Error: '{1}'", path, exception.Message));
                 ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
+                Invalidate();
+                return;
             }
 
             ParentForm.RateOptionsDropDown.SelectedIndex = (int)ParentForm.GraphViewer.Graph.SelectedRateUnit;
