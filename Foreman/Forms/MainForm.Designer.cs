@@ -595,7 +595,7 @@
             // 
             this.RightSplitContainer.Panel2.Controls.Add(this.graphSummaryRight);
             this.RightSplitContainer.Size = new System.Drawing.Size(847, 619);
-            this.RightSplitContainer.SplitterDistance = 813;
+            this.RightSplitContainer.SplitterDistance = 812;
             this.RightSplitContainer.TabIndex = 14;
             // 
             // GraphViewerTabContainer
@@ -605,7 +605,7 @@
             this.GraphViewerTabContainer.Location = new System.Drawing.Point(0, 0);
             this.GraphViewerTabContainer.Name = "GraphViewerTabContainer";
             this.GraphViewerTabContainer.SelectedIndex = 0;
-            this.GraphViewerTabContainer.Size = new System.Drawing.Size(813, 619);
+            this.GraphViewerTabContainer.Size = new System.Drawing.Size(812, 619);
             this.GraphViewerTabContainer.TabIndex = 13;
             // 
             // graphSummaryRight

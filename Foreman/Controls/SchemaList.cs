@@ -22,6 +22,7 @@ namespace Foreman.Controls
         public void LoadSchemas()
         {
             DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//Saved Graphs");
+            listSchemas.Items.Clear();
             foreach (FileInfo file in di.GetFiles("*.fjson"))
             { 
                 listSchemas.Items.Add(file.Name);

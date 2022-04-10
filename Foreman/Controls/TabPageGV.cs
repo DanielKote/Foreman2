@@ -135,6 +135,7 @@ namespace Foreman.Controls
 				serialiser.Serialize(writer, GraphViewer);
 				savefilePath = path;
 				this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+				
 				return true;
 			}
 			catch (Exception exception)

@@ -67,6 +67,8 @@ namespace Foreman
 			{ 
 				if (pg.savefilePath == null || !pg.SaveGraph(pg.savefilePath))
 					pg.SaveGraphAs();
+
+				schemaList.LoadSchemas();
 			}
 		}
 
@@ -76,7 +78,8 @@ namespace Foreman
 			if (pg != null)
             {
 				pg.SaveGraphAs();
-            }				
+				schemaList.LoadSchemas();
+			}				
 		}
 
 		private void LoadGraphButton_Click(object sender, EventArgs e)
