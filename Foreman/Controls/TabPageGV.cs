@@ -134,8 +134,8 @@ namespace Foreman.Controls
 				GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
 				serialiser.Serialize(writer, GraphViewer);
 				savefilePath = path;
-				this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
-				
+				this.Text = string.Format(Path.GetFileName(path) + " ");
+				Parent.Invalidate();
 				return true;
 			}
 			catch (Exception exception)
