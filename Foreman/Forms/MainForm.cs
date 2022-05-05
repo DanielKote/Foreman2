@@ -1,12 +1,12 @@
-﻿using System;
-using System.Windows.Forms;
-using System.IO;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Foreman
 {
@@ -402,7 +402,7 @@ namespace Foreman
 							beacon.Enabled = options.EnabledObjects.Contains(beacon);
 						foreach (Module module in GraphViewer.DCache.Modules.Values)
 							module.Enabled = options.EnabledObjects.Contains(module);
-						GraphViewer.DCache.RocketAssembler.Enabled = GraphViewer.DCache.Assemblers["rocket-silo"]?.Enabled?? false;
+						GraphViewer.DCache.RocketAssembler.Enabled = GraphViewer.DCache.Assemblers["rocket-silo"]?.Enabled ?? false;
 					}
 
 					GraphViewer.LevelOfDetail = options.LevelOfDetail;
@@ -490,7 +490,7 @@ namespace Foreman
 
 		private void MainForm_KeyDown(object sender, KeyEventArgs e)
 		{
-			if(e.KeyCode == Keys.S && (Control.ModifierKeys & Keys.Control) == Keys.Control)
+			if (e.KeyCode == Keys.S && (Control.ModifierKeys & Keys.Control) == Keys.Control)
 				if (savefilePath == null || !SaveGraph(savefilePath))
 					SaveGraphAs();
 		}
@@ -602,8 +602,8 @@ namespace Foreman
 			if (SystemInformation.TerminalServerSession)
 				return;
 			System.Reflection.PropertyInfo aProp = typeof(Control).GetProperty("DoubleBuffered",
-				System.Reflection.BindingFlags.NonPublic |
-				System.Reflection.BindingFlags.Instance);
+							System.Reflection.BindingFlags.NonPublic |
+							System.Reflection.BindingFlags.Instance);
 			aProp.SetValue(c, true, null);
 		}
 

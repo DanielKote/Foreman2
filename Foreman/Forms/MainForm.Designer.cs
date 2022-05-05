@@ -571,27 +571,27 @@
 		}
 
 		#endregion
-        private System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
-        private System.Windows.Forms.Button SaveAsGraphButton;
-        private System.Windows.Forms.Button LoadGraphButton;
-        private System.Windows.Forms.Button NewGraphButton;
-        private System.Windows.Forms.Button EnableDisableButton;
-        private System.Windows.Forms.Button ExportImageButton;
-        private System.Windows.Forms.Button ImportGraphButton;
-        private System.Windows.Forms.GroupBox ProductionGroupBox;
-        private System.Windows.Forms.CheckBox PauseUpdatesCheckbox;
-        private System.Windows.Forms.ComboBox RateOptionsDropDown;
-        private System.Windows.Forms.GroupBox GridLinesGroupBox;
-        private System.Windows.Forms.Button AlignSelectionButton;
-        private System.Windows.Forms.CheckBox GridlinesCheckbox;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox MajorGridlinesDropDown;
-        private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
-        private ProductionGraphViewer GraphViewer;
-        private System.Windows.Forms.Button AddItemButton;
-        private System.Windows.Forms.Button AddRecipeButton;
-        private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
+		private System.Windows.Forms.Button SaveAsGraphButton;
+		private System.Windows.Forms.Button LoadGraphButton;
+		private System.Windows.Forms.Button NewGraphButton;
+		private System.Windows.Forms.Button EnableDisableButton;
+		private System.Windows.Forms.Button ExportImageButton;
+		private System.Windows.Forms.Button ImportGraphButton;
+		private System.Windows.Forms.GroupBox ProductionGroupBox;
+		private System.Windows.Forms.CheckBox PauseUpdatesCheckbox;
+		private System.Windows.Forms.ComboBox RateOptionsDropDown;
+		private System.Windows.Forms.GroupBox GridLinesGroupBox;
+		private System.Windows.Forms.Button AlignSelectionButton;
+		private System.Windows.Forms.CheckBox GridlinesCheckbox;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.ComboBox MajorGridlinesDropDown;
+		private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
+		private ProductionGraphViewer GraphViewer;
+		private System.Windows.Forms.Button AddItemButton;
+		private System.Windows.Forms.Button AddRecipeButton;
+		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.TableLayoutPanel MenuTable;
 		private System.Windows.Forms.TableLayoutPanel MenuButtonsTable;
 		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;

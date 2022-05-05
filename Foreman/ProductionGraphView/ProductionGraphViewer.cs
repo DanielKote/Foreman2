@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Windows.Forms;
-using System.Runtime.Serialization;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
-using Newtonsoft.Json;
-using System.Text;
+using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Foreman
 {
@@ -27,7 +27,7 @@ namespace Foreman
 		public bool ArrowsOnLinks { get; set; }
 		public bool IconsOnly { get; set; }
 		public int IconsSize { get; set; }
-		public int IconsDrawSize { get { return ViewScale > ((double)IconsSize / 96)? 96 : (int)(IconsSize / ViewScale); } }
+		public int IconsDrawSize { get { return ViewScale > ((double)IconsSize / 96) ? 96 : (int)(IconsSize / ViewScale); } }
 
 		public int NodeCountForSimpleView { get; set; } //if the number of elements to draw is over this amount then the drawing functions will switch to simple view draws (mostly for FPS during zoomed out views)
 		public bool ShowRecipeToolTip { get; set; }
@@ -186,7 +186,7 @@ namespace Foreman
 
 		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null, bool offsetLocationToItemTabLevel = false)
 		{
-			if(string.IsNullOrEmpty(DCache.PresetName))
+			if (string.IsNullOrEmpty(DCache.PresetName))
 			{
 				DisposeLinkDrag();
 				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt.");
@@ -195,14 +195,14 @@ namespace Foreman
 
 			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
-			
+
 			if (Grid.ShowGrid)
 				newLocation = Grid.AlignToGrid(newLocation);
 
 			int lastNodeWidth = 0;
 			NodeDirection newNodeDirection = (originElement == null || !SmartNodeDirection) ? Graph.DefaultNodeDirection :
-				draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? originElement.DisplayedNode.NodeDirection :
-				originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
+							draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? originElement.DisplayedNode.NodeDirection :
+							originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
 
 			void ProcessNodeRequest(object o, RecipeRequestArgs recipeRequestArgs)
 			{
@@ -322,11 +322,11 @@ namespace Foreman
 		public void AddPassthroughNodesFromSelection(LinkType linkType, Size offset)
 		{
 			List<BaseNodeElement> newPassthroughNodes = new List<BaseNodeElement>();
-			foreach(PassthroughNodeElement passthroughNode in selectedNodes)
+			foreach (PassthroughNodeElement passthroughNode in selectedNodes)
 			{
 				NodeDirection newNodeDirection = !SmartNodeDirection ? Graph.DefaultNodeDirection :
-					draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? passthroughNode.DisplayedNode.NodeDirection :
-					passthroughNode.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
+								draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? passthroughNode.DisplayedNode.NodeDirection :
+								passthroughNode.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
 
 				Item passthroughItem = ((ReadOnlyPassthroughNode)passthroughNode.DisplayedNode).PassthroughItem;
 
@@ -339,9 +339,9 @@ namespace Foreman
 				controller.SetDirection(newNodeDirection);
 
 				if (linkType == LinkType.Input)
-					Graph.CreateLink(newNode, passthroughNode.DisplayedNode, passthroughItem );
+					Graph.CreateLink(newNode, passthroughNode.DisplayedNode, passthroughItem);
 				else
-					Graph.CreateLink(passthroughNode.DisplayedNode, newNode, passthroughItem );
+					Graph.CreateLink(passthroughNode.DisplayedNode, newNode, passthroughItem);
 
 				newPassthroughNodes.Add(nodeElementDictionary[newNode]);
 			}
@@ -395,8 +395,8 @@ namespace Foreman
 			Point screenOriginPoint = GraphToScreen(new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y));
 			screenOriginPoint = new Point(screenOriginPoint.X - editPanel.Width, screenOriginPoint.Y - (editPanel.Height / 2));
 			Point offset = new Point(
-				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.X), this.Width - screenOriginPoint.X - editPanel.Width - bNodeElement.Width - 25)),
-				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.Y), this.Height - screenOriginPoint.Y - editPanel.Height - 25)));
+							(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.X), this.Width - screenOriginPoint.X - editPanel.Width - bNodeElement.Width - 25)),
+							(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.Y), this.Height - screenOriginPoint.Y - editPanel.Height - 25)));
 
 			ViewOffset = Point.Add(ViewOffset, new Size((int)(offset.X / ViewScale), (int)(offset.Y / ViewScale)));
 			UpdateGraphBounds();
@@ -431,8 +431,8 @@ namespace Foreman
 				recipeEditPanelOriginPoint.Y += editPanel.Height / 2 - 125;
 				recipeEditPanelOriginPoint.X -= recipePanel.Width + 5;
 				Point offset = new Point(
-					(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.X), this.Width - recipeEditPanelOriginPoint.X - editPanel.Width)),
-					(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.Y), this.Height - recipeEditPanelOriginPoint.Y - editPanel.Height - 25)));
+								(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.X), this.Width - recipeEditPanelOriginPoint.X - editPanel.Width)),
+								(int)(Math.Min(Math.Max(0, 25 - recipeEditPanelOriginPoint.Y), this.Height - recipeEditPanelOriginPoint.Y - editPanel.Height - 25)));
 
 				editPanel.Location = Point.Add(recipeEditPanelOriginPoint, (Size)offset);
 				recipePanel.Location = new Point(editPanel.Location.X + editPanel.Width + 5, editPanel.Location.Y);
@@ -555,7 +555,7 @@ namespace Foreman
 			selectionPen.Width = 2 / ViewScale;
 
 			//grid
-			if(!FullGraph)
+			if (!FullGraph)
 				Grid.Paint(graphics, ViewScale, VisibleGraphBounds, (currentDragOperation == DragOperation.Item) ? MouseDownElement as BaseNodeElement : null);
 
 			//process link element widths
@@ -594,7 +594,7 @@ namespace Foreman
 			//paint all elements (nodes & lines)
 			int visibleElements = GetPaintingOrder().Count(e => e.Visible && e is BaseNodeElement);
 			foreach (GraphElement element in GetPaintingOrder())
-				element.Paint(graphics, FullGraph? NodeDrawingStyle.PrintStyle : IconsOnly? NodeDrawingStyle.IconsOnly : (visibleElements > NodeCountForSimpleView || ViewScale < 0.2)? NodeDrawingStyle.Simple : NodeDrawingStyle.Regular); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
+				element.Paint(graphics, FullGraph ? NodeDrawingStyle.PrintStyle : IconsOnly ? NodeDrawingStyle.IconsOnly : (visibleElements > NodeCountForSimpleView || ViewScale < 0.2) ? NodeDrawingStyle.Simple : NodeDrawingStyle.Regular); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
 
 			//selection zone
 			if (currentDragOperation == DragOperation.Selection && !FullGraph)
@@ -744,18 +744,18 @@ namespace Foreman
 
 						rightClickMenu.MenuItems.Clear();
 						rightClickMenu.MenuItems.Add(new MenuItem("Add Item",
-							new EventHandler((o, ee) =>
-							{
-								AddItem(screenPoint, ScreenToGraph(e.Location));
-							})));
+										new EventHandler((o, ee) =>
+										{
+											AddItem(screenPoint, ScreenToGraph(e.Location));
+										})));
 						rightClickMenu.MenuItems.Add(new MenuItem("Add Recipe",
-							new EventHandler((o, ee) =>
-							{
-								AddRecipe(screenPoint, null, ScreenToGraph(e.Location), NewNodeType.Disconnected);
-							})));
+										new EventHandler((o, ee) =>
+										{
+											AddRecipe(screenPoint, null, ScreenToGraph(e.Location), NewNodeType.Disconnected);
+										})));
 						rightClickMenu.Show(this, e.Location);
 					}
-					else if(currentDragOperation != DragOperation.Selection)
+					else if (currentDragOperation != DragOperation.Selection)
 						element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
 					break;
 				case MouseButtons.Middle:
@@ -1065,10 +1065,10 @@ namespace Foreman
 			}
 
 			VisibleGraphBounds = new Rectangle(
-				(int)(-Width / (2 * ViewScale) - ViewOffset.X),
-				(int)(-Height / (2 * ViewScale) - ViewOffset.Y),
-				(int)(Width / ViewScale),
-				(int)(Height / ViewScale));
+							(int)(-Width / (2 * ViewScale) - ViewOffset.X),
+							(int)(-Height / (2 * ViewScale) - ViewOffset.Y),
+							(int)(Width / ViewScale),
+							(int)(Height / ViewScale));
 		}
 
 		private void ProductionGraphViewer_Resize(object sender, EventArgs e)
@@ -1232,7 +1232,7 @@ namespace Foreman
 					else
 					{
 						//errors found. even though the name fits, but the preset seems to be the wrong one. Proceed with searching for best-fit
-						if(errors != null)
+						if (errors != null)
 							presetErrors.Add(errors);
 						allPresets.Remove(savedWPreset);
 					}
