@@ -36,7 +36,7 @@ namespace Foreman
 		public bool DynamicLinkWidth = false;
 		public bool LockedRecipeEditPanelPosition = true;
 		public bool FlagOUSuppliedNodes = false; //if true, will add a flag for over or under supplied nodes
-
+		public bool ReduceCrossings = false;
 		public bool SmartNodeDirection { get; set; }
 
 		public DataCache DCache { get; set; }
@@ -539,6 +539,13 @@ namespace Foreman
 			e.Graphics.TranslateTransform(ViewOffset.X, ViewOffset.Y);
 
 			Paint(e.Graphics, false);
+		}
+
+		public void LayoutGraph()
+		{
+			// TODO: Make the passthrough width configurable
+			Graph.LayoutGraph(ReduceCrossings, n => (n is ReadOnlyPassthroughNode passthrough && passthrough.SimpleDraw) ? 48 : 24 + nodeElementDictionary[n].Width);
+			UpdateNodeVisuals();
 		}
 
 		public new void Paint(Graphics graphics, bool FullGraph = false)

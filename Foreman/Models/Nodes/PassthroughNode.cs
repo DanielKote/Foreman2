@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Foreman
@@ -103,5 +104,15 @@ namespace Foreman
 		}
 
 		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Passthrough node never has the warning state!"); return null; }
+
+		public ReadOnlyNodeLink JoinLinks()
+		{
+			var link = MyNode.MyGraph.CreateLink(
+				MyNode.InputLinks.Single().SupplierNode.ReadOnlyNode,
+				MyNode.OutputLinks.Single().ConsumerNode.ReadOnlyNode,
+				MyNode.PassthroughItem); ;
+			Delete();
+			return link;
+		}
 	}
 }

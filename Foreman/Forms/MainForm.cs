@@ -595,6 +595,18 @@ namespace Foreman
 			}
 		}
 
+		//---------------------------------------------------------Graph layout
+
+		private void LayoutGraphButton_Click(object sender, EventArgs e)
+		{
+			GraphViewer.LayoutGraph();
+		}
+
+		private void ReduceCrossingsCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			GraphViewer.ReduceCrossings = ReduceCrossingsCheckBox.Checked;
+		}
+
 		//---------------------------------------------------------double buffering commands
 
 		public static void SetDoubleBuffered(Control c)
