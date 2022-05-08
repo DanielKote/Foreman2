@@ -56,6 +56,10 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.PauseUpdatesCheckbox = new System.Windows.Forms.CheckBox();
 			this.GraphSummaryButton = new System.Windows.Forms.Button();
+			this.GraphLayoutGroupBox = new System.Windows.Forms.GroupBox();
+			this.GraphLayoutTable = new System.Windows.Forms.TableLayoutPanel();
+			this.LayoutGraphButton = new System.Windows.Forms.Button();
+			this.ReduceCrossingsCheckBox = new System.Windows.Forms.CheckBox();
 			this.VersionLabel = new System.Windows.Forms.Label();
 			this.MainLayoutPanel.SuspendLayout();
 			this.MenuTable.SuspendLayout();
@@ -64,6 +68,8 @@
 			this.GridlinesTable.SuspendLayout();
 			this.ProductionGroupBox.SuspendLayout();
 			this.GraphOptionsTable.SuspendLayout();
+			this.GraphLayoutGroupBox.SuspendLayout();
+			this.GraphLayoutTable.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// MainLayoutPanel
@@ -115,12 +121,13 @@
 			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.MenuTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuTable.Controls.Add(this.MenuButtonsTable, 0, 0);
 			this.MenuTable.Controls.Add(this.GridLinesGroupBox, 1, 0);
 			this.MenuTable.Controls.Add(this.ProductionGroupBox, 2, 0);
+			this.MenuTable.Controls.Add(this.GraphLayoutGroupBox, 3, 0);
 			this.MenuTable.Controls.Add(this.VersionLabel, 5, 0);
 			this.MenuTable.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MenuTable.Location = new System.Drawing.Point(3, 3);
@@ -526,13 +533,72 @@
 			this.GraphSummaryButton.UseVisualStyleBackColor = true;
 			this.GraphSummaryButton.Click += new System.EventHandler(this.GraphSummaryButton_Click);
 			// 
+			// GraphLayoutGroupBox
+			// 
+			this.GraphLayoutGroupBox.AutoSize = true;
+			this.GraphLayoutGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.GraphLayoutGroupBox.Controls.Add(this.GraphLayoutTable);
+			this.GraphLayoutGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.GraphLayoutGroupBox.Location = new System.Drawing.Point(664, 3);
+			this.GraphLayoutGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
+			this.GraphLayoutGroupBox.Name = "GraphLayoutGroupBox";
+			this.GraphLayoutGroupBox.Padding = new System.Windows.Forms.Padding(0);
+			this.GraphLayoutGroupBox.Size = new System.Drawing.Size(126, 122);
+			this.GraphLayoutGroupBox.TabIndex = 19;
+			this.GraphLayoutGroupBox.TabStop = false;
+			this.GraphLayoutGroupBox.Text = "Layout [EXP]";
+			// 
+			// GraphLayoutTable
+			// 
+			this.GraphLayoutTable.AutoSize = true;
+			this.GraphLayoutTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.GraphLayoutTable.ColumnCount = 2;
+			this.GraphLayoutTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphLayoutTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.GraphLayoutTable.Controls.Add(this.LayoutGraphButton, 0, 0);
+			this.GraphLayoutTable.Controls.Add(this.ReduceCrossingsCheckBox, 0, 2);
+			this.GraphLayoutTable.Location = new System.Drawing.Point(3, 16);
+			this.GraphLayoutTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.GraphLayoutTable.Name = "GraphLayoutTable";
+			this.GraphLayoutTable.RowCount = 4;
+			this.GraphLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.GraphLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.GraphLayoutTable.Size = new System.Drawing.Size(120, 66);
+			this.GraphLayoutTable.TabIndex = 1;
+			// 
+			// LayoutGraphButton
+			// 
+			this.LayoutGraphButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.LayoutGraphButton.Location = new System.Drawing.Point(3, 3);
+			this.LayoutGraphButton.Name = "LayoutGraphButton";
+			this.LayoutGraphButton.Size = new System.Drawing.Size(114, 23);
+			this.LayoutGraphButton.TabIndex = 1;
+			this.LayoutGraphButton.Text = "Layout Graph";
+			this.LayoutGraphButton.UseVisualStyleBackColor = true;
+			this.LayoutGraphButton.Click += new System.EventHandler(this.LayoutGraphButton_Click);
+			// 
+			// ReduceCrossingsCheckBox
+			// 
+			this.ReduceCrossingsCheckBox.AutoSize = true;
+			this.ReduceCrossingsCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ReduceCrossingsCheckBox.Location = new System.Drawing.Point(3, 29);
+			this.ReduceCrossingsCheckBox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+			this.ReduceCrossingsCheckBox.Name = "ReduceCrossingsCheckBox";
+			this.ReduceCrossingsCheckBox.Size = new System.Drawing.Size(114, 17);
+			this.ReduceCrossingsCheckBox.TabIndex = 3;
+			this.ReduceCrossingsCheckBox.Text = "Reduce Crossings";
+			this.ReduceCrossingsCheckBox.UseVisualStyleBackColor = true;
+			this.ReduceCrossingsCheckBox.CheckedChanged += new System.EventHandler(this.ReduceCrossingsCheckBox_CheckedChanged);
+			// 
 			// VersionLabel
 			// 
 			this.VersionLabel.AutoSize = true;
 			this.VersionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.VersionLabel.Location = new System.Drawing.Point(810, 0);
+			this.VersionLabel.Location = new System.Drawing.Point(811, 0);
 			this.VersionLabel.Name = "VersionLabel";
-			this.VersionLabel.Size = new System.Drawing.Size(115, 130);
+			this.VersionLabel.Size = new System.Drawing.Size(114, 130);
 			this.VersionLabel.TabIndex = 18;
 			this.VersionLabel.Text = "Foreman v2.0 - dev.12";
 			this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -566,32 +632,36 @@
 			this.ProductionGroupBox.PerformLayout();
 			this.GraphOptionsTable.ResumeLayout(false);
 			this.GraphOptionsTable.PerformLayout();
+			this.GraphLayoutGroupBox.ResumeLayout(false);
+			this.GraphLayoutGroupBox.PerformLayout();
+			this.GraphLayoutTable.ResumeLayout(false);
+			this.GraphLayoutTable.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
-        private System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
-        private System.Windows.Forms.Button SaveAsGraphButton;
-        private System.Windows.Forms.Button LoadGraphButton;
-        private System.Windows.Forms.Button NewGraphButton;
-        private System.Windows.Forms.Button EnableDisableButton;
-        private System.Windows.Forms.Button ExportImageButton;
-        private System.Windows.Forms.Button ImportGraphButton;
-        private System.Windows.Forms.GroupBox ProductionGroupBox;
-        private System.Windows.Forms.CheckBox PauseUpdatesCheckbox;
-        private System.Windows.Forms.ComboBox RateOptionsDropDown;
-        private System.Windows.Forms.GroupBox GridLinesGroupBox;
-        private System.Windows.Forms.Button AlignSelectionButton;
-        private System.Windows.Forms.CheckBox GridlinesCheckbox;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox MajorGridlinesDropDown;
-        private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
-        private ProductionGraphViewer GraphViewer;
-        private System.Windows.Forms.Button AddItemButton;
-        private System.Windows.Forms.Button AddRecipeButton;
-        private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
+		private System.Windows.Forms.Button SaveAsGraphButton;
+		private System.Windows.Forms.Button LoadGraphButton;
+		private System.Windows.Forms.Button NewGraphButton;
+		private System.Windows.Forms.Button EnableDisableButton;
+		private System.Windows.Forms.Button ExportImageButton;
+		private System.Windows.Forms.Button ImportGraphButton;
+		private System.Windows.Forms.GroupBox ProductionGroupBox;
+		private System.Windows.Forms.CheckBox PauseUpdatesCheckbox;
+		private System.Windows.Forms.ComboBox RateOptionsDropDown;
+		private System.Windows.Forms.GroupBox GridLinesGroupBox;
+		private System.Windows.Forms.Button AlignSelectionButton;
+		private System.Windows.Forms.CheckBox GridlinesCheckbox;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.ComboBox MajorGridlinesDropDown;
+		private System.Windows.Forms.ComboBox MinorGridlinesDropDown;
+		private ProductionGraphViewer GraphViewer;
+		private System.Windows.Forms.Button AddItemButton;
+		private System.Windows.Forms.Button AddRecipeButton;
+		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.TableLayoutPanel MenuTable;
 		private System.Windows.Forms.TableLayoutPanel MenuButtonsTable;
 		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
@@ -600,6 +670,10 @@
 		private System.Windows.Forms.CheckBox IconViewCheckBox;
 		private System.Windows.Forms.Label VersionLabel;
 		private System.Windows.Forms.Button SaveButton;
+		private System.Windows.Forms.Button LayoutGraphButton;
+		private System.Windows.Forms.GroupBox GraphLayoutGroupBox;
+		private System.Windows.Forms.TableLayoutPanel GraphLayoutTable;
+		private System.Windows.Forms.CheckBox ReduceCrossingsCheckBox;
 	}
 }
 
