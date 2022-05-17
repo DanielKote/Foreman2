@@ -205,8 +205,8 @@ namespace Foreman
 				return;
 			}
 
-			//MR: if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
-			//MR:	Trace.Fail("Origin element or base item not provided for a new (linked) node");
+			//if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem == null))
+			//	Trace.Fail("Origin element or base item not provided for a new (linked) node");
 			
 			if (Grid.ShowGrid)
 				newLocation = Grid.AlignToGrid(newLocation);

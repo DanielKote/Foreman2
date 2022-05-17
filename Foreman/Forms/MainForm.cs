@@ -100,7 +100,10 @@ namespace Foreman
 
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			//MR_TODO: e.Cancel = !TestGraphSavedStatus();
+			foreach (Controls.TabPageGV pg in GraphViewerTabContainer.TabPages)
+			{
+				e.Cancel = !(pg.TestGraphSavedStatus());
+			}			
 		}
 
 

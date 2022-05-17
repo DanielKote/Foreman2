@@ -174,7 +174,6 @@ namespace Foreman.Controls
 
             Properties.Settings.Default.Save();
             ParentForm.GraphViewer.Invalidate();
-            //MR_TODO: this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 
             SelectedTab.Text = name + "  ";
             Invalidate();
@@ -203,7 +202,6 @@ namespace Foreman.Controls
             }
 
             Properties.Settings.Default.Save();
-            //MR_TODO: this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
         }
     }
 }
