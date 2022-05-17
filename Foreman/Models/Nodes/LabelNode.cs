@@ -19,10 +19,12 @@ namespace Foreman
         internal override double inputRateFor(Item item) { throw new ArgumentException("Label should not have outputs!"); }
         internal override double outputRateFor(Item item) { throw new ArgumentException("Label should not have outputs!"); }
 		
-		public readonly Item LabelItem;
-		public LabelNode(ProductionGraph graph, int nodeID, Item item) : base(graph, nodeID)
+		public string LabelText;
+		public int LabelSize;
+		public LabelNode(ProductionGraph graph, int nodeID, string text, int size) : base(graph, nodeID)
 		{
-			LabelItem = item;
+			LabelText = text;
+			LabelSize = size;
 			controller = LabelNodeController.GetController(this);
 			ReadOnlyNode = new ReadOnlyLabelNode(this);
 		}
@@ -32,24 +34,22 @@ namespace Foreman
 			base.GetObjectData(info, context);
 
 			info.AddValue("NodeType", NodeType.Label);
-			info.AddValue("LabelText", LabelItem.Name);
+			info.AddValue("LabelText", LabelText);
+			info.AddValue("LabelSize", LabelSize);
 		}
 	}
 	public class ReadOnlyLabelNode : ReadOnlyBaseNode
 	{
-		public Item LabelItem => MyNode.LabelItem;
+		public Item LabelItem => null;
 
-		private readonly LabelNode MyNode;
+		public readonly LabelNode MyNode;
 
 		public ReadOnlyLabelNode(LabelNode node) : base(node) { MyNode = node; }
 
 		public override List<string> GetErrors()
 		{
 			List<string> errors = new List<string>();
-			if (LabelItem.IsMissing)
-				errors.Add(string.Format("> Item \"{0}\" doesnt exist in preset!", LabelItem.FriendlyName));
-			else if (!MyNode.AllLinksValid)
-				errors.Add("> Some links are invalid!");
+			// no errors for labels
 			return errors;
 		}
 
@@ -72,14 +72,21 @@ namespace Foreman
 		public override Dictionary<string, Action> GetErrorResolutions()
 		{
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-			if (MyNode.LabelItem.IsMissing)
-				resolutions.Add("Delete node", new Action(() => this.Delete()));
-			else
-				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
-					resolutions.Add(kvp.Key, kvp.Value);
+			// no resolutions - as there should be no errors
 			return resolutions;
 		}
 
 		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Label node never has the warning state!"); return null; }
+
+		public void SetLabelText(string newText)
+		{
+			MyNode.LabelText = newText;
+		}
+
+		public void SetLabelSize(int size)
+		{
+			MyNode.LabelSize = size;
+		}
+
 	}
 }

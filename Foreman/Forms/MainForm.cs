@@ -52,6 +52,7 @@ namespace Foreman
 			}
 #if DEBUG
 			string str = Application.StartupPath + "\\Saved Graphs" + "\\test.fjson";
+			AddLabelButton.Visible = true;
 			//GraphViewerTabContainer.LoadGraph(str, str);
 			//LoadGraph(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }));
 #endif

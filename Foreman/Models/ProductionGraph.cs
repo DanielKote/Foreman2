@@ -118,9 +118,9 @@ namespace Foreman
 
 		public BaseNodeController RequestNodeController(ReadOnlyBaseNode node) { if(roToNode.ContainsKey(node)) return roToNode[node].Controller; return null; }
 
-		public ReadOnlyLabelNode CreateLabelNode(Item item, Point location)
+		public ReadOnlyLabelNode CreateLabelNode(string text, Point location, int size)
         {
-			LabelNode node = new LabelNode(this, lastNodeID++, item);
+			LabelNode node = new LabelNode(this, lastNodeID++, text, size);
 			node.Location = location;
 			node.NodeDirection = DefaultNodeDirection;
 			nodes.Add(node);
@@ -457,7 +457,9 @@ namespace Foreman
 					switch ((NodeType)(int)nodeJToken["NodeType"])
 					{
 						case NodeType.Label:
-							newNode = roToNode[CreateLabelNode(null, location)];
+							itemName = (string)nodeJToken["LabelText"];
+							int itemSize = (int)nodeJToken["LabelSize"];
+							newNode = roToNode[CreateLabelNode(itemName, location,itemSize)];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Consumer:

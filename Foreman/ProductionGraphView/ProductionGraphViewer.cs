@@ -222,7 +222,7 @@ namespace Foreman
 				switch (recipeRequestArgs.NodeType)
 				{
 					case NodeType.Label:
-						newNode = Graph.CreateLabelNode(baseItem, newLocation);
+						newNode = Graph.CreateLabelNode("Empty label", newLocation, 50);
 						break;
 					case NodeType.Consumer:
 						newNode = Graph.CreateConsumerNode(baseItem, newLocation);
@@ -418,6 +418,12 @@ namespace Foreman
 				return;
 			}
 
+			if (bNodeElement is LabelNodeElement labelNodeElement)
+            {
+				EditLabelNode(labelNodeElement);
+				return;
+            }
+
 			SubwindowOpen = true;
 			Control editPanel = new EditFlowPanel(bNodeElement.DisplayedNode, this);
 
@@ -440,6 +446,21 @@ namespace Foreman
 				//bNodeElement.Update();
 				Graph.UpdateNodeValues();
 			};
+		}
+
+		public void EditLabelNode(LabelNodeElement rNodeElement)
+		{
+			LabelNodeController nc = (LabelNodeController)Graph.RequestNodeController(rNodeElement.DisplayedNode);
+
+			SubwindowOpen = true;
+			ReadOnlyLabelNode rNode = (ReadOnlyLabelNode)rNodeElement.DisplayedNode;
+			EditLabel editLabel = new EditLabel(rNode, this);
+			editLabel.Location = new Point(15, 15);
+
+			new FloatingTooltipControl(editLabel, Direction.Left, new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
+			FloatingTooltipControl fttc = new FloatingTooltipControl(editLabel, Direction.Right, new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y), this, true, true);
+			fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.RequestStateUpdate(); Graph.UpdateNodeValues(); };
+
 		}
 
 		public void EditRecipeNode(RecipeNodeElement rNodeElement)

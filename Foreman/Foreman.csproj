@@ -131,6 +131,12 @@
     <Compile Include="Controls\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\EditLabel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\EditLabel.Designer.cs">
+      <DependentUpon>EditLabel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\EditRecipePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -306,6 +312,9 @@
     </Compile>
     <Compile Include="ProductionGraphView\Elements\BaseNodeElement.cs" />
     <Compile Include="Models\Nodes\NodeLink.cs" />
+    <EmbeddedResource Include="Controls\EditLabel.resx">
+      <DependentUpon>EditLabel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\EditRecipePanel.resx">
       <DependentUpon>EditRecipePanel.cs</DependentUpon>
     </EmbeddedResource>
