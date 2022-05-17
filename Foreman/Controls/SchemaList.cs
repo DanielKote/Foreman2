@@ -33,6 +33,7 @@ namespace Foreman.Controls
         {
             string fn = listSchemas.SelectedItem.ToString();
             mainForm.GraphViewerTabContainer.LoadGraph(Application.StartupPath + "//Saved Graphs//" + fn, fn);
+            mainForm.UpdateGridLines();
         }
     }
 }

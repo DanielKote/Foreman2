@@ -86,6 +86,7 @@ namespace Foreman
 		private void LoadGraphButton_Click(object sender, EventArgs e)
 		{
 			GraphViewerTabContainer.LoadGraph();
+			UpdateGridLines();
 		}
 
 		private void ImportGraphButton_Click(object sender, EventArgs e)
@@ -408,55 +409,59 @@ namespace Foreman
 
 		private void MinorGridlinesDropDown_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			int updatedGridUnit = 0;
-			if (MinorGridlinesDropDown.SelectedIndex > 0)
-				updatedGridUnit = 6 * (int)(Math.Pow(2, MinorGridlinesDropDown.SelectedIndex - 1));
-
-			if (GraphViewer != null)
-			{
-				if (GraphViewer.Grid.CurrentGridUnit != updatedGridUnit)
-				{
-					GraphViewer.Grid.CurrentGridUnit = updatedGridUnit;
-					GraphViewer.Invalidate();
-				}
-			}
-			Properties.Settings.Default.MinorGridlines = MinorGridlinesDropDown.SelectedIndex;
-			Properties.Settings.Default.Save();
+			UpdateGridLines();
 		}
 
 		private void MajorGridlinesDropDown_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			int updatedGridUnit = 0;
-			if (MajorGridlinesDropDown.SelectedIndex > 0)
-				updatedGridUnit = 6 * (int)(Math.Pow(2, MajorGridlinesDropDown.SelectedIndex - 1));
-
-			if (GraphViewer != null)
-			{
-				if (GraphViewer.Grid.CurrentMajorGridUnit != updatedGridUnit)
-				{
-					GraphViewer.Grid.CurrentMajorGridUnit = updatedGridUnit;
-					GraphViewer.Invalidate();
-				}
-			}
-			Properties.Settings.Default.MajorGridlines = MajorGridlinesDropDown.SelectedIndex;
-			Properties.Settings.Default.Save();
+			UpdateGridLines();
 		}
 
 		private void GridlinesCheckbox_CheckedChanged(object sender, EventArgs e)
 		{
+			UpdateGridLines();
+		}
+
+		public void UpdateGridLines()
+		{
+			int updatedGridUnit = 0;
+			bool bInvalidate = false;
 			if (GraphViewer != null)
 			{
+				if (MinorGridlinesDropDown.SelectedIndex > 0)
+					updatedGridUnit = 6 * (int)(Math.Pow(2, MinorGridlinesDropDown.SelectedIndex - 1));
+
+				if (GraphViewer.Grid.CurrentGridUnit != updatedGridUnit)
+				{
+					GraphViewer.Grid.CurrentGridUnit = updatedGridUnit;
+					bInvalidate=true;
+				}
+
+				updatedGridUnit = 0;
+				if (MajorGridlinesDropDown.SelectedIndex > 0)
+					updatedGridUnit = 6 * (int)(Math.Pow(2, MajorGridlinesDropDown.SelectedIndex - 1));
+
+				if (GraphViewer.Grid.CurrentMajorGridUnit != updatedGridUnit)
+				{
+					GraphViewer.Grid.CurrentMajorGridUnit = updatedGridUnit;
+					bInvalidate = true;
+				}
+				
 				if (GraphViewer.Grid.ShowGrid != GridlinesCheckbox.Checked)
 				{
 					GraphViewer.Grid.ShowGrid = GridlinesCheckbox.Checked;
-					GraphViewer.Invalidate();
+					bInvalidate = true; ;
 				}
 
+				if (bInvalidate) { GraphViewer.Invalidate(); }
+
 				Properties.Settings.Default.AltGridlines = (GridlinesCheckbox.Checked);
+				Properties.Settings.Default.MinorGridlines = MinorGridlinesDropDown.SelectedIndex;
+				Properties.Settings.Default.MajorGridlines = MajorGridlinesDropDown.SelectedIndex;
+
 				Properties.Settings.Default.Save();
 			}
 		}
-
 		private void AlignSelectionButton_Click(object sender, EventArgs e)
 		{
 			GraphViewer.AlignSelected();
