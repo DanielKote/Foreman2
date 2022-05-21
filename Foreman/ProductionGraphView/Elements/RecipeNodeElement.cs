@@ -17,6 +17,7 @@ namespace Foreman
 		private static readonly Pen productivityPen = new Pen(Brushes.DarkRed, 6);
 		private static readonly Pen productivityPlusPen = new Pen(productivityPen.Brush, 2);
 		private static readonly Pen extraProductivityPen = new Pen(Brushes.Crimson, 6);
+		private static readonly Pen buildingDonePen = new Pen(Brushes.Green, 10);
 
 		private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
 
@@ -128,6 +129,10 @@ namespace Foreman
 			else if (DisplayedNode.ExtraProductivity > 0 && (DisplayedNode.SelectedAssembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners))
 			{
 				graphics.DrawEllipse(extraProductivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10, 6, 6);
+			}
+			if (DisplayedNode.BuildingDone)
+			{
+				graphics.DrawEllipse(buildingDonePen, trans.X + (Width / 2) - 20, trans.Y - (Height / 2) + 10, 10, 10);
 			}
 		}
 
