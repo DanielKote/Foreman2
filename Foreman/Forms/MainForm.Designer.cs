@@ -164,7 +164,6 @@
             this.AddLabelButton.TabIndex = 13;
             this.AddLabelButton.Text = "Add Label";
             this.AddLabelButton.UseVisualStyleBackColor = true;
-            this.AddLabelButton.Visible = false;
             this.AddLabelButton.Click += new System.EventHandler(this.AddLabelButton_Click);
             // 
             // SaveButton
