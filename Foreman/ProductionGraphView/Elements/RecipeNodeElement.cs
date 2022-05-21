@@ -132,7 +132,7 @@ namespace Foreman
 			}
 			if (DisplayedNode.BuildingDone)
 			{
-				graphics.DrawEllipse(buildingDonePen, trans.X + (Width / 2) - 20, trans.Y - (Height / 2) + 10, 10, 10);
+				graphics.DrawEllipse(buildingDonePen, trans.X + (Width / 2) - 20, trans.Y, 10, 10);
 			}
 		}
 
