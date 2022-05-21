@@ -494,6 +494,7 @@ namespace Foreman
 								RecipeNodeController rNodeController = (RecipeNodeController)rNode.Controller;
 
 								rNode.LowPriority = (nodeJToken["LowPriority"] != null);
+								rNode.BuildingDone = (nodeJToken["BuildingDone"] != null);
 
 								rNode.NeighbourCount = (double)nodeJToken["Neighbours"];
 								rNode.ExtraProductivityBonus = (double)nodeJToken["ExtraProductivity"];

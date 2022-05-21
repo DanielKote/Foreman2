@@ -51,6 +51,8 @@ namespace Foreman
 
 		public bool LowPriority { get; set; }
 
+		public bool BuildingDone { get; set; }
+
 		public readonly Recipe BaseRecipe;
 		public double NeighbourCount { get; set; }
 
@@ -105,6 +107,7 @@ namespace Foreman
 		public RecipeNode(ProductionGraph graph, int nodeID, Recipe recipe) : base(graph, nodeID)
 		{
 			LowPriority = false;
+			BuildingDone = false;
 
 			BaseRecipe = recipe;
 			controller = RecipeNodeController.GetController(this);
@@ -342,9 +345,11 @@ namespace Foreman
 				info.AddValue("DesiredAssemblers", DesiredAssemblerCount);
 			if (LowPriority)
 				info.AddValue("LowPriority", 1);
+			if (BuildingDone)
+				info.AddValue("BuildingDone", 1);
 
-			//assembler can not be null!
-			info.AddValue("Assembler", SelectedAssembler.Name);
+            //assembler can not be null!
+            info.AddValue("Assembler", SelectedAssembler.Name);
 			info.AddValue("AssemblerModules", AssemblerModules.Select(m => m.Name));
 			if (Fuel != null)
 				info.AddValue("Fuel", Fuel.Name);
@@ -368,6 +373,7 @@ namespace Foreman
 	{
 		public bool LowPriority => MyNode.LowPriority;
 
+		public bool BuildingDone => MyNode.BuildingDone;
 		public Recipe BaseRecipe => MyNode.BaseRecipe;
 		public Assembler SelectedAssembler => MyNode.SelectedAssembler;
 		public Item Fuel => MyNode.Fuel;
@@ -742,6 +748,8 @@ namespace Foreman
 		//-----------------------------------------------------------------------Set functions
 
 		public void SetPriority(bool lowPriority) { MyNode.LowPriority = lowPriority; }
+
+		public void SetBuildingDone(bool buildingDone) { MyNode.BuildingDone = buildingDone; }
 
 		public override void SetDesiredRate(double rate) { Trace.Fail("Desired rate set requested from recipe node!"); }
 		public void SetDesiredAssemblerCount(double count) { if (MyNode.DesiredAssemblerCount != count) MyNode.DesiredAssemblerCount = count; }

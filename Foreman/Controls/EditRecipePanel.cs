@@ -46,6 +46,7 @@ namespace Foreman
 			KeyNodeTitleInput.Text = nodeData.KeyNodeTitle;
 
 			LowPriorityCheckBox.Checked = nodeData.LowPriority;
+			BuildingDoneCheckBox.Checked = nodeData.BuildingDone;
 
 			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxFactories);
 
@@ -93,6 +94,7 @@ namespace Foreman
 
 			//set these event handlers last - after we have set up all the values / settings
 			LowPriorityCheckBox.CheckedChanged += LowPriorityCheckBox_CheckedChanged;
+            BuildingDoneCheckBox.CheckedChanged += BuildingDoneCheckBox_CheckedChanged;
 			KeyNodeCheckBox.CheckedChanged += KeyNodeCheckBox_CheckedChanged;
 			KeyNodeTitleInput.TextChanged += KeyNodeTitleInput_TextChanged;
 
@@ -105,7 +107,7 @@ namespace Foreman
 			ConstantBeaconInput.ValueChanged += BeaconInput_ValueChanged;
 		}
 
-		private void OptionsPanel_MouseWheel(object sender, MouseEventArgs e)
+        private void OptionsPanel_MouseWheel(object sender, MouseEventArgs e)
 		{
 			//had to set up this slightly convoluted scrolling option to account for mouse wheel events being WAY too fast -> it would skip from start to end in a single tick, potentially missing out several lines worth of items.
 			Panel sPanel = sender as Panel;
@@ -594,6 +596,12 @@ namespace Foreman
 		private void LowPriorityCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			nodeController.SetPriority(LowPriorityCheckBox.Checked);
+			myGraphViewer.Graph.UpdateNodeValues();
+		}
+
+		private void BuildingDoneCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			nodeController.SetBuildingDone(BuildingDoneCheckBox.Checked);
 			myGraphViewer.Graph.UpdateNodeValues();
 		}
 
