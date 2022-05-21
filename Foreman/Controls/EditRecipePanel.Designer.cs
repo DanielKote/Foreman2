@@ -102,8 +102,9 @@ namespace Foreman
             this.FixedAssemblerInput = new System.Windows.Forms.NumericUpDown();
             this.LowPriorityCheckBox = new System.Windows.Forms.CheckBox();
             this.KeyNodeTitleLabel = new System.Windows.Forms.Label();
-            this.ToolTip = new Foreman.CustomToolTip();
             this.BuildingDoneCheckBox = new System.Windows.Forms.CheckBox();
+            this.ToolTip = new Foreman.CustomToolTip();
+            this.IgnoreManualNotMetCheckBox = new System.Windows.Forms.CheckBox();
             this.AssemblerInfoTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).BeginInit();
@@ -134,9 +135,9 @@ namespace Foreman
             this.AutoAssemblersOption.AutoSize = true;
             this.AutoAssemblersOption.Checked = true;
             this.AutoAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AutoAssemblersOption.Location = new System.Drawing.Point(260, 3);
+            this.AutoAssemblersOption.Location = new System.Drawing.Point(213, 3);
             this.AutoAssemblersOption.Name = "AutoAssemblersOption";
-            this.AutoAssemblersOption.Size = new System.Drawing.Size(47, 20);
+            this.AutoAssemblersOption.Size = new System.Drawing.Size(94, 20);
             this.AutoAssemblersOption.TabIndex = 0;
             this.AutoAssemblersOption.TabStop = true;
             this.AutoAssemblersOption.Text = "Auto";
@@ -439,7 +440,7 @@ namespace Foreman
             this.AssemblerRateLabel.Location = new System.Drawing.Point(3, 1);
             this.AssemblerRateLabel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
             this.AssemblerRateLabel.Name = "AssemblerRateLabel";
-            this.AssemblerRateLabel.Size = new System.Drawing.Size(193, 22);
+            this.AssemblerRateLabel.Size = new System.Drawing.Size(146, 22);
             this.AssemblerRateLabel.TabIndex = 3;
             this.AssemblerRateLabel.Text = "# of Assemblers:";
             this.AssemblerRateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1115,6 +1116,7 @@ namespace Foreman
             this.RateOptionsTable.Controls.Add(this.LowPriorityCheckBox, 0, 2);
             this.RateOptionsTable.Controls.Add(this.KeyNodeTitleLabel, 1, 1);
             this.RateOptionsTable.Controls.Add(this.BuildingDoneCheckBox, 1, 2);
+            this.RateOptionsTable.Controls.Add(this.IgnoreManualNotMetCheckBox, 2, 2);
             this.RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
             this.RateOptionsTable.Name = "RateOptionsTable";
@@ -1129,10 +1131,10 @@ namespace Foreman
             // 
             this.RateOptionsTable.SetColumnSpan(this.KeyNodeTitleInput, 3);
             this.KeyNodeTitleInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeTitleInput.Location = new System.Drawing.Point(260, 29);
+            this.KeyNodeTitleInput.Location = new System.Drawing.Point(213, 29);
             this.KeyNodeTitleInput.MaxLength = 200;
             this.KeyNodeTitleInput.Name = "KeyNodeTitleInput";
-            this.KeyNodeTitleInput.Size = new System.Drawing.Size(203, 20);
+            this.KeyNodeTitleInput.Size = new System.Drawing.Size(250, 20);
             this.KeyNodeTitleInput.TabIndex = 23;
             // 
             // KeyNodeCheckBox
@@ -1142,7 +1144,7 @@ namespace Foreman
             this.KeyNodeCheckBox.Location = new System.Drawing.Point(23, 31);
             this.KeyNodeCheckBox.Margin = new System.Windows.Forms.Padding(23, 5, 3, 5);
             this.KeyNodeCheckBox.Name = "KeyNodeCheckBox";
-            this.KeyNodeCheckBox.Size = new System.Drawing.Size(173, 17);
+            this.KeyNodeCheckBox.Size = new System.Drawing.Size(126, 17);
             this.KeyNodeCheckBox.TabIndex = 22;
             this.KeyNodeCheckBox.Text = "Key Node";
             this.KeyNodeCheckBox.UseVisualStyleBackColor = true;
@@ -1162,7 +1164,7 @@ namespace Foreman
             this.LowPriorityCheckBox.Location = new System.Drawing.Point(23, 56);
             this.LowPriorityCheckBox.Margin = new System.Windows.Forms.Padding(23, 3, 3, 3);
             this.LowPriorityCheckBox.Name = "LowPriorityCheckBox";
-            this.LowPriorityCheckBox.Size = new System.Drawing.Size(173, 17);
+            this.LowPriorityCheckBox.Size = new System.Drawing.Size(126, 17);
             this.LowPriorityCheckBox.TabIndex = 5;
             this.LowPriorityCheckBox.Text = "Low Priority Recipe";
             this.LowPriorityCheckBox.UseVisualStyleBackColor = true;
@@ -1171,12 +1173,22 @@ namespace Foreman
             // 
             this.KeyNodeTitleLabel.AutoSize = true;
             this.KeyNodeTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeTitleLabel.Location = new System.Drawing.Point(202, 26);
+            this.KeyNodeTitleLabel.Location = new System.Drawing.Point(155, 26);
             this.KeyNodeTitleLabel.Name = "KeyNodeTitleLabel";
             this.KeyNodeTitleLabel.Size = new System.Drawing.Size(52, 27);
             this.KeyNodeTitleLabel.TabIndex = 24;
             this.KeyNodeTitleLabel.Text = "Title:";
             this.KeyNodeTitleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // BuildingDoneCheckBox
+            // 
+            this.BuildingDoneCheckBox.AutoSize = true;
+            this.BuildingDoneCheckBox.Location = new System.Drawing.Point(155, 56);
+            this.BuildingDoneCheckBox.Name = "BuildingDoneCheckBox";
+            this.BuildingDoneCheckBox.Size = new System.Drawing.Size(52, 17);
+            this.BuildingDoneCheckBox.TabIndex = 25;
+            this.BuildingDoneCheckBox.Text = "Done";
+            this.BuildingDoneCheckBox.UseVisualStyleBackColor = true;
             // 
             // ToolTip
             // 
@@ -1188,15 +1200,15 @@ namespace Foreman
             this.ToolTip.ReshowDelay = 100;
             this.ToolTip.TextFont = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             // 
-            // BuildingDoneCheckBox
+            // IgnoreManualNotMetCheckBox
             // 
-            this.BuildingDoneCheckBox.AutoSize = true;
-            this.BuildingDoneCheckBox.Location = new System.Drawing.Point(202, 56);
-            this.BuildingDoneCheckBox.Name = "BuildingDoneCheckBox";
-            this.BuildingDoneCheckBox.Size = new System.Drawing.Size(52, 17);
-            this.BuildingDoneCheckBox.TabIndex = 25;
-            this.BuildingDoneCheckBox.Text = "Done";
-            this.BuildingDoneCheckBox.UseVisualStyleBackColor = true;
+            this.IgnoreManualNotMetCheckBox.AutoSize = true;
+            this.IgnoreManualNotMetCheckBox.Location = new System.Drawing.Point(213, 56);
+            this.IgnoreManualNotMetCheckBox.Name = "IgnoreManualNotMetCheckBox";
+            this.IgnoreManualNotMetCheckBox.Size = new System.Drawing.Size(94, 17);
+            this.IgnoreManualNotMetCheckBox.TabIndex = 26;
+            this.IgnoreManualNotMetCheckBox.Text = "Ignore Manual";
+            this.IgnoreManualNotMetCheckBox.UseVisualStyleBackColor = true;
             // 
             // EditRecipePanel
             // 
@@ -1328,5 +1340,6 @@ namespace Foreman
 		private System.Windows.Forms.TextBox KeyNodeTitleInput;
 		private System.Windows.Forms.Label KeyNodeTitleLabel;
         private System.Windows.Forms.CheckBox BuildingDoneCheckBox;
+        private System.Windows.Forms.CheckBox IgnoreManualNotMetCheckBox;
     }
 }

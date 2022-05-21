@@ -47,6 +47,7 @@ namespace Foreman
 
 			LowPriorityCheckBox.Checked = nodeData.LowPriority;
 			BuildingDoneCheckBox.Checked = nodeData.BuildingDone;
+			IgnoreManualNotMetCheckBox.Checked = nodeData.IgnoreManualNotMet;
 
 			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxFactories);
 
@@ -95,6 +96,7 @@ namespace Foreman
 			//set these event handlers last - after we have set up all the values / settings
 			LowPriorityCheckBox.CheckedChanged += LowPriorityCheckBox_CheckedChanged;
             BuildingDoneCheckBox.CheckedChanged += BuildingDoneCheckBox_CheckedChanged;
+            IgnoreManualNotMetCheckBox.CheckedChanged += IgnoreManualNotMetCheckBox_CheckedChanged;
 			KeyNodeCheckBox.CheckedChanged += KeyNodeCheckBox_CheckedChanged;
 			KeyNodeTitleInput.TextChanged += KeyNodeTitleInput_TextChanged;
 
@@ -105,6 +107,12 @@ namespace Foreman
 			BeaconCountInput.ValueChanged += BeaconInput_ValueChanged;
 			BeaconsPerAssemblerInput.ValueChanged += BeaconInput_ValueChanged;
 			ConstantBeaconInput.ValueChanged += BeaconInput_ValueChanged;
+		}
+
+        private void IgnoreManualNotMetCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+			nodeController.SetIgnoreManualNotMet(IgnoreManualNotMetCheckBox.Checked);
+			myGraphViewer.Graph.UpdateNodeValues();
 		}
 
         private void OptionsPanel_MouseWheel(object sender, MouseEventArgs e)

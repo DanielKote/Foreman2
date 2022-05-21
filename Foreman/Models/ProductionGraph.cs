@@ -495,7 +495,7 @@ namespace Foreman
 
 								rNode.LowPriority = (nodeJToken["LowPriority"] != null);
 								rNode.BuildingDone = (nodeJToken["BuildingDone"] != null);
-
+								rNode.IgnoreManualNotMet = (nodeJToken["IgnoreManualNotMet"] != null);
 								rNode.NeighbourCount = (double)nodeJToken["Neighbours"];
 								rNode.ExtraProductivityBonus = (double)nodeJToken["ExtraProductivity"];
 

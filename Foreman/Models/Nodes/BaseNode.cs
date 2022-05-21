@@ -115,7 +115,12 @@ namespace Foreman
 
 		public bool ManualRateNotMet()
 		{
-			return (RateType == RateType.Manual) && Math.Abs(ActualRatePerSec - DesiredRatePerSec) > 0.0001;
+			if (this is RecipeNode rNode)
+			{
+				return (RateType == RateType.Manual) && Math.Abs(ActualRatePerSec - DesiredRatePerSec) > 0.0001 && !rNode.IgnoreManualNotMet;
+			}
+			else
+				return (RateType == RateType.Manual) && Math.Abs(ActualRatePerSec - DesiredRatePerSec) > 0.0001;
 		}
 
 		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
