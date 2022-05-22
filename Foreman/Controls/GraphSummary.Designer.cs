@@ -30,6 +30,17 @@
         {
             this.components = new System.ComponentModel.Container();
             this.MainTabControl = new System.Windows.Forms.TabControl();
+            this.AllNodesTabPage = new System.Windows.Forms.TabPage();
+            this.MessagesTable = new System.Windows.Forms.TableLayoutPanel();
+            this.AllNodesListView = new System.Windows.Forms.ListView();
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.IconList = new System.Windows.Forms.ImageList(this.components);
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.filterPassthrough = new System.Windows.Forms.CheckBox();
             this.BuildingsTabPage = new System.Windows.Forms.TabPage();
             this.BuildingsTable = new System.Windows.Forms.TableLayoutPanel();
             this.BuildingsFilterTextBox = new System.Windows.Forms.TextBox();
@@ -41,7 +52,6 @@
             this.AssemblersHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.AssemblersHeaderPower = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.AssemblersHeaderPowerB = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.IconList = new System.Windows.Forms.ImageList(this.components);
             this.MinersPage = new System.Windows.Forms.TabPage();
             this.MinerListView = new System.Windows.Forms.ListView();
             this.MinersHeaderCounter = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -116,7 +126,30 @@
             this.SupplierNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.RecipeNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.filterRecipe = new System.Windows.Forms.CheckBox();
+            this.filterSupplier = new System.Windows.Forms.CheckBox();
+            this.filterConsumer = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbFixedManual = new System.Windows.Forms.RadioButton();
+            this.rbFixedAuto = new System.Windows.Forms.RadioButton();
+            this.rbFixedBoth = new System.Windows.Forms.RadioButton();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.rbBuildingBoth = new System.Windows.Forms.RadioButton();
+            this.rbBuildingDone = new System.Windows.Forms.RadioButton();
+            this.rbBuildingNotDone = new System.Windows.Forms.RadioButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.rbProductionAll = new System.Windows.Forms.RadioButton();
+            this.rbProductionOver = new System.Windows.Forms.RadioButton();
+            this.rbProductionUnder = new System.Windows.Forms.RadioButton();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
             this.MainTabControl.SuspendLayout();
+            this.AllNodesTabPage.SuspendLayout();
+            this.MessagesTable.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.BuildingsTabPage.SuspendLayout();
             this.BuildingsTable.SuspendLayout();
             this.BuildingsTabControl.SuspendLayout();
@@ -134,15 +167,24 @@
             this.KeyNodesTabPage.SuspendLayout();
             this.KeyNodesTable.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.tableLayoutPanel6.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            this.tableLayoutPanel7.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainTabControl
             // 
+            this.MainTabControl.Controls.Add(this.AllNodesTabPage);
             this.MainTabControl.Controls.Add(this.BuildingsTabPage);
             this.MainTabControl.Controls.Add(this.ItemsTabPage);
             this.MainTabControl.Controls.Add(this.KeyNodesTabPage);
             this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.MainTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.MainTabControl.Location = new System.Drawing.Point(3, 3);
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.Padding = new System.Drawing.Point(24, 3);
@@ -150,13 +192,135 @@
             this.MainTabControl.Size = new System.Drawing.Size(774, 534);
             this.MainTabControl.TabIndex = 0;
             // 
+            // AllNodesTabPage
+            // 
+            this.AllNodesTabPage.Controls.Add(this.MessagesTable);
+            this.AllNodesTabPage.Location = new System.Drawing.Point(4, 25);
+            this.AllNodesTabPage.Name = "AllNodesTabPage";
+            this.AllNodesTabPage.Size = new System.Drawing.Size(766, 505);
+            this.AllNodesTabPage.TabIndex = 3;
+            this.AllNodesTabPage.Text = "All nodes";
+            this.AllNodesTabPage.UseVisualStyleBackColor = true;
+            // 
+            // MessagesTable
+            // 
+            this.MessagesTable.ColumnCount = 1;
+            this.MessagesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.MessagesTable.Controls.Add(this.AllNodesListView, 0, 1);
+            this.MessagesTable.Controls.Add(this.tableLayoutPanel3, 0, 0);
+            this.MessagesTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MessagesTable.Location = new System.Drawing.Point(0, 0);
+            this.MessagesTable.Name = "MessagesTable";
+            this.MessagesTable.RowCount = 2;
+            this.MessagesTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.MessagesTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.MessagesTable.Size = new System.Drawing.Size(766, 505);
+            this.MessagesTable.TabIndex = 0;
+            // 
+            // AllNodesListView
+            // 
+            this.AllNodesListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5,
+            this.columnHeader6});
+            this.MessagesTable.SetColumnSpan(this.AllNodesListView, 3);
+            this.AllNodesListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AllNodesListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.AllNodesListView.FullRowSelect = true;
+            this.AllNodesListView.GridLines = true;
+            this.AllNodesListView.HideSelection = false;
+            this.AllNodesListView.LabelWrap = false;
+            this.AllNodesListView.Location = new System.Drawing.Point(7, 144);
+            this.AllNodesListView.Margin = new System.Windows.Forms.Padding(7);
+            this.AllNodesListView.MultiSelect = false;
+            this.AllNodesListView.Name = "AllNodesListView";
+            this.AllNodesListView.Size = new System.Drawing.Size(752, 433);
+            this.AllNodesListView.SmallImageList = this.IconList;
+            this.AllNodesListView.TabIndex = 33;
+            this.AllNodesListView.UseCompatibleStateImageBehavior = false;
+            this.AllNodesListView.View = System.Windows.Forms.View.Details;
+            this.AllNodesListView.VirtualMode = true;
+            this.AllNodesListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.AllNodesListView_RetrieveVirtualItem);
+            this.AllNodesListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.AllNodesListView_MouseDoubleClick);
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Node Type";
+            this.columnHeader2.Width = 100;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Node Details";
+            this.columnHeader3.Width = 200;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Node Title";
+            this.columnHeader4.Width = 200;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Throughput";
+            this.columnHeader5.Width = 80;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "Factories";
+            this.columnHeader6.Width = 80;
+            // 
+            // IconList
+            // 
+            this.IconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.IconList.ImageSize = new System.Drawing.Size(24, 24);
+            this.IconList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.AutoSize = true;
+            this.tableLayoutPanel3.ColumnCount = 5;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel3.Controls.Add(this.groupBox1, 3, 0);
+            this.tableLayoutPanel3.Controls.Add(this.groupBox3, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.groupBox2, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.groupBox4, 0, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(760, 131);
+            this.tableLayoutPanel3.TabIndex = 0;
+            // 
+            // filterPassthrough
+            // 
+            this.filterPassthrough.AutoSize = true;
+            this.filterPassthrough.Checked = true;
+            this.filterPassthrough.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.filterPassthrough.Location = new System.Drawing.Point(3, 55);
+            this.filterPassthrough.Name = "filterPassthrough";
+            this.filterPassthrough.Size = new System.Drawing.Size(101, 20);
+            this.filterPassthrough.TabIndex = 4;
+            this.filterPassthrough.Text = "Passthrough";
+            this.filterPassthrough.UseVisualStyleBackColor = true;
+            this.filterPassthrough.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
             // BuildingsTabPage
             // 
             this.BuildingsTabPage.Controls.Add(this.BuildingsTable);
-            this.BuildingsTabPage.Location = new System.Drawing.Point(4, 29);
+            this.BuildingsTabPage.Location = new System.Drawing.Point(4, 25);
             this.BuildingsTabPage.Name = "BuildingsTabPage";
             this.BuildingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BuildingsTabPage.Size = new System.Drawing.Size(766, 501);
+            this.BuildingsTabPage.Size = new System.Drawing.Size(766, 505);
             this.BuildingsTabPage.TabIndex = 0;
             this.BuildingsTabPage.Text = "Buildings";
             this.BuildingsTabPage.UseVisualStyleBackColor = true;
@@ -183,7 +347,7 @@
             this.BuildingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.BuildingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.BuildingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.BuildingsTable.Size = new System.Drawing.Size(760, 495);
+            this.BuildingsTable.Size = new System.Drawing.Size(760, 499);
             this.BuildingsTable.TabIndex = 1;
             // 
             // BuildingsFilterTextBox
@@ -223,7 +387,7 @@
             this.BuildingsTabControl.Name = "BuildingsTabControl";
             this.BuildingsTabControl.Padding = new System.Drawing.Point(12, 3);
             this.BuildingsTabControl.SelectedIndex = 0;
-            this.BuildingsTabControl.Size = new System.Drawing.Size(752, 432);
+            this.BuildingsTabControl.Size = new System.Drawing.Size(752, 436);
             this.BuildingsTabControl.TabIndex = 27;
             // 
             // AssemblersPage
@@ -233,7 +397,7 @@
             this.AssemblersPage.Location = new System.Drawing.Point(4, 24);
             this.AssemblersPage.Margin = new System.Windows.Forms.Padding(2);
             this.AssemblersPage.Name = "AssemblersPage";
-            this.AssemblersPage.Size = new System.Drawing.Size(744, 404);
+            this.AssemblersPage.Size = new System.Drawing.Size(744, 408);
             this.AssemblersPage.TabIndex = 0;
             this.AssemblersPage.Text = "Assemblers";
             this.AssemblersPage.UseVisualStyleBackColor = true;
@@ -254,7 +418,7 @@
             this.AssemblerListView.Location = new System.Drawing.Point(0, 0);
             this.AssemblerListView.MultiSelect = false;
             this.AssemblerListView.Name = "AssemblerListView";
-            this.AssemblerListView.Size = new System.Drawing.Size(744, 404);
+            this.AssemblerListView.Size = new System.Drawing.Size(744, 408);
             this.AssemblerListView.SmallImageList = this.IconList;
             this.AssemblerListView.TabIndex = 17;
             this.AssemblerListView.UseCompatibleStateImageBehavior = false;
@@ -283,12 +447,6 @@
             this.AssemblersHeaderPowerB.Text = "Power (Beacons)";
             this.AssemblersHeaderPowerB.Width = 100;
             // 
-            // IconList
-            // 
-            this.IconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.IconList.ImageSize = new System.Drawing.Size(24, 24);
-            this.IconList.TransparentColor = System.Drawing.Color.Transparent;
-            // 
             // MinersPage
             // 
             this.MinersPage.Controls.Add(this.MinerListView);
@@ -296,7 +454,7 @@
             this.MinersPage.Location = new System.Drawing.Point(4, 24);
             this.MinersPage.Margin = new System.Windows.Forms.Padding(2);
             this.MinersPage.Name = "MinersPage";
-            this.MinersPage.Size = new System.Drawing.Size(744, 404);
+            this.MinersPage.Size = new System.Drawing.Size(744, 408);
             this.MinersPage.TabIndex = 2;
             this.MinersPage.Text = "Miners";
             this.MinersPage.UseVisualStyleBackColor = true;
@@ -317,7 +475,7 @@
             this.MinerListView.Location = new System.Drawing.Point(0, 0);
             this.MinerListView.MultiSelect = false;
             this.MinerListView.Name = "MinerListView";
-            this.MinerListView.Size = new System.Drawing.Size(744, 404);
+            this.MinerListView.Size = new System.Drawing.Size(744, 408);
             this.MinerListView.SmallImageList = this.IconList;
             this.MinerListView.TabIndex = 17;
             this.MinerListView.UseCompatibleStateImageBehavior = false;
@@ -351,7 +509,7 @@
             this.PowersPage.Controls.Add(this.PowerListView);
             this.PowersPage.Location = new System.Drawing.Point(4, 24);
             this.PowersPage.Name = "PowersPage";
-            this.PowersPage.Size = new System.Drawing.Size(744, 404);
+            this.PowersPage.Size = new System.Drawing.Size(744, 408);
             this.PowersPage.TabIndex = 5;
             this.PowersPage.Text = "Power";
             this.PowersPage.UseVisualStyleBackColor = true;
@@ -372,7 +530,7 @@
             this.PowerListView.Location = new System.Drawing.Point(0, 0);
             this.PowerListView.MultiSelect = false;
             this.PowerListView.Name = "PowerListView";
-            this.PowerListView.Size = new System.Drawing.Size(744, 404);
+            this.PowerListView.Size = new System.Drawing.Size(744, 408);
             this.PowerListView.SmallImageList = this.IconList;
             this.PowerListView.TabIndex = 18;
             this.PowerListView.UseCompatibleStateImageBehavior = false;
@@ -406,7 +564,7 @@
             this.BeaconsPage.Controls.Add(this.BeaconListView);
             this.BeaconsPage.Location = new System.Drawing.Point(4, 24);
             this.BeaconsPage.Name = "BeaconsPage";
-            this.BeaconsPage.Size = new System.Drawing.Size(744, 404);
+            this.BeaconsPage.Size = new System.Drawing.Size(744, 408);
             this.BeaconsPage.TabIndex = 6;
             this.BeaconsPage.Text = "Beacons";
             this.BeaconsPage.UseVisualStyleBackColor = true;
@@ -426,7 +584,7 @@
             this.BeaconListView.Location = new System.Drawing.Point(0, 0);
             this.BeaconListView.MultiSelect = false;
             this.BeaconListView.Name = "BeaconListView";
-            this.BeaconListView.Size = new System.Drawing.Size(744, 404);
+            this.BeaconListView.Size = new System.Drawing.Size(744, 408);
             this.BeaconListView.SmallImageList = this.IconList;
             this.BeaconListView.TabIndex = 19;
             this.BeaconListView.UseCompatibleStateImageBehavior = false;
@@ -528,10 +686,10 @@
             // ItemsTabPage
             // 
             this.ItemsTabPage.Controls.Add(this.ItemsTable);
-            this.ItemsTabPage.Location = new System.Drawing.Point(4, 29);
+            this.ItemsTabPage.Location = new System.Drawing.Point(4, 25);
             this.ItemsTabPage.Name = "ItemsTabPage";
             this.ItemsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ItemsTabPage.Size = new System.Drawing.Size(766, 501);
+            this.ItemsTabPage.Size = new System.Drawing.Size(766, 505);
             this.ItemsTabPage.TabIndex = 1;
             this.ItemsTabPage.Text = "Items/Fluids";
             this.ItemsTabPage.UseVisualStyleBackColor = true;
@@ -557,7 +715,7 @@
             this.ItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.ItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.ItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.ItemsTable.Size = new System.Drawing.Size(760, 495);
+            this.ItemsTable.Size = new System.Drawing.Size(760, 499);
             this.ItemsTable.TabIndex = 2;
             // 
             // label1
@@ -585,7 +743,7 @@
             this.ItemsTabControl.Name = "ItemsTabControl";
             this.ItemsTabControl.Padding = new System.Drawing.Point(12, 3);
             this.ItemsTabControl.SelectedIndex = 0;
-            this.ItemsTabControl.Size = new System.Drawing.Size(752, 434);
+            this.ItemsTabControl.Size = new System.Drawing.Size(752, 438);
             this.ItemsTabControl.TabIndex = 27;
             // 
             // tabPage4
@@ -595,7 +753,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 24);
             this.tabPage4.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(744, 406);
+            this.tabPage4.Size = new System.Drawing.Size(744, 410);
             this.tabPage4.TabIndex = 0;
             this.tabPage4.Text = "Items";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -620,7 +778,7 @@
             this.ItemsListView.Location = new System.Drawing.Point(0, 0);
             this.ItemsListView.MultiSelect = false;
             this.ItemsListView.Name = "ItemsListView";
-            this.ItemsListView.Size = new System.Drawing.Size(744, 406);
+            this.ItemsListView.Size = new System.Drawing.Size(744, 410);
             this.ItemsListView.SmallImageList = this.IconList;
             this.ItemsListView.TabIndex = 17;
             this.ItemsListView.UseCompatibleStateImageBehavior = false;
@@ -628,7 +786,6 @@
             this.ItemsListView.VirtualMode = true;
             this.ItemsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.ItemsListView_ColumnClick);
             this.ItemsListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.ItemsListView_RetrieveVirtualItem);
-            this.ItemsListView.SelectedIndexChanged += new System.EventHandler(this.ItemsListView_SelectedIndexChanged);
             // 
             // ItemsHeaderName
             // 
@@ -677,7 +834,7 @@
             this.tabPage5.Location = new System.Drawing.Point(4, 24);
             this.tabPage5.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(744, 406);
+            this.tabPage5.Size = new System.Drawing.Size(744, 410);
             this.tabPage5.TabIndex = 2;
             this.tabPage5.Text = "Fluids";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -702,7 +859,7 @@
             this.FluidsListView.Location = new System.Drawing.Point(0, 0);
             this.FluidsListView.MultiSelect = false;
             this.FluidsListView.Name = "FluidsListView";
-            this.FluidsListView.Size = new System.Drawing.Size(744, 406);
+            this.FluidsListView.Size = new System.Drawing.Size(744, 410);
             this.FluidsListView.SmallImageList = this.IconList;
             this.FluidsListView.TabIndex = 18;
             this.FluidsListView.UseCompatibleStateImageBehavior = false;
@@ -904,10 +1061,10 @@
             // KeyNodesTabPage
             // 
             this.KeyNodesTabPage.Controls.Add(this.KeyNodesTable);
-            this.KeyNodesTabPage.Location = new System.Drawing.Point(4, 29);
+            this.KeyNodesTabPage.Location = new System.Drawing.Point(4, 25);
             this.KeyNodesTabPage.Name = "KeyNodesTabPage";
             this.KeyNodesTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.KeyNodesTabPage.Size = new System.Drawing.Size(766, 501);
+            this.KeyNodesTabPage.Size = new System.Drawing.Size(766, 505);
             this.KeyNodesTabPage.TabIndex = 2;
             this.KeyNodesTabPage.Text = "Key Nodes";
             this.KeyNodesTabPage.UseVisualStyleBackColor = true;
@@ -933,7 +1090,7 @@
             this.KeyNodesTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.KeyNodesTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.KeyNodesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.KeyNodesTable.Size = new System.Drawing.Size(760, 495);
+            this.KeyNodesTable.Size = new System.Drawing.Size(760, 499);
             this.KeyNodesTable.TabIndex = 3;
             // 
             // KeyNodesListView
@@ -955,7 +1112,7 @@
             this.KeyNodesListView.Margin = new System.Windows.Forms.Padding(7);
             this.KeyNodesListView.MultiSelect = false;
             this.KeyNodesListView.Name = "KeyNodesListView";
-            this.KeyNodesListView.Size = new System.Drawing.Size(746, 428);
+            this.KeyNodesListView.Size = new System.Drawing.Size(746, 432);
             this.KeyNodesListView.SmallImageList = this.IconList;
             this.KeyNodesListView.TabIndex = 32;
             this.KeyNodesListView.UseCompatibleStateImageBehavior = false;
@@ -1107,6 +1264,263 @@
             this.columnHeader1.Text = "Name";
             this.columnHeader1.Width = 290;
             // 
+            // filterRecipe
+            // 
+            this.filterRecipe.AutoSize = true;
+            this.filterRecipe.Checked = true;
+            this.filterRecipe.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.filterRecipe.Location = new System.Drawing.Point(3, 81);
+            this.filterRecipe.Name = "filterRecipe";
+            this.filterRecipe.Size = new System.Drawing.Size(70, 20);
+            this.filterRecipe.TabIndex = 5;
+            this.filterRecipe.Text = "Recipe";
+            this.filterRecipe.UseVisualStyleBackColor = true;
+            this.filterRecipe.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // filterSupplier
+            // 
+            this.filterSupplier.AutoSize = true;
+            this.filterSupplier.Checked = true;
+            this.filterSupplier.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.filterSupplier.Location = new System.Drawing.Point(3, 29);
+            this.filterSupplier.Name = "filterSupplier";
+            this.filterSupplier.Size = new System.Drawing.Size(76, 20);
+            this.filterSupplier.TabIndex = 2;
+            this.filterSupplier.Text = "Supplier";
+            this.filterSupplier.UseVisualStyleBackColor = true;
+            this.filterSupplier.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // filterConsumer
+            // 
+            this.filterConsumer.AutoSize = true;
+            this.filterConsumer.Checked = true;
+            this.filterConsumer.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.filterConsumer.Location = new System.Drawing.Point(3, 3);
+            this.filterConsumer.Name = "filterConsumer";
+            this.filterConsumer.Size = new System.Drawing.Size(87, 20);
+            this.filterConsumer.TabIndex = 3;
+            this.filterConsumer.Text = "Consumer";
+            this.filterConsumer.UseVisualStyleBackColor = true;
+            this.filterConsumer.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.tableLayoutPanel4);
+            this.groupBox1.Location = new System.Drawing.Point(521, 3);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(150, 100);
+            this.groupBox1.TabIndex = 12;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "FixedRate";
+            // 
+            // rbFixedManual
+            // 
+            this.rbFixedManual.AutoSize = true;
+            this.rbFixedManual.Location = new System.Drawing.Point(3, 55);
+            this.rbFixedManual.Name = "rbFixedManual";
+            this.rbFixedManual.Size = new System.Drawing.Size(69, 20);
+            this.rbFixedManual.TabIndex = 2;
+            this.rbFixedManual.Text = "Manual";
+            this.rbFixedManual.UseVisualStyleBackColor = true;
+            this.rbFixedManual.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbFixedAuto
+            // 
+            this.rbFixedAuto.AutoSize = true;
+            this.rbFixedAuto.Location = new System.Drawing.Point(3, 29);
+            this.rbFixedAuto.Name = "rbFixedAuto";
+            this.rbFixedAuto.Size = new System.Drawing.Size(52, 20);
+            this.rbFixedAuto.TabIndex = 1;
+            this.rbFixedAuto.Text = "Auto";
+            this.rbFixedAuto.UseVisualStyleBackColor = true;
+            this.rbFixedAuto.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbFixedBoth
+            // 
+            this.rbFixedBoth.AutoSize = true;
+            this.rbFixedBoth.Checked = true;
+            this.rbFixedBoth.Location = new System.Drawing.Point(3, 3);
+            this.rbFixedBoth.Name = "rbFixedBoth";
+            this.rbFixedBoth.Size = new System.Drawing.Size(52, 20);
+            this.rbFixedBoth.TabIndex = 0;
+            this.rbFixedBoth.TabStop = true;
+            this.rbFixedBoth.Text = "Both";
+            this.rbFixedBoth.UseVisualStyleBackColor = true;
+            this.rbFixedBoth.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 1;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.rbFixedBoth, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.rbFixedAuto, 0, 1);
+            this.tableLayoutPanel4.Controls.Add(this.rbFixedManual, 0, 2);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 3;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(144, 79);
+            this.tableLayoutPanel4.TabIndex = 0;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.tableLayoutPanel5);
+            this.groupBox2.Location = new System.Drawing.Point(209, 3);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(150, 100);
+            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Building";
+            // 
+            // tableLayoutPanel5
+            // 
+            this.tableLayoutPanel5.ColumnCount = 1;
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel5.Controls.Add(this.rbBuildingBoth, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.rbBuildingDone, 0, 1);
+            this.tableLayoutPanel5.Controls.Add(this.rbBuildingNotDone, 0, 2);
+            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            this.tableLayoutPanel5.RowCount = 3;
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(144, 79);
+            this.tableLayoutPanel5.TabIndex = 0;
+            // 
+            // rbBuildingBoth
+            // 
+            this.rbBuildingBoth.AutoSize = true;
+            this.rbBuildingBoth.Checked = true;
+            this.rbBuildingBoth.Location = new System.Drawing.Point(3, 3);
+            this.rbBuildingBoth.Name = "rbBuildingBoth";
+            this.rbBuildingBoth.Size = new System.Drawing.Size(52, 20);
+            this.rbBuildingBoth.TabIndex = 0;
+            this.rbBuildingBoth.TabStop = true;
+            this.rbBuildingBoth.Text = "Both";
+            this.rbBuildingBoth.UseVisualStyleBackColor = true;
+            this.rbBuildingBoth.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbBuildingDone
+            // 
+            this.rbBuildingDone.AutoSize = true;
+            this.rbBuildingDone.Location = new System.Drawing.Point(3, 29);
+            this.rbBuildingDone.Name = "rbBuildingDone";
+            this.rbBuildingDone.Size = new System.Drawing.Size(58, 20);
+            this.rbBuildingDone.TabIndex = 1;
+            this.rbBuildingDone.Text = "Done";
+            this.rbBuildingDone.UseVisualStyleBackColor = true;
+            this.rbBuildingDone.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbBuildingNotDone
+            // 
+            this.rbBuildingNotDone.AutoSize = true;
+            this.rbBuildingNotDone.Location = new System.Drawing.Point(3, 55);
+            this.rbBuildingNotDone.Name = "rbBuildingNotDone";
+            this.rbBuildingNotDone.Size = new System.Drawing.Size(80, 20);
+            this.rbBuildingNotDone.TabIndex = 2;
+            this.rbBuildingNotDone.Text = "Not done";
+            this.rbBuildingNotDone.UseVisualStyleBackColor = true;
+            this.rbBuildingNotDone.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.tableLayoutPanel6);
+            this.groupBox3.Location = new System.Drawing.Point(365, 3);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(150, 100);
+            this.groupBox3.TabIndex = 14;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Production";
+            // 
+            // tableLayoutPanel6
+            // 
+            this.tableLayoutPanel6.ColumnCount = 1;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.Controls.Add(this.rbProductionAll, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.rbProductionOver, 0, 1);
+            this.tableLayoutPanel6.Controls.Add(this.rbProductionUnder, 0, 2);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 3;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(144, 79);
+            this.tableLayoutPanel6.TabIndex = 0;
+            // 
+            // rbProductionAll
+            // 
+            this.rbProductionAll.AutoSize = true;
+            this.rbProductionAll.Checked = true;
+            this.rbProductionAll.Location = new System.Drawing.Point(3, 3);
+            this.rbProductionAll.Name = "rbProductionAll";
+            this.rbProductionAll.Size = new System.Drawing.Size(40, 20);
+            this.rbProductionAll.TabIndex = 0;
+            this.rbProductionAll.TabStop = true;
+            this.rbProductionAll.Text = "All";
+            this.rbProductionAll.UseVisualStyleBackColor = true;
+            this.rbProductionAll.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbProductionOver
+            // 
+            this.rbProductionOver.AutoSize = true;
+            this.rbProductionOver.Location = new System.Drawing.Point(3, 29);
+            this.rbProductionOver.Name = "rbProductionOver";
+            this.rbProductionOver.Size = new System.Drawing.Size(54, 20);
+            this.rbProductionOver.TabIndex = 1;
+            this.rbProductionOver.Text = "Over";
+            this.rbProductionOver.UseVisualStyleBackColor = true;
+            this.rbProductionOver.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbProductionUnder
+            // 
+            this.rbProductionUnder.AutoSize = true;
+            this.rbProductionUnder.Location = new System.Drawing.Point(3, 55);
+            this.rbProductionUnder.Name = "rbProductionUnder";
+            this.rbProductionUnder.Size = new System.Drawing.Size(62, 20);
+            this.rbProductionUnder.TabIndex = 2;
+            this.rbProductionUnder.Text = "Under";
+            this.rbProductionUnder.UseVisualStyleBackColor = true;
+            this.rbProductionUnder.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.AutoSize = true;
+            this.groupBox4.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.groupBox4.Controls.Add(this.tableLayoutPanel7);
+            this.groupBox4.Location = new System.Drawing.Point(3, 3);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(200, 128);
+            this.groupBox4.TabIndex = 15;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Type";
+            // 
+            // tableLayoutPanel7
+            // 
+            this.tableLayoutPanel7.AutoSize = true;
+            this.tableLayoutPanel7.ColumnCount = 1;
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel7.Controls.Add(this.filterConsumer, 0, 0);
+            this.tableLayoutPanel7.Controls.Add(this.filterRecipe, 0, 3);
+            this.tableLayoutPanel7.Controls.Add(this.filterPassthrough, 0, 2);
+            this.tableLayoutPanel7.Controls.Add(this.filterSupplier, 0, 1);
+            this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel7.Name = "tableLayoutPanel7";
+            this.tableLayoutPanel7.RowCount = 4;
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(194, 107);
+            this.tableLayoutPanel7.TabIndex = 0;
+            // 
             // GraphSummary
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1118,6 +1532,11 @@
             this.Padding = new System.Windows.Forms.Padding(3);
             this.Size = new System.Drawing.Size(780, 540);
             this.MainTabControl.ResumeLayout(false);
+            this.AllNodesTabPage.ResumeLayout(false);
+            this.MessagesTable.ResumeLayout(false);
+            this.MessagesTable.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel3.PerformLayout();
             this.BuildingsTabPage.ResumeLayout(false);
             this.BuildingsTabPage.PerformLayout();
             this.BuildingsTable.ResumeLayout(false);
@@ -1144,6 +1563,19 @@
             this.KeyNodesTable.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel4.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.tableLayoutPanel5.ResumeLayout(false);
+            this.tableLayoutPanel5.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.tableLayoutPanel6.ResumeLayout(false);
+            this.tableLayoutPanel6.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            this.tableLayoutPanel7.ResumeLayout(false);
+            this.tableLayoutPanel7.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -1237,5 +1669,35 @@
 		private System.Windows.Forms.Label BeaconCountLabel;
 		private System.Windows.Forms.Label BuildingCountLabel;
 		private System.Windows.Forms.TextBox BuildingsFilterTextBox;
-	}
+        private System.Windows.Forms.TabPage AllNodesTabPage;
+        private System.Windows.Forms.TableLayoutPanel MessagesTable;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.ListView AllNodesListView;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.CheckBox filterPassthrough;
+        private System.Windows.Forms.CheckBox filterConsumer;
+        private System.Windows.Forms.CheckBox filterSupplier;
+        private System.Windows.Forms.CheckBox filterRecipe;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.RadioButton rbFixedBoth;
+        private System.Windows.Forms.RadioButton rbFixedAuto;
+        private System.Windows.Forms.RadioButton rbFixedManual;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
+        private System.Windows.Forms.RadioButton rbBuildingBoth;
+        private System.Windows.Forms.RadioButton rbBuildingDone;
+        private System.Windows.Forms.RadioButton rbBuildingNotDone;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
+        private System.Windows.Forms.RadioButton rbProductionAll;
+        private System.Windows.Forms.RadioButton rbProductionOver;
+        private System.Windows.Forms.RadioButton rbProductionUnder;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+    }
 }

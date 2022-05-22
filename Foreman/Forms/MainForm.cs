@@ -51,8 +51,8 @@ namespace Foreman
 				GraphViewer.Focus();
 			}
 #if DEBUG
-			string str = Application.StartupPath + "\\Saved Graphs" + "\\test.fjson";
-			//GraphViewerTabContainer.LoadGraph(str, str);
+			string str = Application.StartupPath + "\\Saved Graphs" + "\\a1.fjson";
+			GraphViewerTabContainer.LoadGraph(str, str);
 			//LoadGraph(Path.Combine(new string[] { Application.StartupPath, "Saved Graphs", "NodeLayoutTestpage.fjson" }));
 #endif
 		}
@@ -510,7 +510,7 @@ namespace Foreman
         {
 			//ListViewItem lvItem = graphSummaryRight.ItemsListView.SelectedItems[0];
 			graphSummaryRight.Visible = true;
-			graphSummaryRight.InitGraphSummary(GraphViewer.Graph.Nodes, GraphViewer.Graph.NodeLinks, GraphViewer.Graph.GetRateName());
+			graphSummaryRight.InitGraphSummary(GraphViewer.Graph.Nodes, GraphViewer.Graph.NodeLinks, GraphViewer.Graph.GetRateName(), GraphViewer);
 		}
     }
 

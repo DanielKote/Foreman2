@@ -19,7 +19,7 @@ namespace Foreman
 		{
 
 			InitializeComponent();
-			GS.InitGraphSummary(nodes,links,rateString);	
+			GS.InitGraphSummary(nodes,links,rateString,null);	
 		}
 
 		//-------------------------------------------------------------------------------------------------------Initial list initialization

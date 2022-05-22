@@ -12,8 +12,8 @@ using System.IO;
 
 namespace Foreman.Controls
 {
-    public partial class GraphSummary : UserControl
-    {
+	public partial class GraphSummary : UserControl
+	{
 		protected class ItemCounter
 		{
 			public double Input { get; set; }
@@ -37,6 +37,7 @@ namespace Foreman.Controls
 		private List<ListViewItem> unfilteredFluidsList;
 
 		private List<ListViewItem> unfilteredKeyNodesList;
+		private List<ListViewItem> unfilteredAllNodesList;
 
 		private List<ListViewItem> filteredAssemblerList;
 		private List<ListViewItem> filteredMinerList;
@@ -47,20 +48,23 @@ namespace Foreman.Controls
 		private List<ListViewItem> filteredFluidsList;
 
 		private List<ListViewItem> filteredKeyNodesList;
+		private List<ListViewItem> filteredAllNodesList;
 
 		private Dictionary<ListView, int> lastSortOrder; //int is +ve if sorted down, -ve if sorted up, |value| is the column # (starts from 1 due to 0 not having a sign) of the sort.
 
 		private string rateString;
 
+		private ProductionGraphViewer GraphViewer;
 		private static readonly Color AvailableObjectColor = Color.White;
 		private static readonly Color UnavailableObjectColor = Color.Pink;
 		public GraphSummary()
 		{
 			InitializeComponent();
 		}
-		
-		public void InitGraphSummary(IEnumerable<ReadOnlyBaseNode> nodes, IEnumerable<ReadOnlyNodeLink> links, string rateString)
-		{ 
+
+		public void InitGraphSummary(IEnumerable<ReadOnlyBaseNode> nodes, IEnumerable<ReadOnlyNodeLink> links, string rateString, ProductionGraphViewer graphViewer)
+		{
+			GraphViewer = graphViewer;
 			MainForm.SetDoubleBuffered(AssemblerListView);
 			MainForm.SetDoubleBuffered(MinerListView);
 			MainForm.SetDoubleBuffered(PowerListView);
@@ -68,7 +72,7 @@ namespace Foreman.Controls
 			MainForm.SetDoubleBuffered(ItemsListView);
 			MainForm.SetDoubleBuffered(FluidsListView);
 			MainForm.SetDoubleBuffered(KeyNodesListView);
-
+			MainForm.SetDoubleBuffered(AllNodesListView);
 
 			unfilteredAssemblerList = new List<ListViewItem>();
 			unfilteredMinerList = new List<ListViewItem>();
@@ -77,6 +81,7 @@ namespace Foreman.Controls
 			unfilteredItemsList = new List<ListViewItem>();
 			unfilteredFluidsList = new List<ListViewItem>();
 			unfilteredKeyNodesList = new List<ListViewItem>();
+			unfilteredAllNodesList = new List<ListViewItem>();
 
 			filteredAssemblerList = new List<ListViewItem>();
 			filteredMinerList = new List<ListViewItem>();
@@ -85,6 +90,7 @@ namespace Foreman.Controls
 			filteredItemsList = new List<ListViewItem>();
 			filteredFluidsList = new List<ListViewItem>();
 			filteredKeyNodesList = new List<ListViewItem>();
+			filteredAllNodesList = new List<ListViewItem>();
 
 			lastSortOrder = new Dictionary<ListView, int>();
 
@@ -95,27 +101,29 @@ namespace Foreman.Controls
 			lastSortOrder.Add(ItemsListView, 1);
 			lastSortOrder.Add(FluidsListView, 1);
 			lastSortOrder.Add(KeyNodesListView, 1);
+			lastSortOrder.Add(AllNodesListView, 1);
 
 			IconList.Images.Clear();
 			IconList.Images.Add(DataCache.UnknownIcon);
 
 			ItemsTabPage.Text = "Items/Fluids ( per " + rateString + ")";
 			this.rateString = rateString;
-			
+
 			//lists
 			LoadUnfilteredSelectedAssemblerList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && rNode.SelectedAssembler.EntityType == EntityType.Assembler).Select(n => (ReadOnlyRecipeNode)n), unfilteredAssemblerList);
 			LoadUnfilteredSelectedAssemblerList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && (rNode.SelectedAssembler.EntityType == EntityType.Miner || rNode.SelectedAssembler.EntityType == EntityType.OffshorePump)).Select(n => (ReadOnlyRecipeNode)n), unfilteredMinerList);
 			LoadUnfilteredSelectedAssemblerList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && (rNode.SelectedAssembler.EntityType == EntityType.Boiler || rNode.SelectedAssembler.EntityType == EntityType.BurnerGenerator || rNode.SelectedAssembler.EntityType == EntityType.Generator || rNode.SelectedAssembler.EntityType == EntityType.Reactor)).Select(n => (ReadOnlyRecipeNode)n), unfilteredPowerList);
-			
+
 			LoadUnfilteredBeaconList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && rNode.SelectedBeacon != null).Select(n => (ReadOnlyRecipeNode)n), unfilteredBeaconList);
 
 			LoadUnfilteredItemLists(nodes, links, false, unfilteredItemsList);
 			LoadUnfilteredItemLists(nodes, links, true, unfilteredFluidsList);
 
 			LoadUnfilteredKeyNodesList(nodes.Where(n => n.KeyNode), unfilteredKeyNodesList);
+			LoadUnfilteredAllNodesList(nodes, unfilteredAllNodesList);
 
 			//building totals
-			
+
 			double buildingTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => Math.Ceiling(((ReadOnlyRecipeNode)n).ActualAssemblerCount));
 			double beaconTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalBeacons());
 			BuildingCountLabel.Text = "#Buildings: " + GraphicsStuff.DoubleToString(buildingTotal);
@@ -126,13 +134,15 @@ namespace Foreman.Controls
 			double powerProduction = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalGeneratorElectricalProduction());
 			PowerConsumptionLabel.Text = "Power Consumption:" + GraphicsStuff.DoubleToEnergy(powerConsumption, "W");
 			PowerProductionLabel.Text = "Power Production: " + GraphicsStuff.DoubleToEnergy(powerProduction, "W");
-			
+
 			//update filtered
 			UpdateFilteredBuildingLists();
 			UpdateFilteredItemsLists();
 			UpdateFilteredKeyNodesList();
-			
+			UpdateFilteredAllNodesList();
+
 		}
+
 		private void LoadUnfilteredSelectedAssemblerList(IEnumerable<ReadOnlyRecipeNode> origin, List<ListViewItem> lviList)
 		{
 			Dictionary<Assembler, int> buildingCounters = new Dictionary<Assembler, int>();
@@ -363,6 +373,76 @@ namespace Foreman.Controls
 				lviList.Add(lvItem);
 			}
 		}
+		private void LoadUnfilteredAllNodesList(IEnumerable<ReadOnlyBaseNode> origin, List<ListViewItem> lviList)
+		{
+			foreach (ReadOnlyBaseNode node in origin)
+			{
+				//if (node is ReadOnlyRecipeNode xNode)
+				{
+						ListViewItem lvItem = new ListViewItem();
+
+						Bitmap icon;
+						string nodeText;
+						string nodeType;
+						if (node is ReadOnlyConsumerNode cNode)
+						{
+							icon = cNode.ConsumedItem.Icon;
+							nodeText = cNode.ConsumedItem.FriendlyName;
+							nodeType = "Consumer";
+						}
+						else if (node is ReadOnlySupplierNode sNode)
+						{
+							icon = sNode.SuppliedItem.Icon;
+							nodeText = sNode.SuppliedItem.FriendlyName;
+							nodeType = "Supplier";
+						}
+						else if (node is ReadOnlyPassthroughNode pNode)
+						{
+							icon = pNode.PassthroughItem.Icon;
+							nodeText = pNode.PassthroughItem.FriendlyName;
+							nodeType = "Passthrough";
+						}
+						else if (node is ReadOnlyRecipeNode rNode)
+						{
+							icon = rNode.BaseRecipe.Icon;
+							nodeText = rNode.BaseRecipe.FriendlyName;
+							nodeType = "Recipe";
+						}
+						else
+							continue;
+
+						if (icon != null)
+						{
+							IconList.Images.Add(icon);
+							lvItem.ImageIndex = IconList.Images.Count - 1;
+						}
+						else
+						{
+							lvItem.ImageIndex = 0;
+						}
+
+						lvItem.Text = nodeType;
+						lvItem.Tag = node;
+						lvItem.Name = nodeText; //key
+						lvItem.BackColor = AvailableObjectColor;
+						lvItem.SubItems.Add(nodeText);
+						lvItem.SubItems.Add(node.KeyNodeTitle);
+
+						if (node is ReadOnlyRecipeNode rrNode)
+						{
+							lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = "-", Tag = (double)0 });
+							lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = GraphicsStuff.DoubleToString(rrNode.ActualAssemblerCount), Tag = rrNode.ActualAssemblerCount });
+						}
+						else
+						{
+							lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = GraphicsStuff.DoubleToString(node.ActualRate), Tag = node.ActualRate });
+							lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = "-", Tag = (double)0 });
+						}
+
+						lviList.Add(lvItem);
+				}
+			}
+		}
 
 		//-------------------------------------------------------------------------------------------------------Filter functions
 
@@ -462,6 +542,126 @@ namespace Foreman.Controls
 
 		}
 
+		private void UpdateFilteredAllNodesList()
+		{
+			// building status
+			bool includeBuildingsBoth = rbBuildingBoth.Checked;
+			bool includeBuildingsDone = rbBuildingDone.Checked;
+			bool includeBuildingsNotDone = rbBuildingNotDone.Checked;
+
+			// node type
+			bool includeSuppier = filterSupplier.Checked;
+			bool includeConsumer = filterConsumer.Checked;
+			bool includePassthrough = filterPassthrough.Checked;
+			bool includeRecipe = filterRecipe.Checked;
+
+			// FixedRate			
+			bool includeFixedBoth = rbFixedBoth.Checked;
+			bool includeFixedAuto = rbFixedAuto.Checked;
+			bool includeFixedManual = rbFixedManual.Checked;
+
+			// Production status
+			bool includeProductionAll = rbProductionAll.Checked;
+			bool includeProductionOver = rbProductionOver.Checked;
+			bool includeProductionUnder = rbProductionUnder.Checked;
+
+			ReadOnlyBaseNode node;
+
+			filteredAllNodesList.Clear();
+			foreach (ListViewItem lvItem in unfilteredAllNodesList)
+			{
+				node = (ReadOnlyBaseNode)lvItem.Tag;
+
+				if ((node is ReadOnlySupplierNode sNode) && includeSuppier)
+				{
+					//Supplier node is always done
+					if (
+						includeFixedBoth ||
+						(includeFixedManual && (sNode.RateType == RateType.Manual)) ||
+						(includeFixedAuto && (sNode.RateType == RateType.Auto))
+						)
+					{
+						//Supplier cannot be undersupplied, overproduction=>ManualRateNotMet
+						if (
+							includeProductionAll ||
+							(includeProductionOver && sNode.ManualRateNotMet())
+							)
+						{
+							filteredAllNodesList.Add(lvItem);
+						}
+					}
+				}
+
+				else if ((node is ReadOnlyConsumerNode cNode) && includeConsumer)
+				{
+					//Consumer node is always done
+					if (
+						includeFixedBoth ||
+						(includeFixedManual && (cNode.RateType == RateType.Manual)) ||
+						(includeFixedAuto && (cNode.RateType == RateType.Auto))
+						)
+					{
+						// Consumer cannot overproduct
+						if (
+							includeProductionAll ||
+							(includeProductionUnder && cNode.ManualRateNotMet()))
+						{
+							filteredAllNodesList.Add(lvItem);
+						}
+					}
+				}
+
+				else if ((node is ReadOnlyPassthroughNode pNode) && includePassthrough)
+				{
+					//Passthrough node is always done
+					if (
+						includeFixedBoth ||
+						(includeFixedManual && (pNode.RateType == RateType.Manual)) ||
+						(includeFixedAuto && (pNode.RateType == RateType.Auto))
+						)                       
+					{
+						if (
+							includeProductionAll ||
+							(includeProductionOver && pNode.ManualRateNotMet()) ||
+							(includeProductionUnder && pNode.ManualRateNotMet())
+							)
+						{
+							filteredAllNodesList.Add(lvItem);
+						}
+					}
+				}
+
+				else if ((node is ReadOnlyRecipeNode rNode) && includeRecipe)
+				{
+					if (
+						includeFixedBoth ||
+						(includeFixedManual && (rNode.RateType == RateType.Manual)) ||
+						(includeFixedAuto && (rNode.RateType == RateType.Auto))
+						)
+					{
+						if (
+							includeBuildingsBoth ||
+							(includeBuildingsDone && rNode.BuildingDone) ||
+							(includeBuildingsNotDone && !rNode.BuildingDone)
+							)
+						{
+							if (
+								includeProductionAll ||
+								(includeProductionOver && rNode.IsOverproducing()) ||
+								(includeProductionUnder && rNode.ManualRateNotMet())
+								)
+							{
+								filteredAllNodesList.Add(lvItem);
+							}
+						}
+					}
+				}
+
+			}
+
+			AllNodesListView.VirtualListSize = filteredAllNodesList.Count;
+			AllNodesListView.Invalidate();
+		}
 		//-------------------------------------------------------------------------------------------------------Virtual item retrieval for all list views
 
 		private void AssemblerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredAssemblerList[e.ItemIndex]; }
@@ -471,6 +671,7 @@ namespace Foreman.Controls
 		private void ItemsListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredItemsList[e.ItemIndex]; }
 		private void FluidsListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredFluidsList[e.ItemIndex]; }
 		private void KeyNodesListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredKeyNodesList[e.ItemIndex]; }
+		private void AllNodesListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredAllNodesList[e.ItemIndex]; }
 
 		//-------------------------------------------------------------------------------------------------------Filter changed events
 
@@ -662,9 +863,17 @@ namespace Foreman.Controls
 			}
 		}
 
-        private void ItemsListView_SelectedIndexChanged(object sender, EventArgs e)
+        private void AllNodesListView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+			ListViewHitTestInfo info = AllNodesListView.HitTest(e.X, e.Y);
+			ListViewItem item = info.Item;
+			ReadOnlyBaseNode node = (ReadOnlyBaseNode)item.Tag;
+			GraphViewer.ZoomToNode(node.NodeID);
+		}
 
-        }
+        private void filterAllNodes_CheckedChanged(object sender, EventArgs e)
+        {
+			UpdateFilteredAllNodesList();
+		}
     }
 }
