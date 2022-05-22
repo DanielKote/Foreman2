@@ -1418,6 +1418,21 @@ namespace Foreman
 			Invalidate();
 		}
 
+		public void ZoomToNode(int nID)
+		{
+
+			BaseNodeElement node = nodeElements.Where(element => element.DisplayedNode.NodeID == nID).ToList()[0];
+
+			if (node != null)
+			{
+				Point newZoomCenter = GraphToScreen(new Point(node.X,node.Y));
+				ViewScale = 1;
+				ViewOffset = new Point(-node.X, -node.Y);
+
+				UpdateGraphBounds();
+				Invalidate();
+			}
+		}
 		//Stolen from the designer file
 		protected override void Dispose(bool disposing)
 		{
