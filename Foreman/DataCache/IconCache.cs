@@ -34,11 +34,20 @@ namespace Foreman
 	public static class IconCache
 	{
 		private static Bitmap unknownIcon;
+		private static Bitmap blockIcon;
+
 		public static Bitmap GetUnknownIcon()
 		{
 			if (unknownIcon == null)
 				unknownIcon = GetIcon(Path.Combine("Graphics", "UnknownIcon.png"), 32);
 			return unknownIcon;
+		}
+
+		public static Bitmap GetBlockIcon()
+		{
+			if (blockIcon == null)
+				blockIcon = GetIcon(Path.Combine("Graphics", "BlockIcon.png"), 32);
+			return blockIcon;
 		}
 		public static Bitmap GetIcon(string path, int size)
 		{
@@ -122,6 +131,9 @@ namespace Foreman
 							iconCache.Add(iconKVP.Key, iconKVP.Value);
 						}
 					}
+					IconColorPair icp = new IconColorPair();
+					icp.Icon = GetBlockIcon();
+					iconCache.Add("icon.e.BlockIcon", icp);
 				}
 				catch //there was an error reading the cache. Just ignore it and continue (we will have to load the icons from the files directly)
 				{

@@ -48,6 +48,8 @@ namespace Foreman
 		public IReadOnlyDictionary<RecipeShort, Recipe> MissingRecipes { get { return missingRecipes; } }
 
 		public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
+		public static Bitmap BlockIcon { get { return IconCache.GetBlockIcon(); } }
+
 		private static Bitmap noBeaconIcon;
 		public static Bitmap NoBeaconIcon { get { if (noBeaconIcon == null) noBeaconIcon = IconCache.GetIcon(Path.Combine("Graphics", "NoBeacon.png"), 64); return noBeaconIcon; } }
 
