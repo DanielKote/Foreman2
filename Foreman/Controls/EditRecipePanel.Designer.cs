@@ -103,8 +103,9 @@ namespace Foreman
             this.LowPriorityCheckBox = new System.Windows.Forms.CheckBox();
             this.KeyNodeTitleLabel = new System.Windows.Forms.Label();
             this.BuildingDoneCheckBox = new System.Windows.Forms.CheckBox();
-            this.ToolTip = new Foreman.CustomToolTip();
             this.IgnoreManualNotMetCheckBox = new System.Windows.Forms.CheckBox();
+            this.ToolTip = new Foreman.CustomToolTip();
+            this.IgnoreOverproductionCheckBox = new System.Windows.Forms.CheckBox();
             this.AssemblerInfoTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).BeginInit();
@@ -135,7 +136,7 @@ namespace Foreman
             this.AutoAssemblersOption.AutoSize = true;
             this.AutoAssemblersOption.Checked = true;
             this.AutoAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AutoAssemblersOption.Location = new System.Drawing.Point(213, 3);
+            this.AutoAssemblersOption.Location = new System.Drawing.Point(204, 3);
             this.AutoAssemblersOption.Name = "AutoAssemblersOption";
             this.AutoAssemblersOption.Size = new System.Drawing.Size(94, 20);
             this.AutoAssemblersOption.TabIndex = 0;
@@ -147,9 +148,9 @@ namespace Foreman
             // 
             this.FixedAssemblersOption.AutoSize = true;
             this.FixedAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FixedAssemblersOption.Location = new System.Drawing.Point(313, 3);
+            this.FixedAssemblersOption.Location = new System.Drawing.Point(304, 3);
             this.FixedAssemblersOption.Name = "FixedAssemblersOption";
-            this.FixedAssemblersOption.Size = new System.Drawing.Size(50, 20);
+            this.FixedAssemblersOption.Size = new System.Drawing.Size(132, 20);
             this.FixedAssemblersOption.TabIndex = 1;
             this.FixedAssemblersOption.Text = "Fixed";
             this.FixedAssemblersOption.UseVisualStyleBackColor = true;
@@ -193,7 +194,7 @@ namespace Foreman
             this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.Size = new System.Drawing.Size(310, 127);
+            this.AssemblerInfoTable.Size = new System.Drawing.Size(383, 127);
             this.AssemblerInfoTable.TabIndex = 9;
             // 
             // ExtraProductivityLabel
@@ -205,7 +206,7 @@ namespace Foreman
             this.ExtraProductivityLabel.Location = new System.Drawing.Point(3, 101);
             this.ExtraProductivityLabel.Name = "ExtraProductivityLabel";
             this.ExtraProductivityLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.ExtraProductivityLabel.Size = new System.Drawing.Size(234, 26);
+            this.ExtraProductivityLabel.Size = new System.Drawing.Size(307, 26);
             this.ExtraProductivityLabel.TabIndex = 17;
             this.ExtraProductivityLabel.Text = "Extra Productivity Bonus (%):";
             this.ExtraProductivityLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -218,7 +219,7 @@ namespace Foreman
             this.AssemblerPollutionLabel.Location = new System.Drawing.Point(154, 46);
             this.AssemblerPollutionLabel.Margin = new System.Windows.Forms.Padding(1);
             this.AssemblerPollutionLabel.Name = "AssemblerPollutionLabel";
-            this.AssemblerPollutionLabel.Size = new System.Drawing.Size(155, 13);
+            this.AssemblerPollutionLabel.Size = new System.Drawing.Size(228, 13);
             this.AssemblerPollutionLabel.TabIndex = 12;
             this.AssemblerPollutionLabel.Text = "12/min";
             // 
@@ -318,7 +319,7 @@ namespace Foreman
             this.AssemblerEnergyLabel.Location = new System.Drawing.Point(154, 1);
             this.AssemblerEnergyLabel.Margin = new System.Windows.Forms.Padding(1);
             this.AssemblerEnergyLabel.Name = "AssemblerEnergyLabel";
-            this.AssemblerEnergyLabel.Size = new System.Drawing.Size(155, 13);
+            this.AssemblerEnergyLabel.Size = new System.Drawing.Size(228, 13);
             this.AssemblerEnergyLabel.TabIndex = 9;
             this.AssemblerEnergyLabel.Text = "5MJ";
             // 
@@ -330,7 +331,7 @@ namespace Foreman
             this.AssemblerSpeedLabel.Location = new System.Drawing.Point(154, 16);
             this.AssemblerSpeedLabel.Margin = new System.Windows.Forms.Padding(1);
             this.AssemblerSpeedLabel.Name = "AssemblerSpeedLabel";
-            this.AssemblerSpeedLabel.Size = new System.Drawing.Size(155, 13);
+            this.AssemblerSpeedLabel.Size = new System.Drawing.Size(228, 13);
             this.AssemblerSpeedLabel.TabIndex = 10;
             this.AssemblerSpeedLabel.Text = "128.5";
             // 
@@ -343,7 +344,7 @@ namespace Foreman
             this.NeighboursLabel.Location = new System.Drawing.Point(3, 75);
             this.NeighboursLabel.Name = "NeighboursLabel";
             this.NeighboursLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.NeighboursLabel.Size = new System.Drawing.Size(234, 26);
+            this.NeighboursLabel.Size = new System.Drawing.Size(307, 26);
             this.NeighboursLabel.TabIndex = 13;
             this.NeighboursLabel.Text = "Average # of neighbours:";
             this.NeighboursLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -368,7 +369,7 @@ namespace Foreman
             0,
             0,
             131072});
-            this.NeighbourInput.Location = new System.Drawing.Point(243, 78);
+            this.NeighbourInput.Location = new System.Drawing.Point(316, 78);
             this.NeighbourInput.Name = "NeighbourInput";
             this.NeighbourInput.Size = new System.Drawing.Size(64, 20);
             this.NeighbourInput.TabIndex = 14;
@@ -381,7 +382,7 @@ namespace Foreman
             this.GeneratorTemperatureRangeLabel.Location = new System.Drawing.Point(103, 61);
             this.GeneratorTemperatureRangeLabel.Margin = new System.Windows.Forms.Padding(1);
             this.GeneratorTemperatureRangeLabel.Name = "GeneratorTemperatureRangeLabel";
-            this.GeneratorTemperatureRangeLabel.Size = new System.Drawing.Size(206, 13);
+            this.GeneratorTemperatureRangeLabel.Size = new System.Drawing.Size(279, 13);
             this.GeneratorTemperatureRangeLabel.TabIndex = 16;
             this.GeneratorTemperatureRangeLabel.Text = "100*c - 150*c";
             this.GeneratorTemperatureRangeLabel.Visible = false;
@@ -393,7 +394,7 @@ namespace Foreman
             0,
             0,
             0});
-            this.ExtraProductivityInput.Location = new System.Drawing.Point(243, 104);
+            this.ExtraProductivityInput.Location = new System.Drawing.Point(316, 104);
             this.ExtraProductivityInput.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -414,7 +415,7 @@ namespace Foreman
             this.AModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
             this.AModuleOptionsLabel.Name = "AModuleOptionsLabel";
             this.AModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(3);
-            this.AModuleOptionsLabel.Size = new System.Drawing.Size(314, 23);
+            this.AModuleOptionsLabel.Size = new System.Drawing.Size(387, 23);
             this.AModuleOptionsLabel.TabIndex = 13;
             this.AModuleOptionsLabel.Text = "Module Options:";
             // 
@@ -440,7 +441,7 @@ namespace Foreman
             this.AssemblerRateLabel.Location = new System.Drawing.Point(3, 1);
             this.AssemblerRateLabel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
             this.AssemblerRateLabel.Name = "AssemblerRateLabel";
-            this.AssemblerRateLabel.Size = new System.Drawing.Size(146, 22);
+            this.AssemblerRateLabel.Size = new System.Drawing.Size(137, 22);
             this.AssemblerRateLabel.TabIndex = 3;
             this.AssemblerRateLabel.Text = "# of Assemblers:";
             this.AssemblerRateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -456,7 +457,7 @@ namespace Foreman
             this.AssemblerTitle.Margin = new System.Windows.Forms.Padding(0);
             this.AssemblerTitle.Name = "AssemblerTitle";
             this.AssemblerTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
-            this.AssemblerTitle.Size = new System.Drawing.Size(434, 32);
+            this.AssemblerTitle.Size = new System.Drawing.Size(507, 32);
             this.AssemblerTitle.TabIndex = 0;
             this.AssemblerTitle.Text = "Assembler: (Space factory #2)";
             // 
@@ -476,7 +477,7 @@ namespace Foreman
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.Size = new System.Drawing.Size(472, 665);
+            this.MainTable.Size = new System.Drawing.Size(545, 665);
             this.MainTable.TabIndex = 17;
             // 
             // BeaconTable
@@ -507,7 +508,7 @@ namespace Foreman
             this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.BeaconTable.Size = new System.Drawing.Size(466, 222);
+            this.BeaconTable.Size = new System.Drawing.Size(539, 222);
             this.BeaconTable.TabIndex = 21;
             // 
             // BModulesChoicePanel
@@ -737,7 +738,7 @@ namespace Foreman
             this.BeaconTitle.Margin = new System.Windows.Forms.Padding(0);
             this.BeaconTitle.Name = "BeaconTitle";
             this.BeaconTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
-            this.BeaconTitle.Size = new System.Drawing.Size(434, 32);
+            this.BeaconTitle.Size = new System.Drawing.Size(507, 32);
             this.BeaconTitle.TabIndex = 0;
             this.BeaconTitle.Text = "Beacon: (Beacon 2)";
             // 
@@ -752,7 +753,7 @@ namespace Foreman
             this.BModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
             this.BModuleOptionsLabel.Name = "BModuleOptionsLabel";
             this.BModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(3);
-            this.BModuleOptionsLabel.Size = new System.Drawing.Size(314, 23);
+            this.BModuleOptionsLabel.Size = new System.Drawing.Size(387, 23);
             this.BModuleOptionsLabel.TabIndex = 13;
             this.BModuleOptionsLabel.Text = "Module Options:";
             // 
@@ -799,7 +800,7 @@ namespace Foreman
             this.BeaconValuesTable.Controls.Add(this.BeaconCountInput, 1, 0);
             this.BeaconValuesTable.Controls.Add(this.BeaconsPerAssemblerInput, 1, 1);
             this.BeaconValuesTable.Dock = System.Windows.Forms.DockStyle.Right;
-            this.BeaconValuesTable.Location = new System.Drawing.Point(336, 35);
+            this.BeaconValuesTable.Location = new System.Drawing.Point(409, 35);
             this.BeaconValuesTable.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
             this.BeaconValuesTable.Name = "BeaconValuesTable";
             this.BeaconValuesTable.RowCount = 3;
@@ -889,7 +890,7 @@ namespace Foreman
             // 
             this.SelectedBeaconIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this.SelectedBeaconIcon.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelectedBeaconIcon.Location = new System.Drawing.Point(434, 0);
+            this.SelectedBeaconIcon.Location = new System.Drawing.Point(507, 0);
             this.SelectedBeaconIcon.Margin = new System.Windows.Forms.Padding(0);
             this.SelectedBeaconIcon.Name = "SelectedBeaconIcon";
             this.SelectedBeaconIcon.Size = new System.Drawing.Size(32, 32);
@@ -927,7 +928,7 @@ namespace Foreman
             this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerTable.Size = new System.Drawing.Size(466, 349);
+            this.AssemblerTable.Size = new System.Drawing.Size(539, 349);
             this.AssemblerTable.TabIndex = 20;
             // 
             // FuelOptionsPanel
@@ -978,7 +979,7 @@ namespace Foreman
             this.FuelTitle.Margin = new System.Windows.Forms.Padding(0);
             this.FuelTitle.Name = "FuelTitle";
             this.FuelTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
-            this.FuelTitle.Size = new System.Drawing.Size(434, 32);
+            this.FuelTitle.Size = new System.Drawing.Size(507, 32);
             this.FuelTitle.TabIndex = 21;
             this.FuelTitle.Text = "Fuel: (Rockets)";
             // 
@@ -1076,7 +1077,7 @@ namespace Foreman
             // 
             this.SelectedAssemblerIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this.SelectedAssemblerIcon.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelectedAssemblerIcon.Location = new System.Drawing.Point(434, 0);
+            this.SelectedAssemblerIcon.Location = new System.Drawing.Point(507, 0);
             this.SelectedAssemblerIcon.Margin = new System.Windows.Forms.Padding(0);
             this.SelectedAssemblerIcon.Name = "SelectedAssemblerIcon";
             this.SelectedAssemblerIcon.Size = new System.Drawing.Size(32, 32);
@@ -1088,7 +1089,7 @@ namespace Foreman
             // 
             this.SelectedFuelIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this.SelectedFuelIcon.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelectedFuelIcon.Location = new System.Drawing.Point(434, 168);
+            this.SelectedFuelIcon.Location = new System.Drawing.Point(507, 168);
             this.SelectedFuelIcon.Margin = new System.Windows.Forms.Padding(0);
             this.SelectedFuelIcon.Name = "SelectedFuelIcon";
             this.SelectedFuelIcon.Size = new System.Drawing.Size(32, 32);
@@ -1117,6 +1118,7 @@ namespace Foreman
             this.RateOptionsTable.Controls.Add(this.KeyNodeTitleLabel, 1, 1);
             this.RateOptionsTable.Controls.Add(this.BuildingDoneCheckBox, 1, 2);
             this.RateOptionsTable.Controls.Add(this.IgnoreManualNotMetCheckBox, 2, 2);
+            this.RateOptionsTable.Controls.Add(this.IgnoreOverproductionCheckBox, 3, 2);
             this.RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
             this.RateOptionsTable.Name = "RateOptionsTable";
@@ -1124,17 +1126,17 @@ namespace Foreman
             this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.RateOptionsTable.Size = new System.Drawing.Size(466, 76);
+            this.RateOptionsTable.Size = new System.Drawing.Size(539, 76);
             this.RateOptionsTable.TabIndex = 18;
             // 
             // KeyNodeTitleInput
             // 
             this.RateOptionsTable.SetColumnSpan(this.KeyNodeTitleInput, 3);
             this.KeyNodeTitleInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeTitleInput.Location = new System.Drawing.Point(213, 29);
+            this.KeyNodeTitleInput.Location = new System.Drawing.Point(204, 29);
             this.KeyNodeTitleInput.MaxLength = 200;
             this.KeyNodeTitleInput.Name = "KeyNodeTitleInput";
-            this.KeyNodeTitleInput.Size = new System.Drawing.Size(250, 20);
+            this.KeyNodeTitleInput.Size = new System.Drawing.Size(332, 20);
             this.KeyNodeTitleInput.TabIndex = 23;
             // 
             // KeyNodeCheckBox
@@ -1144,7 +1146,7 @@ namespace Foreman
             this.KeyNodeCheckBox.Location = new System.Drawing.Point(23, 31);
             this.KeyNodeCheckBox.Margin = new System.Windows.Forms.Padding(23, 5, 3, 5);
             this.KeyNodeCheckBox.Name = "KeyNodeCheckBox";
-            this.KeyNodeCheckBox.Size = new System.Drawing.Size(126, 17);
+            this.KeyNodeCheckBox.Size = new System.Drawing.Size(117, 17);
             this.KeyNodeCheckBox.TabIndex = 22;
             this.KeyNodeCheckBox.Text = "Key Node";
             this.KeyNodeCheckBox.UseVisualStyleBackColor = true;
@@ -1152,7 +1154,7 @@ namespace Foreman
             // FixedAssemblerInput
             // 
             this.FixedAssemblerInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FixedAssemblerInput.Location = new System.Drawing.Point(369, 3);
+            this.FixedAssemblerInput.Location = new System.Drawing.Point(442, 3);
             this.FixedAssemblerInput.Name = "FixedAssemblerInput";
             this.FixedAssemblerInput.Size = new System.Drawing.Size(94, 20);
             this.FixedAssemblerInput.TabIndex = 4;
@@ -1164,7 +1166,7 @@ namespace Foreman
             this.LowPriorityCheckBox.Location = new System.Drawing.Point(23, 56);
             this.LowPriorityCheckBox.Margin = new System.Windows.Forms.Padding(23, 3, 3, 3);
             this.LowPriorityCheckBox.Name = "LowPriorityCheckBox";
-            this.LowPriorityCheckBox.Size = new System.Drawing.Size(126, 17);
+            this.LowPriorityCheckBox.Size = new System.Drawing.Size(117, 17);
             this.LowPriorityCheckBox.TabIndex = 5;
             this.LowPriorityCheckBox.Text = "Low Priority Recipe";
             this.LowPriorityCheckBox.UseVisualStyleBackColor = true;
@@ -1173,7 +1175,7 @@ namespace Foreman
             // 
             this.KeyNodeTitleLabel.AutoSize = true;
             this.KeyNodeTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeTitleLabel.Location = new System.Drawing.Point(155, 26);
+            this.KeyNodeTitleLabel.Location = new System.Drawing.Point(146, 26);
             this.KeyNodeTitleLabel.Name = "KeyNodeTitleLabel";
             this.KeyNodeTitleLabel.Size = new System.Drawing.Size(52, 27);
             this.KeyNodeTitleLabel.TabIndex = 24;
@@ -1183,12 +1185,22 @@ namespace Foreman
             // BuildingDoneCheckBox
             // 
             this.BuildingDoneCheckBox.AutoSize = true;
-            this.BuildingDoneCheckBox.Location = new System.Drawing.Point(155, 56);
+            this.BuildingDoneCheckBox.Location = new System.Drawing.Point(146, 56);
             this.BuildingDoneCheckBox.Name = "BuildingDoneCheckBox";
             this.BuildingDoneCheckBox.Size = new System.Drawing.Size(52, 17);
             this.BuildingDoneCheckBox.TabIndex = 25;
             this.BuildingDoneCheckBox.Text = "Done";
             this.BuildingDoneCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // IgnoreManualNotMetCheckBox
+            // 
+            this.IgnoreManualNotMetCheckBox.AutoSize = true;
+            this.IgnoreManualNotMetCheckBox.Location = new System.Drawing.Point(204, 56);
+            this.IgnoreManualNotMetCheckBox.Name = "IgnoreManualNotMetCheckBox";
+            this.IgnoreManualNotMetCheckBox.Size = new System.Drawing.Size(94, 17);
+            this.IgnoreManualNotMetCheckBox.TabIndex = 26;
+            this.IgnoreManualNotMetCheckBox.Text = "Ignore Manual";
+            this.IgnoreManualNotMetCheckBox.UseVisualStyleBackColor = true;
             // 
             // ToolTip
             // 
@@ -1200,15 +1212,15 @@ namespace Foreman
             this.ToolTip.ReshowDelay = 100;
             this.ToolTip.TextFont = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             // 
-            // IgnoreManualNotMetCheckBox
+            // IgnoreOverproductionCheckBox
             // 
-            this.IgnoreManualNotMetCheckBox.AutoSize = true;
-            this.IgnoreManualNotMetCheckBox.Location = new System.Drawing.Point(213, 56);
-            this.IgnoreManualNotMetCheckBox.Name = "IgnoreManualNotMetCheckBox";
-            this.IgnoreManualNotMetCheckBox.Size = new System.Drawing.Size(94, 17);
-            this.IgnoreManualNotMetCheckBox.TabIndex = 26;
-            this.IgnoreManualNotMetCheckBox.Text = "Ignore Manual";
-            this.IgnoreManualNotMetCheckBox.UseVisualStyleBackColor = true;
+            this.IgnoreOverproductionCheckBox.AutoSize = true;
+            this.IgnoreOverproductionCheckBox.Location = new System.Drawing.Point(304, 56);
+            this.IgnoreOverproductionCheckBox.Name = "IgnoreOverproductionCheckBox";
+            this.IgnoreOverproductionCheckBox.Size = new System.Drawing.Size(132, 17);
+            this.IgnoreOverproductionCheckBox.TabIndex = 27;
+            this.IgnoreOverproductionCheckBox.Text = "Ignore Overproduction";
+            this.IgnoreOverproductionCheckBox.UseVisualStyleBackColor = true;
             // 
             // EditRecipePanel
             // 
@@ -1221,7 +1233,7 @@ namespace Foreman
             this.DoubleBuffered = true;
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "EditRecipePanel";
-            this.Size = new System.Drawing.Size(472, 665);
+            this.Size = new System.Drawing.Size(545, 665);
             this.AssemblerInfoTable.ResumeLayout(false);
             this.AssemblerInfoTable.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).EndInit();
@@ -1341,5 +1353,6 @@ namespace Foreman
 		private System.Windows.Forms.Label KeyNodeTitleLabel;
         private System.Windows.Forms.CheckBox BuildingDoneCheckBox;
         private System.Windows.Forms.CheckBox IgnoreManualNotMetCheckBox;
+        private System.Windows.Forms.CheckBox IgnoreOverproductionCheckBox;
     }
 }

@@ -48,6 +48,7 @@ namespace Foreman
 			LowPriorityCheckBox.Checked = nodeData.LowPriority;
 			BuildingDoneCheckBox.Checked = nodeData.BuildingDone;
 			IgnoreManualNotMetCheckBox.Checked = nodeData.IgnoreManualNotMet;
+			IgnoreOverproductionCheckBox.Checked = nodeData.IgnoreOverproduction;
 
 			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxFactories);
 
@@ -97,6 +98,7 @@ namespace Foreman
 			LowPriorityCheckBox.CheckedChanged += LowPriorityCheckBox_CheckedChanged;
             BuildingDoneCheckBox.CheckedChanged += BuildingDoneCheckBox_CheckedChanged;
             IgnoreManualNotMetCheckBox.CheckedChanged += IgnoreManualNotMetCheckBox_CheckedChanged;
+			IgnoreOverproductionCheckBox.CheckedChanged += IgnoreOverproductionCheckBox_CheckedChanged;
 			KeyNodeCheckBox.CheckedChanged += KeyNodeCheckBox_CheckedChanged;
 			KeyNodeTitleInput.TextChanged += KeyNodeTitleInput_TextChanged;
 
@@ -107,6 +109,12 @@ namespace Foreman
 			BeaconCountInput.ValueChanged += BeaconInput_ValueChanged;
 			BeaconsPerAssemblerInput.ValueChanged += BeaconInput_ValueChanged;
 			ConstantBeaconInput.ValueChanged += BeaconInput_ValueChanged;
+		}
+
+        private void IgnoreOverproductionCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            nodeController.SetIgnoreOverproduction(IgnoreOverproductionCheckBox.Checked);
+			myGraphViewer.Graph.UpdateNodeValues();
 		}
 
         private void IgnoreManualNotMetCheckBox_CheckedChanged(object sender, EventArgs e)

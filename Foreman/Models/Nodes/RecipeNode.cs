@@ -55,6 +55,7 @@ namespace Foreman
 
 		public bool IgnoreManualNotMet { get; set; }
 
+
 		public readonly Recipe BaseRecipe;
 		public double NeighbourCount { get; set; }
 
@@ -351,6 +352,8 @@ namespace Foreman
 				info.AddValue("BuildingDone", 1);
 			if (IgnoreManualNotMet)
 				info.AddValue("IgnoreManualNotMet", 1);
+			if (IgnoreOverproduction)
+				info.AddValue("IgnoreOverproduction", 1);
 
             //assembler can not be null!
             info.AddValue("Assembler", SelectedAssembler.Name);
@@ -379,7 +382,7 @@ namespace Foreman
 
 		public bool BuildingDone => MyNode.BuildingDone;
 		public bool IgnoreManualNotMet => MyNode.IgnoreManualNotMet;
-
+		public bool IgnoreOverproduction => MyNode.IgnoreOverproduction;
 		public Recipe BaseRecipe => MyNode.BaseRecipe;
 		public Assembler SelectedAssembler => MyNode.SelectedAssembler;
 		public Item Fuel => MyNode.Fuel;
@@ -758,6 +761,8 @@ namespace Foreman
 		public void SetBuildingDone(bool buildingDone) { MyNode.BuildingDone = buildingDone; }
 
 		public void SetIgnoreManualNotMet(bool ignoreManualNotMet) { MyNode.IgnoreManualNotMet = ignoreManualNotMet;}
+		public void SetIgnoreOverproduction(bool ignoreOverproduction) { MyNode.IgnoreOverproduction = ignoreOverproduction;}	
+
 		public override void SetDesiredRate(double rate) { Trace.Fail("Desired rate set requested from recipe node!"); }
 		public void SetDesiredAssemblerCount(double count) { if (MyNode.DesiredAssemblerCount != count) MyNode.DesiredAssemblerCount = count; }
 
