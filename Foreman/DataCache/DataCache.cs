@@ -312,8 +312,6 @@ namespace Foreman
 
 		public void Clear()
 		{
-			RecipePrototype.ResetRecipeIDCounter();
-
 			includedMods.Clear();
 			technologies.Clear();
 			groups.Clear();
@@ -446,6 +444,8 @@ namespace Foreman
 						recipe = missingRecipe;
 					}
 				}
+				if (recipeLinks.ContainsKey(recipeShort.RecipeID))
+					;
 				recipeLinks.Add(recipeShort.RecipeID, recipe);
 			}
 			return recipeLinks;

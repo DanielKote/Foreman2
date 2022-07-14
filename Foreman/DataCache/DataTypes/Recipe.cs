@@ -77,7 +77,6 @@ namespace Foreman
 
 		private static long lastRecipeID = 0;
 		public long RecipeID { get; private set; }
-		public static void ResetRecipeIDCounter() { lastRecipeID = 0; }
 
 		public RecipePrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{

@@ -545,7 +545,7 @@
 			this.Controls.Add(this.MainLayoutPanel);
 			this.DoubleBuffered = true;
 			this.KeyPreview = true;
-			this.MinimumSize = new System.Drawing.Size(950, 800);
+			this.MinimumSize = new System.Drawing.Size(950, 400);
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Foreman 2.0";

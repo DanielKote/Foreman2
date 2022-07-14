@@ -427,7 +427,7 @@ end
 local function ExportResources()
 	tresources = {}
 	for _, resource in pairs(game.entity_prototypes) do
-		if resource.resource_category ~= nil then
+		if resource.resource_category ~= nil and resource.mineable_properties.products ~= nil then
 			tresource = {}
 			tresource['name'] = resource.name
 			tresource['resource_category'] = resource.resource_category
