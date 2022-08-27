@@ -47,8 +47,8 @@ namespace Foreman
 
 			LowPriorityCheckBox.Checked = nodeData.LowPriority;
 			BuildingDoneCheckBox.Checked = nodeData.BuildingDone;
-			IgnoreManualNotMetCheckBox.Checked = nodeData.IgnoreManualNotMet;
-			IgnoreOverproductionCheckBox.Checked = nodeData.IgnoreOverproduction;
+			IgnoreManualNotMetCheckBox.Checked = nodeData.IgnoreManualNotMet();
+			IgnoreOverproductionCheckBox.Checked = nodeData.IgnoreOverproduction();
 
 			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxFactories);
 

@@ -40,7 +40,31 @@
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.IconList = new System.Windows.Forms.ImageList(this.components);
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.rbFixedBoth = new System.Windows.Forms.RadioButton();
+            this.rbFixedAuto = new System.Windows.Forms.RadioButton();
+            this.rbFixedManual = new System.Windows.Forms.RadioButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.rbProductionAll = new System.Windows.Forms.RadioButton();
+            this.rbProductionOver = new System.Windows.Forms.RadioButton();
+            this.rbProductionUnder = new System.Windows.Forms.RadioButton();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.rbBuildingBoth = new System.Windows.Forms.RadioButton();
+            this.rbBuildingDone = new System.Windows.Forms.RadioButton();
+            this.rbBuildingNotDone = new System.Windows.Forms.RadioButton();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
+            this.filterConsumer = new System.Windows.Forms.CheckBox();
+            this.filterRecipe = new System.Windows.Forms.CheckBox();
             this.filterPassthrough = new System.Windows.Forms.CheckBox();
+            this.filterSupplier = new System.Windows.Forms.CheckBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
+            this.rbIgnoreAll = new System.Windows.Forms.RadioButton();
+            this.rbOnlySet = new System.Windows.Forms.RadioButton();
             this.BuildingsTabPage = new System.Windows.Forms.TabPage();
             this.BuildingsTable = new System.Windows.Forms.TableLayoutPanel();
             this.BuildingsFilterTextBox = new System.Windows.Forms.TextBox();
@@ -126,30 +150,20 @@
             this.SupplierNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.RecipeNodeFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.filterRecipe = new System.Windows.Forms.CheckBox();
-            this.filterSupplier = new System.Windows.Forms.CheckBox();
-            this.filterConsumer = new System.Windows.Forms.CheckBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.rbFixedManual = new System.Windows.Forms.RadioButton();
-            this.rbFixedAuto = new System.Windows.Forms.RadioButton();
-            this.rbFixedBoth = new System.Windows.Forms.RadioButton();
-            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.rbBuildingBoth = new System.Windows.Forms.RadioButton();
-            this.rbBuildingDone = new System.Windows.Forms.RadioButton();
-            this.rbBuildingNotDone = new System.Windows.Forms.RadioButton();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.rbProductionAll = new System.Windows.Forms.RadioButton();
-            this.rbProductionOver = new System.Windows.Forms.RadioButton();
-            this.rbProductionUnder = new System.Windows.Forms.RadioButton();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
             this.MainTabControl.SuspendLayout();
             this.AllNodesTabPage.SuspendLayout();
             this.MessagesTable.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.tableLayoutPanel6.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            this.tableLayoutPanel7.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            this.tableLayoutPanel8.SuspendLayout();
             this.BuildingsTabPage.SuspendLayout();
             this.BuildingsTable.SuspendLayout();
             this.BuildingsTabControl.SuspendLayout();
@@ -167,14 +181,6 @@
             this.KeyNodesTabPage.SuspendLayout();
             this.KeyNodesTable.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.tableLayoutPanel4.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.tableLayoutPanel5.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.tableLayoutPanel6.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            this.tableLayoutPanel7.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainTabControl
@@ -289,6 +295,7 @@
             this.tableLayoutPanel3.Controls.Add(this.groupBox3, 2, 0);
             this.tableLayoutPanel3.Controls.Add(this.groupBox2, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.groupBox4, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.groupBox5, 4, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -297,9 +304,253 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 131F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(760, 131);
             this.tableLayoutPanel3.TabIndex = 0;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.tableLayoutPanel4);
+            this.groupBox1.Location = new System.Drawing.Point(434, 3);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(150, 100);
+            this.groupBox1.TabIndex = 12;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "FixedRate";
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 1;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.rbFixedBoth, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.rbFixedAuto, 0, 1);
+            this.tableLayoutPanel4.Controls.Add(this.rbFixedManual, 0, 2);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 3;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(144, 79);
+            this.tableLayoutPanel4.TabIndex = 0;
+            // 
+            // rbFixedBoth
+            // 
+            this.rbFixedBoth.AutoSize = true;
+            this.rbFixedBoth.Checked = true;
+            this.rbFixedBoth.Location = new System.Drawing.Point(3, 3);
+            this.rbFixedBoth.Name = "rbFixedBoth";
+            this.rbFixedBoth.Size = new System.Drawing.Size(52, 20);
+            this.rbFixedBoth.TabIndex = 0;
+            this.rbFixedBoth.TabStop = true;
+            this.rbFixedBoth.Text = "Both";
+            this.rbFixedBoth.UseVisualStyleBackColor = true;
+            this.rbFixedBoth.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbFixedAuto
+            // 
+            this.rbFixedAuto.AutoSize = true;
+            this.rbFixedAuto.Location = new System.Drawing.Point(3, 29);
+            this.rbFixedAuto.Name = "rbFixedAuto";
+            this.rbFixedAuto.Size = new System.Drawing.Size(52, 20);
+            this.rbFixedAuto.TabIndex = 1;
+            this.rbFixedAuto.Text = "Auto";
+            this.rbFixedAuto.UseVisualStyleBackColor = true;
+            this.rbFixedAuto.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbFixedManual
+            // 
+            this.rbFixedManual.AutoSize = true;
+            this.rbFixedManual.Location = new System.Drawing.Point(3, 55);
+            this.rbFixedManual.Name = "rbFixedManual";
+            this.rbFixedManual.Size = new System.Drawing.Size(69, 20);
+            this.rbFixedManual.TabIndex = 2;
+            this.rbFixedManual.Text = "Manual";
+            this.rbFixedManual.UseVisualStyleBackColor = true;
+            this.rbFixedManual.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.tableLayoutPanel6);
+            this.groupBox3.Location = new System.Drawing.Point(278, 3);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(150, 100);
+            this.groupBox3.TabIndex = 14;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Production";
+            // 
+            // tableLayoutPanel6
+            // 
+            this.tableLayoutPanel6.ColumnCount = 1;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.Controls.Add(this.rbProductionAll, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.rbProductionOver, 0, 1);
+            this.tableLayoutPanel6.Controls.Add(this.rbProductionUnder, 0, 2);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 3;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(144, 79);
+            this.tableLayoutPanel6.TabIndex = 0;
+            // 
+            // rbProductionAll
+            // 
+            this.rbProductionAll.AutoSize = true;
+            this.rbProductionAll.Checked = true;
+            this.rbProductionAll.Location = new System.Drawing.Point(3, 3);
+            this.rbProductionAll.Name = "rbProductionAll";
+            this.rbProductionAll.Size = new System.Drawing.Size(40, 20);
+            this.rbProductionAll.TabIndex = 0;
+            this.rbProductionAll.TabStop = true;
+            this.rbProductionAll.Text = "All";
+            this.rbProductionAll.UseVisualStyleBackColor = true;
+            this.rbProductionAll.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbProductionOver
+            // 
+            this.rbProductionOver.AutoSize = true;
+            this.rbProductionOver.Location = new System.Drawing.Point(3, 29);
+            this.rbProductionOver.Name = "rbProductionOver";
+            this.rbProductionOver.Size = new System.Drawing.Size(54, 20);
+            this.rbProductionOver.TabIndex = 1;
+            this.rbProductionOver.Text = "Over";
+            this.rbProductionOver.UseVisualStyleBackColor = true;
+            this.rbProductionOver.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbProductionUnder
+            // 
+            this.rbProductionUnder.AutoSize = true;
+            this.rbProductionUnder.Location = new System.Drawing.Point(3, 55);
+            this.rbProductionUnder.Name = "rbProductionUnder";
+            this.rbProductionUnder.Size = new System.Drawing.Size(62, 20);
+            this.rbProductionUnder.TabIndex = 2;
+            this.rbProductionUnder.Text = "Under";
+            this.rbProductionUnder.UseVisualStyleBackColor = true;
+            this.rbProductionUnder.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.tableLayoutPanel5);
+            this.groupBox2.Location = new System.Drawing.Point(122, 3);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(150, 100);
+            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Building";
+            // 
+            // tableLayoutPanel5
+            // 
+            this.tableLayoutPanel5.ColumnCount = 1;
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel5.Controls.Add(this.rbBuildingBoth, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.rbBuildingDone, 0, 1);
+            this.tableLayoutPanel5.Controls.Add(this.rbBuildingNotDone, 0, 2);
+            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            this.tableLayoutPanel5.RowCount = 3;
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(144, 79);
+            this.tableLayoutPanel5.TabIndex = 0;
+            // 
+            // rbBuildingBoth
+            // 
+            this.rbBuildingBoth.AutoSize = true;
+            this.rbBuildingBoth.Checked = true;
+            this.rbBuildingBoth.Location = new System.Drawing.Point(3, 3);
+            this.rbBuildingBoth.Name = "rbBuildingBoth";
+            this.rbBuildingBoth.Size = new System.Drawing.Size(52, 20);
+            this.rbBuildingBoth.TabIndex = 0;
+            this.rbBuildingBoth.TabStop = true;
+            this.rbBuildingBoth.Text = "Both";
+            this.rbBuildingBoth.UseVisualStyleBackColor = true;
+            this.rbBuildingBoth.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbBuildingDone
+            // 
+            this.rbBuildingDone.AutoSize = true;
+            this.rbBuildingDone.Location = new System.Drawing.Point(3, 29);
+            this.rbBuildingDone.Name = "rbBuildingDone";
+            this.rbBuildingDone.Size = new System.Drawing.Size(58, 20);
+            this.rbBuildingDone.TabIndex = 1;
+            this.rbBuildingDone.Text = "Done";
+            this.rbBuildingDone.UseVisualStyleBackColor = true;
+            this.rbBuildingDone.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbBuildingNotDone
+            // 
+            this.rbBuildingNotDone.AutoSize = true;
+            this.rbBuildingNotDone.Location = new System.Drawing.Point(3, 55);
+            this.rbBuildingNotDone.Name = "rbBuildingNotDone";
+            this.rbBuildingNotDone.Size = new System.Drawing.Size(80, 20);
+            this.rbBuildingNotDone.TabIndex = 2;
+            this.rbBuildingNotDone.Text = "Not done";
+            this.rbBuildingNotDone.UseVisualStyleBackColor = true;
+            this.rbBuildingNotDone.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.AutoSize = true;
+            this.groupBox4.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.groupBox4.Controls.Add(this.tableLayoutPanel7);
+            this.groupBox4.Location = new System.Drawing.Point(3, 3);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(113, 125);
+            this.groupBox4.TabIndex = 15;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Type";
+            // 
+            // tableLayoutPanel7
+            // 
+            this.tableLayoutPanel7.AutoSize = true;
+            this.tableLayoutPanel7.ColumnCount = 1;
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel7.Controls.Add(this.filterConsumer, 0, 0);
+            this.tableLayoutPanel7.Controls.Add(this.filterRecipe, 0, 3);
+            this.tableLayoutPanel7.Controls.Add(this.filterPassthrough, 0, 2);
+            this.tableLayoutPanel7.Controls.Add(this.filterSupplier, 0, 1);
+            this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel7.Name = "tableLayoutPanel7";
+            this.tableLayoutPanel7.RowCount = 4;
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(107, 104);
+            this.tableLayoutPanel7.TabIndex = 0;
+            // 
+            // filterConsumer
+            // 
+            this.filterConsumer.AutoSize = true;
+            this.filterConsumer.Checked = true;
+            this.filterConsumer.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.filterConsumer.Location = new System.Drawing.Point(3, 3);
+            this.filterConsumer.Name = "filterConsumer";
+            this.filterConsumer.Size = new System.Drawing.Size(87, 20);
+            this.filterConsumer.TabIndex = 3;
+            this.filterConsumer.Text = "Consumer";
+            this.filterConsumer.UseVisualStyleBackColor = true;
+            this.filterConsumer.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // filterRecipe
+            // 
+            this.filterRecipe.AutoSize = true;
+            this.filterRecipe.Checked = true;
+            this.filterRecipe.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.filterRecipe.Location = new System.Drawing.Point(3, 81);
+            this.filterRecipe.Name = "filterRecipe";
+            this.filterRecipe.Size = new System.Drawing.Size(70, 20);
+            this.filterRecipe.TabIndex = 5;
+            this.filterRecipe.Text = "Recipe";
+            this.filterRecipe.UseVisualStyleBackColor = true;
+            this.filterRecipe.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
             // 
             // filterPassthrough
             // 
@@ -313,6 +564,72 @@
             this.filterPassthrough.Text = "Passthrough";
             this.filterPassthrough.UseVisualStyleBackColor = true;
             this.filterPassthrough.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // filterSupplier
+            // 
+            this.filterSupplier.AutoSize = true;
+            this.filterSupplier.Checked = true;
+            this.filterSupplier.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.filterSupplier.Location = new System.Drawing.Point(3, 29);
+            this.filterSupplier.Name = "filterSupplier";
+            this.filterSupplier.Size = new System.Drawing.Size(76, 20);
+            this.filterSupplier.TabIndex = 2;
+            this.filterSupplier.Text = "Supplier";
+            this.filterSupplier.UseVisualStyleBackColor = true;
+            this.filterSupplier.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.AutoSize = true;
+            this.groupBox5.Controls.Add(this.tableLayoutPanel8);
+            this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox5.Location = new System.Drawing.Point(590, 3);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(167, 125);
+            this.groupBox5.TabIndex = 16;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Ignores";
+            // 
+            // tableLayoutPanel8
+            // 
+            this.tableLayoutPanel8.ColumnCount = 1;
+            this.tableLayoutPanel8.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel8.Controls.Add(this.rbIgnoreAll, 0, 0);
+            this.tableLayoutPanel8.Controls.Add(this.rbOnlySet, 0, 1);
+            this.tableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel8.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel8.Name = "tableLayoutPanel8";
+            this.tableLayoutPanel8.RowCount = 4;
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel8.Size = new System.Drawing.Size(161, 104);
+            this.tableLayoutPanel8.TabIndex = 0;
+            // 
+            // rbIgnoreAll
+            // 
+            this.rbIgnoreAll.AutoSize = true;
+            this.rbIgnoreAll.Checked = true;
+            this.rbIgnoreAll.Location = new System.Drawing.Point(3, 3);
+            this.rbIgnoreAll.Name = "rbIgnoreAll";
+            this.rbIgnoreAll.Size = new System.Drawing.Size(40, 20);
+            this.rbIgnoreAll.TabIndex = 0;
+            this.rbIgnoreAll.TabStop = true;
+            this.rbIgnoreAll.Text = "All";
+            this.rbIgnoreAll.UseVisualStyleBackColor = true;
+            this.rbIgnoreAll.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
+            // 
+            // rbOnlySet
+            // 
+            this.rbOnlySet.AutoSize = true;
+            this.rbOnlySet.Location = new System.Drawing.Point(3, 29);
+            this.rbOnlySet.Name = "rbOnlySet";
+            this.rbOnlySet.Size = new System.Drawing.Size(73, 20);
+            this.rbOnlySet.TabIndex = 1;
+            this.rbOnlySet.Text = "Only set";
+            this.rbOnlySet.UseVisualStyleBackColor = true;
+            this.rbOnlySet.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
             // 
             // BuildingsTabPage
             // 
@@ -1264,263 +1581,6 @@
             this.columnHeader1.Text = "Name";
             this.columnHeader1.Width = 290;
             // 
-            // filterRecipe
-            // 
-            this.filterRecipe.AutoSize = true;
-            this.filterRecipe.Checked = true;
-            this.filterRecipe.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.filterRecipe.Location = new System.Drawing.Point(3, 81);
-            this.filterRecipe.Name = "filterRecipe";
-            this.filterRecipe.Size = new System.Drawing.Size(70, 20);
-            this.filterRecipe.TabIndex = 5;
-            this.filterRecipe.Text = "Recipe";
-            this.filterRecipe.UseVisualStyleBackColor = true;
-            this.filterRecipe.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // filterSupplier
-            // 
-            this.filterSupplier.AutoSize = true;
-            this.filterSupplier.Checked = true;
-            this.filterSupplier.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.filterSupplier.Location = new System.Drawing.Point(3, 29);
-            this.filterSupplier.Name = "filterSupplier";
-            this.filterSupplier.Size = new System.Drawing.Size(76, 20);
-            this.filterSupplier.TabIndex = 2;
-            this.filterSupplier.Text = "Supplier";
-            this.filterSupplier.UseVisualStyleBackColor = true;
-            this.filterSupplier.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // filterConsumer
-            // 
-            this.filterConsumer.AutoSize = true;
-            this.filterConsumer.Checked = true;
-            this.filterConsumer.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.filterConsumer.Location = new System.Drawing.Point(3, 3);
-            this.filterConsumer.Name = "filterConsumer";
-            this.filterConsumer.Size = new System.Drawing.Size(87, 20);
-            this.filterConsumer.TabIndex = 3;
-            this.filterConsumer.Text = "Consumer";
-            this.filterConsumer.UseVisualStyleBackColor = true;
-            this.filterConsumer.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.tableLayoutPanel4);
-            this.groupBox1.Location = new System.Drawing.Point(521, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(150, 100);
-            this.groupBox1.TabIndex = 12;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "FixedRate";
-            // 
-            // rbFixedManual
-            // 
-            this.rbFixedManual.AutoSize = true;
-            this.rbFixedManual.Location = new System.Drawing.Point(3, 55);
-            this.rbFixedManual.Name = "rbFixedManual";
-            this.rbFixedManual.Size = new System.Drawing.Size(69, 20);
-            this.rbFixedManual.TabIndex = 2;
-            this.rbFixedManual.Text = "Manual";
-            this.rbFixedManual.UseVisualStyleBackColor = true;
-            this.rbFixedManual.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // rbFixedAuto
-            // 
-            this.rbFixedAuto.AutoSize = true;
-            this.rbFixedAuto.Location = new System.Drawing.Point(3, 29);
-            this.rbFixedAuto.Name = "rbFixedAuto";
-            this.rbFixedAuto.Size = new System.Drawing.Size(52, 20);
-            this.rbFixedAuto.TabIndex = 1;
-            this.rbFixedAuto.Text = "Auto";
-            this.rbFixedAuto.UseVisualStyleBackColor = true;
-            this.rbFixedAuto.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // rbFixedBoth
-            // 
-            this.rbFixedBoth.AutoSize = true;
-            this.rbFixedBoth.Checked = true;
-            this.rbFixedBoth.Location = new System.Drawing.Point(3, 3);
-            this.rbFixedBoth.Name = "rbFixedBoth";
-            this.rbFixedBoth.Size = new System.Drawing.Size(52, 20);
-            this.rbFixedBoth.TabIndex = 0;
-            this.rbFixedBoth.TabStop = true;
-            this.rbFixedBoth.Text = "Both";
-            this.rbFixedBoth.UseVisualStyleBackColor = true;
-            this.rbFixedBoth.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // tableLayoutPanel4
-            // 
-            this.tableLayoutPanel4.ColumnCount = 1;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Controls.Add(this.rbFixedBoth, 0, 0);
-            this.tableLayoutPanel4.Controls.Add(this.rbFixedAuto, 0, 1);
-            this.tableLayoutPanel4.Controls.Add(this.rbFixedManual, 0, 2);
-            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 18);
-            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-            this.tableLayoutPanel4.RowCount = 3;
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(144, 79);
-            this.tableLayoutPanel4.TabIndex = 0;
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.tableLayoutPanel5);
-            this.groupBox2.Location = new System.Drawing.Point(209, 3);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(150, 100);
-            this.groupBox2.TabIndex = 13;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Building";
-            // 
-            // tableLayoutPanel5
-            // 
-            this.tableLayoutPanel5.ColumnCount = 1;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.Controls.Add(this.rbBuildingBoth, 0, 0);
-            this.tableLayoutPanel5.Controls.Add(this.rbBuildingDone, 0, 1);
-            this.tableLayoutPanel5.Controls.Add(this.rbBuildingNotDone, 0, 2);
-            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 18);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-            this.tableLayoutPanel5.RowCount = 3;
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(144, 79);
-            this.tableLayoutPanel5.TabIndex = 0;
-            // 
-            // rbBuildingBoth
-            // 
-            this.rbBuildingBoth.AutoSize = true;
-            this.rbBuildingBoth.Checked = true;
-            this.rbBuildingBoth.Location = new System.Drawing.Point(3, 3);
-            this.rbBuildingBoth.Name = "rbBuildingBoth";
-            this.rbBuildingBoth.Size = new System.Drawing.Size(52, 20);
-            this.rbBuildingBoth.TabIndex = 0;
-            this.rbBuildingBoth.TabStop = true;
-            this.rbBuildingBoth.Text = "Both";
-            this.rbBuildingBoth.UseVisualStyleBackColor = true;
-            this.rbBuildingBoth.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // rbBuildingDone
-            // 
-            this.rbBuildingDone.AutoSize = true;
-            this.rbBuildingDone.Location = new System.Drawing.Point(3, 29);
-            this.rbBuildingDone.Name = "rbBuildingDone";
-            this.rbBuildingDone.Size = new System.Drawing.Size(58, 20);
-            this.rbBuildingDone.TabIndex = 1;
-            this.rbBuildingDone.Text = "Done";
-            this.rbBuildingDone.UseVisualStyleBackColor = true;
-            this.rbBuildingDone.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // rbBuildingNotDone
-            // 
-            this.rbBuildingNotDone.AutoSize = true;
-            this.rbBuildingNotDone.Location = new System.Drawing.Point(3, 55);
-            this.rbBuildingNotDone.Name = "rbBuildingNotDone";
-            this.rbBuildingNotDone.Size = new System.Drawing.Size(80, 20);
-            this.rbBuildingNotDone.TabIndex = 2;
-            this.rbBuildingNotDone.Text = "Not done";
-            this.rbBuildingNotDone.UseVisualStyleBackColor = true;
-            this.rbBuildingNotDone.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.tableLayoutPanel6);
-            this.groupBox3.Location = new System.Drawing.Point(365, 3);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(150, 100);
-            this.groupBox3.TabIndex = 14;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Production";
-            // 
-            // tableLayoutPanel6
-            // 
-            this.tableLayoutPanel6.ColumnCount = 1;
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.Controls.Add(this.rbProductionAll, 0, 0);
-            this.tableLayoutPanel6.Controls.Add(this.rbProductionOver, 0, 1);
-            this.tableLayoutPanel6.Controls.Add(this.rbProductionUnder, 0, 2);
-            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 18);
-            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
-            this.tableLayoutPanel6.RowCount = 3;
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(144, 79);
-            this.tableLayoutPanel6.TabIndex = 0;
-            // 
-            // rbProductionAll
-            // 
-            this.rbProductionAll.AutoSize = true;
-            this.rbProductionAll.Checked = true;
-            this.rbProductionAll.Location = new System.Drawing.Point(3, 3);
-            this.rbProductionAll.Name = "rbProductionAll";
-            this.rbProductionAll.Size = new System.Drawing.Size(40, 20);
-            this.rbProductionAll.TabIndex = 0;
-            this.rbProductionAll.TabStop = true;
-            this.rbProductionAll.Text = "All";
-            this.rbProductionAll.UseVisualStyleBackColor = true;
-            this.rbProductionAll.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // rbProductionOver
-            // 
-            this.rbProductionOver.AutoSize = true;
-            this.rbProductionOver.Location = new System.Drawing.Point(3, 29);
-            this.rbProductionOver.Name = "rbProductionOver";
-            this.rbProductionOver.Size = new System.Drawing.Size(54, 20);
-            this.rbProductionOver.TabIndex = 1;
-            this.rbProductionOver.Text = "Over";
-            this.rbProductionOver.UseVisualStyleBackColor = true;
-            this.rbProductionOver.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // rbProductionUnder
-            // 
-            this.rbProductionUnder.AutoSize = true;
-            this.rbProductionUnder.Location = new System.Drawing.Point(3, 55);
-            this.rbProductionUnder.Name = "rbProductionUnder";
-            this.rbProductionUnder.Size = new System.Drawing.Size(62, 20);
-            this.rbProductionUnder.TabIndex = 2;
-            this.rbProductionUnder.Text = "Under";
-            this.rbProductionUnder.UseVisualStyleBackColor = true;
-            this.rbProductionUnder.CheckedChanged += new System.EventHandler(this.filterAllNodes_CheckedChanged);
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.AutoSize = true;
-            this.groupBox4.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.groupBox4.Controls.Add(this.tableLayoutPanel7);
-            this.groupBox4.Location = new System.Drawing.Point(3, 3);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(200, 128);
-            this.groupBox4.TabIndex = 15;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Type";
-            // 
-            // tableLayoutPanel7
-            // 
-            this.tableLayoutPanel7.AutoSize = true;
-            this.tableLayoutPanel7.ColumnCount = 1;
-            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel7.Controls.Add(this.filterConsumer, 0, 0);
-            this.tableLayoutPanel7.Controls.Add(this.filterRecipe, 0, 3);
-            this.tableLayoutPanel7.Controls.Add(this.filterPassthrough, 0, 2);
-            this.tableLayoutPanel7.Controls.Add(this.filterSupplier, 0, 1);
-            this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel7.Location = new System.Drawing.Point(3, 18);
-            this.tableLayoutPanel7.Name = "tableLayoutPanel7";
-            this.tableLayoutPanel7.RowCount = 4;
-            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel7.Size = new System.Drawing.Size(194, 107);
-            this.tableLayoutPanel7.TabIndex = 0;
-            // 
             // GraphSummary
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1537,6 +1597,22 @@
             this.MessagesTable.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel4.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.tableLayoutPanel6.ResumeLayout(false);
+            this.tableLayoutPanel6.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.tableLayoutPanel5.ResumeLayout(false);
+            this.tableLayoutPanel5.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            this.tableLayoutPanel7.ResumeLayout(false);
+            this.tableLayoutPanel7.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.tableLayoutPanel8.ResumeLayout(false);
+            this.tableLayoutPanel8.PerformLayout();
             this.BuildingsTabPage.ResumeLayout(false);
             this.BuildingsTabPage.PerformLayout();
             this.BuildingsTable.ResumeLayout(false);
@@ -1563,19 +1639,6 @@
             this.KeyNodesTable.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.tableLayoutPanel4.ResumeLayout(false);
-            this.tableLayoutPanel4.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.tableLayoutPanel5.ResumeLayout(false);
-            this.tableLayoutPanel5.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.tableLayoutPanel6.ResumeLayout(false);
-            this.tableLayoutPanel6.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
-            this.tableLayoutPanel7.ResumeLayout(false);
-            this.tableLayoutPanel7.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -1699,5 +1762,9 @@
         private System.Windows.Forms.RadioButton rbProductionUnder;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel8;
+        private System.Windows.Forms.RadioButton rbIgnoreAll;
+        private System.Windows.Forms.RadioButton rbOnlySet;
     }
 }

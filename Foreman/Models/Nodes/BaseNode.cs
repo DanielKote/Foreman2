@@ -50,6 +50,7 @@ namespace Foreman
 		public event EventHandler<EventArgs> NodeValuesChanged; //includes actual amount / actual rate changes (ex: graph solved), as well as minor updates (ex:beacon numbers, etc.)
 
 		public bool IgnoreOverproduction { get; set; }
+		public bool IgnoreManualNotMet { get; set; }
 		internal BaseNode(ProductionGraph graph, int nodeID)
 		{
 			MyGraph = graph;
@@ -170,6 +171,8 @@ namespace Foreman
 		public bool IsOverproducing() => MyNode.IsOverproducing();
 		public bool IsOverproducing(Item item) => MyNode.IsOverproducing(item);
 		public bool ManualRateNotMet() => MyNode.ManualRateNotMet();
+		public bool IgnoreOverproduction() => MyNode.IgnoreOverproduction;
+		public bool IgnoreManualNotMet() => MyNode.IgnoreManualNotMet;
 
 		private readonly BaseNode MyNode;
 

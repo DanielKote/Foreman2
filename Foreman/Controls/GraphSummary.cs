@@ -565,6 +565,10 @@ namespace Foreman.Controls
 			bool includeProductionOver = rbProductionOver.Checked;
 			bool includeProductionUnder = rbProductionUnder.Checked;
 
+			//Ignore
+			bool includeIgnoreAll = rbIgnoreAll.Checked;
+			bool includeIgnoreOnlySet = rbOnlySet.Checked;
+
 			ReadOnlyBaseNode node;
 
 			filteredAllNodesList.Clear();
@@ -587,8 +591,9 @@ namespace Foreman.Controls
 							(includeProductionOver && sNode.ManualRateNotMet())
 							)
 						{
-							filteredAllNodesList.Add(lvItem);
-						}
+							if (includeIgnoreAll || (includeIgnoreOnlySet && sNode.IgnoreManualNotMet()))
+								filteredAllNodesList.Add(lvItem);
+						} 
 					}
 				}
 
@@ -606,7 +611,8 @@ namespace Foreman.Controls
 							includeProductionAll ||
 							(includeProductionUnder && cNode.ManualRateNotMet()))
 						{
-							filteredAllNodesList.Add(lvItem);
+							if (includeIgnoreAll || (includeIgnoreOnlySet && cNode.IgnoreManualNotMet()))
+								filteredAllNodesList.Add(lvItem);
 						}
 					}
 				}
@@ -626,7 +632,12 @@ namespace Foreman.Controls
 							(includeProductionUnder && pNode.ManualRateNotMet())
 							)
 						{
-							filteredAllNodesList.Add(lvItem);
+							if (
+								includeIgnoreAll || 
+								(includeIgnoreOnlySet && pNode.ManualRateNotMet()) ||
+								(includeIgnoreOnlySet && pNode.IsOverproducing())
+								)
+									filteredAllNodesList.Add(lvItem);
 						}
 					}
 				}
@@ -875,5 +886,6 @@ namespace Foreman.Controls
         {
 			UpdateFilteredAllNodesList();
 		}
+
     }
 }

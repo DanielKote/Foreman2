@@ -53,9 +53,6 @@ namespace Foreman
 
 		public bool BuildingDone { get; set; }
 
-		public bool IgnoreManualNotMet { get; set; }
-
-
 		public readonly Recipe BaseRecipe;
 		public double NeighbourCount { get; set; }
 
@@ -381,8 +378,6 @@ namespace Foreman
 		public bool LowPriority => MyNode.LowPriority;
 
 		public bool BuildingDone => MyNode.BuildingDone;
-		public bool IgnoreManualNotMet => MyNode.IgnoreManualNotMet;
-		public bool IgnoreOverproduction => MyNode.IgnoreOverproduction;
 		public Recipe BaseRecipe => MyNode.BaseRecipe;
 		public Assembler SelectedAssembler => MyNode.SelectedAssembler;
 		public Item Fuel => MyNode.Fuel;
