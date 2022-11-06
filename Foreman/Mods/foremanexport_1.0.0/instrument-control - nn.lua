@@ -444,11 +444,11 @@ local function ExportResources()
                     tproduct = {}
                     tproduct['name'] = product.name
                     tproduct['type'] = product.type
-    
+                
                     amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
                     amount = amount * ( (product.probability == nil) and 1 or product.probability)
                     tproduct['amount'] = amount
-    
+                
                     if product.type == 'fluid' and product.temperate ~= nil then
                         tproduct['temperature'] = ProcessTemperature(product.temperature)
                     end
