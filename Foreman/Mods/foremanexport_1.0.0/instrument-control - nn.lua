@@ -439,20 +439,22 @@ local function ExportResources()
 			tresource['name'] = resource.name
 
 			tresource['products'] = {}
-			for _, product in pairs(resource.mineable_properties.products) do
-				tproduct = {}
-				tproduct['name'] = product.name
-				tproduct['type'] = product.type
-
-				amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-				amount = amount * ( (product.probability == nil) and 1 or product.probability)
-				tproduct['amount'] = amount
-
-				if product.type == 'fluid' and product.temperate ~= nil then
-					tproduct['temperature'] = ProcessTemperature(product.temperature)
-				end
-				table.insert(tresource['products'], tproduct)
-			end
+			if resource.mineable_properties.products ~= nil then
+                for _, product in pairs(resource.mineable_properties.products) do
+                    tproduct = {}
+                    tproduct['name'] = product.name
+                    tproduct['type'] = product.type
+    
+                    amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
+                    amount = amount * ( (product.probability == nil) and 1 or product.probability)
+                    tproduct['amount'] = amount
+    
+                    if product.type == 'fluid' and product.temperate ~= nil then
+                        tproduct['temperature'] = ProcessTemperature(product.temperature)
+                    end
+                    table.insert(tresource['products'], tproduct)
+                end
+            end
 
 			tresource['lid'] = '$'..localindex
 			ExportLocalisedString(resource.localised_name, localindex)
