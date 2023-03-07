@@ -19,6 +19,8 @@ namespace Foreman
 		public readonly ProductionGraph MyGraph;
 		public readonly int NodeID;
 
+		public bool IsClean { get; protected set; } //if true then this node hasnt changed (internal values or links) since last solver solution
+
 		public bool KeyNode { get; set; }
 		public string KeyNodeTitle { get; set; }
 
@@ -70,8 +72,10 @@ namespace Foreman
 		public bool AllLinksValid { get { return (InputLinks.Count(l => !l.IsValid) + OutputLinks.Count(l => !l.IsValid) == 0); } }
 		public bool AllLinksConnected { get { return !Inputs.Any(i => !InputLinks.Any(l => l.Item == i)) && !Outputs.Any(i => !OutputLinks.Any(l => l.Item == i)); } }
 
-		public virtual void UpdateState()
+		public virtual void UpdateState(bool makeDirty = true)
 		{
+			if(makeDirty)
+				IsClean = false;
 			NodeState originalState = State;
 			State = AllLinksValid ? AllLinksConnected? NodeState.Clean : NodeState.MissingLink : NodeState.Error;
 			if (State != originalState)

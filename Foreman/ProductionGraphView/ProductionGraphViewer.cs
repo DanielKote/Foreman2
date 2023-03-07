@@ -290,7 +290,7 @@ namespace Foreman
 			{
 				ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Passthrough, null));
 				DisposeLinkDrag();
-				Graph.UpdateNodeStates();
+				Graph.UpdateNodeStates(false);
 				Invalidate();
 			}
 			else
@@ -310,7 +310,7 @@ namespace Foreman
 				{
 					SubwindowOpen = false;
 					DisposeLinkDrag();
-					Graph.UpdateNodeStates();
+					Graph.UpdateNodeStates(false);
 					Invalidate();
 				};
 
@@ -348,7 +348,7 @@ namespace Foreman
 			SetSelection(newPassthroughNodes);
 
 			DisposeLinkDrag();
-			Graph.UpdateNodeStates();
+			Graph.UpdateNodeStates(false);
 			Invalidate();
 		}
 

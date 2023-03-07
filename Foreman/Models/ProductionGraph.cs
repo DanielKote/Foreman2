@@ -243,10 +243,10 @@ namespace Foreman
 			lastNodeID = 0;
 		}
 
-		public void UpdateNodeStates()
+		public void UpdateNodeStates(bool markAllAsDirty)
 		{
 			foreach (BaseNode node in nodes)
-				node.UpdateState();
+				node.UpdateState(markAllAsDirty);
 		}
 
 		public IEnumerable<ReadOnlyBaseNode> GetSuppliers(Item item)
@@ -263,10 +263,12 @@ namespace Foreman
 					yield return node;
 		}
 
-		public IEnumerable<IEnumerable<ReadOnlyBaseNode>> GetConnectedNodeGroups() { foreach (IEnumerable<BaseNode> group in GetConnectedComponents()) yield return group.Select(node => node.ReadOnlyNode); }
-		private IEnumerable<IEnumerable<BaseNode>> GetConnectedComponents() //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving
+		public IEnumerable<IEnumerable<ReadOnlyBaseNode>> GetConnectedNodeGroups(bool includeCleanComponents) { foreach (IEnumerable<BaseNode> group in GetConnectedComponents(includeCleanComponents)) yield return group.Select(node => node.ReadOnlyNode); }
+
+		private IEnumerable<IEnumerable<BaseNode>> GetConnectedComponents(bool includeCleanComponents) //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving. Clean components refer to node groups where all the nodes inside the group havent had any changes since last solve operation
 		{
 			//there is an optimized solution for connected components where we keep track of the various groups and modify them as each node/link is added/removed, but testing shows that this calculation below takes under 1ms even for larg 1000+ node graphs, so why bother.
+
 
 			HashSet<BaseNode> unvisitedNodes = new HashSet<BaseNode>(nodes);
 
@@ -274,13 +276,16 @@ namespace Foreman
 
 			while (unvisitedNodes.Any())
 			{
-				connectedComponents.Add(new HashSet<BaseNode>());
+				HashSet<BaseNode> newSet = new HashSet<BaseNode>();
+				bool allClean = true;
+
 				HashSet<BaseNode> toVisitNext = new HashSet<BaseNode>();
 				toVisitNext.Add(unvisitedNodes.First());
 
 				while (toVisitNext.Any())
 				{
 					BaseNode currentNode = toVisitNext.First();
+					allClean &= currentNode.IsClean;
 
 					foreach (NodeLink link in currentNode.InputLinks)
 						if (unvisitedNodes.Contains(link.SupplierNode))
@@ -290,12 +295,14 @@ namespace Foreman
 						if (unvisitedNodes.Contains(link.ConsumerNode))
 							toVisitNext.Add(link.ConsumerNode);
 
-					connectedComponents.Last().Add(currentNode);
+					newSet.Add(currentNode);
 					toVisitNext.Remove(currentNode);
 					unvisitedNodes.Remove(currentNode);
 				}
-			}
 
+				if (!allClean || includeCleanComponents)
+					connectedComponents.Add(newSet);
+			}
 			return connectedComponents;
 		}
 

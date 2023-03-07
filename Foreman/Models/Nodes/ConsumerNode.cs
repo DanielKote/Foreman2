@@ -23,8 +23,10 @@ namespace Foreman
 			ReadOnlyNode = new ReadOnlyConsumerNode(this);
 		}
 
-		public override void UpdateState()
+		public override void UpdateState(bool makeDirty = true)
 		{
+			if (makeDirty)
+				IsClean = false;
 			NodeState oldState = State;
 			State = (!ConsumedItem.IsMissing && AllLinksValid) ? AllLinksConnected ? NodeState.Clean : NodeState.MissingLink : NodeState.Error;
 			if (oldState != State)

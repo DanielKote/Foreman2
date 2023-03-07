@@ -13,7 +13,7 @@ namespace Foreman
 		private int updateCounter = 0;
 		public void OptimizeGraphNodeValues()
 		{
-			foreach (var nodeGroup in GetConnectedComponents())
+			foreach (var nodeGroup in GetConnectedComponents(false))
 				OptimiseNodeGroup(nodeGroup);
 
 			Debug.WriteLine("UPDATE #" + updateCounter++);
@@ -64,6 +64,7 @@ namespace Foreman
 			//this is for all nodes but the recipe node. Recipe node overwrites this to set the factory count instead (as that is what the solver was solving for)
 			ActualRatePerSec = rate;
 			NodeValuesChanged?.Invoke(this, EventArgs.Empty);
+			IsClean = true;
 		}
 
 		internal void AddConstraints(ProductionSolver solver)

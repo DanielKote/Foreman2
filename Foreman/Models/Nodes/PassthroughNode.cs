@@ -25,8 +25,10 @@ namespace Foreman
 			ReadOnlyNode = new ReadOnlyPassthroughNode(this);
 		}
 
-		public override void UpdateState()
+		public override void UpdateState(bool makeDirty = true)
 		{
+			if (makeDirty)
+				IsClean = false;
 			NodeState oldState = State;
 			State = (!PassthroughItem.IsMissing && AllLinksValid) ? AllLinksConnected ? NodeState.Clean : NodeState.MissingLink : NodeState.Error;
 			if (oldState != State)

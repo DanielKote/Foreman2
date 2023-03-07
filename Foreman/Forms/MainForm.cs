@@ -456,7 +456,7 @@ namespace Foreman
 					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
 					Properties.Settings.Default.Save();
 
-					GraphViewer.Graph.UpdateNodeStates();
+					GraphViewer.Graph.UpdateNodeStates(true);
 					GraphViewer.Graph.UpdateNodeValues();
 
 					if (options.RequireReload)
