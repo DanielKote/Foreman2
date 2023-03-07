@@ -126,5 +126,10 @@ namespace Foreman
 				info.HoverStartHandler(lastMouseMoveControl, new MouseEventArgs(MouseButtons.None, 0, info.HoverStartPoint.X, info.HoverStartPoint.Y, 0));
 			}
 		}
+
+		public void Dispose()
+		{
+			timer.Dispose();
+		}
 	}
 }

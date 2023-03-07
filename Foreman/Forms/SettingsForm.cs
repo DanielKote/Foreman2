@@ -78,6 +78,8 @@ namespace Foreman
 		private List<ListViewItem> filteredModuleList;
 		private List<ListViewItem> filteredRecipeList;
 
+		private MouseHoverDetector mhDetector;
+
 		public SettingsForm(SettingsFormOptions options)
 		{
 			Options = options;
@@ -110,7 +112,7 @@ namespace Foreman
 			SelectPresetMenuItem.Click += SelectPresetMenuItem_Click;
 			DeletePresetMenuItem.Click += DeletePresetMenuItem_Click;
 
-			MouseHoverDetector mhDetector = new MouseHoverDetector(100, 200);
+			mhDetector = new MouseHoverDetector(100, 200);
 			mhDetector.Add(RecipeListView, RecipeListView_StartHover, RecipeListView_EndHover);
 
 			CurrentPresetLabel.Text = Options.SelectedPreset.Name;
@@ -660,6 +662,12 @@ namespace Foreman
 				item.Checked = Options.EnabledObjects.Contains((DataObjectBase)item.Tag);
 
 			UpdateFilteredLists();
+		}
+
+		protected override void OnClosed(EventArgs e)
+		{
+			mhDetector.Dispose();
+			base.OnClosed(e);
 		}
 	}
 }
