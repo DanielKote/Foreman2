@@ -65,7 +65,8 @@ namespace Foreman
 		public bool IsTemperatureFluidBurner { get; set; }
 		public fRange FluidFuelTemperatureRange { get; set; }
 
-		public double Speed { get; internal set; }
+		private double speed;
+		public double Speed { get { return speed; } internal set { speed = value == 0 ? 0.001 : value; } }
 
 		public int ModuleSlots { get; internal set; }
 		public double NeighbourBonus { get; internal set; }
