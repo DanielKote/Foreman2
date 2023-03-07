@@ -273,26 +273,12 @@ namespace Foreman
 				}
 
 				//ensure that the foreman export mod is correctly added to the mod-list and is enabled
-				string modListPath = Path.Combine(modsPath, "mod-list.json");
-				JObject modlist = null;
-				if (!File.Exists(modListPath))
-					modlist = new JObject();
-				else
-					modlist = JObject.Parse(File.ReadAllText(modListPath));
-				if (modlist["mods"] == null)
-					modlist.Add("mods", new JArray());
-
-				JToken foremanModToken = modlist["mods"].ToList().FirstOrDefault(t => t["name"] != null && (string)t["name"] == "foremanexport");
-				if (foremanModToken == null)
-					((JArray)modlist["mods"]).Add(new JObject() { { "name", "foremanexport" }, { "enabled", true } });
-				else
-					foremanModToken["enabled"] = true;
+				SetStateForemanExportMod(modsPath, true);
 
 				//copy the files as necessary
 				try
 				{
 					Directory.CreateDirectory(Path.Combine(modsPath, "foremanexport_1.0.0"));
-					File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented)); //updated mod list with foreman export enabled
 
 					File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "info.json" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "info.json" }));
 					File.Copy(Path.Combine(new string[] { "Mods", "foremanexport_1.0.0", "instrument-after-data.lua" }), Path.Combine(new string[] { modsPath, "foremanexport_1.0.0", "instrument-after-data.lua" }), true);
@@ -470,12 +456,15 @@ namespace Foreman
 					}
 				}
 
+				SetStateForemanExportMod(modsPath, false);
 				return NewPresetName;
 			});
 		}
 
 		private void CleanupFailedImport(string modsPath = "", string presetPath = "")
 		{
+			SetStateForemanExportMod(modsPath, false);
+
 			NewPresetName = "";
 
 			if (File.Exists("temp-save.zip"))
@@ -490,6 +479,38 @@ namespace Foreman
 				File.Delete(Path.Combine(Application.StartupPath, presetPath + ".json"));
 			if (presetPath != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".dat")))
 				File.Delete(Path.Combine(Application.StartupPath, presetPath + ".dat"));
+		}
+
+		//Sets the enabled status of the foreman export mod within the mod-list of factorio to be "enabled" (true/false).
+		//Needs to be enabled in order to process the preset, but should be disabled otherwise as it adds processing steps to factorio which shouldnt be done any other time (such as while playing the game)
+		private void SetStateForemanExportMod(string modsPath, bool enabled)
+		{
+			//ensure that the foreman export mod is correctly added to the mod-list and is enabled
+			string modListPath = Path.Combine(modsPath, "mod-list.json");
+			JObject modlist = null;
+			if (!File.Exists(modListPath))
+				modlist = new JObject();
+			else
+				modlist = JObject.Parse(File.ReadAllText(modListPath));
+			if (modlist["mods"] == null)
+				modlist.Add("mods", new JArray());
+
+			JToken foremanModToken = modlist["mods"].ToList().FirstOrDefault(t => t["name"] != null && (string)t["name"] == "foremanexport");
+			if (enabled)
+			{
+				if (foremanModToken == null)
+					((JArray)modlist["mods"]).Add(new JObject() { { "name", "foremanexport" }, { "enabled", enabled } });
+				else
+					foremanModToken["enabled"] = enabled;
+			}
+			else if(foremanModToken != null)
+				foremanModToken.Remove();
+
+			try
+			{
+				File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented)); //updated mod list with foreman export disabled
+			}
+			catch { }
 		}
 
 		private void PresetNameTextBox_TextChanged(object sender, EventArgs e)
