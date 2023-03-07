@@ -486,6 +486,11 @@ namespace Foreman
 			GraphViewer.AddItem(new Point(15, 15), location);
 		}
 
+		private void HelpButton_Click(object sender, EventArgs e)
+		{
+			System.Diagnostics.Process.Start("https://github.com/DanielKote/Foreman2");
+		}
+
 		//---------------------------------------------------------Key & Mouse events
 
 		private void MainForm_KeyDown(object sender, KeyEventArgs e)

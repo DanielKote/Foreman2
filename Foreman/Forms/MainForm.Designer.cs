@@ -32,6 +32,7 @@
 			this.GraphViewer = new Foreman.ProductionGraphViewer();
 			this.MenuTable = new System.Windows.Forms.TableLayoutPanel();
 			this.MenuButtonsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.HelpButton = new System.Windows.Forms.Button();
 			this.SaveButton = new System.Windows.Forms.Button();
 			this.AddItemButton = new System.Windows.Forms.Button();
 			this.AddRecipeButton = new System.Windows.Forms.Button();
@@ -138,6 +139,7 @@
 			this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.MenuButtonsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.MenuButtonsTable.Controls.Add(this.HelpButton, 3, 2);
 			this.MenuButtonsTable.Controls.Add(this.SaveButton, 0, 1);
 			this.MenuButtonsTable.Controls.Add(this.AddItemButton, 1, 1);
 			this.MenuButtonsTable.Controls.Add(this.AddRecipeButton, 1, 2);
@@ -156,8 +158,23 @@
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.MenuButtonsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.MenuButtonsTable.Size = new System.Drawing.Size(245, 120);
+			this.MenuButtonsTable.Size = new System.Drawing.Size(253, 120);
 			this.MenuButtonsTable.TabIndex = 0;
+			// 
+			// HelpButton
+			// 
+			this.HelpButton.AutoSize = true;
+			this.HelpButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.HelpButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.HelpButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.HelpButton.Location = new System.Drawing.Point(164, 62);
+			this.HelpButton.Margin = new System.Windows.Forms.Padding(2);
+			this.HelpButton.Name = "HelpButton";
+			this.HelpButton.Size = new System.Drawing.Size(87, 26);
+			this.HelpButton.TabIndex = 13;
+			this.HelpButton.Text = "Help / Git repo";
+			this.HelpButton.UseVisualStyleBackColor = true;
+			this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
 			// 
 			// SaveButton
 			// 
@@ -211,7 +228,7 @@
 			this.ExportImageButton.Location = new System.Drawing.Point(164, 32);
 			this.ExportImageButton.Margin = new System.Windows.Forms.Padding(2);
 			this.ExportImageButton.Name = "ExportImageButton";
-			this.ExportImageButton.Size = new System.Drawing.Size(79, 26);
+			this.ExportImageButton.Size = new System.Drawing.Size(87, 26);
 			this.ExportImageButton.TabIndex = 8;
 			this.ExportImageButton.Text = "Export Image";
 			this.ExportImageButton.UseVisualStyleBackColor = true;
@@ -225,7 +242,7 @@
 			this.EnableDisableButton.Location = new System.Drawing.Point(164, 2);
 			this.EnableDisableButton.Margin = new System.Windows.Forms.Padding(2);
 			this.EnableDisableButton.Name = "EnableDisableButton";
-			this.EnableDisableButton.Size = new System.Drawing.Size(79, 26);
+			this.EnableDisableButton.Size = new System.Drawing.Size(87, 26);
 			this.EnableDisableButton.TabIndex = 7;
 			this.EnableDisableButton.Text = "Settings";
 			this.EnableDisableButton.UseVisualStyleBackColor = true;
@@ -293,7 +310,7 @@
 			this.GridLinesGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.GridLinesGroupBox.Controls.Add(this.GridlinesTable);
 			this.GridLinesGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.GridLinesGroupBox.Location = new System.Drawing.Point(254, 3);
+			this.GridLinesGroupBox.Location = new System.Drawing.Point(262, 3);
 			this.GridLinesGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.GridLinesGroupBox.Name = "GridLinesGroupBox";
 			this.GridLinesGroupBox.Padding = new System.Windows.Forms.Padding(0);
@@ -430,7 +447,7 @@
 			this.ProductionGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.ProductionGroupBox.Controls.Add(this.GraphOptionsTable);
 			this.ProductionGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ProductionGroupBox.Location = new System.Drawing.Point(468, 3);
+			this.ProductionGroupBox.Location = new System.Drawing.Point(476, 3);
 			this.ProductionGroupBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
 			this.ProductionGroupBox.Name = "ProductionGroupBox";
 			this.ProductionGroupBox.Padding = new System.Windows.Forms.Padding(0);
@@ -600,6 +617,7 @@
 		private System.Windows.Forms.CheckBox IconViewCheckBox;
 		private System.Windows.Forms.Label VersionLabel;
 		private System.Windows.Forms.Button SaveButton;
+		private System.Windows.Forms.Button HelpButton;
 	}
 }
 

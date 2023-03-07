@@ -13,6 +13,8 @@ For example, here's a flowchart showing the optimal resources and assemblers req
 
 To download the latest version of Foreman 2.0 please visit the "Releases" tab here on Github and download the "Release.zip" from the latest release.
 
+The vanilla preset is included in the release, with a couple presets (from common modpacks) available in the "Presets.zip". You can always import your own preset using your customized modpack via the foreman app (see below for "presets" heading).
+
 ## Usage ##
 
 Run Foreman.exe. It will already have the default Factorio 1.1 preset loaded so you can start graphing right away. Click on 'add item' or 'add recipe' button to begin.
@@ -218,6 +220,4 @@ Additionally, be careful when exporting large graphs - this is a raster format i
 
 At the time of writing the only official "contributor" is myself, DanielKotes. This started out as a slight fork of the [original foreman](https://github.com/Rybadour/Foreman), with just a few changes that I didnt bother using git for. It kind of spiraled out of control to the point where it is no longer something that can be considered the original Foreman, thus the new repository.
 
-For now this is in active development so I do not recommend contributing to the project at this time as I make rather extensive changes often enough that any extra changes are more likely than not be depreciated by the time I get to them.
-
-Once this development spurt is finished, I will see about opening up the project for outside contributions / bug fixes / etc.
+I have mostly finished with active development and will mostly be releasing updates pertaining to keeping the software functional / fixing up any major bugs. You are free to make a fork of this project and make any changes you want; I will try to check up on any posted merge requests when I have time.
