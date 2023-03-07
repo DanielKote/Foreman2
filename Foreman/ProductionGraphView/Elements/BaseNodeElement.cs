@@ -220,7 +220,7 @@ namespace Foreman
 			{
 				//background
 				Brush bgBrush = DisplayedNode.State == NodeState.Error ? errorBgBrush : CleanBgBrush;
-				Brush borderBrush = DisplayedNode.ManualRateNotMet() ? undersuppliedFlowBorderBrush : DisplayedNode.IsOverproducing() ? overproducingFlowBorderBrush : equalFlowBorderBrush;
+				Brush borderBrush = DisplayedNode.ManualRateNotMet() && !(this is SupplierNodeElement) ? undersuppliedFlowBorderBrush : DisplayedNode.IsOverproducing() ? overproducingFlowBorderBrush : equalFlowBorderBrush;
 
 				GraphicsStuff.FillRoundRect(trans.X - (Width / 2) + BorderSpacing, trans.Y - (Height / 2) + BorderSpacing, Width - (2 * BorderSpacing), Height - (2 * BorderSpacing), 10, graphics, borderBrush); //flow status border
 

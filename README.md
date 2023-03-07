@@ -76,9 +76,9 @@ The item input/output boxes are usually drawn with a grey border, but appear as 
 
 The nodes themselves are usually colored in light green with a dark green border around them.
 
-(1) If the assigned flow or building count can not be achieved (due to insufficient incoming ingredients), then the border will be colored red.
+(1) If the assigned flow or building count can not be achieved (due to insufficient incoming ingredients), then the border will be colored red. This tends to happen if the user has set one of the previous recipes / inputs to a fixed amount (that is insufficient).
 
-(2) If there is too many ingredients coming in (and thus will be 'stockpiled' at the node), then the border will be colored golden. 
+(2) If the assigned flow or building count is too high (overproduction is expected) or the output isnt connected to anything then the border will be colored golden and whichever item is being overproduced (and thus will begin to stockpile!) will also have its frame colored golden. The two values provided represent the consumed amount (top) and the produced amount (bottom). The difference between the two represent the rate at which the item will accumulate.
 
 (3) If the node uses an unobtainable or disabled recipe or building, then there will be an orange flag on the top left of the node, with a warning sign on the top left.
 

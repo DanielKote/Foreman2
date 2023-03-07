@@ -33,7 +33,7 @@ namespace Foreman
 		}
 
 		public override double GetConsumeRate(Item item) { throw new ArgumentException("Supplier does not consume! nothing should be asking for the consume rate"); }
-		public override double GetSupplyRate(Item item) { return ActualRate; }
+		public override double GetSupplyRate(Item item) { return (RateType == RateType.Manual)? DesiredRate : ActualRate; }
 
 		internal override double inputRateFor(Item item) { throw new ArgumentException("Supplier should not have outputs!"); }
 		internal override double outputRateFor(Item item) { return 1; }
