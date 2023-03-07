@@ -96,7 +96,10 @@ namespace Foreman
 					}
 				}
 
+				SpeedBonus = Math.Max(-0.8f, SpeedBonus);
+				ProductivityBonus = Math.Max(0f, ProductivityBonus);
 				ConsumptionBonus = Math.Max(-0.8f, ConsumptionBonus);
+				PollutionBonus = Math.Max(-0.8f, PollutionBonus);
 			}
 
 			public override string ToString()

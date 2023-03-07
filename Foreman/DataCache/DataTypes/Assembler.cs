@@ -26,19 +26,5 @@ namespace Foreman
 		{
 			return String.Format("Assembler: {0}", Name);
 		}
-
-		public double GetRate(Recipe recipe, double beaconBonus, IEnumerable<Module> modules = null)
-		{
-			double finalSpeed = this.Speed;
-			if (modules != null)
-				foreach (Module module in modules.Where(m => m != null))
-					finalSpeed += module.SpeedBonus * this.Speed;
-			finalSpeed += beaconBonus * this.Speed;
-
-			double craftingTime = recipe.Time / finalSpeed;
-			craftingTime = (double)(Math.Ceiling(craftingTime * 60d) / 60d); //Machines have to wait for a new tick before starting a new item, so round up to the nearest tick
-
-			return (double)(1d / craftingTime);
-		}
 	}
 }
