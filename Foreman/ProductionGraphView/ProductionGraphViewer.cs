@@ -1167,6 +1167,8 @@ namespace Foreman
 				form.Left = ParentForm.Left + 150;
 				form.Top = ParentForm.Top + 200;
 				DialogResult result = form.ShowDialog(); //LOAD FACTORIO DATA
+				if (DCache != null)
+					DCache.Clear();
 				DCache = form.GetDataCache();
 				if (result == DialogResult.Abort)
 				{
@@ -1178,6 +1180,8 @@ namespace Foreman
 						form2.Left = ParentForm.Left + 150;
 						form2.Top = ParentForm.Top + 200;
 						DialogResult result2 = form2.ShowDialog(); //LOAD default preset
+						if (DCache != null)
+							DCache.Clear();
 						DCache = form2.GetDataCache();
 						if (result2 == DialogResult.Abort)
 							MessageBox.Show("The default preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. No Preset is loaded!");

@@ -95,6 +95,8 @@ namespace Foreman
 		private static readonly Regex[] recipeWhiteList = { new Regex("^empty-barrel$") }; //whitelist takes priority over blacklist
 		private static readonly Regex[] recipeBlackList = { new Regex("-barrel$"), new Regex("^deadlock-packrecipe-"), new Regex("^deadlock-unpackrecipe-"), new Regex("^deadlock-plastic-packaging$") };
 
+		private Dictionary<string, IconColorPair> iconCache;
+
 		private static readonly double MaxTemp = 10000000; //some mods set the temperature ranges as 'way too high' and expect factorio to handle it (it does). Since we prefer to show temperature ranges we will define any temp beyond these as no limit
 		private static readonly double MinTemp = -MaxTemp;
 
@@ -209,7 +211,7 @@ namespace Foreman
 			if (jsonData == null)
 				return;
 
-			Dictionary<string, IconColorPair> iconCache = loadIcons ? await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, 0, 90) : new Dictionary<string, IconColorPair>();
+			iconCache = loadIcons ? await IconCache.LoadIconCache(Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".dat" }), progress, 0, 90) : new Dictionary<string, IconColorPair>();
 
 			await Task.Run(() =>
 			{
@@ -241,10 +243,6 @@ namespace Foreman
 					ProcessTechnologyP2(objJToken); //required to properly link technology prerequisites
 				foreach (var objJToken in jsonData["entities"].ToList())
 					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories);
-
-				foreach (var iconset in iconCache.Values)
-					iconset.Icon.Dispose();
-				iconCache.Clear();
 
 				//process launch products
 				foreach (var objJToken in jsonData["items"].Where(t => t["launch_products"] != null).ToList())
@@ -332,6 +330,13 @@ namespace Foreman
 			missingBeacons.Clear();
 			missingRecipes.Clear();
 
+			if (iconCache != null)
+			{
+				foreach (var iconset in iconCache.Values)
+					iconset.Icon.Dispose();
+				iconCache.Clear();
+			}
+
 			groups.Add(extraFormanGroup.Name, extraFormanGroup);
 			subgroups.Add(extractionSubgroupItems.Name, extractionSubgroupItems);
 			subgroups.Add(extractionSubgroupFluids.Name, extractionSubgroupFluids);
@@ -340,6 +345,8 @@ namespace Foreman
 			recipes.Add(HeatRecipe.Name, HeatRecipe);
 			recipes.Add(BurnerRecipe.Name, BurnerRecipe);
 			technologies.Add(StartingTech.Name, startingTech);
+
+
 		}
 
 		//------------------------------------------------------Import processing
