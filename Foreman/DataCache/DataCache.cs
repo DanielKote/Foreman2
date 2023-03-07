@@ -242,6 +242,10 @@ namespace Foreman
 				foreach (var objJToken in jsonData["entities"].ToList())
 					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories);
 
+				foreach (var iconset in iconCache.Values)
+					iconset.Icon.Dispose();
+				iconCache.Clear();
+
 				//process launch products
 				foreach (var objJToken in jsonData["items"].Where(t => t["launch_products"] != null).ToList())
 					ProcessRocketLaunch(objJToken);
