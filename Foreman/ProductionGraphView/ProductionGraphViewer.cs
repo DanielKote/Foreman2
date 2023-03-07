@@ -991,35 +991,57 @@ namespace Foreman
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData) //arrow keys to move the current selection
 		{
-			bool processed = false;
+			bool processed = true;
 			int moveUnit = (Grid.CurrentGridUnit > 0) ? Grid.CurrentGridUnit : 6;
+			int panUnit = (int)(10 / ViewScale);
 			if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) //large move
+			{
 				moveUnit = (Grid.CurrentMajorGridUnit > Grid.CurrentGridUnit) ? Grid.CurrentMajorGridUnit : moveUnit * 4;
+				panUnit *= 5;
+			}
 
 			if ((keyData & Keys.KeyCode) == Keys.Left)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
 					node.SetLocation(new Point(node.X - moveUnit, node.Y));
-				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Right)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
 					node.SetLocation(new Point(node.X + moveUnit, node.Y));
-				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Up)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
 					node.SetLocation(new Point(node.X, node.Y - moveUnit));
-				processed = true;
 			}
 			else if ((keyData & Keys.KeyCode) == Keys.Down)
 			{
 				foreach (BaseNodeElement node in selectedNodes)
 					node.SetLocation(new Point(node.X, node.Y + moveUnit));
-				processed = true;
 			}
+			else if ((keyData & Keys.KeyCode) == Keys.W)
+			{
+				ViewOffset += new Size(0, panUnit);
+				UpdateGraphBounds();
+			}
+			else if ((keyData & Keys.KeyCode) == Keys.A)
+			{
+				ViewOffset += new Size(panUnit, 0);
+				UpdateGraphBounds();
+			}
+			else if ((keyData & Keys.KeyCode) == Keys.S)
+			{
+				ViewOffset += new Size(0, -panUnit);
+				UpdateGraphBounds();
+			}
+			else if ((keyData & Keys.KeyCode) == Keys.D)
+			{
+				ViewOffset += new Size(-panUnit, 0);
+				UpdateGraphBounds();
+			}
+			else
+				processed = false;
 
 			if (processed)
 			{
@@ -1030,6 +1052,11 @@ namespace Foreman
 		}
 
 		//----------------------------------------------Viewpoint events
+
+		private void BGTimer_Tick(object sender, EventArgs e)
+		{
+			//if (key)
+		}
 
 		private void ProductionGraphViewer_Resized(object sender, EventArgs e)
 		{
