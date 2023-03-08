@@ -1020,22 +1020,22 @@ namespace Foreman
 				foreach (BaseNodeElement node in selectedNodes)
 					node.SetLocation(new Point(node.X, node.Y + moveUnit));
 			}
-			else if ((keyData & Keys.KeyCode) == Keys.W)
+			else if ((keyData & Keys.KeyCode) == Keys.W && !SubwindowOpen)
 			{
 				ViewOffset += new Size(0, panUnit);
 				UpdateGraphBounds();
 			}
-			else if ((keyData & Keys.KeyCode) == Keys.A)
+			else if ((keyData & Keys.KeyCode) == Keys.A && !SubwindowOpen)
 			{
 				ViewOffset += new Size(panUnit, 0);
 				UpdateGraphBounds();
 			}
-			else if ((keyData & Keys.KeyCode) == Keys.S)
+			else if ((keyData & Keys.KeyCode) == Keys.S && !SubwindowOpen)
 			{
 				ViewOffset += new Size(0, -panUnit);
 				UpdateGraphBounds();
 			}
-			else if ((keyData & Keys.KeyCode) == Keys.D)
+			else if ((keyData & Keys.KeyCode) == Keys.D && !SubwindowOpen)
 			{
 				ViewOffset += new Size(-panUnit, 0);
 				UpdateGraphBounds();
