@@ -972,7 +972,7 @@ namespace Foreman
 
 				case EnergySource.Electric:
 					entity.EnergyDrain = (double)objJToken["drain"] * 60f; //seconds
-					entity.EnergyConsumption = (double)objJToken["energy_usage"] * 60f; //seconds
+					entity.EnergyConsumption = (double)objJToken["max_energy_usage"] * 60f; //seconds
 					break;
 
 				case EnergySource.Void:
