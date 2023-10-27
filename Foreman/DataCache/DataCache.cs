@@ -1306,7 +1306,7 @@ namespace Foreman
 				if (amount != 0)
 				{
 					if (inputSize * amount > product.StackSize)
-						inputSize = (int)(product.StackSize / amount);
+						inputSize = (int)Math.Ceiling(product.StackSize / amount);
 
 					amount = inputSize * amount;
 
