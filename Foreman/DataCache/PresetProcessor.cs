@@ -282,7 +282,7 @@ namespace Foreman
 						double amount = (double)productJToken["amount"];
 						int productStack = (int)(jsonData["items"].First(t => (string)t["name"] == (string)productJToken["name"])["stack"]?? 1);
 						if (amount != 0 && inputSize * amount > productStack)
-							inputSize = (int)(productStack / amount);
+							inputSize = (int)Math.Ceiling(productStack / amount);
 					}
 					foreach (var productJToken in objJToken["launch_products"])
 					{
