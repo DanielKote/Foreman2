@@ -334,7 +334,19 @@ namespace Foreman.Properties {
                 this["FlagOUSuppliedNodes"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FlagDarkMode {
+            get {
+                return ((bool)this["FlagDarkMode"]);
+            }
+            set {
+                this["FlagDarkMode"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]

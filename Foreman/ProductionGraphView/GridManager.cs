@@ -13,8 +13,8 @@ namespace Foreman
 		public Point DragOrigin;
 
 		private static readonly Pen gridPen = new Pen(Color.FromArgb(230, 230, 230), 1);
-		private static readonly Pen gridMPen = new Pen(Color.FromArgb(200, 200, 200), 1);
-		private static readonly Brush gridBrush = new SolidBrush(Color.FromArgb(240, 240, 240));
+		private static Pen gridMPen = new Pen(Color.FromArgb(200, 200, 200), 1);
+		private static Brush gridBrush = new SolidBrush(Color.FromArgb(240, 240, 240));
 		private static readonly Pen zeroAxisPen = new Pen(Color.FromArgb(140, 140, 140), 2);
 		private static readonly Pen lockedAxisPen = new Pen(Color.FromArgb(180, 80, 80), 4);
 		private const int minGridWidth = 6;
@@ -22,6 +22,11 @@ namespace Foreman
 		public GridManager()
 		{
 			CurrentGridUnit = Properties.Settings.Default.MinorGridlines;
+		}
+
+		public static void SetGridColors(Color bgCol, Color fgCol) {
+			gridBrush = new SolidBrush(bgCol);
+			gridMPen = new Pen(fgCol);
 		}
 
 		public void Paint(Graphics graphics, float viewScale, Rectangle visibleGraphBounds, BaseNodeElement draggedNode = null)
