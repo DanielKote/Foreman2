@@ -952,7 +952,14 @@ namespace Foreman
 
 		public void SetPriority(bool lowPriority) { MyNode.LowPriority = lowPriority; MyNode.UpdateState(); }
 
-		public void SetNeighbourCount(double count) { if (MyNode.NeighbourCount != count) MyNode.NeighbourCount = count; }
+		public void SetNeighbourCount(double count)
+		{
+			if (MyNode.NeighbourCount != count)
+			{
+				MyNode.NeighbourCount = count;
+				MyNode.UpdateInputsAndOutputs(true);
+			}
+		}
 		public void SetExtraProductivityBonus(double bonus) { if (MyNode.ExtraProductivityBonus != bonus) MyNode.ExtraProductivityBonus = bonus; }
 		public void SetBeaconCount(double count) { if (MyNode.BeaconCount != count) MyNode.BeaconCount = count; }
 		public void SetBeaconsPerAssembler(double beacons) { if (MyNode.BeaconsPerAssembler != beacons) MyNode.BeaconsPerAssembler = beacons; }
