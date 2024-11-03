@@ -450,7 +450,7 @@ namespace Foreman
 
 						includedAssemblers.Add(rnode.SelectedAssembler.Assembler.Name);
 
-						if (rnode.SelectedBeacon.Beacon != null)
+						if (rnode.SelectedBeacon)
 							includedBeacons.Add(rnode.SelectedBeacon.Beacon.Name);
 
 						includedModules.UnionWith(rnode.AssemblerModules.Select(m => m.Module.Name));
@@ -459,7 +459,7 @@ namespace Foreman
 						includedQualities.Add(new KeyValuePair<string, int>(rnode.BaseRecipe.Quality.Name, rnode.BaseRecipe.Quality.Level));
 						includedQualities.Add(new KeyValuePair<string, int>(rnode.SelectedAssembler.Quality.Name, rnode.SelectedAssembler.Quality.Level));
 
-						if (rnode.SelectedBeacon.Beacon != null)
+						if (rnode.SelectedBeacon)
 							includedQualities.Add(new KeyValuePair<string, int>(rnode.BaseRecipe.Quality.Name, rnode.BaseRecipe.Quality.Level));
 
 						includedQualities.UnionWith(rnode.AssemblerModules.Select(m => new KeyValuePair<string, int>(m.Quality.Name, m.Quality.Level)));

@@ -146,13 +146,18 @@ namespace Foreman
         public readonly Beacon Beacon;
         public readonly Quality Quality;
 
+        public BeaconQualityPair(string comment) {
+            Beacon = null;
+            Quality = null;
+        }
+
         public BeaconQualityPair(Beacon beacon, Quality quality)
         {
+            if (beacon == null || quality == null)
+                throw new NullReferenceException("null error - Beacon: " + nameof(Beacon) + " Quality: " + nameof(Quality));
+
             Beacon = beacon;
             Quality = quality;
-
-            if (Beacon != null && Quality == null)
-                Trace.Fail(string.Format("Attempted to create Beacon quality pair with Beacon {0} and no quality!", Beacon));
         }
 
         public override bool Equals(object obj) => obj is BeaconQualityPair other && this.Equals(other);
@@ -161,6 +166,7 @@ namespace Foreman
         public static bool operator ==(BeaconQualityPair lhs, BeaconQualityPair rhs) => lhs.Equals(rhs);
         public static bool operator !=(BeaconQualityPair lhs, BeaconQualityPair rhs) => !(lhs == rhs);
         public override string ToString() { return Beacon.ToString() + " (" + Quality.ToString() + ")"; }
+        public static implicit operator bool(BeaconQualityPair bp) => bp != null && bp.Beacon != null && bp.Quality != null;
 
         public string FriendlyName
         {

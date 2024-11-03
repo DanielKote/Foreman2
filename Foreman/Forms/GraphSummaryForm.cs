@@ -102,7 +102,7 @@ namespace Foreman
 			LoadUnfilteredSelectedAssemblerList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && (rNode.SelectedAssembler.Assembler.EntityType == EntityType.Miner || rNode.SelectedAssembler.Assembler.EntityType == EntityType.OffshorePump)).Select(n => (ReadOnlyRecipeNode)n), unfilteredMinerList);
 			LoadUnfilteredSelectedAssemblerList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && (rNode.SelectedAssembler.Assembler.EntityType == EntityType.Boiler || rNode.SelectedAssembler.Assembler.EntityType == EntityType.BurnerGenerator || rNode.SelectedAssembler.Assembler.EntityType == EntityType.Generator || rNode.SelectedAssembler.Assembler.EntityType == EntityType.Reactor)).Select(n => (ReadOnlyRecipeNode)n), unfilteredPowerList);
 
-			LoadUnfilteredBeaconList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && rNode.SelectedBeacon != null).Select(n => (ReadOnlyRecipeNode)n), unfilteredBeaconList);
+			LoadUnfilteredBeaconList(nodes.Where(n => n is ReadOnlyRecipeNode rNode && rNode.SelectedBeacon).Select(n => (ReadOnlyRecipeNode)n), unfilteredBeaconList);
 
 			LoadUnfilteredItemLists(nodes, links, false, unfilteredItemsList);
 			LoadUnfilteredItemLists(nodes, links, true, unfilteredFluidsList);

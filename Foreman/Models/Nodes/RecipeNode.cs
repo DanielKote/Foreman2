@@ -163,7 +163,7 @@ namespace Foreman
 			beaconModules = new List<ModuleQualityPair>();
 
 			SelectedAssembler = new AssemblerQualityPair(recipe.Recipe.Assemblers.First(), assemblerQuality); //everything here works under the assumption that assember isnt null.
-			SelectedBeacon = new BeaconQualityPair(null,null);
+			SelectedBeacon = new BeaconQualityPair("null here because no beacon is defined yet");
 			NeighbourCount = 0;
 
 			BeaconCount = 0;
@@ -208,7 +208,7 @@ namespace Foreman
 			if(AssemblerModules.Any(m => m.Quality.IsMissing))
 				ErrorSet |= Errors.AModuleQualityIsMissing;
 
-			if (SelectedBeacon.Beacon != null)
+			if (SelectedBeacon)
 			{
 				if (SelectedBeacon.Beacon.IsMissing)
 					ErrorSet |= Errors.BeaconIsMissing;
@@ -262,7 +262,7 @@ namespace Foreman
 			if (AssemblerModules.Any(m => !m.Quality.Enabled))
 				WarningSet |= Warnings.AModulesQualityIsDisabled;
 
-			if (SelectedBeacon.Beacon != null)
+			if (SelectedBeacon)
 			{
 				if (!SelectedBeacon.Beacon.Enabled)
 					WarningSet |= Warnings.BeaconIsDisabled;
@@ -543,7 +543,7 @@ namespace Foreman
 			if (FuelRemains != null)
 				info.AddValue("Burnt", FuelRemains.Name);
 
-			if (SelectedBeacon.Beacon != null)
+			if (SelectedBeacon)
 			{
 				info.AddValue("Beacon", SelectedBeacon.Beacon.Name);
 				info.AddValue("BeaconQuality", SelectedBeacon.Quality.Name);
@@ -827,14 +827,14 @@ namespace Foreman
 
 		public int GetTotalBeacons()
 		{
-			if (MyNode.SelectedBeacon.Beacon == null)
+			if (!MyNode.SelectedBeacon)
 				return 0;
 			return (int)Math.Ceiling(((int)(MyNode.ActualSetValue + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
 		}
 
 		public double GetTotalBeaconElectricalConsumption() // J/sec (W)
 		{
-			if (MyNode.SelectedBeacon.Beacon == null)
+			if (!MyNode.SelectedBeacon)
 				return 0;
 			return GetTotalBeacons() * GetBeaconEnergyConsumption();
 		}
@@ -1042,7 +1042,7 @@ namespace Foreman
 
 		public void ClearBeacon()
 		{
-			MyNode.SelectedBeacon = new BeaconQualityPair(null, null);
+			MyNode.SelectedBeacon = new BeaconQualityPair("clear beacons with nulled object");
             MyNode.BeaconModulesClear();
             MyNode.BeaconCount = 0;
             MyNode.BeaconsPerAssembler = 0;
@@ -1052,7 +1052,7 @@ namespace Foreman
 
 		public void SetBeacon(BeaconQualityPair beacon)
 		{
-			if(beacon.Beacon == null) { ClearBeacon(); return; } //shouldnt be called - but whatever
+			if(!beacon) { ClearBeacon(); return; } //shouldnt be called - but whatever
 
 			MyNode.SelectedBeacon = beacon;
 			//check for invalid modules
