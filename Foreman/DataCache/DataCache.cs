@@ -842,11 +842,11 @@ namespace Foreman
 			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
 				module.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
 
-			module.SpeedBonus = Math.Truncate((double)objJToken["module_effects"]["speed"] * 100) / 100;
-			module.ProductivityBonus = Math.Truncate((double)objJToken["module_effects"]["productivity"] * 100) / 100;
-			module.ConsumptionBonus = Math.Truncate((double)objJToken["module_effects"]["consumption"] * 100) / 100;
-			module.PollutionBonus = Math.Truncate((double)objJToken["module_effects"]["pollution"] * 100) / 100;
-			module.QualityBonus = Math.Truncate((double)objJToken["module_effects"]["quality"] * 100) / 100;
+			module.SpeedBonus = Math.Round((double)objJToken["module_effects"]["speed"] * 1000, 0, MidpointRounding.AwayFromZero) / 1000;
+			module.ProductivityBonus = Math.Round((double)objJToken["module_effects"]["productivity"] * 1000, 0, MidpointRounding.AwayFromZero) / 1000;
+			module.ConsumptionBonus = Math.Round((double)objJToken["module_effects"]["consumption"] * 1000, 0, MidpointRounding.AwayFromZero) / 1000;
+			module.PollutionBonus = Math.Round((double)objJToken["module_effects"]["pollution"] * 1000, 0, MidpointRounding.AwayFromZero) / 1000;
+			module.QualityBonus = Math.Round((double)objJToken["module_effects"]["quality"] * 1000, 0, MidpointRounding.AwayFromZero) / 1000;
 
 			module.Tier = (int)objJToken["tier"];
 			module.Category = (string)objJToken["category"];
