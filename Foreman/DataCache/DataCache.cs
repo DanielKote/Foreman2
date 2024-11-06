@@ -1866,7 +1866,7 @@ namespace Foreman
 					tech.InternalOneWayAddSciPack(sciPack, 0);
 			}
 
-			//step 2: further sci pack processing -> for every available science pack we want to build a list of science packs necessary to aquire it. In a situation with multiple (non-equal) research paths (ex: 3 can be aquired through either pack 1&2 or pack 1 alone), take the intersect (1 in this case). These will be added to the sci pack requirement lists
+			//step 2: further sci pack processing -> for every available science pack we want to build a list of science packs necessary to acquire it. In a situation with multiple (non-equal) research paths (ex: 3 can be acquired through either pack 1&2 or pack 1 alone), take the intersect (1 in this case). These will be added to the sci pack requirement lists
 			foreach (Item sciPack in sciPacks)
 				UpdateSciencePackPrerequisites(sciPack);
 
@@ -1896,7 +1896,7 @@ namespace Foreman
 			foreach (TechnologyPrototype tech in technologies.Values.Cast<TechnologyPrototype>())
 				tech.sciPackList.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]) + (sciencePackPrerequisites[s1].Contains(s2) ? 1000 : sciencePackPrerequisites[s2].Contains(s1) ? -1000 : 0));
 
-			//step 5: create science pack lists for each recipe (list of distinct min-pack sets -> ex: if recipe can be aquired through 4 techs with [ A+B, A+B, A+C, A+B+C ] science pack requirements, we will only include A+B and A+C
+			//step 5: create science pack lists for each recipe (list of distinct min-pack sets -> ex: if recipe can be acquired through 4 techs with [ A+B, A+B, A+C, A+B+C ] science pack requirements, we will only include A+B and A+C
 			foreach (RecipePrototype recipe in recipes.Values.Cast<RecipePrototype>())
 			{
 				List<List<Item>> sciPackLists = new List<List<Item>>();
