@@ -309,13 +309,13 @@ namespace Foreman
 			if (savefilePath == null)
 			{
 				if (GraphViewer.Graph.Nodes.Any())
-					return MessageBox.Show("The current graph hasnt been saved!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+					return MessageBox.Show("The current graph hasn't been saved!\nIf you continue, you will lose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
 				else
 					return true;
 			}
 
 			if (!File.Exists(savefilePath))
-				return MessageBox.Show("The current graph's save file has been deleted!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+				return MessageBox.Show("The current graph's save file has been deleted!\nIf you continue, you will lose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
 
 			StringBuilder stringBuilder = new StringBuilder();
 			var writer = new JsonTextWriter(new StringWriter(stringBuilder));
