@@ -60,23 +60,25 @@ end
 local function ProcessProductList(products)
 	productlist = {}
 	for _, product in pairs(products) do
-		tproduct = {}
-		tproduct['name'] = product.name
-		tproduct['type'] = product.type
+		if product.type ~= 'research-progress' then
+			tproduct = {}
+			tproduct['name'] = product.name
+			tproduct['type'] = product.type
 
-		amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-		amount = amount * product.probability
-		amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
-		if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
-		amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
+			amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
+			amount = amount * product.probability
+			amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
+			if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
+			amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
 
-		tproduct['amount'] = amount + amount_added_by_extra_fraction
-		tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
+			tproduct['amount'] = amount + amount_added_by_extra_fraction
+			tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
 
-		if product.type == 'fluid' and product.temperate ~= nil then
-			tproduct['temperature'] = ProcessTemperature(product.temperature)
+			if product.type == 'fluid' and product.temperate ~= nil then
+				tproduct['temperature'] = ProcessTemperature(product.temperature)
+			end
+			table.insert(productlist, tproduct)
 		end
-		table.insert(productlist, tproduct)
 	end
 	return productlist
 end
@@ -151,7 +153,7 @@ local function ExportRecipes()
 		trecipe = {}
 		trecipe['name'] = recipe.name
 		trecipe['icon_name'] = 'icon.r.'..recipe.name
-		if recipe.products[1] then
+		if recipe.products[1] and recipe.products[1].name ~= nil then
 			trecipe["icon_alt_name"] = 'icon.i.'..recipe.products[1].name
 		else
 			trecipe["icon_alt_name"] = 'icon.r.'..recipe.name
