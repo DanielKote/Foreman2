@@ -460,7 +460,7 @@ namespace Foreman
 						includedQualities.Add(new KeyValuePair<string, int>(rnode.SelectedAssembler.Quality.Name, rnode.SelectedAssembler.Quality.Level));
 
 						if (rnode.SelectedBeacon)
-							includedQualities.Add(new KeyValuePair<string, int>(rnode.BaseRecipe.Quality.Name, rnode.BaseRecipe.Quality.Level));
+							includedQualities.Add(new KeyValuePair<string, int>(rnode.SelectedBeacon.Quality.Name, rnode.SelectedBeacon.Quality.Level));
 
 						includedQualities.UnionWith(rnode.AssemblerModules.Select(m => new KeyValuePair<string, int>(m.Quality.Name, m.Quality.Level)));
 						includedQualities.UnionWith(rnode.BeaconModules.Select(m => new KeyValuePair<string, int>(m.Quality.Name, m.Quality.Level)));
