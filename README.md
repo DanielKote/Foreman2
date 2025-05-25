@@ -5,7 +5,7 @@ This is a relatively simple program for generating flowcharts for production lin
 
 Requires .Net 4.8 or higher and Visual C++ 2019 x86 to run. I am not sure about earlier versions, sorry.
 
-For example, here's a flowchart showing the optimal resources and assemblers required to make the first base red science in the Pyanodon mod pack (rather comparable to base Factorio rocket I would say):
+For example, here's a flowchart showing the optimal resources and assemblers required to make the first base red science in the _Pyanodon mod pack_ (rather comparable to base Factorio rocket I would say):
 
 ![2: Base red science for Pyanodons](https://puu.sh/Im6qB/83d13bab31.png)
 
