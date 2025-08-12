@@ -21407,8 +21407,8 @@
         {
           "name": "metallic-asteroid-chunk",
           "type": "item",
-          "amount": 0.2,
-          "p_amount": 0.2
+          "amount": 0.05,
+          "p_amount": 0.05
         }
       ],
       "localised_name": "Metallic asteroid crushing"
@@ -21496,8 +21496,8 @@
         {
           "name": "carbonic-asteroid-chunk",
           "type": "item",
-          "amount": 0.2,
-          "p_amount": 0.2
+          "amount": 0.05,
+          "p_amount": 0.05
         }
       ],
       "localised_name": "Carbonic asteroid crushing"
@@ -21585,8 +21585,8 @@
         {
           "name": "oxide-asteroid-chunk",
           "type": "item",
-          "amount": 0.2,
-          "p_amount": 0.2
+          "amount": 0.05,
+          "p_amount": 0.05
         }
       ],
       "localised_name": "Oxide asteroid crushing"
