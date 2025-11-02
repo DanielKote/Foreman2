@@ -9,7 +9,7 @@ namespace Foreman
 		IReadOnlyCollection<Technology> Prerequisites { get; }
 		IReadOnlyCollection<Technology> PostTechs { get; }
 		IReadOnlyCollection<Recipe> UnlockedRecipes { get; }
-        IReadOnlyCollection<Recipe> UnlockedQualities { get; }
+        IReadOnlyCollection<Quality> UnlockedQualities { get; }
         IReadOnlyDictionary<Item, double> SciPackSet { get; }
 		IReadOnlyList<Item> SciPackList { get; }
 		double ResearchCost { get; }
@@ -21,7 +21,7 @@ namespace Foreman
 		public IReadOnlyCollection<Technology> Prerequisites { get { return prerequisites; } }
 		public IReadOnlyCollection<Technology> PostTechs { get { return postTechs; } }
 		public IReadOnlyCollection<Recipe> UnlockedRecipes { get { return unlockedRecipes; } }
-        public IReadOnlyCollection<Recipe> UnlockedQualities { get { return UnlockedQualities; } }
+        public IReadOnlyCollection<Quality> UnlockedQualities { get { return unlockedQualities; } }
         public IReadOnlyDictionary<Item, double> SciPackSet { get { return sciPackSet; } }
 		public IReadOnlyList<Item> SciPackList { get { return sciPackList; } }
 		public double ResearchCost { get; set; }

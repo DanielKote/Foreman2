@@ -1079,7 +1079,8 @@ namespace Foreman
 				{
 					recipe.myUnlockTechnologies.Add(technology);
 					technology.unlockedRecipes.Add(recipe);
-				}
+                    technology.Available = true;
+                }
 			}
 
 			foreach (var ingredientJToken in objJToken["research_unit_ingredients"].ToList())
