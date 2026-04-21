@@ -2,110 +2,116 @@
 using System.Drawing;
 using System.Linq;
 
-namespace Foreman
-{
-	public class PointingArrowRenderer
-	{
-		private enum Border { Top, Bottom, Left, Right }
+namespace Foreman {
+    public class PointingArrowRenderer(ProductionGraphViewer viewer) {
+        private enum Border {
+            Top,
+            Bottom,
+            Left,
+            Right
+        }
 
-		public bool ShowErrorArrows { get; set; }
-		public bool ShowWarningArrows { get; set; }
-		public bool ShowDisconnectedArrows { get; set; }
-		public bool ShowOUNodeArrows { get; set; }
+        public bool ShowErrorArrows { get; set; }
+        public bool ShowWarningArrows { get; set; }
+        public bool ShowDisconnectedArrows { get; set; }
+        public bool ShowOuNodeArrows { get; set; }
 
-		private static readonly Pen ErrorArrowPen = new Pen(Brushes.DarkRed, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-		private static readonly Pen WarningArrowPen = new Pen(Brushes.DarkOrange, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-		private static readonly Pen DisconnectedArrowPen = new Pen(Brushes.Goldenrod, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-		private static readonly Pen OUNodeArrowPen = new Pen(Brushes.Goldenrod, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-		
-		private const int ArrowScale = 8;
-		private const int Padding = 10;
+        private static readonly Pen ErrorArrowPen = new(Brushes.DarkRed, ArrowScale)
+            { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 
-		private readonly ProductionGraphViewer Viewer;
+        private static readonly Pen WarningArrowPen = new(Brushes.DarkOrange, ArrowScale)
+            { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 
-		public PointingArrowRenderer(ProductionGraphViewer viewer) { Viewer = viewer; }
+        private static readonly Pen DisconnectedArrowPen = new(Brushes.Goldenrod, ArrowScale)
+            { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 
-		public void Paint(Graphics graphics, ProductionGraph graph)
-		{
-			if (ShowErrorArrows)
-				foreach (Point errorPoint in graph.Nodes.Where(node => node.State == NodeState.Error).Select(node => Viewer.GraphToScreen(node.Location)))
-					DrawArrow(graphics, errorPoint, ErrorArrowPen);
-			if (ShowWarningArrows)
-				foreach (Point warningPoint in graph.Nodes.Where(node => node.State == NodeState.Warning).Select(node => Viewer.GraphToScreen(node.Location)))
-					DrawArrow(graphics, warningPoint, WarningArrowPen);
-			if (ShowDisconnectedArrows)
-				foreach (Point errorPoint in graph.Nodes.Where(node => node.State == NodeState.MissingLink).Select(node => Viewer.GraphToScreen(node.Location)))
-					DrawArrow(graphics, errorPoint, DisconnectedArrowPen);
-			if (ShowOUNodeArrows)
-				foreach (Point errorPoint in graph.Nodes.Where(node => node.IsOverproducing() || node.ManualRateNotMet()).Select(node => Viewer.GraphToScreen(node.Location)))
-					DrawArrow(graphics, errorPoint, OUNodeArrowPen);
-		}
+        private static readonly Pen OuNodeArrowPen = new(Brushes.Goldenrod, ArrowScale)
+            { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 
-		private void DrawArrow(Graphics graphics, Point nodeOrigin, Pen arrowPen)
-		{
-			if (nodeOrigin.X > -Padding && nodeOrigin.X < Viewer.Width + Padding && nodeOrigin.Y > -Padding && nodeOrigin.Y < Viewer.Height + Padding) //roughly 'in bounds'
-				return;
+        private const int ArrowScale = 8;
+        private const int Padding = 10;
 
-			Point center = new Point(Viewer.Width / 2, Viewer.Height / 2);
-			Point borderPoint;
+        public void Paint(Graphics graphics, ProductionGraph graph) {
+            if (ShowErrorArrows)
+                foreach (var errorPoint in graph.Nodes.Where(node => node.State == NodeState.Error).Select(node => viewer.GraphToScreen(node.Location)))
+                    DrawArrow(graphics, errorPoint, ErrorArrowPen);
+            if (ShowWarningArrows)
+                foreach (var warningPoint in graph.Nodes.Where(node => node.State == NodeState.Warning).Select(node => viewer.GraphToScreen(node.Location)))
+                    DrawArrow(graphics, warningPoint, WarningArrowPen);
+            if (ShowDisconnectedArrows)
+                foreach (var errorPoint in graph.Nodes.Where(node => node.State == NodeState.MissingLink).Select(node => viewer.GraphToScreen(node.Location)))
+                    DrawArrow(graphics, errorPoint, DisconnectedArrowPen);
+            if (ShowOuNodeArrows)
+                foreach (var errorPoint in graph.Nodes.Where(node => node.IsOverproducing() || node.ManualRateNotMet())
+                    .Select(node => viewer.GraphToScreen(node.Location)))
+                    DrawArrow(graphics, errorPoint, OuNodeArrowPen);
+        }
 
-			if (nodeOrigin.Y < Padding)
-			{
-				borderPoint = IntersectionPoint(nodeOrigin, center, Padding, true);
-				if (borderPoint.X >= Padding && borderPoint.X <= Viewer.Width - Padding) //within the top segment of the border
-				{
-					DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
-					return;
-				}
-			}
+        private void DrawArrow(Graphics graphics, Point nodeOrigin, Pen arrowPen) {
+            // roughly 'in bounds'
+            if (nodeOrigin.X > -Padding && nodeOrigin.X < viewer.Width + Padding && nodeOrigin.Y > -Padding && nodeOrigin.Y < viewer.Height + Padding)
+                return;
 
-			if (nodeOrigin.Y > Viewer.Height - Padding)
-			{
-				borderPoint = IntersectionPoint(nodeOrigin, center, Viewer.Height - Padding, true);
-				if (borderPoint.X >= Padding && borderPoint.X <= Viewer.Width - Padding) //within the bottom segment of the border
-				{
-					DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
-					return;
-				}
-			}
+            var center = new Point(viewer.Width / 2, viewer.Height / 2);
+            Point borderPoint;
 
-			if (nodeOrigin.X < Padding)
-			{
-				borderPoint = IntersectionPoint(nodeOrigin, center, Padding, false);
-				if (borderPoint.Y >= Padding && borderPoint.Y <= Viewer.Height - Padding) //within the left segment of the border
-				{
-					DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
-					return;
-				}
-			}
+            if (nodeOrigin.Y < Padding) {
+                borderPoint = IntersectionPoint(nodeOrigin, center, Padding, true);
 
-			if (nodeOrigin.X > Viewer.Width - Padding)
-			{
-				borderPoint = IntersectionPoint(nodeOrigin, center, Viewer.Width - Padding, false);
-				if (borderPoint.Y >= Padding && borderPoint.Y <= Viewer.Height - Padding) //within the right segment of the border
-				{
-					DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
-					return;
-				}
-			}
-			//if we are here, then there was no need to paint the arrow (within borders). Due to previous checks this shouldnt happen though.
-		}
+                // within the top segment of the border
+                if (borderPoint.X >= Padding && borderPoint.X <= viewer.Width - Padding) {
+                    DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
+                    return;
+                }
+            }
 
-		private void DrawArrow(Graphics graphics, Point origin, Point endpoint, float length,  Pen arrowPen)
-		{
-			SizeF sizedVector = new SizeF(origin.X - endpoint.X, origin.Y - endpoint.Y);
-			float vectorLength = (float)Math.Sqrt(sizedVector.Width * sizedVector.Width + sizedVector.Height * sizedVector.Height);
-			sizedVector = new SizeF(sizedVector.Width * length / vectorLength, sizedVector.Height * length / vectorLength);
-			origin = Point.Add(endpoint, sizedVector.ToSize());
-			graphics.DrawLine(arrowPen, origin, endpoint);
-		}
+            if (nodeOrigin.Y > viewer.Height - Padding) {
+                borderPoint = IntersectionPoint(nodeOrigin, center, viewer.Height - Padding, true);
 
-		private Point IntersectionPoint(Point a, Point b, int c, bool horizontal) //c is x if vertical line, and y if horizontal line
-		{
-			if (horizontal)
-				return new Point(a.X + ((b.X - a.X) * (c - a.Y) / (b.Y - a.Y)), c);
-			else
-				return new Point(c, a.Y + ((b.Y - a.Y) * (c - a.X) / (b.X - a.X)));
-		}
-	}
+                // within the bottom segment of the border
+                if (borderPoint.X >= Padding && borderPoint.X <= viewer.Width - Padding) {
+                    DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
+                    return;
+                }
+            }
+
+            if (nodeOrigin.X < Padding) {
+                borderPoint = IntersectionPoint(nodeOrigin, center, Padding, false);
+
+                // within the left segment of the border
+                if (borderPoint.Y >= Padding && borderPoint.Y <= viewer.Height - Padding) {
+                    DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
+                    return;
+                }
+            }
+
+            if (nodeOrigin.X > viewer.Width - Padding) {
+                borderPoint = IntersectionPoint(nodeOrigin, center, viewer.Width - Padding, false);
+
+                // within the right segment of the border
+                if (borderPoint.Y >= Padding && borderPoint.Y <= viewer.Height - Padding) {
+                    DrawArrow(graphics, center, borderPoint, ArrowScale * 4, arrowPen);
+                    return;
+                }
+            }
+
+            // if we are here, then there was no need to paint the arrow (within borders).
+            // Due to previous checks this shouldn't happen though.
+        }
+
+        private void DrawArrow(Graphics graphics, Point origin, Point endpoint, float length, Pen arrowPen) {
+            var sizedVector = new SizeF(origin.X - endpoint.X, origin.Y - endpoint.Y);
+            var vectorLength = (float) Math.Sqrt(sizedVector.Width * sizedVector.Width + sizedVector.Height * sizedVector.Height);
+            sizedVector = new SizeF(sizedVector.Width * length / vectorLength, sizedVector.Height * length / vectorLength);
+            origin = Point.Add(endpoint, sizedVector.ToSize());
+            graphics.DrawLine(arrowPen, origin, endpoint);
+        }
+
+        // c is x if vertical line, and y if horizontal line
+        private Point IntersectionPoint(Point a, Point b, int c, bool horizontal) {
+            return horizontal
+                ? new Point(a.X + (b.X - a.X) * (c - a.Y) / (b.Y - a.Y), c)
+                : new Point(c, a.Y + (b.Y - a.Y) * (c - a.X) / (b.X - a.X));
+        }
+    }
 }

@@ -1,180 +1,201 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
-namespace Foreman
-{
-	public class ItemTabElement : GraphElement
-	{
-		public static int TabWidth { get { return iconSize + border * 3; } } //I just use these two to get a decent aproximation as to how far to space new nodes when bulk-added
-		public static int TabBorder { get { return border; } }
+namespace Foreman {
+    public class ItemTabElement : GraphElement {
+        // I just use these two to get a decent approximation as to how far to space new nodes when bulk-added
+        public static int TabWidth => iconSize + border * 3;
 
-		public LinkType LinkType;
-		public ItemQualityPair Item { get; private set; }
-		public IEnumerable<ReadOnlyNodeLink> Links { get { return LinkType == LinkType.Input ? DisplayedNode.InputLinks.Where(l => l.Item == Item) : DisplayedNode.OutputLinks.Where(l => l.Item == Item); } }
+        public static int TabBorder => border;
 
-		public bool HideItemTab { get; set; }
+        public LinkType LinkType;
+        public ItemQualityPair Item { get; private set; }
 
-		private const int iconSize = 32;
-		private const int border = 3;
-		private int textHeight = 11;
+        public IEnumerable<ReadOnlyNodeLink> Links {
+            get {
+                return LinkType == LinkType.Input
+                    ? _displayedNode.InputLinks.Where(l => l.Item == Item)
+                    : _displayedNode.OutputLinks.Where(l => l.Item == Item);
+            }
+        }
 
-		private static StringFormat bottomFormat = new StringFormat() { LineAlignment = StringAlignment.Far, Alignment = StringAlignment.Center };
-		private static StringFormat topFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
+        public bool HideItemTab { get; set; }
 
-		private static Brush directionBrush = new SolidBrush(Color.FromArgb(40, Color.Black));
+        private const int iconSize = 32;
+        private const int border = 3;
+        private int _textHeight = 11;
 
-		private static Pen regularBorderPen = new Pen(Color.DimGray, 3);
-		private static Pen overproducedBorderPen = new Pen(Color.DarkGoldenrod, 3);
-		private static Pen disconnectedBorderPen = new Pen(Color.DarkRed, 3);
+        private static StringFormat _bottomFormat = new() { LineAlignment = StringAlignment.Far, Alignment = StringAlignment.Center };
+        private static StringFormat _topFormat = new() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
 
-		private static Brush textBrush = Brushes.Black;
-		private static Brush fillBrush = Brushes.White;
+        private static Brush _directionBrush = new SolidBrush(Color.FromArgb(40, Color.Black));
 
-		private static Font textFont = new Font(FontFamily.GenericSansSerif, 6);
+        private static Pen _regularBorderPen = new(Color.DimGray, 3);
+        private static Pen _overproducedBorderPen = new(Color.DarkGoldenrod, 3);
+        private static Pen _disconnectedBorderPen = new(Color.DarkRed, 3);
 
-		private Pen borderPen;
-		private string text = "";
+        private static Brush _textBrush = Brushes.Black;
+        private static Brush _fillBrush = Brushes.White;
 
-		private readonly ReadOnlyBaseNode DisplayedNode;
+        private static Font _textFont = new(FontFamily.GenericSansSerif, 6);
 
-		public ItemTabElement(ItemQualityPair item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) : base(graphViewer, node)
-		{
-			DisplayedNode = node.DisplayedNode;
-			Item = item;
-			LinkType = type;
-			HideItemTab = false;
+        private Pen _borderPen;
+        private string _text = "";
 
-			borderPen = regularBorderPen;
-			int textHeight = (int)base.graphViewer.CreateGraphics().MeasureString("a", textFont).Height;
-			Width = TabWidth;
-			Height = iconSize + textHeight + border + 3;
-			X = 0; Y = 0;
-		}
+        private readonly ReadOnlyBaseNode _displayedNode;
 
-		public Point GetConnectionPoint() //in graph coordinates
-		{
-			if ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Down))
-				return LocalToGraph(new Point(0, Height / 2));
-			else //if ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.down) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Up))
-				return LocalToGraph(new Point(0, -Height / 2));
-		}
+        public ItemTabElement(ItemQualityPair item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) : base(graphViewer, node) {
+            _displayedNode = node.DisplayedNode;
+            Item = item;
+            LinkType = type;
+            HideItemTab = false;
 
-		public void UpdateValues(double recipeRate, double outputRate, bool isOverproduced) //if input then: recipe rate = consume rate; if output then recipe rate = production rate
-		{
-			borderPen = regularBorderPen;
-			text = GraphicsStuff.DoubleToString(recipeRate);
-			int textHeight = 10;
-			if (isOverproduced)
-			{
-				borderPen = overproducedBorderPen;
-				text = GraphicsStuff.DoubleToString(outputRate) + "\n" + text;
-				textHeight += 10;
-			}
-			else if (!Links.Any())
-				borderPen = disconnectedBorderPen;
+            _borderPen = _regularBorderPen;
+            var textHeight = (int) GraphViewer.CreateGraphics().MeasureString("a", _textFont).Height;
+            Width = TabWidth;
+            Height = iconSize + textHeight + border + 3;
+            X = 0;
+            Y = 0;
+        }
 
-			Height = iconSize + textHeight + border + 3;
-		}
+        // in graph coordinates
+        public Point GetConnectionPoint() {
+            if ((LinkType == LinkType.Input && _displayedNode.NodeDirection == NodeDirection.Up) ||
+                (LinkType == LinkType.Output && _displayedNode.NodeDirection == NodeDirection.Down))
+                return LocalToGraph(new Point(0, Height / 2));
+            else //if ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.down) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Up))
+                return LocalToGraph(new Point(0, -Height / 2));
+        }
 
-		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
-		{
-			if (style == NodeDrawingStyle.IconsOnly || HideItemTab)
-				return;
+        // if input then: recipe rate = consume rate; if output then recipe rate = production rate
+        public void UpdateValues(double recipeRate, double outputRate, bool isOverproduced) {
+            _borderPen = _regularBorderPen;
+            _text = GraphicsStuff.DoubleToString(recipeRate);
+            var textHeight = 10;
+            if (isOverproduced) {
+                _borderPen = _overproducedBorderPen;
+                _text = GraphicsStuff.DoubleToString(outputRate) + "\n" + _text;
+                textHeight += 10;
+            } else if (!Links.Any())
+                _borderPen = _disconnectedBorderPen;
 
-			Point trans = LocalToGraph(new Point(0, 0));
+            Height = iconSize + textHeight + border + 3;
+        }
 
-			//background
-			GraphicsStuff.FillRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, fillBrush);
+        protected override void Draw(Graphics graphics, NodeDrawingStyle style) {
+            if (style == NodeDrawingStyle.IconsOnly || HideItemTab)
+                return;
 
-			//direction signs (only if using dynamic link width or not using arrows on links)
-			if (graphViewer.DynamicLinkWidth || !graphViewer.ArrowsOnLinks)
-			{
-				if (DisplayedNode.NodeDirection == NodeDirection.Up)
-					graphics.FillPolygon(directionBrush, new Point[] { new Point(trans.X - (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X + (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X, trans.Y - (Bounds.Height / 2)) });
-				else
-					graphics.FillPolygon(directionBrush, new Point[] { new Point(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2)), new Point(trans.X + (Bounds.Width / 2), trans.Y - (Bounds.Height / 2)), new Point(trans.X, trans.Y + (Bounds.Height / 2)) });
-			}
+            var trans = LocalToGraph(new Point(0, 0));
 
-			//border
-			GraphicsStuff.DrawRoundRect(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2), Bounds.Width, Bounds.Height, border, graphics, borderPen);
+            // background
 
-			//text & icon
-			if (style == NodeDrawingStyle.Regular || style == NodeDrawingStyle.PrintStyle)
-			{
-				if (LinkType == LinkType.Output)
-				{
-					graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y + ((textHeight + border - Bounds.Height - 10) / 2)), topFormat);
-					graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y + (Bounds.Height / 2) - border - iconSize, iconSize, iconSize);
-				}
-				else
-				{
-					graphics.DrawString(text, textFont, textBrush, new PointF(trans.X, trans.Y - ((textHeight + border - Bounds.Height - 10) / 2)), bottomFormat);
-					graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - (Bounds.Width / 2) + (int)(border * 1.5), trans.Y - (Bounds.Height / 2) + border, iconSize, iconSize);
-				}
-			}
-		}
+            GraphicsStuff.FillRoundRect(trans.X - Bounds.Width / 2, trans.Y - Bounds.Height / 2, Bounds.Width, Bounds.Height, border, graphics, _fillBrush);
 
-		public override List<TooltipInfo> GetToolTips(Point graph_point)
-		{
-			List<TooltipInfo> toolTips = new List<TooltipInfo>();
-			TooltipInfo tti = new TooltipInfo();
-			BaseNodeElement parentNode = (BaseNodeElement)myParent;
+            // direction signs (only if using dynamic link width or not using arrows on links)
 
-			if (parentNode.DisplayedNode is ReadOnlyRecipeNode rNode)
-			{
-				if (LinkType == LinkType.Input)
-					tti.Text = Item.Item is Fluid? rNode.BaseRecipe.Recipe.GetIngredientFriendlyName(Item.Item) : Item.FriendlyName;
-				else //if(LinkType == LinkType.Output)
-					tti.Text = Item.Item is Fluid? rNode.BaseRecipe.Recipe.GetProductFriendlyName(Item.Item) : Item.FriendlyName;
-			}
-			else if ((Item.Item is Fluid fluid) && fluid.IsTemperatureDependent)
-			{
-				fRange tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.DisplayedNode, (LinkType == LinkType.Input) ? LinkType.Output : LinkType.Input, true); //input type tab means output of connection link and vice versa
-				if (tempRange.Ignore && DisplayedNode is ReadOnlyPassthroughNode)
-					tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.DisplayedNode, LinkType, true); //if there was no temp range on this side of this throughput node, try to just copy the other side
-				tti.Text = fluid.GetTemperatureRangeFriendlyName(tempRange);
-			}
-			else
-				tti.Text = Item.FriendlyName;
+            if (GraphViewer.DynamicLinkWidth || !GraphViewer.ArrowsOnLinks) {
+                if (_displayedNode.NodeDirection == NodeDirection.Up)
+                    graphics.FillPolygon(_directionBrush,
+                    [
+                        new Point(trans.X - Bounds.Width / 2, trans.Y + Bounds.Height / 2),
+                        new Point(trans.X + Bounds.Width / 2, trans.Y + Bounds.Height / 2), new Point(trans.X, trans.Y - Bounds.Height / 2)
+                    ]);
+                else
+                    graphics.FillPolygon(_directionBrush,
+                    [
+                        new Point(trans.X - Bounds.Width / 2, trans.Y - Bounds.Height / 2),
+                        new Point(trans.X + Bounds.Width / 2, trans.Y - Bounds.Height / 2), new Point(trans.X, trans.Y + Bounds.Height / 2)
+                    ]);
+            }
 
-			tti.Direction = ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Down)) ? Direction.Up : Direction.Down;
-			tti.ScreenLocation = graphViewer.GraphToScreen(GetConnectionPoint());
-			toolTips.Add(tti);
+            // border
 
-			TooltipInfo helpToolTipInfo = new TooltipInfo();
-			helpToolTipInfo.Text = "Drag to create a new connection.\nRight click for options.";
-			helpToolTipInfo.Direction = Direction.None;
-			helpToolTipInfo.ScreenLocation = new Point(10, 10);
-			toolTips.Add(helpToolTipInfo);
+            GraphicsStuff.DrawRoundRect(trans.X - Bounds.Width / 2, trans.Y - Bounds.Height / 2, Bounds.Width, Bounds.Height, border, graphics, _borderPen);
 
-			return toolTips;
-		}
+            // text & icon
 
-		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
-		{
-			if (button == MouseButtons.Right)
-			{
-				List<ReadOnlyNodeLink> connections = new List<ReadOnlyNodeLink>();
-				if (LinkType == LinkType.Input)
-					connections.AddRange(DisplayedNode.InputLinks.Where(l => l.Item == Item));
-				else //if (LinkType == LinkType.Output)
-					connections.AddRange(DisplayedNode.OutputLinks.Where(l => l.Item == Item));
+            if (style is NodeDrawingStyle.Regular or NodeDrawingStyle.PrintStyle) {
+                if (LinkType == LinkType.Output) {
+                    graphics.DrawString(_text, _textFont, _textBrush, new PointF(trans.X, trans.Y + (_textHeight + border - Bounds.Height - 10) / 2),
+                        _topFormat);
+                    graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - Bounds.Width / 2 + (int) (border * 1.5),
+                        trans.Y + Bounds.Height / 2 - border - iconSize, iconSize, iconSize);
+                } else {
+                    graphics.DrawString(_text, _textFont, _textBrush, new PointF(trans.X, trans.Y - (_textHeight + border - Bounds.Height - 10) / 2),
+                        _bottomFormat);
+                    graphics.DrawImage(Item.Icon ?? DataCache.UnknownIcon, trans.X - Bounds.Width / 2 + (int) (border * 1.5),
+                        trans.Y - Bounds.Height / 2 + border, iconSize, iconSize);
+                }
+            }
+        }
 
-				RightClickMenu.Items.Add(new ToolStripMenuItem("Delete connections", null,
-					new EventHandler((o, e) =>
-					{
-						RightClickMenu.Close();
-						foreach (ReadOnlyNodeLink link in connections)
-							graphViewer.Graph.DeleteLink(link);
-						graphViewer.Graph.UpdateNodeValues();
-					}))
-				{ Enabled = connections.Count > 0 });
+        public override List<TooltipInfo> GetToolTips(Point graphPoint) {
+            var toolTips = new List<TooltipInfo>();
+            var tti = new TooltipInfo();
+            var parentNode = (BaseNodeElement) MyParent;
 
-				RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
-			}
-		}
-	}
+            if (parentNode.DisplayedNode is ReadOnlyRecipeNode rNode) {
+                if (LinkType == LinkType.Input)
+                    tti.Text = Item.Item is Fluid ? rNode.BaseRecipe.Recipe.GetIngredientFriendlyName(Item.Item) : Item.FriendlyName;
+                else //if(LinkType == LinkType.Output)
+                    tti.Text = Item.Item is Fluid ? rNode.BaseRecipe.Recipe.GetProductFriendlyName(Item.Item) : Item.FriendlyName;
+            } else if (Item.Item is Fluid { IsTemperatureDependent: true } fluid) {
+                // input type tab means output of connection link and vice versa
+                var tempRange = LinkChecker.GetTemperatureRange(
+                    fluid,
+                    parentNode.DisplayedNode,
+                    LinkType == LinkType.Input
+                        ? LinkType.Output
+                        : LinkType.Input,
+                    true
+                );
+
+                // if there was no temp range on this side of this throughput node, try to just copy the other side
+                if (tempRange.Ignore && _displayedNode is ReadOnlyPassthroughNode)
+                    tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.DisplayedNode, LinkType, true);
+                tti.Text = fluid.GetTemperatureRangeFriendlyName(tempRange);
+            } else
+                tti.Text = Item.FriendlyName;
+
+            tti.Direction = (LinkType == LinkType.Input && _displayedNode.NodeDirection == NodeDirection.Up) ||
+                (LinkType == LinkType.Output && _displayedNode.NodeDirection == NodeDirection.Down)
+                    ? Direction.Up
+                    : Direction.Down;
+            tti.ScreenLocation = GraphViewer.GraphToScreen(GetConnectionPoint());
+            toolTips.Add(tti);
+
+            var helpToolTipInfo = new TooltipInfo {
+                Text = "Drag to create a new connection.\nRight click for options.",
+                Direction = Direction.None,
+                ScreenLocation = new Point(10, 10)
+            };
+            toolTips.Add(helpToolTipInfo);
+
+            return toolTips;
+        }
+
+        public override void MouseUp(Point graphPoint, MouseButtons button, bool wasDragged) {
+            if (button != MouseButtons.Right)
+                return;
+
+            var connections = new List<ReadOnlyNodeLink>();
+            connections.AddRange(LinkType == LinkType.Input
+                ? _displayedNode.InputLinks.Where(l => l.Item == Item)
+                : _displayedNode.OutputLinks.Where(l => l.Item == Item));
+
+            RightClickMenu.Items.Add(new ToolStripMenuItem("Delete connections", null,
+                    (o, e) => {
+                        RightClickMenu.Close();
+                        foreach (var link in connections)
+                            GraphViewer.Graph.DeleteLink(link);
+                        GraphViewer.Graph.UpdateNodeValues();
+                    })
+                { Enabled = connections.Count > 0 });
+
+            RightClickMenu.Show(GraphViewer, GraphViewer.GraphToScreen(graphPoint));
+        }
+    }
 }

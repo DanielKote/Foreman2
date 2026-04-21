@@ -2,136 +2,130 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman
-{
-	public class PassthroughNodeElement : BaseNodeElement
-	{
-		protected override Brush CleanBgBrush { get { return passthroughBGBrush; } }
-		private static Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(200, 200, 200));
+namespace Foreman {
+    public class PassthroughNodeElement : BaseNodeElement {
+        protected override Brush CleanBgBrush => _passthroughBgBrush;
 
-		private string ItemName { get { return DisplayedNode.PassthroughItem.FriendlyName; } }
+        private static Brush _passthroughBgBrush = new SolidBrush(Color.FromArgb(200, 200, 200));
 
-		private new readonly ReadOnlyPassthroughNode DisplayedNode;
+        private string ItemName => _displayedNode.PassthroughItem.FriendlyName;
 
-		public PassthroughNodeElement(ProductionGraphViewer graphViewer, ReadOnlyPassthroughNode node) : base(graphViewer, node)
-		{
-			Width = PassthroughNodeWidth;
-			Height = BaseSimpleHeight;
-			DisplayedNode = node;
-		}
+        private readonly ReadOnlyPassthroughNode _displayedNode;
 
-		protected override Bitmap NodeIcon() { return null; }
+        public PassthroughNodeElement(ProductionGraphViewer graphViewer, ReadOnlyPassthroughNode node) : base(graphViewer, node) {
+            Width = PassthroughNodeWidth;
+            Height = BaseSimpleHeight;
+            _displayedNode = node;
+        }
 
-		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
-		{
-			if (style != NodeDrawingStyle.IconsOnly && DisplayedNode.SimpleDraw && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.KeyNode && !DisplayedNode.IsOverproducing() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any())
-			{
-				InputTabs[0].HideItemTab = true;
-				OutputTabs[0].HideItemTab = true;
+        protected override Bitmap NodeIcon() {
+            return null;
+        }
 
-				float maxLineWidth = DisplayedNode.InputLinks.Concat(DisplayedNode.OutputLinks).Select(l => graphViewer.LinkElementDictionary[l].LinkWidth).Max();
-				Point inputPoint = InputTabs[0].GetConnectionPoint();
-				Point outputPoint = OutputTabs[0].GetConnectionPoint();
-				using (Pen pen = new Pen(DisplayedNode.PassthroughItem.Item.AverageColor, maxLineWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
-					graphics.DrawLine(pen, inputPoint, outputPoint);
-				if (style == NodeDrawingStyle.Regular)
-				{
-					using (Brush brush = new SolidBrush(DisplayedNode.PassthroughItem.Item.AverageColor))
-					{
-						graphics.FillEllipse(brush, inputPoint.X - 6, Math.Min(outputPoint.Y, inputPoint.Y) - 6 + (ItemTabElement.TabWidth / 2), 12, 12);
-						graphics.FillEllipse(brush, inputPoint.X - 6, Math.Max(outputPoint.Y, inputPoint.Y) - 6 - (ItemTabElement.TabWidth / 2), 12, 12);
-					}
-					if (Highlighted)
-						using (Pen pen = new Pen(selectionOverlayBrush, Math.Max(30, maxLineWidth + 10)) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
-							graphics.DrawLine(pen, inputPoint, outputPoint);
-				}
-			}
-			else
-			{
-				InputTabs[0].HideItemTab = false;
-				OutputTabs[0].HideItemTab = false;
-				base.Draw(graphics, style);
-			}
-		}
+        protected override void Draw(Graphics graphics, NodeDrawingStyle style) {
+            if (style != NodeDrawingStyle.IconsOnly && _displayedNode.SimpleDraw && _displayedNode.RateType == RateType.Auto && !_displayedNode.KeyNode &&
+                !_displayedNode.IsOverproducing() && !_displayedNode.ManualRateNotMet() && _displayedNode.InputLinks.Any() &&
+                _displayedNode.OutputLinks.Any()) {
+                InputTabs[0].HideItemTab = true;
+                OutputTabs[0].HideItemTab = true;
 
-		protected override void DetailsDraw(Graphics graphics, Point trans)
-		{
-			if (DisplayedNode.RateType == RateType.Manual)
-			{
-				int yoffset = DisplayedNode.NodeDirection == NodeDirection.Up ? 28 : 32;
-				Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 18);
-				Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 18, titleSlot.Width, 20);
-				//graphics.DrawRectangle(devPen, textSlot);
-				//graphics.DrawRectangle(devPen, titleSlot);
+                var maxLineWidth = _displayedNode.InputLinks.Concat(_displayedNode.OutputLinks).Select(l => GraphViewer.LinkElementDictionary[l].LinkWidth)
+                    .Max();
+                var inputPoint = InputTabs[0].GetConnectionPoint();
+                var outputPoint = OutputTabs[0].GetConnectionPoint();
+                using (var pen = new Pen(_displayedNode.PassthroughItem.Item.AverageColor, maxLineWidth)) {
+                    pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
+                    pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
+                    graphics.DrawLine(pen, inputPoint, outputPoint);
+                }
 
-				graphics.DrawString("-Limit-", TitleFont, TextBrush, titleSlot, TitleFormat);
-				GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.DoubleToString(DisplayedNode.DesiredRate), BaseFont, textSlot);
-			}
-		}
+                if (style != NodeDrawingStyle.Regular) return;
 
-		protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive)
-		{
-			List<TooltipInfo> tooltips = new List<TooltipInfo>();
+                using (Brush brush = new SolidBrush(_displayedNode.PassthroughItem.Item.AverageColor)) {
+                    graphics.FillEllipse(brush, inputPoint.X - 6, Math.Min(outputPoint.Y, inputPoint.Y) - 6 + ItemTabElement.TabWidth / 2, 12, 12);
+                    graphics.FillEllipse(brush, inputPoint.X - 6, Math.Max(outputPoint.Y, inputPoint.Y) - 6 - ItemTabElement.TabWidth / 2, 12, 12);
+                }
 
-			if (exclusive)
-			{
-				TooltipInfo helpToolTipInfo = new TooltipInfo();
-				helpToolTipInfo.Text = string.Format("Left click on this node to edit the throughput of {0}.\nRight click for options.", ItemName);
-				helpToolTipInfo.Direction = Direction.None;
-				helpToolTipInfo.ScreenLocation = new Point(10, 10);
-				tooltips.Add(helpToolTipInfo);
-			}
+                if (!Highlighted)
+                    return;
 
-			return tooltips;
-		}
+                using (var pen = new Pen(SelectionOverlayBrush, Math.Max(30, maxLineWidth + 10))) {
+                    pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
+                    pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
+                    graphics.DrawLine(pen, inputPoint, outputPoint);
+                }
+            } else {
+                InputTabs[0].HideItemTab = false;
+                OutputTabs[0].HideItemTab = false;
+                base.Draw(graphics, style);
+            }
+        }
 
-		protected override void AddRClickMenuOptions(bool nodeInSelection)
-		{
-			RightClickMenu.Items.Add(new ToolStripSeparator());
-			if (DisplayedNode.SimpleDraw)
-			{
-				RightClickMenu.Items.Add(new ToolStripMenuItem("Dont simple-draw node", null,
-					new EventHandler((o, e) =>
-					{
-						RightClickMenu.Close();
-						((PassthroughNodeController)graphViewer.Graph.RequestNodeController(DisplayedNode)).SetSimpleDraw(false);
-						graphViewer.Invalidate();
-					})));
-				if (graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(this))
-				{
-					RightClickMenu.Items.Add(new ToolStripMenuItem("Dont simple-draw selected nodes", null,
-						new EventHandler((o, e) =>
-						{
-							RightClickMenu.Close();
-							graphViewer.SetSelectedPassthroughNodesSimpleDraw(false);
-							graphViewer.Invalidate();
-						})));
-				}
-			}
-			else
-			{
-				RightClickMenu.Items.Add(new ToolStripMenuItem("Simple-draw node", null,
-					new EventHandler((o, e) =>
-					{
-						RightClickMenu.Close();
-						((PassthroughNodeController)graphViewer.Graph.RequestNodeController(DisplayedNode)).SetSimpleDraw(true);
-						graphViewer.Invalidate();
-					})));
-				if (graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(this))
-				{
-					RightClickMenu.Items.Add(new ToolStripMenuItem("Simple-draw selected nodes", null,
-						new EventHandler((o, e) =>
-						{
-							RightClickMenu.Close();
-							graphViewer.SetSelectedPassthroughNodesSimpleDraw(true);
-							graphViewer.Invalidate();
-						})));
-				}
-			}
-		}
-	}
+        protected override void DetailsDraw(Graphics graphics, Point trans) {
+            if (_displayedNode.RateType != RateType.Manual)
+                return;
+
+            var yOffset = _displayedNode.NodeDirection == NodeDirection.Up ? 28 : 32;
+            var titleSlot = new Rectangle(trans.X - Width / 2 + 5, trans.Y - Height / 2 + yOffset, Width - 10, 18);
+            var textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 18, titleSlot.Width, 20);
+            //graphics.DrawRectangle(devPen, textSlot);
+            //graphics.DrawRectangle(devPen, titleSlot);
+
+            graphics.DrawString("-Limit-", TitleFont, TextBrush, titleSlot, TitleFormat);
+            GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.DoubleToString(_displayedNode.DesiredRate), BaseFont, textSlot);
+        }
+
+        protected override List<TooltipInfo> GetMyToolTips(Point graphPoint, bool exclusive) {
+            var tooltips = new List<TooltipInfo>();
+
+            if (!exclusive)
+                return tooltips;
+
+            var helpToolTipInfo = new TooltipInfo {
+                Text = $"Left click on this node to edit the throughput of {ItemName}.\nRight click for options.",
+                Direction = Direction.None,
+                ScreenLocation = new Point(10, 10)
+            };
+            tooltips.Add(helpToolTipInfo);
+
+            return tooltips;
+        }
+
+        protected override void AddRClickMenuOptions(bool nodeInSelection) {
+            RightClickMenu.Items.Add(new ToolStripSeparator());
+            if (_displayedNode.SimpleDraw) {
+                RightClickMenu.Items.Add(new ToolStripMenuItem("Don't simple-draw node", null,
+                    (o, e) => {
+                        RightClickMenu.Close();
+                        ((PassthroughNodeController) GraphViewer.Graph.RequestNodeController(_displayedNode)).SetSimpleDraw(false);
+                        GraphViewer.Invalidate();
+                    }));
+                if (GraphViewer.SelectedNodes.Count > 1 && GraphViewer.SelectedNodes.Contains(this)) {
+                    RightClickMenu.Items.Add(new ToolStripMenuItem("Don't simple-draw selected nodes", null,
+                        (o, e) => {
+                            RightClickMenu.Close();
+                            GraphViewer.SetSelectedPassthroughNodesSimpleDraw(false);
+                            GraphViewer.Invalidate();
+                        }));
+                }
+            } else {
+                RightClickMenu.Items.Add(new ToolStripMenuItem("Simple-draw node", null,
+                    (o, e) => {
+                        RightClickMenu.Close();
+                        ((PassthroughNodeController) GraphViewer.Graph.RequestNodeController(_displayedNode)).SetSimpleDraw(true);
+                        GraphViewer.Invalidate();
+                    }));
+                if (GraphViewer.SelectedNodes.Count > 1 && GraphViewer.SelectedNodes.Contains(this)) {
+                    RightClickMenu.Items.Add(new ToolStripMenuItem("Simple-draw selected nodes", null,
+                        (o, e) => {
+                            RightClickMenu.Close();
+                            GraphViewer.SetSelectedPassthroughNodesSimpleDraw(true);
+                            GraphViewer.Invalidate();
+                        }));
+                }
+            }
+        }
+    }
 }

@@ -1,153 +1,178 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Foreman
-{
-	class BeaconElement : GraphElement
-	{
-		private const int BeaconIconSize = 28;
-		private const int ModuleIconSize = 12;
-		private const int ModuleSpacing = 11;
+namespace Foreman {
+    class BeaconElement : GraphElement {
+        private const int BeaconIconSize = 28;
+        private const int ModuleIconSize = 12;
+        private const int ModuleSpacing = 11;
 
-		//in this case it is easier to work with 0,0 coordinates being the top-left most corner.
-		private static readonly Point[] moduleLocations = new Point[] { new Point(ModuleSpacing * 2, 0), new Point(ModuleSpacing * 2, ModuleSpacing), new Point(ModuleSpacing, 0), new Point(ModuleSpacing, ModuleSpacing), new Point(0, 0), new Point(0, ModuleSpacing) };
-		private static readonly Point moduleOffset = new Point(10, 3);
+        // in this case it is easier to work with 0,0 coordinates being the top-left most corner.
+        private static readonly Point[] ModuleLocations = [
+            new(ModuleSpacing * 2, 0), new(ModuleSpacing * 2, ModuleSpacing), new(ModuleSpacing, 0), new(ModuleSpacing, ModuleSpacing),
+            new(0, 0), new(0, ModuleSpacing)
+        ];
 
-		private static readonly Pen speedModulePen = new Pen(Brushes.DarkBlue, 2);
-		private static readonly Pen prodModulePen = new Pen(Brushes.DarkRed, 2);
-        private static readonly Pen effModulePen = new Pen(Brushes.DarkGreen, 2);
-        private static readonly Pen qualityModulePen = new Pen(Brushes.Gold, 2);
-        private static readonly Pen unknownModulePen = new Pen(Brushes.Black, 2);
-        private static readonly Font moduleFont = new Font(FontFamily.GenericSansSerif, 5, FontStyle.Bold);
+        private static readonly Point ModuleOffset = new(10, 3);
 
-		private static readonly Font counterBaseFont = new Font(FontFamily.GenericSansSerif, 8);
-		private static readonly Brush textBrush = Brushes.Black;
-		private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Near };
+        private static readonly Pen SpeedModulePen = new(Brushes.DarkBlue, 2);
+        private static readonly Pen ProdModulePen = new(Brushes.DarkRed, 2);
+        private static readonly Pen EffModulePen = new(Brushes.DarkGreen, 2);
+        private static readonly Pen QualityModulePen = new(Brushes.Gold, 2);
+        private static readonly Pen UnknownModulePen = new(Brushes.Black, 2);
+        private static readonly Font ModuleFont = new(FontFamily.GenericSansSerif, 5, FontStyle.Bold);
 
-		private readonly ReadOnlyRecipeNode DisplayedNode;
+        private static readonly Font CounterBaseFont = new(FontFamily.GenericSansSerif, 8);
+        private static readonly Brush TextBrush = Brushes.Black;
+        private static readonly StringFormat TextFormat = new() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Near };
 
-		public BeaconElement(ProductionGraphViewer graphViewer, RecipeNodeElement parent) : base(graphViewer, parent)
-		{
-			DisplayedNode = (ReadOnlyRecipeNode)parent.DisplayedNode;
+        private readonly ReadOnlyRecipeNode _displayedNode;
 
-			Width = BeaconIconSize + (ModuleSpacing * 3) + 12;
-			Height = BeaconIconSize;
-		}
+        public BeaconElement(ProductionGraphViewer graphViewer, RecipeNodeElement parent) : base(graphViewer, parent) {
+            _displayedNode = (ReadOnlyRecipeNode) parent.DisplayedNode;
 
-		public void SetVisibility(bool visible)
-		{
-			Visible = visible;
-		}
+            Width = BeaconIconSize + ModuleSpacing * 3 + 12;
+            Height = BeaconIconSize;
+        }
 
-		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
-		{
-			if (!DisplayedNode.SelectedBeacon || style == NodeDrawingStyle.IconsOnly || style == NodeDrawingStyle.Simple)
-				return;
+        public void SetVisibility(bool visible) {
+            Visible = visible;
+        }
 
-			Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
-			//graphics.DrawRectangle(devPen, trans.X, trans.Y, Width, Height);
+        protected override void Draw(Graphics graphics, NodeDrawingStyle style) {
+            if (!_displayedNode.SelectedBeacon || style == NodeDrawingStyle.IconsOnly || style == NodeDrawingStyle.Simple)
+                return;
 
-			//beacon
-			graphics.DrawImage(DisplayedNode.SelectedBeacon.Icon, trans.X + moduleOffset.X + ModuleSpacing * 3 + 2, trans.Y, BeaconIconSize, BeaconIconSize);
+            var trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
+            //graphics.DrawRectangle(devPen, trans.X, trans.Y, Width, Height);
 
-			//modules
-			if (DisplayedNode.BeaconModules.Count <= 6)
-			{
+            // beacon
 
-				for (int i = 0; i < moduleLocations.Length && i < DisplayedNode.BeaconModules.Count; i++)
-					graphics.DrawImage(DisplayedNode.BeaconModules[i].Icon, trans.X + moduleLocations[i].X + moduleOffset.X, trans.Y + moduleLocations[i].Y + moduleOffset.Y, ModuleIconSize, ModuleIconSize);
-			}
-			else if(DisplayedNode.BeaconModules.Count <= 8 * 4) //resot to drawing circles for each module instead -> 8x4 set, so 32 max modules
-			{
-				for (int x = 0; x < 8; x++)
-				{
-					for (int y = 0; y < 4; y++)
-					{
-						if (DisplayedNode.BeaconModules.Count > (x * 4) + y)
-						{
-                            Pen marker = DisplayedNode.BeaconModules[(x * 7) + y].Module.GetProductivityBonus() > 0 ? prodModulePen :
-                                DisplayedNode.BeaconModules[(x * 7) + y].Module.GetQualityBonus() > 0 ? qualityModulePen :
-                                DisplayedNode.BeaconModules[(x * 7) + y].Module.GetConsumptionBonus() < 0 ? effModulePen :
-                                DisplayedNode.BeaconModules[(x * 7) + y].Module.GetSpeedBonus() > 0 ? speedModulePen :
-                                unknownModulePen; 
-							graphics.DrawEllipse(marker, trans.X + moduleOffset.X + (ModuleSpacing * 2) + ModuleIconSize - 5 - (x * 5), trans.Y + moduleOffset.Y + 2 + (y * 5), 2, 2);
-						}
-					}
-				}
-			}
-			else
-			{
-                int prodModules = DisplayedNode.BeaconModules.Count(m => m.Module.GetProductivityBonus() > 0);
-                int qualityModules = DisplayedNode.BeaconModules.Count(m => m.Module.GetQualityBonus() > 0 && m.Module.GetProductivityBonus() <= 0);
-                int efficiencyModules = DisplayedNode.BeaconModules.Count(m => m.Module.GetConsumptionBonus() < 0 && m.Module.GetProductivityBonus() <= 0 && m.Module.GetQualityBonus() <= 0);
-                int speedModules = DisplayedNode.BeaconModules.Count(m => m.Module.GetSpeedBonus() > 0 && m.Module.GetConsumptionBonus() >= 0 && m.Module.GetProductivityBonus() <= 0 && m.Module.GetQualityBonus() <= 0);
-                int unknownModules = DisplayedNode.BeaconModules.Count - prodModules - efficiencyModules - speedModules - qualityModules;
-                graphics.DrawString(string.Format("S:{0}", speedModules), moduleFont, Brushes.DarkBlue, trans.X, trans.Y + 5);
-                graphics.DrawString(string.Format("E:{0}", efficiencyModules), moduleFont, Brushes.DarkGreen, trans.X, trans.Y + 15);
-                graphics.DrawString(string.Format("P:{0}", prodModules), moduleFont, Brushes.DarkRed, trans.X + 22, trans.Y + 5);
-                graphics.DrawString(string.Format("Q:{0}", qualityModules), moduleFont, Brushes.Gold, trans.X + 22, trans.Y + 15);
-                graphics.DrawString(string.Format("U:{0}", unknownModules), moduleFont, Brushes.Black, trans.X, trans.Y + 25);
-			}
+            graphics.DrawImage(_displayedNode.SelectedBeacon.Icon, trans.X + ModuleOffset.X + ModuleSpacing * 3 + 2, trans.Y, BeaconIconSize, BeaconIconSize);
 
-			//quantity
-			if (DisplayedNode.SelectedBeacon) // && recipeNode.BeaconCount > 0)
-			{
-				Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 5, (myParent.Width / 2) - this.X - (this.Width / 2) - 6, 18);
-				//graphics.DrawRectangle(devPen, textbox);
+            //modules
 
-				double beaconCount = DisplayedNode.GetTotalBeacons();
-				string sbeaconCount = (beaconCount >= 10000) ? beaconCount.ToString("0.##e0") : beaconCount.ToString("0");
+            if (_displayedNode.BeaconModules.Count <= 6) {
+                for (var i = 0; i < ModuleLocations.Length && i < _displayedNode.BeaconModules.Count; i++) {
+                    graphics.DrawImage(
+                        _displayedNode.BeaconModules[i].Icon,
+                        trans.X + ModuleLocations[i].X + ModuleOffset.X,
+                        trans.Y + ModuleLocations[i].Y + ModuleOffset.Y,
+                        ModuleIconSize,
+                        ModuleIconSize
+                    );
+                }
+            } else if (_displayedNode.BeaconModules.Count <= 8 * 4) { // reset to drawing circles for each module instead -> 8x4 set, so 32 max modules
+                for (var x = 0; x < 8; x++) {
+                    for (var y = 0; y < 4; y++) {
+                        if (_displayedNode.BeaconModules.Count > x * 4 + y) {
+                            var module = _displayedNode.BeaconModules[x * 4 + y].Module;
+                            Pen marker;
 
-				string text = graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Medium ? string.Format("x {0}", (DisplayedNode.BeaconCount).ToString("0.##")) : string.Format("x {0} Σ{1}", (DisplayedNode.BeaconCount).ToString("0.##"), sbeaconCount);
-				GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
-			}
-		}
+                            if (module.GetProductivityBonus() > 0) {
+                                marker = ProdModulePen;
+                            } else if (module.GetQualityBonus() > 0) {
+                                marker = QualityModulePen;
+                            } else if (module.GetConsumptionBonus() < 0) {
+                                marker = EffModulePen;
+                            } else if (module.GetSpeedBonus() > 0) {
+                                marker = SpeedModulePen;
+                            } else {
+                                marker = UnknownModulePen;
+                            }
 
-		public override List<TooltipInfo> GetToolTips(Point graph_point)
-		{
-			if (!Visible)
-				return null;
-			if (!DisplayedNode.SelectedBeacon)
-				return null;
+                            graphics.DrawEllipse(
+                                marker,
+                                trans.X + ModuleOffset.X + ModuleSpacing * 2 + ModuleIconSize - 5 - x * 5,
+                                trans.Y + ModuleOffset.Y + 2 + y * 5,
+                                2,
+                                2
+                            );
+                        }
+                    }
+                }
+            } else {
+                var prodModules = _displayedNode.BeaconModules.Count(m => m.Module.GetProductivityBonus() > 0);
+                var qualityModules = _displayedNode.BeaconModules.Count(m => m.Module.GetQualityBonus() > 0 && m.Module.GetProductivityBonus() <= 0);
+                var efficiencyModules = _displayedNode.BeaconModules.Count(m =>
+                    m.Module.GetConsumptionBonus() < 0 && m.Module.GetProductivityBonus() <= 0 && m.Module.GetQualityBonus() <= 0);
+                var speedModules = _displayedNode.BeaconModules.Count(m =>
+                    m.Module.GetSpeedBonus() > 0 && m.Module.GetConsumptionBonus() >= 0 && m.Module.GetProductivityBonus() <= 0 &&
+                    m.Module.GetQualityBonus() <= 0);
+                var unknownModules = _displayedNode.BeaconModules.Count - prodModules - efficiencyModules - speedModules - qualityModules;
+                graphics.DrawString($"S:{speedModules}", ModuleFont, Brushes.DarkBlue, trans.X, trans.Y + 5);
+                graphics.DrawString($"E:{efficiencyModules}", ModuleFont, Brushes.DarkGreen, trans.X, trans.Y + 15);
+                graphics.DrawString($"P:{prodModules}", ModuleFont, Brushes.DarkRed, trans.X + 22, trans.Y + 5);
+                graphics.DrawString($"Q:{qualityModules}", ModuleFont, Brushes.Gold, trans.X + 22, trans.Y + 15);
+                graphics.DrawString($"U:{unknownModules}", ModuleFont, Brushes.Black, trans.X, trans.Y + 25);
+            }
 
-			List<TooltipInfo> tooltips = new List<TooltipInfo>();
+            // quantity
 
-			Point localPoint = Point.Add(GraphToLocal(graph_point), new Size(Width / 2, Height / 2));
-			if (DisplayedNode.BeaconModules.Count > 0 && localPoint.X < (ModuleSpacing * 3) + 2) //over modules
-			{
-				TooltipInfo tti = new TooltipInfo();
-				tti.Direction = Direction.Up;
-				tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(1 + moduleOffset.X + (DisplayedNode.BeaconModules.Count > 2 ? DisplayedNode.BeaconModules.Count > 4 ? DisplayedNode.BeaconModules.Count > 6 ? ModuleSpacing * 5 / 2 : ModuleSpacing * 3 / 2 : ModuleSpacing * 4 / 2 : ModuleSpacing * 5 / 2) - (Width / 2), Height / 2)));
-				tti.Text = "Beacon Modules:";
+            if (_displayedNode.SelectedBeacon) /* && recipeNode.BeaconCount > 0) */ {
+                var textbox = new Rectangle(trans.X + Width, trans.Y + 5, MyParent.Width / 2 - X - Width / 2 - 6, 18);
+                //graphics.DrawRectangle(devPen, textbox);
 
-                Dictionary<ModuleQualityPair, int> moduleCounter = new Dictionary<ModuleQualityPair, int>();
-                foreach (ModuleQualityPair m in DisplayedNode.BeaconModules)
-                {
+                double beaconCount = _displayedNode.GetTotalBeacons();
+                var sBeaconCount = beaconCount >= 10000 ? beaconCount.ToString("0.##e0") : beaconCount.ToString("0");
+
+                var text = GraphViewer.LevelOfDetail == ProductionGraphViewer.Lod.Medium
+                    ? $"x {_displayedNode.BeaconCount:0.##}"
+                    : $"x {_displayedNode.BeaconCount:0.##} Σ{sBeaconCount}";
+                GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, text, CounterBaseFont, textbox, true);
+            }
+        }
+
+        public override List<TooltipInfo> GetToolTips(Point graphPoint) {
+            if (!Visible)
+                return null;
+            if (!_displayedNode.SelectedBeacon)
+                return null;
+
+            var tooltips = new List<TooltipInfo>();
+
+            var localPoint = Point.Add(GraphToLocal(graphPoint), new Size(Width / 2, Height / 2));
+            if (_displayedNode.BeaconModules.Count > 0 && localPoint.X < ModuleSpacing * 3 + 2) { // over modules
+                var tti = new TooltipInfo {
+                    Direction = Direction.Up,
+                    ScreenLocation = GraphViewer.GraphToScreen(LocalToGraph(new Point(
+                        1 + ModuleOffset.X + (_displayedNode.BeaconModules.Count > 2
+                            ? _displayedNode.BeaconModules.Count > 4
+                                ? _displayedNode.BeaconModules.Count > 6
+                                    ? ModuleSpacing * 5 / 2
+                                    : ModuleSpacing * 3 / 2
+                                : ModuleSpacing * 4 / 2
+                            : ModuleSpacing * 5 / 2) - Width / 2, Height / 2))),
+                    Text = "Beacon Modules:"
+                };
+
+                var moduleCounter = new Dictionary<ModuleQualityPair, int>();
+                foreach (var m in _displayedNode.BeaconModules) {
                     if (moduleCounter.ContainsKey(m))
                         moduleCounter[m]++;
                     else
                         moduleCounter.Add(m, 1);
                 }
 
-                foreach (ModuleQualityPair m in moduleCounter.Keys.OrderBy(m => m.Module.FriendlyName).ThenBy(m => m.Quality.Level).ThenBy(m => m.Quality.FriendlyName))
-                    tti.Text += string.Format("\n   {0} :{1}", moduleCounter[m], m.FriendlyName);
-				tooltips.Add(tti);
-			}
-			else //over assembler
-			{
-				TooltipInfo tti = new TooltipInfo();
-				tti.Direction = Direction.Up;
-				tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(moduleOffset.X + (ModuleSpacing * 3) + 2 + (BeaconIconSize / 2) - (Width / 2), Height / 2)));
-                tti.Text = DisplayedNode.SelectedBeacon.FriendlyName;
-                tooltips.Add(tti);
-			}
+                foreach (var m in moduleCounter.Keys.OrderBy(m => m.Module.FriendlyName)
+                    .ThenBy(m => m.Quality.Level)
+                    .ThenBy(m => m.Quality.FriendlyName)) {
+                    tti.Text += $"\n   {moduleCounter[m]} :{m.FriendlyName}";
+                }
 
-			return tooltips;
-		}
-	}
+                tooltips.Add(tti);
+            } else { // over assembler
+                var tti = new TooltipInfo {
+                    Direction = Direction.Up,
+                    ScreenLocation = GraphViewer.GraphToScreen(
+                        LocalToGraph(new Point(ModuleOffset.X + ModuleSpacing * 3 + 2 + BeaconIconSize / 2 - Width / 2, Height / 2))),
+                    Text = _displayedNode.SelectedBeacon.FriendlyName
+                };
+                tooltips.Add(tti);
+            }
+
+            return tooltips;
+        }
+    }
 }

@@ -1,57 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace Foreman
-{
-	public class SupplierNodeElement : BaseNodeElement
-	{
-		protected override Brush CleanBgBrush { get { return supplierBgBrush; } }
-		private static Brush supplierBgBrush = new SolidBrush(Color.FromArgb(231, 214, 224));
+namespace Foreman {
+    public class SupplierNodeElement : BaseNodeElement {
+        protected override Brush CleanBgBrush => _supplierBgBrush;
 
-		private string ItemName { get { return DisplayedNode.SuppliedItem.FriendlyName; } }
+        private static Brush _supplierBgBrush = new SolidBrush(Color.FromArgb(231, 214, 224));
 
-		private new readonly ReadOnlySupplierNode DisplayedNode;
+        private string ItemName => _displayedNode.SuppliedItem.FriendlyName;
 
-		public SupplierNodeElement(ProductionGraphViewer graphViewer, ReadOnlySupplierNode node) : base(graphViewer, node)
-		{
-			Width = MinWidth;
-			Height = BaseSimpleHeight;
-			DisplayedNode = node;
-		}
+        private readonly ReadOnlySupplierNode _displayedNode;
 
-		protected override Bitmap NodeIcon() { return DisplayedNode.SuppliedItem.Icon; }
+        public SupplierNodeElement(ProductionGraphViewer graphViewer, ReadOnlySupplierNode node) : base(graphViewer, node) {
+            Width = MinWidth;
+            Height = BaseSimpleHeight;
+            _displayedNode = node;
+        }
 
-		protected override void DetailsDraw(Graphics graphics, Point trans)
-		{
-			int yoffset = DisplayedNode.NodeDirection == NodeDirection.Up ? 32 : 5;
-			Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 20);
-			Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 20, titleSlot.Width, (Height / 2) - 5);
-			//graphics.DrawRectangle(devPen, textSlot);
-			//graphics.DrawRectangle(devPen, titleSlot);
+        protected override Bitmap NodeIcon() {
+            return _displayedNode.SuppliedItem.Icon;
+        }
 
-			graphics.DrawString(DisplayedNode.RateType == RateType.Auto ? "Infinite Source:" : "Exact Input:", TitleFont, TextBrush, titleSlot, TitleFormat);
-			GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, ItemName, BaseFont, textSlot);
-		}
+        protected override void DetailsDraw(Graphics graphics, Point trans) {
+            var yoffset = _displayedNode.NodeDirection == NodeDirection.Up ? 32 : 5;
+            var titleSlot = new Rectangle(trans.X - Width / 2 + 5, trans.Y - Height / 2 + yoffset, Width - 10, 20);
+            var textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 20, titleSlot.Width, Height / 2 - 5);
+            //graphics.DrawRectangle(devPen, textSlot);
+            //graphics.DrawRectangle(devPen, titleSlot);
 
-		protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive)
-		{
-			List<TooltipInfo> tooltips = new List<TooltipInfo>();
+            graphics.DrawString(_displayedNode.RateType == RateType.Auto ? "Infinite Source:" : "Exact Input:", TitleFont, TextBrush, titleSlot, TitleFormat);
+            GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, ItemName, BaseFont, textSlot);
+        }
 
-			if (exclusive)
-			{
-				TooltipInfo helpToolTipInfo = new TooltipInfo();
-				helpToolTipInfo.Text = string.Format("Left click on this node to edit quantity of {0} produced.\nRight click for options.", ItemName);
-				helpToolTipInfo.Direction = Direction.None;
-				helpToolTipInfo.ScreenLocation = new Point(10, 10);
-				tooltips.Add(helpToolTipInfo);
-			}
+        protected override List<TooltipInfo> GetMyToolTips(Point graphPoint, bool exclusive) {
+            var tooltips = new List<TooltipInfo>();
 
-			return tooltips;
-		}
-	}
+            if (exclusive) {
+                var helpToolTipInfo = new TooltipInfo {
+                    Text = $"Left click on this node to edit quantity of {ItemName} produced.\nRight click for options.",
+                    Direction = Direction.None,
+                    ScreenLocation = new Point(10, 10)
+                };
+                tooltips.Add(helpToolTipInfo);
+            }
+
+            return tooltips;
+        }
+    }
 }

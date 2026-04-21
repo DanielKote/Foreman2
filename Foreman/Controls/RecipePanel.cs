@@ -1,24 +1,26 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman
-{
-	public class RecipePanel : UserControl //helper class to draw the recipe in a panel (container)
-	{
-		private Recipe[] Recipes;
-		public RecipePanel(Recipe[] recipes)
-		{
-			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-			this.DoubleBuffered = true;
+namespace Foreman {
+    // helper class to draw the recipe in a panel (container)
+    public class RecipePanel : UserControl {
+        private Recipe[] _recipes;
 
-			this.BackColor = Color.Black;
+        public RecipePanel(Recipe[] recipes) {
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            DoubleBuffered = true;
 
-			Recipes = recipes;
-			this.Size = RecipePainter.GetSize(Recipes);
-			this.Location = new Point(0, 0);
-		}
+            BackColor = Color.Black;
 
-		protected override void OnPaint(PaintEventArgs e) { RecipePainter.Paint(Recipes, e.Graphics, new Point(0, 0)); }
-		protected override void OnPaintBackground(PaintEventArgs e) { }
-	}
+            _recipes = recipes;
+            Size = RecipePainter.GetSize(_recipes);
+            Location = new Point(0, 0);
+        }
+
+        protected override void OnPaint(PaintEventArgs e) {
+            RecipePainter.Paint(_recipes, e.Graphics, new Point(0, 0));
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e) { }
+    }
 }

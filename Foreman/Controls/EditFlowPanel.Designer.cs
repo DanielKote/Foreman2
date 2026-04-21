@@ -1,7 +1,5 @@
-﻿namespace Foreman
-{
-    partial class EditFlowPanel
-	{
+﻿namespace Foreman {
+    partial class EditFlowPanel {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
@@ -11,12 +9,11 @@
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -26,8 +23,7 @@
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
             this.KeyNodeCheckBox = new System.Windows.Forms.CheckBox();
             this.SimplePassthroughNodesCheckBox = new System.Windows.Forms.CheckBox();
@@ -38,14 +34,14 @@
             this.KeyNodeTitleInput = new System.Windows.Forms.TextBox();
             this.KeyNodeTitleLabel = new System.Windows.Forms.Label();
             this.RateOptionsTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FixedFlowInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.FixedFlowInput)).BeginInit();
             this.SuspendLayout();
             // 
             // RateOptionsTable
             // 
             this.RateOptionsTable.AutoSize = true;
             this.RateOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.RateOptionsTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.RateOptionsTable.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.RateOptionsTable.ColumnCount = 4;
             this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -140,10 +136,11 @@
             this.FixedFlowInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FixedFlowInput.Location = new System.Drawing.Point(132, 24);
             this.FixedFlowInput.Maximum = new decimal(new int[] {
-            1000000000,
-            0,
-            0,
-            0});
+                1000000000,
+                0,
+                0,
+                0
+            });
             this.FixedFlowInput.Name = "FixedFlowInput";
             this.FixedFlowInput.Size = new System.Drawing.Size(114, 20);
             this.FixedFlowInput.TabIndex = 4;
@@ -184,22 +181,21 @@
             this.Size = new System.Drawing.Size(255, 103);
             this.RateOptionsTable.ResumeLayout(false);
             this.RateOptionsTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FixedFlowInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.FixedFlowInput)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-		#endregion
+        #endregion
 
-		private System.Windows.Forms.TableLayoutPanel RateOptionsTable;
-		public System.Windows.Forms.RadioButton FixedOption;
-		public System.Windows.Forms.RadioButton AutoOption;
-		private System.Windows.Forms.Label RateLabel;
-		private System.Windows.Forms.NumericUpDown FixedFlowInput;
-		private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
-		private System.Windows.Forms.CheckBox KeyNodeCheckBox;
-		private System.Windows.Forms.TextBox KeyNodeTitleInput;
-		private System.Windows.Forms.Label KeyNodeTitleLabel;
-	}
+        private System.Windows.Forms.TableLayoutPanel RateOptionsTable;
+        public System.Windows.Forms.RadioButton FixedOption;
+        public System.Windows.Forms.RadioButton AutoOption;
+        private System.Windows.Forms.Label RateLabel;
+        private System.Windows.Forms.NumericUpDown FixedFlowInput;
+        private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
+        private System.Windows.Forms.CheckBox KeyNodeCheckBox;
+        private System.Windows.Forms.TextBox KeyNodeTitleInput;
+        private System.Windows.Forms.Label KeyNodeTitleLabel;
+    }
 }

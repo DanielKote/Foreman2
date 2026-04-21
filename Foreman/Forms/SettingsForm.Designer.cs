@@ -1,7 +1,5 @@
-﻿namespace Foreman
-{
-    partial class SettingsForm
-    {
+﻿namespace Foreman {
+    partial class SettingsForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -11,12 +9,11 @@
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -26,8 +23,7 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.ModSelectionBox = new System.Windows.Forms.ListBox();
@@ -46,26 +42,26 @@
             this.EnabledObjectsTabControl = new System.Windows.Forms.TabControl();
             this.AssemblersPage = new System.Windows.Forms.TabPage();
             this.AssemblerListView = new System.Windows.Forms.ListView();
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader) (new System.Windows.Forms.ColumnHeader()));
             this.IconList = new System.Windows.Forms.ImageList(this.components);
             this.MinersPage = new System.Windows.Forms.TabPage();
             this.MinerListView = new System.Windows.Forms.ListView();
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader) (new System.Windows.Forms.ColumnHeader()));
             this.PowersPage = new System.Windows.Forms.TabPage();
             this.PowerListView = new System.Windows.Forms.ListView();
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader) (new System.Windows.Forms.ColumnHeader()));
             this.BeaconsPage = new System.Windows.Forms.TabPage();
             this.BeaconListView = new System.Windows.Forms.ListView();
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader) (new System.Windows.Forms.ColumnHeader()));
             this.ModulesPage = new System.Windows.Forms.TabPage();
             this.ModuleListView = new System.Windows.Forms.ListView();
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader) (new System.Windows.Forms.ColumnHeader()));
             this.RecipesPage = new System.Windows.Forms.TabPage();
             this.RecipeListView = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader) (new System.Windows.Forms.ColumnHeader()));
             this.QualityPage = new System.Windows.Forms.TabPage();
             this.QualityListView = new System.Windows.Forms.ListView();
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader) (new System.Windows.Forms.ColumnHeader()));
             this.FilterTextBox = new System.Windows.Forms.TextBox();
             this.SetEnabledFromSciencePacksButton = new System.Windows.Forms.Button();
             this.PresetsTable = new System.Windows.Forms.TableLayoutPanel();
@@ -161,21 +157,21 @@
             this.GraphOptionsTable.SuspendLayout();
             this.graphOptionsGroupBox.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.QualityStepsInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.QualityStepsInput)).BeginInit();
             this.advancedGroupBox.SuspendLayout();
             this.AdvancedOptionsTable.SuspendLayout();
             this.defaultsGroupBox.SuspendLayout();
             this.DefaultsTable.SuspendLayout();
             this.nodeGraphicsGroupBox.SuspendLayout();
             this.NodeGraphicsTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.IconsSizeInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NodeCountForSimpleViewInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.IconsSizeInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.NodeCountForSimpleViewInput)).BeginInit();
             this.guideArrowsGroupBox.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.solverOptionsGroupBox.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LowPriorityPowerInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PullConsumerNodesPowerInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.LowPriorityPowerInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.PullConsumerNodesPowerInput)).BeginInit();
             this.FormButtonsTable.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -425,7 +421,8 @@
             // 
             this.AssemblerListView.CheckBoxes = true;
             this.AssemblerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader4});
+                this.columnHeader4
+            });
             this.AssemblerListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AssemblerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.AssemblerListView.FullRowSelect = true;
@@ -473,7 +470,8 @@
             // 
             this.MinerListView.CheckBoxes = true;
             this.MinerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader3});
+                this.columnHeader3
+            });
             this.MinerListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MinerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.MinerListView.FullRowSelect = true;
@@ -513,7 +511,8 @@
             // 
             this.PowerListView.CheckBoxes = true;
             this.PowerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader5});
+                this.columnHeader5
+            });
             this.PowerListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PowerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.PowerListView.FullRowSelect = true;
@@ -553,7 +552,8 @@
             // 
             this.BeaconListView.CheckBoxes = true;
             this.BeaconListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader6});
+                this.columnHeader6
+            });
             this.BeaconListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BeaconListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.BeaconListView.FullRowSelect = true;
@@ -595,7 +595,8 @@
             // 
             this.ModuleListView.CheckBoxes = true;
             this.ModuleListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader2});
+                this.columnHeader2
+            });
             this.ModuleListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ModuleListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.ModuleListView.FullRowSelect = true;
@@ -629,14 +630,15 @@
             this.RecipesPage.Name = "RecipesPage";
             this.RecipesPage.Size = new System.Drawing.Size(444, 302);
             this.RecipesPage.TabIndex = 4;
-            this.RecipesPage.Text = "Recipes";
+            this.RecipesPage.Text = "RecipesView";
             this.RecipesPage.UseVisualStyleBackColor = true;
             // 
             // RecipeListView
             // 
             this.RecipeListView.CheckBoxes = true;
             this.RecipeListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
+                this.columnHeader1
+            });
             this.RecipeListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RecipeListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.RecipeListView.FullRowSelect = true;
@@ -676,7 +678,8 @@
             // 
             this.QualityListView.CheckBoxes = true;
             this.QualityListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader7});
+                this.columnHeader7
+            });
             this.QualityListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.QualityListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.QualityListView.FullRowSelect = true;
@@ -872,8 +875,9 @@
             // 
             this.PresetMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.PresetMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.SelectPresetMenuItem,
-            this.DeletePresetMenuItem});
+                this.SelectPresetMenuItem,
+                this.DeletePresetMenuItem
+            });
             this.PresetMenuStrip.Name = "PresetMenuStrip";
             this.PresetMenuStrip.Size = new System.Drawing.Size(143, 48);
             // 
@@ -1015,23 +1019,26 @@
             this.QualityStepsInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.QualityStepsInput.Location = new System.Drawing.Point(197, 3);
             this.QualityStepsInput.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
+                20,
+                0,
+                0,
+                0
+            });
             this.QualityStepsInput.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+                1,
+                0,
+                0,
+                0
+            });
             this.QualityStepsInput.Name = "QualityStepsInput";
             this.QualityStepsInput.Size = new System.Drawing.Size(98, 20);
             this.QualityStepsInput.TabIndex = 14;
             this.QualityStepsInput.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+                1,
+                0,
+                0,
+                0
+            });
             // 
             // label12
             // 
@@ -1159,8 +1166,9 @@
             this.NodeDirectionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.NodeDirectionDropDown.FormattingEnabled = true;
             this.NodeDirectionDropDown.Items.AddRange(new object[] {
-            "Up (default)",
-            "Down"});
+                "Up (default)",
+                "Down"
+            });
             this.NodeDirectionDropDown.Location = new System.Drawing.Point(87, 52);
             this.NodeDirectionDropDown.Margin = new System.Windows.Forms.Padding(2);
             this.NodeDirectionDropDown.Name = "NodeDirectionDropDown";
@@ -1347,23 +1355,26 @@
             this.IconsSizeInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IconsSizeInput.Location = new System.Drawing.Point(196, 52);
             this.IconsSizeInput.Maximum = new decimal(new int[] {
-            256,
-            0,
-            0,
-            0});
+                256,
+                0,
+                0,
+                0
+            });
             this.IconsSizeInput.Minimum = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
+                8,
+                0,
+                0,
+                0
+            });
             this.IconsSizeInput.Name = "IconsSizeInput";
             this.IconsSizeInput.Size = new System.Drawing.Size(97, 20);
             this.IconsSizeInput.TabIndex = 19;
             this.IconsSizeInput.Value = new decimal(new int[] {
-            12,
-            0,
-            0,
-            0});
+                12,
+                0,
+                0,
+                0
+            });
             // 
             // RoundAssemblerCountCheckBox
             // 
@@ -1474,16 +1485,18 @@
             this.NodeGraphicsTable.SetColumnSpan(this.NodeCountForSimpleViewInput, 2);
             this.NodeCountForSimpleViewInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.NodeCountForSimpleViewInput.Increment = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
+                25,
+                0,
+                0,
+                0
+            });
             this.NodeCountForSimpleViewInput.Location = new System.Drawing.Point(196, 26);
             this.NodeCountForSimpleViewInput.Maximum = new decimal(new int[] {
-            2000,
-            0,
-            0,
-            0});
+                2000,
+                0,
+                0,
+                0
+            });
             this.NodeCountForSimpleViewInput.Name = "NodeCountForSimpleViewInput";
             this.NodeCountForSimpleViewInput.Size = new System.Drawing.Size(97, 20);
             this.NodeCountForSimpleViewInput.TabIndex = 13;
@@ -1638,52 +1651,59 @@
             // 
             this.LowPriorityPowerInput.DecimalPlaces = 1;
             this.LowPriorityPowerInput.Increment = new decimal(new int[] {
-            2,
-            0,
-            0,
-            65536});
+                2,
+                0,
+                0,
+                65536
+            });
             this.LowPriorityPowerInput.Location = new System.Drawing.Point(222, 3);
             this.LowPriorityPowerInput.Maximum = new decimal(new int[] {
-            6,
-            0,
-            0,
-            0});
+                6,
+                0,
+                0,
+                0
+            });
             this.LowPriorityPowerInput.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+                1,
+                0,
+                0,
+                0
+            });
             this.LowPriorityPowerInput.Name = "LowPriorityPowerInput";
             this.LowPriorityPowerInput.Size = new System.Drawing.Size(120, 20);
             this.LowPriorityPowerInput.TabIndex = 6;
             this.LowPriorityPowerInput.Value = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
+                4,
+                0,
+                0,
+                0
+            });
             // 
             // PullConsumerNodesPowerInput
             // 
             this.PullConsumerNodesPowerInput.DecimalPlaces = 1;
             this.PullConsumerNodesPowerInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
+                1,
+                0,
+                0,
+                65536
+            });
             this.PullConsumerNodesPowerInput.Location = new System.Drawing.Point(222, 23);
             this.PullConsumerNodesPowerInput.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
+                5,
+                0,
+                0,
+                0
+            });
             this.PullConsumerNodesPowerInput.Name = "PullConsumerNodesPowerInput";
             this.PullConsumerNodesPowerInput.Size = new System.Drawing.Size(120, 20);
             this.PullConsumerNodesPowerInput.TabIndex = 8;
             this.PullConsumerNodesPowerInput.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+                1,
+                0,
+                0,
+                0
+            });
             // 
             // PullConsumerNodesCheckBox
             // 
@@ -1774,7 +1794,7 @@
             this.graphOptionsGroupBox.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.QualityStepsInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.QualityStepsInput)).EndInit();
             this.advancedGroupBox.ResumeLayout(false);
             this.advancedGroupBox.PerformLayout();
             this.AdvancedOptionsTable.ResumeLayout(false);
@@ -1787,8 +1807,8 @@
             this.nodeGraphicsGroupBox.PerformLayout();
             this.NodeGraphicsTable.ResumeLayout(false);
             this.NodeGraphicsTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.IconsSizeInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NodeCountForSimpleViewInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.IconsSizeInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.NodeCountForSimpleViewInput)).EndInit();
             this.guideArrowsGroupBox.ResumeLayout(false);
             this.guideArrowsGroupBox.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -1797,15 +1817,15 @@
             this.solverOptionsGroupBox.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LowPriorityPowerInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PullConsumerNodesPowerInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.LowPriorityPowerInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.PullConsumerNodesPowerInput)).EndInit();
             this.FormButtonsTable.ResumeLayout(false);
             this.FormButtonsTable.PerformLayout();
             this.ResumeLayout(false);
-
         }
 
         #endregion
+
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button CancelSettingsButton;
         private System.Windows.Forms.Button ConfirmButton;
@@ -1835,77 +1855,77 @@
         private System.Windows.Forms.ListView RecipeListView;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ImageList IconList;
-		private System.Windows.Forms.CheckBox ShowUnavailablesFilterCheckBox;
-		private RecipeToolTip RecipeToolTip;
-		private System.Windows.Forms.ListView AssemblerListView;
-		private System.Windows.Forms.ColumnHeader columnHeader4;
-		private System.Windows.Forms.ListView MinerListView;
-		private System.Windows.Forms.ColumnHeader columnHeader3;
-		private System.Windows.Forms.ListView ModuleListView;
-		private System.Windows.Forms.ColumnHeader columnHeader2;
-		private System.Windows.Forms.TableLayoutPanel PresetsTable;
-		private System.Windows.Forms.TableLayoutPanel DifficultyTable;
-		private System.Windows.Forms.TableLayoutPanel CurrentPresetTable;
-		private System.Windows.Forms.TableLayoutPanel MainTable;
-		private System.Windows.Forms.TableLayoutPanel FormButtonsTable;
-		private System.Windows.Forms.TableLayoutPanel EnabledObjectsTable;
-		private System.Windows.Forms.TabPage PowersPage;
-		private System.Windows.Forms.ListView PowerListView;
-		private System.Windows.Forms.ColumnHeader columnHeader5;
-		private System.Windows.Forms.TabPage BeaconsPage;
-		private System.Windows.Forms.ListView BeaconListView;
-		private System.Windows.Forms.ColumnHeader columnHeader6;
-		private System.Windows.Forms.TabControl MainTabControl;
-		private System.Windows.Forms.TabPage PresetsTab;
-		private System.Windows.Forms.TabPage EnabledObjectsTab;
-		private System.Windows.Forms.TabPage OptionsTab;
-		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
-		private System.Windows.Forms.GroupBox nodeGraphicsGroupBox;
-		private System.Windows.Forms.GroupBox advancedGroupBox;
-		private System.Windows.Forms.GroupBox defaultsGroupBox;
-		private System.Windows.Forms.TableLayoutPanel AdvancedOptionsTable;
-		private System.Windows.Forms.CheckBox ShowUnavailablesCheckBox;
-		private System.Windows.Forms.TableLayoutPanel DefaultsTable;
-		private System.Windows.Forms.ComboBox ModuleSelectorStyleDropDown;
-		private System.Windows.Forms.ComboBox AssemblerSelectorStyleDropDown;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.TableLayoutPanel NodeGraphicsTable;
-		private System.Windows.Forms.CheckBox ShowNodeRecipeCheckBox;
-		private System.Windows.Forms.RadioButton HighLodRadioButton;
-		private System.Windows.Forms.CheckBox DynamicLWCheckBox;
-		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.RadioButton MediumLodRadioButton;
-		private System.Windows.Forms.RadioButton LowLodRadioButton;
-		private System.Windows.Forms.CheckBox RecipeEditPanelPositionLockCheckBox;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.NumericUpDown NodeCountForSimpleViewInput;
-		private System.Windows.Forms.CheckBox LoadBarrelingCheckBox;
-		private System.Windows.Forms.CheckBox WarningArrowsCheckBox;
-		private System.Windows.Forms.CheckBox ErrorArrowsCheckBox;
-		private System.Windows.Forms.Button SetEnabledFromSciencePacksButton;
-		private System.Windows.Forms.CheckBox AbbreviateSciPackCheckBox;
-		private System.Windows.Forms.CheckBox RoundAssemblerCountCheckBox;
-		private System.Windows.Forms.CheckBox ShowProductivityBonusOnAllCheckBox;
-		private System.Windows.Forms.CheckBox DisconnectedArrowsCheckBox;
-		private System.Windows.Forms.ComboBox NodeDirectionDropDown;
-		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.CheckBox FlagOUSupplyNodesCheckBox;
-		private System.Windows.Forms.GroupBox guideArrowsGroupBox;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.CheckBox OUSuppliedArrowsCheckBox;
-		private System.Windows.Forms.Label label10;
-		private System.Windows.Forms.NumericUpDown IconsSizeInput;
-		private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
-		private System.Windows.Forms.CheckBox ArrowsOnLinksCheckBox;
-		private System.Windows.Forms.CheckBox SmartNodeDirectionCheckBox;
-		private System.Windows.Forms.GroupBox solverOptionsGroupBox;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-		private System.Windows.Forms.CheckBox PullConsumerNodesCheckBox;
-		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.NumericUpDown LowPriorityPowerInput;
-		private System.Windows.Forms.Button EnableAllButton;
-		private System.Windows.Forms.NumericUpDown PullConsumerNodesPowerInput;
+        private System.Windows.Forms.CheckBox ShowUnavailablesFilterCheckBox;
+        private RecipeToolTip RecipeToolTip;
+        private System.Windows.Forms.ListView AssemblerListView;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ListView MinerListView;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ListView ModuleListView;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.TableLayoutPanel PresetsTable;
+        private System.Windows.Forms.TableLayoutPanel DifficultyTable;
+        private System.Windows.Forms.TableLayoutPanel CurrentPresetTable;
+        private System.Windows.Forms.TableLayoutPanel MainTable;
+        private System.Windows.Forms.TableLayoutPanel FormButtonsTable;
+        private System.Windows.Forms.TableLayoutPanel EnabledObjectsTable;
+        private System.Windows.Forms.TabPage PowersPage;
+        private System.Windows.Forms.ListView PowerListView;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.TabPage BeaconsPage;
+        private System.Windows.Forms.ListView BeaconListView;
+        private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.TabControl MainTabControl;
+        private System.Windows.Forms.TabPage PresetsTab;
+        private System.Windows.Forms.TabPage EnabledObjectsTab;
+        private System.Windows.Forms.TabPage OptionsTab;
+        private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
+        private System.Windows.Forms.GroupBox nodeGraphicsGroupBox;
+        private System.Windows.Forms.GroupBox advancedGroupBox;
+        private System.Windows.Forms.GroupBox defaultsGroupBox;
+        private System.Windows.Forms.TableLayoutPanel AdvancedOptionsTable;
+        private System.Windows.Forms.CheckBox ShowUnavailablesCheckBox;
+        private System.Windows.Forms.TableLayoutPanel DefaultsTable;
+        private System.Windows.Forms.ComboBox ModuleSelectorStyleDropDown;
+        private System.Windows.Forms.ComboBox AssemblerSelectorStyleDropDown;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TableLayoutPanel NodeGraphicsTable;
+        private System.Windows.Forms.CheckBox ShowNodeRecipeCheckBox;
+        private System.Windows.Forms.RadioButton HighLodRadioButton;
+        private System.Windows.Forms.CheckBox DynamicLWCheckBox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.RadioButton MediumLodRadioButton;
+        private System.Windows.Forms.RadioButton LowLodRadioButton;
+        private System.Windows.Forms.CheckBox RecipeEditPanelPositionLockCheckBox;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown NodeCountForSimpleViewInput;
+        private System.Windows.Forms.CheckBox LoadBarrelingCheckBox;
+        private System.Windows.Forms.CheckBox WarningArrowsCheckBox;
+        private System.Windows.Forms.CheckBox ErrorArrowsCheckBox;
+        private System.Windows.Forms.Button SetEnabledFromSciencePacksButton;
+        private System.Windows.Forms.CheckBox AbbreviateSciPackCheckBox;
+        private System.Windows.Forms.CheckBox RoundAssemblerCountCheckBox;
+        private System.Windows.Forms.CheckBox ShowProductivityBonusOnAllCheckBox;
+        private System.Windows.Forms.CheckBox DisconnectedArrowsCheckBox;
+        private System.Windows.Forms.ComboBox NodeDirectionDropDown;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.CheckBox FlagOUSupplyNodesCheckBox;
+        private System.Windows.Forms.GroupBox guideArrowsGroupBox;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.CheckBox OUSuppliedArrowsCheckBox;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.NumericUpDown IconsSizeInput;
+        private System.Windows.Forms.CheckBox SimplePassthroughNodesCheckBox;
+        private System.Windows.Forms.CheckBox ArrowsOnLinksCheckBox;
+        private System.Windows.Forms.CheckBox SmartNodeDirectionCheckBox;
+        private System.Windows.Forms.GroupBox solverOptionsGroupBox;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.CheckBox PullConsumerNodesCheckBox;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.NumericUpDown LowPriorityPowerInput;
+        private System.Windows.Forms.Button EnableAllButton;
+        private System.Windows.Forms.NumericUpDown PullConsumerNodesPowerInput;
         private System.Windows.Forms.TabPage QualityPage;
         private System.Windows.Forms.ListView QualityListView;
         private System.Windows.Forms.ColumnHeader columnHeader7;

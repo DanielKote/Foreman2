@@ -1,33 +1,29 @@
-﻿namespace Foreman
-{
-	partial class PresetImportForm
-	{
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+﻿namespace Foreman {
+    partial class PresetImportForm {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing && (components != null))
-			{
-				components.Dispose();
-			}
-			base.Dispose(disposing);
-		}
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
+                components.Dispose();
+            }
 
-		#region Windows Form Designer generated code
+            base.Dispose(disposing);
+        }
 
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent() {
             this.FactorioBrowseButton = new System.Windows.Forms.Button();
             this.FactorioLocationComboBox = new System.Windows.Forms.ComboBox();
             this.FactorioLocationGroup = new System.Windows.Forms.GroupBox();
@@ -164,7 +160,8 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point,
+                ((byte) (0)));
             this.label1.Location = new System.Drawing.Point(2, 0);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
@@ -411,11 +408,11 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
+        }
 
-		}
+        #endregion
 
-		#endregion
-		private System.Windows.Forms.Button FactorioBrowseButton;
+        private System.Windows.Forms.Button FactorioBrowseButton;
         private System.Windows.Forms.ComboBox FactorioLocationComboBox;
         private System.Windows.Forms.GroupBox FactorioLocationGroup;
         private System.Windows.Forms.GroupBox FactorioSettingsGroup;
@@ -424,18 +421,18 @@
         private System.Windows.Forms.GroupBox PresetNameGroup;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TableLayoutPanel MainTable;
-		private System.Windows.Forms.TableLayoutPanel PresetNameTable;
-		private System.Windows.Forms.Button CancelImportButtonB;
-		private System.Windows.Forms.TableLayoutPanel FactorioSettingsTable;
-		private System.Windows.Forms.TextBox PresetNameTextBox;
-		private System.Windows.Forms.TableLayoutPanel FactorioLocationTable;
-		private System.Windows.Forms.Button OKButton;
-		private System.Windows.Forms.Button CancelImportButton;
-		private CustomProgressBar ImportProgressBar;
-		private System.Windows.Forms.GroupBox FactorioModLocationGroup;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.Button ModsBrowseButton;
-		private System.Windows.Forms.ComboBox ModsLocationComboBox;
-	}
+        private System.Windows.Forms.TableLayoutPanel MainTable;
+        private System.Windows.Forms.TableLayoutPanel PresetNameTable;
+        private System.Windows.Forms.Button CancelImportButtonB;
+        private System.Windows.Forms.TableLayoutPanel FactorioSettingsTable;
+        private System.Windows.Forms.TextBox PresetNameTextBox;
+        private System.Windows.Forms.TableLayoutPanel FactorioLocationTable;
+        private System.Windows.Forms.Button OKButton;
+        private System.Windows.Forms.Button CancelImportButton;
+        private CustomProgressBar ImportProgressBar;
+        private System.Windows.Forms.GroupBox FactorioModLocationGroup;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Button ModsBrowseButton;
+        private System.Windows.Forms.ComboBox ModsLocationComboBox;
+    }
 }

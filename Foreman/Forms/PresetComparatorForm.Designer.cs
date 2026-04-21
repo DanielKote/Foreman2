@@ -48,7 +48,7 @@ namespace Foreman
 			this.CloseButton = new System.Windows.Forms.Button();
 			this.TabTable = new System.Windows.Forms.TableLayoutPanel();
 			this.label2 = new System.Windows.Forms.Label();
-			this.LeftOnlyListView = new Foreman.FFListView();
+			this.LeftOnlyListView = new Foreman.FfListView();
 			this.LeftOnlyHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.IconList = new System.Windows.Forms.ImageList(this.components);
 			this.label5 = new System.Windows.Forms.Label();
@@ -56,7 +56,7 @@ namespace Foreman
 			this.RightListView = new Foreman.SyncListView();
 			this.RightHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.LeftHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.RightOnlyListView = new Foreman.FFListView();
+			this.RightOnlyListView = new Foreman.FfListView();
 			this.RightOnlyHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.BothPresetsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.HideSimilarObjectsCheckBox = new System.Windows.Forms.CheckBox();
@@ -216,7 +216,7 @@ namespace Foreman
 			this.RecipeTabPage.Name = "RecipeTabPage";
 			this.RecipeTabPage.Size = new System.Drawing.Size(651, 0);
 			this.RecipeTabPage.TabIndex = 2;
-			this.RecipeTabPage.Text = "Recipes";
+			this.RecipeTabPage.Text = "RecipesView";
 			// 
 			// AssemblerTabPage
 			// 
@@ -644,10 +644,10 @@ namespace Foreman
         private System.Windows.Forms.TabPage MinerTabPage;
         private System.Windows.Forms.TabPage ModuleTabPage;
         private System.Windows.Forms.TableLayoutPanel TabTable;
-        private FFListView RightOnlyListView;
+        private FfListView RightOnlyListView;
         private SyncListView RightListView;
         private SyncListView LeftListView;
-        private FFListView LeftOnlyListView;
+        private FfListView LeftOnlyListView;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;

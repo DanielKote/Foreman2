@@ -2,277 +2,294 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace Foreman
-{
-	public abstract class BaseLinkElement : GraphElement
-	{
-		public enum LineType { Simple, UShape, NShape }
+namespace Foreman {
+    public abstract class BaseLinkElement : GraphElement {
+        public enum LineType {
+            Simple,
+            UShape,
+            NShape
+        }
 
-		public BaseNodeElement SupplierElement { get; protected set; }
-		public BaseNodeElement ConsumerElement { get; protected set; }
-		public virtual ItemQualityPair Item { get; protected set; }
+        public BaseNodeElement SupplierElement { get; protected set; }
+        public BaseNodeElement ConsumerElement { get; protected set; }
+        public virtual ItemQualityPair Item { get; protected set; }
 
-		private Point consumerOrigin, supplierOrigin;
-		private NodeDirection consumerDirection, supplierDirection;
+        private Point _consumerOrigin, _supplierOrigin;
+        private NodeDirection _consumerDirection, _supplierDirection;
 
-		public LineType Type { get; private set; }
+        public LineType Type { get; private set; }
 
-		private Point consumerPull, supplierPull; //for basic links
-		private Point midUA, midUB, midUC, midUD, pullU1, pullU2, pullU3, pullU4; //for U shape links
-		private Point midNA, midNB, midNC, midND, midNE, midNF, pullN1, pullN2, pullN3, pullN4, pullN5, pullN6, pullN7, pullN8; //for N shape links
-		//private Point pointMidA, pointMidAPull, pointMidB, pointMidBPull; //for the U and N shape links
+        // for basic links
+        private Point _consumerPull, _supplierPull;
+        // for U shape links
+        private Point _midUa, _midUb, _midUc, _midUd, _pullU1, _pullU2, _pullU3, _pullU4;
+        // for N shape links
+        private Point _midNa, _midNb, _midNc, _midNd, _midNe, _midNf, _pullN1, _pullN2, _pullN3, _pullN4, _pullN5, _pullN6, _pullN7, _pullN8;
+        //private Point pointMidA, pointMidAPull, pointMidB, pointMidBPull; //for the U and N shape links
 
-		public float LinkWidth { get; set; }
+        public float LinkWidth { get; set; }
 
-		public Rectangle CalculatedBounds { get; private set; }
+        public Rectangle CalculatedBounds { get; private set; }
 
-		protected bool iconOnlyDraw;
+        protected bool IconOnlyDraw;
 
-		private const int circlePull = 100;
-		private static CustomLineCap arrowCap = new AdjustableArrowCap(4,3);
+        private const int circlePull = 100;
+        private static CustomLineCap _arrowCap = new AdjustableArrowCap(4, 3);
 
-		public override Point Location //link elements are always considered to be located at 0,0 graph to simplify things, with their connection points being in graph-coordinates (no need to do any local transforms)
-		{
-			get { return new Point(); }
-			set { }
-		}
-		public override int X { get { return 0; } set { } }
-		public override int Y { get { return 0; } set { } }
+        // link elements are always considered to be located at 0,0 graph to simplify things,
+        // with their connection points being in graph-coordinates (no need to do any local transforms)
+        public override Point Location {
+            get => new();
+            set { }
+        }
 
-		public BaseLinkElement(ProductionGraphViewer graphViewer) : base(graphViewer)
-		{
-			LinkWidth = 3f;
-		}
-		protected BaseLinkElement(ProductionGraphViewer graphViewer, BaseLinkElement masterLink) : base(graphViewer, masterLink) { LinkWidth = masterLink.Width; }
+        public override int X {
+            get => 0;
+            set { }
+        }
 
-		public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder)
-		{
-			//NOTE: link element works in graph coordinates throughout (since Location is 0,0 for it - and it is always owned directly by the graph viewer). So we dont have to bother with graph to local conversions
-			UpdateCurve();
-			Visible =
-					 	CalculatedBounds.X + CalculatedBounds.Width > graph_zone.X - xborder &&
-						CalculatedBounds.X < graph_zone.X + graph_zone.Width + xborder &&
-						CalculatedBounds.Y + CalculatedBounds.Height > graph_zone.Y - yborder &&
-						CalculatedBounds.Y < graph_zone.Y + graph_zone.Height + yborder;
-		}
+        public override int Y {
+            get => 0;
+            set { }
+        }
 
-		protected abstract Tuple<Point, Point> GetCurveEndpoints(); //supplier,consumer
-		protected abstract Tuple<NodeDirection, NodeDirection> GetEndpointDirections(); //supplier,consumer
+        public BaseLinkElement(ProductionGraphViewer graphViewer) : base(graphViewer) {
+            LinkWidth = 3f;
+        }
 
-		protected void UpdateCurve() //updates all points & boundaries (important for occluding objects outside view)
-		{
-			Tuple<Point,Point> endpoints = GetCurveEndpoints();
-			Tuple<NodeDirection, NodeDirection> endpointDirections = GetEndpointDirections();
+        protected BaseLinkElement(ProductionGraphViewer graphViewer, BaseLinkElement masterLink) : base(graphViewer, masterLink) {
+            LinkWidth = masterLink.Width;
+        }
 
-			if (endpoints == null || endpointDirections == null)
-				return;
+        // NOTE: link element works in graph coordinates throughout (since Location is 0,0 for it - and it is always owned directly by the graph viewer).
+        // So we don't have to bother with graph to local conversions
+        public override void UpdateVisibility(Rectangle graphZone, int xBorder = 0, int yBorder = 0) {
+            UpdateCurve();
+            Visible =
+                CalculatedBounds.X + CalculatedBounds.Width > graphZone.X - xBorder &&
+                CalculatedBounds.X < graphZone.X + graphZone.Width + xBorder &&
+                CalculatedBounds.Y + CalculatedBounds.Height > graphZone.Y - yBorder &&
+                CalculatedBounds.Y < graphZone.Y + graphZone.Height + yBorder;
+        }
 
-			if (supplierOrigin != endpoints.Item1|| consumerOrigin != endpoints.Item2 || supplierDirection != endpointDirections.Item1 || consumerDirection != endpointDirections.Item2)
-			{
-				supplierOrigin = endpoints.Item1;
-				supplierDirection = endpointDirections.Item1;
-				consumerOrigin = endpoints.Item2;
-				consumerDirection = endpointDirections.Item2;
+        // supplier, consumer
+        protected abstract Tuple<Point, Point> GetCurveEndpoints();
+        // supplier, consumer
+        protected abstract Tuple<NodeDirection, NodeDirection> GetEndpointDirections();
 
-				Type = (supplierDirection != consumerDirection) ? LineType.UShape :
-					((supplierDirection == NodeDirection.Up && consumerOrigin.Y > supplierOrigin.Y) || (supplierDirection == NodeDirection.Down && consumerOrigin.Y < supplierOrigin.Y)) ? LineType.NShape : LineType.Simple;
+        // updates all points & boundaries (important for occluding objects outside view)
+        protected void UpdateCurve() {
+            var endpoints = GetCurveEndpoints();
+            var endpointDirections = GetEndpointDirections();
 
-				switch(Type)
-				{
-					case LineType.Simple: //supplier and consumer directions are same, link direction is regular (consumer is below supplier if direction is up, and above supplier if direction is down)
-						if (supplierDirection == NodeDirection.Up)
-						{
-							supplierPull = new Point(supplierOrigin.X, supplierOrigin.Y -  Math.Max((int)((supplierOrigin.Y - consumerOrigin.Y) / 2), 20));
-							consumerPull = new Point(consumerOrigin.X, consumerOrigin.Y + Math.Max((int)((supplierOrigin.Y - consumerOrigin.Y) / 2), 20));
-						}
-						else
-						{
-							supplierPull = new Point(supplierOrigin.X, supplierOrigin.Y + Math.Max((int)((consumerOrigin.Y - supplierOrigin.Y) / 2), 20));
-							consumerPull = new Point(consumerOrigin.X, consumerOrigin.Y - Math.Max((int)((consumerOrigin.Y - supplierOrigin.Y) / 2), 20));
-						}
+            if (endpoints == null || endpointDirections == null)
+                return;
 
-						CalculatedBounds = new Rectangle(
-							Math.Min(supplierOrigin.X, consumerOrigin.X),
-							Math.Min(supplierOrigin.Y, consumerOrigin.Y),
-							Math.Abs(supplierOrigin.X - consumerOrigin.X),
-							Math.Abs(supplierOrigin.Y - consumerOrigin.Y));
+            if (_supplierOrigin != endpoints.Item1 || _consumerOrigin != endpoints.Item2 || _supplierDirection != endpointDirections.Item1 ||
+                _consumerDirection != endpointDirections.Item2) {
+                _supplierOrigin = endpoints.Item1;
+                _supplierDirection = endpointDirections.Item1;
+                _consumerOrigin = endpoints.Item2;
+                _consumerDirection = endpointDirections.Item2;
 
-						break;
-					case LineType.UShape: //supplier and consumer directions are different
+                Type = _supplierDirection != _consumerDirection ? LineType.UShape :
+                    (_supplierDirection == NodeDirection.Up && _consumerOrigin.Y > _supplierOrigin.Y) ||
+                    (_supplierDirection == NodeDirection.Down && _consumerOrigin.Y < _supplierOrigin.Y) ? LineType.NShape : LineType.Simple;
 
-						int xOffset = Math.Min(circlePull * 2, Math.Abs(consumerOrigin.X - supplierOrigin.X)) * Math.Sign(consumerOrigin.X - supplierOrigin.X) / 2;
-						if(supplierDirection == NodeDirection.Up)
-						{
-							midUA = new Point(supplierOrigin.X, Math.Min(supplierOrigin.Y, consumerOrigin.Y));
-							midUB = new Point(midUA.X + xOffset, midUA.Y - circlePull);
-							midUD = new Point(consumerOrigin.X, midUA.Y);
-							midUC = new Point(midUD.X - xOffset, midUB.Y);
+                switch (Type) {
+                    // supplier and consumer directions are same, link direction is regular
+                    // (consumer is below supplier if direction is up, and above supplier if direction is down)
+                    case LineType.Simple:
+                        if (_supplierDirection == NodeDirection.Up) {
+                            _supplierPull = new Point(_supplierOrigin.X, _supplierOrigin.Y - Math.Max((_supplierOrigin.Y - _consumerOrigin.Y) / 2, 20));
+                            _consumerPull = new Point(_consumerOrigin.X, _consumerOrigin.Y + Math.Max((_supplierOrigin.Y - _consumerOrigin.Y) / 2, 20));
+                        } else {
+                            _supplierPull = new Point(_supplierOrigin.X, _supplierOrigin.Y + Math.Max((_consumerOrigin.Y - _supplierOrigin.Y) / 2, 20));
+                            _consumerPull = new Point(_consumerOrigin.X, _consumerOrigin.Y - Math.Max((_consumerOrigin.Y - _supplierOrigin.Y) / 2, 20));
+                        }
 
-							pullU1 = new Point(supplierOrigin.X, midUA.Y - (circlePull / 2));
-							pullU2 = new Point(supplierOrigin.X + (xOffset / 2), midUB.Y);
-							pullU3 = new Point(consumerOrigin.X - (xOffset / 2), midUB.Y);
-							pullU4 = new Point(consumerOrigin.X, midUD.Y - (circlePull / 2));
-						}
-						else
-						{
-							midUA = new Point(supplierOrigin.X, Math.Max(supplierOrigin.Y, consumerOrigin.Y));
-							midUB = new Point(midUA.X + xOffset, midUA.Y + circlePull);
-							midUD = new Point(consumerOrigin.X, midUA.Y);
-							midUC = new Point(midUD.X - xOffset, midUB.Y);
+                        CalculatedBounds = new Rectangle(
+                            Math.Min(_supplierOrigin.X, _consumerOrigin.X),
+                            Math.Min(_supplierOrigin.Y, _consumerOrigin.Y),
+                            Math.Abs(_supplierOrigin.X - _consumerOrigin.X),
+                            Math.Abs(_supplierOrigin.Y - _consumerOrigin.Y));
 
-							pullU1 = new Point(supplierOrigin.X, midUA.Y + (circlePull / 2));
-							pullU2 = new Point(supplierOrigin.X + (xOffset / 2), midUB.Y);
-							pullU3 = new Point(consumerOrigin.X - (xOffset / 2), midUB.Y);
-							pullU4 = new Point(consumerOrigin.X, midUD.Y + (circlePull / 2));
-						}
+                        break;
 
-						CalculatedBounds = new Rectangle(
-							Math.Min(supplierOrigin.X, consumerOrigin.X),
-							Math.Min(supplierOrigin.Y, consumerOrigin.Y) - (supplierDirection == NodeDirection.Up? circlePull : 0),
-							Math.Abs(supplierOrigin.X - consumerOrigin.X),
-							Math.Abs(supplierOrigin.Y - consumerOrigin.Y) + circlePull);
-						break;
-					case LineType.NShape: //supplier and consumer directions are same, but the link direction is wrong (consumer is above supplier if direction is up, and below supplier if direction is down)
-						int midX = Math.Abs(supplierOrigin.X - consumerOrigin.X) > 2 * circlePull ? (supplierOrigin.X + consumerOrigin.X) / 2 : supplierOrigin.X > consumerOrigin.X ? supplierOrigin.X + (int)(circlePull * 1.5) : supplierOrigin.X - (int)(circlePull * 1.5);
-						int xOffsetA = Math.Min(circlePull * 2, Math.Abs(supplierOrigin.X - midX)) * Math.Sign(midX - supplierOrigin.X) / 2;
-						int xOffsetB = Math.Min(circlePull * 2, Math.Abs(midX - consumerOrigin.X)) * Math.Sign(consumerOrigin.X - midX) / 2;
+                    // supplier and consumer directions are different
+                    case LineType.UShape:
 
-						midNC = new Point(midX, supplierOrigin.Y);
-						midND = new Point(midX, consumerOrigin.Y);
+                        var xOffset = Math.Min(circlePull * 2, Math.Abs(_consumerOrigin.X - _supplierOrigin.X)) *
+                            Math.Sign(_consumerOrigin.X - _supplierOrigin.X) /
+                            2;
+                        if (_supplierDirection == NodeDirection.Up) {
+                            _midUa = new Point(_supplierOrigin.X, Math.Min(_supplierOrigin.Y, _consumerOrigin.Y));
+                            _midUb = new Point(_midUa.X + xOffset, _midUa.Y - circlePull);
+                            _midUd = new Point(_consumerOrigin.X, _midUa.Y);
+                            _midUc = new Point(_midUd.X - xOffset, _midUb.Y);
 
-						if(supplierDirection == NodeDirection.Up)
-						{
-							midNA = new Point(supplierOrigin.X + xOffsetA, supplierOrigin.Y - circlePull);
-							midNB = new Point(midNC.X - xOffsetA, midNA.Y);
+                            _pullU1 = new Point(_supplierOrigin.X, _midUa.Y - circlePull / 2);
+                            _pullU2 = new Point(_supplierOrigin.X + xOffset / 2, _midUb.Y);
+                            _pullU3 = new Point(_consumerOrigin.X - xOffset / 2, _midUb.Y);
+                            _pullU4 = new Point(_consumerOrigin.X, _midUd.Y - circlePull / 2);
+                        } else {
+                            _midUa = new Point(_supplierOrigin.X, Math.Max(_supplierOrigin.Y, _consumerOrigin.Y));
+                            _midUb = new Point(_midUa.X + xOffset, _midUa.Y + circlePull);
+                            _midUd = new Point(_consumerOrigin.X, _midUa.Y);
+                            _midUc = new Point(_midUd.X - xOffset, _midUb.Y);
 
-							midNE = new Point(midND.X + xOffsetB, consumerOrigin.Y + circlePull);
-							midNF = new Point(consumerOrigin.X - xOffsetB, midNE.Y);
+                            _pullU1 = new Point(_supplierOrigin.X, _midUa.Y + circlePull / 2);
+                            _pullU2 = new Point(_supplierOrigin.X + xOffset / 2, _midUb.Y);
+                            _pullU3 = new Point(_consumerOrigin.X - xOffset / 2, _midUb.Y);
+                            _pullU4 = new Point(_consumerOrigin.X, _midUd.Y + circlePull / 2);
+                        }
 
-							pullN1 = new Point(supplierOrigin.X, supplierOrigin.Y - (circlePull / 2));
-							pullN2 = new Point(supplierOrigin.X + (xOffsetA / 2), midNA.Y);
-							pullN3 = new Point(midNC.X - (xOffsetA / 2), midNA.Y);
-							pullN4 = new Point(midNC.X, pullN1.Y);
-							pullN5 = new Point(midNC.X, consumerOrigin.Y + (circlePull / 2));
-							pullN6 = new Point(midNC.X + (xOffsetB / 2), midNE.Y);
-							pullN7 = new Point(consumerOrigin.X - (xOffsetB / 2), midNE.Y);
-							pullN8 = new Point(consumerOrigin.X, pullN5.Y);
-						}
-						else
-						{
-							midNA = new Point(supplierOrigin.X + xOffsetA, supplierOrigin.Y + circlePull);
-							midNB = new Point(midNC.X - xOffsetA, midNA.Y);
+                        CalculatedBounds = new Rectangle(
+                            Math.Min(_supplierOrigin.X, _consumerOrigin.X),
+                            Math.Min(_supplierOrigin.Y, _consumerOrigin.Y) - (_supplierDirection == NodeDirection.Up ? circlePull : 0),
+                            Math.Abs(_supplierOrigin.X - _consumerOrigin.X),
+                            Math.Abs(_supplierOrigin.Y - _consumerOrigin.Y) + circlePull);
+                        break;
 
-							midNE = new Point(midND.X + xOffsetB, consumerOrigin.Y - circlePull);
-							midNF = new Point(consumerOrigin.X - xOffsetB, midNE.Y);
+                    // supplier and consumer directions are same, but the link direction is wrong
+                    // (consumer is above supplier if direction is up, and below supplier if direction is down)
+                    case LineType.NShape:
+                        var midX = Math.Abs(_supplierOrigin.X - _consumerOrigin.X) > 2 * circlePull ? (_supplierOrigin.X + _consumerOrigin.X) / 2 :
+                            _supplierOrigin.X > _consumerOrigin.X ? _supplierOrigin.X + (int) (circlePull * 1.5) : _supplierOrigin.X - (int) (circlePull * 1.5);
+                        var xOffsetA = Math.Min(circlePull * 2, Math.Abs(_supplierOrigin.X - midX)) * Math.Sign(midX - _supplierOrigin.X) / 2;
+                        var xOffsetB = Math.Min(circlePull * 2, Math.Abs(midX - _consumerOrigin.X)) * Math.Sign(_consumerOrigin.X - midX) / 2;
 
-							pullN1 = new Point(supplierOrigin.X, supplierOrigin.Y + (circlePull / 2));
-							pullN2 = new Point(supplierOrigin.X + (xOffsetA / 2), midNA.Y);
-							pullN3 = new Point(midNC.X - (xOffsetA / 2), midNA.Y);
-							pullN4 = new Point(midNC.X, pullN1.Y);
-							pullN5 = new Point(midNC.X, consumerOrigin.Y - (circlePull / 2));
-							pullN6 = new Point(midNC.X + (xOffsetB / 2), midNE.Y);
-							pullN7 = new Point(consumerOrigin.X - (xOffsetB / 2), midNE.Y);
-							pullN8 = new Point(consumerOrigin.X, pullN5.Y);
-						}
+                        _midNc = new Point(midX, _supplierOrigin.Y);
+                        _midNd = new Point(midX, _consumerOrigin.Y);
 
-						CalculatedBounds = new Rectangle(
-							Math.Min(Math.Min(midX, supplierOrigin.X), consumerOrigin.X),
-							Math.Min(supplierOrigin.Y, consumerOrigin.Y) - circlePull,
-							Math.Max(Math.Max(midX, supplierOrigin.X), consumerOrigin.X) - Math.Min(Math.Min(midX, supplierOrigin.X), consumerOrigin.X),
-							Math.Abs(supplierOrigin.Y - consumerOrigin.Y) + (2 * circlePull));
-						break;
-				}
-			}
-		}
-		public override bool ContainsPoint(Point graph_point)
-		{
-			return false;
-		}
+                        if (_supplierDirection == NodeDirection.Up) {
+                            _midNa = new Point(_supplierOrigin.X + xOffsetA, _supplierOrigin.Y - circlePull);
+                            _midNb = new Point(_midNc.X - xOffsetA, _midNa.Y);
 
-		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
-		{
-			iconOnlyDraw = (style == NodeDrawingStyle.IconsOnly);
-			UpdateCurve();
+                            _midNe = new Point(_midNd.X + xOffsetB, _consumerOrigin.Y + circlePull);
+                            _midNf = new Point(_consumerOrigin.X - xOffsetB, _midNe.Y);
 
-			using (Pen pen = new Pen(Item.Item.AverageColor, LinkWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
-			{
-				if (graphViewer.ArrowsOnLinks && !graphViewer.DynamicLinkWidth && !iconOnlyDraw)
-					pen.CustomEndCap = arrowCap;
+                            _pullN1 = new Point(_supplierOrigin.X, _supplierOrigin.Y - circlePull / 2);
+                            _pullN2 = new Point(_supplierOrigin.X + xOffsetA / 2, _midNa.Y);
+                            _pullN3 = new Point(_midNc.X - xOffsetA / 2, _midNa.Y);
+                            _pullN4 = new Point(_midNc.X, _pullN1.Y);
+                            _pullN5 = new Point(_midNc.X, _consumerOrigin.Y + circlePull / 2);
+                            _pullN6 = new Point(_midNc.X + xOffsetB / 2, _midNe.Y);
+                            _pullN7 = new Point(_consumerOrigin.X - xOffsetB / 2, _midNe.Y);
+                            _pullN8 = new Point(_consumerOrigin.X, _pullN5.Y);
+                        } else {
+                            _midNa = new Point(_supplierOrigin.X + xOffsetA, _supplierOrigin.Y + circlePull);
+                            _midNb = new Point(_midNc.X - xOffsetA, _midNa.Y);
 
-				switch(Type)
-				{
-					case LineType.Simple:
-						graphics.DrawBeziers(pen, new Point[]
-						{
-							supplierOrigin,
-							supplierPull,
+                            _midNe = new Point(_midNd.X + xOffsetB, _consumerOrigin.Y - circlePull);
+                            _midNf = new Point(_consumerOrigin.X - xOffsetB, _midNe.Y);
 
-							consumerPull,
-							consumerOrigin
-						});
-						break;
-					case LineType.UShape:
-						graphics.DrawBeziers(pen, new Point[]
-						{
-							supplierOrigin,
-							supplierOrigin,
+                            _pullN1 = new Point(_supplierOrigin.X, _supplierOrigin.Y + circlePull / 2);
+                            _pullN2 = new Point(_supplierOrigin.X + xOffsetA / 2, _midNa.Y);
+                            _pullN3 = new Point(_midNc.X - xOffsetA / 2, _midNa.Y);
+                            _pullN4 = new Point(_midNc.X, _pullN1.Y);
+                            _pullN5 = new Point(_midNc.X, _consumerOrigin.Y - circlePull / 2);
+                            _pullN6 = new Point(_midNc.X + xOffsetB / 2, _midNe.Y);
+                            _pullN7 = new Point(_consumerOrigin.X - xOffsetB / 2, _midNe.Y);
+                            _pullN8 = new Point(_consumerOrigin.X, _pullN5.Y);
+                        }
 
-							midUA,
-							midUA,
-							pullU1,
+                        CalculatedBounds = new Rectangle(
+                            Math.Min(Math.Min(midX, _supplierOrigin.X), _consumerOrigin.X),
+                            Math.Min(_supplierOrigin.Y, _consumerOrigin.Y) - circlePull,
+                            Math.Max(Math.Max(midX, _supplierOrigin.X), _consumerOrigin.X) - Math.Min(Math.Min(midX, _supplierOrigin.X), _consumerOrigin.X),
+                            Math.Abs(_supplierOrigin.Y - _consumerOrigin.Y) + 2 * circlePull);
+                        break;
+                }
+            }
+        }
 
-							pullU2,
-							midUB,
-							midUB,
+        public override bool ContainsPoint(Point graphPoint) {
+            return false;
+        }
 
-							midUC,
-							midUC,
-							pullU3,
+        protected override void Draw(Graphics graphics, NodeDrawingStyle style) {
+            IconOnlyDraw = style == NodeDrawingStyle.IconsOnly;
+            UpdateCurve();
 
-							pullU4,
-							midUD,
-							midUD,
+            using var pen = new Pen(Item.Item.AverageColor, LinkWidth);
 
-							consumerOrigin,
-							consumerOrigin
-						});
-						break;
-					case LineType.NShape:
-						graphics.DrawBeziers(pen, new Point[]
-						{
-							supplierOrigin,
-							pullN1,
+            pen.EndCap = LineCap.Round;
+            pen.StartCap = LineCap.Round;
+            if (GraphViewer.ArrowsOnLinks && !GraphViewer.DynamicLinkWidth && !IconOnlyDraw)
+                pen.CustomEndCap = _arrowCap;
 
-							pullN2,
-							midNA,
-							midNA,
+            switch (Type) {
+                case LineType.Simple:
+                    graphics.DrawBeziers(pen, [
+                        _supplierOrigin,
+                        _supplierPull,
 
-							midNB,
-							midNB,
-							pullN3,
+                        _consumerPull,
+                        _consumerOrigin
+                    ]);
+                    break;
 
-							pullN4,
-							midNC,
-							midNC,
-							
-							midND,
-							midND,
-							pullN5,
+                case LineType.UShape:
+                    graphics.DrawBeziers(pen, [
+                        _supplierOrigin,
+                        _supplierOrigin,
 
-							pullN6,
-							midNE,
-							midNE,
+                        _midUa,
+                        _midUa,
+                        _pullU1,
 
-							midNF,
-							midNF,
-							pullN7,
+                        _pullU2,
+                        _midUb,
+                        _midUb,
 
-							pullN8,
-							consumerOrigin
-						}); ;
-						break;
-				}
-			}
-		}
-	}
+                        _midUc,
+                        _midUc,
+                        _pullU3,
+
+                        _pullU4,
+                        _midUd,
+                        _midUd,
+
+                        _consumerOrigin,
+                        _consumerOrigin
+                    ]);
+                    break;
+
+                case LineType.NShape:
+                    graphics.DrawBeziers(pen, [
+                        _supplierOrigin,
+                        _pullN1,
+
+                        _pullN2,
+                        _midNa,
+                        _midNa,
+
+                        _midNb,
+                        _midNb,
+                        _pullN3,
+
+                        _pullN4,
+                        _midNc,
+                        _midNc,
+
+                        _midNd,
+                        _midNd,
+                        _pullN5,
+
+                        _pullN6,
+                        _midNe,
+                        _midNe,
+
+                        _midNf,
+                        _midNf,
+                        _pullN7,
+
+                        _pullN8,
+                        _consumerOrigin
+                    ]);
+                    break;
+            }
+        }
+    }
 }

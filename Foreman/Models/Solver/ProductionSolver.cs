@@ -1,253 +1,266 @@
-﻿using System;
+﻿using Google.OrTools.LinearSolver;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using Google.OrTools.LinearSolver;
 using System.Diagnostics;
+using System.Linq;
 
-namespace Foreman
-{
-	// A wrapper around Google's Optimization Tools, specifically the Linear Programming library. We
-	// can express a factory as a system of linear constraints, and this library takes care of
-	// solving them for us.
-	//
-	// Google also provides a library for Flow Algorithms which sounds like an appealing and
-	// potentially simpler alternative, though it's not obvious to me that the problem maps exactly.
-	//
-	// https://developers.google.com/optimization/lp/glop
-	public class ProductionSolver
-	{
-		public double LowPriorityMultiplier { get; set; }
+namespace Foreman {
+    // A wrapper around Google's Optimization Tools, specifically the Linear Programming library. We
+    // can express a factory as a system of linear constraints, and this library takes care of
+    // solving them for us.
+    //
+    // Google also provides a library for Flow Algorithms which sounds like an appealing and
+    // potentially simpler alternative, though it's not obvious to me that the problem maps exactly.
+    //
+    // https://developers.google.com/optimization/lp/glop
+    public class ProductionSolver {
+        public double LowPriorityMultiplier { get; set; }
 
-		private double outputObjectiveCoefficient; //we want to maximize the output of each automatic consumer node.
-		private double factoryObjectiveCoefficient; //we want to minimize the number of buildings (of all recipe nodes), but not at the expense of oversupply or errors
+        // we want to maximize the output of each automatic consumer node.
+        private double _outputObjectiveCoefficient;
 
-		private double overflowObjectiveCoefficient; //cost of oversupply needs to be great enough that the solver doesnt choose to 0 all recipe nodes and swallow any produced items as 'oversupply'. This needs to take into account the current nodes output ratios (ex: if item is produced extremely slowly, this value needs to be high enough for the solver not to decide to 0 its use)
-		private double errorObjectiveCoefficient; //errors should be avoided at all cost (if possible)
+        // we want to minimize the number of buildings (of all recipe nodes), but not at the expense of oversupply or errors
+        private double _factoryObjectiveCoefficient;
 
-		public class Solution
-		{
-			public Solution(Dictionary<BaseNode, double> nodes, Dictionary<NodeLink, double> links)
-			{
-				Nodes = nodes;
-				Links = links;
-			}
+        // cost of oversupply needs to be great enough that the solver doesnt choose to 0 all recipe nodes and swallow any produced items as 'oversupply'.
+        // This needs to take into account the current nodes output ratios (ex: if item is produced extremely slowly,
+        // this value needs to be high enough for the solver not to decide to 0 its use)
+        private double _overflowObjectiveCoefficient;
 
-			public Dictionary<BaseNode, double> Nodes { get; private set; }
-			public Dictionary<NodeLink, double> Links { get; private set; }
+        // errors should be avoided at all cost (if possible)
+        private double _errorObjectiveCoefficient;
 
-			public double ActualRate(BaseNode node)
-			{
-				return Nodes[node];
-			}
+        public class Solution(Dictionary<BaseNode, double> nodes, Dictionary<NodeLink, double> links) {
+            public Dictionary<BaseNode, double> Nodes { get; private set; } = nodes;
+            public Dictionary<NodeLink, double> Links { get; private set; } = links;
 
-			public double Throughput(NodeLink link)
-			{
-				return Links[link];
-			}
-		}
+            public double ActualRate(BaseNode node) {
+                return Nodes[node];
+            }
 
-		private Objective objective;
+            public double Throughput(NodeLink link) {
+                return Links[link];
+            }
+        }
 
-		private GoogleSolver solver;
+        private Objective _objective;
 
-		// There is no way to generate a unique string/name for nodes, so instead store a map so they
-		// can be uniquely associated.
-		private Dictionary<object, Variable> allVariables;
+        private GoogleSolver _solver;
 
-		// We only keep track of constraints as we create them for debugging purposes. OrTools
-		// doesn't provide a method for listing all constraints on a solver, which is unfortunate.
+        // There is no way to generate a unique string/name for nodes, so instead store a map so they
+        // can be uniquely associated.
+        private Dictionary<object, Variable> _allVariables;
 
-		// Keep track of nodes as they are added to ensure the solution contains all of them, even if
-		// there are no links.
-		private List<BaseNode> nodes;
+        // We only keep track of constraints as we create them for debugging purposes. OrTools
+        // doesn't provide a method for listing all constraints on a solver, which is unfortunate.
 
-		// Used to ensure uniqueness of variables names
-		private int counter;
+        // Keep track of nodes as they are added to ensure the solution contains all of them, even if
+        // there are no links.
+        private List<BaseNode> _nodes;
 
-		enum LinkType { LINK, ERROR }
-		enum RateType { ACTUAL, ERROR }
+        // Used to ensure uniqueness of variables names
+        private int _counter;
 
-		public ProductionSolver(bool pullOutputNodes, double pullPower, double minRecipeOutRate, double lowPriorityMultiplier) : this(pullOutputNodes, pullPower, 1e-2, 1e-1 / Math.Min(1e-3, minRecipeOutRate), 1e2 / Math.Min(1e-3, minRecipeOutRate), lowPriorityMultiplier) { } //io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock) is enough to produce 120,000 MJ of heat and thus is consumed at around 1/120000 per sec, so the minRecipeOutRate should be 1/120000)
+        enum LinkType {
+            Link,
+            Error
+        }
 
-		public ProductionSolver(bool pullOutputNodes, double outputObjectiveC, double factoryObjectiveC, double overflowObjectiveC, double errorObjectiveC, double lowPriorityMultiplier)
-		{
-			LowPriorityMultiplier = lowPriorityMultiplier;
-			outputObjectiveCoefficient =  pullOutputNodes? outputObjectiveC : 0;
-			factoryObjectiveCoefficient = factoryObjectiveC;
-			overflowObjectiveCoefficient = overflowObjectiveC;
-			errorObjectiveCoefficient = errorObjectiveC;
+        enum RateType {
+            Actual,
+            Error
+        }
 
-			solver = GoogleSolver.Create();
-			objective = solver.Objective();
-			allVariables = new Dictionary<object, Variable>();
-			nodes = new List<BaseNode>();
-		}
+        // io ratio is the maximum output imbalance (ex: 1 deuterium cell (highest nuclear in seablock)
+        // is enough to produce 120,000 MJ of heat and thus is consumed at around 1/120000 per sec, so the minRecipeOutRate should be 1/120000)
+        public ProductionSolver(bool pullOutputNodes, double pullPower, double minRecipeOutRate, double lowPriorityMultiplier) :
+            this(
+                pullOutputNodes,
+                pullPower,
+                1e-2,
+                1e-1 / Math.Min(1e-3, minRecipeOutRate),
+                1e2 / Math.Min(1e-3, minRecipeOutRate),
+                lowPriorityMultiplier
+            ) {
+        }
 
-		public void AddNode(BaseNode node)
-		{
-			Variable nodeRate = variableFor(node);
-			nodes.Add(node);
-		}
+        public ProductionSolver(
+            bool pullOutputNodes,
+            double outputObjectiveC,
+            double factoryObjectiveC,
+            double overflowObjectiveC,
+            double errorObjectiveC,
+            double lowPriorityMultiplier
+        ) {
+            LowPriorityMultiplier = lowPriorityMultiplier;
+            _outputObjectiveCoefficient = pullOutputNodes ? outputObjectiveC : 0;
+            _factoryObjectiveCoefficient = factoryObjectiveC;
+            _overflowObjectiveCoefficient = overflowObjectiveC;
+            _errorObjectiveCoefficient = errorObjectiveC;
 
-		//we want to minimize the number of buildings (so recipe nodes only). For all other nodes we dont care about the rates, since their flows will be dictated by other factors.
-		//this does mean that we prefer paths with least number of buildings, which may mean more source items consumed (ex: a base oil process with speed modules will be prefered over an advanced oil process without speed modules)
-		//however since there is a cost associated with providing those items (through more buildings for resource extraction), this should be OK for most use-cases.
-		public void AddRecipeNode(RecipeNode node, double factoryRateCoefficient)
-		{
-			Variable nodeRate = variableFor(node);
-			nodes.Add(node);
-			objective.SetCoefficient(nodeRate, factoryObjectiveCoefficient * factoryRateCoefficient * (node.LowPriority ? LowPriorityMultiplier : 1));
-		}
+            _solver = GoogleSolver.Create();
+            _objective = _solver.Objective();
+            _allVariables = new Dictionary<object, Variable>();
+            _nodes = [];
+        }
 
-		// Returns null if no optimal solution can be found. Technically GLOP can return non-optimal
-		// solutions, but since I don't have any inputs that generate those I'm opting on the side of
-		// safety by treating those as non-solutions.
-		public Solution Solve()
-		{
-			if (nodes.Count == 0)
-				return new Solution(new Dictionary<BaseNode, double>(), new Dictionary<NodeLink, double>()); //no nodes mean empty solution (no errors)
+        public void AddNode(BaseNode node) {
+            var nodeRate = VariableFor(node);
+            _nodes.Add(node);
+        }
 
-			objective.SetMinimization();
+        // we want to minimize the number of buildings (so recipe nodes only).
+        // For all other nodes we don't care about the rates, since their flows will be dictated by other factors.
+        // this does mean that we prefer paths with the least number of buildings, which may mean more source items consumed
+        // (ex: a base oil process with speed modules will be preferred over an advanced oil process without speed modules)
+        // however since there is a cost associated with providing those items (through more buildings for resource extraction),
+        // this should be OK for most use-cases.
+        public void AddRecipeNode(RecipeNode node, double factoryRateCoefficient) {
+            var nodeRate = VariableFor(node);
+            _nodes.Add(node);
+            _objective.SetCoefficient(nodeRate, _factoryObjectiveCoefficient * factoryRateCoefficient * (node.LowPriority ? LowPriorityMultiplier : 1));
+        }
 
-			//solver.Solve(); //<<---------------------------------- Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
-			//ex: coal liquifaction produces more heavy oil than is required (25->90) -> solution will be found (if it is connected back to itself only), but there will be an over-production of heavy oil.
-			//    Kovarex enrichment produces less Uranium 238 than is required (5->2) -> solution will be 0 (if it is connected back to itself only), as there is no way to satisfy the inputs. In a more complicated case with multiple nodes (instead of one recipe looped back to itself), this can lead to a null-solution (error)
-			if (solver.Solve() != Solver.ResultStatus.OPTIMAL)
-				return null; //error solution -> sets all values to 0 and records the error
+        // Returns null if no optimal solution can be found. Technically GLOP can return non-optimal
+        // solutions, but since I don't have any inputs that generate those I'm opting on the side of
+        // safety by treating those as non-solutions.
+        public Solution Solve() {
+            if (_nodes.Count == 0)
+                // no nodes mean empty solution (no errors)
+                return new Solution(new Dictionary<BaseNode, double>(), new Dictionary<NodeLink, double>());
 
-			Dictionary<BaseNode, double> nodeSolutions = nodes
-				.ToDictionary(x => x, x => solutionFor(Tuple.Create(x, RateType.ACTUAL)));
+            _objective.SetMinimization();
 
-			Dictionary<NodeLink, double> linkSolutions = nodes
-				.SelectMany(x => x.OutputLinks)
-				.ToDictionary(x => x, x => solutionFor(x));
+            // solver.Solve(); //<<---------------------------------- Cyclic recipes with 'not enough provided' can lead to no-solution.
+            // Cyclic recipes with 'extra left' lead to an over-supply (solution found)
+            // ex: coal liquefaction produces more heavy oil than is required (25->90) ->
+            // solution will be found (if it is connected back to itself only), but there will be an over-production of heavy oil.
+            // Kovarex enrichment produces less Uranium 238 than is required (5->2) ->
+            // solution will be 0 (if it is connected back to itself only), as there is no way to satisfy the inputs.
+            // In a more complicated case with multiple nodes (instead of one recipe looped back to itself), this can lead to a null-solution (error)
 
-			return new Solution(nodeSolutions, linkSolutions);
-		}
+            if (_solver.Solve() != Solver.ResultStatus.OPTIMAL)
+                return null; //error solution -> sets all values to 0 and records the error
 
-		// Ensure that the solution has a rate matching desired for this node. Typically there will
-		// one of these on the ultimate output node, though multiple are supported, on any node. If
-		// there is a conflict, a 'best effort' solution will be returned, where some nodes actual
-		// rates will be less than the desired asked for here.
-		public void AddTarget(BaseNode node, double desiredRate)
-		{
-			Variable nodeVar = variableFor(node, RateType.ACTUAL);
-			Variable errorVar = variableFor(node, RateType.ERROR);
+            var nodeSolutions = _nodes
+                .ToDictionary(x => x, x => SolutionFor(Tuple.Create(x, RateType.Actual)));
 
-			// The sum of the rate for this node, plus an error variable, must be equal to
-			// desiredRate. In normal scenarios, the error variable will be zero. In error scenarios the error variable will be +ve non-zero.
-			Constraint constraint = MakeConstraint(desiredRate, desiredRate);
-			constraint.SetCoefficient(nodeVar, 1);
-			constraint.SetCoefficient(errorVar, 1);
+            var linkSolutions = _nodes
+                .SelectMany(x => x.OutputLinks)
+                .ToDictionary(x => x, SolutionFor);
 
-			objective.SetCoefficient(errorVar, errorObjectiveCoefficient);
-		}
+            return new Solution(nodeSolutions, linkSolutions);
+        }
 
-		//we want to maximize the amount of output items, so we add a negative weight to the objective for the given consumer node.
-		//Only done if asked for, and can easily lead to unbound solutions (where due to -ve weighting an 'infinite' amount of output at the expense of 'infinite' number
-		//of factories is considered the 'optimal' solution
-		public void AddOutputObjective(ConsumerNode node)
-		{
-			if(outputObjectiveCoefficient > 0)
-				objective.SetCoefficient(variableFor(node), -outputObjectiveCoefficient);
-		}
+        // Ensure that the solution has a rate matching desired for this node. Typically, there will
+        // one of these on the ultimate output node, though multiple are supported, on any node. If
+        // there is a conflict, a 'best effort' solution will be returned, where some nodes actual
+        // rates will be less than the desired asked for here.
+        public void AddTarget(BaseNode node, double desiredRate) {
+            var nodeVar = VariableFor(node);
+            var errorVar = VariableFor(node, RateType.Error);
 
-		//set the node to be zero (used for passthrough nodes with missing input or output)
-		public void SetZero(PassthroughNode node)
-		{
-			Variable nodeVar = variableFor(node);
-			Constraint constraint = MakeConstraint(0, 0);
-			constraint.SetCoefficient(nodeVar, 1);
-		}
+            // The sum of the rate for this node, plus an error variable, must be equal to
+            // desiredRate. In normal scenarios, the error variable will be zero. In error scenarios the error variable will be +ve non-zero.
 
-		// Constrain a ratio on the output side of a node. This is done for each unique item, and constrains the producted item (based on the node rate) to be equal to the amount of the item transported away by the links
-		// Due to the possibility of an overflow, we introduce an 'overflow' variable here that accounts for any extra items produced that cant be consumed by the nodes above.
-		//	BUT! this is done only for recipe nodes! all other nodes cant have overflows!
-		public void AddOutputRatio(BaseNode node, ItemQualityPair item, IEnumerable<NodeLink> links, double rate)
-		{
-			Debug.Assert(links.All(x => x.SupplierNode == node));
-			AddIORatio(node, item, links, rate, node is RecipeNode || node is SpoilNode || node is PlantNode);
-		}
+            var constraint = MakeConstraint(desiredRate, desiredRate);
+            constraint.SetCoefficient(nodeVar, 1);
+            constraint.SetCoefficient(errorVar, 1);
 
-		// Constrain a ratio on the input side of a node. Done for each unique item, and constrains the consumed item (based on the node rate) to be equal to the amount of the item provided by the links.
-		// unlike with the outputs, we dont have any error/overflow variables here. the numbers MUST equal
-		public void AddInputRatio(BaseNode node, ItemQualityPair item, IEnumerable<NodeLink> links, double rate)
-		{
-			Debug.Assert(links.All(x => x.ConsumerNode == node));
-			AddIORatio(node, item, links, rate, false);
-		}
+            _objective.SetCoefficient(errorVar, _errorObjectiveCoefficient);
+        }
 
-		private void AddIORatio(BaseNode node, ItemQualityPair item, IEnumerable<NodeLink> links, double rate, bool includeErrorVariable)
-		{
-			Constraint constraint = MakeConstraint(0, 0);
-			Variable rateVariable = variableFor(node);
+        //we want to maximize the amount of output items, so we add a negative weight to the objective for the given consumer node.
+        //Only done if asked for, and can easily lead to unbound solutions (where due to -ve weighting an 'infinite' amount of output at the expense of 'infinite' number
+        //of factories is considered the 'optimal' solution
+        public void AddOutputObjective(ConsumerNode node) {
+            if (_outputObjectiveCoefficient > 0)
+                _objective.SetCoefficient(VariableFor(node), -_outputObjectiveCoefficient);
+        }
 
-			constraint.SetCoefficient(rateVariable, rate);
-			foreach (var link in links)
-			{
-				Variable variable = variableFor(link);
-				constraint.SetCoefficient(variable, -1);
-			}
+        //set the node to be zero (used for passthrough nodes with missing input or output)
+        public void SetZero(PassthroughNode node) {
+            var nodeVar = VariableFor(node);
+            var constraint = MakeConstraint(0, 0);
+            constraint.SetCoefficient(nodeVar, 1);
+        }
 
-			if (includeErrorVariable)
-			{
-				Variable errorVariable = VariableForOverflow(node, item);
-				constraint.SetCoefficient(errorVariable, -1);
-				objective.SetCoefficient(errorVariable, overflowObjectiveCoefficient);
-			}
-		}
+        // Constrain a ratio on the output side of a node. This is done for each unique item, and constrains the produced item
+        // (based on the node rate) to be equal to the amount of the item transported away by the links
+        // Due to the possibility of an overflow, we introduce an 'overflow' variable here
+        // that accounts for any extra items produced that cant be consumed by the nodes above.
+        //	BUT! this is done only for recipe nodes! all other nodes cant have overflows!
+        public void AddOutputRatio(BaseNode node, ItemQualityPair item, IEnumerable<NodeLink> links, double rate) {
+            Debug.Assert(links.All(x => x.SupplierNode == node));
+            AddIoRatio(node, item, links, rate, node is RecipeNode or SpoilNode or PlantNode);
+        }
 
-		private Constraint MakeConstraint(double low, double high)
-		{
-			return solver.MakeConstraint(low, high);
-		}
+        // Constrain a ratio on the input side of a node. Done for each unique item, and constrains the consumed item (based on the node rate)
+        // to be equal to the amount of the item provided by the links.
+        // unlike with the outputs, we don't have any error/overflow variables here. the numbers MUST equal
+        public void AddInputRatio(BaseNode node, ItemQualityPair item, IEnumerable<NodeLink> links, double rate) {
+            Debug.Assert(links.All(x => x.ConsumerNode == node));
+            AddIoRatio(node, item, links, rate, false);
+        }
 
-		private Variable variableFor(NodeLink inputLink)
-		{
-			return variableFor(inputLink, makeName("link", "S(" + inputLink.ConsumerNode.NodeID + ")", "C(" + inputLink.ConsumerNode.NodeID + ")", inputLink.Item.ToString()));
-		}
+        private void AddIoRatio(BaseNode node, ItemQualityPair item, IEnumerable<NodeLink> links, double rate, bool includeErrorVariable) {
+            var constraint = MakeConstraint(0, 0);
+            var rateVariable = VariableFor(node);
 
-		private Variable variableFor(BaseNode node, RateType type = RateType.ACTUAL)
-		{
-			return variableFor(Tuple.Create(node, type), makeName("node", type, node.NodeID, node.ToString()));
-		}
+            constraint.SetCoefficient(rateVariable, rate);
+            foreach (var link in links) {
+                var variable = VariableFor(link);
+                constraint.SetCoefficient(variable, -1);
+            }
 
-		private Variable VariableForOverflow(BaseNode node, ItemQualityPair item)
-		{
-			return variableFor(Tuple.Create(node, item), makeName("node-overflow", node.NodeID, node.ToString(), item.ToString()));
-		}
+            if (includeErrorVariable) {
+                var errorVariable = VariableForOverflow(node, item);
+                constraint.SetCoefficient(errorVariable, -1);
+                _objective.SetCoefficient(errorVariable, _overflowObjectiveCoefficient);
+            }
+        }
 
-		private Variable variableFor(object key, string name)
-		{
-			if (allVariables.ContainsKey(key))
-				return allVariables[key];
+        private Constraint MakeConstraint(double low, double high) {
+            return _solver.MakeConstraint(low, high);
+        }
 
-			Variable newVar = solver.MakeNumVar(0.0, double.PositiveInfinity, name + ":" + GetSequence());
-			allVariables[key] = newVar;
-			return newVar;
-		}
+        private Variable VariableFor(NodeLink inputLink) {
+            return VariableFor(inputLink,
+                MakeName("link", "S(" + inputLink.ConsumerNode.NodeId + ")", "C(" + inputLink.ConsumerNode.NodeId + ")", inputLink.Item.ToString()));
+        }
 
-		private double solutionFor(object key)
-		{
-			if (allVariables.ContainsKey(key))
-				return allVariables[key].SolutionValue();
-			return 0.0;
-		}
+        private Variable VariableFor(BaseNode node, RateType type = RateType.Actual) {
+            return VariableFor(Tuple.Create(node, type), MakeName("node", type, node.NodeId, node.ToString()));
+        }
 
-		private int GetSequence()
-		{
-			return this.counter += 1;
-		}
+        private Variable VariableForOverflow(BaseNode node, ItemQualityPair item) {
+            return VariableFor(Tuple.Create(node, item), MakeName("node-overflow", node.NodeId, node.ToString(), item.ToString()));
+        }
 
-        private string makeName(params object[] components)
-        {
+        private Variable VariableFor(object key, string name) {
+            if (_allVariables.TryGetValue(key, out var variableFor))
+                return variableFor;
+
+            var newVar = _solver.MakeNumVar(0.0, double.PositiveInfinity, name + ":" + GetSequence());
+            _allVariables[key] = newVar;
+            return newVar;
+        }
+
+        private double SolutionFor(object key) {
+            return _allVariables.ContainsKey(key) ? _allVariables[key].SolutionValue() : 0.0;
+        }
+
+        private int GetSequence() {
+            return _counter += 1;
+        }
+
+        private string MakeName(params object[] components) {
             return string.Join(":", components).ToLower().Replace(" ", "-");
         }
 
         // A human-readable description of the constraints. Useful for debugging.
-        public override string ToString()
-		{
-			return solver.ToString();
-		}
-	}
+        public override string ToString() {
+            return _solver.ToString();
+        }
+    }
 }

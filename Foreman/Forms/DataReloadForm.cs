@@ -1,73 +1,62 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using System.Windows.Forms;
 
-namespace Foreman
-{
-	public partial class DataLoadForm : Form
-	{
-		private int currentPercent;
-		private string currentText;
+namespace Foreman {
+    public partial class DataLoadForm : Form {
+        private int _currentPercent;
+        private string _currentText;
 
-		private Preset selectedPreset;
-		private DataCache createdDataCache;
+        private Preset _selectedPreset;
+        private DataCache _createdDataCache;
 
-		public DataLoadForm(Preset preset)
-		{
-			currentPercent = 0;
-			currentText = "";
+        public DataLoadForm(Preset preset) {
+            _currentPercent = 0;
+            _currentText = "";
 
-			selectedPreset = preset;
+            _selectedPreset = preset;
 
-			InitializeComponent();
-		}
+            InitializeComponent();
+        }
 
-		private async void ProgressForm_Load(object sender, EventArgs e)
-		{
+        private async void ProgressForm_Load(object sender, EventArgs e) {
 #if DEBUG
-			DateTime startTime = DateTime.Now;
-			//ErrorLogging.LogLine("Init program.");
+            var startTime = DateTime.Now;
+            //ErrorLogging.LogLine("Init program.");
 #endif
-			var progress = new Progress<KeyValuePair<int, string>>(value =>
-			{
-				if (value.Key > currentPercent)
-				{
-					currentPercent = value.Key;
-					progressBar.Value = value.Key;
-				}
-				if (!String.IsNullOrEmpty(value.Value) && value.Value != currentText)
-				{
-					currentText = value.Value;
-					Text = "Preparing Foreman: " + value.Value;
-				}
-			}) as IProgress<KeyValuePair<int, string>>;
+            IProgress<KeyValuePair<int, string>> progress = new Progress<KeyValuePair<int, string>>(value => {
+                if (value.Key > _currentPercent) {
+                    _currentPercent = value.Key;
+                    progressBar.Value = value.Key;
+                }
 
-			createdDataCache = new DataCache(Properties.Settings.Default.UseRecipeBWfilters);
-			try
-			{ 
-				await createdDataCache.LoadAllData(selectedPreset, progress);
-				DialogResult = DialogResult.OK;
-			}
-			catch
-			{
-				createdDataCache = new DataCache(true); //blank data cache in case of error.
-				DialogResult = DialogResult.Abort;
-			}
-			Close();
+                if (!string.IsNullOrEmpty(value.Value) && value.Value != _currentText) {
+                    _currentText = value.Value;
+                    Text = $"Preparing Foreman: {value.Value}";
+                }
+            });
+
+            _createdDataCache = new DataCache(Properties.Settings.Default.UseRecipeBWfilters);
+            try {
+                await _createdDataCache.LoadAllData(_selectedPreset, progress);
+                DialogResult = DialogResult.OK;
+            } catch {
+                // blank data cache in case of error.
+                _createdDataCache = new DataCache(true);
+                DialogResult = DialogResult.Abort;
+            }
+
+            Close();
 
 #if DEBUG
-			TimeSpan diff = DateTime.Now.Subtract(startTime);
-			Console.WriteLine("Load time: " + Math.Round(diff.TotalSeconds, 2) + " seconds.");
-			ErrorLogging.LogLine("Load time: " + Math.Round(diff.TotalSeconds, 2) + " seconds.");
+            var diff = DateTime.Now.Subtract(startTime);
+            Console.WriteLine($"Load time: {Math.Round(diff.TotalSeconds, 2)} seconds.");
+            ErrorLogging.LogLine($"Load time: {Math.Round(diff.TotalSeconds, 2)} seconds.");
 #endif
-		}
+        }
 
-		public DataCache GetDataCache()
-		{
-			return createdDataCache;
-		}
-	}
+        public DataCache GetDataCache() {
+            return _createdDataCache;
+        }
+    }
 }

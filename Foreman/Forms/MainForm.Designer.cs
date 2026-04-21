@@ -1,33 +1,29 @@
-﻿namespace Foreman
-{
-	partial class MainForm
-	{
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+﻿namespace Foreman {
+    partial class MainForm {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing && (components != null))
-			{
-				components.Dispose();
-			}
-			base.Dispose(disposing);
-		}
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
+                components.Dispose();
+            }
 
-		#region Windows Form Designer generated code
+            base.Dispose(disposing);
+        }
 
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.MainLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.GraphViewer = new Foreman.ProductionGraphViewer();
@@ -96,7 +92,7 @@
             this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GraphViewer.IconsOnly = false;
             this.GraphViewer.IconsSize = 32;
-            this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.LOD.Medium;
+            this.GraphViewer.LevelOfDetail = Foreman.ProductionGraphViewer.Lod.Medium;
             this.GraphViewer.Location = new System.Drawing.Point(3, 136);
             this.GraphViewer.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.GraphViewer.MouseDownElement = null;
@@ -167,7 +163,8 @@
             this.HelpButton.AutoSize = true;
             this.HelpButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.HelpButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.HelpButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HelpButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point,
+                ((byte) (0)));
             this.HelpButton.Location = new System.Drawing.Point(164, 62);
             this.HelpButton.Margin = new System.Windows.Forms.Padding(2);
             this.HelpButton.Name = "HelpButton";
@@ -196,7 +193,8 @@
             this.AddItemButton.AutoSize = true;
             this.AddItemButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.AddItemButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddItemButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AddItemButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point,
+                ((byte) (0)));
             this.AddItemButton.Location = new System.Drawing.Point(77, 32);
             this.AddItemButton.Margin = new System.Windows.Forms.Padding(2);
             this.AddItemButton.Name = "AddItemButton";
@@ -211,7 +209,8 @@
             this.AddRecipeButton.AutoSize = true;
             this.AddRecipeButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.AddRecipeButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddRecipeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AddRecipeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point,
+                ((byte) (0)));
             this.AddRecipeButton.Location = new System.Drawing.Point(77, 62);
             this.AddRecipeButton.Margin = new System.Windows.Forms.Padding(2);
             this.AddRecipeButton.Name = "AddRecipeButton";
@@ -361,18 +360,19 @@
             this.MinorGridlinesDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.MinorGridlinesDropDown.FormattingEnabled = true;
             this.MinorGridlinesDropDown.Items.AddRange(new object[] {
-            "none",
-            "1",
-            "2",
-            "4",
-            "8",
-            "16",
-            "32",
-            "64",
-            "128",
-            "256",
-            "512",
-            "1024"});
+                "none",
+                "1",
+                "2",
+                "4",
+                "8",
+                "16",
+                "32",
+                "64",
+                "128",
+                "256",
+                "512",
+                "1024"
+            });
             this.MinorGridlinesDropDown.Location = new System.Drawing.Point(104, 2);
             this.MinorGridlinesDropDown.Margin = new System.Windows.Forms.Padding(2);
             this.MinorGridlinesDropDown.Name = "MinorGridlinesDropDown";
@@ -399,18 +399,19 @@
             this.MajorGridlinesDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.MajorGridlinesDropDown.FormattingEnabled = true;
             this.MajorGridlinesDropDown.Items.AddRange(new object[] {
-            "None",
-            "1",
-            "2",
-            "4",
-            "8",
-            "16",
-            "32",
-            "64",
-            "128",
-            "256",
-            "512",
-            "1024"});
+                "None",
+                "1",
+                "2",
+                "4",
+                "8",
+                "16",
+                "32",
+                "64",
+                "128",
+                "256",
+                "512",
+                "1024"
+            });
             this.MajorGridlinesDropDown.Location = new System.Drawing.Point(104, 27);
             this.MajorGridlinesDropDown.Margin = new System.Windows.Forms.Padding(2);
             this.MajorGridlinesDropDown.Name = "MajorGridlinesDropDown";
@@ -522,7 +523,8 @@
             this.PauseUpdatesCheckbox.AutoSize = true;
             this.GraphOptionsTable.SetColumnSpan(this.PauseUpdatesCheckbox, 2);
             this.PauseUpdatesCheckbox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PauseUpdatesCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PauseUpdatesCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold,
+                System.Drawing.GraphicsUnit.Point, ((byte) (0)));
             this.PauseUpdatesCheckbox.Location = new System.Drawing.Point(3, 73);
             this.PauseUpdatesCheckbox.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.PauseUpdatesCheckbox.Name = "PauseUpdatesCheckbox";
@@ -562,7 +564,7 @@
             this.ClientSize = new System.Drawing.Size(934, 761);
             this.Controls.Add(this.MainLayoutPanel);
             this.DoubleBuffered = true;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = ((System.Drawing.Icon) (resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(950, 400);
             this.Name = "MainForm";
@@ -586,10 +588,10 @@
             this.GraphOptionsTable.ResumeLayout(false);
             this.GraphOptionsTable.PerformLayout();
             this.ResumeLayout(false);
+        }
 
-		}
+        #endregion
 
-		#endregion
         private System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
         private System.Windows.Forms.Button SaveAsGraphButton;
         private System.Windows.Forms.Button LoadGraphButton;
@@ -611,15 +613,14 @@
         private System.Windows.Forms.Button AddItemButton;
         private System.Windows.Forms.Button AddRecipeButton;
         private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TableLayoutPanel MenuTable;
-		private System.Windows.Forms.TableLayoutPanel MenuButtonsTable;
-		private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
-		private System.Windows.Forms.TableLayoutPanel GridlinesTable;
-		private System.Windows.Forms.Button GraphSummaryButton;
-		private System.Windows.Forms.CheckBox IconViewCheckBox;
-		private System.Windows.Forms.Label VersionLabel;
-		private System.Windows.Forms.Button SaveButton;
-		private System.Windows.Forms.Button HelpButton;
-	}
+        private System.Windows.Forms.TableLayoutPanel MenuTable;
+        private System.Windows.Forms.TableLayoutPanel MenuButtonsTable;
+        private System.Windows.Forms.TableLayoutPanel GraphOptionsTable;
+        private System.Windows.Forms.TableLayoutPanel GridlinesTable;
+        private System.Windows.Forms.Button GraphSummaryButton;
+        private System.Windows.Forms.CheckBox IconViewCheckBox;
+        private System.Windows.Forms.Label VersionLabel;
+        private System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.Button HelpButton;
+    }
 }
-

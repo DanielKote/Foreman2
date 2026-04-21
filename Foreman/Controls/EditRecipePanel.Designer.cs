@@ -1,9 +1,7 @@
 ﻿using System.Drawing;
 
-namespace Foreman
-{
-    partial class EditRecipePanel
-    {
+namespace Foreman {
+    partial class EditRecipePanel {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
@@ -13,12 +11,11 @@ namespace Foreman
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -28,8 +25,7 @@ namespace Foreman
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.AutoAssemblersOption = new System.Windows.Forms.RadioButton();
             this.FixedAssemblersOption = new System.Windows.Forms.RadioButton();
             this.AssemblerInfoTable = new System.Windows.Forms.TableLayoutPanel();
@@ -108,8 +104,8 @@ namespace Foreman
             this.QualitySelector = new System.Windows.Forms.ComboBox();
             this.ToolTip = new Foreman.CustomToolTip();
             this.AssemblerInfoTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.NeighbourInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.ExtraProductivityInput)).BeginInit();
             this.MainTable.SuspendLayout();
             this.BeaconTable.SuspendLayout();
             this.BModulesChoicePanel.SuspendLayout();
@@ -117,19 +113,19 @@ namespace Foreman
             this.SelectedBModulesPanel.SuspendLayout();
             this.BeaconChoicePanel.SuspendLayout();
             this.BeaconValuesTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ConstantBeaconInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconCountInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconsPerAssemblerInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedBeaconIcon)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.ConstantBeaconInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.BeaconCountInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.BeaconsPerAssemblerInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.SelectedBeaconIcon)).BeginInit();
             this.AssemblerTable.SuspendLayout();
             this.FuelOptionsPanel.SuspendLayout();
             this.AModulesChoicePanel.SuspendLayout();
             this.AssemblerChoicePanel.SuspendLayout();
             this.SelectedAModulesPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedAssemblerIcon)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedFuelIcon)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.SelectedAssemblerIcon)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.SelectedFuelIcon)).BeginInit();
             this.RateOptionsTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FixedAssemblerInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.FixedAssemblerInput)).BeginInit();
             this.SuspendLayout();
             // 
             // AutoAssemblersOption
@@ -393,10 +389,11 @@ namespace Foreman
             // 
             this.NeighbourInput.DecimalPlaces = 2;
             this.NeighbourInput.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
+                5,
+                0,
+                0,
+                131072
+            });
             this.NeighbourInput.Location = new System.Drawing.Point(243, 98);
             this.NeighbourInput.Name = "NeighbourInput";
             this.NeighbourInput.Size = new System.Drawing.Size(64, 20);
@@ -418,16 +415,18 @@ namespace Foreman
             // ExtraProductivityInput
             // 
             this.ExtraProductivityInput.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
+                10,
+                0,
+                0,
+                0
+            });
             this.ExtraProductivityInput.Location = new System.Drawing.Point(243, 124);
             this.ExtraProductivityInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
+                100000,
+                0,
+                0,
+                0
+            });
             this.ExtraProductivityInput.Name = "ExtraProductivityInput";
             this.ExtraProductivityInput.Size = new System.Drawing.Size(64, 20);
             this.ExtraProductivityInput.TabIndex = 18;
@@ -435,7 +434,7 @@ namespace Foreman
             // AModuleOptionsLabel
             // 
             this.AModuleOptionsLabel.AutoSize = true;
-            this.AModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.AModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.AssemblerTable.SetColumnSpan(this.AModuleOptionsLabel, 2);
             this.AModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AModuleOptionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
@@ -450,7 +449,7 @@ namespace Foreman
             // AModulesLabel
             // 
             this.AModulesLabel.AutoSize = true;
-            this.AModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.AModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.AModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AModulesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.AModulesLabel.Location = new System.Drawing.Point(0, 268);
@@ -477,7 +476,7 @@ namespace Foreman
             // AssemblerTitle
             // 
             this.AssemblerTitle.AutoSize = true;
-            this.AssemblerTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.AssemblerTitle.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.AssemblerTable.SetColumnSpan(this.AssemblerTitle, 2);
             this.AssemblerTitle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AssemblerTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
@@ -512,7 +511,7 @@ namespace Foreman
             // 
             this.BeaconTable.AutoSize = true;
             this.BeaconTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BeaconTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.BeaconTable.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (65)))), ((int) (((byte) (65)))), ((int) (((byte) (65)))));
             this.BeaconTable.ColumnCount = 4;
             this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -744,7 +743,7 @@ namespace Foreman
             // BModulesLabel
             // 
             this.BModulesLabel.AutoSize = true;
-            this.BModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.BModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.BModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BModulesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.BModulesLabel.Location = new System.Drawing.Point(0, 121);
@@ -758,7 +757,7 @@ namespace Foreman
             // BeaconTitle
             // 
             this.BeaconTitle.AutoSize = true;
-            this.BeaconTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.BeaconTitle.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.BeaconTable.SetColumnSpan(this.BeaconTitle, 3);
             this.BeaconTitle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BeaconTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
@@ -773,7 +772,7 @@ namespace Foreman
             // BModuleOptionsLabel
             // 
             this.BModuleOptionsLabel.AutoSize = true;
-            this.BModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.BModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.BeaconTable.SetColumnSpan(this.BModuleOptionsLabel, 3);
             this.BModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BModuleOptionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
@@ -843,10 +842,11 @@ namespace Foreman
             this.ConstantBeaconInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ConstantBeaconInput.Location = new System.Drawing.Point(70, 57);
             this.ConstantBeaconInput.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
+                1000,
+                0,
+                0,
+                0
+            });
             this.ConstantBeaconInput.Name = "ConstantBeaconInput";
             this.ConstantBeaconInput.Size = new System.Drawing.Size(54, 20);
             this.ConstantBeaconInput.TabIndex = 5;
@@ -855,7 +855,8 @@ namespace Foreman
             // 
             this.label8.AutoSize = true;
             this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point,
+                ((byte) (0)));
             this.label8.Location = new System.Drawing.Point(2, 2);
             this.label8.Margin = new System.Windows.Forms.Padding(2);
             this.label8.Name = "label8";
@@ -894,10 +895,11 @@ namespace Foreman
             this.BeaconCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BeaconCountInput.Location = new System.Drawing.Point(70, 3);
             this.BeaconCountInput.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
+                1000,
+                0,
+                0,
+                0
+            });
             this.BeaconCountInput.Name = "BeaconCountInput";
             this.BeaconCountInput.Size = new System.Drawing.Size(54, 20);
             this.BeaconCountInput.TabIndex = 3;
@@ -907,17 +909,18 @@ namespace Foreman
             this.BeaconsPerAssemblerInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BeaconsPerAssemblerInput.Location = new System.Drawing.Point(70, 30);
             this.BeaconsPerAssemblerInput.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
+                1000,
+                0,
+                0,
+                0
+            });
             this.BeaconsPerAssemblerInput.Name = "BeaconsPerAssemblerInput";
             this.BeaconsPerAssemblerInput.Size = new System.Drawing.Size(54, 20);
             this.BeaconsPerAssemblerInput.TabIndex = 4;
             // 
             // SelectedBeaconIcon
             // 
-            this.SelectedBeaconIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.SelectedBeaconIcon.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.SelectedBeaconIcon.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SelectedBeaconIcon.Location = new System.Drawing.Point(434, 0);
             this.SelectedBeaconIcon.Margin = new System.Windows.Forms.Padding(0);
@@ -931,7 +934,7 @@ namespace Foreman
             // 
             this.AssemblerTable.AutoSize = true;
             this.AssemblerTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.AssemblerTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.AssemblerTable.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (65)))), ((int) (((byte) (65)))), ((int) (((byte) (65)))));
             this.AssemblerTable.ColumnCount = 3;
             this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -1000,7 +1003,7 @@ namespace Foreman
             // FuelTitle
             // 
             this.FuelTitle.AutoSize = true;
-            this.FuelTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.FuelTitle.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.AssemblerTable.SetColumnSpan(this.FuelTitle, 2);
             this.FuelTitle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FuelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
@@ -1104,7 +1107,7 @@ namespace Foreman
             // 
             // SelectedAssemblerIcon
             // 
-            this.SelectedAssemblerIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.SelectedAssemblerIcon.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.SelectedAssemblerIcon.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SelectedAssemblerIcon.Location = new System.Drawing.Point(434, 0);
             this.SelectedAssemblerIcon.Margin = new System.Windows.Forms.Padding(0);
@@ -1116,7 +1119,7 @@ namespace Foreman
             // 
             // SelectedFuelIcon
             // 
-            this.SelectedFuelIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.SelectedFuelIcon.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.SelectedFuelIcon.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SelectedFuelIcon.Location = new System.Drawing.Point(434, 188);
             this.SelectedFuelIcon.Margin = new System.Windows.Forms.Padding(0);
@@ -1130,7 +1133,7 @@ namespace Foreman
             // 
             this.RateOptionsTable.AutoSize = true;
             this.RateOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.RateOptionsTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.RateOptionsTable.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (40)))), ((int) (((byte) (40)))), ((int) (((byte) (40)))));
             this.RateOptionsTable.ColumnCount = 5;
             this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -1236,7 +1239,7 @@ namespace Foreman
             // ToolTip
             // 
             this.ToolTip.AutoPopDelay = 100000;
-            this.ToolTip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.ToolTip.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (65)))), ((int) (((byte) (65)))), ((int) (((byte) (65)))));
             this.ToolTip.ForeColor = System.Drawing.Color.White;
             this.ToolTip.InitialDelay = 200;
             this.ToolTip.OwnerDraw = true;
@@ -1257,8 +1260,8 @@ namespace Foreman
             this.Size = new System.Drawing.Size(472, 689);
             this.AssemblerInfoTable.ResumeLayout(false);
             this.AssemblerInfoTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.NeighbourInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.ExtraProductivityInput)).EndInit();
             this.MainTable.ResumeLayout(false);
             this.MainTable.PerformLayout();
             this.BeaconTable.ResumeLayout(false);
@@ -1273,10 +1276,10 @@ namespace Foreman
             this.BeaconChoicePanel.PerformLayout();
             this.BeaconValuesTable.ResumeLayout(false);
             this.BeaconValuesTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ConstantBeaconInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconCountInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconsPerAssemblerInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedBeaconIcon)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.ConstantBeaconInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.BeaconCountInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.BeaconsPerAssemblerInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.SelectedBeaconIcon)).EndInit();
             this.AssemblerTable.ResumeLayout(false);
             this.AssemblerTable.PerformLayout();
             this.FuelOptionsPanel.ResumeLayout(false);
@@ -1287,91 +1290,90 @@ namespace Foreman
             this.AssemblerChoicePanel.PerformLayout();
             this.SelectedAModulesPanel.ResumeLayout(false);
             this.SelectedAModulesPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedAssemblerIcon)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedFuelIcon)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.SelectedAssemblerIcon)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.SelectedFuelIcon)).EndInit();
             this.RateOptionsTable.ResumeLayout(false);
             this.RateOptionsTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FixedAssemblerInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.FixedAssemblerInput)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
 
         public System.Windows.Forms.RadioButton AutoAssemblersOption;
         public System.Windows.Forms.RadioButton FixedAssemblersOption;
-		private System.Windows.Forms.TableLayoutPanel AssemblerInfoTable;
-		private System.Windows.Forms.Label AssemblerPollutionLabel;
-		private System.Windows.Forms.Label AssemblerEnergyTitleLabel;
-		private System.Windows.Forms.Label AssemblerPollutionPercentLabel;
-		private System.Windows.Forms.Label AssemblerSpeedTitleLabel;
-		private System.Windows.Forms.Label AssemblerProductivityPercentLabel;
-		private System.Windows.Forms.Label AssemblerProductivityTitleLabel;
-		private System.Windows.Forms.Label AssemblerSpeedPercentLabel;
-		private System.Windows.Forms.Label AssemblerPollutionTitleLabel;
-		private System.Windows.Forms.Label AssemblerEnergyPercentLabel;
-		private System.Windows.Forms.Label AssemblerEnergyLabel;
-		private System.Windows.Forms.Label AssemblerSpeedLabel;
-		private System.Windows.Forms.Label AModuleOptionsLabel;
-		private System.Windows.Forms.Label AModulesLabel;
-		private System.Windows.Forms.Label AssemblerRateLabel;
-		private System.Windows.Forms.Label AssemblerTitle;
-		private System.Windows.Forms.TableLayoutPanel AssemblerTable;
-		private System.Windows.Forms.Panel AModulesChoicePanel;
-		private System.Windows.Forms.TableLayoutPanel AModulesChoiceTable;
-		private System.Windows.Forms.Panel AssemblerChoicePanel;
-		private System.Windows.Forms.TableLayoutPanel AssemblerChoiceTable;
-		private System.Windows.Forms.TableLayoutPanel MainTable;
-		private System.Windows.Forms.TableLayoutPanel BeaconTable;
-		private System.Windows.Forms.Panel BModulesChoicePanel;
-		private System.Windows.Forms.TableLayoutPanel BModulesChoiceTable;
-		private System.Windows.Forms.Panel SelectedBModulesPanel;
-		private System.Windows.Forms.TableLayoutPanel SelectedBModulesTable;
-		private System.Windows.Forms.Label BeaconTitle;
-		private System.Windows.Forms.Panel BeaconChoicePanel;
-		private System.Windows.Forms.TableLayoutPanel BeaconChoiceTable;
-		private System.Windows.Forms.Label BModulesLabel;
-		private System.Windows.Forms.Label BModuleOptionsLabel;
-		private System.Windows.Forms.TableLayoutPanel BeaconInfoTable;
-		private System.Windows.Forms.Label label14;
-		private System.Windows.Forms.Label TotalBeaconsLabel;
-		private System.Windows.Forms.Label label16;
-		private System.Windows.Forms.Label BeaconEfficiencyLabel;
-		private System.Windows.Forms.Label label18;
-		private System.Windows.Forms.Label BeaconModuleCountLabel;
-		private System.Windows.Forms.Label label20;
-		private System.Windows.Forms.Label BeaconEnergyLabel;
-		private System.Windows.Forms.TableLayoutPanel RateOptionsTable;
-		private System.Windows.Forms.TableLayoutPanel BeaconValuesTable;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.Label label10;
-		private CustomToolTip ToolTip;
-		private System.Windows.Forms.Panel FuelOptionsPanel;
-		private System.Windows.Forms.TableLayoutPanel FuelOptionsTable;
-		private System.Windows.Forms.Label FuelTitle;
-		private System.Windows.Forms.Panel SelectedAModulesPanel;
-		private System.Windows.Forms.TableLayoutPanel SelectedAModulesTable;
-		private System.Windows.Forms.PictureBox SelectedAssemblerIcon;
-		private System.Windows.Forms.PictureBox SelectedFuelIcon;
-		private System.Windows.Forms.PictureBox SelectedBeaconIcon;
-		private System.Windows.Forms.Label NeighboursLabel;
-		private System.Windows.Forms.NumericUpDown NeighbourInput;
-		private System.Windows.Forms.NumericUpDown ConstantBeaconInput;
-		private System.Windows.Forms.NumericUpDown BeaconCountInput;
-		private System.Windows.Forms.NumericUpDown BeaconsPerAssemblerInput;
-		private System.Windows.Forms.NumericUpDown FixedAssemblerInput;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label TotalBeaconEnergyLabel;
-		private System.Windows.Forms.Label GeneratorTemperatureLabel;
-		private System.Windows.Forms.Label GeneratorTemperatureRangeLabel;
-		private System.Windows.Forms.Label ExtraProductivityLabel;
-		private System.Windows.Forms.NumericUpDown ExtraProductivityInput;
-		private System.Windows.Forms.CheckBox LowPriorityCheckBox;
-		private System.Windows.Forms.CheckBox KeyNodeCheckBox;
-		private System.Windows.Forms.TextBox KeyNodeTitleInput;
-		private System.Windows.Forms.Label KeyNodeTitleLabel;
+        private System.Windows.Forms.TableLayoutPanel AssemblerInfoTable;
+        private System.Windows.Forms.Label AssemblerPollutionLabel;
+        private System.Windows.Forms.Label AssemblerEnergyTitleLabel;
+        private System.Windows.Forms.Label AssemblerPollutionPercentLabel;
+        private System.Windows.Forms.Label AssemblerSpeedTitleLabel;
+        private System.Windows.Forms.Label AssemblerProductivityPercentLabel;
+        private System.Windows.Forms.Label AssemblerProductivityTitleLabel;
+        private System.Windows.Forms.Label AssemblerSpeedPercentLabel;
+        private System.Windows.Forms.Label AssemblerPollutionTitleLabel;
+        private System.Windows.Forms.Label AssemblerEnergyPercentLabel;
+        private System.Windows.Forms.Label AssemblerEnergyLabel;
+        private System.Windows.Forms.Label AssemblerSpeedLabel;
+        private System.Windows.Forms.Label AModuleOptionsLabel;
+        private System.Windows.Forms.Label AModulesLabel;
+        private System.Windows.Forms.Label AssemblerRateLabel;
+        private System.Windows.Forms.Label AssemblerTitle;
+        private System.Windows.Forms.TableLayoutPanel AssemblerTable;
+        private System.Windows.Forms.Panel AModulesChoicePanel;
+        private System.Windows.Forms.TableLayoutPanel AModulesChoiceTable;
+        private System.Windows.Forms.Panel AssemblerChoicePanel;
+        private System.Windows.Forms.TableLayoutPanel AssemblerChoiceTable;
+        private System.Windows.Forms.TableLayoutPanel MainTable;
+        private System.Windows.Forms.TableLayoutPanel BeaconTable;
+        private System.Windows.Forms.Panel BModulesChoicePanel;
+        private System.Windows.Forms.TableLayoutPanel BModulesChoiceTable;
+        private System.Windows.Forms.Panel SelectedBModulesPanel;
+        private System.Windows.Forms.TableLayoutPanel SelectedBModulesTable;
+        private System.Windows.Forms.Label BeaconTitle;
+        private System.Windows.Forms.Panel BeaconChoicePanel;
+        private System.Windows.Forms.TableLayoutPanel BeaconChoiceTable;
+        private System.Windows.Forms.Label BModulesLabel;
+        private System.Windows.Forms.Label BModuleOptionsLabel;
+        private System.Windows.Forms.TableLayoutPanel BeaconInfoTable;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label TotalBeaconsLabel;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label BeaconEfficiencyLabel;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label BeaconModuleCountLabel;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label BeaconEnergyLabel;
+        private System.Windows.Forms.TableLayoutPanel RateOptionsTable;
+        private System.Windows.Forms.TableLayoutPanel BeaconValuesTable;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private CustomToolTip ToolTip;
+        private System.Windows.Forms.Panel FuelOptionsPanel;
+        private System.Windows.Forms.TableLayoutPanel FuelOptionsTable;
+        private System.Windows.Forms.Label FuelTitle;
+        private System.Windows.Forms.Panel SelectedAModulesPanel;
+        private System.Windows.Forms.TableLayoutPanel SelectedAModulesTable;
+        private System.Windows.Forms.PictureBox SelectedAssemblerIcon;
+        private System.Windows.Forms.PictureBox SelectedFuelIcon;
+        private System.Windows.Forms.PictureBox SelectedBeaconIcon;
+        private System.Windows.Forms.Label NeighboursLabel;
+        private System.Windows.Forms.NumericUpDown NeighbourInput;
+        private System.Windows.Forms.NumericUpDown ConstantBeaconInput;
+        private System.Windows.Forms.NumericUpDown BeaconCountInput;
+        private System.Windows.Forms.NumericUpDown BeaconsPerAssemblerInput;
+        private System.Windows.Forms.NumericUpDown FixedAssemblerInput;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label TotalBeaconEnergyLabel;
+        private System.Windows.Forms.Label GeneratorTemperatureLabel;
+        private System.Windows.Forms.Label GeneratorTemperatureRangeLabel;
+        private System.Windows.Forms.Label ExtraProductivityLabel;
+        private System.Windows.Forms.NumericUpDown ExtraProductivityInput;
+        private System.Windows.Forms.CheckBox LowPriorityCheckBox;
+        private System.Windows.Forms.CheckBox KeyNodeCheckBox;
+        private System.Windows.Forms.TextBox KeyNodeTitleInput;
+        private System.Windows.Forms.Label KeyNodeTitleLabel;
         private System.Windows.Forms.Label AssemblerQualityPercentLabel;
         private System.Windows.Forms.Label AssemblerQualityTitleLabel;
         private System.Windows.Forms.Label QualitySelectorLabel;

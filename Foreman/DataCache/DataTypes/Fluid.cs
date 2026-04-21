@@ -1,69 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Foreman
-{
-	public interface Fluid : Item
-	{
-		bool IsTemperatureDependent { get; }
-		double DefaultTemperature { get; }
-		double SpecificHeatCapacity { get; }
-		double GasTemperature { get; }
-		double MaxTemperature { get; }
+namespace Foreman;
 
-		string GetTemperatureRangeFriendlyName(fRange tempRange);
-		string GetTemperatureFriendlyName(double temperature);
-	}
+public interface Fluid : Item {
+    bool IsTemperatureDependent { get; }
+    double DefaultTemperature { get; }
+    double SpecificHeatCapacity { get; }
+    double GasTemperature { get; }
+    double MaxTemperature { get; }
 
-	public class FluidPrototype : ItemPrototype, Fluid
-	{
-		public bool IsTemperatureDependent { get; internal set; } //true if not all recipes can accept each other (ex: fluid produced in R1 is at 10*c, and is required to be at 20+*c as ingredient at R2)
-		public double DefaultTemperature { get; internal set; }
-		public double SpecificHeatCapacity { get; internal set; }
-		public double GasTemperature { get; internal set; }
-		public double MaxTemperature { get; internal set; }
+    string GetTemperatureRangeFriendlyName(FRange tempRange);
+    string GetTemperatureFriendlyName(double temperature);
+}
 
-		public FluidPrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, subgroup, order, isMissing)
-		{
-			IsTemperatureDependent = false;
-			DefaultTemperature = 0;
-			SpecificHeatCapacity = 0;
-			GasTemperature = 0;
-			MaxTemperature = 0;
-		}
+public class FluidPrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false)
+    : ItemPrototype(dCache, name, friendlyName, subgroup, order, isMissing), Fluid {
+    // true if not all recipes can accept each other
+    // (ex: fluid produced in R1 is at 10*c, and is required to be at 20+*c as ingredient at R2)
+    public bool IsTemperatureDependent { get; internal set; }
 
-		public string GetTemperatureRangeFriendlyName(fRange tempRange)
-		{
-			if (tempRange.Ignore)
-				return FriendlyName;
+    public double DefaultTemperature { get; internal set; }
+    public double SpecificHeatCapacity { get; internal set; }
+    public double GasTemperature { get; internal set; }
+    public double MaxTemperature { get; internal set; }
 
-			string name = FriendlyName;
-			bool includeMin = tempRange.Min >= double.MinValue;
-			bool includeMax = tempRange.Max <= double.MaxValue;
+    public string GetTemperatureRangeFriendlyName(FRange tempRange) {
+        if (tempRange.Ignore)
+            return FriendlyName;
 
-			if (tempRange.Min == tempRange.Max)
-				name += string.Format(" ({0}°c)", tempRange.Min.ToString("0"));
-			else if (includeMin && includeMax)
-				name += string.Format(" ({0}-{1}°c)", tempRange.Min.ToString("0"), tempRange.Max.ToString("0"));
-			else if (includeMin)
-				name += string.Format(" (min {0}°c)", tempRange.Min.ToString("0"));
-			else if (includeMax)
-				name += string.Format(" (max {0}°c)", tempRange.Max.ToString("0"));
-			else
-				name += "(any°)";
+        var name = FriendlyName;
+        var includeMin = tempRange.Min >= double.MinValue;
+        var includeMax = tempRange.Max <= double.MaxValue;
 
-			return name;
-		}
+        if (Math.Abs(tempRange.Min - tempRange.Max) < double.Epsilon)
+            name += $" ({tempRange.Min:0}°c)";
+        else if (includeMin && includeMax)
+            name += $" ({tempRange.Min:0}-{tempRange.Max:0}°c)";
+        else if (includeMin)
+            name += $" (min {tempRange.Min:0}°c)";
+        else if (includeMax)
+            name += $" (max {tempRange.Max:0}°c)";
+        else
+            name += "(any°)";
 
-		public string GetTemperatureFriendlyName(double temperature)
-		{
-			return string.Format("{0} ({1}°c)", FriendlyName, temperature.ToString("0"));
-		}
+        return name;
+    }
+
+    public string GetTemperatureFriendlyName(double temperature) {
+        return $"{FriendlyName} ({temperature:0}°c)";
+    }
 
 
-		public override string ToString() { return string.Format("Item: {0}", Name); }
-	}
+    public override string ToString() {
+        return $"Item: {Name}";
+    }
 }

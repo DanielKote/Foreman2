@@ -1,19 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 
-namespace Foreman
-{
-    public interface Quality : DataObjectBase
-    {
+namespace Foreman {
+    public interface Quality : DataObjectBase {
         Quality NextQuality { get; }
         Quality PrevQuality { get; }
         double NextProbability { get; }
 
         bool IsMissing { get; }
 
-        int Level { get; } //'power' of the quality
+        // 'power' of the quality
+        int Level { get; }
         double BeaconPowerMultiplier { get; }
         double MiningDrillResourceDrainMultiplier { get; }
 
@@ -21,8 +17,7 @@ namespace Foreman
         IReadOnlyList<IReadOnlyList<Item>> MyUnlockSciencePacks { get; }
     }
 
-    public class QualityPrototype : DataObjectBasePrototype, Quality
-    {
+    public class QualityPrototype : DataObjectBasePrototype, Quality {
         public Quality NextQuality { get; internal set; }
         public Quality PrevQuality { get; internal set; }
         public double NextProbability { get; set; }
@@ -33,13 +28,14 @@ namespace Foreman
         public double BeaconPowerMultiplier { get; set; }
         public double MiningDrillResourceDrainMultiplier { get; set; }
 
-        public IReadOnlyCollection<Technology> MyUnlockTechnologies { get { return myUnlockTechnologies; } }
+        public IReadOnlyCollection<Technology> MyUnlockTechnologies => myUnlockTechnologies;
+
         public IReadOnlyList<IReadOnlyList<Item>> MyUnlockSciencePacks { get; set; }
 
         internal HashSet<TechnologyPrototype> myUnlockTechnologies { get; private set; }
 
-        public QualityPrototype(DataCache dCache, string name, string friendlyName, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
-        {
+        public QualityPrototype(DataCache dCache, string name, string friendlyName, string order, bool isMissing = false) : base(dCache, name, friendlyName,
+            order) {
             Enabled = true;
             IsMissing = isMissing;
 
@@ -51,10 +47,12 @@ namespace Foreman
             BeaconPowerMultiplier = 1;
             MiningDrillResourceDrainMultiplier = 1;
 
-            myUnlockTechnologies = new HashSet<TechnologyPrototype>();
+            myUnlockTechnologies = [];
             MyUnlockSciencePacks = new List<List<Item>>();
         }
 
-        public override string ToString() { return string.Format("Quality T{0}: {1}", Level, Name); }
+        public override string ToString() {
+            return $"Quality T{Level}: {Name}";
+        }
     }
 }

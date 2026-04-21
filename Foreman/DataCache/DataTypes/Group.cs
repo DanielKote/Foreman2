@@ -1,58 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
-namespace Foreman
-{
-	public interface Group : DataObjectBase
-	{
-		IReadOnlyList<Subgroup> Subgroups { get; }
-	}
+namespace Foreman {
+    public interface Group : DataObjectBase {
+        IReadOnlyList<Subgroup> Subgroups { get; }
+    }
 
-	public interface Subgroup : DataObjectBase
-	{
-		Group MyGroup { get; }
-		IReadOnlyList<Recipe> Recipes { get; }
-		IReadOnlyList<Item> Items { get; }
-	}
+    public interface Subgroup : DataObjectBase {
+        Group MyGroup { get; }
+        IReadOnlyList<Recipe> Recipes { get; }
+        IReadOnlyList<Item> Items { get; }
+    }
 
 
-	public class GroupPrototype : DataObjectBasePrototype, Group
-	{
-		public IReadOnlyList<Subgroup> Subgroups { get { return subgroups; } }
+    public class GroupPrototype(DataCache dCache, string name, string lname, string order) :
+        DataObjectBasePrototype(dCache, name, lname, order), Group {
+        public IReadOnlyList<Subgroup> Subgroups => subgroups;
 
-		internal List<SubgroupPrototype> subgroups;
+        internal List<SubgroupPrototype> subgroups = [];
 
-		public GroupPrototype(DataCache dCache, string name, string lname, string order) : base(dCache, name, lname, order)
-		{
-			subgroups = new List<SubgroupPrototype>();
-		}
+        // sort them by their order string
+        public void SortSubgroups() {
+            subgroups.Sort();
+        }
 
-		public void SortSubgroups() { subgroups.Sort(); } //sort them by their order string
+        public override string ToString() {
+            return $"Group: {Name}";
+        }
+    }
 
-		public override string ToString() { return String.Format("Group: {0}", Name); }
-	}
+    public class SubgroupPrototype(DataCache dCache, string name, string order) :
+        DataObjectBasePrototype(dCache, name, name, order), Subgroup {
+        public Group MyGroup => myGroup;
 
-	public class SubgroupPrototype : DataObjectBasePrototype, Subgroup
-	{
-		public Group MyGroup { get { return myGroup; } }
+        public IReadOnlyList<Recipe> Recipes => recipes;
 
-		public IReadOnlyList<Recipe> Recipes { get { return recipes; } }
-		public IReadOnlyList<Item> Items { get { return items; } }
+        public IReadOnlyList<Item> Items => items;
 
-		internal GroupPrototype myGroup;
+        internal GroupPrototype myGroup;
 
-		internal List<RecipePrototype> recipes;
-		internal List<ItemPrototype> items;
+        internal List<RecipePrototype> recipes = [];
+        internal List<ItemPrototype> items = [];
 
-		public SubgroupPrototype(DataCache dCache, string name, string order) : base(dCache, name, name, order)
-		{
-			recipes = new List<RecipePrototype>();
-			items = new List<ItemPrototype>();
-		}
+        // sort them by their order string
+        public void SortIRs() {
+            recipes.Sort();
+            items.Sort();
+        }
 
-		public void SortIRs() { recipes.Sort(); items.Sort(); } //sort them by their order string
-
-		public override string ToString() { return String.Format("Subgroup: {0}", Name); }
-	}
+        public override string ToString() {
+            return $"Subgroup: {Name}";
+        }
+    }
 }

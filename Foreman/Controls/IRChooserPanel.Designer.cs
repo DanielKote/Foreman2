@@ -1,8 +1,5 @@
-﻿
-namespace Foreman
-{
-    partial class IRChooserPanel
-    {
+﻿namespace Foreman {
+    partial class IrChooserPanel {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
@@ -12,12 +9,11 @@ namespace Foreman
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -27,8 +23,7 @@ namespace Foreman
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
             this.OtherNodeOptionsBTable = new System.Windows.Forms.TableLayoutPanel();
             this.AddSpoilButton = new System.Windows.Forms.Button();
@@ -359,7 +354,8 @@ namespace Foreman
             // 
             this.QualityLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.QualityLabel.AutoSize = true;
-            this.QualityLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.QualityLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point,
+                ((byte) (0)));
             this.QualityLabel.Location = new System.Drawing.Point(30, 6);
             this.QualityLabel.Name = "QualityLabel";
             this.QualityLabel.Size = new System.Drawing.Size(47, 15);
@@ -502,7 +498,7 @@ namespace Foreman
             this.Controls.Add(this.MainTable);
             this.DoubleBuffered = true;
             this.Margin = new System.Windows.Forms.Padding(1);
-            this.Name = "IRChooserPanel";
+            this.Name = "IrChooserPanel";
             this.Size = new System.Drawing.Size(287, 412);
             this.Leave += new System.EventHandler(this.IRChooserPanel_Leave);
             this.MainTable.ResumeLayout(false);
@@ -520,7 +516,6 @@ namespace Foreman
             this.IRTable.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
@@ -535,15 +530,15 @@ namespace Foreman
         protected System.Windows.Forms.Panel ItemIconPanel;
         protected System.Windows.Forms.Label FilterLabel;
         protected System.Windows.Forms.CheckBox RecipeNameOnlyFilterCheckBox;
-		protected System.Windows.Forms.TableLayoutPanel OtherNodeOptionsATable;
-		protected System.Windows.Forms.Button AddSupplyButton;
-		protected System.Windows.Forms.Button AddPassthroughButton;
-		protected System.Windows.Forms.Button AddConsumerButton;
-		protected System.Windows.Forms.TableLayoutPanel IRTable;
-		protected System.Windows.Forms.TableLayoutPanel GroupTable;
-		private System.Windows.Forms.TableLayoutPanel TopOptionsTable;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-		protected System.Windows.Forms.CheckBox AsFuelCheckBox;
+        protected System.Windows.Forms.TableLayoutPanel OtherNodeOptionsATable;
+        protected System.Windows.Forms.Button AddSupplyButton;
+        protected System.Windows.Forms.Button AddPassthroughButton;
+        protected System.Windows.Forms.Button AddConsumerButton;
+        protected System.Windows.Forms.TableLayoutPanel IRTable;
+        protected System.Windows.Forms.TableLayoutPanel GroupTable;
+        private System.Windows.Forms.TableLayoutPanel TopOptionsTable;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        protected System.Windows.Forms.CheckBox AsFuelCheckBox;
         protected System.Windows.Forms.TableLayoutPanel OtherNodeOptionsBTable;
         protected System.Windows.Forms.Button AddSpoilButton;
         protected System.Windows.Forms.Button AddPlantButton;

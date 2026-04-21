@@ -1,32 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman
-{
-	static class ControlExtensions
-	{
-		static public void UIThread(this Control control, Action code)
-		{
-			if (control.InvokeRequired)
-			{
-				control.BeginInvoke(code);
-				return;
-			}
-			code.Invoke();
-		}
+namespace Foreman {
+    static class ControlExtensions {
+        public static void UiThread(this Control control, Action code) {
+            if (control.InvokeRequired) {
+                control.BeginInvoke(code);
+                return;
+            }
 
-		static public void UIThreadInvoke(this Control control, Action code)
-		{
-			if (control.InvokeRequired)
-			{
-				control.Invoke(code);
-				return;
-			}
-			code.Invoke();
-		}
-	}
+            code.Invoke();
+        }
+
+        public static void UiThreadInvoke(this Control control, Action code) {
+            if (control.InvokeRequired) {
+                control.Invoke(code);
+                return;
+            }
+
+            code.Invoke();
+        }
+    }
 }
