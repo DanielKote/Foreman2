@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -42,7 +41,8 @@ namespace Foreman {
             try {
                 await createdDataCache.LoadAllData(selectedPreset, progress);
                 DialogResult = DialogResult.OK;
-            } catch {
+            } catch (Exception ex) {
+                ErrorLogging.LogException(ex, string.Format("Failed to load preset '{0}'", selectedPreset.Name));
                 createdDataCache = new DataCache(true); //blank data cache in case of error.
                 DialogResult = DialogResult.Abort;
             }

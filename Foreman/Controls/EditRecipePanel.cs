@@ -1,4 +1,5 @@
-﻿using Google.OrTools.LinearSolver;
+﻿using Foreman.Graph;
+using Google.OrTools.LinearSolver;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,16 +28,16 @@ namespace Foreman {
         private readonly ProductionGraphViewer myGraphViewer;
         private readonly DataCache panelCache;
         private readonly RecipeNodeController nodeController;
-        private readonly ReadOnlyRecipeNode nodeData;
+        private readonly IRecipeNodeViewModel nodeData;
 
         private double RateMultiplier { get { return myGraphViewer.Graph.GetRateMultipler(); } }
         private string RateName { get { return myGraphViewer.Graph.GetRateName(); } }
 
         private List<Quality> qualitySelectorIndexSet;
 
-        public EditRecipePanel(ReadOnlyRecipeNode node, ProductionGraphViewer graphViewer) {
+        public EditRecipePanel(IRecipeNodeViewModel node, ProductionGraphViewer graphViewer) {
             nodeData = node;
-            if (graphViewer.Graph.RequestNodeController(node) is not RecipeNodeController controller)
+            if (graphViewer.Session.Editor.RequestNodeController(node.Id) is not RecipeNodeController controller)
                 throw new InvalidOperationException("Recipe node has no controller.");
             nodeController = controller;
             myGraphViewer = graphViewer;

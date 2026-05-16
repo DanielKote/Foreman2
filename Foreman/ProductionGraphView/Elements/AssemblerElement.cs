@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.Graph;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -27,10 +28,11 @@ namespace Foreman {
         private static readonly Brush textBrush = Brushes.Black;
         private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Near };
 
-        private readonly ReadOnlyRecipeNode DisplayedNode;
+        private IRecipeNodeViewModel RecipeViewModel => (IRecipeNodeViewModel)parent.ViewModel;
+        private readonly RecipeNodeElement parent;
 
         public AssemblerElement(ProductionGraphViewer graphViewer, RecipeNodeElement parent) : base(graphViewer, parent) {
-            DisplayedNode = (ReadOnlyRecipeNode)parent.DisplayedNode;
+            this.parent = parent;
 
             Width = AssemblerIconSize + (ModuleSpacing * 2) + 2;
             Height = AssemblerIconSize;
@@ -48,34 +50,34 @@ namespace Foreman {
             //graphics.DrawRectangle(devPen, trans.X, trans.Y, Width, Height);
 
             //assembler
-            if (DisplayedNode.SelectedAssembler.Icon is not null)
-                graphics.DrawImage(DisplayedNode.SelectedAssembler.Icon, trans.X + ModuleSpacing * 2 + 2, trans.Y, AssemblerIconSize, AssemblerIconSize);
+            if (RecipeViewModel.SelectedAssembler.Icon is not null)
+                graphics.DrawImage(RecipeViewModel.SelectedAssembler.Icon, trans.X + ModuleSpacing * 2 + 2, trans.Y, AssemblerIconSize, AssemblerIconSize);
 
             //modules
-            if (DisplayedNode.AssemblerModules.Count <= 6) {
-                for (int i = 0; i < moduleLocations.Length && i < DisplayedNode.AssemblerModules.Count; i++)
-                    if (DisplayedNode.AssemblerModules[i].Icon is Bitmap icon)
+            if (RecipeViewModel.AssemblerModules.Count <= 6) {
+                for (int i = 0; i < moduleLocations.Length && i < RecipeViewModel.AssemblerModules.Count; i++)
+                    if (RecipeViewModel.AssemblerModules[i].Icon is Bitmap icon)
                         graphics.DrawImage(icon, trans.X + moduleLocations[i].X + moduleOffset.X, trans.Y + moduleLocations[i].Y + moduleOffset.Y, ModuleIconSize, ModuleIconSize);
-            } else if (DisplayedNode.AssemblerModules.Count <= 4 * 7) //resot to drawing circles for each module instead -> 4x7 set, so max 28 modules shown
+            } else if (RecipeViewModel.AssemblerModules.Count <= 4 * 7) //resot to drawing circles for each module instead -> 4x7 set, so max 28 modules shown
               {
                 for (int x = 0; x < 4; x++) {
                     for (int y = 0; y < 7; y++) {
-                        if (DisplayedNode.AssemblerModules.Count > (x * 7) + y) {
-                            Pen marker = DisplayedNode.AssemblerModules[(x * 7) + y].Module.GetProductivityBonus() > 0 ? prodModulePen :
-                                DisplayedNode.AssemblerModules[(x * 7) + y].Module.GetQualityBonus() > 0 ? qualityModulePen :
-                                DisplayedNode.AssemblerModules[(x * 7) + y].Module.GetConsumptionBonus() < 0 ? effModulePen :
-                                DisplayedNode.AssemblerModules[(x * 7) + y].Module.GetSpeedBonus() > 0 ? speedModulePen :
+                        if (RecipeViewModel.AssemblerModules.Count > (x * 7) + y) {
+                            Pen marker = RecipeViewModel.AssemblerModules[(x * 7) + y].Module.GetProductivityBonus() > 0 ? prodModulePen :
+                                RecipeViewModel.AssemblerModules[(x * 7) + y].Module.GetQualityBonus() > 0 ? qualityModulePen :
+                                RecipeViewModel.AssemblerModules[(x * 7) + y].Module.GetConsumptionBonus() < 0 ? effModulePen :
+                                RecipeViewModel.AssemblerModules[(x * 7) + y].Module.GetSpeedBonus() > 0 ? speedModulePen :
                                 unknownModulePen;
                             graphics.DrawEllipse(marker, trans.X + moduleOffset.X + ModuleSpacing + ModuleIconSize - 3 - (x * 7), trans.Y + moduleOffset.Y + (y * 7), 3, 3);
                         }
                     }
                 }
             } else {
-                int prodModules = DisplayedNode.AssemblerModules.Count(m => m.Module.GetProductivityBonus() > 0);
-                int qualityModules = DisplayedNode.AssemblerModules.Count(m => m.Module.GetQualityBonus() > 0 && m.Module.GetProductivityBonus() <= 0);
-                int efficiencyModules = DisplayedNode.AssemblerModules.Count(m => m.Module.GetConsumptionBonus() < 0 && m.Module.GetProductivityBonus() <= 0 && m.Module.GetQualityBonus() <= 0);
-                int speedModules = DisplayedNode.AssemblerModules.Count(m => m.Module.GetSpeedBonus() > 0 && m.Module.GetConsumptionBonus() >= 0 && m.Module.GetProductivityBonus() <= 0 && m.Module.GetQualityBonus() <= 0);
-                int unknownModules = DisplayedNode.AssemblerModules.Count - prodModules - efficiencyModules - speedModules - qualityModules;
+                int prodModules = RecipeViewModel.AssemblerModules.Count(m => m.Module.GetProductivityBonus() > 0);
+                int qualityModules = RecipeViewModel.AssemblerModules.Count(m => m.Module.GetQualityBonus() > 0 && m.Module.GetProductivityBonus() <= 0);
+                int efficiencyModules = RecipeViewModel.AssemblerModules.Count(m => m.Module.GetConsumptionBonus() < 0 && m.Module.GetProductivityBonus() <= 0 && m.Module.GetQualityBonus() <= 0);
+                int speedModules = RecipeViewModel.AssemblerModules.Count(m => m.Module.GetSpeedBonus() > 0 && m.Module.GetConsumptionBonus() >= 0 && m.Module.GetProductivityBonus() <= 0 && m.Module.GetQualityBonus() <= 0);
+                int unknownModules = RecipeViewModel.AssemblerModules.Count - prodModules - efficiencyModules - speedModules - qualityModules;
                 graphics.DrawString(string.Format("S:{0}", speedModules), moduleFont, Brushes.DarkBlue, trans.X, trans.Y + 10);
                 graphics.DrawString(string.Format("E:{0}", efficiencyModules), moduleFont, Brushes.DarkGreen, trans.X, trans.Y + 20);
                 graphics.DrawString(string.Format("P:{0}", prodModules), moduleFont, Brushes.DarkRed, trans.X, trans.Y + 30);
@@ -86,21 +88,22 @@ namespace Foreman {
             //assembler info + quantity
             int parentHalfWidth = myParent is RecipeNodeElement recipeParent ? recipeParent.Width : Width;
             Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 10, (parentHalfWidth / 2) - this.X - (this.Width / 2) - 6, 30);
-            if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && (DisplayedNode.SelectedAssembler.Assembler.EntityType == EntityType.Assembler || DisplayedNode.SelectedAssembler.Assembler.EntityType == EntityType.Miner || DisplayedNode.SelectedAssembler.Assembler.EntityType == EntityType.OffshorePump)) {
+            if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && (RecipeViewModel.SelectedAssembler.Assembler.EntityType == EntityType.Assembler || RecipeViewModel.SelectedAssembler.Assembler.EntityType == EntityType.Miner || RecipeViewModel.SelectedAssembler.Assembler.EntityType == EntityType.OffshorePump)) {
                 //info text
-                if (DisplayedNode.GetQualityMultiplier() > 0) {
+                if (RecipeViewModel.GetQualityMultiplier() > 0) {
                     graphics.DrawString("Speed:\nProd:\nPower:\nQuality:", infoFont, textBrush, trans.X + Width + 2, trans.Y);
-                    graphics.DrawString(string.Format("{0:+0%; -0%; 0%}\n{1:+0%; -0%; 0%}\n{2:+0%; -0%; 0%}\n{3:+0%; -0%; 0%}", (DisplayedNode.GetSpeedMultiplier() - 1), (DisplayedNode.GetProductivityMultiplier() - 1), (DisplayedNode.GetConsumptionMultiplier() - 1), DisplayedNode.GetQualityMultiplier()), infoFont, textBrush, trans.X + Width + 26, trans.Y);
+                    graphics.DrawString(string.Format("{0:+0%; -0%; 0%}\n{1:+0%; -0%; 0%}\n{2:+0%; -0%; 0%}\n{3:+0%; -0%; 0%}", (RecipeViewModel.GetSpeedMultiplier() - 1), (RecipeViewModel.GetProductivityMultiplier() - 1), (RecipeViewModel.GetConsumptionMultiplier() - 1), RecipeViewModel.GetQualityMultiplier()), infoFont, textBrush, trans.X + Width + 26, trans.Y);
                 } else {
                     graphics.DrawString("Speed:\nProd:\nPower:", infoFont, textBrush, trans.X + Width + 2, trans.Y);
-                    graphics.DrawString(string.Format("{0:+0%; -0%; 0%}\n{1:+0%; -0%; 0%}\n{2:+0%; -0%; 0%}", (DisplayedNode.GetSpeedMultiplier() - 1), (DisplayedNode.GetProductivityMultiplier() - 1), (DisplayedNode.GetConsumptionMultiplier() - 1)), infoFont, textBrush, trans.X + Width + 26, trans.Y);
+                    graphics.DrawString(string.Format("{0:+0%; -0%; 0%}\n{1:+0%; -0%; 0%}\n{2:+0%; -0%; 0%}", (RecipeViewModel.GetSpeedMultiplier() - 1), (RecipeViewModel.GetProductivityMultiplier() - 1), (RecipeViewModel.GetConsumptionMultiplier() - 1)), infoFont, textBrush, trans.X + Width + 26, trans.Y);
                 }
 
                 textbox.Y = trans.Y + 28;
-            } else if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && DisplayedNode.SelectedAssembler.Assembler.EntityType == EntityType.Generator) {
+            } else if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.High && RecipeViewModel.SelectedAssembler.Assembler.EntityType == EntityType.Generator) {
                 //info text
                 graphics.DrawString("Power:", infoFont, textBrush, trans.X + Width, trans.Y + 10);
-                graphics.DrawString(string.Format("{0:P0}", DisplayedNode.GetGeneratorEffectivity()), infoFont, textBrush, trans.X + Width + 26, trans.Y + 10);
+                double generatorEffectivity = RecipeViewModel.GetGeneratorEffectivity();
+                graphics.DrawString(string.Format("{0:P0}", generatorEffectivity), infoFont, textBrush, trans.X + Width + 26, trans.Y + 10);
 
                 textbox.Y = trans.Y + 24;
             }
@@ -108,10 +111,10 @@ namespace Foreman {
             //quantity
             //graphics.DrawRectangle(devPen, textbox);
             string text = "x";
-            if (DisplayedNode.SelectedAssembler.Assembler.IsMissing)
+            if (RecipeViewModel.SelectedAssembler.Assembler.IsMissing)
                 text += "---";
             else
-                text += BuildingQuantityToText(DisplayedNode.ActualSetValue);
+                text += BuildingQuantityToText(RecipeViewModel.ActualSetValue);
 
             GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
         }
@@ -123,15 +126,15 @@ namespace Foreman {
             List<TooltipInfo> tooltips = [];
 
             Point localPoint = Point.Add(GraphToLocal(graph_point), new Size(Width / 2, Height / 2));
-            if (localPoint.X < (ModuleSpacing * 2) + 2 && DisplayedNode.AssemblerModules.Count > 0) //over modules
+            if (localPoint.X < (ModuleSpacing * 2) + 2 && RecipeViewModel.AssemblerModules.Count > 0) //over modules
             {
                 TooltipInfo tti = new TooltipInfo();
                 tti.Direction = Direction.Down;
-                tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(1 + (DisplayedNode.AssemblerModules.Count > 3 ? DisplayedNode.AssemblerModules.Count > 6 ? ModuleSpacing * 3 / 2 : ModuleSpacing : ModuleSpacing * 3 / 2) - (Width / 2), -Height / 2)));
+                tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(1 + (RecipeViewModel.AssemblerModules.Count > 3 ? RecipeViewModel.AssemblerModules.Count > 6 ? ModuleSpacing * 3 / 2 : ModuleSpacing : ModuleSpacing * 3 / 2) - (Width / 2), -Height / 2)));
                 tti.Text = "Assembler Modules:";
 
                 Dictionary<ModuleQualityPair, int> moduleCounter = new Dictionary<ModuleQualityPair, int>();
-                foreach (ModuleQualityPair m in DisplayedNode.AssemblerModules) {
+                foreach (ModuleQualityPair m in RecipeViewModel.AssemblerModules) {
                     if (moduleCounter.ContainsKey(m))
                         moduleCounter[m]++;
                     else
@@ -146,7 +149,7 @@ namespace Foreman {
                 TooltipInfo tti = new TooltipInfo();
                 tti.Direction = Direction.Down;
                 tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point((ModuleSpacing * 2) + 2 + (AssemblerIconSize / 2) - (Width / 2), -Height / 2)));
-                tti.Text = DisplayedNode.SelectedAssembler.FriendlyName ?? "";
+                tti.Text = RecipeViewModel.SelectedAssembler.FriendlyName ?? "";
                 tooltips.Add(tti);
             }
 

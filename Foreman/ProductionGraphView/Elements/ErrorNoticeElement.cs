@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.Graph;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -12,10 +13,10 @@ namespace Foreman {
         private const int ErrorIconSize = 24;
         private static readonly Bitmap errorIcon = IconCache.GetIcon(Path.Combine("Graphics", "ErrorIcon.png"), 64);
 
-        private readonly ReadOnlyBaseNode DisplayedNode;
+        private readonly INodeViewModel NodeViewModel;
 
         public ErrorNoticeElement(ProductionGraphViewer graphViewer, BaseNodeElement parent) : base(graphViewer, parent) {
-            DisplayedNode = parent.DisplayedNode;
+            NodeViewModel = parent.ViewModel;
             Width = ErrorIconSize;
             Height = ErrorIconSize;
         }
@@ -37,12 +38,12 @@ namespace Foreman {
                 return null;
 
             List<string>? text;
-            switch (DisplayedNode.State) {
+            switch (NodeViewModel.State) {
                 case NodeState.Error:
-                    text = DisplayedNode.GetErrors();
+                    text = NodeViewModel.GetErrors();
                     break;
                 case NodeState.Warning:
-                    text = DisplayedNode.GetWarnings();
+                    text = NodeViewModel.GetWarnings();
                     break;
                 case NodeState.Clean:
                 default:
@@ -75,9 +76,9 @@ namespace Foreman {
             Dictionary<string, Action>? resolutions;
             if (myParent is not BaseNodeElement parentNode)
                 return;
-            if (graphViewer.Graph.RequestNodeController(DisplayedNode) is not BaseNodeController nodeController)
+            if (graphViewer.Session.Editor.RequestNodeController(NodeViewModel.Id) is not BaseNodeController nodeController)
                 return;
-            switch (parentNode.DisplayedNode.State) {
+            switch (parentNode.ViewModel.State) {
                 case NodeState.Error:
                     resolutions = nodeController.GetErrorResolutions();
                     break;

@@ -1,18 +1,19 @@
-﻿using System;
+﻿using Foreman.Graph;
+using System;
 using System.Windows.Forms;
 
 namespace Foreman {
     public partial class EditFlowPanel : UserControl {
         private readonly ProductionGraphViewer myGraphViewer;
         private readonly BaseNodeController nodeController;
-        private readonly ReadOnlyBaseNode nodeData;
+        private readonly INodeViewModel nodeData;
 
-        public EditFlowPanel(ReadOnlyBaseNode node, ProductionGraphViewer graphViewer) {
+        public EditFlowPanel(INodeViewModel node, ProductionGraphViewer graphViewer) {
             InitializeComponent();
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 
             nodeData = node;
-            if (graphViewer.Graph.RequestNodeController(node) is not BaseNodeController controller)
+            if (graphViewer.Session.Editor.RequestNodeController(node.Id) is not BaseNodeController controller)
                 throw new InvalidOperationException("Node has no controller.");
             nodeController = controller;
             myGraphViewer = graphViewer;
@@ -20,7 +21,7 @@ namespace Foreman {
             RateLabel.Text = node.SetValueDescription;
             FixedFlowInput.Maximum = (decimal)(node.MaxDesiredSetValue * graphViewer.Graph.GetRateMultipler());
 
-            if (node is ReadOnlyPassthroughNode pNode) {
+            if (node is IPassthroughNodeViewModel pNode) {
                 SimplePassthroughNodesCheckBox.Checked = pNode.SimpleDraw;
                 SimplePassthroughNodesCheckBox.Visible = true;
             }

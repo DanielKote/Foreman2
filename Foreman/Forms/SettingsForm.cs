@@ -332,9 +332,9 @@ namespace Foreman {
             if (PresetListBox.SelectedItem is Preset selectedPreset && selectedPreset.IsCurrentlySelected && !selectedPreset.IsDefaultPreset) //safety check - should always pass
             {
                 if (MessageBox.Show("Are you sure you wish to delete the \"" + selectedPreset.Name + "\" preset? This is irreversible.", "Confirm Delete", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                    string jsonPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".pjson" });
-                    string customjsonPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".json" });
-                    string iconPath = Path.Combine(new string[] { Application.StartupPath, "Presets", selectedPreset.Name + ".dat" });
+                    string jsonPath = PresetProcessor.GetPresetPath(selectedPreset.Name, ".pjson");
+                    string customjsonPath = PresetProcessor.GetPresetPath(selectedPreset.Name, ".json");
+                    string iconPath = PresetProcessor.GetPresetPath(selectedPreset.Name, ".dat");
 
                     if (File.Exists(jsonPath))
                         File.Delete(jsonPath);

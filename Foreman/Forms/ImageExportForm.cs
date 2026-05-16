@@ -76,8 +76,8 @@ namespace Foreman {
                         image.Save(fileTextBox.Text, ImageFormat.Png);
                         Close();
                     } catch (Exception exception) {
-                        MessageBox.Show("Error saving image: " + exception.Message);
-                        ErrorLogging.LogLine("Error saving image: " + exception.ToString());
+                        MessageBox.Show("Error saving image. See log for more details.");
+                        ErrorLogging.LogException(exception, "Error saving image");
                     }
                 }
             }

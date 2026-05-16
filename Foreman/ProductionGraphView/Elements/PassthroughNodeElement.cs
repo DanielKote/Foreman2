@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.Graph;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,27 +12,25 @@ namespace Foreman {
         protected override Brush CleanBgBrush { get { return passthroughBGBrush; } }
         private static Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(200, 200, 200));
 
-        private string ItemName => DisplayedNode.PassthroughItem.FriendlyName ?? "";
+        private IPassthroughNodeViewModel PassthroughViewModel => (IPassthroughNodeViewModel)ViewModel;
+        private string ItemName => PassthroughViewModel.PassthroughItem.FriendlyName ?? "";
 
-        private new readonly ReadOnlyPassthroughNode DisplayedNode;
-
-        public PassthroughNodeElement(ProductionGraphViewer graphViewer, ReadOnlyPassthroughNode node) : base(graphViewer, node) {
+        public PassthroughNodeElement(ProductionGraphViewer graphViewer, IPassthroughNodeViewModel viewModel) : base(graphViewer, viewModel) {
             Width = PassthroughNodeWidth;
             Height = BaseSimpleHeight;
-            DisplayedNode = node;
         }
 
         protected override Bitmap? NodeIcon() => null;
 
         protected override void Draw(Graphics graphics, NodeDrawingStyle style) {
-            if (style != NodeDrawingStyle.IconsOnly && DisplayedNode.SimpleDraw && DisplayedNode.RateType == RateType.Auto && !DisplayedNode.KeyNode && !DisplayedNode.IsOverproducing() && !DisplayedNode.ManualRateNotMet() && DisplayedNode.InputLinks.Any() && DisplayedNode.OutputLinks.Any()) {
+            if (style != NodeDrawingStyle.IconsOnly && PassthroughViewModel.SimpleDraw && PassthroughViewModel.RateType == RateType.Auto && !PassthroughViewModel.KeyNode && !PassthroughViewModel.IsOverproducing() && !PassthroughViewModel.ManualRateNotMet() && PassthroughViewModel.InputLinks.Any() && PassthroughViewModel.OutputLinks.Any()) {
                 InputTabs[0].HideItemTab = true;
                 OutputTabs[0].HideItemTab = true;
 
-                float maxLineWidth = DisplayedNode.InputLinks.Concat(DisplayedNode.OutputLinks).Select(l => graphViewer.LinkElementDictionary[l].LinkWidth).Max();
+                float maxLineWidth = PassthroughViewModel.InputLinks.Concat(PassthroughViewModel.OutputLinks).Select(l => graphViewer.GetLinkElement(l.Id)?.LinkWidth ?? 0).Max();
                 Point inputPoint = InputTabs[0].GetConnectionPoint();
                 Point outputPoint = OutputTabs[0].GetConnectionPoint();
-                if (DisplayedNode.PassthroughItem.Item is not Item passthroughItem)
+                if (PassthroughViewModel.PassthroughItem.Item is not Item passthroughItem)
                     return;
                 using (Pen pen = new Pen(passthroughItem.AverageColor, maxLineWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
                     graphics.DrawLine(pen, inputPoint, outputPoint);
@@ -52,39 +51,28 @@ namespace Foreman {
         }
 
         protected override void DetailsDraw(Graphics graphics, Point trans) {
-            if (DisplayedNode.RateType == RateType.Manual) {
-                int yoffset = DisplayedNode.NodeDirection == NodeDirection.Up ? 28 : 32;
+            if (PassthroughViewModel.RateType == RateType.Manual) {
+                int yoffset = PassthroughViewModel.NodeDirection == NodeDirection.Up ? 28 : 32;
                 Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 18);
                 Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 18, titleSlot.Width, 20);
                 //graphics.DrawRectangle(devPen, textSlot);
                 //graphics.DrawRectangle(devPen, titleSlot);
 
                 graphics.DrawString("-Limit-", TitleFont, TextBrush, titleSlot, TitleFormat);
-                GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.DoubleToString(DisplayedNode.DesiredRate), BaseFont, textSlot);
+                GraphicsStuff.DrawText(graphics, TextBrush, TextFormat, GraphicsStuff.DoubleToString(PassthroughViewModel.DesiredRate), BaseFont, textSlot);
             }
         }
 
-        protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive) {
-            List<TooltipInfo> tooltips = new List<TooltipInfo>();
-
-            if (exclusive) {
-                TooltipInfo helpToolTipInfo = new TooltipInfo();
-                helpToolTipInfo.Text = string.Format("Left click on this node to edit the throughput of {0}.\nRight click for options.", ItemName);
-                helpToolTipInfo.Direction = Direction.None;
-                helpToolTipInfo.ScreenLocation = new Point(10, 10);
-                tooltips.Add(helpToolTipInfo);
-            }
-
-            return tooltips;
-        }
+        protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive) =>
+            ExclusiveHelpTooltip(string.Format("Left click on this node to edit the throughput of {0}.\nRight click for options.", ItemName), exclusive);
 
         protected override void AddRClickMenuOptions(bool nodeInSelection) {
             RightClickMenu.Items.Add(new ToolStripSeparator());
-            if (DisplayedNode.SimpleDraw) {
+            if (PassthroughViewModel.SimpleDraw) {
                 RightClickMenu.Items.Add(new ToolStripMenuItem("Dont simple-draw node", null,
                     new EventHandler((o, e) => {
                         RightClickMenu.Close();
-                        if (graphViewer.Graph.RequestNodeController(DisplayedNode) is PassthroughNodeController passthroughController)
+                        if (graphViewer.Session.Editor.RequestNodeController(PassthroughViewModel.Id) is PassthroughNodeController passthroughController)
                             passthroughController.SetSimpleDraw(false);
                         graphViewer.Invalidate();
                     })));
@@ -100,7 +88,7 @@ namespace Foreman {
                 RightClickMenu.Items.Add(new ToolStripMenuItem("Simple-draw node", null,
                     new EventHandler((o, e) => {
                         RightClickMenu.Close();
-                        if (graphViewer.Graph.RequestNodeController(DisplayedNode) is PassthroughNodeController passthroughController)
+                        if (graphViewer.Session.Editor.RequestNodeController(PassthroughViewModel.Id) is PassthroughNodeController passthroughController)
                             passthroughController.SetSimpleDraw(true);
                         graphViewer.Invalidate();
                     })));

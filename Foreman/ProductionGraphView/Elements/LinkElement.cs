@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.Graph;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,17 +7,17 @@ using System.Linq;
 
 namespace Foreman {
     public class LinkElement : BaseLinkElement {
-        public ReadOnlyNodeLink DisplayedLink { get; private set; }
-        public override ItemQualityPair Item { get { return DisplayedLink.Item; } protected set { } }
+        public INodeLinkViewModel ViewModel { get; private set; }
+        public override ItemQualityPair Item { get { return ViewModel.Item; } protected set { } }
 
         public ItemTabElement SupplierTab { get; protected set; }
         public ItemTabElement ConsumerTab { get; protected set; }
 
-        public LinkElement(ProductionGraphViewer graphViewer, ReadOnlyNodeLink displayedLink, BaseNodeElement supplierElement, BaseNodeElement consumerElement) : base(graphViewer) {
+        public LinkElement(ProductionGraphViewer graphViewer, INodeLinkViewModel viewModel, BaseNodeElement supplierElement, BaseNodeElement consumerElement) : base(graphViewer) {
             if (supplierElement == null || consumerElement == null)
                 Trace.Fail("Link element being created with one of the connected elements being null!");
 
-            DisplayedLink = displayedLink;
+            ViewModel = viewModel;
             SupplierElement = supplierElement;
             ConsumerElement = consumerElement;
             ItemTabElement? supplierTab = supplierElement.GetOutputLineItemTab(Item);
@@ -38,7 +39,7 @@ namespace Foreman {
         protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections() {
             if (SupplierElement is null || ConsumerElement is null)
                 throw new InvalidOperationException("Link element is missing a connected node.");
-            return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+            return new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, ConsumerElement.ViewModel.NodeDirection);
         }
     }
 }

@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -119,60 +117,32 @@ namespace Foreman {
                     modsPath = Path.Combine(userDataPath ?? "", "mods");
                     if (!Directory.Exists(modsPath))
                         Directory.CreateDirectory(modsPath);
-                    Directory.CreateDirectory(Path.Combine(modsPath, "foremansavereader_2.0.0"));
                     try {
-
-                        File.Copy(Path.Combine(new string[] { "Mods", "foremansavereader_2.0.0", "info.json" }), Path.Combine(new string[] { modsPath, "foremansavereader_2.0.0", "info.json" }), true);
-                        File.Copy(Path.Combine(new string[] { "Mods", "foremansavereader_2.0.0", "instrument-control.lua" }), Path.Combine(new string[] { modsPath, "foremansavereader_2.0.0", "instrument-control.lua" }), true);
-                    } catch {
+                        FactorioBundledModHelper.CopyToModsFolder("foremansavereader_2.0.0", modsPath, "info.json", "instrument-control.lua");
+                    } catch (Exception ex) {
                         MessageBox.Show("could not copy foreman save reader mod files (Mods/foremansavereader_2.0.0/) to the factorio mods folder. Reinstall foreman?");
-                        ErrorLogging.LogLine("copying of foreman save reader mod files failed.");
+                        ErrorLogging.LogException(ex, "copying of foreman save reader mod files failed");
                         return DialogResult.Abort;
                     }
 
-                    //ensure that the foreman save reader mod is correctly added to the mod-list and is enabled
-                    string modListPath = Path.Combine(modsPath, "mod-list.json");
-                    JObject? modlist = null;
-                    if (!File.Exists(modListPath))
-                        modlist = new JObject();
-                    else
-                        modlist = JObject.Parse(File.ReadAllText(modListPath));
-                    if (modlist["mods"] == null)
-                        modlist.Add("mods", new JArray());
+                    FactorioModListHelper.SetModState(modsPath, "foremansavereader", enabled: true);
 
-                    var foremansavereaderModToken = modlist["mods"]?.FirstOrDefault(t => (string?)t["name"] == "foremansavereader");
-                    if (foremansavereaderModToken == null)
-                        ((JArray?)modlist["mods"])?.Add(new JObject() { { "name", "foremansavereader" }, { "enabled", true } });
-                    else
-                        foremansavereaderModToken["enabled"] = true;
-                    File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented));
-
-                    //open the map with factorio and read the save file info (mods, technology, recipes)
-                    Process process = new Process();
-                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    process.StartInfo.FileName = factorioPath;
-                    process.StartInfo.Arguments = string.Format("--instrument-mod foremansavereader --benchmark \"{0}\" --benchmark-ticks 1 --benchmark-runs 1", Path.GetFileName(saveFilePath));
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.RedirectStandardInput = true;
-                    process.Start();
-                    string resultString = "";
-                    while (!process.HasExited) {
-                        resultString += process.StandardOutput.ReadToEnd();
-                        if (token.IsCancellationRequested) {
-                            process.Close();
+                    string resultString = FactorioBenchmarkRunner.Run(
+                        factorioPath,
+                        string.Format("--instrument-mod foremansavereader --benchmark \"{0}\" --benchmark-ticks 1 --benchmark-runs 1", Path.GetFileName(saveFilePath)),
+                        token,
+                        () => {
                             if (Directory.Exists(Path.Combine(modsPath, "foremansavereader_2.0.0")))
                                 Directory.Delete(Path.Combine(modsPath, "foremansavereader_2.0.0"), true);
-                            return DialogResult.Cancel;
-                        }
-                        Thread.Sleep(100);
-                    }
+                        });
+
+                    if (string.IsNullOrEmpty(resultString) && token.IsCancellationRequested)
+                        return DialogResult.Cancel;
 
                     if (Directory.Exists(Path.Combine(modsPath, "foremansavereader_2.0.0")))
                         Directory.Delete(Path.Combine(modsPath, "foremansavereader_2.0.0"), true);
 
-                    if (resultString.IndexOf("Is another instance already running?") != -1) {
+                    if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
                         MessageBox.Show("File read could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment...");
                         return DialogResult.Cancel;
                     } else if (resultString.IndexOf("<<<END-EXPORT-P0>>>") == -1) {
@@ -185,25 +155,26 @@ namespace Foreman {
                     //parse output
                     string exportString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P0>>>") + 23);
                     exportString = exportString.Substring(0, exportString.IndexOf("<<<END-EXPORT-P0>>>") - 1);
-                    JObject export = JObject.Parse(exportString);
+                    JsonObject export = PresetJson.ParseObject(exportString);
 
                     SaveFileInfo = new SaveFileInfo();
-                    foreach (var objJToken in export["mods"]?.AsEnumerable() ?? [])
-                        if ((string?)objJToken["name"] is string name && (string?)objJToken["version"] is string version)
+                    foreach (JsonNode objJToken in PresetJson.EnumerateArray(export, "mods"))
+                        if (PresetJson.GetString(objJToken, "name") is string name && PresetJson.GetString(objJToken, "version") is string version)
                             SaveFileInfo.Mods.Add(name, version);
-                    foreach (var objJToken in export["technologies"]?.AsEnumerable() ?? [])
-                        if ((string?)objJToken["name"] is string name && (bool?)objJToken["enabled"] is bool enabled)
+                    foreach (JsonNode objJToken in PresetJson.EnumerateArray(export, "technologies"))
+                        if (PresetJson.GetString(objJToken, "name") is string name && PresetJson.GetBool(objJToken, "enabled") is bool enabled)
                             SaveFileInfo.Technologies.Add(name, enabled);
-                    foreach (var objJToken in export["recipes"]?.AsEnumerable() ?? [])
-                        if ((string?)objJToken["name"] is string name && (bool?)objJToken["enabled"] is bool enabled)
+                    foreach (JsonNode objJToken in PresetJson.EnumerateArray(export, "recipes"))
+                        if (PresetJson.GetString(objJToken, "name") is string name && PresetJson.GetBool(objJToken, "enabled") is bool enabled)
                             SaveFileInfo.Recipes.Add(name, enabled);
 
                     Properties.Settings.Default.LastSaveFileLocation = Path.GetDirectoryName(saveFilePath);
                     Properties.Settings.Default.Save();
                     return DialogResult.OK;
-                } catch {
-                    if (!string.IsNullOrEmpty(modsPath) && Directory.Exists(Path.Combine(modsPath, "foremanexport_2.0.0")))
-                        Directory.Delete(Path.Combine(modsPath, "foremanexport_2.0.0"), true);
+                } catch (Exception ex) {
+                    ErrorLogging.LogException(ex, string.Format("Error reading save file '{0}'", saveFilePath));
+                    if (!string.IsNullOrEmpty(modsPath) && Directory.Exists(Path.Combine(modsPath, "foremansavereader_2.0.0")))
+                        Directory.Delete(Path.Combine(modsPath, "foremansavereader_2.0.0"), true);
                     SaveFileInfo = null;
                     return DialogResult.Abort;
                 }

@@ -33,16 +33,32 @@ namespace ForemanTest.support {
 
         public static void RegisterQuality(DataCache cache, Quality quality) {
             GetDictionary<string, Quality>(cache, "Qualities")[quality.Name] = quality;
-            var store = typeof(DataCache).GetField("_store", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(cache)!;
-            store.GetType().GetProperty("DefaultQuality")!.SetValue(store, quality);
+            object store = GetDataCacheStore(cache);
+            ReflectionTestHelper.RequireProperty(store.GetType(), "DefaultQuality", BindingFlags.Instance | BindingFlags.Public)
+                .SetValue(store, quality);
         }
+
+        public static void SetPresetName(DataCache cache, string presetName) {
+            MethodInfo setter = ReflectionTestHelper.Require(
+                typeof(DataCache).GetProperty(nameof(DataCache.PresetName))?.GetSetMethod(nonPublic: true),
+                "DataCache.PresetName setter was not found.");
+            setter.Invoke(cache, new object[] { presetName });
+        }
+
+        private static object GetDataCacheStore(DataCache cache) =>
+            ReflectionTestHelper.RequireInstance(
+                ReflectionTestHelper.RequireField(typeof(DataCache), "_store", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(cache),
+                "DataCache._store was null.");
 
         private static Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(DataCache cache, string dictionaryName)
             where TKey : notnull {
-            var store = typeof(DataCache)
-                .GetField("_store", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .GetValue(cache)!;
-            return (Dictionary<TKey, TValue>)store.GetType().GetProperty(dictionaryName)!.GetValue(store)!;
+            object store = GetDataCacheStore(cache);
+            object? dictionary = ReflectionTestHelper.RequireProperty(store.GetType(), dictionaryName, BindingFlags.Instance | BindingFlags.Public)
+                .GetValue(store);
+            return (Dictionary<TKey, TValue>)ReflectionTestHelper.RequireInstance(
+                dictionary,
+                $"DataCache store property {dictionaryName} was null.");
         }
     }
 }

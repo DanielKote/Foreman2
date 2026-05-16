@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.Graph;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -70,18 +71,18 @@ namespace Foreman {
 
                 if (myParent is DraggedLinkElement masterLinkElement) {
                     Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
-                    if (masterDirections.Item2 == ConsumerElement.DisplayedNode.NodeDirection)
+                    if (masterDirections.Item2 == ConsumerElement.ViewModel.NodeDirection)
                         return masterDirections;
-                    return new Tuple<NodeDirection, NodeDirection>(masterLinkElement.GetEndpointDirections().Item1 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
+                    return new Tuple<NodeDirection, NodeDirection>(masterLinkElement.GetEndpointDirections().Item1 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up, ConsumerElement.ViewModel.NodeDirection);
                 }
 
                 if (!graphViewer.SmartNodeDirection)
-                    return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+                    return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.ViewModel.NodeDirection);
 
                 Point consumerPoint = iconOnlyDraw ? ConsumerElement.Location : ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
-                if ((ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up && consumerPoint.Y > EndpointLocation.Y) || (ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Down && consumerPoint.Y < EndpointLocation.Y))
-                    return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
-                return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+                if ((ConsumerElement.ViewModel.NodeDirection == NodeDirection.Up && consumerPoint.Y > EndpointLocation.Y) || (ConsumerElement.ViewModel.NodeDirection == NodeDirection.Down && consumerPoint.Y < EndpointLocation.Y))
+                    return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.ViewModel.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up, ConsumerElement.ViewModel.NodeDirection);
+                return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.ViewModel.NodeDirection, ConsumerElement.ViewModel.NodeDirection);
             }
             if (ConsumerElement == null) {
                 if (SupplierElement == null)
@@ -89,21 +90,21 @@ namespace Foreman {
 
                 if (myParent is DraggedLinkElement masterLinkElement) {
                     Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
-                    if (masterDirections.Item1 == SupplierElement.DisplayedNode.NodeDirection)
+                    if (masterDirections.Item1 == SupplierElement.ViewModel.NodeDirection)
                         return masterDirections;
-                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, masterLinkElement.GetEndpointDirections().Item2 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, masterLinkElement.GetEndpointDirections().Item2 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
                 }
 
                 if (!graphViewer.SmartNodeDirection)
-                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
+                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
 
                 Point supplierPoint = iconOnlyDraw ? SupplierElement.Location : SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
-                if ((SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up && supplierPoint.Y < EndpointLocation.Y) || (SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Down && supplierPoint.Y > EndpointLocation.Y))
-                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
-                return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection);
+                if ((SupplierElement.ViewModel.NodeDirection == NodeDirection.Up && supplierPoint.Y < EndpointLocation.Y) || (SupplierElement.ViewModel.NodeDirection == NodeDirection.Down && supplierPoint.Y > EndpointLocation.Y))
+                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, SupplierElement.ViewModel.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+                return new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, SupplierElement.ViewModel.NodeDirection);
             }
 
-            return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+            return new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, ConsumerElement.ViewModel.NodeDirection);
         }
 
         private void EndDrag(Point graph_point) {
@@ -111,7 +112,7 @@ namespace Foreman {
 
             if (SupplierElement != null && ConsumerElement != null) //no nulls -> this is a 'link 2 nodes' operation
             {
-                graphViewer.Graph.CreateLink(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
+                graphViewer.Session.Editor.CreateLink(SupplierElement.ViewModel.Id, ConsumerElement.ViewModel.Id, this.Item);
 
                 graphViewer.Graph.UpdateNodeValues();
                 graphViewer.UpdateGraphBounds();
@@ -152,15 +153,15 @@ namespace Foreman {
 
             BaseNodeElement? mousedElement = graphViewer.GetNodeAtPoint(graph_point);
             if (mousedElement != null) {
-                if (StartConnectionType == LinkType.Input && mousedElement.DisplayedNode.Outputs.Contains(Item))
+                if (StartConnectionType == LinkType.Input && mousedElement.ViewModel.Outputs.Contains(Item))
                     SupplierElement = mousedElement;
-                else if (StartConnectionType == LinkType.Output && mousedElement.DisplayedNode.Inputs.Contains(Item))
+                else if (StartConnectionType == LinkType.Output && mousedElement.ViewModel.Inputs.Contains(Item))
                     ConsumerElement = mousedElement;
 
                 //if we have found a possible connection above (both supplier & consumer are no longer null), but the item temperature check fails, break connection
                 if (SupplierElement != null &&
                     ConsumerElement != null &&
-                    !LinkChecker.IsPossibleConnection(Item, SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode)) {
+                    !LinkChecker.IsPossibleConnection(Item, SupplierElement.ViewModel, ConsumerElement.ViewModel, graphViewer.Session)) {
                     if (StartConnectionType == LinkType.Input)
                         SupplierElement = null;
                     else  //if(StartConnectionType == LinkType.Output)
@@ -184,7 +185,7 @@ namespace Foreman {
             if (SupplierElement == null || ConsumerElement == null) {
                 if ((Control.ModifierKeys & Keys.Control) == Keys.Control && !SubElements.Any(e => e is DraggedLinkElement) && originElement is PassthroughNodeElement && graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(originElement) && !graphViewer.SelectedNodes.Any(e => !(e is PassthroughNodeElement)))
                     foreach (PassthroughNodeElement node in graphViewer.SelectedNodes.Where(e => e != originElement))
-                        new DraggedLinkElement(graphViewer, node, StartConnectionType, ((ReadOnlyPassthroughNode)node.DisplayedNode).PassthroughItem, this);
+                        new DraggedLinkElement(graphViewer, node, StartConnectionType, ((IPassthroughNodeViewModel)node.ViewModel).PassthroughItem, this);
                 else if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
                     foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
                         link.Dispose();

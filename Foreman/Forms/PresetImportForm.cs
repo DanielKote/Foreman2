@@ -1,12 +1,11 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,12 +53,8 @@ namespace Foreman {
                     dialog.SelectedPath = FactorioLocationComboBox.Text;
 
                 if (dialog.ShowDialog() == DialogResult.OK) {
-                    if (File.Exists(Path.Combine(new string[] { dialog.SelectedPath, "bin", "x64", "factorio.exe" })))
-                        FactorioLocationComboBox.Text = dialog.SelectedPath;
-                    else if (File.Exists(Path.Combine(new string[] { dialog.SelectedPath, "x64", "factorio.exe" })))
-                        FactorioLocationComboBox.Text = Path.GetDirectoryName(dialog.SelectedPath);
-                    else if (File.Exists(Path.Combine(dialog.SelectedPath, "factorio.exe")))
-                        FactorioLocationComboBox.Text = Path.GetDirectoryName(Path.GetDirectoryName(dialog.SelectedPath));
+                    if (FactorioPathsProcessor.TryNormalizeInstallPath(dialog.SelectedPath, out string installRoot))
+                        FactorioLocationComboBox.Text = installRoot;
                     else
                         MessageBox.Show("Selected directory doesnt seem to be a factorio install folder (it should at the very least have \"bin\" and \"data\" folders, along with a \"config-path.cfg\" file)");
                 }
@@ -182,8 +177,8 @@ namespace Foreman {
         private async Task<string> ProcessPreset(string installPath, string foremanModName, string modsPath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token) {
             return await Task.Run(() => {
                 //prepare for running factorio
-                string exePath = Path.Combine(new string[] { installPath, "bin", "x64", "factorio.exe" });
-                string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", NewPresetName });
+                string exePath = FactorioPathsProcessor.GetExecutablePath(installPath);
+                string presetPath = PresetProcessor.GetPresetPath(NewPresetName, "");
                 if (!File.Exists(exePath)) {
                     MessageBox.Show("factorio.exe not found..."); //considering that we got here with factorio.exe checks, this is a bit redundant. but whatevs.
                     CleanupFailedImport();
@@ -198,81 +193,56 @@ namespace Foreman {
                 } catch (Exception e) {
                     if (e is UnauthorizedAccessException) {
                         MessageBox.Show("Insufficient access to the factorio mods folder. Please ensure factorio mods are in an accessible folder, or launch Foreman with Administrator privileges.");
-                        ErrorLogging.LogLine("insufficient access to factorio mods folder E: " + e.ToString());
+                        ErrorLogging.LogException(e, "insufficient access to factorio mods folder");
                     } else {
                         MessageBox.Show("Unknown error trying to access factorio mods folder. Sorry");
-                        ErrorLogging.LogLine("Error while accessing factorio mods folder E:" + e.ToString());
+                        ErrorLogging.LogException(e, "error while accessing factorio mods folder");
                     }
                     CleanupFailedImport(modsPath);
                     return "";
                 }
 
-                //launch factorio to create the temporary save we will use for export (LAUNCH #1)
-                Process process = new Process();
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                process.StartInfo.FileName = exePath;
-
                 progress.Report(new KeyValuePair<int, string>(10, "Running Factorio - creating test save."));
-                process.StartInfo.Arguments = string.Format("--mod-directory \"{0}\" --create temp-save.zip", modsPath);
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardInput = true;
-                process.Start();
-                string resultString = "";
-                while (!process.HasExited) {
-                    resultString += process.StandardOutput.ReadToEnd();
-                    if (token.IsCancellationRequested) {
-                        process.Close();
-                        CleanupFailedImport(modsPath);
-                        return "";
-                    }
-                    Thread.Sleep(100);
-                }
+                string resultString = FactorioBenchmarkRunner.Run(
+                    exePath,
+                    string.Format("--mod-directory \"{0}\" --create temp-save.zip", modsPath),
+                    token,
+                    () => CleanupFailedImport(modsPath));
 
-                if (resultString.IndexOf("Is another instance already running?") != -1) {
+                if (string.IsNullOrEmpty(resultString) && token.IsCancellationRequested)
+                    return "";
+
+                if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
                     MessageBox.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
                     CleanupFailedImport(modsPath);
                     return "";
                 }
 
-                //ensure that the foreman export mod is correctly added to the mod-list and is enabled
-                SetStateForemanExportMod(modsPath, true);
+                FactorioModListHelper.SetModState(modsPath, "foremanexport", enabled: true, removeFromListWhenDisabled: false);
 
-                //copy the files as necessary
                 try {
-                    Directory.CreateDirectory(Path.Combine(modsPath, foremanModName));
-
-                    File.Copy(Path.Combine(new string[] { "Mods", foremanModName, "info.json" }), Path.Combine(new string[] { modsPath, foremanModName, "info.json" }));
-                    File.Copy(Path.Combine(new string[] { "Mods", foremanModName, "instrument-after-data.lua" }), Path.Combine(new string[] { modsPath, foremanModName, "instrument-after-data.lua" }), true);
-
-                    File.Copy(Path.Combine(new string[] { "Mods", foremanModName, "instrument-control.lua" }), Path.Combine(new string[] { modsPath, foremanModName, "instrument-control.lua" }), true);
+                    FactorioBundledModHelper.CopyToModsFolder(foremanModName, modsPath, "info.json", "instrument-after-data.lua", "instrument-control.lua");
                 } catch (Exception e) {
                     if (e is UnauthorizedAccessException) {
                         MessageBox.Show("Insufficient access to copy foreman export mod files (Mods/" + foremanModName + "/) to the factorio mods folder. Please ensure factorio mods are in an accessible folder, or launch Foreman with Administrator privileges.");
-                        ErrorLogging.LogLine("copying of foreman export mod files failed - insufficient access E:" + e.ToString());
+                        ErrorLogging.LogException(e, "copying of foreman export mod files failed - insufficient access");
                     } else {
                         MessageBox.Show("could not copy foreman export mod files (Mods/" + foremanModName + "/) to the factorio mods folder. Reinstall foreman?");
-                        ErrorLogging.LogLine("copying of foreman export mod files failed. E:" + e.ToString());
+                        ErrorLogging.LogException(e, "copying of foreman export mod files failed");
                     }
                     CleanupFailedImport(modsPath);
                     return "";
                 }
 
-                //launch factorio again to export the data (LAUNCH #2)
                 progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
-                process.StartInfo.Arguments = string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath);
-                process.Start();
-                resultString = "";
-                while (!process.HasExited) {
-                    resultString += process.StandardOutput.ReadToEnd();
-                    if (token.IsCancellationRequested) {
-                        process.Close();
-                        CleanupFailedImport(modsPath);
-                        return "";
-                    }
-                    Thread.Sleep(100);
-                }
+                resultString = FactorioBenchmarkRunner.Run(
+                    exePath,
+                    string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath),
+                    token,
+                    () => CleanupFailedImport(modsPath));
+
+                if (string.IsNullOrEmpty(resultString) && token.IsCancellationRequested)
+                    return "";
 
                 if (File.Exists("temp-save.zip"))
                     File.Delete("temp-save.zip");
@@ -281,7 +251,7 @@ namespace Foreman {
 
                 progress.Report(new KeyValuePair<int, string>(25, "Processing mod files."));
 
-                if (resultString.IndexOf("Is another instance already running?") != -1) {
+                if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
                     MessageBox.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
                     CleanupFailedImport(modsPath);
                     return "";
@@ -318,14 +288,14 @@ namespace Foreman {
                 File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
                 File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
 #endif
-                JObject? iconJObject = null;
-                JObject? dataJObject = null;
+                JsonObject? iconJObject = null;
+                JsonObject? dataJObject = null;
                 try {
-                    iconJObject = JObject.Parse(iconString); //this is what needs to be parsed to get all the icons
-                    dataJObject = JObject.Parse(dataString); //this is pretty much the entire json preset - just need to save it.
-                } catch {
+                    iconJObject = PresetJson.ParseObject(iconString);
+                    dataJObject = PresetJson.ParseObject(dataString);
+                } catch (Exception ex) {
                     MessageBox.Show("Foreman export could not be completed - unknown json parsing error.\nSorry");
-                    ErrorLogging.LogLine("json parsing of output failed. This is clearly an error with the export mod (" + foremanModName + "). Consult _iconJObjectOut.json and _dataJObjectOut.json and check which one isnt a valid json (and why)");
+                    ErrorLogging.LogException(ex, "json parsing of export mod output failed (" + foremanModName + "); consult _iconJObjectOut.json and _dataJObjectOut.json");
                     File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
                     File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
                     CleanupFailedImport(modsPath);
@@ -333,34 +303,34 @@ namespace Foreman {
                 }
 
                 //now to trawl over the dataJObject entities and replace any 'lid' with 'localised_name'
-                foreach (JToken set in dataJObject.Values()) {
-                    foreach (JToken obj in set) {
-                        if (obj is JObject jobject && (string?)jobject["lid"] is string lid) {
-                            JProperty lname = new JProperty("localised_name", localisedNames[lid]);
-                            jobject.Add(lname);
+                foreach (string groupName in PresetJson.GetObjectPropertyNames(dataJObject)) {
+                    if (dataJObject[groupName] is not JsonArray set)
+                        continue;
+                    foreach (JsonNode? obj in set) {
+                        if (obj is JsonObject jobject && PresetJson.GetString(jobject, "lid") is string lid) {
+                            jobject["localised_name"] = localisedNames[lid];
                             jobject.Remove("lid");
                         }
                     }
                 }
 
                 //save new preset (data)
-                File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".pjson"), dataJObject.ToString(Formatting.Indented));
+                File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".pjson"), PresetJson.WriteIndented(dataJObject));
                 File.Copy(Path.Combine(Application.StartupPath, "baseCustom.json"), Path.Combine(Application.StartupPath, presetPath + ".json"), true);
 #if DEBUG
-                File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconJObject.ToString(Formatting.Indented));
-                File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataJObject.ToString(Formatting.Indented));
+                File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), PresetJson.WriteIndented(iconJObject));
+                File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), PresetJson.WriteIndented(dataJObject));
 #endif
 
                 if (token.IsCancellationRequested) {
-                    process.Close();
                     CleanupFailedImport(modsPath);
                     return "";
                 }
 
                 //now we need to process icons. This is done by the IconProcessor.
                 Dictionary<string, string> modSet = new Dictionary<string, string>();
-                foreach (var objJToken in dataJObject["mods"]?.AsEnumerable() ?? [])
-                    if ((string?)objJToken["name"] is string name && (string?)objJToken["version"] is string version)
+                foreach (JsonNode objJToken in PresetJson.EnumerateArray(dataJObject, "mods"))
+                    if (PresetJson.GetString(objJToken, "name") is string name && PresetJson.GetString(objJToken, "version") is string version)
                         modSet.Add(name.ToLower(), version);
 
                 using (IconCacheProcessor icProcessor = new IconCacheProcessor()) {
@@ -387,13 +357,14 @@ namespace Foreman {
                     }
                 }
 
-                SetStateForemanExportMod(modsPath, false);
+                FactorioModListHelper.SetModState(modsPath, "foremanexport", enabled: false, removeFromListWhenDisabled: true);
                 return NewPresetName;
             });
         }
 
         private void CleanupFailedImport(string modsPath = "", string presetPath = "", string foremanModName = "") {
-            SetStateForemanExportMod(modsPath, false);
+            if (!string.IsNullOrEmpty(modsPath))
+                FactorioModListHelper.SetModState(modsPath, "foremanexport", enabled: false, removeFromListWhenDisabled: true);
 
             NewPresetName = "";
 
@@ -409,35 +380,6 @@ namespace Foreman {
                 File.Delete(Path.Combine(Application.StartupPath, presetPath + ".json"));
             if (presetPath != "" && foremanModName != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".dat")))
                 File.Delete(Path.Combine(Application.StartupPath, presetPath + ".dat"));
-        }
-
-        //Sets the enabled status of the foreman export mod within the mod-list of factorio to be "enabled" (true/false).
-        //Needs to be enabled in order to process the preset, but should be disabled otherwise as it adds processing steps to factorio which shouldnt be done any other time (such as while playing the game)
-        private void SetStateForemanExportMod(string modsPath, bool enabled) {
-            //ensure that the foreman export mod is correctly added to the mod-list and is enabled
-            string modListPath = Path.Combine(modsPath, "mod-list.json");
-            JObject? modlist = null;
-            if (!File.Exists(modListPath))
-                modlist = new JObject();
-            else
-                modlist = JObject.Parse(File.ReadAllText(modListPath));
-            if (modlist["mods"] == null)
-                modlist.Add("mods", new JArray());
-
-            var foremanModToken = modlist["mods"]?.FirstOrDefault(t => (string?)t["name"] == "foremanexport");
-            if (enabled) {
-                if (foremanModToken == null)
-                    ((JArray?)modlist["mods"])?.Add(new JObject() { { "name", "foremanexport" }, { "enabled", enabled } });
-                else
-                    foremanModToken["enabled"] = enabled;
-            } else if (foremanModToken != null)
-                foremanModToken.Remove();
-
-            try {
-                File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented)); //updated mod list with foreman export disabled
-            } catch (Exception ex) {
-                ErrorLogging.LogLine(string.Format("Failed to update mod-list.json at {0}: {1}", modListPath, ex));
-            }
         }
 
         private void PresetNameTextBox_TextChanged(object? sender, EventArgs e) {

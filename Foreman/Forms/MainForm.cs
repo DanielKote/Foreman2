@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -16,6 +14,8 @@ namespace Foreman {
         internal const string DefaultPreset = "Factorio 2.0 Vanilla";
         internal string DefaultAppName;
         private string? savefilePath = null;
+        /// <summary>JSON snapshot after last successful load/save; used for dirty detection (round-trip serialize ≠ on-disk text).</summary>
+        private string? savefileBaselineJson = null;
 
         public MainForm() {
             InitializeComponent();
@@ -66,8 +66,6 @@ namespace Foreman {
             Version? assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
             if (assemblyVersion is not null)
                 VersionLabel.Text = string.Format("v{0}.{1}.{2}.{3}", assemblyVersion.Major, assemblyVersion.Minor, assemblyVersion.Build, assemblyVersion.Revision);
-
-            Properties.Settings.Default.ForemanVersion = VersionUpdater.SaveFormatVersion;
 
             if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
                 Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
@@ -176,23 +174,19 @@ namespace Foreman {
         }
 
         private bool SaveGraph(string path) {
-            var serialiser = JsonSerializer.Create();
-            //serialiser.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            serialiser.Formatting = Formatting.Indented;
-            var writer = new JsonTextWriter(new StreamWriter(path));
             try {
                 GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
-                serialiser.Serialize(writer, GraphViewer);
+                string json = GraphSaveCodec.WriteViewerToString(GraphViewer, writeIndented: true);
+                File.WriteAllText(path, json);
                 savefilePath = path;
+                savefileBaselineJson = json;
                 this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
                 return true;
             } catch (Exception exception) {
                 MessageBox.Show("Could not save this file. See log for more details");
-                ErrorLogging.LogLine(String.Format("Error saving file '{0}'. Error: '{1}'", path, exception.Message));
-                ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
+                ErrorLogging.LogException(exception, string.Format("Error saving file '{0}'", path));
                 return false;
             } finally {
-                writer.Close();
             }
         }
 
@@ -214,12 +208,13 @@ namespace Foreman {
 
         private async void LoadGraph(string path) {
             try {
-                await GraphViewer.LoadFromJson(JObject.Parse(File.ReadAllText(path)), false, true);
+                await GraphViewer.LoadFromJson(File.ReadAllText(path), false, true);
                 savefilePath = path;
+                CaptureSaveBaseline();
             } catch (Exception exception) {
-                MessageBox.Show("Could not load this file. See log for more details");
-                ErrorLogging.LogLine(string.Format("Error loading file '{0}'. Error: '{1}'", path, exception.Message));
-                ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
+                MessageBox.Show(
+                    "This save file is too old or corrupt. Try opening it in Foreman 2.2.16.1 and saving it again, then open the new file here.");
+                ErrorLogging.LogException(exception, string.Format("Error loading file '{0}'", path));
             }
 
             RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
@@ -248,12 +243,18 @@ namespace Foreman {
                 Properties.Settings.Default.CurrentPresetName = validPresets[0].Name;
                 GraphViewer.LoadPreset(validPresets[0]);
                 savefilePath = null;
+                savefileBaselineJson = null;
             } else {
                 Properties.Settings.Default.CurrentPresetName = "No Preset!";
             }
 
             Properties.Settings.Default.Save();
             this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+        }
+
+        private void CaptureSaveBaseline() {
+            GraphViewer.Graph.SerializeNodeIdSet = null;
+            savefileBaselineJson = GraphSaveCodec.WriteViewerToString(GraphViewer, writeIndented: true);
         }
 
         private void ImportGraph() {
@@ -271,13 +272,17 @@ namespace Foreman {
 
         private void ImportGraph(string path) {
             try {
-                if ((JObject?)JObject.Parse(File.ReadAllText(path))["ProductionGraph"] is not JObject graph)
-                    throw new Exception("ProductionGraph key is not a valid JObject.");
-                GraphViewer.ImportNodesFromJson(graph, GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2)), true);
+                ProductionGraphSaveDocument? graphDocument = GraphSaveCodec.ReadGraphPayload(File.ReadAllText(path));
+                if (graphDocument is null)
+                    throw new Exception(
+                        "This save file is too old or corrupt. Try opening it in Foreman 2.2.16.1 and saving it again, then open the new file here.");
+                GraphViewer.ImportNodesFromDocument(
+                    graphDocument,
+                    GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2)),
+                    applySolverSettings: true);
             } catch (Exception exception) {
-                MessageBox.Show("Could not import from this file. See log for more details");
-                ErrorLogging.LogLine(string.Format("Error importing from file '{0}'. Error: '{1}'", path, exception.Message));
-                ErrorLogging.LogLine(string.Format("Full error output: {0}", exception.ToString()));
+                MessageBox.Show("Could not import this file. See log for more details.");
+                ErrorLogging.LogException(exception, string.Format("Error importing from file '{0}'", path));
             }
         }
 
@@ -292,15 +297,11 @@ namespace Foreman {
             if (!File.Exists(savefilePath))
                 return MessageBox.Show("The current graph's save file has been deleted!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
 
-            StringBuilder stringBuilder = new StringBuilder();
-            var writer = new JsonTextWriter(new StringWriter(stringBuilder));
+            GraphViewer.Graph.SerializeNodeIdSet = null;
+            string currentSaveJson = GraphSaveCodec.WriteViewerToString(GraphViewer, writeIndented: true);
+            string? savedJson = savefileBaselineJson ?? File.ReadAllText(savefilePath);
 
-            JsonSerializer serialiser = JsonSerializer.Create();
-            serialiser.Formatting = Formatting.Indented;
-            GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
-            serialiser.Serialize(writer, GraphViewer);
-
-            if (File.ReadAllText(savefilePath) != stringBuilder.ToString()) {
+            if (savedJson != currentSaveJson) {
                 DialogResult result = MessageBox.Show("The current graph has been modified!\nDo you wish to save before continuing?", "Are you sure?", MessageBoxButtons.YesNoCancel);
                 if (result == DialogResult.Cancel)
                     return false;
@@ -545,7 +546,7 @@ namespace Foreman {
         }
 
         private void GraphSummaryButton_Click(object? sender, EventArgs e) {
-            using (GraphSummaryForm form = new GraphSummaryForm(GraphViewer.Graph.Nodes, GraphViewer.Graph.NodeLinks, GraphViewer.Graph.GetRateName())) {
+            using (GraphSummaryForm form = new GraphSummaryForm(GraphViewer.Session, GraphViewer.Graph.GetRateName())) {
                 form.StartPosition = FormStartPosition.Manual;
                 form.Left = this.Left + 50;
                 form.Top = this.Top + 50;

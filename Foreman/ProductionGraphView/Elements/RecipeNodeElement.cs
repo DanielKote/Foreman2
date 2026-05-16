@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Foreman.Graph;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,9 +21,8 @@ namespace Foreman {
         private readonly AssemblerElement AssemblerElement;
         private readonly BeaconElement BeaconElement;
 
-        private string RecipeName => DisplayedNode.BaseRecipe.FriendlyName ?? "";
-
-        private new readonly ReadOnlyRecipeNode DisplayedNode;
+        internal IRecipeNodeViewModel RecipeViewModel => (IRecipeNodeViewModel)ViewModel;
+        private string RecipeName => RecipeViewModel.BaseRecipe.FriendlyName ?? "";
 
         private static bool OptionsCopyAssemblerDefault = true;
         private static bool OptionsCopyExtraProductivityMinersDefault = true;
@@ -33,9 +32,7 @@ namespace Foreman {
         private static bool OptionsCopyBeaconDefault = true;
         private static bool OptionsCopyBeaconModulesDefault = true;
 
-        public RecipeNodeElement(ProductionGraphViewer graphViewer, ReadOnlyRecipeNode node) : base(graphViewer, node) {
-            DisplayedNode = node;
-
+        public RecipeNodeElement(ProductionGraphViewer graphViewer, IRecipeNodeViewModel viewModel) : base(graphViewer, viewModel) {
             AssemblerElement = new AssemblerElement(graphViewer, this);
             AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
 
@@ -49,25 +46,25 @@ namespace Foreman {
             //update tabs (necessary now that it is possible that an item was added or removed)... I am looking at you furnaces!!! ... also - with quality added to the game it is possible that the outputs will drastically change based on selected modules (add/remove quality)
             //done by first checking all old tabs and removing any that are no longer part of the displayed node, then looking at the displayed node io and adding any new tabs that are necessary.
             //could potentially be done by just deleting all the old ones and remaking them from scratch, but come on - thats much more intensive than just doing some checks!
-            foreach (ItemTabElement oldTab in InputTabs.Where(tab => !DisplayedNode.Inputs.Contains(tab.Item)).ToList()) {
+            foreach (ItemTabElement oldTab in InputTabs.Where(tab => !RecipeViewModel.Inputs.Contains(tab.Item)).ToList()) {
                 InputTabs.Remove(oldTab);
                 oldTab.Dispose();
             }
-            foreach (ItemTabElement oldTab in OutputTabs.Where(tab => !DisplayedNode.Outputs.Contains(tab.Item)).ToList()) {
+            foreach (ItemTabElement oldTab in OutputTabs.Where(tab => !RecipeViewModel.Outputs.Contains(tab.Item)).ToList()) {
                 OutputTabs.Remove(oldTab);
                 oldTab.Dispose();
             }
-            foreach (ItemQualityPair item in DisplayedNode.Inputs)
+            foreach (ItemQualityPair item in RecipeViewModel.Inputs)
                 if (!InputTabs.Any(tab => tab.Item == item))
                     InputTabs.Add(new ItemTabElement(item, LinkType.Input, graphViewer, this));
-            foreach (ItemQualityPair item in DisplayedNode.Outputs)
+            foreach (ItemQualityPair item in RecipeViewModel.Outputs)
                 if (!OutputTabs.Any(tab => tab.Item == item))
                     OutputTabs.Add(new ItemTabElement(item, LinkType.Output, graphViewer, this));
 
             //now that the tabs have been updated, update the size and positioning of the node:
-            int yOffset = (DisplayedNode.NodeDirection == NodeDirection.Up && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Down && OutputTabs.Count == 0 && InputTabs.Count != 0) ? 10 :
-                          (DisplayedNode.NodeDirection == NodeDirection.Down && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Up && OutputTabs.Count == 0 && InputTabs.Count != 0) ? -10 : 0;
-            yOffset += DisplayedNode.NodeDirection == NodeDirection.Up ? 4 : 0;
+            int yOffset = (RecipeViewModel.NodeDirection == NodeDirection.Up && InputTabs.Count == 0 && OutputTabs.Count != 0) || (RecipeViewModel.NodeDirection == NodeDirection.Down && OutputTabs.Count == 0 && InputTabs.Count != 0) ? 10 :
+                          (RecipeViewModel.NodeDirection == NodeDirection.Down && InputTabs.Count == 0 && OutputTabs.Count != 0) || (RecipeViewModel.NodeDirection == NodeDirection.Up && OutputTabs.Count == 0 && InputTabs.Count != 0) ? -10 : 0;
+            yOffset += RecipeViewModel.NodeDirection == NodeDirection.Up ? 4 : 0;
 
             AssemblerElement.Location = new Point(-26, -14 + yOffset);
             BeaconElement.Location = new Point(-30, 27 + yOffset);
@@ -85,26 +82,26 @@ namespace Foreman {
             base.UpdateState();
         }
 
-        protected override Bitmap? NodeIcon() => DisplayedNode.BaseRecipe.Icon;
+        protected override Bitmap? NodeIcon() => RecipeViewModel.BaseRecipe.Icon;
 
         protected override void DetailsDraw(Graphics graphics, Point trans) {
             if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) //text only view
             {
                 //text
-                bool overproducing = DisplayedNode.IsOverproducing();
+                bool overproducing = RecipeViewModel.IsOverproducing();
                 Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (overproducing ? 32 : 27), (Width - 10 - 40), Height - (overproducing ? 64 : 54));
                 //graphics.DrawRectangle(devPen, textSlot);
                 int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
 
                 //assembler icon
-                Bitmap assemblerIcon = DisplayedNode.SelectedAssembler ? DisplayedNode.SelectedAssembler.Icon ?? DataCache.UnknownIcon : DataCache.UnknownIcon;
+                Bitmap assemblerIcon = RecipeViewModel.SelectedAssembler ? RecipeViewModel.SelectedAssembler.Icon ?? DataCache.UnknownIcon : DataCache.UnknownIcon;
                 graphics.DrawImage(assemblerIcon, trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);
 
                 //productivity ticks
-                int pModules = DisplayedNode.AssemblerModules.Count(m => m.Module.GetProductivityBonus() > 0);
-                pModules += (int)(DisplayedNode.BeaconModules.Count(m => m.Module.GetProductivityBonus() > 0) * DisplayedNode.BeaconCount);
+                int pModules = RecipeViewModel.AssemblerModules.Count(m => m.Module.GetProductivityBonus() > 0);
+                pModules += (int)(RecipeViewModel.BeaconModules.Count(m => m.Module.GetProductivityBonus() > 0) * RecipeViewModel.BeaconCount);
 
-                bool extraProductivity = DisplayedNode.ExtraProductivity > 0 && (DisplayedNode.SelectedAssembler.Assembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners);
+                bool extraProductivity = RecipeViewModel.ExtraProductivity > 0 && (RecipeViewModel.SelectedAssembler.Assembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners);
                 pModules += extraProductivity ? 1 : 0;
 
                 for (int i = 0; i < pModules && i < 6; i++)
@@ -113,47 +110,47 @@ namespace Foreman {
                     graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2) - 4, trans.Y - (Height / 2) + 84, trans.X - (Width / 2) + 8, trans.Y - (Height / 2) + 84);
                     graphics.DrawLine(productivityPlusPen, trans.X - (Width / 2) + 2, trans.Y - (Height / 2) + 84 - 6, trans.X - (Width / 2) + 2, trans.Y - (Height / 2) + 84 + 6);
                 }
-            } else if (DisplayedNode.ExtraProductivity > 0 && (DisplayedNode.SelectedAssembler.Assembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners)) {
+            } else if (RecipeViewModel.ExtraProductivity > 0 && (RecipeViewModel.SelectedAssembler.Assembler.EntityType == EntityType.Miner || graphViewer.Graph.EnableExtraProductivityForNonMiners)) {
                 graphics.DrawEllipse(extraProductivityPen, trans.X - (Width / 2) - 1, trans.Y - (Height / 2) + 10, 6, 6);
             }
         }
 
         protected override void AddRClickMenuOptions(bool nodeInSelection) {
             if (nodeInSelection) {
-                List<ReadOnlyRecipeNode> rNodes = new List<ReadOnlyRecipeNode>(graphViewer.SelectedNodes.Where(ne => ne is RecipeNodeElement).Select(ne => (ReadOnlyRecipeNode)ne.DisplayedNode));
-                if (!rNodes.Contains(this.DisplayedNode))
-                    rNodes.Add((ReadOnlyRecipeNode)this.DisplayedNode);
+                List<IRecipeNodeViewModel> rNodes = graphViewer.SelectedNodes.OfType<RecipeNodeElement>().Select(ne => (IRecipeNodeViewModel)ne.ViewModel).ToList();
+                if (!rNodes.Contains(RecipeViewModel))
+                    rNodes.Add(RecipeViewModel);
 
                 RightClickMenu.Items.Add(new ToolStripSeparator());
 
                 RightClickMenu.Items.Add(new ToolStripMenuItem("Apply default assembler(s)", null,
                     new EventHandler((o, e) => {
                         RightClickMenu.Close();
-                        foreach (ReadOnlyRecipeNode rNode in rNodes)
-                            if (graphViewer.Graph.RequestNodeController(rNode) is RecipeNodeController controller)
+                        foreach (IRecipeNodeViewModel rNode in rNodes)
+                            if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                 controller.AutoSetAssembler();
                     })));
                 RightClickMenu.Items.Add(new ToolStripMenuItem("Apply default modules", null,
                     new EventHandler((o, e) => {
                         RightClickMenu.Close();
-                        foreach (ReadOnlyRecipeNode rNode in rNodes)
-                            if (graphViewer.Graph.RequestNodeController(rNode) is RecipeNodeController controller)
+                        foreach (IRecipeNodeViewModel rNode in rNodes)
+                            if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                 controller.AutoSetAssemblerModules();
                     })));
                 if (rNodes.Any(rn => rn.AssemblerModules.Count > 0))
                     RightClickMenu.Items.Add(new ToolStripMenuItem("Remove modules", null,
                         new EventHandler((o, e) => {
                             RightClickMenu.Close();
-                            foreach (ReadOnlyRecipeNode rNode in rNodes)
-                                if (graphViewer.Graph.RequestNodeController(rNode) is RecipeNodeController controller)
+                            foreach (IRecipeNodeViewModel rNode in rNodes)
+                                if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                     controller.RemoveAssemblerModules();
                         })));
                 if (rNodes.Any(rn => rn.SelectedBeacon))
                     RightClickMenu.Items.Add(new ToolStripMenuItem("Remove beacons", null,
                         new EventHandler((o, e) => {
                             RightClickMenu.Close();
-                            foreach (ReadOnlyRecipeNode rNode in rNodes)
-                                if (graphViewer.Graph.RequestNodeController(rNode) is RecipeNodeController controller)
+                            foreach (IRecipeNodeViewModel rNode in rNodes)
+                                if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                     controller.ClearBeacon();
                         })));
 
@@ -212,8 +209,8 @@ namespace Foreman {
                                     if (canPasteBeacon)
                                         OptionsCopyBeaconModulesDefault = beaconCheck.Checked;
 
-                                    foreach (ReadOnlyRecipeNode rNode in rNodes) {
-                                        if (graphViewer.Graph.RequestNodeController(rNode) is not RecipeNodeController controller)
+                                    foreach (IRecipeNodeViewModel rNode in rNodes) {
+                                        if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is not RecipeNodeController controller)
                                             continue;
 
                                         if (assemblerCheck.Checked && rNode.BaseRecipe.Recipe is Recipe nodeRecipe && nodeRecipe.Assemblers.Contains(pastedAssembler)) {
@@ -263,14 +260,7 @@ namespace Foreman {
             RightClickMenu.Items.Add(new ToolStripMenuItem("Copy this assembler's options", null,
                 new EventHandler((o, e) => {
                     RightClickMenu.Close();
-                    StringBuilder stringBuilder = new StringBuilder();
-                    var writer = new JsonTextWriter(new StringWriter(stringBuilder));
-
-                    JsonSerializer serialiser = JsonSerializer.Create();
-                    serialiser.Formatting = Formatting.None;
-                    serialiser.Serialize(writer, new NodeCopyOptions(DisplayedNode as ReadOnlyRecipeNode));
-
-                    Clipboard.SetText(stringBuilder.ToString());
+                    Clipboard.SetText(GraphSaveCodec.WriteNodeCopyOptionsToString(new NodeCopyOptions(RecipeViewModel)));
 
                 })));
         }
@@ -279,7 +269,7 @@ namespace Foreman {
             List<TooltipInfo> tooltips = new List<TooltipInfo>();
 
             if (graphViewer.ShowRecipeToolTip) {
-                if (DisplayedNode.BaseRecipe.Recipe is Recipe recipe) {
+                if (RecipeViewModel.BaseRecipe.Recipe is Recipe recipe) {
                     Recipe[] recipes = [recipe];
                     TooltipInfo ttiRecipe = new TooltipInfo();
                     ttiRecipe.Direction = Direction.Left;
@@ -290,16 +280,12 @@ namespace Foreman {
                 }
             }
 
-            if (exclusive) {
-                TooltipInfo helpToolTipInfo = new TooltipInfo();
-                string entityName = DisplayedNode.SelectedAssembler.Assembler is Assembler helpAssembler
-                    ? helpAssembler.GetEntityTypeName(false).ToLower()
-                    : "assembler";
-                helpToolTipInfo.Text = string.Format("Left click on this node to edit its {0}, modules, beacon, etc.\nRight click for options.", entityName);
-                helpToolTipInfo.Direction = Direction.None;
-                helpToolTipInfo.ScreenLocation = new Point(10, 10);
-                tooltips.Add(helpToolTipInfo);
-            }
+            string entityName = RecipeViewModel.SelectedAssembler.Assembler is Assembler helpAssembler
+                ? helpAssembler.GetEntityTypeName(false).ToLower()
+                : "assembler";
+            tooltips.AddRange(ExclusiveHelpTooltip(
+                string.Format("Left click on this node to edit its {0}, modules, beacon, etc.\nRight click for options.", entityName),
+                exclusive));
 
             return tooltips;
         }

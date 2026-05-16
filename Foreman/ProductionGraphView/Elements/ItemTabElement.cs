@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.Graph;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Foreman {
 
         public LinkType LinkType;
         public ItemQualityPair Item { get; private set; }
-        public IEnumerable<ReadOnlyNodeLink> Links { get { return LinkType == LinkType.Input ? DisplayedNode.InputLinks.Where(l => l.Item == Item) : DisplayedNode.OutputLinks.Where(l => l.Item == Item); } }
+        public IEnumerable<INodeLinkViewModel> Links { get { return LinkType == LinkType.Input ? NodeViewModel.InputLinks.Where(l => l.Item == Item) : NodeViewModel.OutputLinks.Where(l => l.Item == Item); } }
 
         public bool HideItemTab { get; set; }
 
@@ -36,10 +37,10 @@ namespace Foreman {
         private Pen borderPen;
         private string text = "";
 
-        private readonly ReadOnlyBaseNode DisplayedNode;
+        private readonly INodeViewModel NodeViewModel;
 
         public ItemTabElement(ItemQualityPair item, LinkType type, ProductionGraphViewer graphViewer, BaseNodeElement node) : base(graphViewer, node) {
-            DisplayedNode = node.DisplayedNode;
+            NodeViewModel = node.ViewModel;
             Item = item;
             LinkType = type;
             HideItemTab = false;
@@ -54,9 +55,9 @@ namespace Foreman {
 
         public Point GetConnectionPoint() //in graph coordinates
         {
-            if ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Down))
+            if ((LinkType == LinkType.Input && NodeViewModel.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && NodeViewModel.NodeDirection == NodeDirection.Down))
                 return LocalToGraph(new Point(0, Height / 2));
-            else //if ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.down) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Up))
+            else //if ((LinkType == LinkType.Input && NodeViewModel.NodeDirection == NodeDirection.down) || (LinkType == LinkType.Output && NodeViewModel.NodeDirection == NodeDirection.Up))
                 return LocalToGraph(new Point(0, -Height / 2));
         }
 
@@ -86,7 +87,7 @@ namespace Foreman {
 
             //direction signs (only if using dynamic link width or not using arrows on links)
             if (graphViewer.DynamicLinkWidth || !graphViewer.ArrowsOnLinks) {
-                if (DisplayedNode.NodeDirection == NodeDirection.Up)
+                if (NodeViewModel.NodeDirection == NodeDirection.Up)
                     graphics.FillPolygon(directionBrush, new Point[] { new Point(trans.X - (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X + (Bounds.Width / 2), trans.Y + (Bounds.Height / 2)), new Point(trans.X, trans.Y - (Bounds.Height / 2)) });
                 else
                     graphics.FillPolygon(directionBrush, new Point[] { new Point(trans.X - (Bounds.Width / 2), trans.Y - (Bounds.Height / 2)), new Point(trans.X + (Bounds.Width / 2), trans.Y - (Bounds.Height / 2)), new Point(trans.X, trans.Y + (Bounds.Height / 2)) });
@@ -113,20 +114,25 @@ namespace Foreman {
             if (myParent is not BaseNodeElement parentNode)
                 return toolTips;
 
-            if (parentNode.DisplayedNode is ReadOnlyRecipeNode rNode && rNode.BaseRecipe.Recipe is Recipe recipe) {
+            if (parentNode.ViewModel is IRecipeNodeViewModel rNode && rNode.BaseRecipe.Recipe is Recipe recipe) {
                 if (LinkType == LinkType.Input)
                     tti.Text = Item.Item is Fluid fluid ? recipe.GetIngredientFriendlyName(fluid) : Item.FriendlyName ?? "";
                 else //if(LinkType == LinkType.Output)
                     tti.Text = Item.Item is Fluid fluid ? recipe.GetProductFriendlyName(fluid) : Item.FriendlyName ?? "";
             } else if ((Item.Item is Fluid fluid) && fluid.IsTemperatureDependent) {
-                fRange tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.DisplayedNode, (LinkType == LinkType.Input) ? LinkType.Output : LinkType.Input, true); //input type tab means output of connection link and vice versa
-                if (tempRange.Ignore && DisplayedNode is ReadOnlyPassthroughNode)
-                    tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.DisplayedNode, LinkType, true); //if there was no temp range on this side of this throughput node, try to just copy the other side
+                fRange tempRange = LinkChecker.GetTemperatureRange(
+                    fluid,
+                    parentNode.ViewModel,
+                    (LinkType == LinkType.Input) ? LinkType.Output : LinkType.Input,
+                    true,
+                    graphViewer.Session); //input type tab means output of connection link and vice versa
+                if (tempRange.Ignore && NodeViewModel is IPassthroughNodeViewModel)
+                    tempRange = LinkChecker.GetTemperatureRange(fluid, parentNode.ViewModel, LinkType, true, graphViewer.Session); //if there was no temp range on this side of this throughput node, try to just copy the other side
                 tti.Text = fluid.GetTemperatureRangeFriendlyName(tempRange);
             } else
                 tti.Text = Item.FriendlyName ?? "";
 
-            tti.Direction = ((LinkType == LinkType.Input && DisplayedNode.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && DisplayedNode.NodeDirection == NodeDirection.Down)) ? Direction.Up : Direction.Down;
+            tti.Direction = ((LinkType == LinkType.Input && NodeViewModel.NodeDirection == NodeDirection.Up) || (LinkType == LinkType.Output && NodeViewModel.NodeDirection == NodeDirection.Down)) ? Direction.Up : Direction.Down;
             tti.ScreenLocation = graphViewer.GraphToScreen(GetConnectionPoint());
             toolTips.Add(tti);
 
@@ -141,17 +147,17 @@ namespace Foreman {
 
         public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged) {
             if (button == MouseButtons.Right) {
-                List<ReadOnlyNodeLink> connections = new List<ReadOnlyNodeLink>();
+                List<LinkId> connections = new List<LinkId>();
                 if (LinkType == LinkType.Input)
-                    connections.AddRange(DisplayedNode.InputLinks.Where(l => l.Item == Item));
+                    connections.AddRange(NodeViewModel.InputLinks.Where(l => l.Item == Item).Select(l => l.Id));
                 else //if (LinkType == LinkType.Output)
-                    connections.AddRange(DisplayedNode.OutputLinks.Where(l => l.Item == Item));
+                    connections.AddRange(NodeViewModel.OutputLinks.Where(l => l.Item == Item).Select(l => l.Id));
 
                 RightClickMenu.Items.Add(new ToolStripMenuItem("Delete connections", null,
                     new EventHandler((o, e) => {
                         RightClickMenu.Close();
-                        foreach (ReadOnlyNodeLink link in connections)
-                            graphViewer.Graph.DeleteLink(link);
+                        foreach (LinkId linkId in connections)
+                            graphViewer.Session.Editor.DeleteLink(linkId);
                         graphViewer.Graph.UpdateNodeValues();
                     })) { Enabled = connections.Count > 0 });
 
