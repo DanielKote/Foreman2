@@ -1,5 +1,4 @@
 ﻿using Google.OrTools.LinearSolver;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,20 +15,18 @@ namespace Foreman {
     public enum LinkType { Input, Output }
 
     public class NodeEventArgs : EventArgs {
-        public ReadOnlyBaseNode node;
-        public NodeEventArgs(ReadOnlyBaseNode node) { this.node = node; }
+        public BaseNode Node { get; }
+        public NodeEventArgs(BaseNode node) => Node = node;
     }
     public class NodeLinkEventArgs : EventArgs {
-        public ReadOnlyNodeLink nodeLink;
-        public NodeLinkEventArgs(ReadOnlyNodeLink nodeLink) { this.nodeLink = nodeLink; }
+        public NodeLink Link { get; }
+        public NodeLinkEventArgs(NodeLink link) => Link = link;
     }
 
-    [Serializable]
-    public partial class ProductionGraph : ISerializable {
+    public partial class ProductionGraph {
         public class NewNodeCollection {
-            public List<ReadOnlyBaseNode> newNodes { get; private set; }
-            public List<ReadOnlyNodeLink> newLinks { get; private set; }
-            public NewNodeCollection() { newNodes = new List<ReadOnlyBaseNode>(); newLinks = new List<ReadOnlyNodeLink>(); }
+            public List<BaseNode> newNodes { get; } = new();
+            public List<NodeLink> newLinks { get; } = new();
         }
 
         //public DataCache DCache { get; private set; }
@@ -62,9 +59,21 @@ namespace Foreman {
         public ModuleSelector ModuleSelector { get; private set; }
         public FuelSelector FuelSelector { get; private set; }
 
-        public IEnumerable<ReadOnlyBaseNode> Nodes => nodes.Select(node => node.ReadOnlyNode).OfType<ReadOnlyBaseNode>();
-        public IEnumerable<ReadOnlyNodeLink> NodeLinks => nodeLinks.Select(link => link.ReadOnlyLink);
+        public IEnumerable<BaseNode> Nodes => nodes;
+        public IEnumerable<NodeLink> NodeLinks => nodeLinks;
         public HashSet<int>? SerializeNodeIdSet { get; set; } //if this isnt null then the serialized production graph will only contain these nodes (and links between them)
+
+        internal (IReadOnlyCollection<BaseNode> nodes, IReadOnlyCollection<NodeLink> links) GetFragmentForSerialization() {
+            if (SerializeNodeIdSet is null)
+                return (nodes, nodeLinks);
+            var includedNodes = new HashSet<BaseNode>(nodes.Where(node => SerializeNodeIdSet.Contains(node.NodeID)));
+            var includedLinks = new HashSet<NodeLink>();
+            foreach (NodeLink link in nodeLinks) {
+                if (includedNodes.Contains(link.ConsumerNode) && includedNodes.Contains(link.SupplierNode))
+                    includedLinks.Add(link);
+            }
+            return (includedNodes, includedLinks);
+        }
 
         //editing this value will require the entire graph to be updated as any recipe nodes on it will possibly change the number of products and possibly cause a cascade of removed links
         private uint maxQualitySteps;
@@ -88,6 +97,7 @@ namespace Foreman {
         public event EventHandler<NodeLinkEventArgs>? LinkAdded;
         public event EventHandler<NodeLinkEventArgs>? LinkDeleted;
         public event EventHandler<EventArgs>? NodeValuesUpdated;
+        public event EventHandler? GraphCleared;
 
         public Rectangle Bounds {
             get {
@@ -111,8 +121,6 @@ namespace Foreman {
 
         private HashSet<BaseNode> nodes;
         private HashSet<NodeLink> nodeLinks;
-        private Dictionary<ReadOnlyBaseNode, BaseNode> roToNode;
-        private Dictionary<ReadOnlyNodeLink, NodeLink> roToLink;
         private int lastNodeID;
 
         public ProductionGraph() {
@@ -123,8 +131,6 @@ namespace Foreman {
 
             nodes = new HashSet<BaseNode>();
             nodeLinks = new HashSet<NodeLink>();
-            roToNode = new Dictionary<ReadOnlyBaseNode, BaseNode>();
-            roToLink = new Dictionary<ReadOnlyNodeLink, NodeLink>();
             lastNodeID = 0;
 
             AssemblerSelector = new AssemblerSelector();
@@ -132,51 +138,41 @@ namespace Foreman {
             FuelSelector = new FuelSelector();
         }
 
-        public BaseNodeController? RequestNodeController(ReadOnlyBaseNode node) => roToNode.TryGetValue(node, out var bn) ? bn.Controller : null;
+        public BaseNodeController? RequestNodeController(BaseNode node) => nodes.Contains(node) ? node.Controller : null;
 
-        private T SetupNodeOfType<T>(BaseNode node, Point location)
-            where T : ReadOnlyBaseNode {
+        private BaseNode SetupNodeOfType(BaseNode node, Point location) {
             node.Location = location;
             node.NodeDirection = DefaultNodeDirection;
-            if (node.ReadOnlyNode is not T ret)
-                throw new ArgumentNullException(nameof(node.ReadOnlyNode));
             nodes.Add(node);
-            roToNode.Add(node.ReadOnlyNode, node);
             node.UpdateState();
-            NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
-            return ret;
+            NodeAdded?.Invoke(this, new NodeEventArgs(node));
+            return node;
         }
 
-        public ReadOnlyConsumerNode CreateConsumerNode(ItemQualityPair item, Point location) {
-            return SetupNodeOfType<ReadOnlyConsumerNode>(new ConsumerNode(this, lastNodeID++, item), location);
-        }
+        public ConsumerNode CreateConsumerNode(ItemQualityPair item, Point location) =>
+            (ConsumerNode)SetupNodeOfType(new ConsumerNode(this, lastNodeID++, item), location);
 
-        public ReadOnlySupplierNode CreateSupplierNode(ItemQualityPair item, Point location) {
-            return SetupNodeOfType<ReadOnlySupplierNode>(new SupplierNode(this, lastNodeID++, item), location);
-        }
+        public SupplierNode CreateSupplierNode(ItemQualityPair item, Point location) =>
+            (SupplierNode)SetupNodeOfType(new SupplierNode(this, lastNodeID++, item), location);
 
-        public ReadOnlyPassthroughNode CreatePassthroughNode(ItemQualityPair item, Point location) {
-            return SetupNodeOfType<ReadOnlyPassthroughNode>(new PassthroughNode(this, lastNodeID++, item), location);
-        }
+        public PassthroughNode CreatePassthroughNode(ItemQualityPair item, Point location) =>
+            (PassthroughNode)SetupNodeOfType(new PassthroughNode(this, lastNodeID++, item), location);
 
-        public ReadOnlySpoilNode CreateSpoilNode(ItemQualityPair inputItem, Item outputItem, Point location) {
-            return SetupNodeOfType<ReadOnlySpoilNode>(new SpoilNode(this, lastNodeID++, inputItem, outputItem), location);
-        }
+        public SpoilNode CreateSpoilNode(ItemQualityPair inputItem, Item outputItem, Point location) =>
+            (SpoilNode)SetupNodeOfType(new SpoilNode(this, lastNodeID++, inputItem, outputItem), location);
 
-        public ReadOnlyPlantNode CreatePlantNode(PlantProcess plantProcess, Quality quality, Point location) {
-            return SetupNodeOfType<ReadOnlyPlantNode>(new PlantNode(this, lastNodeID++, plantProcess, quality), location);
-        }
+        public PlantNode CreatePlantNode(PlantProcess plantProcess, Quality quality, Point location) =>
+            (PlantNode)SetupNodeOfType(new PlantNode(this, lastNodeID++, plantProcess, quality), location);
 
-        public ReadOnlyRecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location) => CreateRecipeNode(recipe, location, null);
-        private ReadOnlyRecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location, Action<RecipeNode>? nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
-        {
+        public RecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location) =>
+            CreateRecipeNode(recipe, location, null);
+
+        private RecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location, Action<RecipeNode>? nodeSetupAction) {
             if (DefaultAssemblerQuality is null)
                 throw new NullReferenceException(nameof(DefaultAssemblerQuality));
             RecipeNode node = new RecipeNode(this, lastNodeID++, recipe, DefaultAssemblerQuality);
             node.Location = location;
             node.NodeDirection = DefaultNodeDirection;
-            if (node.ReadOnlyNode is not ReadOnlyRecipeNode ret)
-                throw new NullReferenceException(nameof(node.ReadOnlyNode));
             nodeSetupAction?.Invoke(node);
             if (nodeSetupAction == null) {
                 RecipeNodeController rnController = (RecipeNodeController)node.Controller;
@@ -184,73 +180,66 @@ namespace Foreman {
                 rnController.AutoSetAssemblerModules();
             }
             nodes.Add(node);
-            roToNode.Add(ret, node);
             node.UpdateInputsAndOutputs();
-            NodeAdded?.Invoke(this, new NodeEventArgs(ret));
-            return ret;
+            NodeAdded?.Invoke(this, new NodeEventArgs(node));
+            return node;
         }
 
-        public ReadOnlyNodeLink CreateLink(ReadOnlyBaseNode supplier, ReadOnlyBaseNode consumer, ItemQualityPair item) {
-            if (!roToNode.ContainsKey(supplier) || !roToNode.ContainsKey(consumer) || !supplier.Outputs.Contains(item) || !consumer.Inputs.Contains(item))
-                Trace.Fail(string.Format("Node link creation called with invalid parameters! consumer:{0}. supplier:{1}. item:{2}.", consumer.ToString(), supplier.ToString(), item.ToString()));
-            if (supplier.OutputLinks.Any(l => l.Item == item && l.Consumer == consumer)) //check for an already existing connection
-                return supplier.OutputLinks.First(l => l.Item == item && l.Consumer == consumer);
+        public NodeLink CreateLink(BaseNode supplier, BaseNode consumer, ItemQualityPair item) {
+            if (!nodes.Contains(supplier) || !nodes.Contains(consumer) || !supplier.Outputs.Contains(item) || !consumer.Inputs.Contains(item))
+                Trace.Fail(string.Format("Node link creation called with invalid parameters! consumer:{0}. supplier:{1}. item:{2}.", consumer, supplier, item));
+            if (supplier.OutputLinks.Any(l => l.Item == item && l.ConsumerNode == consumer))
+                return supplier.OutputLinks.First(l => l.Item == item && l.ConsumerNode == consumer);
 
-            BaseNode supplierNode = roToNode[supplier];
-            BaseNode consumerNode = roToNode[consumer];
-
-            NodeLink link = new NodeLink(this, supplierNode, consumerNode, item);
-            supplierNode.OutputLinks.Add(link);
-            consumerNode.InputLinks.Add(link);
+            NodeLink link = new NodeLink(this, supplier, consumer, item);
+            supplier.OutputLinks.Add(link);
+            consumer.InputLinks.Add(link);
             LinkChangeUpdateImpactedNodeStates(link, LinkType.Input);
             LinkChangeUpdateImpactedNodeStates(link, LinkType.Output);
 
             nodeLinks.Add(link);
-            roToLink.Add(link.ReadOnlyLink, link);
-            LinkAdded?.Invoke(this, new NodeLinkEventArgs(link.ReadOnlyLink));
-            return link.ReadOnlyLink;
+            LinkAdded?.Invoke(this, new NodeLinkEventArgs(link));
+            return link;
         }
 
-        public void DeleteNode(ReadOnlyBaseNode node) {
-            if (!roToNode.ContainsKey(node))
-                Trace.Fail(string.Format("Node deletion called on a node ({0}) that isnt part of the graph!", node.ToString()));
+        public void DeleteNode(BaseNode node) {
+            if (!nodes.Contains(node))
+                Trace.Fail(string.Format("Node deletion called on a node ({0}) that isnt part of the graph!", node));
 
-            foreach (ReadOnlyNodeLink link in node.InputLinks.ToList())
+            foreach (NodeLink link in node.InputLinks.ToList())
                 DeleteLink(link);
-            foreach (ReadOnlyNodeLink link in node.OutputLinks.ToList())
+            foreach (NodeLink link in node.OutputLinks.ToList())
                 DeleteLink(link);
 
-            nodes.Remove(roToNode[node]);
-            roToNode.Remove(node);
+            nodes.Remove(node);
             NodeDeleted?.Invoke(this, new NodeEventArgs(node));
         }
 
-        public void DeleteNodes(IEnumerable<ReadOnlyBaseNode> nodes) {
-            foreach (ReadOnlyBaseNode node in nodes)
+        public void DeleteNodes(IEnumerable<BaseNode> nodesToDelete) {
+            foreach (BaseNode node in nodesToDelete.ToList())
                 DeleteNode(node);
         }
 
-        public void DeleteLink(ReadOnlyNodeLink link) {
-            if (!roToLink.ContainsKey(link) || link.Consumer is null || link.Supplier is null || !roToNode.ContainsKey(link.Consumer) || !roToNode.ContainsKey(link.Supplier))
-                Trace.Fail(string.Format("Link deletion called with a link ({0}) that isnt part of the graph, or whose node(s) ({1}), ({2}) is/are not part of the graph!", link.ToString(), link.Consumer?.ToString(), link.Supplier?.ToString()));
+        public void DeleteLink(NodeLink link) {
+            if (!nodeLinks.Contains(link))
+                Trace.Fail(string.Format("Link deletion called with a link that isnt part of the graph!"));
 
-            NodeLink nodeLink = roToLink[link];
-            nodeLink.ConsumerNode.InputLinks.Remove(nodeLink);
-            nodeLink.SupplierNode.OutputLinks.Remove(nodeLink);
-            LinkChangeUpdateImpactedNodeStates(nodeLink, LinkType.Input);
-            LinkChangeUpdateImpactedNodeStates(nodeLink, LinkType.Output);
+            link.ConsumerNode.InputLinks.Remove(link);
+            link.SupplierNode.OutputLinks.Remove(link);
+            LinkChangeUpdateImpactedNodeStates(link, LinkType.Input);
+            LinkChangeUpdateImpactedNodeStates(link, LinkType.Output);
 
-            nodeLinks.Remove(nodeLink);
-            roToLink.Remove(link);
+            nodeLinks.Remove(link);
             LinkDeleted?.Invoke(this, new NodeLinkEventArgs(link));
         }
 
         public void ClearGraph() {
-            foreach (var node in nodes.Select(node => node.ReadOnlyNode).OfType<ReadOnlyBaseNode>())
+            foreach (BaseNode node in nodes.ToList())
                 DeleteNode(node);
 
             SerializeNodeIdSet = null;
             lastNodeID = 0;
+            GraphCleared?.Invoke(this, EventArgs.Empty);
         }
 
         public void UpdateNodeMaxQualities() {
@@ -265,22 +254,20 @@ namespace Foreman {
                 node.UpdateState(markAllAsDirty);
         }
 
-        public IEnumerable<ReadOnlyBaseNode> GetSuppliers(ItemQualityPair item) {
-            foreach (ReadOnlyBaseNode node in Nodes)
+        public IEnumerable<BaseNode> GetSuppliers(ItemQualityPair item) {
+            foreach (BaseNode node in Nodes)
                 if (node.Outputs.Contains(item))
                     yield return node;
         }
 
-        public IEnumerable<ReadOnlyBaseNode> GetConsumers(ItemQualityPair item) {
-            foreach (ReadOnlyBaseNode node in Nodes)
+        public IEnumerable<BaseNode> GetConsumers(ItemQualityPair item) {
+            foreach (BaseNode node in Nodes)
                 if (node.Inputs.Contains(item))
                     yield return node;
         }
 
-        public IEnumerable<IEnumerable<ReadOnlyBaseNode>> GetConnectedNodeGroups(bool includeCleanComponents) {
-            foreach (IEnumerable<BaseNode> group in GetConnectedComponents(includeCleanComponents))
-                yield return group.Select(node => node.ReadOnlyNode).OfType<ReadOnlyBaseNode>();
-        }
+        public IEnumerable<IEnumerable<BaseNode>> GetConnectedNodeGroups(bool includeCleanComponents) =>
+            GetConnectedComponents(includeCleanComponents);
 
         private IEnumerable<IEnumerable<BaseNode>> GetConnectedComponents(bool includeCleanComponents) //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving. Clean components refer to node groups where all the nodes inside the group havent had any changes since last solve operation
         {
@@ -322,7 +309,9 @@ namespace Foreman {
 
         public void UpdateNodeValues() {
             if (!PauseUpdates) {
-                try { OptimizeGraphNodeValues(); } catch (OverflowException) { } //overflow can theoretically be possible for extremely unbalanced recipes, but with the limit of double and the artificial limit set on max throughput this should never happen.
+                try { OptimizeGraphNodeValues(); } catch (OverflowException ex) {
+                    ErrorLogging.LogException(ex, "OptimizeGraphNodeValues overflow");
+                }
             }
             NodeValuesUpdated?.Invoke(this, EventArgs.Empty); //called even if no changes have been made in order to re-draw the graph (since something required a node value update - link deletion? node addition? whatever)
         }
@@ -354,353 +343,23 @@ namespace Foreman {
 
         //----------------------------------------------Save/Load JSON functions
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context) {
-            //collect the set of nodes and links to be saved (either entire set, or only that which is bound by the specified serialized node list)
-            HashSet<BaseNode> includedNodes = nodes;
-            HashSet<NodeLink> includedLinks = nodeLinks;
-            if (SerializeNodeIdSet != null) {
-                includedNodes = new HashSet<BaseNode>(nodes.Where(node => SerializeNodeIdSet.Contains(node.NodeID)));
-                includedLinks = new HashSet<NodeLink>();
-                foreach (NodeLink link in nodeLinks)
-                    if (includedNodes.Contains(link.ConsumerNode) && includedNodes.Contains(link.SupplierNode))
-                        includedLinks.Add(link);
-            }
+        public NewNodeCollection InsertNodesFromDocument(
+            DataCache cache,
+            ProductionGraphSaveDocument document,
+            bool applySolverSettings) =>
+            GraphSaveLoader.LoadProductionGraph(this, cache, document, applySolverSettings);
 
-            //prepare list of items/assemblers/modules/beacons/recipes that are part of the saved set. Recipes have to include a missing component due to the possibility of different recipes having same name (ex: regular iron.recipe, missing iron.recipe, missing iron.recipe #2)
-            HashSet<string> includedItems = [];
-
-            HashSet<string> includedAssemblers = [];
-            HashSet<string> includedModules = [];
-            HashSet<string> includedBeacons = [];
-
-            HashSet<Recipe> includedRecipes = [];
-            HashSet<Recipe> includedMissingRecipes = new(new RecipeNaInPrComparer()); //compares by name, ingredients, and products (not amounts, just items)
-            HashSet<PlantProcess> includedPlantProcesses = [];
-            HashSet<PlantProcess> includedMissingPlantProcesses = new(new PlantNaInPrComparer());
-
-            HashSet<KeyValuePair<string, int>> includedQualities = new(); //name,level
-            if (DefaultAssemblerQuality is not null)
-                includedQualities.Add(new KeyValuePair<string, int>(DefaultAssemblerQuality.Name, DefaultAssemblerQuality.Level));
-
-            foreach (BaseNode node in includedNodes) {
-                switch (node) {
-                    case RecipeNode rnode:
-                        if (rnode.BaseRecipe.Recipe?.IsMissing is true)
-                            includedMissingRecipes.Add(rnode.BaseRecipe.Recipe);
-                        else if (rnode.BaseRecipe.Recipe is not null)
-                            includedRecipes.Add(rnode.BaseRecipe.Recipe);
-
-                        includedAssemblers.Add(rnode.SelectedAssembler.Assembler.Name);
-
-                        if (rnode.SelectedBeacon && rnode.SelectedBeacon.Beacon is not null)
-                            includedBeacons.Add(rnode.SelectedBeacon.Beacon.Name);
-
-                        includedModules.UnionWith(rnode.AssemblerModules.Select(m => m.Module.Name));
-                        includedModules.UnionWith(rnode.BeaconModules.Select(m => m.Module.Name));
-
-                        if (rnode.BaseRecipe.Quality is not null)
-                            includedQualities.Add(new(rnode.BaseRecipe.Quality.Name, rnode.BaseRecipe.Quality.Level));
-                        includedQualities.Add(new(rnode.SelectedAssembler.Quality.Name, rnode.SelectedAssembler.Quality.Level));
-
-                        if (rnode.SelectedBeacon && rnode.BaseRecipe.Quality is not null)
-                            includedQualities.Add(new(rnode.BaseRecipe.Quality.Name, rnode.BaseRecipe.Quality.Level));
-
-                        includedQualities.UnionWith(rnode.AssemblerModules.Select(m => new KeyValuePair<string, int>(m.Quality.Name, m.Quality.Level)));
-                        includedQualities.UnionWith(rnode.BeaconModules.Select(m => new KeyValuePair<string, int>(m.Quality.Name, m.Quality.Level)));
-                        break;
-                    case PlantNode pnode:
-                        if (pnode.BasePlantProcess.IsMissing)
-                            includedMissingPlantProcesses.Add(pnode.BasePlantProcess);
-                        else
-                            includedPlantProcesses.Add(pnode.BasePlantProcess);
-                        if (pnode.Seed.Quality is not null)
-                            includedQualities.Add(new(pnode.Seed.Quality.Name, pnode.Seed.Quality.Level));
-                        break;
-                    case ConsumerNode cnode:
-                        if (cnode.ConsumedItem.Quality is not null)
-                            includedQualities.Add(new(cnode.ConsumedItem.Quality.Name, cnode.ConsumedItem.Quality.Level));
-                        break;
-                    case SupplierNode snode:
-                        if (snode.SuppliedItem.Quality is not null)
-                            includedQualities.Add(new(snode.SuppliedItem.Quality.Name, snode.SuppliedItem.Quality.Level));
-                        break;
-                    case PassthroughNode passnode:
-                        if (passnode.PassthroughItem.Quality is not null)
-                            includedQualities.Add(new KeyValuePair<string, int>(passnode.PassthroughItem.Quality.Name, passnode.PassthroughItem.Quality.Level));
-                        break;
-                    case SpoilNode spoilnode:
-                        if (spoilnode.InputItem.Quality is not null)
-                            includedQualities.Add(new KeyValuePair<string, int>(spoilnode.InputItem.Quality.Name, spoilnode.InputItem.Quality.Level));
-                        break;
-                }
-
-                //these will process all inputs/outputs -> so fuel/burnt items are included automatically!
-                includedItems.UnionWith(node.Inputs.Select(i => i.Item?.Name).OfType<string>());
-                includedItems.UnionWith(node.Outputs.Select(i => i.Item?.Name).OfType<string>());
-            }
-            var includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
-            includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
-            var includedPlantShorts = includedPlantProcesses.Select(pprocess => new PlantShort(pprocess)).ToList();
-            includedPlantShorts.AddRange(includedMissingPlantProcesses.Select(pprocess => new PlantShort(pprocess))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
-
-            //serialize
-            info.AddValue("Version", Properties.Settings.Default.ForemanVersion);
-            info.AddValue("Object", "ProductionGraph");
-
-            info.AddValue("EnableExtraProductivityForNonMiners", EnableExtraProductivityForNonMiners);
-            info.AddValue("DefaultNodeDirection", (int)DefaultNodeDirection);
-            info.AddValue("Solver_PullOutputNodes", PullOutputNodes);
-            info.AddValue("Solver_PullOutputNodesPower", PullOutputNodesPower);
-            info.AddValue("Solver_LowPriorityPower", LowPriorityPower);
-            info.AddValue("MaxQualitySteps", MaxQualitySteps);
-            info.AddValue("DefaultQuality", DefaultAssemblerQuality?.Name ?? "normal");
-
-            info.AddValue("IncludedItems", includedItems);
-            info.AddValue("IncludedRecipes", includedRecipeShorts);
-            info.AddValue("IncludedPlantProcesses", includedPlantShorts);
-            info.AddValue("IncludedAssemblers", includedAssemblers);
-            info.AddValue("IncludedModules", includedModules);
-            info.AddValue("IncludedBeacons", includedBeacons);
-            info.AddValue("IncludedQualities", includedQualities);
-
-            info.AddValue("Nodes", includedNodes);
-            info.AddValue("NodeLinks", includedLinks);
-        }
-
-        public NewNodeCollection InsertNodesFromJson(DataCache cache, JObject json, bool loadSolverValues) //cache is necessary since we will possibly be adding to mssing items/recipes
-        {
-            if (JsonTokens.AsInt32(json["Version"]) != Properties.Settings.Default.ForemanVersion ||
-                JsonTokens.AsString(json["Object"]) != "ProductionGraph") {
-                JObject? migrated = VersionUpdater.UpdateGraph(json, cache);
-                if (migrated is null) //update failed
-                    return new NewNodeCollection();
-                json = migrated;
-            }
-
-            NewNodeCollection newNodeCollection = new NewNodeCollection();
-            Dictionary<int, ReadOnlyBaseNode> oldNodeIndices = new Dictionary<int, ReadOnlyBaseNode>(); //the links between the node index (as imported) and the newly created node (which will now have a different index). Used to link up nodes
-
-            try {
-                //check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
-                cache.ProcessImportedItemsSet(json["IncludedItems"]?.Select(t => (string?)t).OfType<string>() ?? []);
-                var qualityLinks = cache.ProcessImportedQualitiesSet(json["IncludedQualities"]
-                    ?.Select(j => (string?)j["Key"] is string key && (int?)j["Value"] is int value ? new KeyValuePair<string, int>(key, value) : (KeyValuePair<string, int>?)null).OfType<KeyValuePair<string, int>>() ?? []);
-                cache.ProcessImportedAssemblersSet(json["IncludedAssemblers"]?.Select(t => (string?)t).OfType<string>() ?? []);
-                cache.ProcessImportedModulesSet(json["IncludedModules"]?.Select(t => (string?)t).OfType<string>() ?? []);
-                cache.ProcessImportedBeaconsSet(json["IncludedBeacons"]?.Select(t => (string?)t).OfType<string>() ?? []);
-                Dictionary<long, Recipe> recipeLinks = cache.ProcessImportedRecipesSet(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
-                Dictionary<long, PlantProcess> plantProcessLinks = cache.ProcessImportedPlantProcessesSet(PlantShort.GetSetFromJson(json["IncludedPlantProcesses"]));
-
-                if (loadSolverValues) {
-                    EnableExtraProductivityForNonMiners = JsonTokens.AsBoolean(json["EnableExtraProductivityForNonMiners"]) is true;
-                    DefaultNodeDirection = JsonTokens.AsInt32(json["DefaultNodeDirection"]) is int directionValue ? (NodeDirection)directionValue : NodeDirection.Up;
-                    PullOutputNodes = JsonTokens.AsBoolean(json["Solver_PullOutputNodes"]) is true;
-                    PullOutputNodesPower = JsonTokens.AsDouble(json["Solver_PullOutputNodesPower"]) ?? default;
-                    LowPriorityPower = JsonTokens.AsDouble(json["Solver_LowPriorityPower"]) ?? default;
-                    MaxQualitySteps = (uint)(JsonTokens.AsInt32(json["MaxQualitySteps"]) ?? default);
-                    DefaultAssemblerQuality = qualityLinks[JsonTokens.AsString(json["DefaultQuality"]) ?? "normal"];
-                }
-
-                //add in all the graph nodes
-                foreach (JToken nodeJToken in json["Nodes"]?.AsEnumerable() ?? []) {
-                    BaseNode? newNode = null;
-                    string[] locationString = JsonTokens.AsString(nodeJToken["Location"])?.Split(',') ?? [];
-                    Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
-                    string? itemName = null; //just an early define
-                    Quality? quality = null; //early define
-
-                    if (JsonTokens.AsInt32(nodeJToken["NodeType"]) is not int nt)
-                        continue;
-
-                    switch ((NodeType)nt) {
-                        case NodeType.Consumer:
-                            itemName = JsonTokens.AsString(nodeJToken["Item"]);
-                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq)
-                                qualityLinks.TryGetValue(bq, out quality);
-                            if (itemName is not null && quality is not null && cache.Items.TryGetValue(itemName, out var value))
-                                newNode = roToNode[CreateConsumerNode(new ItemQualityPair(value, quality), location)];
-                            else if (itemName is not null && quality is not null)
-                                newNode = roToNode[CreateConsumerNode(new ItemQualityPair(cache.MissingItems[itemName], quality), location)];
-                            if (newNode?.ReadOnlyNode is not null)
-                                newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
-                            break;
-                        case NodeType.Supplier:
-                            itemName = JsonTokens.AsString(nodeJToken["Item"]);
-                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq2)
-                                qualityLinks.TryGetValue(bq2, out quality);
-                            if (itemName is not null && quality is not null && cache.Items.TryGetValue(itemName, out var value2))
-                                newNode = roToNode[CreateSupplierNode(new ItemQualityPair(value2, quality), location)];
-                            else if (itemName is not null && quality is not null)
-                                newNode = roToNode[CreateSupplierNode(new ItemQualityPair(cache.MissingItems[itemName], quality), location)];
-                            if (newNode?.ReadOnlyNode is not null)
-                                newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
-                            break;
-                        case NodeType.Passthrough:
-                            itemName = JsonTokens.AsString(nodeJToken["Item"]);
-                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq3)
-                                qualityLinks.TryGetValue(bq3, out quality);
-                            if (itemName is not null && quality is not null && cache.Items.TryGetValue(itemName, out var value3))
-                                newNode = roToNode[CreatePassthroughNode(new ItemQualityPair(value3, quality), location)];
-                            else if (itemName is not null && quality is not null)
-                                newNode = roToNode[CreatePassthroughNode(new ItemQualityPair(cache.MissingItems[itemName], quality), location)];
-                            (newNode as PassthroughNode)?.SimpleDraw = JsonTokens.AsBoolean(nodeJToken["SDraw"]) is true;
-                            if (newNode?.ReadOnlyNode is not null)
-                                newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
-                            break;
-                        case NodeType.Spoil:
-                            itemName = JsonTokens.AsString(nodeJToken["InputItem"]);
-                            var outputItemName = JsonTokens.AsString(nodeJToken["OutputItem"]);
-                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq4)
-                                qualityLinks.TryGetValue(bq4, out quality);
-                            var inputItem = itemName is not null ? (cache.Items.ContainsKey(itemName) ? cache.Items[itemName] : cache.MissingItems[itemName]) : default;
-                            var outputItem = outputItemName is not null ? (cache.Items.ContainsKey(outputItemName) ? cache.Items[outputItemName] : cache.MissingItems[outputItemName]) : default;
-                            if (inputItem is not null && quality is not null && outputItem is not null)
-                                newNode = roToNode[CreateSpoilNode(new ItemQualityPair(inputItem, quality), outputItem, location)];
-                            if (newNode?.ReadOnlyNode is not null)
-                                newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
-                            break;
-                        case NodeType.Plant:
-                            long pprocessID = JsonTokens.AsInt64(nodeJToken["PlantProcessID"]) ?? default;
-                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq5)
-                                qualityLinks.TryGetValue(bq5, out quality);
-                            if (quality is not null)
-                                newNode = roToNode[CreatePlantNode(plantProcessLinks[pprocessID], quality, location)];
-                            if (newNode?.ReadOnlyNode is not null)
-                                newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
-                            break;
-                        case NodeType.Recipe:
-                            long recipeID = JsonTokens.AsInt64(nodeJToken["RecipeID"]) ?? default;
-                            Quality? recipeQuality = null;
-                            if (JsonTokens.AsString(nodeJToken["RecipeQuality"]) is string rq)
-                                qualityLinks.TryGetValue(rq, out recipeQuality);
-                            if (recipeQuality is not null)
-                                newNode = roToNode[CreateRecipeNode(new RecipeQualityPair(recipeLinks[recipeID], recipeQuality), location, (rNode) => {
-                                    RecipeNodeController rNodeController = (RecipeNodeController)rNode.Controller;
-
-                                    rNode.LowPriority = (nodeJToken["LowPriority"] != null);
-
-                                    rNode.NeighbourCount = JsonTokens.AsDouble(nodeJToken["Neighbours"]) ?? default;
-                                    rNode.ExtraProductivityBonus = JsonTokens.AsDouble(nodeJToken["ExtraProductivity"]) ?? default;
-
-                                    var assemblerName = JsonTokens.AsString(nodeJToken["Assembler"]);
-                                    Quality? assemblerQuality = null;
-                                    if (JsonTokens.AsString(nodeJToken["AssemblerQuality"]) is string aq)
-                                        qualityLinks.TryGetValue(aq, out assemblerQuality);
-                                    if (assemblerName is not null && assemblerQuality is not null && cache.Assemblers.TryGetValue(assemblerName, out var assembler))
-                                        rNodeController.SetAssembler(new AssemblerQualityPair(assembler, assemblerQuality));
-                                    else if (assemblerName is not null && assemblerQuality is not null && cache.MissingAssemblers.TryGetValue(assemblerName, out var assembler2))
-                                        rNodeController.SetAssembler(new AssemblerQualityPair(assembler2, assemblerQuality));
-
-                                    foreach (JToken module in nodeJToken["AssemblerModules"]?.AsEnumerable() ?? []) {
-                                        var moduleName = JsonTokens.AsString(module["Name"]);
-                                        Quality? moduleQuality = null;
-                                        if (JsonTokens.AsString(module["Quality"]) is string quality)
-                                            qualityLinks.TryGetValue(quality, out moduleQuality);
-                                        if (moduleName is not null && moduleQuality is not null && cache.Modules.TryGetValue(moduleName, out var module2))
-                                            rNodeController.AddAssemblerModule(new ModuleQualityPair(module2, moduleQuality));
-                                        else if (moduleName is not null && moduleQuality is not null && cache.MissingModules.TryGetValue(moduleName, out module2))
-                                            rNodeController.AddAssemblerModule(new ModuleQualityPair(module2, moduleQuality));
-                                    }
-
-                                    if (nodeJToken["Fuel"] != null) {
-                                        var s = JsonTokens.AsString(nodeJToken["Fuel"]);
-                                        if (s is not null && cache.Items.TryGetValue(s, out var item))
-                                            rNodeController.SetFuel(item);
-                                        else if (s is not null && cache.MissingItems.TryGetValue(s, out var item2))
-                                            rNodeController.SetFuel(item2);
-                                    } else if (rNode.SelectedAssembler.Assembler.IsBurner) //and fuel is null... well - its the import. set it as null (and consider it an error)
-                                        rNodeController.SetFuel(null);
-
-                                    if (JsonTokens.AsString(nodeJToken["Burnt"]) is string burntStr) {
-                                        Item? burntItem;
-                                        if (!cache.Items.TryGetValue(burntStr, out burntItem))
-                                            cache.MissingItems.TryGetValue(burntStr, out burntItem);
-                                        if (rNode.FuelRemains != burntItem)
-                                            rNode.SetBurntOverride(burntItem);
-                                    } else if (rNode.Fuel != null && rNode.Fuel.BurnResult != null) //same as above - there should be a burn result, but there isnt...
-                                        rNode.SetBurntOverride(null);
-
-                                    if (JsonTokens.AsString(nodeJToken["Beacon"]) is string beaconName) {
-                                        Quality? beaconQuality = null;
-                                        if (JsonTokens.AsString(nodeJToken["BeaconQuality"]) is string beaconQualityStr)
-                                            qualityLinks.TryGetValue(beaconQualityStr, out beaconQuality);
-
-                                        if (beaconQuality is not null && cache.Beacons.ContainsKey(beaconName))
-                                            rNodeController.SetBeacon(new BeaconQualityPair(cache.Beacons[beaconName], beaconQuality));
-                                        else if (beaconQuality is not null)
-                                            rNodeController.SetBeacon(new BeaconQualityPair(cache.MissingBeacons[beaconName], beaconQuality));
-
-                                        foreach (JToken module in nodeJToken["BeaconModules"]?.AsEnumerable() ?? []) {
-                                            var moduleName = JsonTokens.AsString(module["Name"]);
-                                            Quality? moduleQuality = null;
-                                            if (JsonTokens.AsString(module["Quality"]) is string q)
-                                                qualityLinks.TryGetValue(q, out moduleQuality);
-
-                                            if (moduleName is not null && moduleQuality is not null && cache.Modules.TryGetValue(moduleName, out var module2))
-                                                rNodeController.AddBeaconModule(new ModuleQualityPair(module2, moduleQuality));
-                                            else if (moduleName is not null && moduleQuality is not null && cache.MissingModules.TryGetValue(moduleName, out module2))
-                                                rNodeController.AddBeaconModule(new ModuleQualityPair(module2, moduleQuality));
-                                        }
-
-                                        rNode.BeaconCount = JsonTokens.AsDouble(nodeJToken["BeaconCount"]) ?? default;
-                                        rNode.BeaconsPerAssembler = JsonTokens.AsDouble(nodeJToken["BeaconsPerAssembler"]) ?? default;
-                                        rNode.BeaconsConst = JsonTokens.AsDouble(nodeJToken["BeaconsConst"]) ?? default;
-                                    }
-
-                                    if (rNode.ReadOnlyNode is not null)
-                                        newNodeCollection.newNodes.Add(rNode.ReadOnlyNode); //done last, so as to catch any errors above first.
-                                })];
-                            break;
-                        default:
-                            throw new Exception(); //we will catch it right away and delete all nodes added in thus far. Error was most likely in json read, in which case we count it as a corrupt json and not import anything.
-                    }
-
-                    if (JsonTokens.AsInt32(nodeJToken["RateType"]) is int i)
-                        newNode?.RateType = (RateType)i;
-                    if (newNode?.RateType == RateType.Manual)
-                        newNode.DesiredSetValue = JsonTokens.AsDouble(nodeJToken["DesiredSetValue"]) ?? default;
-
-                    newNode?.NodeDirection = JsonTokens.AsInt32(nodeJToken["Direction"]) is int j ? (NodeDirection)j : NodeDirection.Up;
-
-                    if (JsonTokens.AsString(nodeJToken["KeyNode"]) is string keyNode) {
-                        newNode?.KeyNode = true;
-                        newNode?.KeyNodeTitle = keyNode;
-                    }
-
-                    if (JsonTokens.AsInt32(nodeJToken["NodeID"]) is int nodeId && newNode?.ReadOnlyNode is not null)
-                        oldNodeIndices.Add(nodeId, newNode.ReadOnlyNode);
-                }
-
-                //link the new nodes
-                foreach (JToken nodeLinkJToken in json["NodeLinks"]?.AsEnumerable() ?? []) {
-                    if (JsonTokens.AsInt32(nodeLinkJToken["SupplierID"]) is not int supplierId ||
-                        JsonTokens.AsInt32(nodeLinkJToken["ConsumerID"]) is not int consumerId ||
-                        JsonTokens.AsString(nodeLinkJToken["Quality"]) is not string qualityStr ||
-                        JsonTokens.AsString(nodeLinkJToken["Item"]) is not string itemName)
-                        continue;
-                    ReadOnlyBaseNode supplier = oldNodeIndices[supplierId];
-                    ReadOnlyBaseNode consumer = oldNodeIndices[consumerId];
-                    ItemQualityPair item;
-                    var quality = qualityLinks[qualityStr];
-                    if (quality is null)
-                        continue;
-
-                    if (cache.Items.ContainsKey(itemName))
-                        item = new ItemQualityPair(cache.Items[itemName], quality);
-                    else
-                        item = new ItemQualityPair(cache.MissingItems[itemName], quality);
-
-                    if (LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
-                        newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
-                }
-            } catch (Exception e) //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
-              {
-                ErrorLogging.LogLine(string.Format("Error loading nodes into producton graph! ERROR: {0}", e));
-                Console.WriteLine(e);
-                DeleteNodes(newNodeCollection.newNodes);
+        public NewNodeCollection InsertNodesFromFragment(DataCache cache, string json, bool applySolverSettings) {
+            ProductionGraphSaveDocument? document = GraphSaveCodec.ReadGraphPayload(json);
+            if (document is null)
                 return new NewNodeCollection();
-            }
-            return newNodeCollection;
+            return InsertNodesFromDocument(cache, document, applySolverSettings);
         }
+
+        internal RecipeNode CreateRecipeNodeWithSetup(
+            RecipeQualityPair recipe,
+            Point location,
+            Action<RecipeNode>? nodeSetupAction) =>
+            CreateRecipeNode(recipe, location, nodeSetupAction);
     }
 }

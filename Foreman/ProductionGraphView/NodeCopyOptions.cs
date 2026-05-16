@@ -1,14 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Foreman.Graph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Foreman {
-    [Serializable]
-    public class NodeCopyOptions : ISerializable {
+    public class NodeCopyOptions {
         public readonly AssemblerQualityPair Assembler;
         public readonly IReadOnlyList<ModuleQualityPair> AssemblerModules;
         public readonly Item? Fuel;
@@ -21,17 +19,115 @@ namespace Foreman {
         public readonly double BeaconsPerAssembler;
         public readonly double BeaconsConst;
 
-        public NodeCopyOptions(ReadOnlyRecipeNode node) {
-            Assembler = node.SelectedAssembler;
-            AssemblerModules = new List<ModuleQualityPair>(node.AssemblerModules);
-            Fuel = node.Fuel;
-            Beacon = node.SelectedBeacon;
-            BeaconModules = new List<ModuleQualityPair>(node.BeaconModules);
-            BeaconCount = node.BeaconCount;
-            BeaconsPerAssembler = node.BeaconsPerAssembler;
-            BeaconsConst = node.BeaconsConst;
-            NeighbourCount = node.NeighbourCount;
-            ExtraProductivityBonus = node.ExtraProductivity;
+        public NodeCopyOptions(IRecipeNodeViewModel node) : this(
+            node.SelectedAssembler,
+            node.AssemblerModules,
+            node.Fuel,
+            node.SelectedBeacon,
+            node.BeaconModules,
+            node.BeaconCount,
+            node.BeaconsPerAssembler,
+            node.BeaconsConst,
+            node.NeighbourCount,
+            node.ExtraProductivity) {
+        }
+
+        public NodeCopyOptions(RecipeNode node) : this(
+            node.SelectedAssembler,
+            node.AssemblerModules,
+            node.Fuel,
+            node.SelectedBeacon,
+            node.BeaconModules,
+            node.BeaconCount,
+            node.BeaconsPerAssembler,
+            node.BeaconsConst,
+            node.NeighbourCount,
+            node.ExtraProductivityBonus) {
+        }
+
+        private NodeCopyOptions(
+            AssemblerQualityPair assembler,
+            IReadOnlyList<ModuleQualityPair> assemblerModules,
+            Item? fuel,
+            BeaconQualityPair beacon,
+            IReadOnlyList<ModuleQualityPair> beaconModules,
+            double beaconCount,
+            double beaconsPerAssembler,
+            double beaconsConst,
+            double neighbourCount,
+            double extraProductivityBonus) {
+            Assembler = assembler;
+            AssemblerModules = new List<ModuleQualityPair>(assemblerModules);
+            Fuel = fuel;
+            Beacon = beacon;
+            BeaconModules = new List<ModuleQualityPair>(beaconModules);
+            BeaconCount = beaconCount;
+            BeaconsPerAssembler = beaconsPerAssembler;
+            BeaconsConst = beaconsConst;
+            NeighbourCount = neighbourCount;
+            ExtraProductivityBonus = extraProductivityBonus;
+        }
+
+        internal static NodeCopyOptions? FromSaveDocument(NodeCopyOptionsSaveDocument document, DataCache cache) {
+            Quality? defaultQuality = cache.DefaultQuality;
+
+            if (!cache.Assemblers.TryGetValue(document.AssemblerName, out Assembler? assembler) || assembler is null)
+                return null;
+
+            Quality? assemblerQuality = ResolveQuality(cache, document.AssemblerQualityName, defaultQuality);
+            if (assemblerQuality is null)
+                return null;
+
+            BeaconQualityPair beaconPair;
+            if (document.BeaconName is not null) {
+                if (!cache.Beacons.TryGetValue(document.BeaconName, out Beacon? beacon) || beacon is null)
+                    return null;
+                Quality? beaconQuality = ResolveQuality(cache, document.BeaconQualityName ?? "", defaultQuality);
+                if (beaconQuality is null)
+                    return null;
+                beaconPair = new BeaconQualityPair(beacon, beaconQuality);
+            } else
+                beaconPair = new BeaconQualityPair("no beacon");
+
+            Item? fuel = null;
+            if (document.FuelName is not null && cache.Items.TryGetValue(document.FuelName, out Item? fuelItem))
+                fuel = fuelItem;
+
+            return new NodeCopyOptions(
+                new AssemblerQualityPair(assembler, assemblerQuality),
+                ResolveModules(cache, document.AssemblerModules, defaultQuality),
+                document.NeighbourCount,
+                document.ExtraProductivityBonus,
+                fuel,
+                beaconPair,
+                ResolveModules(cache, document.BeaconModules, defaultQuality),
+                document.BeaconName is not null ? document.BeaconCount : 0,
+                document.BeaconName is not null ? document.BeaconsPerAssembler : 0,
+                document.BeaconName is not null ? document.BeaconsConst : 0);
+        }
+
+        private static Quality? ResolveQuality(DataCache cache, string qualityName, Quality? defaultQuality) {
+            if (cache.Qualities.TryGetValue(qualityName, out Quality? quality))
+                return quality;
+            if (cache.MissingQualities.TryGetValue(qualityName, out quality))
+                return quality;
+            return defaultQuality;
+        }
+
+        private static List<ModuleQualityPair> ResolveModules(
+            DataCache cache,
+            IReadOnlyList<ModuleQualitySaveData> modules,
+            Quality? defaultQuality) {
+            List<ModuleQualityPair> result = [];
+            foreach (ModuleQualitySaveData moduleData in modules) {
+                if (!cache.Modules.TryGetValue(moduleData.ModuleName, out Module? module) || module is null)
+                    continue;
+                Quality? quality = ResolveQuality(cache, moduleData.QualityName, defaultQuality);
+                if (quality is null)
+                    continue;
+                result.Add(new ModuleQualityPair(module, quality));
+            }
+            return result;
         }
 
         private NodeCopyOptions(AssemblerQualityPair assembler, List<ModuleQualityPair> assemblerModules, double neighbourCount, double extraProductivityBonus, Item? fuel, BeaconQualityPair beacon, List<ModuleQualityPair> beaconModules, double beaconCount, double beaconsPerA, double beaconsCont) {
@@ -48,120 +144,17 @@ namespace Foreman {
         }
 
         public static NodeCopyOptions? GetNodeCopyOptions(string serialized, DataCache cache) {
-            try { return GetNodeCopyOptions(JObject.Parse(serialized), cache); } catch (Exception ex) {
-                ErrorLogging.LogLine(string.Format("Failed to parse node copy options from clipboard: {0}", ex));
+            try {
+                NodeCopyOptionsSaveDocument? document = GraphSaveCodec.ReadNodeCopyOptions(serialized);
+                return document is null ? null : FromSaveDocument(document, cache);
+            } catch (Exception ex) {
+                ErrorLogging.LogException(ex, "Failed to parse node copy options from clipboard");
                 return null;
             }
         }
 
-        public static NodeCopyOptions? GetNodeCopyOptions(JToken json, DataCache cache) {
-            if (JsonTokens.AsInt32(json["Version"]) != Properties.Settings.Default.ForemanVersion || JsonTokens.AsString(json["Object"]) != "NodeCopyOptions")
-                return null;
+        public static NodeCopyOptions? GetNodeCopyOptions(NodeCopyOptionsSaveDocument document, DataCache cache) =>
+            FromSaveDocument(document, cache);
 
-            Quality? defaultQuality = cache.DefaultQuality;
-
-            string? assemblerName = JsonTokens.AsString(json["Assembler"]);
-            if (string.IsNullOrEmpty(assemblerName) || !cache.Assemblers.TryGetValue(assemblerName, out Assembler? assembler) || assembler is null)
-                return null;
-
-            Quality? assemblerQuality = null;
-            string? assemblerQualityName = JsonTokens.AsString(json["AssemblerQuality"]);
-            if (!string.IsNullOrEmpty(assemblerQualityName) && cache.Qualities.TryGetValue(assemblerQualityName, out Quality? aq))
-                assemblerQuality = aq;
-            if (assemblerQuality is null && defaultQuality is null)
-                return null;
-            Quality resolvedAssemblerQuality = assemblerQuality is not null
-                ? assemblerQuality
-                : defaultQuality ?? throw new InvalidOperationException("Missing default quality for assembler.");
-            AssemblerQualityPair assemberQP = new AssemblerQualityPair(assembler, resolvedAssemblerQuality);
-
-            bool beacons = json["Beacon"] != null;
-            BeaconQualityPair beaconQP;
-            if (beacons) {
-                string? beaconName = JsonTokens.AsString(json["Beacon"]);
-                if (string.IsNullOrEmpty(beaconName) || !cache.Beacons.TryGetValue(beaconName, out Beacon? beacon) || beacon is null)
-                    return null;
-                Quality? beaconQuality = null;
-                string? beaconQualityName = JsonTokens.AsString(json["BeaconQuality"]);
-                if (!string.IsNullOrEmpty(beaconQualityName) && cache.Qualities.TryGetValue(beaconQualityName, out Quality? bq))
-                    beaconQuality = bq;
-                if (beaconQuality is null && defaultQuality is null)
-                    return null;
-                Quality resolvedBeaconQuality = beaconQuality is not null
-                    ? beaconQuality
-                    : defaultQuality ?? throw new InvalidOperationException("Missing default quality for beacon.");
-                beaconQP = new BeaconQualityPair(beacon, resolvedBeaconQuality);
-            } else
-                beaconQP = new BeaconQualityPair("no beacon");
-
-            List<ModuleQualityPair> aModules = new List<ModuleQualityPair>();
-            foreach (JToken moduleToken in json["AModules"] ?? new JArray()) {
-                string? moduleName = JsonTokens.AsString(moduleToken["Name"]);
-                string? moduleQualityName = JsonTokens.AsString(moduleToken["Quality"]);
-                if (string.IsNullOrEmpty(moduleName) || string.IsNullOrEmpty(moduleQualityName))
-                    continue;
-                if (!cache.Modules.TryGetValue(moduleName, out Module? module) || module is null)
-                    continue;
-                Quality? quality = cache.Qualities.TryGetValue(moduleQualityName, out Quality? mq) ? mq : defaultQuality;
-                if (quality is null)
-                    continue;
-                aModules.Add(new ModuleQualityPair(module, quality));
-            }
-
-            List<ModuleQualityPair> bModules = new List<ModuleQualityPair>();
-            foreach (JToken moduleToken in json["BModules"] ?? new JArray()) {
-                string? moduleName = JsonTokens.AsString(moduleToken["Name"]);
-                string? moduleQualityName = JsonTokens.AsString(moduleToken["Quality"]);
-                if (string.IsNullOrEmpty(moduleName) || string.IsNullOrEmpty(moduleQualityName))
-                    continue;
-                if (!cache.Modules.TryGetValue(moduleName, out Module? module) || module is null)
-                    continue;
-                Quality? quality = cache.Qualities.TryGetValue(moduleQualityName, out Quality? mq) ? mq : defaultQuality;
-                if (quality is null)
-                    continue;
-                bModules.Add(new ModuleQualityPair(module, quality));
-            }
-
-            Item? fuel = null;
-            string? fuelName = JsonTokens.AsString(json["Fuel"]);
-            if (!string.IsNullOrEmpty(fuelName) && cache.Items.TryGetValue(fuelName, out Item? fuelItem))
-                fuel = fuelItem;
-
-            NodeCopyOptions nco = new NodeCopyOptions(
-                assemberQP,
-                aModules,
-                JsonTokens.AsDouble(json["Neighbours"]) ?? 0,
-                JsonTokens.AsDouble(json["ExtraProductivity"]) ?? 0,
-                fuel,
-                beaconQP,
-                bModules,
-                beacons ? JsonTokens.AsDouble(json["BeaconCount"]) ?? 0 : 0,
-                beacons ? JsonTokens.AsDouble(json["BeaconsPA"]) ?? 0 : 0,
-                beacons ? JsonTokens.AsDouble(json["BeaconsC"]) ?? 0 : 0);
-            return nco;
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context) {
-            info.AddValue("Version", Properties.Settings.Default.ForemanVersion);
-            info.AddValue("Object", "NodeCopyOptions");
-            info.AddValue("Assembler", Assembler.Assembler.Name);
-            info.AddValue("AssemblerQuality", Assembler.Quality.Name);
-
-            info.AddValue("Neighbours", NeighbourCount);
-            info.AddValue("ExtraProductivity", ExtraProductivityBonus);
-            info.AddValue("AModules", AssemblerModules);
-            info.AddValue("BModules", BeaconModules);
-
-            if (Fuel != null)
-                info.AddValue("Fuel", Fuel.Name);
-
-            if (Beacon.Beacon is Beacon beaconEntity && Beacon.Quality is Quality beaconQuality) {
-                info.AddValue("Beacon", beaconEntity.Name);
-                info.AddValue("BeaconQuality", beaconQuality.Name);
-                info.AddValue("BeaconCount", BeaconCount);
-                info.AddValue("BeaconsPA", BeaconsPerAssembler);
-                info.AddValue("BeaconsC", BeaconsConst);
-            }
-        }
     }
 }
