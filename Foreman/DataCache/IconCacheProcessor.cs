@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -8,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -121,7 +121,7 @@ namespace Foreman {
             return true;
         }
 
-        public bool CreateIconCache(JObject iconJObject, string cachePath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token, int startingPercent, int endingPercent) {
+        public bool CreateIconCache(JsonObject iconJObject, string cachePath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token, int startingPercent, int endingPercent) {
             ObjectDisposedException.ThrowIf(disposedValue, this);
             TotalPathCount = 0;
             FailedPathCount = 0;
@@ -130,53 +130,53 @@ namespace Foreman {
             bitmapCache.Clear();
 
             int totalCount =
-                (iconJObject["technologies"]?.Count() ?? default) +
-                (iconJObject["recipes"]?.Count() ?? default) +
-                (iconJObject["items"]?.Count() ?? default) +
-                (iconJObject["fluids"]?.Count() ?? default) +
-                (iconJObject["entities"]?.Count() ?? default) +
-                (iconJObject["groups"]?.Count() ?? default) +
-                (iconJObject["qualities"]?.Count() ?? default);
+                PresetJson.CountArray(iconJObject, "technologies") +
+                PresetJson.CountArray(iconJObject, "recipes") +
+                PresetJson.CountArray(iconJObject, "items") +
+                PresetJson.CountArray(iconJObject, "fluids") +
+                PresetJson.CountArray(iconJObject, "entities") +
+                PresetJson.CountArray(iconJObject, "groups") +
+                PresetJson.CountArray(iconJObject, "qualities");
 
             progress.Report(new(startingPercent, "Creating icons."));
             int counter = 0;
-            foreach (var iconJToken in iconJObject["technologies"]?.AsEnumerable() ?? []) {
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconJObject, "technologies")) {
                 if (token.IsCancellationRequested)
                     return false;
                 progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 256);
             }
-            foreach (var iconJToken in iconJObject["recipes"]?.AsEnumerable() ?? []) {
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconJObject, "recipes")) {
                 if (token.IsCancellationRequested)
                     return false;
                 progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 32);
             }
-            foreach (var iconJToken in iconJObject["items"]?.AsEnumerable() ?? []) {
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconJObject, "items")) {
                 if (token.IsCancellationRequested)
                     return false;
                 progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 32);
             }
-            foreach (var iconJToken in iconJObject["fluids"]?.AsEnumerable() ?? []) {
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconJObject, "fluids")) {
                 if (token.IsCancellationRequested)
                     return false;
                 progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 32);
             }
-            foreach (var iconJToken in iconJObject["entities"]?.AsEnumerable() ?? []) {
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconJObject, "entities")) {
                 if (token.IsCancellationRequested)
                     return false;
                 progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 64);
             }
-            foreach (var iconJToken in iconJObject["groups"]?.AsEnumerable() ?? []) {
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconJObject, "groups")) {
                 if (token.IsCancellationRequested)
                     return false;
                 progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
                 ProcessIcon(iconJToken, 64);
             }
-            foreach (var iconJToken in iconJObject["qualities"]?.AsEnumerable() ?? []) {
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconJObject, "qualities")) {
                 if (token.IsCancellationRequested)
                     return false;
                 progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
@@ -188,13 +188,13 @@ namespace Foreman {
             return (FailedPathCount == 0);
         }
 
-        private void ProcessIcon(JToken objJToken, int defaultIconSize) {
-            if (objJToken["icon_data"] is JToken iconDataJToken) {
-                var iconName = (string?)objJToken["icon_name"];
+        private void ProcessIcon(JsonNode objJToken, int defaultIconSize) {
+            if (PresetJson.GetNode(objJToken, "icon_data") is JsonNode iconDataJToken) {
+                string? iconName = PresetJson.GetString(objJToken, "icon_name");
                 var iconData = new IconColorPair(null, Color.Black);
 
-                var mainIconPath = (string?)iconDataJToken["icon"];
-                var baseIconSize = (int?)iconDataJToken["icon_size"] ?? 32;
+                string? mainIconPath = PresetJson.GetString(iconDataJToken, "icon");
+                int baseIconSize = PresetJson.GetInt32(iconDataJToken, "icon_size") ?? 32;
 
                 if (mainIconPath is null)
                     return;
@@ -203,18 +203,18 @@ namespace Foreman {
                 iicon.iconScale = defaultIconSize / iicon.iconSize;
 
                 var iicons = new List<IconInfo>();
-                foreach (var iconJToken in iconDataJToken["icons"]?.AsEnumerable() ?? []) {
-                    if ((string?)iconJToken["icon"] is not string icon ||
-                        iconJToken["shift"] is not JToken shift ||
-                        shift.Count() < 2 ||
-                        iconJToken["tint"] is not JToken tint ||
-                        tint.Count() < 4)
+                foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconDataJToken, "icons")) {
+                    if (PresetJson.GetString(iconJToken, "icon") is not string icon ||
+                        PresetJson.GetNode(iconJToken, "shift") is not JsonArray shift ||
+                        shift.Count < 2 ||
+                        PresetJson.GetNode(iconJToken, "tint") is not JsonArray tint ||
+                        tint.Count < 4)
                         return;
-                    IconInfo picon = new IconInfo(icon, (int?)iconJToken["icon_size"] ?? baseIconSize);
-                    picon.iconScale = (double?)iconJToken["scale"] ?? defaultIconSize / picon.iconSize;
+                    IconInfo picon = new IconInfo(icon, PresetJson.GetInt32(iconJToken, "icon_size") ?? baseIconSize);
+                    picon.iconScale = PresetJson.GetDouble(iconJToken, "scale") ?? defaultIconSize / picon.iconSize;
 
-                    picon.iconOffset = new Point((int?)shift[0] ?? default, (int?)shift[1] ?? default);
-                    picon.SetIconTint((double?)tint[3] ?? default, (double?)tint[0] ?? default, (double?)tint[1] ?? default, (double?)tint[2] ?? default);
+                    picon.iconOffset = new Point(PresetJson.GetInt32Value(shift[0]) ?? default, PresetJson.GetInt32Value(shift[1]) ?? default);
+                    picon.SetIconTint(PresetJson.GetDoubleValue(tint[3]) ?? default, PresetJson.GetDoubleValue(tint[0]) ?? default, PresetJson.GetDoubleValue(tint[1]) ?? default, PresetJson.GetDoubleValue(tint[2]) ?? default);
                     iicons.Add(picon);
                 }
                 if (iconName is not null && !myIconCache.ContainsKey(iconName))
@@ -335,17 +335,17 @@ namespace Foreman {
                 if (folderLinks.ContainsKey(origin)) {
 
                     file = Path.Combine(folderLinks[origin], file);
-                    try { bitmapCache.Add(fileName, new Bitmap(file)); } catch {
+                    try { bitmapCache.Add(fileName, new Bitmap(file)); } catch (Exception ex) {
                         bitmapCache.Add(fileName, null);
                         FailedPathCount++;
-                        ErrorLogging.LogLine("IconCacheProcessor: given fileName not found in mod folders: " + fileName);
+                        ErrorLogging.LogException(ex, "IconCacheProcessor: failed to load icon from file " + fileName);
                     }
 
                 } else if (archiveFileLinks?.TryGetValue(fileName, out var entry) is true) {
-                    try { bitmapCache.Add(fileName, new Bitmap(entry.Open())); } catch {
+                    try { bitmapCache.Add(fileName, new Bitmap(entry.Open())); } catch (Exception ex) {
                         bitmapCache.Add(fileName, null);
                         FailedPathCount++;
-                        ErrorLogging.LogLine("IconCacheProcessor: given fileName not found in mod folders: " + fileName);
+                        ErrorLogging.LogException(ex, "IconCacheProcessor: failed to load icon from archive " + fileName);
                     }
 
                 } else {

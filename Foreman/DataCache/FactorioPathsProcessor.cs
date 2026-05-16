@@ -10,7 +10,7 @@ namespace Foreman {
             List<string> factorioPaths = new List<string>();
 
             //program files install
-            string pfConfigPath = Path.Combine(new string[] { "c:\\", "Program Files", "Factorio", "config-path.cfg" });
+            string pfConfigPath = Path.Combine("c:\\", "Program Files", "Factorio", "config-path.cfg");
             if (File.Exists(pfConfigPath) && Path.GetDirectoryName(pfConfigPath) is string dir)
                 factorioPaths.Add(dir);
 
@@ -107,12 +107,29 @@ namespace Foreman {
                     if (folder.Length > 0)
                         folder = folder.Substring(1);
                 }
-                return string.IsNullOrEmpty(folder) ? Path.Combine(path, "Factorio") : Path.Combine(new string[] { path, "Factorio", folder });
+                return string.IsNullOrEmpty(folder) ? Path.Combine(path, "Factorio") : Path.Combine(path, "Factorio", folder);
             } else
                 ErrorLogging.LogLine("path string (from one of the config files) did not start as expected (.factorio || __PATH__executable__ || __PATH__system-write-data__). Path string:" + input);
 
             return installPath; //something weird must have happened to end up here. Honesty these path conversions are a bit of a mess - not enough examples to be sure its correct (works with all case 'I' have...)
         }
 
+        public static string GetExecutablePath(string installPath) =>
+            Path.Combine(installPath, "bin", "x64", "factorio.exe");
+
+        public static bool TryNormalizeInstallPath(string selectedPath, out string installRoot) {
+            installRoot = selectedPath;
+            if (File.Exists(GetExecutablePath(selectedPath)))
+                return true;
+            if (File.Exists(Path.Combine(selectedPath, "x64", "factorio.exe"))) {
+                installRoot = Path.GetDirectoryName(selectedPath) ?? selectedPath;
+                return true;
+            }
+            if (File.Exists(Path.Combine(selectedPath, "factorio.exe"))) {
+                installRoot = Path.GetDirectoryName(Path.GetDirectoryName(selectedPath) ?? selectedPath) ?? selectedPath;
+                return true;
+            }
+            return false;
+        }
     }
 }

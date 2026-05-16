@@ -1,27 +1,30 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman {
     public static class PresetProcessor {
+        internal static string GetPresetPath(string presetName, string extension) =>
+            Path.Combine(Application.StartupPath, "Presets", presetName + extension);
+
         public static PresetInfo ReadPresetInfo(Preset preset) {
             Dictionary<string, string> mods = new Dictionary<string, string>();
-            string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
+            string presetPath = GetPresetPath(preset.Name, ".pjson");
             if (!File.Exists(presetPath))
                 return new PresetInfo(null, false, false);
 
             try {
-                JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
-                foreach (var objJToken in jsonData["mods"]?.AsEnumerable() ?? [])
-                    if ((string?)objJToken["name"] is string name && (string?)objJToken["version"] is string version)
+                JsonObject jsonData = PresetJson.ParseObject(File.ReadAllText(presetPath));
+                foreach (JsonNode objJsonNode in PresetJson.EnumerateArray(jsonData, "mods"))
+                    if (PresetJson.GetString(objJsonNode, "name") is string name && PresetJson.GetString(objJsonNode, "version") is string version)
                         mods.Add(name, version);
-                return new PresetInfo(mods, (int?)jsonData["difficulty"]?[0] == 1, (int?)jsonData["difficulty"]?[1] == 1);
+                return new PresetInfo(mods, PresetJson.GetInt32At(jsonData, "difficulty", 0) == 1, PresetJson.GetInt32At(jsonData, "difficulty", 1) == 1);
             } catch (Exception ex) {
-                ErrorLogging.LogLine(string.Format("Failed to read preset info from {0}: {1}", presetPath, ex));
+                ErrorLogging.LogException(ex, string.Format("Failed to read preset info from {0}", presetPath));
                 mods.Clear();
                 mods.Add("ERROR READING PRESET!", "");
                 return new PresetInfo(mods, false, false);
@@ -29,24 +32,13 @@ namespace Foreman {
 
         }
 
-        public static JObject PrepPreset(Preset preset) {
-            string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
-            string presetCustomPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".json" });
+        public static JsonObject PrepPreset(Preset preset) {
+            string presetPath = GetPresetPath(preset.Name, ".pjson");
+            string presetCustomPath = GetPresetPath(preset.Name, ".json");
 
-            JObject jsonData = JObject.Parse(File.ReadAllText(presetPath));
-            if (File.Exists(presetCustomPath)) {
-                JObject cjsonData = JObject.Parse(File.ReadAllText(presetCustomPath));
-                foreach (var groupToken in cjsonData) {
-                    foreach (JObject itemToken in groupToken.Value?.Cast<JObject>() ?? []) {
-                        var presetItemToken = (JObject?)jsonData[groupToken.Key]?.FirstOrDefault(t => (string?)t["name"] == (string?)itemToken["name"]);
-                        if (presetItemToken is not null)
-                            foreach (var parameter in itemToken)
-                                presetItemToken[parameter.Key] = parameter.Value;
-                        else
-                            (jsonData[groupToken.Key] as JArray)?.Add(itemToken);
-                    }
-                }
-            }
+            JsonObject jsonData = PresetJson.ParseObject(File.ReadAllText(presetPath));
+            if (File.Exists(presetCustomPath))
+                PresetJson.MergePresetOverlay(jsonData, PresetJson.ParseObject(File.ReadAllText(presetCustomPath)));
             return jsonData;
         }
 
@@ -55,7 +47,7 @@ namespace Foreman {
         //still, this is only really helpful if you are using 10 presets (1.5 sec load inatead of 2.5 sec) or more, but hey; i will keep it.
         //any changes to preset json style have to be reflected here though (unlike for a full data cache loader above, which just incorporates any changes to data cache as long as they dont impact the outputs)
         public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<string> qualityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts) {
-            JObject jsonData = PrepPreset(preset);
+            JsonObject jsonData = PrepPreset(preset);
 
             //parse preset (note: this is preset data, so we are guaranteed to only have one name per item/recipe/mod/etc.)
             HashSet<string> presetItems = new HashSet<string>();
@@ -78,19 +70,19 @@ namespace Foreman {
             presetEntities.Add("§§a:rocket-assembler");
 
             //read in mods
-            foreach (var objJToken in jsonData["mods"]?.AsEnumerable() ?? [])
-                if ((string?)objJToken["name"] is string name && (string?)objJToken["version"] is string version)
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "mods"))
+                if (PresetJson.GetString(objJsonNode, "name") is string name && PresetJson.GetString(objJsonNode, "version") is string version)
                     presetMods.Add(name, version);
             //read in items (and their plant results)
-            foreach (var objJToken in jsonData["items"]?.AsEnumerable() ?? []) {
-                if ((string?)objJToken["name"] is not string name)
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "items")) {
+                if (PresetJson.GetString(objJsonNode, "name") is not string name)
                     continue;
                 presetItems.Add(name);
-                if (objJToken["plant_results"] != null) {
+                if (objJsonNode["plant_results"] != null) {
                     PlantShort plantProcess = new PlantShort(name);
-                    foreach (var productJToken in objJToken["plant_results"]?.AsEnumerable() ?? []) {
-                        double amount = (double?)productJToken["amount"] ?? default;
-                        if (amount > 0 && (string?)productJToken["name"] is string productName) {
+                    foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "plant_results")) {
+                        double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
+                        if (amount > 0 && PresetJson.GetString(productJsonNode, "name") is string productName) {
                             if (plantProcess.Products.ContainsKey(productName))
                                 plantProcess.Products[productName] += amount;
                             else
@@ -101,35 +93,35 @@ namespace Foreman {
                 }
             }
             //read in fluids
-            foreach (var objJToken in jsonData["fluids"]?.AsEnumerable() ?? [])
-                if ((string?)objJToken["name"] is string name)
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "fluids"))
+                if (PresetJson.GetString(objJsonNode, "name") is string name)
                     presetItems.Add(name);
             //read in entities
-            foreach (var objJToken in jsonData["entities"]?.AsEnumerable() ?? [])
-                if ((string?)objJToken["name"] is string name)
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "entities"))
+                if (PresetJson.GetString(objJsonNode, "name") is string name)
                     presetEntities.Add(name);
             //read in quality data
-            foreach (var objJToken in jsonData["qualities"]?.AsEnumerable() ?? [])
-                if ((string?)objJToken["name"] is string name)
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "qualities"))
+                if (PresetJson.GetString(objJsonNode, "name") is string name)
                     presetQualities.Add(name);
 
             //read in recipes
-            foreach (var objJToken in jsonData["recipes"]?.AsEnumerable() ?? []) {
-                if ((string?)objJToken["name"] is not string name)
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "recipes")) {
+                if (PresetJson.GetString(objJsonNode, "name") is not string name)
                     continue;
                 RecipeShort recipe = new RecipeShort(name);
-                foreach (var ingredientJToken in objJToken["ingredients"]?.AsEnumerable() ?? []) {
-                    double amount = (double?)ingredientJToken["amount"] ?? default;
-                    if (amount > 0 && (string?)ingredientJToken["name"] is string ingredientName) {
+                foreach (JsonNode ingredientJsonNode in PresetJson.EnumerateArray(objJsonNode, "ingredients")) {
+                    double amount = PresetJson.GetDouble(ingredientJsonNode, "amount") ?? default;
+                    if (amount > 0 && PresetJson.GetString(ingredientJsonNode, "name") is string ingredientName) {
                         if (recipe.Ingredients.ContainsKey(ingredientName))
                             recipe.Ingredients[ingredientName] += amount;
                         else
                             recipe.Ingredients.Add(ingredientName, amount);
                     }
                 }
-                foreach (var productJToken in objJToken["products"]?.AsEnumerable() ?? []) {
-                    double amount = (double?)productJToken["amount"] ?? default;
-                    if (amount > 0 && (string?)productJToken["name"] is string productName) {
+                foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "products")) {
+                    double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
+                    if (amount > 0 && PresetJson.GetString(productJsonNode, "name") is string productName) {
                         if (recipe.Products.ContainsKey(productName))
                             recipe.Products[productName] += amount;
                         else
@@ -140,19 +132,19 @@ namespace Foreman {
             }
 
             //have to process mining, generators and boilers (since we convert them to recipes as well)
-            foreach (var objJToken in jsonData["resources"]?.AsEnumerable() ?? [])
-                AddResourceExtractionRecipe(objJToken, presetRecipes);
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "resources"))
+                AddResourceExtractionRecipe(objJsonNode, presetRecipes);
             //offshore-pump / water-tile fluids (same pseudo-recipes as DataCache; not listed under "resources")
-            foreach (var objJToken in jsonData["water_resources"]?.AsEnumerable() ?? [])
-                AddResourceExtractionRecipe(objJToken, presetRecipes);
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "water_resources"))
+                AddResourceExtractionRecipe(objJsonNode, presetRecipes);
 
-            foreach (var objJToken in jsonData["entities"]?.AsEnumerable() ?? []) {
-                var type = (string?)objJToken["type"];
+            foreach (var objJsonNode in PresetJson.EnumerateArray(jsonData, "entities")) {
+                var type = PresetJson.GetString(objJsonNode, "type");
                 if (type == "boiler") {
-                    if ((string?)objJToken["fluid_ingredient"] is not string ingredient || (string?)objJToken["fluid_product"] is not string product)
+                    if (PresetJson.GetString(objJsonNode, "fluid_ingredient") is not string ingredient || PresetJson.GetString(objJsonNode, "fluid_product") is not string product)
                         continue;
 
-                    double temp = (double?)objJToken["target_temperature"] ?? default;
+                    double temp = PresetJson.GetDouble(objJsonNode, "target_temperature") ?? default;
 
                     RecipeShort recipe = new RecipeShort(string.Format("§§r:b:{0}:{1}:{2}", ingredient, product, temp.ToString()));
                     recipe.Ingredients.Add(ingredient, 60);
@@ -161,11 +153,11 @@ namespace Foreman {
                     if (!presetRecipes.ContainsKey(recipe.Name))
                         presetRecipes.Add(recipe.Name, recipe);
                 } else if (type == "generator") {
-                    if ((string?)objJToken["fluid_ingredient"] is not string ingredient)
+                    if (PresetJson.GetString(objJsonNode, "fluid_ingredient") is not string ingredient)
                         continue;
 
-                    double minTemp = (double?)objJToken["minimum_temperature"] ?? double.NaN;
-                    double maxTemp = (double?)objJToken["maximum_temperature"] ?? double.NaN;
+                    double minTemp = PresetJson.GetDouble(objJsonNode, "minimum_temperature") ?? double.NaN;
+                    double maxTemp = PresetJson.GetDouble(objJsonNode, "maximum_temperature") ?? double.NaN;
                     RecipeShort recipe = new RecipeShort(string.Format("§§r:g:{0}:{1}>{2}", ingredient, minTemp, maxTemp));
                     recipe.Ingredients.Add(ingredient, 60);
 
@@ -176,21 +168,21 @@ namespace Foreman {
 
             //process launch product recipes
             if (presetItems.Contains("rocket-part") && presetRecipes.ContainsKey("rocket-part") && presetEntities.Contains("rocket-silo")) {
-                foreach (var objJToken in jsonData["items"]?.Concat(jsonData["fluids"]?.AsEnumerable() ?? []).Where(t => t["launch_products"] is not null) ?? []) {
-                    if ((string?)objJToken["name"] is not string name)
+                foreach (JsonNode objJsonNode in PresetJson.EnumerateArray(jsonData, "items").Concat(PresetJson.EnumerateArray(jsonData, "fluids")).Where(t => PresetJson.GetNode(t, "launch_products") is not null)) {
+                    if (PresetJson.GetString(objJsonNode, "name") is not string name)
                         continue;
                     RecipeShort recipe = new RecipeShort(string.Format("§§r:rl:launch-{0}", name));
 
-                    int inputSize = (int?)objJToken["stack"] ?? default;
-                    foreach (var productJToken in objJToken["launch_products"]?.AsEnumerable() ?? []) {
-                        double amount = (double?)productJToken["amount"] ?? default;
-                        int productStack = (int?)jsonData["items"]?.First(t => (string?)t["name"] == (string?)productJToken["name"])?["stack"] ?? 1;
+                    int inputSize = PresetJson.GetInt32(objJsonNode, "stack") ?? default;
+                    foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "launch_products")) {
+                        double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
+                        int productStack = PresetJson.GetInt32(PresetJson.EnumerateArray(jsonData, "items").FirstOrDefault(t => PresetJson.GetString(t, "name") == PresetJson.GetString(productJsonNode, "name")), "stack") ?? 1;
                         if (amount != 0 && inputSize * amount > productStack)
                             inputSize = (int)(productStack / amount);
                     }
-                    foreach (var productJToken in objJToken["launch_products"]?.AsEnumerable() ?? []) {
-                        double amount = (double?)productJToken["amount"] ?? default;
-                        if (amount != 0 && (string?)productJToken["name"] is string prodName)
+                    foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "launch_products")) {
+                        double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
+                        if (amount != 0 && PresetJson.GetString(productJsonNode, "name") is string prodName)
                             recipe.Products.Add(prodName, amount * inputSize);
                     }
 
@@ -261,17 +253,17 @@ namespace Foreman {
             return errors;
         }
 
-        private static void AddResourceExtractionRecipe(JToken objJToken, Dictionary<string, RecipeShort> presetRecipes) {
-            if (objJToken["products"] is not JArray products || products.Count == 0)
+        private static void AddResourceExtractionRecipe(JsonNode objJsonNode, Dictionary<string, RecipeShort> presetRecipes) {
+            if (!PresetJson.EnumerateArray(objJsonNode, "products").Any())
                 return;
-            if ((string?)objJToken["name"] is not string name)
+            if (PresetJson.GetString(objJsonNode, "name") is not string name)
                 return;
 
             RecipeShort recipe = new RecipeShort("§§r:e:" + name);
 
-            foreach (var productJToken in objJToken["products"]?.AsEnumerable() ?? []) {
-                double amount = (double?)productJToken["amount"] ?? default;
-                if (amount > 0 && (string?)productJToken["name"] is string productName) {
+            foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "products")) {
+                double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
+                if (amount > 0 && PresetJson.GetString(productJsonNode, "name") is string productName) {
                     if (recipe.Products.ContainsKey(productName))
                         recipe.Products[productName] += amount;
                     else
@@ -281,7 +273,7 @@ namespace Foreman {
             if (recipe.Products.Count == 0)
                 return;
 
-            if ((string?)objJToken["required_fluid"] is string reqFluid && (double?)objJToken["fluid_amount"] is double fluidAmnt && fluidAmnt != 0)
+            if (PresetJson.GetString(objJsonNode, "required_fluid") is string reqFluid && PresetJson.GetDouble(objJsonNode, "fluid_amount") is double fluidAmnt && fluidAmnt != 0)
                 recipe.Ingredients.Add(reqFluid, fluidAmnt);
 
             presetRecipes.Add(recipe.Name, recipe);

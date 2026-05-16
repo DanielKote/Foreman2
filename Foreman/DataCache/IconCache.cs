@@ -81,8 +81,9 @@ namespace Foreman {
                         g.DrawImage(image, new Rectangle(0, 0, (size * image.Width / image.Height), size));
                     return bmp;
                 }
-            } catch (Exception) {
+            } catch (Exception ex) {
                 bmp?.Dispose();
+                ErrorLogging.LogException(ex, string.Format("IconCache.GetIcon failed for '{0}' (size {1})", path, size));
                 return new Bitmap(size, size);
             }
         }
@@ -171,7 +172,7 @@ namespace Foreman {
                     }
                 } catch (Exception ex) {
                     iconCache.Clear();
-                    ErrorLogging.LogLine($"Failed to load icon cache from {path}: {ex}");
+                    ErrorLogging.LogException(ex, $"Failed to load icon cache from {path}");
                     MessageBox.Show(
                         $"The icon cache \"{Path.GetFileName(path)}\" could not be read.\n\n" +
                         "Delete that file in the Presets folder (or re-import the preset) to rebuild the cache. " +

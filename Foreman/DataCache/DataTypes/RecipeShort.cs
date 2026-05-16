@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,25 +31,17 @@ namespace Foreman {
                 Products.Add(kvp.Key.Name, kvp.Value);
         }
 
-        public RecipeShort(JToken recipe) {
-            Name = (string?)recipe["Name"] ?? "<JSON ERROR>";
-            RecipeID = (long?)recipe["RecipeID"] ?? default;
-            isMissing = (bool?)recipe["isMissing"] is true;
-
-            Ingredients = new Dictionary<string, double>();
-            foreach (JProperty ingredient in recipe["Ingredients"]?.AsEnumerable() ?? [])
-                Ingredients.Add(ingredient.Name, (double)ingredient.Value);
-
-            Products = new Dictionary<string, double>();
-            foreach (JProperty ingredient in recipe["Products"]?.AsEnumerable() ?? [])
-                Products.Add(ingredient.Name, (double)ingredient.Value);
-        }
-
-        public static List<RecipeShort> GetSetFromJson(JToken? jdata) {
-            List<RecipeShort> resultList = [];
-            foreach (JToken recipe in jdata?.AsEnumerable() ?? [])
-                resultList.Add(new RecipeShort(recipe));
-            return resultList;
+        public RecipeShort(
+            string name,
+            long recipeId,
+            bool missing,
+            Dictionary<string, double> ingredients,
+            Dictionary<string, double> products) {
+            Name = name;
+            RecipeID = recipeId;
+            isMissing = missing;
+            Ingredients = ingredients;
+            Products = products;
         }
 
         public bool Equals(RecipeShort? other) {
