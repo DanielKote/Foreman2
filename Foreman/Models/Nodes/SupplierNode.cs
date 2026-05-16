@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Foreman {
-    [Serializable]
     public class SupplierNode : BaseNode {
         public enum Errors {
             Clean = 0b_0000_0000_0000,
@@ -32,116 +31,34 @@ namespace Foreman {
 
         public SupplierNode(ProductionGraph graph, int nodeID, ItemQualityPair item) : base(graph, nodeID) {
             SuppliedItem = item;
-            controller = SupplierNodeController.GetController(this);
-            ReadOnlyNode = new ReadOnlySupplierNode(this);
+            controller = new SupplierNodeController(this);
         }
 
         internal override NodeState GetUpdatedState() {
-            WarningSet = Warnings.Clean;
-            ErrorSet = Errors.Clean;
-
-            if (SuppliedItem.Item?.IsMissing is true)
-                ErrorSet |= Errors.ItemMissing;
-            if (SuppliedItem.Quality?.Available is not true)
-                ErrorSet |= Errors.QualityMissing;
-            if (!AllLinksValid)
-                ErrorSet |= Errors.InvalidLinks;
-
-            if (ErrorSet != Errors.Clean)
-                return NodeState.Error;
-
-            if (SuppliedItem.Quality?.Enabled is not true)
-                WarningSet |= Warnings.QualityDisabled;
-            if (SuppliedItem.Item?.Available is not true)
-                WarningSet |= Warnings.ItemUnavailable;
-            if (SuppliedItem.Item?.Enabled is not true)
-                WarningSet |= Warnings.ItemDisabled;
-
-            if (WarningSet != Warnings.Clean)
-                return NodeState.Warning;
-            if (AllLinksConnected)
-                return NodeState.Clean;
-            return NodeState.MissingLink;
+            ItemQualityNodeState.Evaluate(SuppliedItem, AllLinksValid, AllLinksConnected, out int errors, out int warnings, out NodeState state);
+            ErrorSet = (Errors)errors;
+            WarningSet = (Warnings)warnings;
+            return state;
         }
 
         public override double GetConsumeRate(ItemQualityPair item) { throw new ArgumentException("Supplier does not consume! nothing should be asking for the consume rate"); }
         public override double GetSupplyRate(ItemQualityPair item) { return (RateType == RateType.Manual) ? DesiredRate : ActualRate; }
 
-        internal override double inputRateFor(ItemQualityPair item) { throw new ArgumentException("Supplier should not have outputs!"); }
+        internal override double inputRateFor(ItemQualityPair item) { throw new ArgumentException("Supplier does not consume!"); }
         internal override double outputRateFor(ItemQualityPair item) { return 1; }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context) {
-            base.GetObjectData(info, context);
-
-            info.AddValue("NodeType", NodeType.Supplier);
-            info.AddValue("Item", SuppliedItem.Item?.Name ?? "ItemNameError");
-            info.AddValue("BaseQuality", SuppliedItem.Quality?.Name ?? "QualityError");
-            if (RateType == RateType.Manual)
-                info.AddValue("DesiredRate", DesiredRatePerSec);
-        }
+        public override List<string> GetErrors() => ItemQualityNodeMessages.GetErrors(SuppliedItem, (int)ErrorSet);
+        public override List<string> GetWarnings() => ItemQualityNodeMessages.GetWarnings(SuppliedItem, (int)WarningSet);
 
         public override string ToString() => string.Format("Supply node for: {0} ({1})", SuppliedItem.Item?.Name, SuppliedItem.Quality?.Name);
-    }
-
-    public class ReadOnlySupplierNode : ReadOnlyBaseNode {
-        public ItemQualityPair SuppliedItem => MyNode.SuppliedItem;
-
-        private readonly SupplierNode MyNode;
-
-        public ReadOnlySupplierNode(SupplierNode node) : base(node) { MyNode = node; }
-
-        public override List<string> GetErrors() {
-            List<string> errors = [];
-            if (SuppliedItem.Item is null || SuppliedItem.Quality is null)
-                return errors;
-            if ((MyNode.ErrorSet & SupplierNode.Errors.ItemMissing) != 0)
-                errors.Add(string.Format("> Item \"{0}\" doesnt exist in preset!", SuppliedItem.Item.FriendlyName));
-            if ((MyNode.ErrorSet & SupplierNode.Errors.QualityMissing) != 0)
-                errors.Add(string.Format("> Quality \"{0}\" doesnt exist in preset!", SuppliedItem.Quality.FriendlyName));
-            if ((MyNode.ErrorSet & SupplierNode.Errors.InvalidLinks) != 0)
-                errors.Add("> Some links are invalid!");
-            return errors;
-        }
-
-        public override List<string> GetWarnings() {
-            List<string> warnings = [];
-            if (SuppliedItem.Quality is null)
-                return warnings;
-            if ((MyNode.WarningSet & SupplierNode.Warnings.QualityUnavailable) != 0)
-                warnings.Add(string.Format("> Quality \"{0}\" isnt available in regular gameplay.", SuppliedItem.Quality.FriendlyName));
-            else if ((MyNode.WarningSet & SupplierNode.Warnings.QualityDisabled) != 0)
-                warnings.Add(string.Format("> Quality \"{0}\" isnt currently enabled.", SuppliedItem.Quality.FriendlyName));
-            if ((MyNode.WarningSet & SupplierNode.Warnings.ItemDisabled) != 0)
-                warnings.Add(string.Format("> Item \"{0}\" isnt currently enabled.", SuppliedItem.Quality.FriendlyName));
-            if ((MyNode.WarningSet & SupplierNode.Warnings.ItemUnavailable) != 0)
-                warnings.Add(string.Format("> Item \"{0}\" is unavailable in regular play.", SuppliedItem.Quality.FriendlyName));
-            return warnings;
-        }
     }
 
     public class SupplierNodeController : BaseNodeController {
         private readonly SupplierNode MyNode;
 
-        protected SupplierNodeController(SupplierNode myNode) : base(myNode) { MyNode = myNode; }
+        internal SupplierNodeController(SupplierNode myNode) : base(myNode) { MyNode = myNode; }
 
-        public static SupplierNodeController GetController(SupplierNode node) {
-            if (node.Controller != null)
-                return (SupplierNodeController)node.Controller;
-            return new SupplierNodeController(node);
-        }
-
-        public override Dictionary<string, Action> GetErrorResolutions() {
-            Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
-            if (MyNode.ErrorSet != SupplierNode.Errors.Clean)
-                resolutions.Add("Delete node", new Action(() => this.Delete()));
-            else
-                foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
-                    resolutions.Add(kvp.Key, kvp.Value);
-            return resolutions;
-        }
-
-        public override Dictionary<string, Action> GetWarningResolutions() {
-            return new Dictionary<string, Action>();
-        }
+        public override Dictionary<string, Action> GetErrorResolutions() =>
+            ErrorResolutionsDeleteOrFixLinks(MyNode.ErrorSet != SupplierNode.Errors.Clean);
     }
 }

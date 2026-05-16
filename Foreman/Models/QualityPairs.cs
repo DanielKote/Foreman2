@@ -50,8 +50,7 @@ namespace Foreman {
         }
     }
 
-    [Serializable]
-    public readonly struct ModuleQualityPair : ISerializable {
+    public readonly struct ModuleQualityPair {
         public readonly Module Module;
         public readonly Quality Quality;
 
@@ -70,11 +69,6 @@ namespace Foreman {
         public static bool operator !=(ModuleQualityPair lhs, ModuleQualityPair rhs) => !(lhs == rhs);
         public static implicit operator bool(ModuleQualityPair bp) => bp.Module != null && bp.Quality != null;
         public override string ToString() => Module.ToString() + " (" + Quality.ToString() + ")";
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context) {
-            info.AddValue("Name", Module.Name);
-            info.AddValue("Quality", Quality.Name);
-        }
 
         public string FriendlyName {
             get {

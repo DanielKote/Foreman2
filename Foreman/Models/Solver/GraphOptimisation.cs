@@ -38,7 +38,7 @@ namespace Foreman {
 
                 //ErrorLogging.LogLine(solver.ToString());
                 //Console.WriteLine(solver.ToString());
-                Console.WriteLine("Solver failed");
+                ErrorLogging.LogLine("Solver failed to find a solution for a connected node group");
             }
 
             foreach (BaseNode node in nodeGroup) {

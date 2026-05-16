@@ -6,8 +6,7 @@ using System.Runtime.Serialization;
 using System.Xml.Schema;
 
 namespace Foreman {
-    [Serializable]
-    public class RecipeNode : BaseNode {
+    public partial class RecipeNode : BaseNode {
         public enum Errors {
             Clean = 0b_0000_0000_0000,
             RecipeIsMissing = 0b_0000_0000_0001,
@@ -157,8 +156,7 @@ namespace Foreman {
             BaseRecipe = recipe;
             RecipeOwner = recipeDefinition.Owner;
 
-            controller = RecipeNodeController.GetController(this);
-            ReadOnlyNode = new ReadOnlyRecipeNode(this);
+            controller = new RecipeNodeController(this);
 
             inputSet = new Dictionary<ItemQualityPair, double>();
             inputList = new List<ItemQualityPair>();
@@ -280,7 +278,7 @@ namespace Foreman {
             if (BeaconModules.Any(m => !m.Quality.Enabled))
                 WarningSet |= Warnings.BModulesQualityIsDisabled;
 
-            if (SelectedAssembler.Assembler.IsTemperatureFluidBurner && !LinkChecker.GetTemperatureRange(Fuel as Fluid, ReadOnlyNode, LinkType.Output, false).IsPoint())
+            if (SelectedAssembler.Assembler.IsTemperatureFluidBurner && !LinkChecker.GetTemperatureRange(Fuel as Fluid, this, LinkType.Output, false).IsPoint())
                 WarningSet |= Warnings.TemeratureFluidBurnerInvalidLinks;
 
             if (WarningSet != Warnings.Clean)
@@ -380,11 +378,11 @@ namespace Foreman {
             //links
             foreach (NodeLink link in InputLinks.ToList()) {
                 if (!inputSet.ContainsKey(link.Item))
-                    MyGraph.DeleteLink(link.ReadOnlyLink);
+                    MyGraph.DeleteLink(link);
             }
             foreach (NodeLink link in OutputLinks.ToList()) {
                 if (!outputSet.ContainsKey(link.Item))
-                    MyGraph.DeleteLink(link.ReadOnlyLink);
+                    MyGraph.DeleteLink(link);
             }
 
             UpdateState();
@@ -489,7 +487,7 @@ namespace Foreman {
         internal double inputRateForFuel() {
             double temperature = double.NaN;
             if (SelectedAssembler.Assembler.IsTemperatureFluidBurner)
-                temperature = LinkChecker.GetTemperatureRange(Fuel as Fluid, ReadOnlyNode, LinkType.Output, false).Min;
+                temperature = LinkChecker.GetTemperatureRange(Fuel as Fluid, this, LinkType.Output, false).Min;
 
             //burner rate = recipe time (modified by speed bonus & assembler) * fuel consumption rate of assembler (modified by fuel, temperature, and consumption modifier)
             return (recipeDefinition.Time / (SelectedAssembler.Assembler.GetSpeed(SelectedAssembler.Quality) * GetSpeedMultiplier())) * SelectedAssembler.Assembler.GetBaseFuelConsumptionRate(Fuel, SelectedAssembler.Quality, temperature) * GetConsumptionMultiplier();
@@ -506,325 +504,13 @@ namespace Foreman {
             return minValue;
         }
 
-        //------------------------------------------------------------------------object save & string
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context) {
-            base.GetObjectData(info, context);
-
-            info.AddValue("NodeType", NodeType.Recipe);
-            info.AddValue("RecipeID", recipeDefinition.RecipeID);
-            info.AddValue("RecipeQuality", recipeQuality.Name);
-            info.AddValue("Neighbours", NeighbourCount);
-            info.AddValue("ExtraProductivity", ExtraProductivityBonus);
-
-            if (LowPriority)
-                info.AddValue("LowPriority", 1);
-
-            //assembler can not be null!
-            info.AddValue("Assembler", SelectedAssembler.Assembler.Name);
-            info.AddValue("AssemblerQuality", SelectedAssembler.Quality.Name);
-            info.AddValue("AssemblerModules", AssemblerModules);
-            //fuel is assumed to always be of the 'default quality' - whatever this is for the current datacache
-            if (Fuel != null)
-                info.AddValue("Fuel", Fuel.Name);
-            if (FuelRemains != null)
-                info.AddValue("Burnt", FuelRemains.Name);
-
-            BeaconQualityPair beaconPair = SelectedBeacon;
-            if (beaconPair.Beacon is Beacon beaconEnt && beaconPair.Quality is Quality beaconQual) {
-                info.AddValue("Beacon", beaconEnt.Name);
-                info.AddValue("BeaconQuality", beaconQual.Name);
-                info.AddValue("BeaconModules", BeaconModules);
-                info.AddValue("BeaconCount", BeaconCount);
-                info.AddValue("BeaconsPerAssembler", BeaconsPerAssembler);
-                info.AddValue("BeaconsConst", BeaconsConst);
-            }
-        }
-
         public override string ToString() { return string.Format("Recipe node for: {0} ({1})", recipeDefinition.Name, recipeQuality.Name); }
-    }
-
-    public class ReadOnlyRecipeNode : ReadOnlyBaseNode {
-        public bool LowPriority => MyNode.LowPriority;
-
-        public uint MaxQualitySteps => MyNode.MaxQualitySteps;
-
-        public RecipeQualityPair BaseRecipe => MyNode.BaseRecipe;
-        public AssemblerQualityPair SelectedAssembler => MyNode.SelectedAssembler;
-        public Item? Fuel => MyNode.Fuel;
-        public Item? FuelRemains => MyNode.FuelRemains;
-        public IReadOnlyList<ModuleQualityPair> AssemblerModules => MyNode.AssemblerModules;
-
-        public BeaconQualityPair SelectedBeacon => MyNode.SelectedBeacon;
-        public IReadOnlyList<ModuleQualityPair> BeaconModules => MyNode.BeaconModules;
-
-        public double NeighbourCount => MyNode.NeighbourCount;
-        public double ExtraProductivity => MyNode.ExtraProductivityBonus;
-        public double BeaconCount => MyNode.BeaconCount;
-        public double BeaconsPerAssembler => MyNode.BeaconsPerAssembler;
-        public double BeaconsConst => MyNode.BeaconsConst;
-
-        public double GetConsumptionMultiplier() => MyNode.GetConsumptionMultiplier();
-        public double GetSpeedMultiplier() => MyNode.GetSpeedMultiplier();
-        public double GetProductivityMultiplier() => MyNode.GetProductivityBonus() + 1;
-        public double GetPollutionMultiplier() => MyNode.GetPollutionMultiplier();
-        public double GetQualityMultiplier() => MyNode.GetQualityMultiplier();
-
-        //------------------------------------------------------------------------ warning / errors functions
-
-        public override List<string> GetErrors() {
-            RecipeNode.Errors ErrorSet = MyNode.ErrorSet;
-
-            List<string> output = new List<string>();
-
-            if ((ErrorSet & RecipeNode.Errors.RecipeIsMissing) != 0) {
-                output.Add(string.Format("> Recipe \"{0}\" doesnt exist in preset!", MyNode.RecipeDefinition.FriendlyName));
-                return output; //missing recipe is an automatic end -> we dont care about any other errors, since the only solution is to delete the node.
-            }
-            if ((ErrorSet & RecipeNode.Errors.RQualityIsMissing) != 0)
-                output.Add(string.Format("> Recipe's Quality \"{0}\" doesnt exist in preset!", MyNode.RecipeQualityRef.FriendlyName));
-
-            if ((ErrorSet & RecipeNode.Errors.AssemblerIsMissing) != 0)
-                output.Add(string.Format("> Assembler \"{0}\" doesnt exist in preset!", MyNode.SelectedAssembler.Assembler.FriendlyName));
-            if ((ErrorSet & RecipeNode.Errors.AQualityIsMissing) != 0)
-                output.Add(string.Format("> Assembler's Quality \"{0}\" doesnt exist in preset!", MyNode.SelectedAssembler.Quality.FriendlyName));
-
-            if ((ErrorSet & RecipeNode.Errors.BurnerNoFuelSet) != 0)
-                output.Add("> Burner Assembler has no fuel set!");
-            if ((ErrorSet & RecipeNode.Errors.FuelIsMissing) != 0)
-                output.Add("> Burner Assembler's fuel doesnt exist in preset!");
-            if ((ErrorSet & RecipeNode.Errors.InvalidFuel) != 0)
-                output.Add("> Burner Assembler has an invalid fuel set!");
-            if ((ErrorSet & RecipeNode.Errors.InvalidFuelRemains) != 0)
-                output.Add("> Burning result doesnt match fuel's burn result!");
-            if ((ErrorSet & RecipeNode.Errors.AModuleIsMissing) != 0)
-                output.Add("> Some of the assembler modules dont exist in preset!");
-            if ((ErrorSet & RecipeNode.Errors.AModuleLimitExceeded) != 0)
-                output.Add(string.Format("> Assembler has too many modules ({0}/{1})!", MyNode.AssemblerModules.Count, MyNode.SelectedAssembler.Assembler.ModuleSlots));
-            if ((ErrorSet & RecipeNode.Errors.AModuleQualityIsMissing) != 0)
-                output.Add(string.Format("> Assembler's Module's Quality \"{0}\" doesnt exist in preset!", MyNode.AssemblerModules.First(m => m.Quality.IsMissing).Quality.FriendlyName));
-
-            if ((ErrorSet & RecipeNode.Errors.BeaconIsMissing) != 0)
-                output.Add(string.Format("> Beacon \"{0}\" doesnt exist in preset!", MyNode.SelectedBeacon.Beacon?.FriendlyName ?? "(none)"));
-            if ((ErrorSet & RecipeNode.Errors.BQualityIsMissing) != 0)
-                output.Add(string.Format("> Beacon's Quality \"{0}\" doesnt exist in preset!", MyNode.SelectedBeacon.Quality?.FriendlyName ?? "(none)"));
-
-            if ((ErrorSet & RecipeNode.Errors.BModuleIsMissing) != 0)
-                output.Add("> Some of the beacon modules dont exist in preset!");
-            if ((ErrorSet & RecipeNode.Errors.BModuleLimitExceeded) != 0)
-                output.Add("> Beacon has too many modules!");
-            if ((ErrorSet & RecipeNode.Errors.BModuleQualityIsMissing) != 0)
-                output.Add(string.Format("> Beacon's Module's Quality \"{0}\" doesnt exist in preset!", MyNode.BeaconModules.First(m => m.Quality.IsMissing).Quality.FriendlyName));
-
-            if ((ErrorSet & RecipeNode.Errors.InvalidLinks) != 0)
-                output.Add("> Some links are invalid!");
-
-            return output;
-        }
-
-        public override List<string> GetWarnings() {
-            RecipeNode.Warnings WarningSet = MyNode.WarningSet;
-
-            List<string> output = new List<string>();
-
-            //recipe
-            if ((WarningSet & RecipeNode.Warnings.RecipeIsDisabled) != 0)
-                output.Add("X> Selected recipe is disabled.");
-            if ((WarningSet & RecipeNode.Warnings.RecipeIsUnavailable) != 0)
-                output.Add("X> Selected recipe is unavailable in regular play.");
-
-            if ((WarningSet & RecipeNode.Warnings.NoAvailableAssemblers) != 0)
-                output.Add("X> No enabled assemblers for this recipe.");
-            else {
-                if ((WarningSet & RecipeNode.Warnings.AssemblerIsDisabled) != 0)
-                    output.Add("> Selected assembler is disabled.");
-                if ((WarningSet & RecipeNode.Warnings.AssemblerIsUnavailable) != 0)
-                    output.Add("> Selected assembler is unavailable in regular play.");
-            }
-
-            //fuel
-            if ((WarningSet & RecipeNode.Warnings.NoAvailableFuels) != 0)
-                output.Add("X> No fuel can be produced.");
-            else {
-                if ((WarningSet & RecipeNode.Warnings.FuelIsUnavailable) != 0)
-                    output.Add("> Selected fuel is unavailable in regular play.");
-                if ((WarningSet & RecipeNode.Warnings.FuelIsUncraftable) != 0)
-                    output.Add("> Selected fuel cant be produced.");
-            }
-            if ((WarningSet & RecipeNode.Warnings.TemeratureFluidBurnerInvalidLinks) != 0)
-                output.Add("> Temperature based fuel uses multiple incoming temperatures (fuel use # might be wrong).");
-
-            //modules & beacon modules
-            if ((WarningSet & RecipeNode.Warnings.AModuleIsDisabled) != 0)
-                output.Add("> Some selected assembler modules are disabled.");
-            if ((WarningSet & RecipeNode.Warnings.AModuleIsUnavailable) != 0)
-                output.Add("> Some selected assembler modules are unavailable in regular play.");
-            if ((WarningSet & RecipeNode.Warnings.BeaconIsDisabled) != 0)
-                output.Add("> Selected beacon is disabled.");
-            if ((WarningSet & RecipeNode.Warnings.BeaconIsUnavailable) != 0)
-                output.Add("> Selected beacon is unavailable in regular play.");
-            if ((WarningSet & RecipeNode.Warnings.BModuleIsDisabled) != 0)
-                output.Add("> Some selected beacon modules are disabled.");
-            if ((WarningSet & RecipeNode.Warnings.BModuleIsUnavailable) != 0)
-                output.Add("> Some selected beacon modules are unavailable in regular play.");
-
-            return output;
-        }
-
-        //----------------------------------------------------------------------- Get functions (single assembler/beacon info)
-
-        public double GetGeneratorMinimumTemperature() {
-            if (SelectedAssembler.Assembler.EntityType == EntityType.Generator) {
-                //minimum temperature accepted by generator is the largest of either the default temperature (at which point the power generation is 0 and it actually doesnt consume anything), or the set min temp
-                Fluid fluidBase = (Fluid)MyNode.RecipeDefinition.IngredientList[0]; //generators have 1 input & 0 output. only input is the fluid being consumed.
-                return Math.Max(fluidBase.DefaultTemperature + 0.1, MyNode.RecipeDefinition.IngredientTemperatureMap[fluidBase].Min);
-            }
-            Trace.Fail("Cant ask for minimum generator temperature for a non-generator!");
-            return 0;
-        }
-
-        public double GetGeneratorMaximumTemperature() {
-            if (SelectedAssembler.Assembler.EntityType == EntityType.Generator)
-                return MyNode.RecipeDefinition.IngredientTemperatureMap[MyNode.RecipeDefinition.IngredientList[0]].Max;
-            Trace.Fail("Cant ask for maximum generator temperature for a non-generator!");
-            return 0;
-        }
-
-        public double GetGeneratorAverageTemperature() {
-            if (SelectedAssembler.Assembler.EntityType != EntityType.Generator)
-                Trace.Fail("Cant ask for average generator temperature for a non-generator!");
-
-            return GetAverageTemperature(this, MyNode.RecipeDefinition.IngredientList[0]);
-            double GetAverageTemperature(ReadOnlyBaseNode? node, Item item) {
-                if (node is ReadOnlyPassthroughNode || node == this) {
-                    double totalFlow = 0;
-                    double totalTemperatureFlow = 0;
-                    double totalTemperature = 0;
-                    foreach (ReadOnlyNodeLink link in node.InputLinks) //Throughput node: all same item. Generator node: only input is the fluid item.
-                    {
-                        totalFlow += link.Throughput;
-                        double temperature = GetAverageTemperature(link.Supplier, item);
-                        totalTemperatureFlow += temperature * link.Throughput;
-                        totalTemperature += temperature;
-                    }
-                    if (totalFlow == 0) {
-                        if (node.InputLinks.Count() == 0)
-                            return SelectedAssembler.Assembler.OperationTemperature;
-                        else
-                            return totalTemperature / node.InputLinks.Count();
-                    }
-                    return totalTemperatureFlow / totalFlow;
-                } else if (node is ReadOnlySupplierNode)
-                    return SelectedAssembler.Assembler.OperationTemperature; //assume supplier is optimal temperature (cant exactly set to infinity or something as that would just cause the final result to be infinity)
-                else if (node is ReadOnlyRecipeNode rnode)
-                    return rnode.MyNode.RecipeDefinition.ProductTemperatureMap[item];
-                Trace.Fail("Unexpected node type in generator calculation!");
-                return 0;
-            }
-        }
-
-        public double GetGeneratorEffectivity() {
-            Fluid fluid = (Fluid)MyNode.RecipeDefinition.IngredientList[0];
-            return Math.Min((GetGeneratorAverageTemperature() - fluid.DefaultTemperature) / (MyNode.SelectedAssembler.Assembler.OperationTemperature - fluid.DefaultTemperature), 1);
-        }
-
-        public double GetGeneratorElectricalProduction() //Watts
-        {
-            if (SelectedAssembler.Assembler.EntityType == EntityType.Generator)
-                return SelectedAssembler.Assembler.GetEnergyProduction(SelectedAssembler.Quality) * GetGeneratorEffectivity();
-            return SelectedAssembler.Assembler.GetEnergyProduction(SelectedAssembler.Quality); //no consumption multiplier => generators cant have modules / beacon effects
-        }
-
-
-        public double GetAssemblerSpeed() {
-            return SelectedAssembler.Assembler.GetSpeed(SelectedAssembler.Quality) * MyNode.GetSpeedMultiplier();
-        }
-
-        public double GetAssemblerEnergyConsumption() //Watts
-        {
-            return SelectedAssembler.Assembler.GetEnergyDrain() + (SelectedAssembler.Assembler.GetEnergyConsumption(SelectedAssembler.Quality) * MyNode.GetConsumptionMultiplier());
-        }
-
-        public double GetAssemblerPollutionProduction() //pollution/sec
-        {
-            //there are now multiple types of pollution, so not sure how to handle this (at least in terms of displaying it)
-            return 0;// SelectedAssembler.Pollution * MyNode.GetPollutionMultiplier() * GetAssemblerEnergyConsumption(); //pollution is counted in per energy //POLLUTION UPDATER REQUIRED
-        }
-
-        public double GetBeaconEnergyConsumption() //Watts
-        {
-            if (!SelectedBeacon || SelectedBeacon.Beacon is not Beacon beacon || SelectedBeacon.Quality is not Quality quality)
-                return 0;
-            if (beacon.EnergySource != EnergySource.Electric)
-                return 0;
-            return beacon.GetEnergyProduction(quality) + beacon.GetEnergyDrain();
-        }
-
-        public double GetBeaconPollutionProduction() //pollution/sec
-        {
-            if (!SelectedBeacon)
-                return 0;
-            //once again - multiple types of pollution, so not sure how to handle this at this time
-            return 0; // SelectedBeacon.Pollution * GetBeaconEnergyConsumption(); //POLLUTION UPDATE REQUIRED
-        }
-
-        //----------------------------------------------------------------------- Get functions (totals)
-
-        public double GetTotalCrafts() {
-            return GetAssemblerSpeed() * MyNode.MyGraph.GetRateMultipler() / MyNode.RecipeDefinition.Time;
-        }
-
-        public double GetTotalAssemblerFuelConsumption() //fuel items / time unit
-        {
-            if (MyNode.Fuel == null)
-                return 0;
-            return MyNode.MyGraph.GetRateMultipler() * MyNode.inputRateForFuel();
-        }
-
-        public double GetTotalAssemblerElectricalConsumption() // J/sec (W)
-        {
-            if (MyNode.SelectedAssembler.Assembler.EnergySource != EnergySource.Electric)
-                return 0;
-
-            double partialAssembler = MyNode.ActualSetValue % 1;
-            double entireAssemblers = MyNode.ActualSetValue - partialAssembler;
-
-            return (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * SelectedAssembler.Assembler.GetEnergyDrain()) + (ActualSetValue * SelectedAssembler.Assembler.GetEnergyConsumption(SelectedAssembler.Quality) * GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
-        }
-
-        public double GetTotalGeneratorElectricalProduction() // J/sec (W) ; this is also when the temperature range of incoming fuel is taken into account
-        {
-            return GetGeneratorElectricalProduction() * MyNode.ActualSetValue;
-        }
-
-        public int GetTotalBeacons() {
-            if (!MyNode.SelectedBeacon)
-                return 0;
-            return (int)Math.Ceiling(((int)(MyNode.ActualSetValue + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
-        }
-
-        public double GetTotalBeaconElectricalConsumption() // J/sec (W)
-        {
-            if (!MyNode.SelectedBeacon)
-                return 0;
-            return GetTotalBeacons() * GetBeaconEnergyConsumption();
-        }
-
-        private readonly RecipeNode MyNode;
-
-        public ReadOnlyRecipeNode(RecipeNode node) : base(node) { MyNode = node; }
     }
 
     public class RecipeNodeController : BaseNodeController {
         private readonly RecipeNode MyNode;
 
-        protected RecipeNodeController(RecipeNode myNode) : base(myNode) { MyNode = myNode; }
-
-        public static RecipeNodeController GetController(RecipeNode node) {
-            if (node.Controller != null)
-                return (RecipeNodeController)node.Controller;
-            return new RecipeNodeController(node);
-        }
+        internal RecipeNodeController(RecipeNode myNode) : base(myNode) { MyNode = myNode; }
 
         //------------------------------------------------------------------------ warning / errors functions
 
@@ -905,7 +591,7 @@ namespace Foreman {
             if ((WarningSet & RecipeNode.Warnings.TemeratureFluidBurnerInvalidLinks) != 0 && MyNode.Fuel?.Owner.DefaultQuality is not null)
                 resolutions.Add("Remove fuel links", new Action(() => {
                     foreach (NodeLink fuelLink in MyNode.InputLinks.Where(l => l.Item == new ItemQualityPair(MyNode.Fuel, MyNode.Fuel.Owner.DefaultQuality)).ToList())
-                        MyNode.MyGraph.DeleteLink(fuelLink.ReadOnlyLink);
+                        MyNode.MyGraph.DeleteLink(fuelLink);
                 }));
 
             return resolutions;

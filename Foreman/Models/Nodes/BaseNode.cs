@@ -1,28 +1,44 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Schema;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace Foreman {
     public enum RateType { Auto, Manual };
     public enum NodeState { Clean, MissingLink, Warning, Error }
     public enum NodeDirection { Up, Down }
 
-    [Serializable]
-    public abstract partial class BaseNode : ISerializable {
+    public abstract partial class BaseNode {
         public abstract BaseNodeController Controller { get; }
-        public ReadOnlyBaseNode? ReadOnlyNode { get; protected set; }
         public readonly ProductionGraph MyGraph;
         public readonly int NodeID;
 
         public bool IsClean { get; protected set; } //if true then this node hasnt changed (internal values or links) since last solver solution
 
-        public bool KeyNode { get; set; }
-        public string KeyNodeTitle { get; set; }
+        private bool keyNode;
+        private string keyNodeTitle = "";
+
+        public bool KeyNode {
+            get => keyNode;
+            set {
+                if (keyNode == value)
+                    return;
+                keyNode = value;
+                OnNodeStateChanged();
+            }
+        }
+
+        public string KeyNodeTitle {
+            get => keyNodeTitle;
+            set {
+                if (keyNodeTitle == value)
+                    return;
+                keyNodeTitle = value;
+                OnNodeStateChanged();
+            }
+        }
 
         public Point Location { get; set; }
 
@@ -128,72 +144,10 @@ namespace Foreman {
             return (RateType == RateType.Manual) && Math.Abs(ActualRatePerSec - DesiredRatePerSec) > 0.0001;
         }
 
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context) {
-            info.AddValue("NodeID", NodeID);
-            info.AddValue("Location", Location);
-            info.AddValue("RateType", RateType);
-            info.AddValue("Direction", NodeDirection);
+        public virtual List<string> GetErrors() => [];
+        public virtual List<string> GetWarnings() => [];
 
-            if (RateType == RateType.Manual)
-                info.AddValue("DesiredSetValue", DesiredSetValue);
-            if (KeyNode)
-                info.AddValue("KeyNode", KeyNodeTitle);
-        }
     }
-
-    public abstract class ReadOnlyBaseNode {
-        public int NodeID => MyNode.NodeID;
-        public Point Location => MyNode.Location;
-
-        public bool KeyNode => MyNode.KeyNode;
-        public string KeyNodeTitle => MyNode.KeyNodeTitle;
-
-        public IEnumerable<ItemQualityPair> Inputs => MyNode.Inputs;
-        public IEnumerable<ItemQualityPair> Outputs => MyNode.Outputs;
-
-        public IEnumerable<ReadOnlyNodeLink> InputLinks { get { foreach (NodeLink nodeLink in MyNode.InputLinks) yield return nodeLink.ReadOnlyLink; } }
-        public IEnumerable<ReadOnlyNodeLink> OutputLinks { get { foreach (NodeLink nodeLink in MyNode.OutputLinks) yield return nodeLink.ReadOnlyLink; } }
-
-        public RateType RateType => MyNode.RateType;
-        public double ActualRate => MyNode.ActualRate;
-        public double ActualRatePerSec => MyNode.ActualRatePerSec;
-        public double DesiredRate => MyNode.DesiredRate;
-        public NodeState State => MyNode.State;
-
-        public double ActualSetValue => MyNode.ActualSetValue;
-        public double DesiredSetValue => MyNode.DesiredSetValue;
-        public double MaxDesiredSetValue => MyNode.MaxDesiredSetValue;
-        public string SetValueDescription => MyNode.SetValueDescription;
-
-        public NodeDirection NodeDirection => MyNode.NodeDirection;
-
-        public abstract List<string> GetErrors();
-        public abstract List<string> GetWarnings();
-
-        public double GetConsumeRate(ItemQualityPair item) => MyNode.GetConsumeRate(item);
-        public double GetSupplyRate(ItemQualityPair item) => MyNode.GetSupplyRate(item);
-        public double GetSupplyUsedRate(ItemQualityPair item) => MyNode.GetSupplyUsedRate(item);
-        public bool IsOverproducing() => MyNode.IsOverproducing();
-        public bool IsOverproducing(ItemQualityPair item) => MyNode.IsOverproducing(item);
-        public bool ManualRateNotMet() => MyNode.ManualRateNotMet();
-
-        private readonly BaseNode MyNode;
-
-        public event EventHandler<EventArgs>? NodeStateChanged;
-        public event EventHandler<EventArgs>? NodeValuesChanged;
-
-        public ReadOnlyBaseNode(BaseNode node) {
-            MyNode = node;
-            MyNode.NodeStateChanged += Node_NodeStateChanged;
-            MyNode.NodeValuesChanged += Node_NodeValuesChanged;
-        }
-
-        private void Node_NodeStateChanged(object? sender, EventArgs e) { NodeStateChanged?.Invoke(this, EventArgs.Empty); }
-        private void Node_NodeValuesChanged(object? sender, EventArgs e) { NodeValuesChanged?.Invoke(this, EventArgs.Empty); }
-
-        public override string ToString() { return "RO: " + MyNode.ToString(); }
-    }
-
 
     public abstract class BaseNodeController {
         private readonly BaseNode MyNode;
@@ -214,25 +168,40 @@ namespace Foreman {
         public void SetDirection(NodeDirection direction) { if (MyNode.NodeDirection != direction) MyNode.NodeDirection = direction; }
 
         public abstract Dictionary<string, Action> GetErrorResolutions();
-        public abstract Dictionary<string, Action> GetWarningResolutions();
+        public virtual Dictionary<string, Action> GetWarningResolutions() => new Dictionary<string, Action>();
+
+        protected Dictionary<string, Action> ErrorResolutionsDeleteOrFixLinks(bool deleteNode) {
+            if (deleteNode)
+                return new Dictionary<string, Action> { ["Delete node"] = Delete };
+            return GetInvalidConnectionResolutions();
+        }
+
+        protected Dictionary<string, Action> ErrorResolutionsWithFixOrLinks(bool deleteNode, string? fixLabel, Action? fixAction) {
+            Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+            if (deleteNode)
+                resolutions["Delete node"] = Delete;
+            if (fixLabel is not null && fixAction is not null)
+                resolutions[fixLabel] = fixAction;
+            else
+                foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
+                    resolutions.Add(kvp.Key, kvp.Value);
+            return resolutions;
+        }
 
         protected Dictionary<string, Action> GetInvalidConnectionResolutions() {
             Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
             if (!MyNode.AllLinksValid) {
                 resolutions.Add("Delete invalid links", new Action(() => {
                     foreach (NodeLink invalidLink in MyNode.InputLinks.Where(l => !l.IsValid).ToList())
-                        MyNode.MyGraph.DeleteLink(invalidLink.ReadOnlyLink);
+                        MyNode.MyGraph.DeleteLink(invalidLink);
                     foreach (NodeLink invalidLink in MyNode.OutputLinks.Where(l => !l.IsValid).ToList())
-                        MyNode.MyGraph.DeleteLink(invalidLink.ReadOnlyLink);
+                        MyNode.MyGraph.DeleteLink(invalidLink);
                 }));
             }
             return resolutions;
         }
 
-        public void Delete() {
-            if (MyNode.ReadOnlyNode is not null)
-                MyNode.MyGraph.DeleteNode(MyNode.ReadOnlyNode);
-        }
+        public void Delete() => MyNode.MyGraph.DeleteNode(MyNode);
         public override string ToString() => "C: " + MyNode.ToString();
     }
 }
