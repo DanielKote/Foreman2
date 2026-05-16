@@ -991,7 +991,7 @@ namespace Foreman {
                     try {
                         JObject json = JObject.Parse(Clipboard.GetText());
                         ImportNodesFromJson(json, ScreenToGraph(PointToClient(Cursor.Position)), false);
-                    } catch { Console.WriteLine("Non-Foreman paste detected."); } //clipboard string wasnt a proper json object, or didnt process properly. Likely answer: was a clip NOT from foreman.
+                    } catch (Exception ex) { ErrorLogging.LogLine(string.Format("Non-Foreman paste or invalid clipboard JSON: {0}", ex.Message)); }
                 }
             } else if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
                 UpdateSelection();
@@ -1246,6 +1246,11 @@ namespace Foreman {
             MessageBox.Show(message, "Cannot load save", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
+        public async Task ReloadGraphForCurrentPreset() {
+            JObject saveState = JObject.Parse(JsonConvert.SerializeObject(this));
+            await LoadFromJson(saveState, useFirstPreset: true, setEnablesFromJson: false);
+        }
+
         public async Task LoadFromJson(JObject json, bool useFirstPreset, bool setEnablesFromJson) {
             bool versionMismatch = JsonTokens.AsInt32(json["Version"]) != Properties.Settings.Default.ForemanVersion
                 || JsonTokens.AsString(json["Object"]) != "ProductionGraphViewer";
@@ -1379,43 +1384,12 @@ namespace Foreman {
 
             //update enabled statuses
             if (setEnablesFromJson) {
-                foreach (Beacon beacon in cache.Beacons.Values)
-                    beacon.Enabled = false;
-                if (json["EnabledBeacons"] is JArray enabledBeacons) {
-                    foreach (JToken t in enabledBeacons) {
-                        if (t.Type == JTokenType.String && t.Value<string>() is string beaconName && cache.Beacons.ContainsKey(beaconName))
-                            cache.Beacons[beaconName].Enabled = true;
-                    }
-                }
-
-                foreach (Assembler assembler in cache.Assemblers.Values)
-                    assembler.Enabled = false;
-                if (json["EnabledAssemblers"] is JArray enabledAssemblers) {
-                    foreach (JToken t in enabledAssemblers) {
-                        if (t.Type == JTokenType.String && t.Value<string>() is string asmName && cache.Assemblers.ContainsKey(asmName))
-                            cache.Assemblers[asmName].Enabled = true;
-                    }
-                }
+                JsonTokens.ApplyEnabledFromSave(cache.Beacons.Values, cache.Beacons, json["EnabledBeacons"], (b, e) => b.Enabled = e);
+                JsonTokens.ApplyEnabledFromSave(cache.Assemblers.Values, cache.Assemblers, json["EnabledAssemblers"], (a, e) => a.Enabled = e);
                 if (cache.RocketAssembler is not null)
                     cache.RocketAssembler.Enabled = cache.Assemblers["rocket-silo"]?.Enabled ?? false;
-
-                foreach (Module module in cache.Modules.Values)
-                    module.Enabled = false;
-                if (json["EnabledModules"] is JArray enabledModules) {
-                    foreach (JToken t in enabledModules) {
-                        if (t.Type == JTokenType.String && t.Value<string>() is string modName && cache.Modules.ContainsKey(modName))
-                            cache.Modules[modName].Enabled = true;
-                    }
-                }
-
-                foreach (Recipe recipe in cache.Recipes.Values)
-                    recipe.Enabled = false;
-                if (json["EnabledRecipes"] is JArray enabledRecipes) {
-                    foreach (JToken t in enabledRecipes) {
-                        if (t.Type == JTokenType.String && t.Value<string>() is string recipeName && cache.Recipes.ContainsKey(recipeName))
-                            cache.Recipes[recipeName].Enabled = true;
-                    }
-                }
+                JsonTokens.ApplyEnabledFromSave(cache.Modules.Values, cache.Modules, json["EnabledModules"], (m, e) => m.Enabled = e);
+                JsonTokens.ApplyEnabledFromSave(cache.Recipes.Values, cache.Recipes, json["EnabledRecipes"], (r, e) => r.Enabled = e);
             }
 
             //add all nodes

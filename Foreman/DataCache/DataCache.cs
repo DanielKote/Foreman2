@@ -347,10 +347,6 @@ namespace Foreman {
                 //check each fluid to see if all production recipe temperatures can fit within all consumption recipe ranges. if not, then the item / fluid is set to be 'temperature dependent' and requires further processing when checking link validity.
                 UpdateFluidTemperatureDependencies();
 
-#if DEBUG
-                //PrintDataCache();
-#endif
-
                 progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));
                 progress.Report(new KeyValuePair<int, string>(100, "Done!"));
             });
@@ -1209,7 +1205,8 @@ namespace Foreman {
                 bool success = false;
                 switch (etype) {
                     case EntityType.Assembler:
-                        success = AssemblerAdditionalProcessing(objJToken, aEntity, craftingCategories);
+                        AssemblerAdditionalProcessing(objJToken, aEntity, craftingCategories);
+                        success = true;
                         break;
                     case EntityType.Boiler:
                         success = BoilerAdditionalProcessing(objJToken, aEntity);
@@ -1221,7 +1218,8 @@ namespace Foreman {
                         success = GeneratorAdditionalProcessing(objJToken, aEntity);
                         break;
                     case EntityType.Miner:
-                        success = MinerAdditionalProcessing(objJToken, aEntity, resourceCategories, miningWithFluidRecipes);
+                        MinerAdditionalProcessing(objJToken, aEntity, resourceCategories, miningWithFluidRecipes);
+                        success = true;
                         break;
                     case EntityType.OffshorePump:
                         success = OffshorePumpAdditionalProcessing(objJToken, aEntity, resourceCategories["<<foreman_resource_category_water_tile>>"]);
@@ -1337,7 +1335,7 @@ namespace Foreman {
             return true;
         }
 
-        private bool AssemblerAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> craftingCategories) //recipe user
+        private void AssemblerAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> craftingCategories) //recipe user
         {
             foreach (var recipe in objJToken["crafting_categories"]
                 ?.Select(o => (string?)o)
@@ -1347,11 +1345,9 @@ namespace Foreman {
                 recipe.assemblers.Add(aEntity);
                 aEntity.recipes.Add(recipe);
             }
-            //TODO: What is the point of returning a bool?
-            return true;
         }
 
-        private bool MinerAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> resourceCategories, List<Recipe> miningWithFluidRecipes) //resource provider
+        private void MinerAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> resourceCategories, List<Recipe> miningWithFluidRecipes) //resource provider
         {
             foreach (var recipe in objJToken["resource_categories"]
                 ?.Select(o => (string?)o)
@@ -1364,8 +1360,6 @@ namespace Foreman {
                 recipe.assemblers.Add(aEntity);
                 aEntity.recipes.Add(recipe);
             }
-            //TODO: What is the point of returning a bool?
-            return true;
         }
 
         private bool OffshorePumpAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, List<RecipePrototype> waterPumpRecipes) {
@@ -1940,122 +1934,5 @@ namespace Foreman {
             }
         }
 
-        //--------------------------------------------------------------------DEBUG PRINTING FUNCTIONS
-
-        private void PrintDataCache() {
-            Console.WriteLine("AVAILABLE: ----------------------------------------------------------------");
-            Console.WriteLine("Technologies:");
-            foreach (TechnologyPrototype tech in technologies.Values)
-                if (tech.Available)
-                    Console.WriteLine("    " + tech);
-            Console.WriteLine("Groups:");
-            foreach (GroupPrototype group in groups.Values)
-                if (group.Available)
-                    Console.WriteLine("    " + group);
-            Console.WriteLine("Subgroups:");
-            foreach (SubgroupPrototype sgroup in subgroups.Values)
-                if (sgroup.Available)
-                    Console.WriteLine("    " + sgroup);
-            Console.WriteLine("Items:");
-            foreach (ItemPrototype item in items.Values)
-                if (item.Available)
-                    Console.WriteLine("    " + item);
-            Console.WriteLine("Assemblers:");
-            foreach (AssemblerPrototype assembler in assemblers.Values)
-                if (assembler.Available)
-                    Console.WriteLine("    " + assembler);
-            Console.WriteLine("Modules:");
-            foreach (ModulePrototype module in modules.Values)
-                if (module.Available)
-                    Console.WriteLine("    " + module);
-            Console.WriteLine("Recipes:");
-            foreach (RecipePrototype recipe in recipes.Values)
-                if (recipe.Available)
-                    Console.WriteLine("    " + recipe);
-            Console.WriteLine("Beacons:");
-            foreach (BeaconPrototype beacon in beacons.Values)
-                if (beacon.Available)
-                    Console.WriteLine("    " + beacon);
-
-            Console.WriteLine("UNAVAILABLE: ----------------------------------------------------------------");
-            Console.WriteLine("Technologies:");
-            foreach (TechnologyPrototype tech in technologies.Values)
-                if (!tech.Available)
-                    Console.WriteLine("    " + tech);
-            Console.WriteLine("Groups:");
-            foreach (GroupPrototype group in groups.Values)
-                if (!group.Available)
-                    Console.WriteLine("    " + group);
-            Console.WriteLine("Subgroups:");
-            foreach (SubgroupPrototype sgroup in subgroups.Values)
-                if (!sgroup.Available)
-                    Console.WriteLine("    " + sgroup);
-            Console.WriteLine("Items:");
-            foreach (ItemPrototype item in items.Values)
-                if (!item.Available)
-                    Console.WriteLine("    " + item);
-            Console.WriteLine("Assemblers:");
-            foreach (AssemblerPrototype assembler in assemblers.Values)
-                if (!assembler.Available)
-                    Console.WriteLine("    " + assembler);
-            Console.WriteLine("Modules:");
-            foreach (ModulePrototype module in modules.Values)
-                if (!module.Available)
-                    Console.WriteLine("    " + module);
-            Console.WriteLine("Recipes:");
-            foreach (RecipePrototype recipe in recipes.Values)
-                if (!recipe.Available)
-                    Console.WriteLine("    " + recipe);
-            Console.WriteLine("Beacons:");
-            foreach (BeaconPrototype beacon in beacons.Values)
-                if (!beacon.Available)
-                    Console.WriteLine("    " + beacon);
-
-            Console.WriteLine("TECHNOLOGIES: ----------------------------------------------------------------");
-            Console.WriteLine("Technology tiers:");
-            foreach (TechnologyPrototype tech in technologies.Values.OrderBy(t => t.Tier)) {
-                Console.WriteLine("   T:" + tech.Tier.ToString("000") + " : " + tech.Name);
-                foreach (TechnologyPrototype prereq in tech.prerequisites)
-                    Console.WriteLine("      > T:" + prereq.Tier.ToString("000" + " : " + prereq.Name));
-            }
-            Console.WriteLine("Science Pack order:");
-            foreach (Item sciPack in sciencePacks)
-                Console.WriteLine("   >" + sciPack.FriendlyName);
-            Console.WriteLine("Science Pack prerequisites:");
-            foreach (Item sciPack in sciencePacks) {
-                Console.WriteLine("   >" + sciPack);
-                foreach (Item i in sciencePackPrerequisites[sciPack])
-                    Console.WriteLine("      >" + i);
-            }
-
-            Console.WriteLine("RECIPES: ----------------------------------------------------------------");
-            foreach (RecipePrototype recipe in recipes.Values) {
-                Console.WriteLine("R: " + recipe.Name);
-                foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
-                    Console.WriteLine("  >" + tech.Tier.ToString("000") + ":" + tech.Name);
-                foreach (IReadOnlyList<Item> sciPackList in recipe.MyUnlockSciencePacks) {
-                    Console.Write("    >Science Packs Option: ");
-                    foreach (Item sciPack in sciPackList)
-                        Console.Write(sciPack.Name + ", ");
-                    Console.WriteLine();
-                }
-            }
-
-            Console.WriteLine("TEMPERATURE DEPENDENT FLUIDS: ----------------------------------------------------------------");
-            foreach (ItemPrototype fluid in items.Values.Where(i => i is Fluid f && f.IsTemperatureDependent)) {
-                Console.WriteLine(fluid.Name);
-                HashSet<double> productionTemps = new HashSet<double>();
-                foreach (Recipe recipe in fluid.productionRecipes)
-                    productionTemps.Add(recipe.ProductTemperatureMap[fluid]);
-                Console.Write("   Production ranges:          >");
-                foreach (double temp in productionTemps.ToList().OrderBy(t => t))
-                    Console.Write(temp + ", ");
-                Console.WriteLine();
-                Console.Write("   Failed Consumption ranges:  >");
-                foreach (Recipe recipe in fluid.consumptionRecipes.Where(r => productionTemps.Any(t => !r.IngredientTemperatureMap[fluid].Contains(t))))
-                    Console.Write("(" + recipe.IngredientTemperatureMap[fluid].Min + ">" + recipe.IngredientTemperatureMap[fluid].Max + ": " + recipe.Name + "), ");
-                Console.WriteLine();
-            }
-        }
     }
 }

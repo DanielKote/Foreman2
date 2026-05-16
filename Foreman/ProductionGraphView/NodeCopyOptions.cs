@@ -48,7 +48,10 @@ namespace Foreman {
         }
 
         public static NodeCopyOptions? GetNodeCopyOptions(string serialized, DataCache cache) {
-            try { return GetNodeCopyOptions(JObject.Parse(serialized), cache); } catch { return null; }
+            try { return GetNodeCopyOptions(JObject.Parse(serialized), cache); } catch (Exception ex) {
+                ErrorLogging.LogLine(string.Format("Failed to parse node copy options from clipboard: {0}", ex));
+                return null;
+            }
         }
 
         public static NodeCopyOptions? GetNodeCopyOptions(JToken json, DataCache cache) {
@@ -57,12 +60,12 @@ namespace Foreman {
 
             Quality? defaultQuality = cache.DefaultQuality;
 
-            string? assemblerName = json.Value<string>("Assembler");
+            string? assemblerName = JsonTokens.AsString(json["Assembler"]);
             if (string.IsNullOrEmpty(assemblerName) || !cache.Assemblers.TryGetValue(assemblerName, out Assembler? assembler) || assembler is null)
                 return null;
 
             Quality? assemblerQuality = null;
-            string? assemblerQualityName = json.Value<string>("AssemblerQuality");
+            string? assemblerQualityName = JsonTokens.AsString(json["AssemblerQuality"]);
             if (!string.IsNullOrEmpty(assemblerQualityName) && cache.Qualities.TryGetValue(assemblerQualityName, out Quality? aq))
                 assemblerQuality = aq;
             if (assemblerQuality is null && defaultQuality is null)
@@ -75,11 +78,11 @@ namespace Foreman {
             bool beacons = json["Beacon"] != null;
             BeaconQualityPair beaconQP;
             if (beacons) {
-                string? beaconName = json.Value<string>("Beacon");
+                string? beaconName = JsonTokens.AsString(json["Beacon"]);
                 if (string.IsNullOrEmpty(beaconName) || !cache.Beacons.TryGetValue(beaconName, out Beacon? beacon) || beacon is null)
                     return null;
                 Quality? beaconQuality = null;
-                string? beaconQualityName = json.Value<string>("BeaconQuality");
+                string? beaconQualityName = JsonTokens.AsString(json["BeaconQuality"]);
                 if (!string.IsNullOrEmpty(beaconQualityName) && cache.Qualities.TryGetValue(beaconQualityName, out Quality? bq))
                     beaconQuality = bq;
                 if (beaconQuality is null && defaultQuality is null)
@@ -93,8 +96,8 @@ namespace Foreman {
 
             List<ModuleQualityPair> aModules = new List<ModuleQualityPair>();
             foreach (JToken moduleToken in json["AModules"] ?? new JArray()) {
-                string? moduleName = moduleToken.Value<string>("Name");
-                string? moduleQualityName = moduleToken.Value<string>("Quality");
+                string? moduleName = JsonTokens.AsString(moduleToken["Name"]);
+                string? moduleQualityName = JsonTokens.AsString(moduleToken["Quality"]);
                 if (string.IsNullOrEmpty(moduleName) || string.IsNullOrEmpty(moduleQualityName))
                     continue;
                 if (!cache.Modules.TryGetValue(moduleName, out Module? module) || module is null)
@@ -107,8 +110,8 @@ namespace Foreman {
 
             List<ModuleQualityPair> bModules = new List<ModuleQualityPair>();
             foreach (JToken moduleToken in json["BModules"] ?? new JArray()) {
-                string? moduleName = moduleToken.Value<string>("Name");
-                string? moduleQualityName = moduleToken.Value<string>("Quality");
+                string? moduleName = JsonTokens.AsString(moduleToken["Name"]);
+                string? moduleQualityName = JsonTokens.AsString(moduleToken["Quality"]);
                 if (string.IsNullOrEmpty(moduleName) || string.IsNullOrEmpty(moduleQualityName))
                     continue;
                 if (!cache.Modules.TryGetValue(moduleName, out Module? module) || module is null)
@@ -120,7 +123,7 @@ namespace Foreman {
             }
 
             Item? fuel = null;
-            string? fuelName = json.Value<string>("Fuel");
+            string? fuelName = JsonTokens.AsString(json["Fuel"]);
             if (!string.IsNullOrEmpty(fuelName) && cache.Items.TryGetValue(fuelName, out Item? fuelItem))
                 fuel = fuelItem;
 

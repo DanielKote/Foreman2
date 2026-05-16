@@ -469,8 +469,8 @@ namespace Foreman {
 
         public NewNodeCollection InsertNodesFromJson(DataCache cache, JObject json, bool loadSolverValues) //cache is necessary since we will possibly be adding to mssing items/recipes
         {
-            if ((int?)json["Version"] != Properties.Settings.Default.ForemanVersion ||
-                (string?)json["Object"] != "ProductionGraph") {
+            if (JsonTokens.AsInt32(json["Version"]) != Properties.Settings.Default.ForemanVersion ||
+                JsonTokens.AsString(json["Object"]) != "ProductionGraph") {
                 JObject? migrated = VersionUpdater.UpdateGraph(json, cache);
                 if (migrated is null) //update failed
                     return new NewNodeCollection();
@@ -492,30 +492,30 @@ namespace Foreman {
                 Dictionary<long, PlantProcess> plantProcessLinks = cache.ProcessImportedPlantProcessesSet(PlantShort.GetSetFromJson(json["IncludedPlantProcesses"]));
 
                 if (loadSolverValues) {
-                    EnableExtraProductivityForNonMiners = (bool?)json["EnableExtraProductivityForNonMiners"] is true;
-                    DefaultNodeDirection = (int?)json["DefaultNodeDirection"] is int i ? (NodeDirection)i : NodeDirection.Up;
-                    PullOutputNodes = (bool?)json["Solver_PullOutputNodes"] is true;
-                    PullOutputNodesPower = (double?)json["Solver_PullOutputNodesPower"] ?? default;
-                    LowPriorityPower = (double?)json["Solver_LowPriorityPower"] ?? default;
-                    MaxQualitySteps = (uint?)json["MaxQualitySteps"] ?? default;
-                    DefaultAssemblerQuality = qualityLinks[(string?)json["DefaultQuality"] ?? "normal"];
+                    EnableExtraProductivityForNonMiners = JsonTokens.AsBoolean(json["EnableExtraProductivityForNonMiners"]) is true;
+                    DefaultNodeDirection = JsonTokens.AsInt32(json["DefaultNodeDirection"]) is int directionValue ? (NodeDirection)directionValue : NodeDirection.Up;
+                    PullOutputNodes = JsonTokens.AsBoolean(json["Solver_PullOutputNodes"]) is true;
+                    PullOutputNodesPower = JsonTokens.AsDouble(json["Solver_PullOutputNodesPower"]) ?? default;
+                    LowPriorityPower = JsonTokens.AsDouble(json["Solver_LowPriorityPower"]) ?? default;
+                    MaxQualitySteps = (uint)(JsonTokens.AsInt32(json["MaxQualitySteps"]) ?? default);
+                    DefaultAssemblerQuality = qualityLinks[JsonTokens.AsString(json["DefaultQuality"]) ?? "normal"];
                 }
 
                 //add in all the graph nodes
                 foreach (JToken nodeJToken in json["Nodes"]?.AsEnumerable() ?? []) {
                     BaseNode? newNode = null;
-                    string[] locationString = ((string?)nodeJToken["Location"])?.Split(',') ?? [];
+                    string[] locationString = JsonTokens.AsString(nodeJToken["Location"])?.Split(',') ?? [];
                     Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
                     string? itemName = null; //just an early define
                     Quality? quality = null; //early define
 
-                    if ((int?)nodeJToken["NodeType"] is not int nt)
+                    if (JsonTokens.AsInt32(nodeJToken["NodeType"]) is not int nt)
                         continue;
 
                     switch ((NodeType)nt) {
                         case NodeType.Consumer:
-                            itemName = (string?)nodeJToken["Item"];
-                            if ((string?)nodeJToken["BaseQuality"] is string bq)
+                            itemName = JsonTokens.AsString(nodeJToken["Item"]);
+                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq)
                                 qualityLinks.TryGetValue(bq, out quality);
                             if (itemName is not null && quality is not null && cache.Items.TryGetValue(itemName, out var value))
                                 newNode = roToNode[CreateConsumerNode(new ItemQualityPair(value, quality), location)];
@@ -525,8 +525,8 @@ namespace Foreman {
                                 newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
                             break;
                         case NodeType.Supplier:
-                            itemName = (string?)nodeJToken["Item"];
-                            if ((string?)nodeJToken["BaseQuality"] is string bq2)
+                            itemName = JsonTokens.AsString(nodeJToken["Item"]);
+                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq2)
                                 qualityLinks.TryGetValue(bq2, out quality);
                             if (itemName is not null && quality is not null && cache.Items.TryGetValue(itemName, out var value2))
                                 newNode = roToNode[CreateSupplierNode(new ItemQualityPair(value2, quality), location)];
@@ -536,21 +536,21 @@ namespace Foreman {
                                 newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
                             break;
                         case NodeType.Passthrough:
-                            itemName = (string?)nodeJToken["Item"];
-                            if ((string?)nodeJToken["BaseQuality"] is string bq3)
+                            itemName = JsonTokens.AsString(nodeJToken["Item"]);
+                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq3)
                                 qualityLinks.TryGetValue(bq3, out quality);
                             if (itemName is not null && quality is not null && cache.Items.TryGetValue(itemName, out var value3))
                                 newNode = roToNode[CreatePassthroughNode(new ItemQualityPair(value3, quality), location)];
                             else if (itemName is not null && quality is not null)
                                 newNode = roToNode[CreatePassthroughNode(new ItemQualityPair(cache.MissingItems[itemName], quality), location)];
-                            (newNode as PassthroughNode)?.SimpleDraw = (bool?)nodeJToken["SDraw"] is true;
+                            (newNode as PassthroughNode)?.SimpleDraw = JsonTokens.AsBoolean(nodeJToken["SDraw"]) is true;
                             if (newNode?.ReadOnlyNode is not null)
                                 newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
                             break;
                         case NodeType.Spoil:
-                            itemName = (string?)nodeJToken["InputItem"];
-                            var outputItemName = (string?)nodeJToken["OutputItem"];
-                            if ((string?)nodeJToken["BaseQuality"] is string bq4)
+                            itemName = JsonTokens.AsString(nodeJToken["InputItem"]);
+                            var outputItemName = JsonTokens.AsString(nodeJToken["OutputItem"]);
+                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq4)
                                 qualityLinks.TryGetValue(bq4, out quality);
                             var inputItem = itemName is not null ? (cache.Items.ContainsKey(itemName) ? cache.Items[itemName] : cache.MissingItems[itemName]) : default;
                             var outputItem = outputItemName is not null ? (cache.Items.ContainsKey(outputItemName) ? cache.Items[outputItemName] : cache.MissingItems[outputItemName]) : default;
@@ -560,8 +560,8 @@ namespace Foreman {
                                 newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
                             break;
                         case NodeType.Plant:
-                            long pprocessID = (long?)nodeJToken["PlantProcessID"] ?? default;
-                            if ((string?)nodeJToken["BaseQuality"] is string bq5)
+                            long pprocessID = JsonTokens.AsInt64(nodeJToken["PlantProcessID"]) ?? default;
+                            if (JsonTokens.AsString(nodeJToken["BaseQuality"]) is string bq5)
                                 qualityLinks.TryGetValue(bq5, out quality);
                             if (quality is not null)
                                 newNode = roToNode[CreatePlantNode(plantProcessLinks[pprocessID], quality, location)];
@@ -569,9 +569,9 @@ namespace Foreman {
                                 newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
                             break;
                         case NodeType.Recipe:
-                            long recipeID = (long?)nodeJToken["RecipeID"] ?? default;
+                            long recipeID = JsonTokens.AsInt64(nodeJToken["RecipeID"]) ?? default;
                             Quality? recipeQuality = null;
-                            if ((string?)nodeJToken["RecipeQuality"] is string rq)
+                            if (JsonTokens.AsString(nodeJToken["RecipeQuality"]) is string rq)
                                 qualityLinks.TryGetValue(rq, out recipeQuality);
                             if (recipeQuality is not null)
                                 newNode = roToNode[CreateRecipeNode(new RecipeQualityPair(recipeLinks[recipeID], recipeQuality), location, (rNode) => {
@@ -579,12 +579,12 @@ namespace Foreman {
 
                                     rNode.LowPriority = (nodeJToken["LowPriority"] != null);
 
-                                    rNode.NeighbourCount = (double?)nodeJToken["Neighbours"] ?? default;
-                                    rNode.ExtraProductivityBonus = (double?)nodeJToken["ExtraProductivity"] ?? default;
+                                    rNode.NeighbourCount = JsonTokens.AsDouble(nodeJToken["Neighbours"]) ?? default;
+                                    rNode.ExtraProductivityBonus = JsonTokens.AsDouble(nodeJToken["ExtraProductivity"]) ?? default;
 
-                                    var assemblerName = (string?)nodeJToken["Assembler"];
+                                    var assemblerName = JsonTokens.AsString(nodeJToken["Assembler"]);
                                     Quality? assemblerQuality = null;
-                                    if ((string?)nodeJToken["AssemblerQuality"] is string aq)
+                                    if (JsonTokens.AsString(nodeJToken["AssemblerQuality"]) is string aq)
                                         qualityLinks.TryGetValue(aq, out assemblerQuality);
                                     if (assemblerName is not null && assemblerQuality is not null && cache.Assemblers.TryGetValue(assemblerName, out var assembler))
                                         rNodeController.SetAssembler(new AssemblerQualityPair(assembler, assemblerQuality));
@@ -592,9 +592,9 @@ namespace Foreman {
                                         rNodeController.SetAssembler(new AssemblerQualityPair(assembler2, assemblerQuality));
 
                                     foreach (JToken module in nodeJToken["AssemblerModules"]?.AsEnumerable() ?? []) {
-                                        var moduleName = (string?)module["Name"];
+                                        var moduleName = JsonTokens.AsString(module["Name"]);
                                         Quality? moduleQuality = null;
-                                        if ((string?)module["Quality"] is string quality)
+                                        if (JsonTokens.AsString(module["Quality"]) is string quality)
                                             qualityLinks.TryGetValue(quality, out moduleQuality);
                                         if (moduleName is not null && moduleQuality is not null && cache.Modules.TryGetValue(moduleName, out var module2))
                                             rNodeController.AddAssemblerModule(new ModuleQualityPair(module2, moduleQuality));
@@ -603,7 +603,7 @@ namespace Foreman {
                                     }
 
                                     if (nodeJToken["Fuel"] != null) {
-                                        var s = (string?)nodeJToken["Fuel"];
+                                        var s = JsonTokens.AsString(nodeJToken["Fuel"]);
                                         if (s is not null && cache.Items.TryGetValue(s, out var item))
                                             rNodeController.SetFuel(item);
                                         else if (s is not null && cache.MissingItems.TryGetValue(s, out var item2))
@@ -611,7 +611,7 @@ namespace Foreman {
                                     } else if (rNode.SelectedAssembler.Assembler.IsBurner) //and fuel is null... well - its the import. set it as null (and consider it an error)
                                         rNodeController.SetFuel(null);
 
-                                    if ((string?)nodeJToken["Burnt"] is string burntStr) {
+                                    if (JsonTokens.AsString(nodeJToken["Burnt"]) is string burntStr) {
                                         Item? burntItem;
                                         if (!cache.Items.TryGetValue(burntStr, out burntItem))
                                             cache.MissingItems.TryGetValue(burntStr, out burntItem);
@@ -620,9 +620,9 @@ namespace Foreman {
                                     } else if (rNode.Fuel != null && rNode.Fuel.BurnResult != null) //same as above - there should be a burn result, but there isnt...
                                         rNode.SetBurntOverride(null);
 
-                                    if ((string?)nodeJToken["Beacon"] is string beaconName) {
+                                    if (JsonTokens.AsString(nodeJToken["Beacon"]) is string beaconName) {
                                         Quality? beaconQuality = null;
-                                        if ((string?)nodeJToken["BeaconQuality"] is string beaconQualityStr)
+                                        if (JsonTokens.AsString(nodeJToken["BeaconQuality"]) is string beaconQualityStr)
                                             qualityLinks.TryGetValue(beaconQualityStr, out beaconQuality);
 
                                         if (beaconQuality is not null && cache.Beacons.ContainsKey(beaconName))
@@ -631,9 +631,9 @@ namespace Foreman {
                                             rNodeController.SetBeacon(new BeaconQualityPair(cache.MissingBeacons[beaconName], beaconQuality));
 
                                         foreach (JToken module in nodeJToken["BeaconModules"]?.AsEnumerable() ?? []) {
-                                            var moduleName = (string?)module["Name"];
+                                            var moduleName = JsonTokens.AsString(module["Name"]);
                                             Quality? moduleQuality = null;
-                                            if ((string?)module["Quality"] is string q)
+                                            if (JsonTokens.AsString(module["Quality"]) is string q)
                                                 qualityLinks.TryGetValue(q, out moduleQuality);
 
                                             if (moduleName is not null && moduleQuality is not null && cache.Modules.TryGetValue(moduleName, out var module2))
@@ -642,9 +642,9 @@ namespace Foreman {
                                                 rNodeController.AddBeaconModule(new ModuleQualityPair(module2, moduleQuality));
                                         }
 
-                                        rNode.BeaconCount = (double?)nodeJToken["BeaconCount"] ?? default;
-                                        rNode.BeaconsPerAssembler = (double?)nodeJToken["BeaconsPerAssembler"] ?? default;
-                                        rNode.BeaconsConst = (double?)nodeJToken["BeaconsConst"] ?? default;
+                                        rNode.BeaconCount = JsonTokens.AsDouble(nodeJToken["BeaconCount"]) ?? default;
+                                        rNode.BeaconsPerAssembler = JsonTokens.AsDouble(nodeJToken["BeaconsPerAssembler"]) ?? default;
+                                        rNode.BeaconsConst = JsonTokens.AsDouble(nodeJToken["BeaconsConst"]) ?? default;
                                     }
 
                                     if (rNode.ReadOnlyNode is not null)
@@ -655,28 +655,28 @@ namespace Foreman {
                             throw new Exception(); //we will catch it right away and delete all nodes added in thus far. Error was most likely in json read, in which case we count it as a corrupt json and not import anything.
                     }
 
-                    if ((int?)nodeJToken["RateType"] is int i)
+                    if (JsonTokens.AsInt32(nodeJToken["RateType"]) is int i)
                         newNode?.RateType = (RateType)i;
                     if (newNode?.RateType == RateType.Manual)
-                        newNode.DesiredSetValue = (double?)nodeJToken["DesiredSetValue"] ?? default;
+                        newNode.DesiredSetValue = JsonTokens.AsDouble(nodeJToken["DesiredSetValue"]) ?? default;
 
-                    newNode?.NodeDirection = (int?)nodeJToken["Direction"] is int j ? (NodeDirection)j : NodeDirection.Up;
+                    newNode?.NodeDirection = JsonTokens.AsInt32(nodeJToken["Direction"]) is int j ? (NodeDirection)j : NodeDirection.Up;
 
-                    if ((string?)nodeJToken["KeyNode"] is string keyNode) {
+                    if (JsonTokens.AsString(nodeJToken["KeyNode"]) is string keyNode) {
                         newNode?.KeyNode = true;
                         newNode?.KeyNodeTitle = keyNode;
                     }
 
-                    if ((int?)nodeJToken["NodeID"] is int nodeId && newNode?.ReadOnlyNode is not null)
+                    if (JsonTokens.AsInt32(nodeJToken["NodeID"]) is int nodeId && newNode?.ReadOnlyNode is not null)
                         oldNodeIndices.Add(nodeId, newNode.ReadOnlyNode);
                 }
 
                 //link the new nodes
                 foreach (JToken nodeLinkJToken in json["NodeLinks"]?.AsEnumerable() ?? []) {
-                    if ((int?)nodeLinkJToken["SupplierID"] is not int supplierId ||
-                        (int?)nodeLinkJToken["ConsumerID"] is not int consumerId ||
-                        (string?)nodeLinkJToken["Quality"] is not string qualityStr ||
-                        (string?)nodeLinkJToken["Item"] is not string itemName)
+                    if (JsonTokens.AsInt32(nodeLinkJToken["SupplierID"]) is not int supplierId ||
+                        JsonTokens.AsInt32(nodeLinkJToken["ConsumerID"]) is not int consumerId ||
+                        JsonTokens.AsString(nodeLinkJToken["Quality"]) is not string qualityStr ||
+                        JsonTokens.AsString(nodeLinkJToken["Item"]) is not string itemName)
                         continue;
                     ReadOnlyBaseNode supplier = oldNodeIndices[supplierId];
                     ReadOnlyBaseNode consumer = oldNodeIndices[consumerId];

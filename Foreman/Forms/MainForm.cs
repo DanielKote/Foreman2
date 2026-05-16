@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -62,7 +63,11 @@ namespace Foreman {
         private void MainForm_Load(object? sender, EventArgs e) {
             WindowState = FormWindowState.Maximized;
 
-            Properties.Settings.Default.ForemanVersion = VersionUpdater.CurrentVersion;
+            Version? assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            if (assemblyVersion is not null)
+                VersionLabel.Text = string.Format("v{0}.{1}.{2}.{3}", assemblyVersion.Major, assemblyVersion.Minor, assemblyVersion.Build, assemblyVersion.Revision);
+
+            Properties.Settings.Default.ForemanVersion = VersionUpdater.SaveFormatVersion;
 
             if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
                 Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
@@ -223,8 +228,6 @@ namespace Foreman {
             Properties.Settings.Default.DefaultAssemblerOption = (int)GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle;
             Properties.Settings.Default.DefaultModuleOption = (int)GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle;
             Properties.Settings.Default.DefaultNodeDirection = (int)GraphViewer.Graph.DefaultNodeDirection;
-
-            Properties.Settings.Default.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
 
             Properties.Settings.Default.Save();
             GraphViewer.Invalidate();
@@ -403,8 +406,7 @@ namespace Foreman {
                         Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset?.Name;
                         Properties.Settings.Default.UseRecipeBWfilters = options.DEV_UseRecipeBWFilters;
 
-                        var validPresets = GetValidPresetsList();
-                        await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
+                        await GraphViewer.ReloadGraphForCurrentPreset();
                         this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
                     } else //not loading a new preset -> update the enabled statuses
                       {

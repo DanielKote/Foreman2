@@ -419,7 +419,7 @@ namespace Foreman {
                                     }
                                 })));
                         }
-                    } catch { }
+                    } catch (Exception ex) { ErrorLogging.LogLine(string.Format("Failed to apply clipboard node options: {0}", ex)); }
                 }
 
 

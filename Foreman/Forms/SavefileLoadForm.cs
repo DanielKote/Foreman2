@@ -110,22 +110,10 @@ namespace Foreman {
                         }
                     }
 
-                    //test factorio version
-                    FileVersionInfo factorioVersionInfo = FileVersionInfo.GetVersionInfo(factorioPath);
-                    if (factorioVersionInfo.ProductMajorPart < 2) {
-                        MessageBox.Show("Factorio Version below 2.0 can not be used with this version of Foreman. Please use Factorio 2.0 or newer. Alternatively download dev.13 or under of foreman 2.0 for pre factorio 2.0.");
-                        ErrorLogging.LogLine(string.Format("Factorio version 0.x or 1.x instead of 2.x - use Foreman dev.13 or below for these factorio installs.", factorioVersionInfo.ProductVersion));
+                    if (!FactorioInstallValidator.TryValidateExecutable(factorioPath, out string? factorioVersionError)) {
+                        MessageBox.Show(factorioVersionError);
                         return DialogResult.Cancel;
-                    } else
-                        if (factorioVersionInfo.ProductMajorPart > 2) {
-                            MessageBox.Show("Factorio Version 3.x+ can not be used with this version of Foreman. Sit tight and wait for update...\nYou can also try to msg me on discord (u\\DanielKotes) if for some reason I am not already aware of this.");
-                            ErrorLogging.LogLine(string.Format("Factorio version 3.x+ isnt supported.", factorioVersionInfo.ProductVersion));
-                            return DialogResult.Cancel;
-                        } else if (factorioVersionInfo.ProductMinorPart < 0 || (factorioVersionInfo.ProductMinorPart == 0 && factorioVersionInfo.ProductBuildPart < 7)) {
-                            MessageBox.Show("Factorio version (" + factorioVersionInfo.ProductVersion + ") can not be used with Foreman. Please use Factorio 2.0.7 or newer.");
-                            ErrorLogging.LogLine(string.Format("Factorio version was too old. {0} instead of 2.0.7+", factorioVersionInfo.ProductVersion));
-                            return DialogResult.Cancel;
-                        }
+                    }
 
                     //copy the save reader mod to the mods folder
                     modsPath = Path.Combine(userDataPath ?? "", "mods");

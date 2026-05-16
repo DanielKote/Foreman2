@@ -127,27 +127,15 @@ namespace Foreman {
                 return;
             }
 
-            FileVersionInfo factorioVersionInfo = FileVersionInfo.GetVersionInfo(Path.Combine(new string[] { installPath, "bin", "x64", "factorio.exe" }));
-            if (factorioVersionInfo.ProductMajorPart < 2) {
+            string factorioExePath = Path.Combine(installPath, "bin", "x64", "factorio.exe");
+            if (!FactorioInstallValidator.TryValidateExecutable(factorioExePath, out string? factorioVersionError)) {
                 EnableProgressBar(false);
-                MessageBox.Show("Factorio Version below 2.0 can not be used with this version of Foreman. Please use Factorio 2.0 or newer. Alternatively download dev.13 or under of foreman 2.0 for pre factorio 2.0.");
-                ErrorLogging.LogLine(string.Format("Factorio version 0.x or 1.x instead of 2.x - use Foreman dev.13 or below for these factorio installs.", factorioVersionInfo.ProductVersion));
+                MessageBox.Show(factorioVersionError);
                 CleanupFailedImport();
                 return;
-            } else
-                if (factorioVersionInfo.ProductMajorPart > 2) {
-                    EnableProgressBar(false);
-                    MessageBox.Show("Factorio Version 3.x+ can not be used with this version of Foreman. Sit tight and wait for update...\nYou can also try to msg me on discord (u\\DanielKotes) if for some reason I am not already aware of this.");
-                    ErrorLogging.LogLine(string.Format("Factorio version 3.x+ isnt supported.", factorioVersionInfo.ProductVersion));
-                    CleanupFailedImport();
-                    return;
-                } else if (factorioVersionInfo.ProductMinorPart < 0 || (factorioVersionInfo.ProductMinorPart == 0 && factorioVersionInfo.ProductBuildPart < 7)) {
-                    EnableProgressBar(false);
-                    MessageBox.Show("Factorio version (" + factorioVersionInfo.ProductVersion + ") can not be used with Foreman. Please use Factorio 2.0.7 or newer.");
-                    ErrorLogging.LogLine(string.Format("Factorio version was too old. {0} instead of 2.0.7+", factorioVersionInfo.ProductVersion));
-                    CleanupFailedImport();
-                    return;
-                }
+            }
+
+            FileVersionInfo factorioVersionInfo = FileVersionInfo.GetVersionInfo(factorioExePath);
 
             string modsPath = ModsLocationComboBox.Text;
             if (string.IsNullOrEmpty(modsPath) || !File.Exists(Path.Combine(modsPath, "mod-list.json"))) {
@@ -447,7 +435,9 @@ namespace Foreman {
 
             try {
                 File.WriteAllText(modListPath, modlist.ToString(Formatting.Indented)); //updated mod list with foreman export disabled
-            } catch { }
+            } catch (Exception ex) {
+                ErrorLogging.LogLine(string.Format("Failed to update mod-list.json at {0}: {1}", modListPath, ex));
+            }
         }
 
         private void PresetNameTextBox_TextChanged(object? sender, EventArgs e) {

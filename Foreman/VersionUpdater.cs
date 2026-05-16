@@ -9,9 +9,11 @@ using System.Windows.Forms;
 
 namespace Foreman {
     public static class VersionUpdater {
-        public const int CurrentVersion = 7;
+        /// <summary>Save-file schema version (distinct from application assembly version).</summary>
+        public const int SaveFormatVersion = 7;
 
-        //at some point we need to come back here and actuall fill in the version updater from the base foreman to the current version.
+        /// <summary>Supported save versions for automatic upgrade (see <see cref="UpdateSave"/> / <see cref="UpdateGraph"/>).</summary>
+        public static readonly IReadOnlySet<int> SupportedSaveVersions = new HashSet<int> { 2, 3, 4, 5, 6, 7 };
 
 
         public static JObject? UpdateSave(JObject original, DataCache cache) {

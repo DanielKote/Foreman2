@@ -20,7 +20,8 @@ namespace Foreman {
                     if ((string?)objJToken["name"] is string name && (string?)objJToken["version"] is string version)
                         mods.Add(name, version);
                 return new PresetInfo(mods, (int?)jsonData["difficulty"]?[0] == 1, (int?)jsonData["difficulty"]?[1] == 1);
-            } catch {
+            } catch (Exception ex) {
+                ErrorLogging.LogLine(string.Format("Failed to read preset info from {0}: {1}", presetPath, ex));
                 mods.Clear();
                 mods.Add("ERROR READING PRESET!", "");
                 return new PresetInfo(mods, false, false);
@@ -49,15 +50,11 @@ namespace Foreman {
             return jsonData;
         }
 
-        public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<string> qualityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts) {
-            return await TestPresetStreamlined(preset, modList, itemList, entityList, qualityList, recipeShorts, plantShorts);
-        }
-
         //this preset comparer loads a 'light' version of the preset - basically loading the items and entities as strings only (no data), and only the minimal info for recipes (name, ingredients + amounts, products + amounts)
         //this speeds things up such that the comparison takes around 150ms for a large preset like seablock (10x vanilla), instead of 250ms as for a full datacache load.
         //still, this is only really helpful if you are using 10 presets (1.5 sec load inatead of 2.5 sec) or more, but hey; i will keep it.
         //any changes to preset json style have to be reflected here though (unlike for a full data cache loader above, which just incorporates any changes to data cache as long as they dont impact the outputs)
-        private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<string> qualityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts) {
+        public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<string> qualityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts) {
             JObject jsonData = PrepPreset(preset);
 
             //parse preset (note: this is preset data, so we are guaranteed to only have one name per item/recipe/mod/etc.)

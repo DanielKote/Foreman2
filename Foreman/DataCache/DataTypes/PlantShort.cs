@@ -59,19 +59,6 @@ namespace Foreman {
             return Name == other.Name &&
                 Products.Count == other.ProductList.Count &&
                 other.ProductList.All(p => Products.TryGetValue(p.Name, out var prod) && prod == other.ProductSet[p]);
-
-            //TODO: Surely the old logic is just wrong. Returns true if not similar?!?
-            /*
-			bool similar = Name == other.Name && Products.Count == other.ProductList.Count;
-
-			if (similar)
-			{
-				foreach (Item ingredient in other.ProductList)
-					if (!Products.ContainsKey(ingredient.Name) || Products[ingredient.Name] != other.ProductSet[ingredient])
-						return false;
-			}
-			return true;
-			*/
         }
     }
 

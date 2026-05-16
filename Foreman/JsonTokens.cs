@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace Foreman {
@@ -8,6 +9,8 @@ namespace Foreman {
             token is { Type: JTokenType.String } ? token.Value<string>() : null;
 
         public static int? AsInt32(JToken? token) => token is null ? null : (int?)token;
+
+        public static long? AsInt64(JToken? token) => token is null ? null : (long?)token;
 
         public static double? AsDouble(JToken? token) => token is null ? null : (double?)token;
 
@@ -34,6 +37,19 @@ namespace Foreman {
                     modSet[mod[0]] = mod[1];
             }
             return modSet;
+        }
+
+        public static void ApplyEnabledFromSave<T>(
+            IEnumerable<T> all,
+            IReadOnlyDictionary<string, T> byName,
+            JToken? enabledNamesToken,
+            Action<T, bool> setEnabled) where T : class {
+            foreach (T item in all)
+                setEnabled(item, false);
+            foreach (string name in EnumerateStrings(enabledNamesToken)) {
+                if (byName.TryGetValue(name, out T? item))
+                    setEnabled(item, true);
+            }
         }
 
         public static List<string> EnumerateQualityKeys(JToken? includedQualitiesToken) {
