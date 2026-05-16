@@ -10,7 +10,7 @@
     },
     {
       "name": "base",
-      "version": "2.0.13"
+      "version": "2.0.76"
     }
   ],
   "technologies": [
@@ -489,7 +489,7 @@
       "name": "automation-science-pack",
       "icon_name": "icon.t.automation-science-pack",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "steam-power",
@@ -950,7 +950,7 @@
       "name": "chemical-science-pack",
       "icon_name": "icon.t.chemical-science-pack",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "advanced-circuit",
@@ -3295,7 +3295,7 @@
       "name": "logistic-science-pack",
       "icon_name": "icon.t.logistic-science-pack",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "automation-science-pack"
@@ -3698,7 +3698,7 @@
       "name": "military-science-pack",
       "icon_name": "icon.t.military-science-pack",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "military-2",
@@ -4588,7 +4588,7 @@
       "name": "production-science-pack",
       "icon_name": "icon.t.production-science-pack",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "productivity-module",
@@ -5347,7 +5347,7 @@
       "name": "rocket-silo",
       "icon_name": "icon.t.rocket-silo",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "concrete",
@@ -5504,7 +5504,7 @@
       "name": "space-science-pack",
       "icon_name": "icon.t.space-science-pack",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "rocket-silo"
@@ -6232,7 +6232,7 @@
       "name": "utility-science-pack",
       "icon_name": "icon.t.utility-science-pack",
       "enabled": true,
-      "essential": false,
+      "essential": true,
       "hidden": false,
       "prerequisites": [
         "robotics",
@@ -11011,7 +11011,7 @@
       "enabled": false,
       "category": "crafting",
       "energy": 30,
-      "order": "b[cargo-landing-pad]",
+      "order": "c[cargo-landing-pad]",
       "subgroup": "space-related",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
@@ -11828,7 +11828,7 @@
           "name": "water-barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         }
       ],
       "localised_name": "Fill Water barrel"
@@ -11868,7 +11868,7 @@
           "name": "crude-oil-barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         }
       ],
       "localised_name": "Fill Crude oil barrel"
@@ -11908,7 +11908,7 @@
           "name": "petroleum-gas-barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         }
       ],
       "localised_name": "Fill Petroleum gas barrel"
@@ -11948,7 +11948,7 @@
           "name": "light-oil-barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         }
       ],
       "localised_name": "Fill Light oil barrel"
@@ -11988,7 +11988,7 @@
           "name": "heavy-oil-barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         }
       ],
       "localised_name": "Fill Heavy oil barrel"
@@ -12028,7 +12028,7 @@
           "name": "lubricant-barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         }
       ],
       "localised_name": "Fill Lubricant barrel"
@@ -12068,7 +12068,7 @@
           "name": "sulfuric-acid-barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         }
       ],
       "localised_name": "Fill Sulfuric acid barrel"
@@ -12103,13 +12103,13 @@
           "name": "barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         },
         {
           "name": "water",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 0
         }
       ],
       "localised_name": "Empty Water barrel"
@@ -12144,13 +12144,13 @@
           "name": "barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         },
         {
           "name": "crude-oil",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 0
         }
       ],
       "localised_name": "Empty Crude oil barrel"
@@ -12185,13 +12185,13 @@
           "name": "barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         },
         {
           "name": "petroleum-gas",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 0
         }
       ],
       "localised_name": "Empty Petroleum gas barrel"
@@ -12226,13 +12226,13 @@
           "name": "barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         },
         {
           "name": "light-oil",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 0
         }
       ],
       "localised_name": "Empty Light oil barrel"
@@ -12267,13 +12267,13 @@
           "name": "barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         },
         {
           "name": "heavy-oil",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 0
         }
       ],
       "localised_name": "Empty Heavy oil barrel"
@@ -12308,13 +12308,13 @@
           "name": "barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         },
         {
           "name": "lubricant",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 0
         }
       ],
       "localised_name": "Empty Lubricant barrel"
@@ -12349,13 +12349,13 @@
           "name": "barrel",
           "type": "item",
           "amount": 1,
-          "p_amount": 1
+          "p_amount": 0
         },
         {
           "name": "sulfuric-acid",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 0
         }
       ],
       "localised_name": "Empty Sulfuric acid barrel"
@@ -13678,7 +13678,7 @@
       "icon_alt_name": "icon.i.piercing-rounds-magazine",
       "enabled": false,
       "category": "crafting",
-      "energy": 3,
+      "energy": 6,
       "order": "a[basic-clips]-b[piercing-rounds-magazine]",
       "subgroup": "ammo",
       "maximum_productivity": 3,
@@ -13694,7 +13694,7 @@
         {
           "name": "copper-plate",
           "type": "item",
-          "amount": 5
+          "amount": 2
         },
         {
           "name": "steel-plate",
@@ -13704,15 +13704,15 @@
         {
           "name": "firearm-magazine",
           "type": "item",
-          "amount": 1
+          "amount": 2
         }
       ],
       "products": [
         {
           "name": "piercing-rounds-magazine",
           "type": "item",
-          "amount": 1,
-          "p_amount": 1
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Piercing rounds magazine"
@@ -14404,7 +14404,7 @@
       "enabled": false,
       "category": "crafting",
       "energy": 8,
-      "order": "d[defender-capsule]",
+      "order": "d[defender]-b[capsule]",
       "subgroup": "capsule",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
@@ -14449,7 +14449,7 @@
       "enabled": false,
       "category": "crafting",
       "energy": 15,
-      "order": "e[defender-capsule]",
+      "order": "e[distractor]-b[capsule]",
       "subgroup": "capsule",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
@@ -14489,7 +14489,7 @@
       "enabled": false,
       "category": "crafting",
       "energy": 15,
-      "order": "f[destroyer-capsule]",
+      "order": "f[destroyer]-b[capsule]",
       "subgroup": "capsule",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
@@ -15676,7 +15676,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15698,7 +15698,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15720,7 +15720,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15742,7 +15742,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15764,7 +15764,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15786,7 +15786,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15808,7 +15808,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15830,7 +15830,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15852,7 +15852,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -15874,7 +15874,7 @@
       "allowed_effects": {
         "consumption": true,
         "speed": true,
-        "productivity": false,
+        "productivity": true,
         "pollution": true,
         "quality": true
       },
@@ -16961,7 +16961,7 @@
     {
       "name": "cargo-landing-pad",
       "icon_name": "icon.i.cargo-landing-pad",
-      "order": "b[cargo-landing-pad]",
+      "order": "c[cargo-landing-pad]",
       "subgroup": "space-related",
       "stack_size": 1,
       "weight": 1000000,
@@ -17310,7 +17310,7 @@
       "order": "c[advanced-intermediates]-c[flying-robot-frame]",
       "subgroup": "intermediate-product",
       "stack_size": 50,
-      "weight": 6666.6666564941406,
+      "weight": 6666.666656494141,
       "ingredient_to_weight_coefficient": 0.5,
       "localised_name": "Flying robot frame"
     },
@@ -17343,7 +17343,7 @@
       "order": "d[rocket-parts]-d[rocket-part]",
       "subgroup": "intermediate-product",
       "stack_size": 5,
-      "weight": 100000,
+      "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
       "localised_name": "Rocket part"
     },
@@ -17827,7 +17827,7 @@
     {
       "name": "defender-capsule",
       "icon_name": "icon.i.defender-capsule",
-      "order": "d[defender-capsule]",
+      "order": "d[defender]-b[capsule]",
       "subgroup": "capsule",
       "stack_size": 100,
       "weight": 10000,
@@ -17837,7 +17837,7 @@
     {
       "name": "distractor-capsule",
       "icon_name": "icon.i.distractor-capsule",
-      "order": "e[defender-capsule]",
+      "order": "e[distractor]-b[capsule]",
       "subgroup": "capsule",
       "stack_size": 100,
       "weight": 20000,
@@ -17847,7 +17847,7 @@
     {
       "name": "destroyer-capsule",
       "icon_name": "icon.i.destroyer-capsule",
-      "order": "f[destroyer-capsule]",
+      "order": "f[destroyer]-b[capsule]",
       "subgroup": "capsule",
       "stack_size": 100,
       "weight": 40000,
@@ -18285,6 +18285,16 @@
       "localised_name": "Unknown item"
     },
     {
+      "name": "no-item",
+      "icon_name": "icon.i.no-item",
+      "order": "",
+      "subgroup": "other",
+      "stack_size": 1,
+      "weight": 100,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "No item"
+    },
+    {
       "name": "electric-energy-interface",
       "icon_name": "icon.i.electric-energy-interface",
       "order": "a[electric-energy-interface]-b[electric-energy-interface]",
@@ -18303,6 +18313,26 @@
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
       "localised_name": "Linked chest"
+    },
+    {
+      "name": "proxy-container",
+      "icon_name": "icon.i.proxy-container",
+      "order": "a[items]-a[proxy-container]",
+      "subgroup": "other",
+      "stack_size": 10,
+      "weight": 100,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "Proxy container"
+    },
+    {
+      "name": "bottomless-chest",
+      "icon_name": "icon.i.bottomless-chest",
+      "order": "a[items]-c[bottomless-chest]",
+      "subgroup": "other",
+      "stack_size": 10,
+      "weight": 100,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "Bottomless chest"
     },
     {
       "name": "heat-interface",
@@ -18333,6 +18363,46 @@
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
       "localised_name": "Linked belt"
+    },
+    {
+      "name": "one-way-valve",
+      "icon_name": "icon.i.one-way-valve",
+      "order": "b[items]-o[one-way-valve]",
+      "subgroup": "other",
+      "stack_size": 10,
+      "weight": 100,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "One-way valve"
+    },
+    {
+      "name": "overflow-valve",
+      "icon_name": "icon.i.overflow-valve",
+      "order": "b[items]-o[overflow-valve]",
+      "subgroup": "other",
+      "stack_size": 10,
+      "weight": 100,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "Overflow valve"
+    },
+    {
+      "name": "top-up-valve",
+      "icon_name": "icon.i.top-up-valve",
+      "order": "b[items]-o[top-up-valve]",
+      "subgroup": "other",
+      "stack_size": 10,
+      "weight": 100,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "Top-up valve"
+    },
+    {
+      "name": "infinity-cargo-wagon",
+      "icon_name": "icon.i.infinity-cargo-wagon",
+      "order": "c[item]-o[infinity-cargo-wagon]",
+      "subgroup": "other",
+      "stack_size": 5,
+      "weight": 100,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "Infinity cargo wagon"
     },
     {
       "name": "infinity-chest",
@@ -18631,7 +18701,7 @@
       "category": "speed",
       "tier": 2,
       "module_effects": {
-        "consumption": 0.60000002384185791,
+        "consumption": 0.6000000238418579,
         "speed": 0.30000001192092896,
         "productivity": 0,
         "pollution": 0,
@@ -18679,7 +18749,7 @@
       "category": "efficiency",
       "tier": 2,
       "module_effects": {
-        "consumption": -0.40000000596046448,
+        "consumption": -0.4000000059604645,
         "speed": 0,
         "productivity": 0,
         "pollution": 0,
@@ -18711,9 +18781,9 @@
       "category": "productivity",
       "tier": 1,
       "module_effects": {
-        "consumption": 0.40000000596046448,
+        "consumption": 0.4000000059604645,
         "speed": -0.05000000074505806,
-        "productivity": 0.039999999105930328,
+        "productivity": 0.03999999910593033,
         "pollution": 0.05000000074505806,
         "quality": 0
       },
@@ -18727,10 +18797,10 @@
       "category": "productivity",
       "tier": 2,
       "module_effects": {
-        "consumption": 0.60000002384185791,
+        "consumption": 0.6000000238418579,
         "speed": -0.10000000149011612,
-        "productivity": 0.059999998658895493,
-        "pollution": 0.070000000298023224,
+        "productivity": 0.05999999865889549,
+        "pollution": 0.07000000029802322,
         "quality": 0
       },
       "localised_name": "Productivity module 2"
@@ -18790,7 +18860,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": 2.7777777777777781E-07
+        "pollution": 2.777777777777778E-07
       },
       "fuel_categories": [
         "chemical"
@@ -19367,7 +19437,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": 7.4074074074074073E-07
+        "pollution": 7.407407407407407E-07
       },
       "fuel_categories": [
         "chemical"
@@ -19445,7 +19515,7 @@
       "fuel_effectivity": 1,
       "drain": 6000,
       "pollution": {
-        "pollution": 9.2592592592592591E-08
+        "pollution": 9.259259259259259E-08
       },
       "localised_name": "Electric furnace"
     },
@@ -19759,7 +19829,7 @@
       "fuel_effectivity": 1,
       "drain": 14000,
       "pollution": {
-        "pollution": 2.3809523809523809E-07
+        "pollution": 2.380952380952381E-07
       },
       "localised_name": "Oil refinery"
     },
@@ -20151,7 +20221,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 8333.3333333333339,
+      "drain": 8333.333333333334,
       "pollution": {
         "pollution": 0
       },
@@ -20443,11 +20513,15 @@
         "virtual-signal-special",
         "virtual-signal-number",
         "virtual-signal-letter",
+        "virtual-signal-punctuation",
+        "virtual-signal-math",
         "virtual-signal-color",
         "virtual-signal",
         "shapes",
         "arrows",
-        "additions"
+        "arrows-misc",
+        "pictographs",
+        "bullets"
       ],
       "localised_name": "Signals"
     },
@@ -20741,11 +20815,19 @@
       "order": "cb"
     },
     {
+      "name": "virtual-signal-punctuation",
+      "order": "cb"
+    },
+    {
       "name": "capsule-explosions",
       "order": "cc"
     },
     {
       "name": "tree-explosions",
+      "order": "cd"
+    },
+    {
+      "name": "virtual-signal-math",
       "order": "cd"
     },
     {
@@ -20953,7 +21035,7 @@
       "order": "g"
     },
     {
-      "name": "additions",
+      "name": "arrows-misc",
       "order": "h"
     },
     {
@@ -20969,6 +21051,10 @@
       "order": "h"
     },
     {
+      "name": "pictographs",
+      "order": "i"
+    },
+    {
       "name": "terrain",
       "order": "i"
     },
@@ -20982,6 +21068,10 @@
     },
     {
       "name": "ammo-category",
+      "order": "j"
+    },
+    {
+      "name": "bullets",
       "order": "j"
     },
     {
