@@ -9,6 +9,7 @@
     <SccProvider>
     </SccProvider>
     <TargetFramework>net10.0-windows8.0</TargetFramework>
+    <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>ForemanTest</AssemblyTitle>
     <Product>ForemanTest</Product>
@@ -39,6 +40,10 @@
     <None Include="..\Foreman\Presets\Factorio 2.0 Vanilla.pjson" Link="Presets\Factorio 2.0 Vanilla.pjson" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Foreman\Presets\Factorio 2.0 Vanilla.dat" Link="Presets\Factorio 2.0 Vanilla.dat" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Foreman\Presets\Factorio 2.0 Vanilla.json" Link="Presets\Factorio 2.0 Vanilla.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Foreman\Presets\Factorio 2.0 Vanilla.json')" />
+    <None Include="..\Foreman\Presets\Factorio 2.0 Space Age.pjson" Link="Presets\Factorio 2.0 Space Age.pjson" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Foreman\Presets\Factorio 2.0 Space Age.dat" Link="Presets\Factorio 2.0 Space Age.dat" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Foreman\Presets\Factorio 2.0 Space Age.json" Link="Presets\Factorio 2.0 Space Age.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Foreman\Presets\Factorio 2.0 Space Age.json')" />
+    <None Include="Flowchart.fjson" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foreman\Foreman.csproj" />
@@ -47,6 +52,5 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="4.2.2" />
     <PackageReference Include="MSTest.TestFramework" Version="4.2.2" />
-    <PackageReference Include="System.Collections.Immutable" Version="10.0.7" />
   </ItemGroup>
 </Project>

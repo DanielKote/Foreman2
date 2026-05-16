@@ -1,224 +1,257 @@
 ﻿using Foreman;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ForemanTest.support;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace ForemanTest {
-    // A fluid interface for building up production graphs for testing. See references for usage.
+    // Fluent builder for small production graphs used by solver tests.
     public class GraphBuilder {
-        public static SubgroupPrototype TestSubgroup = new SubgroupPrototype(null, "", "");
+        private readonly List<Tuple<ProductionNodeBuilder, ProductionNodeBuilder>> links = new();
+        private readonly HashSet<ProductionNodeBuilder> nodes = new();
 
+        private GraphBuilder() { }
 
-        private static int counter = 0;
-        protected static int GetSequence() {
-            counter += 1;
-            return counter;
-        }
-
-        private List<Tuple<ProductionNodeBuilder, ProductionNodeBuilder>> links;
-        private ISet<ProductionNodeBuilder> nodes;
-
-        protected GraphBuilder() {
-            this.links = new List<Tuple<ProductionNodeBuilder, ProductionNodeBuilder>>();
-            this.nodes = new HashSet<ProductionNodeBuilder>();
-        }
-
-        public static GraphBuilder Create() {
-            return new GraphBuilder();
-        }
+        public static GraphBuilder Create() => new GraphBuilder();
 
         internal SingletonNodeBuilder Supply(string item) {
-            var node = new SingletonNodeBuilder(SupplierNode.Create).Item(item);
-            this.nodes.Add(node);
+            var node = new SingletonNodeBuilder(isSupplier: true).Item(item);
+            nodes.Add(node);
             return node;
         }
-
 
         public SingletonNodeBuilder Consumer(string item) {
-            var node = new SingletonNodeBuilder(ConsumerNode.Create).Item(item);
-            this.nodes.Add(node);
+            var node = new SingletonNodeBuilder(isSupplier: false).Item(item);
+            nodes.Add(node);
             return node;
         }
 
-        internal RecipeBuilder Recipe(string name = null) {
+        internal RecipeBuilder Recipe(string? name = null) {
             var node = new RecipeBuilder(name);
-            this.nodes.Add(node);
+            nodes.Add(node);
             return node;
         }
 
         internal SingletonNodeBuilder Passthrough(string item) {
-            var node = new SingletonNodeBuilder(PassthroughNode.Create).Item(item);
-            this.nodes.Add(node);
+            var node = new SingletonNodeBuilder(isSupplier: null).Item(item);
+            nodes.Add(node);
             return node;
         }
 
-        // Link the provided nodes by automatically matching up inputs to outputs.
-        // The same builder can be passed to multiple different invocations, to enable building of complex graphs.
         internal void Link(params ProductionNodeBuilder[] nodeBuilders) {
-            var bs = ((IEnumerable<ProductionNodeBuilder>)nodeBuilders);
-            var pairs = bs.Zip(bs.Skip(1), Tuple.Create);
-
-            this.links.AddRange(pairs);
+            var sequence = (IEnumerable<ProductionNodeBuilder>)nodeBuilders;
+            links.AddRange(sequence.Zip(sequence.Skip(1), Tuple.Create));
         }
 
         internal BuiltData Build() {
-            DataCache dCache = new DataCache(true);
-            var graph = new ProductionGraph(dCache);
+            var cache = new DataCache(filterRecipes: true);
+            var subgroup = new SubgroupPrototype(cache, "§§test:subgroup", "z");
+            var quality = new QualityPrototype(cache, "normal", "Normal", "a");
 
-            foreach (var node in this.nodes) {
-                node.Build(graph);
+            var graph = new ProductionGraph { DefaultAssemblerQuality = quality };
+
+            var context = new BuildContext(cache, subgroup, quality);
+
+            foreach (var node in nodes)
+                node.Build(context, graph);
+
+            foreach (var (lhs, rhs) in links) {
+                foreach (var item in lhs.BuiltOutputs.Intersect(rhs.BuiltInputs, ItemQualityPairComparer.Instance))
+                    graph.CreateLink(lhs.BuiltNode, rhs.BuiltNode, item);
             }
 
-            foreach (var link in this.links) {
-                var lhs = link.Item1;
-                var rhs = link.Item2;
-
-                foreach (var item in lhs.Built.Outputs.Intersect(rhs.Built.Inputs)) {
-                    NodeLink.Create(lhs.Built, rhs.Built, item);
-                }
-            }
-            return new BuiltData(graph);
+            return new BuiltData(graph, context);
         }
 
-        abstract public class ProductionNodeBuilder {
+        public sealed class BuildContext {
+            public DataCache Cache { get; }
+            public SubgroupPrototype Subgroup { get; }
+            public Quality Quality { get; }
+            public Assembler TestAssembler { get; }
 
-            public BaseNode Built { get; protected set; } // TODO: Build if not already
-            abstract internal void Build(ProductionGraph graph);
+            public BuildContext(DataCache cache, SubgroupPrototype subgroup, Quality quality) {
+                Cache = cache;
+                Subgroup = subgroup;
+                Quality = quality;
+                TestAssembler = TestPrototypeFactory.CreateTestAssembler(cache);
+            }
+
+            public ItemQualityPair ItemPair(string name) {
+                var item = TestDataCacheHelper.GetOrCreateItem(Cache, Subgroup, name);
+                return new ItemQualityPair(item, Quality);
+            }
+        }
+
+        public abstract class ProductionNodeBuilder {
+            private BaseNode? builtNode;
+
+            public BaseNode BuiltNode {
+                get => builtNode ?? throw new InvalidOperationException("Call Build before reading BuiltNode.");
+                protected set => builtNode = value;
+            }
+            public IEnumerable<ItemQualityPair> BuiltInputs { get; protected set; } = Array.Empty<ItemQualityPair>();
+            public IEnumerable<ItemQualityPair> BuiltOutputs { get; protected set; } = Array.Empty<ItemQualityPair>();
+
+            internal abstract void Build(BuildContext context, ProductionGraph graph);
         }
 
         public class SingletonNodeBuilder : ProductionNodeBuilder {
-            private Func<ItemPrototype, ProductionGraph, BaseNode> createFunction;
+            private readonly bool? isSupplier;
+            private string itemName = "";
+            private float target;
 
-            public SingletonNodeBuilder(Func<Item, ProductionGraph, BaseNode> f) {
-                this.createFunction = f;
-            }
-
-            public string itemName { get; private set; }
-            public float target { get; private set; }
+            internal SingletonNodeBuilder(bool? isSupplier) => this.isSupplier = isSupplier;
 
             internal SingletonNodeBuilder Item(string item) {
-                this.itemName = item;
+                itemName = item;
                 return this;
             }
 
-            internal SingletonNodeBuilder Target(float target) {
-                this.target = target;
+            internal SingletonNodeBuilder Target(float targetValue) {
+                target = targetValue;
                 return this;
             }
 
-            internal override void Build(ProductionGraph graph) {
-                Built = this.createFunction(new ItemPrototype(graph.DCache, itemName, "", false, TestSubgroup, ""), graph);
+            internal override void Build(BuildContext context, ProductionGraph graph) {
+                var pair = context.ItemPair(itemName);
+                BaseNode node = isSupplier switch {
+                    true => graph.CreateSupplierNode(pair, Point.Empty),
+                    false => graph.CreateConsumerNode(pair, Point.Empty),
+                    _ => graph.CreatePassthroughNode(pair, Point.Empty)
+                };
+                BuiltNode = node;
+                BuiltInputs = node.Inputs;
+                BuiltOutputs = node.Outputs;
 
-                if (target > 0) {
-                    this.Built.desiredRate = target;
-                    this.Built.rateType = RateType.Manual;
-                } else {
-                    this.Built.rateType = RateType.Auto;
+                if (graph.RequestNodeController(node) is BaseNodeController controller) {
+                    if (target > 0) {
+                        controller.SetRateType(RateType.Manual);
+                        controller.SetDesiredSetValue(target);
+                    } else
+                        controller.SetRateType(RateType.Auto);
                 }
             }
         }
 
         internal class RecipeBuilder : ProductionNodeBuilder {
-            private Dictionary<string, float> inputs;
-            private Dictionary<string, float> outputs;
-            private string name;
+            private readonly Dictionary<string, float> inputs = new();
+            private readonly Dictionary<string, float> outputs = new();
+            private string? name;
             private double efficiency;
-
             public float target { get; private set; }
 
-            internal RecipeBuilder(string name) {
-                this.inputs = new Dictionary<string, float>();
-                this.outputs = new Dictionary<string, float>();
-                this.name = name;
-            }
+            internal RecipeBuilder(string? name) => this.name = name;
 
-            internal override void Build(ProductionGraph graph) {
-                var duration = 1;
-                if (name == null)
-                    name = "recipe-" + GetSequence();
+            internal override void Build(BuildContext context, ProductionGraph graph) {
+                if (name is null)
+                    name = "recipe-" + Guid.NewGuid().ToString("N")[..8];
 
-                RecipePrototype recipe = new RecipePrototype(graph.DCache, name, "", TestSubgroup, "");
-                recipe.Time = duration;
-                foreach (KeyValuePair<string, float> kvp in inputs)
-                    recipe.InternalOneWayAddIngredient(graph.DCache.Items[kvp.Key] as ItemPrototype, kvp.Value);
-                foreach (KeyValuePair<string, float> kvp in outputs)
-                    recipe.InternalOneWayAddProduct(graph.DCache.Items[kvp.Key] as ItemPrototype, kvp.Value);
+                var recipe = new RecipePrototype(context.Cache, name, name, context.Subgroup, "z");
+                TestPrototypeFactory.SetRecipeTime(recipe, 1);
+                TestPrototypeFactory.LinkRecipeAndAssembler(recipe, context.TestAssembler);
+                TestDataCacheHelper.RegisterRecipe(context.Cache, recipe);
 
-                Built = RecipeNode.Create(recipe, graph);
-                this.Built.ProductivityBonus = efficiency;
+                foreach (var kvp in inputs) {
+                    var item = TestDataCacheHelper.GetOrCreateItem(context.Cache, context.Subgroup, kvp.Key);
+                    recipe.InternalOneWayAddIngredient(item, kvp.Value);
+                }
 
-                if (target > 0) {
-                    this.Built.desiredRate = target;
-                    this.Built.rateType = RateType.Manual;
-                } else {
-                    this.Built.rateType = RateType.Auto;
+                foreach (var kvp in outputs) {
+                    var item = TestDataCacheHelper.GetOrCreateItem(context.Cache, context.Subgroup, kvp.Key);
+                    // ProductPSet must be non-zero for ExtraProductivityBonus to affect solver ratios.
+                    double pQuantity = efficiency > 0 ? kvp.Value : 0;
+                    recipe.InternalOneWayAddProduct(item, kvp.Value, pQuantity);
+                }
+
+                var recipeNode = graph.CreateRecipeNode(new RecipeQualityPair(recipe, context.Quality), Point.Empty);
+                BuiltNode = recipeNode;
+                BuiltInputs = recipeNode.Inputs;
+                BuiltOutputs = recipeNode.Outputs;
+
+                if (graph.RequestNodeController(recipeNode) is RecipeNodeController recipeController) {
+                    recipeController.SetExtraProductivityBonus(efficiency);
+                    if (target > 0) {
+                        recipeController.SetRateType(RateType.Manual);
+                        recipeController.SetDesiredSetValue(target);
+                    } else
+                        recipeController.SetRateType(RateType.Auto);
                 }
             }
 
             internal RecipeBuilder Input(string itemName, float amount) {
-                inputs.Add(itemName, amount);
+                inputs[itemName] = amount;
                 return this;
             }
 
             internal RecipeBuilder Output(string itemName, float amount) {
-                outputs.Add(itemName, amount);
+                outputs[itemName] = amount;
                 return this;
             }
 
-            internal RecipeBuilder Target(float target) {
-                this.target = target;
+            internal RecipeBuilder Target(float targetValue) {
+                target = targetValue;
                 return this;
             }
 
             internal RecipeBuilder Efficiency(double bonus) {
-                this.efficiency = bonus;
+                efficiency = bonus;
                 return this;
             }
-
-            //private Dictionary<Item, float> itemizeKeys(Dictionary<string, float> d)
-            //{
-            //    return d.ToDictionary(kp => new Item(kp.Key), kp => kp.Value);
-            //}
         }
 
         public class BuiltData {
-            public ProductionGraph Graph { get; internal set; }
+            public ProductionGraph Graph { get; }
+            public DataCache Cache { get; }
+            private readonly BuildContext context;
 
-            public BuiltData(ProductionGraph graph) {
-                this.Graph = graph;
+            public BuiltData(ProductionGraph graph, BuildContext context) {
+                Graph = graph;
+                this.context = context;
+                Cache = context.Cache;
             }
 
-            public float SupplyRate(string itemName) {
-                return Suppliers(itemName).Where(x => x is SupplierNode).Select(x => x.actualRate).Sum();
+            public void Solve() => Graph.OptimizeGraphNodeValues();
+
+            public float SupplyRate(string itemName) =>
+                (float)Suppliers(itemName).OfType<SupplierNode>().Sum(n => n.ActualRate);
+
+            public float ConsumedRate(string itemName) =>
+                (float)Consumers(itemName).OfType<ConsumerNode>().Sum(n => n.ActualRate);
+
+            public float RecipeRate(string name) =>
+                (float)Graph.Nodes
+                    .OfType<RecipeNode>()
+                    .Where(n => n.BaseRecipe.Recipe?.Name == name)
+                    .Sum(n => n.ActualRate);
+
+            /// <summary>Sum of incoming link throughput for an item (legacy GetSuppliedRate).</summary>
+            public double RecipeInputRate(string recipeName, string itemName) =>
+                RecipeInputRate(recipeName, itemName, supplier: null);
+
+            /// <summary>Incoming throughput from a specific supplier node, if given.</summary>
+            public double RecipeInputRate(string recipeName, string itemName, BaseNode? supplier) {
+                var recipeNode = Graph.Nodes
+                    .OfType<RecipeNode>()
+                    .First(n => n.BaseRecipe.Recipe?.Name == recipeName);
+                return recipeNode.InputLinks
+                    .Where(l => l.Item.Item?.Name == itemName && (supplier is null || l.SupplierNode == supplier))
+                    .Sum(l => l.Throughput);
             }
 
-            private IEnumerable<BaseNode> Suppliers(string itemName) {
-                return Graph.GetSuppliers(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
-            }
+            private IEnumerable<BaseNode> Suppliers(string itemName) =>
+                Graph.GetSuppliers(context.ItemPair(itemName));
 
-            public float ConsumedRate(string itemName) {
-                return Consumers(itemName).Where(x => x is ConsumerNode).Select(x => x.actualRate).Sum();
-            }
+            private IEnumerable<BaseNode> Consumers(string itemName) =>
+                Graph.GetConsumers(context.ItemPair(itemName));
+        }
 
-            private IEnumerable<BaseNode> Consumers(string itemName) {
-                return Graph.GetConsumers(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
-            }
-
-            public float RecipeRate(string name) {
-                return Graph.Nodes
-                   .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
-                   .Select(x => x.actualRate)
-                   .Sum();
-            }
-
-            internal double RecipeInputRate(string name, string itemName) {
-                return Graph.Nodes
-                   .Where(x => x is RecipeNode && ((RecipeNode)x).BaseRecipe.Name == name)
-                   .Select(x => (RecipeNode)x)
-                   .First()
-                   .GetSuppliedRate(new ItemPrototype(Graph.DCache, itemName, "", false, TestSubgroup, ""));
-            }
+        private sealed class ItemQualityPairComparer : IEqualityComparer<ItemQualityPair> {
+            public static ItemQualityPairComparer Instance { get; } = new();
+            public bool Equals(ItemQualityPair x, ItemQualityPair y) =>
+                x.Item?.Name == y.Item?.Name && x.Quality?.Name == y.Quality?.Name;
+            public int GetHashCode(ItemQualityPair obj) =>
+                HashCode.Combine(obj.Item?.Name, obj.Quality?.Name);
         }
     }
 }

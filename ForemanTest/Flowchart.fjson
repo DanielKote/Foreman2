@@ -1,0 +1,2872 @@
+{
+  "Version": 7,
+  "Object": "ProductionGraphViewer",
+  "SavedPresetName": "Factorio 2.0 Space Age",
+  "IncludedMods": [
+    "core|1.0",
+    "base|2.0.76",
+    "elevated-rails|2.0.76",
+    "quality|2.0.76",
+    "space-age|2.0.76"
+  ],
+  "Unit": 1,
+  "ViewOffset": "-39, -387",
+  "ViewScale": 0.9090909,
+  "ExtraProdForNonMiners": false,
+  "AssemblerSelectorStyle": 3,
+  "ModuleSelectorStyle": 0,
+  "FuelPriorityList": [
+    "nutrients"
+  ],
+  "EnabledRecipes": [
+    "§§r:h:heat-generation",
+    "wooden-chest",
+    "iron-chest",
+    "steel-chest",
+    "storage-tank",
+    "transport-belt",
+    "fast-transport-belt",
+    "express-transport-belt",
+    "turbo-transport-belt",
+    "underground-belt",
+    "fast-underground-belt",
+    "express-underground-belt",
+    "turbo-underground-belt",
+    "splitter",
+    "fast-splitter",
+    "express-splitter",
+    "turbo-splitter",
+    "burner-inserter",
+    "inserter",
+    "long-handed-inserter",
+    "fast-inserter",
+    "bulk-inserter",
+    "stack-inserter",
+    "small-electric-pole",
+    "medium-electric-pole",
+    "big-electric-pole",
+    "substation",
+    "pipe",
+    "pipe-to-ground",
+    "casting-pipe",
+    "casting-pipe-to-ground",
+    "pump",
+    "rail",
+    "rail-ramp",
+    "rail-support",
+    "train-stop",
+    "rail-signal",
+    "rail-chain-signal",
+    "locomotive",
+    "cargo-wagon",
+    "fluid-wagon",
+    "artillery-wagon",
+    "car",
+    "tank",
+    "spidertron",
+    "logistic-robot",
+    "construction-robot",
+    "active-provider-chest",
+    "passive-provider-chest",
+    "storage-chest",
+    "buffer-chest",
+    "requester-chest",
+    "roboport",
+    "small-lamp",
+    "arithmetic-combinator",
+    "decider-combinator",
+    "selector-combinator",
+    "constant-combinator",
+    "power-switch",
+    "programmable-speaker",
+    "display-panel",
+    "stone-brick",
+    "stone-brick-recycling",
+    "stone-wall-recycling",
+    "concrete",
+    "hazard-concrete-recycling",
+    "hazard-concrete",
+    "refined-concrete",
+    "refined-hazard-concrete-recycling",
+    "refined-hazard-concrete",
+    "landfill",
+    "landfill-recycling",
+    "artificial-yumako-soil",
+    "overgrowth-yumako-soil",
+    "artificial-jellynut-soil",
+    "overgrowth-jellynut-soil",
+    "ice-platform",
+    "foundation",
+    "cliff-explosives",
+    "repair-pack",
+    "boiler",
+    "steam-engine",
+    "solar-panel",
+    "accumulator",
+    "nuclear-reactor",
+    "heat-pipe",
+    "heat-exchanger",
+    "steam-turbine",
+    "fusion-reactor",
+    "fusion-generator",
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "big-mining-drill",
+    "offshore-pump",
+    "pumpjack",
+    "stone-furnace",
+    "steel-furnace",
+    "electric-furnace",
+    "foundry",
+    "recycler",
+    "agricultural-tower",
+    "biochamber",
+    "captive-biter-spawner",
+    "captive-biter-spawner-recycling",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "oil-refinery",
+    "chemical-plant",
+    "centrifuge",
+    "electromagnetic-plant",
+    "cryogenic-plant",
+    "lab",
+    "biolab",
+    "biolab-recycling",
+    "lightning-rod",
+    "lightning-collector",
+    "heating-tower",
+    "beacon",
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "efficiency-module",
+    "efficiency-module-2",
+    "efficiency-module-3",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3",
+    "quality-module",
+    "quality-module-2",
+    "quality-module-3",
+    "basic-oil-processing",
+    "advanced-oil-processing",
+    "simple-coal-liquefaction",
+    "coal-liquefaction",
+    "heavy-oil-cracking",
+    "light-oil-cracking",
+    "solid-fuel-from-petroleum-gas",
+    "solid-fuel-from-light-oil",
+    "solid-fuel-from-heavy-oil",
+    "lubricant",
+    "sulfuric-acid",
+    "acid-neutralisation",
+    "steam-condensation",
+    "ice-melting",
+    "wood-recycling",
+    "wooden-chest-recycling",
+    "coal-recycling",
+    "stone-furnace-recycling",
+    "stone-recycling",
+    "iron-ore-recycling",
+    "copper-ore-recycling",
+    "uranium-ore-recycling",
+    "raw-fish-recycling",
+    "ice-platform-recycling",
+    "ice-recycling",
+    "firearm-magazine-recycling",
+    "iron-chest-recycling",
+    "iron-gear-wheel-recycling",
+    "iron-plate",
+    "iron-plate-recycling",
+    "iron-stick-recycling",
+    "light-armor-recycling",
+    "pipe-recycling",
+    "copper-cable-recycling",
+    "copper-plate",
+    "copper-plate-recycling",
+    "steel-chest-recycling",
+    "steel-plate",
+    "steel-plate-recycling",
+    "rocket-fuel-recycling",
+    "solid-fuel-recycling",
+    "plastic-bar",
+    "plastic-bar-recycling",
+    "sulfur",
+    "sulfur-recycling",
+    "battery",
+    "explosives",
+    "explosives-recycling",
+    "carbon",
+    "carbon-recycling",
+    "coal-synthesis",
+    "iron-gear-wheel",
+    "iron-stick",
+    "copper-cable",
+    "barrel",
+    "barrel-recycling",
+    "electronic-circuit",
+    "advanced-circuit",
+    "processing-unit",
+    "engine-unit",
+    "electric-engine-unit",
+    "flying-robot-frame",
+    "low-density-structure",
+    "rocket-fuel",
+    "nuclear-fuel-recycling",
+    "uranium-processing",
+    "uranium-235-recycling",
+    "uranium-238-recycling",
+    "uranium-fuel-cell",
+    "uranium-fuel-cell-recycling",
+    "depleted-uranium-fuel-cell-recycling",
+    "nuclear-fuel-reprocessing",
+    "kovarex-enrichment-process",
+    "nuclear-fuel",
+    "calcite-recycling",
+    "molten-iron-from-lava",
+    "molten-copper-from-lava",
+    "molten-iron",
+    "molten-copper",
+    "casting-iron",
+    "casting-copper",
+    "casting-steel",
+    "casting-iron-gear-wheel",
+    "casting-iron-stick",
+    "casting-low-density-structure",
+    "concrete-from-molten-iron",
+    "casting-copper-cable",
+    "tungsten-ore-recycling",
+    "tungsten-carbide",
+    "tungsten-carbide-recycling",
+    "tungsten-plate",
+    "tungsten-plate-recycling",
+    "supercapacitor-recycling",
+    "scrap-recycling",
+    "holmium-ore-recycling",
+    "holmium-solution",
+    "holmium-plate",
+    "holmium-plate-recycling",
+    "superconductor",
+    "superconductor-recycling",
+    "electrolyte",
+    "supercapacitor",
+    "yumako-processing",
+    "yumako-seed-recycling",
+    "jellynut-processing",
+    "jellynut-seed-recycling",
+    "yumako-recycling",
+    "jellynut-recycling",
+    "iron-bacteria",
+    "iron-bacteria-recycling",
+    "iron-bacteria-cultivation",
+    "copper-bacteria",
+    "copper-bacteria-recycling",
+    "copper-bacteria-cultivation",
+    "nutrients-recycling",
+    "spoilage-recycling",
+    "nutrients-from-spoilage",
+    "nutrients-from-yumako-mash",
+    "nutrients-from-bioflux",
+    "pentapod-egg",
+    "bioflux-recycling",
+    "yumako-mash-recycling",
+    "jelly-recycling",
+    "rocket-fuel-from-jelly",
+    "biolubricant",
+    "bioplastic",
+    "biosulfur",
+    "carbon-fiber-recycling",
+    "bioflux",
+    "burnt-spoilage",
+    "carbon-fiber",
+    "biter-egg",
+    "biter-egg-recycling",
+    "pentapod-egg-recycling",
+    "wood-processing",
+    "tree-seed-recycling",
+    "fish-breeding",
+    "nutrients-from-fish",
+    "nutrients-from-biter-egg",
+    "quantum-processor-recycling",
+    "ammoniacal-solution-separation",
+    "solid-fuel-from-ammonia",
+    "ammonia-rocket-fuel",
+    "fluoroketone",
+    "fluoroketone-cooling",
+    "lithium",
+    "lithium-recycling",
+    "lithium-plate",
+    "lithium-plate-recycling",
+    "quantum-processor",
+    "fusion-power-cell",
+    "fusion-power-cell-recycling",
+    "automation-science-pack",
+    "automation-science-pack-recycling",
+    "logistic-science-pack",
+    "logistic-science-pack-recycling",
+    "military-science-pack",
+    "military-science-pack-recycling",
+    "chemical-science-pack",
+    "chemical-science-pack-recycling",
+    "production-science-pack",
+    "production-science-pack-recycling",
+    "utility-science-pack",
+    "utility-science-pack-recycling",
+    "space-science-pack",
+    "space-science-pack-recycling",
+    "metallurgic-science-pack",
+    "metallurgic-science-pack-recycling",
+    "agricultural-science-pack",
+    "agricultural-science-pack-recycling",
+    "electromagnetic-science-pack",
+    "electromagnetic-science-pack-recycling",
+    "cryogenic-science-pack",
+    "cryogenic-science-pack-recycling",
+    "promethium-science-pack",
+    "promethium-science-pack-recycling",
+    "rocket-silo",
+    "rocket-part",
+    "cargo-landing-pad",
+    "space-platform-foundation",
+    "cargo-bay",
+    "asteroid-collector",
+    "crusher",
+    "thruster",
+    "space-platform-starter-pack",
+    "metallic-asteroid-chunk-recycling",
+    "carbonic-asteroid-chunk-recycling",
+    "oxide-asteroid-chunk-recycling",
+    "promethium-asteroid-chunk-recycling",
+    "metallic-asteroid-crushing",
+    "carbonic-asteroid-crushing",
+    "oxide-asteroid-crushing",
+    "metallic-asteroid-reprocessing",
+    "carbonic-asteroid-reprocessing",
+    "oxide-asteroid-reprocessing",
+    "advanced-metallic-asteroid-crushing",
+    "advanced-carbonic-asteroid-crushing",
+    "advanced-oxide-asteroid-crushing",
+    "thruster-fuel",
+    "advanced-thruster-fuel",
+    "thruster-oxidizer",
+    "advanced-thruster-oxidizer",
+    "submachine-gun",
+    "railgun",
+    "teslagun",
+    "shotgun",
+    "combat-shotgun",
+    "rocket-launcher",
+    "flamethrower",
+    "firearm-magazine",
+    "piercing-rounds-magazine",
+    "uranium-rounds-magazine",
+    "shotgun-shell",
+    "piercing-shotgun-shell",
+    "cannon-shell",
+    "explosive-cannon-shell",
+    "uranium-cannon-shell",
+    "explosive-uranium-cannon-shell",
+    "artillery-shell",
+    "rocket",
+    "explosive-rocket",
+    "atomic-bomb",
+    "capture-robot-rocket",
+    "flamethrower-ammo",
+    "flamethrower-ammo-recycling",
+    "railgun-ammo",
+    "tesla-ammo",
+    "grenade",
+    "cluster-grenade",
+    "poison-capsule",
+    "slowdown-capsule",
+    "defender-capsule",
+    "distractor-capsule",
+    "destroyer-capsule",
+    "light-armor",
+    "heavy-armor",
+    "modular-armor",
+    "power-armor",
+    "power-armor-mk2",
+    "mech-armor",
+    "solar-panel-equipment",
+    "fission-reactor-equipment",
+    "fusion-reactor-equipment",
+    "battery-equipment",
+    "battery-mk2-equipment",
+    "battery-mk3-equipment",
+    "belt-immunity-equipment",
+    "exoskeleton-equipment",
+    "personal-roboport-equipment",
+    "personal-roboport-mk2-equipment",
+    "night-vision-equipment",
+    "toolbelt-equipment",
+    "energy-shield-equipment",
+    "energy-shield-mk2-equipment",
+    "personal-laser-defense-equipment",
+    "discharge-defense-equipment",
+    "stone-wall",
+    "gate",
+    "radar",
+    "land-mine",
+    "gun-turret",
+    "laser-turret",
+    "flamethrower-turret",
+    "artillery-turret",
+    "rocket-turret",
+    "tesla-turret",
+    "railgun-turret",
+    "accumulator-recycling",
+    "active-provider-chest-recycling",
+    "advanced-circuit-recycling",
+    "agricultural-tower-recycling",
+    "arithmetic-combinator-recycling",
+    "artificial-jellynut-soil-recycling",
+    "artificial-yumako-soil-recycling",
+    "artillery-shell-recycling",
+    "artillery-turret-recycling",
+    "artillery-wagon-recycling",
+    "assembling-machine-1-recycling",
+    "assembling-machine-2-recycling",
+    "assembling-machine-3-recycling",
+    "asteroid-collector-recycling",
+    "atomic-bomb-recycling",
+    "battery-equipment-recycling",
+    "battery-mk2-equipment-recycling",
+    "battery-mk3-equipment-recycling",
+    "battery-recycling",
+    "beacon-recycling",
+    "belt-immunity-equipment-recycling",
+    "big-electric-pole-recycling",
+    "big-mining-drill-recycling",
+    "biochamber-recycling",
+    "boiler-recycling",
+    "buffer-chest-recycling",
+    "bulk-inserter-recycling",
+    "burner-inserter-recycling",
+    "burner-mining-drill-recycling",
+    "cannon-shell-recycling",
+    "capture-robot-rocket-recycling",
+    "car-recycling",
+    "cargo-bay-recycling",
+    "cargo-landing-pad-recycling",
+    "cargo-wagon-recycling",
+    "centrifuge-recycling",
+    "chemical-plant-recycling",
+    "cliff-explosives-recycling",
+    "cluster-grenade-recycling",
+    "combat-shotgun-recycling",
+    "concrete-recycling",
+    "constant-combinator-recycling",
+    "construction-robot-recycling",
+    "crusher-recycling",
+    "cryogenic-plant-recycling",
+    "decider-combinator-recycling",
+    "defender-capsule-recycling",
+    "destroyer-capsule-recycling",
+    "discharge-defense-equipment-recycling",
+    "display-panel-recycling",
+    "distractor-capsule-recycling",
+    "efficiency-module-2-recycling",
+    "efficiency-module-3-recycling",
+    "efficiency-module-recycling",
+    "electric-engine-unit-recycling",
+    "electric-furnace-recycling",
+    "electric-mining-drill-recycling",
+    "electromagnetic-plant-recycling",
+    "electronic-circuit-recycling",
+    "energy-shield-equipment-recycling",
+    "energy-shield-mk2-equipment-recycling",
+    "engine-unit-recycling",
+    "exoskeleton-equipment-recycling",
+    "explosive-cannon-shell-recycling",
+    "explosive-rocket-recycling",
+    "explosive-uranium-cannon-shell-recycling",
+    "express-loader-recycling",
+    "express-splitter-recycling",
+    "express-transport-belt-recycling",
+    "express-underground-belt-recycling",
+    "fast-inserter-recycling",
+    "fast-loader-recycling",
+    "fast-splitter-recycling",
+    "fast-transport-belt-recycling",
+    "fast-underground-belt-recycling",
+    "fission-reactor-equipment-recycling",
+    "flamethrower-recycling",
+    "flamethrower-turret-recycling",
+    "fluid-wagon-recycling",
+    "flying-robot-frame-recycling",
+    "foundation-recycling",
+    "foundry-recycling",
+    "fusion-generator-recycling",
+    "fusion-reactor-equipment-recycling",
+    "fusion-reactor-recycling",
+    "gate-recycling",
+    "grenade-recycling",
+    "gun-turret-recycling",
+    "heat-exchanger-recycling",
+    "heat-interface-recycling",
+    "heat-pipe-recycling",
+    "heating-tower-recycling",
+    "heavy-armor-recycling",
+    "infinity-chest-recycling",
+    "infinity-pipe-recycling",
+    "inserter-recycling",
+    "lab-recycling",
+    "land-mine-recycling",
+    "laser-turret-recycling",
+    "lightning-collector-recycling",
+    "lightning-rod-recycling",
+    "loader-recycling",
+    "locomotive-recycling",
+    "logistic-robot-recycling",
+    "long-handed-inserter-recycling",
+    "low-density-structure-recycling",
+    "mech-armor-recycling",
+    "medium-electric-pole-recycling",
+    "modular-armor-recycling",
+    "night-vision-equipment-recycling",
+    "nuclear-reactor-recycling",
+    "offshore-pump-recycling",
+    "oil-refinery-recycling",
+    "overgrowth-jellynut-soil-recycling",
+    "overgrowth-yumako-soil-recycling",
+    "passive-provider-chest-recycling",
+    "personal-laser-defense-equipment-recycling",
+    "personal-roboport-equipment-recycling",
+    "personal-roboport-mk2-equipment-recycling",
+    "piercing-rounds-magazine-recycling",
+    "piercing-shotgun-shell-recycling",
+    "pipe-to-ground-recycling",
+    "pistol-recycling",
+    "poison-capsule-recycling",
+    "power-armor-mk2-recycling",
+    "power-armor-recycling",
+    "power-switch-recycling",
+    "processing-unit-recycling",
+    "productivity-module-2-recycling",
+    "productivity-module-3-recycling",
+    "productivity-module-recycling",
+    "programmable-speaker-recycling",
+    "pump-recycling",
+    "pumpjack-recycling",
+    "quality-module-2-recycling",
+    "quality-module-3-recycling",
+    "quality-module-recycling",
+    "radar-recycling",
+    "rail-chain-signal-recycling",
+    "rail-ramp-recycling",
+    "rail-recycling",
+    "rail-signal-recycling",
+    "rail-support-recycling",
+    "railgun-ammo-recycling",
+    "railgun-recycling",
+    "railgun-turret-recycling",
+    "recycler-recycling",
+    "refined-concrete-recycling",
+    "repair-pack-recycling",
+    "requester-chest-recycling",
+    "roboport-recycling",
+    "rocket-launcher-recycling",
+    "rocket-recycling",
+    "rocket-silo-recycling",
+    "rocket-turret-recycling",
+    "selector-combinator-recycling",
+    "shotgun-recycling",
+    "shotgun-shell-recycling",
+    "slowdown-capsule-recycling",
+    "small-electric-pole-recycling",
+    "small-lamp-recycling",
+    "solar-panel-equipment-recycling",
+    "solar-panel-recycling",
+    "space-platform-foundation-recycling",
+    "space-platform-starter-pack-recycling",
+    "speed-module-2-recycling",
+    "speed-module-3-recycling",
+    "speed-module-recycling",
+    "spidertron-recycling",
+    "splitter-recycling",
+    "stack-inserter-recycling",
+    "steam-engine-recycling",
+    "steam-turbine-recycling",
+    "steel-furnace-recycling",
+    "storage-chest-recycling",
+    "storage-tank-recycling",
+    "submachine-gun-recycling",
+    "substation-recycling",
+    "tank-recycling",
+    "tesla-ammo-recycling",
+    "tesla-turret-recycling",
+    "teslagun-recycling",
+    "thruster-recycling",
+    "toolbelt-equipment-recycling",
+    "train-stop-recycling",
+    "transport-belt-recycling",
+    "turbo-loader-recycling",
+    "turbo-splitter-recycling",
+    "turbo-transport-belt-recycling",
+    "turbo-underground-belt-recycling",
+    "underground-belt-recycling",
+    "uranium-cannon-shell-recycling",
+    "uranium-rounds-magazine-recycling",
+    "§§r:e:coal",
+    "§§r:e:copper-ore",
+    "§§r:e:iron-ore",
+    "§§r:e:stone",
+    "§§r:e:uranium-ore",
+    "§§r:e:calcite",
+    "§§r:e:tungsten-ore",
+    "§§r:e:scrap",
+    "§§r:e:crude-oil",
+    "§§r:e:lithium-brine",
+    "§§r:e:water",
+    "§§r:e:lava",
+    "§§r:e:heavy-oil",
+    "§§r:e:ammoniacal-solution",
+    "§§r:b:water:steam:165",
+    "§§r:g:steam:100>NaN",
+    "§§r:b:water:steam:500"
+  ],
+  "EnabledAssemblers": [
+    "boiler",
+    "steam-engine",
+    "nuclear-reactor",
+    "heat-exchanger",
+    "steam-turbine",
+    "burner-mining-drill",
+    "electric-mining-drill",
+    "big-mining-drill",
+    "offshore-pump",
+    "pumpjack",
+    "stone-furnace",
+    "steel-furnace",
+    "electric-furnace",
+    "foundry",
+    "recycler",
+    "biochamber",
+    "captive-biter-spawner",
+    "assembling-machine-1",
+    "assembling-machine-2",
+    "assembling-machine-3",
+    "oil-refinery",
+    "chemical-plant",
+    "centrifuge",
+    "electromagnetic-plant",
+    "cryogenic-plant",
+    "heating-tower",
+    "rocket-silo",
+    "crusher",
+    "§§a:player-assembler",
+    "§§a:rocket-assembler"
+  ],
+  "EnabledModules": [
+    "speed-module",
+    "speed-module-2",
+    "speed-module-3",
+    "efficiency-module",
+    "efficiency-module-2",
+    "efficiency-module-3",
+    "productivity-module",
+    "productivity-module-2",
+    "productivity-module-3",
+    "quality-module",
+    "quality-module-2",
+    "quality-module-3"
+  ],
+  "EnabledBeacons": [
+    "beacon"
+  ],
+  "ProductionGraph": {
+    "Version": 7,
+    "Object": "ProductionGraph",
+    "EnableExtraProductivityForNonMiners": false,
+    "DefaultNodeDirection": 0,
+    "Solver_PullOutputNodes": false,
+    "Solver_PullOutputNodesPower": 1.0,
+    "Solver_LowPriorityPower": 2.0,
+    "MaxQualitySteps": 5,
+    "DefaultQuality": "normal",
+    "IncludedItems": [
+      "metallic-asteroid-chunk",
+      "iron-ore",
+      "oxide-asteroid-chunk",
+      "ice",
+      "calcite",
+      "molten-iron",
+      "iron-plate",
+      "carbonic-asteroid-chunk",
+      "carbon",
+      "space-science-pack",
+      "heavy-oil",
+      "lubricant",
+      "electronic-circuit",
+      "engine-unit",
+      "electric-engine-unit",
+      "water",
+      "petroleum-gas",
+      "sulfur",
+      "sulfuric-acid",
+      "copper-plate",
+      "battery",
+      "steel-plate",
+      "flying-robot-frame",
+      "iron-stick",
+      "stone",
+      "rail",
+      "advanced-circuit",
+      "productivity-module",
+      "stone-brick",
+      "electric-furnace",
+      "pipe",
+      "iron-gear-wheel",
+      "light-oil",
+      "crude-oil",
+      "coal",
+      "plastic-bar",
+      "copper-cable",
+      "stone-wall",
+      "firearm-magazine",
+      "piercing-rounds-magazine",
+      "grenade",
+      "copper-ore",
+      "molten-copper",
+      "transport-belt",
+      "inserter",
+      "processing-unit",
+      "low-density-structure",
+      "utility-science-pack",
+      "production-science-pack",
+      "chemical-science-pack",
+      "military-science-pack",
+      "logistic-science-pack",
+      "automation-science-pack"
+    ],
+    "IncludedRecipes": [
+      {
+        "Name": "metallic-asteroid-crushing",
+        "RecipeID": 1720,
+        "isMissing": false,
+        "Ingredients": {
+          "metallic-asteroid-chunk": 1.0
+        },
+        "Products": {
+          "iron-ore": 20.0,
+          "metallic-asteroid-chunk": 0.2
+        }
+      },
+      {
+        "Name": "advanced-oxide-asteroid-crushing",
+        "RecipeID": 1728,
+        "isMissing": false,
+        "Ingredients": {
+          "oxide-asteroid-chunk": 1.0
+        },
+        "Products": {
+          "ice": 3.0,
+          "calcite": 2.0,
+          "oxide-asteroid-chunk": 0.05
+        }
+      },
+      {
+        "Name": "molten-iron",
+        "RecipeID": 1605,
+        "isMissing": false,
+        "Ingredients": {
+          "iron-ore": 50.0,
+          "calcite": 1.0
+        },
+        "Products": {
+          "molten-iron": 500.0
+        }
+      },
+      {
+        "Name": "casting-iron",
+        "RecipeID": 1607,
+        "isMissing": false,
+        "Ingredients": {
+          "molten-iron": 20.0
+        },
+        "Products": {
+          "iron-plate": 2.0
+        }
+      },
+      {
+        "Name": "oxide-asteroid-crushing",
+        "RecipeID": 1722,
+        "isMissing": false,
+        "Ingredients": {
+          "oxide-asteroid-chunk": 1.0
+        },
+        "Products": {
+          "ice": 5.0,
+          "oxide-asteroid-chunk": 0.2
+        }
+      },
+      {
+        "Name": "carbonic-asteroid-crushing",
+        "RecipeID": 1721,
+        "isMissing": false,
+        "Ingredients": {
+          "carbonic-asteroid-chunk": 1.0
+        },
+        "Products": {
+          "carbon": 10.0,
+          "carbonic-asteroid-chunk": 0.2
+        }
+      },
+      {
+        "Name": "space-science-pack",
+        "RecipeID": 1692,
+        "isMissing": false,
+        "Ingredients": {
+          "ice": 1.0,
+          "iron-plate": 2.0,
+          "carbon": 1.0
+        },
+        "Products": {
+          "space-science-pack": 5.0
+        }
+      },
+      {
+        "Name": "lubricant",
+        "RecipeID": 1510,
+        "isMissing": false,
+        "Ingredients": {
+          "heavy-oil": 10.0
+        },
+        "Products": {
+          "lubricant": 10.0
+        }
+      },
+      {
+        "Name": "electric-engine-unit",
+        "RecipeID": 1588,
+        "isMissing": false,
+        "Ingredients": {
+          "electronic-circuit": 2.0,
+          "engine-unit": 1.0,
+          "lubricant": 15.0
+        },
+        "Products": {
+          "electric-engine-unit": 1.0
+        }
+      },
+      {
+        "Name": "sulfur",
+        "RecipeID": 1544,
+        "isMissing": false,
+        "Ingredients": {
+          "water": 30.0,
+          "petroleum-gas": 30.0
+        },
+        "Products": {
+          "sulfur": 2.0
+        }
+      },
+      {
+        "Name": "sulfuric-acid",
+        "RecipeID": 1511,
+        "isMissing": false,
+        "Ingredients": {
+          "iron-plate": 1.0,
+          "sulfur": 5.0,
+          "water": 100.0
+        },
+        "Products": {
+          "sulfuric-acid": 50.0
+        }
+      },
+      {
+        "Name": "battery",
+        "RecipeID": 1546,
+        "isMissing": false,
+        "Ingredients": {
+          "iron-plate": 1.0,
+          "copper-plate": 1.0,
+          "sulfuric-acid": 20.0
+        },
+        "Products": {
+          "battery": 1.0
+        }
+      },
+      {
+        "Name": "flying-robot-frame",
+        "RecipeID": 1589,
+        "isMissing": false,
+        "Ingredients": {
+          "steel-plate": 1.0,
+          "battery": 2.0,
+          "electronic-circuit": 3.0,
+          "electric-engine-unit": 1.0
+        },
+        "Products": {
+          "flying-robot-frame": 1.0
+        }
+      },
+      {
+        "Name": "casting-iron-stick",
+        "RecipeID": 1611,
+        "isMissing": false,
+        "Ingredients": {
+          "molten-iron": 20.0
+        },
+        "Products": {
+          "iron-stick": 4.0
+        }
+      },
+      {
+        "Name": "rail",
+        "RecipeID": 1397,
+        "isMissing": false,
+        "Ingredients": {
+          "stone": 1.0,
+          "steel-plate": 1.0,
+          "iron-stick": 1.0
+        },
+        "Products": {
+          "rail": 2.0
+        }
+      },
+      {
+        "Name": "productivity-module",
+        "RecipeID": 1494,
+        "isMissing": false,
+        "Ingredients": {
+          "electronic-circuit": 5.0,
+          "advanced-circuit": 5.0
+        },
+        "Products": {
+          "productivity-module": 1.0
+        }
+      },
+      {
+        "Name": "electric-furnace",
+        "RecipeID": 1466,
+        "isMissing": false,
+        "Ingredients": {
+          "steel-plate": 10.0,
+          "advanced-circuit": 5.0,
+          "stone-brick": 10.0
+        },
+        "Products": {
+          "electric-furnace": 1.0
+        }
+      },
+      {
+        "Name": "casting-pipe",
+        "RecipeID": 1394,
+        "isMissing": false,
+        "Ingredients": {
+          "molten-iron": 10.0
+        },
+        "Products": {
+          "pipe": 1.0
+        }
+      },
+      {
+        "Name": "engine-unit",
+        "RecipeID": 1587,
+        "isMissing": false,
+        "Ingredients": {
+          "steel-plate": 1.0,
+          "iron-gear-wheel": 1.0,
+          "pipe": 2.0
+        },
+        "Products": {
+          "engine-unit": 1.0
+        }
+      },
+      {
+        "Name": "light-oil-cracking",
+        "RecipeID": 1506,
+        "isMissing": false,
+        "Ingredients": {
+          "water": 30.0,
+          "light-oil": 30.0
+        },
+        "Products": {
+          "petroleum-gas": 20.0
+        }
+      },
+      {
+        "Name": "heavy-oil-cracking",
+        "RecipeID": 1505,
+        "isMissing": false,
+        "Ingredients": {
+          "water": 30.0,
+          "heavy-oil": 40.0
+        },
+        "Products": {
+          "light-oil": 30.0
+        }
+      },
+      {
+        "Name": "§§r:e:water",
+        "RecipeID": 2033,
+        "isMissing": false,
+        "Ingredients": {},
+        "Products": {
+          "water": 60.0
+        }
+      },
+      {
+        "Name": "§§r:e:crude-oil",
+        "RecipeID": 2029,
+        "isMissing": false,
+        "Ingredients": {},
+        "Products": {
+          "crude-oil": 10.0
+        }
+      },
+      {
+        "Name": "advanced-oil-processing",
+        "RecipeID": 1502,
+        "isMissing": false,
+        "Ingredients": {
+          "water": 50.0,
+          "crude-oil": 100.0
+        },
+        "Products": {
+          "heavy-oil": 25.0,
+          "light-oil": 45.0,
+          "petroleum-gas": 55.0
+        }
+      },
+      {
+        "Name": "plastic-bar",
+        "RecipeID": 1542,
+        "isMissing": false,
+        "Ingredients": {
+          "coal": 1.0,
+          "petroleum-gas": 20.0
+        },
+        "Products": {
+          "plastic-bar": 2.0
+        }
+      },
+      {
+        "Name": "electronic-circuit",
+        "RecipeID": 1584,
+        "isMissing": false,
+        "Ingredients": {
+          "iron-plate": 1.0,
+          "copper-cable": 3.0
+        },
+        "Products": {
+          "electronic-circuit": 1.0
+        }
+      },
+      {
+        "Name": "copper-cable",
+        "RecipeID": 1581,
+        "isMissing": false,
+        "Ingredients": {
+          "copper-plate": 1.0
+        },
+        "Products": {
+          "copper-cable": 2.0
+        }
+      },
+      {
+        "Name": "advanced-circuit",
+        "RecipeID": 1585,
+        "isMissing": false,
+        "Ingredients": {
+          "plastic-bar": 2.0,
+          "copper-cable": 4.0,
+          "electronic-circuit": 2.0
+        },
+        "Products": {
+          "advanced-circuit": 1.0
+        }
+      },
+      {
+        "Name": "§§r:e:stone",
+        "RecipeID": 2024,
+        "isMissing": false,
+        "Ingredients": {},
+        "Products": {
+          "stone": 1.0
+        }
+      },
+      {
+        "Name": "stone-brick",
+        "RecipeID": 1426,
+        "isMissing": false,
+        "Ingredients": {
+          "stone": 2.0
+        },
+        "Products": {
+          "stone-brick": 1.0
+        }
+      },
+      {
+        "Name": "stone-wall",
+        "RecipeID": 1788,
+        "isMissing": false,
+        "Ingredients": {
+          "stone-brick": 5.0
+        },
+        "Products": {
+          "stone-wall": 1.0
+        }
+      },
+      {
+        "Name": "casting-steel",
+        "RecipeID": 1609,
+        "isMissing": false,
+        "Ingredients": {
+          "molten-iron": 30.0
+        },
+        "Products": {
+          "steel-plate": 1.0
+        }
+      },
+      {
+        "Name": "firearm-magazine",
+        "RecipeID": 1741,
+        "isMissing": false,
+        "Ingredients": {
+          "iron-plate": 4.0
+        },
+        "Products": {
+          "firearm-magazine": 1.0
+        }
+      },
+      {
+        "Name": "piercing-rounds-magazine",
+        "RecipeID": 1742,
+        "isMissing": false,
+        "Ingredients": {
+          "copper-plate": 2.0,
+          "steel-plate": 1.0,
+          "firearm-magazine": 2.0
+        },
+        "Products": {
+          "piercing-rounds-magazine": 2.0
+        }
+      },
+      {
+        "Name": "§§r:e:coal",
+        "RecipeID": 2021,
+        "isMissing": false,
+        "Ingredients": {},
+        "Products": {
+          "coal": 1.0
+        }
+      },
+      {
+        "Name": "grenade",
+        "RecipeID": 1759,
+        "isMissing": false,
+        "Ingredients": {
+          "coal": 10.0,
+          "iron-plate": 5.0
+        },
+        "Products": {
+          "grenade": 1.0
+        }
+      },
+      {
+        "Name": "§§r:e:iron-ore",
+        "RecipeID": 2023,
+        "isMissing": false,
+        "Ingredients": {},
+        "Products": {
+          "iron-ore": 1.0
+        }
+      },
+      {
+        "Name": "§§r:e:copper-ore",
+        "RecipeID": 2022,
+        "isMissing": false,
+        "Ingredients": {},
+        "Products": {
+          "copper-ore": 1.0
+        }
+      },
+      {
+        "Name": "molten-copper",
+        "RecipeID": 1606,
+        "isMissing": false,
+        "Ingredients": {
+          "copper-ore": 50.0,
+          "calcite": 1.0
+        },
+        "Products": {
+          "molten-copper": 500.0
+        }
+      },
+      {
+        "Name": "transport-belt",
+        "RecipeID": 1366,
+        "isMissing": false,
+        "Ingredients": {
+          "iron-plate": 1.0,
+          "iron-gear-wheel": 1.0
+        },
+        "Products": {
+          "transport-belt": 2.0
+        }
+      },
+      {
+        "Name": "inserter",
+        "RecipeID": 1383,
+        "isMissing": false,
+        "Ingredients": {
+          "iron-plate": 1.0,
+          "iron-gear-wheel": 1.0,
+          "electronic-circuit": 1.0
+        },
+        "Products": {
+          "inserter": 1.0
+        }
+      },
+      {
+        "Name": "utility-science-pack",
+        "RecipeID": 1690,
+        "isMissing": false,
+        "Ingredients": {
+          "processing-unit": 2.0,
+          "flying-robot-frame": 1.0,
+          "low-density-structure": 3.0
+        },
+        "Products": {
+          "utility-science-pack": 3.0
+        }
+      },
+      {
+        "Name": "production-science-pack",
+        "RecipeID": 1688,
+        "isMissing": false,
+        "Ingredients": {
+          "rail": 30.0,
+          "electric-furnace": 1.0,
+          "productivity-module": 1.0
+        },
+        "Products": {
+          "production-science-pack": 3.0
+        }
+      },
+      {
+        "Name": "chemical-science-pack",
+        "RecipeID": 1686,
+        "isMissing": false,
+        "Ingredients": {
+          "sulfur": 1.0,
+          "advanced-circuit": 3.0,
+          "engine-unit": 2.0
+        },
+        "Products": {
+          "chemical-science-pack": 2.0
+        }
+      },
+      {
+        "Name": "military-science-pack",
+        "RecipeID": 1684,
+        "isMissing": false,
+        "Ingredients": {
+          "piercing-rounds-magazine": 1.0,
+          "grenade": 1.0,
+          "stone-wall": 2.0
+        },
+        "Products": {
+          "military-science-pack": 2.0
+        }
+      },
+      {
+        "Name": "logistic-science-pack",
+        "RecipeID": 1682,
+        "isMissing": false,
+        "Ingredients": {
+          "transport-belt": 1.0,
+          "inserter": 1.0
+        },
+        "Products": {
+          "logistic-science-pack": 1.0
+        }
+      },
+      {
+        "Name": "casting-iron-gear-wheel",
+        "RecipeID": 1610,
+        "isMissing": false,
+        "Ingredients": {
+          "molten-iron": 10.0
+        },
+        "Products": {
+          "iron-gear-wheel": 1.0
+        }
+      },
+      {
+        "Name": "casting-copper",
+        "RecipeID": 1608,
+        "isMissing": false,
+        "Ingredients": {
+          "molten-copper": 20.0
+        },
+        "Products": {
+          "copper-plate": 2.0
+        }
+      },
+      {
+        "Name": "automation-science-pack",
+        "RecipeID": 1680,
+        "isMissing": false,
+        "Ingredients": {
+          "copper-plate": 1.0,
+          "iron-gear-wheel": 1.0
+        },
+        "Products": {
+          "automation-science-pack": 1.0
+        }
+      }
+    ],
+    "IncludedPlantProcesses": [],
+    "IncludedAssemblers": [
+      "crusher",
+      "foundry",
+      "assembling-machine-3",
+      "chemical-plant",
+      "electromagnetic-plant",
+      "offshore-pump",
+      "pumpjack",
+      "oil-refinery",
+      "big-mining-drill",
+      "electric-furnace"
+    ],
+    "IncludedModules": [
+      "speed-module-3",
+      "efficiency-module-3"
+    ],
+    "IncludedBeacons": [],
+    "IncludedQualities": [
+      {
+        "Key": "normal",
+        "Value": 0
+      }
+    ],
+    "Nodes": [
+      {
+        "NodeID": 64,
+        "Location": "1752, 1632",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 0,
+        "Item": "metallic-asteroid-chunk",
+        "BaseQuality": "normal"
+      },
+      {
+        "NodeID": 63,
+        "Location": "1752, 1392",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1720,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "crusher",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 62,
+        "Location": "1584, 1392",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1728,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "crusher",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 61,
+        "Location": "1656, 1176",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1605,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 60,
+        "Location": "1656, 960",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1607,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 59,
+        "Location": "1584, 1632",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 0,
+        "Item": "oxide-asteroid-chunk",
+        "BaseQuality": "normal"
+      },
+      {
+        "NodeID": 58,
+        "Location": "1488, 960",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1722,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "crusher",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 57,
+        "Location": "1344, 1176",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 0,
+        "Item": "carbonic-asteroid-chunk",
+        "BaseQuality": "normal"
+      },
+      {
+        "NodeID": 56,
+        "Location": "1344, 960",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1721,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "crusher",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 55,
+        "Location": "1416, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1692,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": [
+          {
+            "Name": "speed-module-3",
+            "Quality": "normal"
+          },
+          {
+            "Name": "speed-module-3",
+            "Quality": "normal"
+          },
+          {
+            "Name": "efficiency-module-3",
+            "Quality": "normal"
+          },
+          {
+            "Name": "efficiency-module-3",
+            "Quality": "normal"
+          }
+        ]
+      },
+      {
+        "NodeID": 54,
+        "Location": "264, 168",
+        "RateType": 1,
+        "Direction": 0,
+        "DesiredSetValue": 1000.0000000000001,
+        "NodeType": 1,
+        "Item": "space-science-pack",
+        "BaseQuality": "normal",
+        "DesiredRate": 16.666666666666668
+      },
+      {
+        "NodeID": 53,
+        "Location": "504, 1536",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1510,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 52,
+        "Location": "768, 888",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1588,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 51,
+        "Location": "744, 1320",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1544,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 50,
+        "Location": "624, 1104",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1511,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 49,
+        "Location": "576, 888",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1546,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 48,
+        "Location": "1152, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1589,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 47,
+        "Location": "-240, 1128",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1611,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 46,
+        "Location": "936, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1397,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 45,
+        "Location": "768, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1494,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "electromagnetic-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 44,
+        "Location": "600, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1466,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 43,
+        "Location": "-408, 1128",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1394,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 42,
+        "Location": "432, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1587,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 41,
+        "Location": "360, 1512",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 2,
+        "Item": "petroleum-gas",
+        "BaseQuality": "normal",
+        "SDraw": false
+      },
+      {
+        "NodeID": 40,
+        "Location": "360, 1704",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1506,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 39,
+        "Location": "552, 1896",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1505,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 38,
+        "Location": "528, 2328",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 2033,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "offshore-pump",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 37,
+        "Location": "360, 2328",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 2029,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "pumpjack",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 36,
+        "Location": "384, 2088",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1502,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "oil-refinery",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 35,
+        "Location": "264, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1544,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 34,
+        "Location": "384, 888",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1542,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "chemical-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 33,
+        "Location": "216, 888",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1584,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "electromagnetic-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 32,
+        "Location": "72, 1104",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1581,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "electromagnetic-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 31,
+        "Location": "96, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1585,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "electromagnetic-plant",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 30,
+        "Location": "-264, 1368",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 2024,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "big-mining-drill",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 29,
+        "Location": "-72, 888",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1426,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "electric-furnace",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 28,
+        "Location": "-72, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1788,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 27,
+        "Location": "-576, 1128",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1609,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 26,
+        "Location": "-216, 888",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1741,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 25,
+        "Location": "-240, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1742,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 24,
+        "Location": "-432, 1368",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 2021,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "big-mining-drill",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 23,
+        "Location": "-432, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1759,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 22,
+        "Location": "-1296, 1848",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 0,
+        "Item": "oxide-asteroid-chunk",
+        "BaseQuality": "normal"
+      },
+      {
+        "NodeID": 21,
+        "Location": "-1296, 1608",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1728,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "crusher",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 20,
+        "Location": "-936, 1608",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 2023,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "big-mining-drill",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 19,
+        "Location": "-1128, 1608",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 2022,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "big-mining-drill",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 18,
+        "Location": "-960, 1344",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1605,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 17,
+        "Location": "-1152, 1344",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1606,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 16,
+        "Location": "-768, 1128",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1607,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 15,
+        "Location": "-792, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1366,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 14,
+        "Location": "-624, 672",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1383,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 13,
+        "Location": "96, 360",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1690,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 12,
+        "Location": "-72, 360",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1688,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 11,
+        "Location": "-240, 360",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1686,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 10,
+        "Location": "-408, 360",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1684,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 9,
+        "Location": "96, 168",
+        "RateType": 1,
+        "Direction": 0,
+        "DesiredSetValue": 1000.0000000000001,
+        "NodeType": 1,
+        "Item": "utility-science-pack",
+        "BaseQuality": "normal",
+        "DesiredRate": 16.666666666666668
+      },
+      {
+        "NodeID": 8,
+        "Location": "-72, 168",
+        "RateType": 1,
+        "Direction": 0,
+        "DesiredSetValue": 1000.0000000000001,
+        "NodeType": 1,
+        "Item": "production-science-pack",
+        "BaseQuality": "normal",
+        "DesiredRate": 16.666666666666668
+      },
+      {
+        "NodeID": 7,
+        "Location": "-240, 168",
+        "RateType": 1,
+        "Direction": 0,
+        "DesiredSetValue": 1000.0000000000001,
+        "NodeType": 1,
+        "Item": "chemical-science-pack",
+        "BaseQuality": "normal",
+        "DesiredRate": 16.666666666666668
+      },
+      {
+        "NodeID": 6,
+        "Location": "-408, 168",
+        "RateType": 1,
+        "Direction": 0,
+        "DesiredSetValue": 1000.0000000000001,
+        "NodeType": 1,
+        "Item": "military-science-pack",
+        "BaseQuality": "normal",
+        "DesiredRate": 16.666666666666668
+      },
+      {
+        "NodeID": 5,
+        "Location": "-696, 360",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1682,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 4,
+        "Location": "-696, 168",
+        "RateType": 1,
+        "Direction": 0,
+        "DesiredSetValue": 1000.0000000000001,
+        "NodeType": 1,
+        "Item": "logistic-science-pack",
+        "BaseQuality": "normal",
+        "DesiredRate": 16.666666666666668
+      },
+      {
+        "NodeID": 3,
+        "Location": "-960, 1128",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1610,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 2,
+        "Location": "-1152, 1128",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1608,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "foundry",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      },
+      {
+        "NodeID": 1,
+        "Location": "-1032, 168",
+        "RateType": 1,
+        "Direction": 0,
+        "DesiredSetValue": 1000.0000000000001,
+        "NodeType": 1,
+        "Item": "automation-science-pack",
+        "BaseQuality": "normal",
+        "DesiredRate": 16.666666666666668
+      },
+      {
+        "NodeID": 0,
+        "Location": "-1032, 360",
+        "RateType": 0,
+        "Direction": 0,
+        "NodeType": 3,
+        "RecipeID": 1680,
+        "RecipeQuality": "normal",
+        "Neighbours": 0.0,
+        "ExtraProductivity": 0.0,
+        "Assembler": "assembling-machine-3",
+        "AssemblerQuality": "normal",
+        "AssemblerModules": []
+      }
+    ],
+    "NodeLinks": [
+      {
+        "SupplierID": 63,
+        "ConsumerID": 61,
+        "Item": "iron-ore",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 63,
+        "ConsumerID": 63,
+        "Item": "metallic-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 64,
+        "ConsumerID": 63,
+        "Item": "metallic-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 59,
+        "ConsumerID": 58,
+        "Item": "oxide-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 57,
+        "ConsumerID": 56,
+        "Item": "carbonic-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 56,
+        "ConsumerID": 56,
+        "Item": "carbonic-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 56,
+        "ConsumerID": 55,
+        "Item": "carbon",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 55,
+        "ConsumerID": 54,
+        "Item": "space-science-pack",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 58,
+        "ConsumerID": 58,
+        "Item": "oxide-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 58,
+        "ConsumerID": 55,
+        "Item": "ice",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 62,
+        "ConsumerID": 61,
+        "Item": "calcite",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 61,
+        "ConsumerID": 60,
+        "Item": "molten-iron",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 16,
+        "ConsumerID": 49,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 50,
+        "ConsumerID": 49,
+        "Item": "sulfuric-acid",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 62,
+        "ConsumerID": 55,
+        "Item": "ice",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 58,
+        "ConsumerID": 62,
+        "Item": "oxide-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 2,
+        "ConsumerID": 49,
+        "Item": "copper-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 47,
+        "ConsumerID": 46,
+        "Item": "iron-stick",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 27,
+        "ConsumerID": 46,
+        "Item": "steel-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 30,
+        "ConsumerID": 46,
+        "Item": "stone",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 46,
+        "ConsumerID": 12,
+        "Item": "rail",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 29,
+        "ConsumerID": 44,
+        "Item": "stone-brick",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 36,
+        "ConsumerID": 53,
+        "Item": "heavy-oil",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 27,
+        "ConsumerID": 44,
+        "Item": "steel-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 49,
+        "ConsumerID": 48,
+        "Item": "battery",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 53,
+        "ConsumerID": 52,
+        "Item": "lubricant",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 62,
+        "ConsumerID": 62,
+        "Item": "oxide-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 44,
+        "ConsumerID": 12,
+        "Item": "electric-furnace",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 27,
+        "ConsumerID": 48,
+        "Item": "steel-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 27,
+        "ConsumerID": 42,
+        "Item": "steel-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 33,
+        "ConsumerID": 45,
+        "Item": "electronic-circuit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 33,
+        "ConsumerID": 52,
+        "Item": "electronic-circuit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 39,
+        "ConsumerID": 40,
+        "Item": "light-oil",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 40,
+        "ConsumerID": 41,
+        "Item": "petroleum-gas",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 42,
+        "ConsumerID": 52,
+        "Item": "engine-unit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 38,
+        "ConsumerID": 39,
+        "Item": "water",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 59,
+        "ConsumerID": 62,
+        "Item": "oxide-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 36,
+        "ConsumerID": 39,
+        "Item": "heavy-oil",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 37,
+        "ConsumerID": 36,
+        "Item": "crude-oil",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 33,
+        "ConsumerID": 48,
+        "Item": "electronic-circuit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 41,
+        "ConsumerID": 35,
+        "Item": "petroleum-gas",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 31,
+        "ConsumerID": 44,
+        "Item": "advanced-circuit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 52,
+        "ConsumerID": 48,
+        "Item": "electric-engine-unit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 32,
+        "ConsumerID": 31,
+        "Item": "copper-cable",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 33,
+        "ConsumerID": 31,
+        "Item": "electronic-circuit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 2,
+        "ConsumerID": 32,
+        "Item": "copper-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 16,
+        "ConsumerID": 33,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 32,
+        "ConsumerID": 33,
+        "Item": "copper-cable",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 31,
+        "ConsumerID": 11,
+        "Item": "advanced-circuit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 28,
+        "ConsumerID": 10,
+        "Item": "stone-wall",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 30,
+        "ConsumerID": 29,
+        "Item": "stone",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 34,
+        "ConsumerID": 31,
+        "Item": "plastic-bar",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 26,
+        "ConsumerID": 25,
+        "Item": "firearm-magazine",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 16,
+        "ConsumerID": 26,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 41,
+        "ConsumerID": 51,
+        "Item": "petroleum-gas",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 60,
+        "ConsumerID": 55,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 25,
+        "ConsumerID": 10,
+        "Item": "piercing-rounds-magazine",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 31,
+        "ConsumerID": 45,
+        "Item": "advanced-circuit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 18,
+        "ConsumerID": 43,
+        "Item": "molten-iron",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 38,
+        "ConsumerID": 51,
+        "Item": "water",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 38,
+        "ConsumerID": 35,
+        "Item": "water",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 43,
+        "ConsumerID": 42,
+        "Item": "pipe",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 41,
+        "ConsumerID": 34,
+        "Item": "petroleum-gas",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 51,
+        "ConsumerID": 50,
+        "Item": "sulfur",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 38,
+        "ConsumerID": 36,
+        "Item": "water",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 36,
+        "ConsumerID": 41,
+        "Item": "petroleum-gas",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 16,
+        "ConsumerID": 50,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 3,
+        "ConsumerID": 42,
+        "Item": "iron-gear-wheel",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 36,
+        "ConsumerID": 40,
+        "Item": "light-oil",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 24,
+        "ConsumerID": 23,
+        "Item": "coal",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 45,
+        "ConsumerID": 12,
+        "Item": "productivity-module",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 38,
+        "ConsumerID": 50,
+        "Item": "water",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 35,
+        "ConsumerID": 11,
+        "Item": "sulfur",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 42,
+        "ConsumerID": 11,
+        "Item": "engine-unit",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 23,
+        "ConsumerID": 10,
+        "Item": "grenade",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 62,
+        "ConsumerID": 58,
+        "Item": "oxide-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 48,
+        "ConsumerID": 13,
+        "Item": "flying-robot-frame",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 21,
+        "ConsumerID": 18,
+        "Item": "calcite",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 18,
+        "ConsumerID": 27,
+        "Item": "molten-iron",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 18,
+        "ConsumerID": 47,
+        "Item": "molten-iron",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 21,
+        "ConsumerID": 17,
+        "Item": "calcite",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 27,
+        "ConsumerID": 25,
+        "Item": "steel-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 2,
+        "ConsumerID": 25,
+        "Item": "copper-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 22,
+        "ConsumerID": 21,
+        "Item": "oxide-asteroid-chunk",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 16,
+        "ConsumerID": 23,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 24,
+        "ConsumerID": 34,
+        "Item": "coal",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 20,
+        "ConsumerID": 18,
+        "Item": "iron-ore",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 29,
+        "ConsumerID": 28,
+        "Item": "stone-brick",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 19,
+        "ConsumerID": 17,
+        "Item": "copper-ore",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 18,
+        "ConsumerID": 16,
+        "Item": "molten-iron",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 16,
+        "ConsumerID": 15,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 3,
+        "ConsumerID": 14,
+        "Item": "iron-gear-wheel",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 18,
+        "ConsumerID": 3,
+        "Item": "molten-iron",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 3,
+        "ConsumerID": 15,
+        "Item": "iron-gear-wheel",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 15,
+        "ConsumerID": 5,
+        "Item": "transport-belt",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 17,
+        "ConsumerID": 2,
+        "Item": "molten-copper",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 11,
+        "ConsumerID": 7,
+        "Item": "chemical-science-pack",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 10,
+        "ConsumerID": 6,
+        "Item": "military-science-pack",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 13,
+        "ConsumerID": 9,
+        "Item": "utility-science-pack",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 14,
+        "ConsumerID": 5,
+        "Item": "inserter",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 12,
+        "ConsumerID": 8,
+        "Item": "production-science-pack",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 3,
+        "ConsumerID": 0,
+        "Item": "iron-gear-wheel",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 16,
+        "ConsumerID": 14,
+        "Item": "iron-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 5,
+        "ConsumerID": 4,
+        "Item": "logistic-science-pack",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 2,
+        "ConsumerID": 0,
+        "Item": "copper-plate",
+        "Quality": "normal"
+      },
+      {
+        "SupplierID": 0,
+        "ConsumerID": 1,
+        "Item": "automation-science-pack",
+        "Quality": "normal"
+      }
+    ]
+  }
+}

@@ -17,7 +17,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.SupplyRate("Plate"));
         }
@@ -34,7 +34,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
         }
@@ -51,7 +51,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(50, data.SupplyRate("Plate"));
         }
@@ -68,7 +68,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(5, data.SupplyRate("Plate"));
         }
@@ -85,7 +85,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(8, data.SupplyRate("Plate"));
         }
@@ -106,7 +106,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             var production = data.SupplyRate("Plate");
             Assert.IsTrue(production == 10, "Suppliers misproduced: " + production);
@@ -128,7 +128,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(15, data.SupplyRate("Plate"));
         }
@@ -144,7 +144,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
         }
@@ -161,7 +161,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
             AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
@@ -177,9 +177,9 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
-            AssertFloatsAreEqual(0, data.Graph.Nodes[0].actualRate);
+            AssertFloatsAreEqual(0, data.Graph.Nodes.First().ActualRate);
         }
 
         [TestMethod]
@@ -192,9 +192,9 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
-            AssertFloatsAreEqual(10, data.Graph.Nodes[0].actualRate);
+            AssertFloatsAreEqual(10, data.Graph.Nodes.First().ActualRate);
         }
 
         [TestMethod]
@@ -213,7 +213,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.SupplyRate("Plate"));
             AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
@@ -231,7 +231,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.SupplyRate("Ore"));
         }
@@ -247,7 +247,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(2, data.RecipeRate("fixer"));
         }
@@ -264,7 +264,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.ConsumedRate("Ice"));
         }
@@ -281,7 +281,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(8, data.SupplyRate("Ore"));
         }
@@ -290,10 +290,11 @@ namespace ForemanTest {
         public void TestRecipeCanBeOverSupplied() {
             var builder = GraphBuilder.Create();
             var recipe = builder.Recipe("furnace").Input("Ore", 1).Output("Plate", 1);
+            var primaryOreSupply = builder.Supply("Ore").Target(20);
             var dualOreSupplier = builder.Supply("Ore").Target(10);
 
             builder.Link(
-                builder.Supply("Ore").Target(20),
+                primaryOreSupply,
                 recipe,
                 builder.Consumer("Plate").Target(10)
             );
@@ -308,10 +309,13 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
-            AssertFloatsAreEqual(20, data.RecipeInputRate("furnace", "Ore"));
+            // Manual supplier on the furnace line delivers its full target even though only 10 plates are needed.
+            AssertFloatsAreEqual(20, data.RecipeInputRate("furnace", "Ore", primaryOreSupply.BuiltNode));
+            // Second supplier also reaches the furnace; total incoming ore exceeds recipe demand.
+            AssertFloatsAreEqual(25, data.RecipeInputRate("furnace", "Ore"));
         }
 
         [TestMethod]
@@ -333,7 +337,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(15, data.ConsumedRate("Ore"));
             AssertFloatsAreEqual(10, data.ConsumedRate("Plate"));
@@ -351,7 +355,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(15, data.SupplyRate("Ore"));
 
@@ -371,7 +375,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(data.SupplyRate("Ore"), data.ConsumedRate("Plate"));
         }
@@ -403,7 +407,7 @@ namespace ForemanTest {
 
             var data = builder.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(data.Graph);
+            data.Solve();
 
             AssertFloatsAreEqual(10, data.ConsumedRate("Battery"));
 
@@ -488,8 +492,8 @@ namespace ForemanTest {
             var dataA = builderA.Build();
             var dataB = builderB.Build();
 
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(dataA.Graph);
-            GraphOptimisations.FindOptimalGraphToSatisfyFixedNodes(dataB.Graph);
+            dataA.Solve();
+            dataB.Solve();
 
             AssertFloatsAreEqual(12, dataA.ConsumedRate("Gas"));
             AssertFloatsAreEqual(12, dataB.ConsumedRate("Gas"));
