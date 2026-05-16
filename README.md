@@ -3,7 +3,7 @@
 
 This is a relatively simple program for generating flowcharts for production lines in the game [Factorio](https://www.factorio.com/).
 
-Requires .Net 4.8 or higher and Visual C++ 2019 x86 to run. I am not sure about earlier versions, sorry.
+Requires .NET 10 (Windows) and the native Visual C++ runtime used by Google OR-Tools (x64). The release build targets `net10.0-windows`.
 
 For example, here's a flowchart showing the optimal resources and assemblers required to make the first base red science in the Pyanodon mod pack (rather comparable to base Factorio rocket I would say):
 
@@ -17,7 +17,7 @@ The vanilla preset is included in the release, with a couple presets (from commo
 
 ## Usage ##
 
-Run Foreman.exe. It will already have the default Factorio 1.1 preset loaded so you can start graphing right away. Click on 'add item' or 'add recipe' button to begin.
+Run Foreman.exe. It will already have the default Factorio 2.0 Vanilla preset loaded so you can start graphing right away. Click on 'add item' or 'add recipe' button to begin.
 
 Once you have your first node, you can drag from the ingredients/products of the node to add more nodes, or just click on add item/add recipe to add a disconnected node.
 

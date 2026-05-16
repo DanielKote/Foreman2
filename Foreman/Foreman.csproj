@@ -1,424 +1,97 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C574A82A-02F7-4A10-8C93-AF4638ECDE0D}</ProjectGuid>
+    <TargetFramework>net10.0-windows8.0</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Foreman</RootNamespace>
     <AssemblyName>Foreman</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <FileAlignment>512</FileAlignment>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>C:\Users\Xavier\Desktop\Foreman-Head\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>2.0.12.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <PublishWizardCompleted>true</PublishWizardCompleted>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x64</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>107AC00A53C804C936C4498793F1FF789447337B</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>Foreman_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(BuildingInsideVisualStudioCode)'!='true' ">
-    <GenerateManifests>true</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetZone>LocalIntranet</TargetZone>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
+    <ApplicationVisualStyles>true</ApplicationVisualStyles>
+    <ApplicationUseCompatibleTextRendering>true</ApplicationUseCompatibleTextRendering>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyTitle>Foreman 2</AssemblyTitle>
+    <Description>Flowchart generation program for Factorio</Description>
+    <Company></Company>
+    <Product>Foreman</Product>
+    <Copyright>Copyright ©2021 Daniel Kotes; ©2014 Nick Powell</Copyright>
+    <Version>2.2.16.1</Version>
+    <AssemblyVersion>2.2.16.1</AssemblyVersion>
+    <FileVersion>2.2.16.1</FileVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>Foreman2.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Google.OrTools, Version=5.1.4075.23203, Culture=neutral, PublicKeyToken=e5e5a4177ad79658, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Google.OrTools.9.1.9490\lib\net452\Google.OrTools.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Protobuf, Version=3.18.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Google.Protobuf.3.18.0\lib\net45\Google.Protobuf.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.IO.Compression.ZipFile, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IO.Compression.ZipFile.4.3.0\lib\net46\System.IO.Compression.ZipFile.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="Google.OrTools" Version="9.15.6755" />
+    <PackageReference Include="Google.Protobuf" Version="3.34.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenchmarkTimer.cs" />
-    <Compile Include="Controls\ControlExtensions.cs" />
-    <Compile Include="Controls\DataObjectCheckedListBox.cs">
+    <Compile Update="Controls\DataObjectCheckedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\CustomProgressBar.cs">
+    <Compile Update="Controls\CustomProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\EditRecipePanel.cs">
+    <Compile Update="Controls\EditRecipePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\EditRecipePanel.Designer.cs">
-      <DependentUpon>EditRecipePanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\EditFlowPanel.cs">
+    <Compile Update="Controls\EditFlowPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\EditFlowPanel.Designer.cs">
-      <DependentUpon>EditFlowPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\IRChooserPanel.cs">
+    <Compile Update="Controls\IRChooserPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\IRChooserPanel.Designer.cs">
-      <DependentUpon>IRChooserPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\MouseHoverDetector.cs" />
-    <Compile Include="Controls\RecipePanel.cs">
+    <Compile Update="Controls\RecipePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\RecipeToolTip.cs">
+    <Compile Update="Controls\RecipeToolTip.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\SyncListView.cs">
+    <Compile Update="Controls\SyncListView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DataCache\DataTypes\EntityObjectBase.cs" />
-    <Compile Include="DataCache\DataTypes\Fluid.cs" />
-    <Compile Include="DataCache\DataTypes\Quality.cs" />
-    <Compile Include="DataCache\DataTypes\PlantProcess.cs" />
-    <Compile Include="DataCache\DataTypes\PlantShort.cs" />
-    <Compile Include="DataCache\DataTypes\RecipeShort.cs" />
-    <Compile Include="DataCache\FactorioPathsProcessor.cs" />
-    <Compile Include="DataCache\IconCache.cs" />
-    <Compile Include="DataCache\DataTypes\Assembler.cs" />
-    <Compile Include="DataCache\DataTypes\Beacon.cs" />
-    <Compile Include="DataCache\DataTypes\DataObjectBase.cs" />
-    <Compile Include="DataCache\DataTypes\Group.cs" />
-    <Compile Include="DataCache\DataTypes\Module.cs" />
-    <Compile Include="DataCache\DataTypes\Technology.cs" />
-    <Compile Include="DataCache\InfoPackageClasses.cs" />
-    <Compile Include="DataCache\PresetProcessor.cs" />
-    <Compile Include="Forms\GraphSummaryForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\GraphSummaryForm.Designer.cs">
-      <DependentUpon>GraphSummaryForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\SavefileLoadForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SavefileLoadForm.Designer.cs">
-      <DependentUpon>SavefileLoadForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PresetImportForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PresetImportForm.designer.cs">
-      <DependentUpon>PresetImportForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PresetComparatorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PresetComparatorForm.Designer.cs">
-      <DependentUpon>PresetComparatorForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PresetSelectionForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PresetSelectionForm.Designer.cs">
-      <DependentUpon>PresetSelectionForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\SciencePacksLoadForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SciencePacksLoadForm.Designer.cs">
-      <DependentUpon>SciencePacksLoadForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Models\AssemblerSelector.cs" />
-    <Compile Include="Models\FuelSelector.cs" />
-    <Compile Include="Models\LinkChecker.cs" />
-    <Compile Include="Models\ModuleSelector.cs" />
-    <Compile Include="Models\Nodes\ConsumerNode.cs" />
-    <Compile Include="Models\Nodes\PlantNode.cs" />
-    <Compile Include="Models\Nodes\SpoilNode.cs" />
-    <Compile Include="Models\Nodes\PassthroughNode.cs" />
-    <Compile Include="Models\Nodes\RecipeNode.cs" />
-    <Compile Include="Models\Nodes\SupplierNode.cs" />
-    <Compile Include="DataCache\DataCache.cs" />
-    <Compile Include="Forms\SettingsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SettingsForm.Designer.cs">
-      <DependentUpon>SettingsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Models\QualityPairs.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="ProductionGraphView\Elements\AssemblerElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\BaseLinkElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\BeaconElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\ConsumerNodeElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\ErrorNoticeElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\PlantNodeElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\SpoilNodeElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\PassthroughNodeElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\RecipeNodeElement.cs" />
-    <Compile Include="ProductionGraphView\Elements\SupplierNodeElement.cs" />
-    <Compile Include="ProductionGraphView\FloatingTooltipControl.cs" />
-    <Compile Include="ProductionGraphView\Elements\DraggedLinkElement.cs" />
-    <Compile Include="DataCache\ErrorLogging.cs" />
-    <Compile Include="DataCache\IconCacheProcessor.cs" />
-    <Compile Include="Models\Solver\GoogleSolver.cs" />
-    <Compile Include="Controls\GraphicsStuff.cs" />
-    <Compile Include="ProductionGraphView\Elements\GraphElement.cs" />
-    <Compile Include="Models\Solver\GraphOptimisation.cs" />
-    <Compile Include="Forms\ImageExportForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ImageExportForm.Designer.cs">
-      <DependentUpon>ImageExportForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProductionGraphView\GridManager.cs" />
-    <Compile Include="ProductionGraphView\Elements\ItemTabElement.cs" />
-    <Compile Include="Forms\MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataCache\DataTypes\Item.cs" />
-    <Compile Include="ProductionGraphView\Elements\LinkElement.cs" />
-    <Compile Include="Models\Nodes\BaseNode.cs" />
-    <Compile Include="Models\Solver\ProductionSolver.cs" />
-    <Compile Include="ProductionGraphView\FloatingTooltipRenderer.cs" />
-    <Compile Include="ProductionGraphView\NodeCopyOptions.cs" />
-    <Compile Include="ProductionGraphView\PointingArrowRenderer.cs" />
-    <Compile Include="VersionUpdater.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Forms\DataReloadForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\DataReloadForm.Designer.cs">
-      <DependentUpon>DataReloadForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DataCache\DataTypes\Recipe.cs" />
-    <Compile Include="Models\ProductionGraph.cs" />
-    <Compile Include="ProductionGraphView\ProductionGraphViewer.cs">
+    <Compile Update="ProductionGraphView\ProductionGraphViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProductionGraphView\ProductionGraphViewer.Designer.cs">
-      <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProductionGraphView\Elements\BaseNodeElement.cs" />
-    <Compile Include="Models\Nodes\NodeLink.cs" />
-    <EmbeddedResource Include="Controls\EditRecipePanel.resx">
-      <DependentUpon>EditRecipePanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\EditFlowPanel.resx">
-      <DependentUpon>EditFlowPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\IRChooserPanel.resx">
-      <DependentUpon>IRChooserPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\GraphSummaryForm.resx">
-      <DependentUpon>GraphSummaryForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SavefileLoadForm.resx">
-      <DependentUpon>SavefileLoadForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PresetImportForm.resx">
-      <DependentUpon>PresetImportForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PresetComparatorForm.resx">
-      <DependentUpon>PresetComparatorForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PresetSelectionForm.resx">
-      <DependentUpon>PresetSelectionForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SciencePacksLoadForm.resx">
-      <DependentUpon>SciencePacksLoadForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SettingsForm.resx">
-      <DependentUpon>SettingsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImageExportForm.resx">
-      <DependentUpon>ImageExportForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DataReloadForm.resx">
-      <DependentUpon>DataReloadForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="ProductionGraphView\ProductionGraphViewer.resx">
-      <DependentUpon>ProductionGraphViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="baseCustom.json">
+    <None Update="App.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="baseCustom.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Foreman_TemporaryKey.pfx" />
-    <None Include="Mods\foremanexport_1.0.0\info.json">
+    <None Update="Presets\Factorio 2.0 Space Age.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mods\foremanexport_1.0.0\instrument-after-data.lua">
+    <None Update="Presets\Factorio 2.0 Space Age.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mods\foremanexport_1.0.0\instrument-control - ee.lua">
+    <None Update="Presets\Factorio 2.0 Space Age.pjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mods\foremanexport_1.0.0\instrument-control - en.lua">
+    <None Update="Presets\Factorio 2.0 Vanilla.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mods\foremanexport_1.0.0\instrument-control - ne.lua">
+    <None Update="Presets\Factorio 2.0 Vanilla.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mods\foremanexport_1.0.0\instrument-control - nn.lua">
+    <None Update="Presets\Factorio 2.0 Vanilla.pjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mods\foremanexport_2.0.0\info.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Mods\foremanexport_2.0.0\instrument-after-data.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Mods\foremanexport_2.0.0\instrument-control.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Mods\foremansavereader_1.0.0\info.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Mods\foremansavereader_1.0.0\instrument-control.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Mods\foremansavereader_2.0.0\info.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Mods\foremansavereader_2.0.0\instrument-control.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
-    <None Include="Presets\Factorio 2.0 Space Age.dat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Presets\Factorio 2.0 Space Age.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Presets\Factorio 2.0 Space Age.pjson">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Presets\Factorio 2.0 Vanilla.dat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Presets\Factorio 2.0 Vanilla.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Presets\Factorio 2.0 Vanilla.pjson">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Properties\app.manifest" />
-    <None Include="Properties\Settings.settings">
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Foreman2.ico" />
@@ -458,30 +131,8 @@
     <Content Include="Licences.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Include="Mods\**\*.*">
+	  <CopyToOutputDirectory>IfDifferent</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.2 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -1,16 +1,13 @@
-﻿using System.Linq;
+﻿using Foreman;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Foreman;
 using System;
+using System.Linq;
 
-namespace ForemanTest
-{
+namespace ForemanTest {
     [TestClass]
-    public class SolverTest
-    {
+    public class SolverTest {
         [TestMethod]
-        public void TestBasicSolve()
-        {
+        public void TestBasicSolve() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -26,8 +23,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestBasicRecipe()
-        {
+        public void TestBasicRecipe() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -44,8 +40,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestRecipeThatReducesItems()
-        {
+        public void TestRecipeThatReducesItems() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -62,8 +57,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestRecipeThatMultipliesItems()
-        {
+        public void TestRecipeThatMultipliesItems() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -80,8 +74,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestRecipeWithUnevenInputOutputRatio()
-        {
+        public void TestRecipeWithUnevenInputOutputRatio() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -98,8 +91,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestMultipleInput()
-        {
+        public void TestMultipleInput() {
             var builder = GraphBuilder.Create();
             var consumer = builder.Consumer("Plate").Target(10);
 
@@ -121,8 +113,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestMultipleOutput()
-        {
+        public void TestMultipleOutput() {
             var builder = GraphBuilder.Create();
             var supplier = builder.Supply("Plate");
 
@@ -143,8 +134,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestFixedSupply()
-        {
+        public void TestFixedSupply() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -160,8 +150,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestFixedRecipe()
-        {
+        public void TestFixedRecipe() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -179,8 +168,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestPartialGraph()
-        {
+        public void TestPartialGraph() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -195,8 +183,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestSingleFixedRecipe()
-        {
+        public void TestSingleFixedRecipe() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -211,8 +198,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestDisjointGraph()
-        {
+        public void TestDisjointGraph() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -234,8 +220,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestRecipeLinkedToSelf()
-        {
+        public void TestRecipeLinkedToSelf() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -252,8 +237,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestCycle()
-        {
+        public void TestCycle() {
             var builder = GraphBuilder.Create();
 
             var fixer = builder.Recipe("fixer").Input("Broken", 5).Output("Fixed", 5);
@@ -269,8 +253,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestNoInputRecipe()
-        {
+        public void TestNoInputRecipe() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -287,8 +270,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestRecipeWithEfficiencyBonus()
-        {
+        public void TestRecipeWithEfficiencyBonus() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -305,8 +287,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestRecipeCanBeOverSupplied()
-        {
+        public void TestRecipeCanBeOverSupplied() {
             var builder = GraphBuilder.Create();
             var recipe = builder.Recipe("furnace").Input("Ore", 1).Output("Plate", 1);
             var dualOreSupplier = builder.Supply("Ore").Target(10);
@@ -334,8 +315,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestMinimizeOverSupply()
-        {
+        public void TestMinimizeOverSupply() {
             var builder = GraphBuilder.Create();
             var recipe = builder.Recipe("furnace").Input("Ore", 1).Output("Plate", 1);
             var dualOreSupplier = builder.Supply("Ore").Target(25);
@@ -360,8 +340,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestOverProduction()
-        {
+        public void TestOverProduction() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -381,8 +360,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestUnderProduction()
-        {
+        public void TestUnderProduction() {
             var builder = GraphBuilder.Create();
 
             builder.Link(
@@ -399,8 +377,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestPreferUseOfOverSupplyThanFromSuppliers()
-        {
+        public void TestPreferUseOfOverSupplyThanFromSuppliers() {
             var builder = GraphBuilder.Create();
 
             var recipe = builder.Recipe().Output("Plate", 1).Output("Waste", 1);
@@ -435,8 +412,7 @@ namespace ForemanTest
         }
 
         [TestMethod]
-        public void TestPassThroughDoesNotAlterSolve()
-        {
+        public void TestPassThroughDoesNotAlterSolve() {
             // This regression was reported in
             // https://bitbucket.org/Nicksaurus/foreman/pull-requests/17/do-not-merge-progress-modal-new-solver/diff#comment-36282209.
             // In particular, resources were "pooling" in the passthrough node and extra refinery
@@ -449,8 +425,7 @@ namespace ForemanTest
             GraphBuilder[] builders = { builderA, builderB };
             bool[] addPassthroughs = { false, true };
 
-            foreach (var tuple in builders.Zip(addPassthroughs, (a, b) => Tuple.Create(a, b)))
-            {
+            foreach (var tuple in builders.Zip(addPassthroughs, (a, b) => Tuple.Create(a, b))) {
                 var builder = tuple.Item1;
                 var usePassthrough = tuple.Item2;
 
@@ -472,8 +447,7 @@ namespace ForemanTest
 
                 var target = builder.Consumer("Gas").Target(12);
 
-                if (usePassthrough)
-                {
+                if (usePassthrough) {
                     builder.Link(
                         oilSupply,
                         refining,
@@ -482,8 +456,7 @@ namespace ForemanTest
                         lightCracking,
                         target
                     );
-                } else
-                {
+                } else {
                     builder.Link(
                         oilSupply,
                         refining,
@@ -524,8 +497,7 @@ namespace ForemanTest
             AssertFloatsAreEqual(dataA.SupplyRate("Oil"), dataB.SupplyRate("Oil"));
         }
 
-        private void AssertFloatsAreEqual(double expected, double actual)
-        {
+        private void AssertFloatsAreEqual(double expected, double actual) {
             Assert.AreEqual(expected, actual, 0.0001);
         }
     }

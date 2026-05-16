@@ -92,7 +92,6 @@
             this.GraphViewer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.GraphViewer.BackColor = System.Drawing.Color.White;
             this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GraphViewer.DCache = null;
             this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GraphViewer.IconsOnly = false;
             this.GraphViewer.IconsSize = 32;
@@ -619,7 +618,7 @@
 		private System.Windows.Forms.CheckBox IconViewCheckBox;
 		private System.Windows.Forms.Label VersionLabel;
 		private System.Windows.Forms.Button SaveButton;
-		private System.Windows.Forms.Button HelpButton;
+		private new System.Windows.Forms.Button HelpButton;
 	}
 }
 

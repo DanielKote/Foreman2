@@ -96,10 +96,13 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ForemanVersion" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">7</Value>
     </Setting>
     <Setting Name="SmartNodeDirection" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="FlagDarkMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

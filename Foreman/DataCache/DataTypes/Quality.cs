@@ -3,12 +3,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
-namespace Foreman
-{
-    public interface Quality : DataObjectBase
-    {
-        Quality NextQuality { get; }
-        Quality PrevQuality { get; }
+namespace Foreman {
+    public interface Quality : DataObjectBase {
+        Quality? NextQuality { get; }
+        Quality? PrevQuality { get; }
         double NextProbability { get; }
 
         bool IsMissing { get; }
@@ -21,10 +19,9 @@ namespace Foreman
         IReadOnlyList<IReadOnlyList<Item>> MyUnlockSciencePacks { get; }
     }
 
-    public class QualityPrototype : DataObjectBasePrototype, Quality
-    {
-        public Quality NextQuality { get; internal set; }
-        public Quality PrevQuality { get; internal set; }
+    public class QualityPrototype : DataObjectBasePrototype, Quality {
+        public Quality? NextQuality { get; internal set; }
+        public Quality? PrevQuality { get; internal set; }
         public double NextProbability { get; set; }
 
         public bool IsMissing { get; private set; }
@@ -38,8 +35,7 @@ namespace Foreman
 
         internal HashSet<TechnologyPrototype> myUnlockTechnologies { get; private set; }
 
-        public QualityPrototype(DataCache dCache, string name, string friendlyName, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
-        {
+        public QualityPrototype(DataCache dCache, string name, string friendlyName, string order, bool isMissing = false) : base(dCache, name, friendlyName, order) {
             Enabled = true;
             IsMissing = isMissing;
 

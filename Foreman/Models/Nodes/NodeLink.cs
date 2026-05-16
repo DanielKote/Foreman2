@@ -2,82 +2,76 @@
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Foreman
-{
-	[Serializable]
-	public class NodeLink : ISerializable
-	{
-		private readonly NodeLinkController controller;
-		public NodeLinkController Controller { get { return controller; } }
-		public ReadOnlyNodeLink ReadOnlyLink { get; protected set; }
+namespace Foreman {
+    [Serializable]
+    public class NodeLink : ISerializable {
+        private readonly NodeLinkController controller;
+        public NodeLinkController Controller { get { return controller; } }
+        public ReadOnlyNodeLink ReadOnlyLink { get; protected set; }
 
-		public ItemQualityPair Item { get; private set; }
-		public double ThroughputPerSec { get; internal set; }
-		public double Throughput { get { return ThroughputPerSec * MyGraph.GetRateMultipler(); } }
-		public bool IsValid { get; private set; }
+        public ItemQualityPair Item { get; private set; }
+        public double ThroughputPerSec { get; internal set; }
+        public double Throughput { get { return ThroughputPerSec * MyGraph.GetRateMultipler(); } }
+        public bool IsValid { get; private set; }
 
-		public readonly ProductionGraph MyGraph;
+        public readonly ProductionGraph MyGraph;
 
-		public readonly BaseNode SupplierNode;
-		public readonly BaseNode ConsumerNode;
+        public readonly BaseNode SupplierNode;
+        public readonly BaseNode ConsumerNode;
 
-		internal NodeLink(ProductionGraph myGraph, BaseNode supplier, BaseNode consumer, ItemQualityPair item)
-		{
-			MyGraph = myGraph;
-			SupplierNode = supplier;
-			ConsumerNode = consumer;
-			Item = item;
+        internal NodeLink(ProductionGraph myGraph, BaseNode supplier, BaseNode consumer, ItemQualityPair item) {
+            MyGraph = myGraph;
+            SupplierNode = supplier;
+            ConsumerNode = consumer;
+            Item = item;
 
-			controller = NodeLinkController.GetController(this);
-			ReadOnlyLink = new ReadOnlyNodeLink(this);
+            controller = NodeLinkController.GetController(this);
+            ReadOnlyLink = new ReadOnlyNodeLink(this);
 
-			IsValid = LinkChecker.IsPossibleConnection(Item, SupplierNode.ReadOnlyNode, ConsumerNode.ReadOnlyNode); //only need to check once -> item & recipe temperatures cant change.
-		}
+            if (SupplierNode.ReadOnlyNode is not null && ConsumerNode.ReadOnlyNode is not null)
+                IsValid = LinkChecker.IsPossibleConnection(Item, SupplierNode.ReadOnlyNode, ConsumerNode.ReadOnlyNode); //only need to check once -> item & recipe temperatures cant change.
+        }
 
-		public void GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			info.AddValue("SupplierID", SupplierNode.NodeID);
-			info.AddValue("ConsumerID", ConsumerNode.NodeID);
-			info.AddValue("Item", Item.Item.Name);
-			info.AddValue("Quality", Item.Quality.Name);
-		}
+        public void GetObjectData(SerializationInfo info, StreamingContext context) {
+            info.AddValue("SupplierID", SupplierNode.NodeID);
+            info.AddValue("ConsumerID", ConsumerNode.NodeID);
+            info.AddValue("Item", Item.Item?.Name ?? "ItemNameError");
+            info.AddValue("Quality", Item.Quality?.Name ?? "QualityError");
+        }
 
-		public override string ToString() { return string.Format("NodeLink for {0} ({1}) connecting {1} -> {2}", Item.Item.Name, Item.Quality.Name, SupplierNode.NodeID, ConsumerNode.NodeID); }
-	}
+        public override string ToString() => string.Format("NodeLink for {0} ({1}) connecting {1} -> {2}", Item.Item?.Name, Item.Quality?.Name, SupplierNode.NodeID, ConsumerNode.NodeID);
+    }
 
-	public class ReadOnlyNodeLink
-	{
-		public ReadOnlyBaseNode Supplier => MyLink.SupplierNode.ReadOnlyNode;
-		public ReadOnlyBaseNode Consumer => MyLink.ConsumerNode.ReadOnlyNode;
+    public class ReadOnlyNodeLink {
+        public ReadOnlyBaseNode? Supplier => MyLink.SupplierNode.ReadOnlyNode;
+        public ReadOnlyBaseNode? Consumer => MyLink.ConsumerNode.ReadOnlyNode;
 
-		public NodeDirection SupplierDirection => MyLink.SupplierNode.NodeDirection;
-		public NodeDirection ConsumerDirection => MyLink.ConsumerNode.NodeDirection;
+        public NodeDirection SupplierDirection => MyLink.SupplierNode.NodeDirection;
+        public NodeDirection ConsumerDirection => MyLink.ConsumerNode.NodeDirection;
 
-		public ItemQualityPair Item => MyLink.Item;
-		public double Throughput => MyLink.Throughput;
-		public bool IsValid => MyLink.IsValid;
+        public ItemQualityPair Item => MyLink.Item;
+        public double Throughput => MyLink.Throughput;
+        public bool IsValid => MyLink.IsValid;
 
-		private readonly NodeLink MyLink;
+        private readonly NodeLink MyLink;
 
-		public ReadOnlyNodeLink(NodeLink link) { MyLink = link; }
+        public ReadOnlyNodeLink(NodeLink link) { MyLink = link; }
 
-		public override string ToString() { return "RO: " + MyLink.ToString(); }
-	}
+        public override string ToString() { return "RO: " + MyLink.ToString(); }
+    }
 
-	public class NodeLinkController
-	{
-		private readonly NodeLink MyLink;
+    public class NodeLinkController {
+        private readonly NodeLink MyLink;
 
-		protected NodeLinkController(NodeLink link) { MyLink = link; }
+        protected NodeLinkController(NodeLink link) { MyLink = link; }
 
-		public static NodeLinkController GetController(NodeLink link)
-		{
-			if (link.Controller != null)
-				return (NodeLinkController)link.Controller;
-			return new NodeLinkController(link);
-		}
+        public static NodeLinkController GetController(NodeLink link) {
+            if (link.Controller != null)
+                return (NodeLinkController)link.Controller;
+            return new NodeLinkController(link);
+        }
 
-		public void Delete() { MyLink.MyGraph.DeleteLink(MyLink.ReadOnlyLink); }
-		public override string ToString() { return "C: " + MyLink.ToString(); }
-	}
+        public void Delete() { MyLink.MyGraph.DeleteLink(MyLink.ReadOnlyLink); }
+        public override string ToString() { return "C: " + MyLink.ToString(); }
+    }
 }

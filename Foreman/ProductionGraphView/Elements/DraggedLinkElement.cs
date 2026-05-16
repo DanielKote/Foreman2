@@ -1,217 +1,209 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Diagnostics;
-using System.Collections.Generic;
 
-namespace Foreman
-{
-	public class DraggedLinkElement : BaseLinkElement
-	{
-		public override ItemQualityPair Item { get; protected set; }
-		public LinkType StartConnectionType { get; private set; }
-		public Point EndpointLocation { get; set; }
+namespace Foreman {
+    public class DraggedLinkElement : BaseLinkElement {
+        public override ItemQualityPair Item { get; protected set; }
+        public LinkType StartConnectionType { get; private set; }
+        public Point EndpointLocation { get; set; }
 
-		private bool dragEnded;
-		private BaseNodeElement originElement;
+        private bool dragEnded;
+        private readonly BaseNodeElement originElement;
 
-		public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item) : base(graphViewer) { Init(graphViewer, startNode, startConnectionType, item); }
-		protected DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item, DraggedLinkElement masterLink) : base(graphViewer, masterLink) { Init(graphViewer, startNode, startConnectionType, item); }
+        public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item) : base(graphViewer) {
+            if (startNode == null)
+                throw new ArgumentNullException(nameof(startNode), "Cant create a dragged link element with a null startNode!");
+            originElement = startNode;
+            Init(startConnectionType, item);
+        }
+        protected DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item, DraggedLinkElement masterLink) : base(graphViewer, masterLink) {
+            if (startNode == null)
+                throw new ArgumentNullException(nameof(startNode), "Cant create a dragged link element with a null startNode!");
+            originElement = startNode;
+            Init(startConnectionType, item);
+        }
 
-		protected void Init(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item)
-		{
-			if (startNode == null)
-				Trace.Fail("Cant create a dragged link element with a null startNode!");
+        private void Init(LinkType startConnectionType, ItemQualityPair item) {
+            if (startConnectionType == LinkType.Input)
+                ConsumerElement = originElement;
+            else
+                SupplierElement = originElement;
 
-			originElement = startNode;
-			if (startConnectionType == LinkType.Input)
-				ConsumerElement = startNode;
-			else
-				SupplierElement = startNode;
+            StartConnectionType = startConnectionType;
+            Item = item;
 
-			StartConnectionType = startConnectionType;
-			Item = item;
-
-			dragEnded = false;
-		}
+            dragEnded = false;
+        }
 
 
-		public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder) { Visible = true; } //always visible.
+        public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder) { Visible = true; } //always visible.
 
-		public override void PrePaint()
-		{
-			UpdateSlaveLinks();
-			foreach (DraggedLinkElement slaveLink in SubElements.Where(e => e is DraggedLinkElement))
-				slaveLink.LinkWidth = this.LinkWidth;
-		}
+        public override void PrePaint() {
+            UpdateSlaveLinks();
+            foreach (DraggedLinkElement slaveLink in SubElements.Where(e => e is DraggedLinkElement))
+                slaveLink.LinkWidth = this.LinkWidth;
+        }
 
-		protected override Tuple<Point,Point> GetCurveEndpoints()
-		{
-			if (dragEnded)
-				return null; //no update
+        protected override Tuple<Point, Point>? GetCurveEndpoints() {
+            if (dragEnded)
+                return null; //no update
 
-			Point supplierPoint = EndpointLocation;
-			Point consumerPoint = EndpointLocation;
-			if(SupplierElement != null)
-				supplierPoint = iconOnlyDraw ? SupplierElement.Location : SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
-			if(ConsumerElement != null)
-				consumerPoint = iconOnlyDraw ? ConsumerElement.Location : ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
+            Point supplierPoint = EndpointLocation;
+            Point consumerPoint = EndpointLocation;
+            if (SupplierElement != null)
+                supplierPoint = iconOnlyDraw ? SupplierElement.Location : SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
+            if (ConsumerElement != null)
+                consumerPoint = iconOnlyDraw ? ConsumerElement.Location : ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
 
-			return new Tuple<Point, Point>(supplierPoint, consumerPoint);
-		}
+            return new Tuple<Point, Point>(supplierPoint, consumerPoint);
+        }
 
-		protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections()
-		{
+        protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections() {
 
-			if (SupplierElement == null)
-			{
-				if (myParent is DraggedLinkElement masterLinkElement)
-				{
-					Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
-					if (masterDirections.Item2 == ConsumerElement.DisplayedNode.NodeDirection)
-						return masterDirections;
-					return new Tuple<NodeDirection, NodeDirection>(masterLinkElement.GetEndpointDirections().Item1 == NodeDirection.Up? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
-				}
+            if (SupplierElement == null) {
+                if (ConsumerElement == null)
+                    return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, graphViewer.Graph.DefaultNodeDirection);
 
-				if (!graphViewer.SmartNodeDirection)
-					return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+                if (myParent is DraggedLinkElement masterLinkElement) {
+                    Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
+                    if (masterDirections.Item2 == ConsumerElement.DisplayedNode.NodeDirection)
+                        return masterDirections;
+                    return new Tuple<NodeDirection, NodeDirection>(masterLinkElement.GetEndpointDirections().Item1 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
+                }
 
-				Point consumerPoint = iconOnlyDraw ? ConsumerElement.Location : ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
-				if ((ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up && consumerPoint.Y > EndpointLocation.Y) || (ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Down && consumerPoint.Y < EndpointLocation.Y))
-					return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
-				return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
-			}
-			if (ConsumerElement == null)
-			{
-				if (myParent is DraggedLinkElement masterLinkElement)
-				{
-					Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
-					if (masterDirections.Item1 == SupplierElement.DisplayedNode.NodeDirection)
-						return masterDirections;
-					return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, masterLinkElement.GetEndpointDirections().Item2 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
-				}
+                if (!graphViewer.SmartNodeDirection)
+                    return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
 
-				if (!graphViewer.SmartNodeDirection)
-					return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
+                Point consumerPoint = iconOnlyDraw ? ConsumerElement.Location : ConsumerElement.GetInputLineItemTab(Item).GetConnectionPoint();
+                if ((ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up && consumerPoint.Y > EndpointLocation.Y) || (ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Down && consumerPoint.Y < EndpointLocation.Y))
+                    return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up, ConsumerElement.DisplayedNode.NodeDirection);
+                return new Tuple<NodeDirection, NodeDirection>(ConsumerElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+            }
+            if (ConsumerElement == null) {
+                if (SupplierElement == null)
+                    return new Tuple<NodeDirection, NodeDirection>(graphViewer.Graph.DefaultNodeDirection, graphViewer.Graph.DefaultNodeDirection);
 
-				Point supplierPoint = iconOnlyDraw ? SupplierElement.Location : SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
-				if ((SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up && supplierPoint.Y < EndpointLocation.Y) || (SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Down && supplierPoint.Y > EndpointLocation.Y))
-					return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
-				return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection);
-			}
+                if (myParent is DraggedLinkElement masterLinkElement) {
+                    Tuple<NodeDirection, NodeDirection> masterDirections = masterLinkElement.GetEndpointDirections();
+                    if (masterDirections.Item1 == SupplierElement.DisplayedNode.NodeDirection)
+                        return masterDirections;
+                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, masterLinkElement.GetEndpointDirections().Item2 == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+                }
 
-			return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
-		}
+                if (!graphViewer.SmartNodeDirection)
+                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, graphViewer.Graph.DefaultNodeDirection);
 
-		private void EndDrag(Point graph_point)
-		{
-			dragEnded = true;
+                Point supplierPoint = iconOnlyDraw ? SupplierElement.Location : SupplierElement.GetOutputLineItemTab(Item).GetConnectionPoint();
+                if ((SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up && supplierPoint.Y < EndpointLocation.Y) || (SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Down && supplierPoint.Y > EndpointLocation.Y))
+                    return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up);
+                return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, SupplierElement.DisplayedNode.NodeDirection);
+            }
 
-			if (SupplierElement != null && ConsumerElement != null) //no nulls -> this is a 'link 2 nodes' operation
-			{
-				graphViewer.Graph.CreateLink(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
+            return new Tuple<NodeDirection, NodeDirection>(SupplierElement.DisplayedNode.NodeDirection, ConsumerElement.DisplayedNode.NodeDirection);
+        }
 
-				graphViewer.Graph.UpdateNodeValues();
-				graphViewer.UpdateGraphBounds();
-				graphViewer.Invalidate();
-				graphViewer.DisposeLinkDrag();
-			}
-			else if(SubElements.Any(e => e is DraggedLinkElement)) //at least one null + sub-link -> this is an 'add new passthrough nodes operation
-			{
-				graphViewer.AddPassthroughNodesFromSelection(StartConnectionType, (Size)Point.Subtract(EndpointLocation, (Size)originElement.Location));
-			}
-			else //at least one null -> this is an 'add new recipe' operation
-			{
-				Point screenPoint = new Point(graphViewer.GraphToScreen(graph_point).X - 150, 15);
-				screenPoint.X = Math.Max(15, Math.Min(graphViewer.Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
+        private void EndDrag(Point graph_point) {
+            dragEnded = true;
 
-				if (StartConnectionType == LinkType.Input && SupplierElement == null)
-					graphViewer.AddNewNode(screenPoint, Item, EndpointLocation, NewNodeType.Supplier, ConsumerElement, true);
-				else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
-					graphViewer.AddNewNode(screenPoint, Item, EndpointLocation, NewNodeType.Consumer, SupplierElement, true);
-				else
-					Trace.Fail("Both null dragged link!");
-			}
-		}
+            if (SupplierElement != null && ConsumerElement != null) //no nulls -> this is a 'link 2 nodes' operation
+            {
+                graphViewer.Graph.CreateLink(SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode, this.Item);
 
-		public override void MouseDown(Point graph_point, MouseButtons button)
-		{
-			if (button == MouseButtons.Left)
-				EndDrag(graph_point);
-			else if (button == MouseButtons.Right) //cancel drag-link
-				graphViewer.DisposeLinkDrag();
-		}
+                graphViewer.Graph.UpdateNodeValues();
+                graphViewer.UpdateGraphBounds();
+                graphViewer.Invalidate();
+                graphViewer.DisposeLinkDrag();
+            } else if (SubElements.Any(e => e is DraggedLinkElement)) //at least one null + sub-link -> this is an 'add new passthrough nodes operation
+              {
+                graphViewer.AddPassthroughNodesFromSelection(StartConnectionType, (Size)Point.Subtract(EndpointLocation, (Size)originElement.Location));
+            } else //at least one null -> this is an 'add new recipe' operation
+              {
+                Point screenPoint = new Point(graphViewer.GraphToScreen(graph_point).X - 150, 15);
+                screenPoint.X = Math.Max(15, Math.Min(graphViewer.Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
 
-		public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged)
-		{
-			if (button == MouseButtons.Left)
-				EndDrag(graph_point);
-		}
+                if (StartConnectionType == LinkType.Input && SupplierElement == null)
+                    graphViewer.AddNewNode(screenPoint, Item, EndpointLocation, NewNodeType.Supplier, ConsumerElement, true);
+                else if (StartConnectionType == LinkType.Output && ConsumerElement == null)
+                    graphViewer.AddNewNode(screenPoint, Item, EndpointLocation, NewNodeType.Consumer, SupplierElement, true);
+                else
+                    Trace.Fail("Both null dragged link!");
+            }
+        }
 
-		public override void MouseMoved(Point graph_point)
-		{
-			if (dragEnded)
-				return;
+        public override void MouseDown(Point graph_point, MouseButtons button) {
+            if (button == MouseButtons.Left)
+                EndDrag(graph_point);
+            else if (button == MouseButtons.Right) //cancel drag-link
+                graphViewer.DisposeLinkDrag();
+        }
 
-			BaseNodeElement mousedElement = graphViewer.GetNodeAtPoint(graph_point);
-			if (mousedElement != null)
-			{
-				if (StartConnectionType == LinkType.Input && mousedElement.DisplayedNode.Outputs.Contains(Item))
-					SupplierElement = mousedElement;
-				else if (StartConnectionType == LinkType.Output && mousedElement.DisplayedNode.Inputs.Contains(Item))
-					ConsumerElement = mousedElement;
+        public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged) {
+            if (button == MouseButtons.Left)
+                EndDrag(graph_point);
+        }
 
-				//if we have found a possible connection above (both supplier & consumer are no longer null), but the item temperature check fails, break connection
-				if (SupplierElement != null &&
-					ConsumerElement != null &&
-					!LinkChecker.IsPossibleConnection(Item, SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode))
-				{
-					if (StartConnectionType == LinkType.Input)
-						SupplierElement = null;
-					else  //if(StartConnectionType == LinkType.Output)
-						ConsumerElement = null;
-				}
+        public override void MouseMoved(Point graph_point) {
+            if (dragEnded)
+                return;
 
-				if(SupplierElement != null && ConsumerElement != null && SubElements.Any(e => e is DraggedLinkElement))
-					foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
-						link.Dispose();
-			}
-			else //no node under mouse, break any previously established connections (ex:when mouse drag leaves a possible connection)
-			{
-				if (StartConnectionType == LinkType.Input)
-					SupplierElement = null;
-				else  //if(StartConnectionType == LinkType.Output)
-					ConsumerElement = null;
-			}
-			UpdateEndpoint();
-		}
+            BaseNodeElement? mousedElement = graphViewer.GetNodeAtPoint(graph_point);
+            if (mousedElement != null) {
+                if (StartConnectionType == LinkType.Input && mousedElement.DisplayedNode.Outputs.Contains(Item))
+                    SupplierElement = mousedElement;
+                else if (StartConnectionType == LinkType.Output && mousedElement.DisplayedNode.Inputs.Contains(Item))
+                    ConsumerElement = mousedElement;
 
-		private void UpdateSlaveLinks()
-		{
-			if (SupplierElement == null || ConsumerElement == null)
-			{
-				if ((Control.ModifierKeys & Keys.Control) == Keys.Control && !SubElements.Any(e => e is DraggedLinkElement) && originElement is PassthroughNodeElement && graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(originElement) && !graphViewer.SelectedNodes.Any(e => !(e is PassthroughNodeElement)))
-					foreach (PassthroughNodeElement node in graphViewer.SelectedNodes.Where(e => e != originElement))
-						new DraggedLinkElement(graphViewer, node, StartConnectionType, ((ReadOnlyPassthroughNode)node.DisplayedNode).PassthroughItem, this);
-				else if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
-					foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
-						link.Dispose();
-				UpdateEndpoint();
-			}
-		}
+                //if we have found a possible connection above (both supplier & consumer are no longer null), but the item temperature check fails, break connection
+                if (SupplierElement != null &&
+                    ConsumerElement != null &&
+                    !LinkChecker.IsPossibleConnection(Item, SupplierElement.DisplayedNode, ConsumerElement.DisplayedNode)) {
+                    if (StartConnectionType == LinkType.Input)
+                        SupplierElement = null;
+                    else  //if(StartConnectionType == LinkType.Output)
+                        ConsumerElement = null;
+                }
 
-		private void UpdateEndpoint()
-		{
-			EndpointLocation = graphViewer.ScreenToGraph(graphViewer.PointToClient(Cursor.Position));
-			if (graphViewer.Grid.ShowGrid && graphViewer.Grid.CurrentGridUnit > 0)
-				EndpointLocation = graphViewer.Grid.AlignToGrid(EndpointLocation);
+                if (SupplierElement != null && ConsumerElement != null && SubElements.Any(e => e is DraggedLinkElement))
+                    foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
+                        link.Dispose();
+            } else //no node under mouse, break any previously established connections (ex:when mouse drag leaves a possible connection)
+              {
+                if (StartConnectionType == LinkType.Input)
+                    SupplierElement = null;
+                else  //if(StartConnectionType == LinkType.Output)
+                    ConsumerElement = null;
+            }
+            UpdateEndpoint();
+        }
 
-			if (SubElements.Any(e => e is DraggedLinkElement))
-			{
-				foreach (DraggedLinkElement slaveLink in SubElements.Where(e => e is DraggedLinkElement))
-					slaveLink.EndpointLocation = Point.Add((StartConnectionType == LinkType.Input ? slaveLink.ConsumerElement : slaveLink.SupplierElement).Location, (Size)Point.Subtract(EndpointLocation, (Size)originElement.Location));
-			}
-		}
-	}
+        private void UpdateSlaveLinks() {
+            if (SupplierElement == null || ConsumerElement == null) {
+                if ((Control.ModifierKeys & Keys.Control) == Keys.Control && !SubElements.Any(e => e is DraggedLinkElement) && originElement is PassthroughNodeElement && graphViewer.SelectedNodes.Count > 1 && graphViewer.SelectedNodes.Contains(originElement) && !graphViewer.SelectedNodes.Any(e => !(e is PassthroughNodeElement)))
+                    foreach (PassthroughNodeElement node in graphViewer.SelectedNodes.Where(e => e != originElement))
+                        new DraggedLinkElement(graphViewer, node, StartConnectionType, ((ReadOnlyPassthroughNode)node.DisplayedNode).PassthroughItem, this);
+                else if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
+                    foreach (DraggedLinkElement link in SubElements.Where(e => e is DraggedLinkElement).ToList())
+                        link.Dispose();
+                UpdateEndpoint();
+            }
+        }
+
+        private void UpdateEndpoint() {
+            EndpointLocation = graphViewer.ScreenToGraph(graphViewer.PointToClient(Cursor.Position));
+            if (graphViewer.Grid.ShowGrid && graphViewer.Grid.CurrentGridUnit > 0)
+                EndpointLocation = graphViewer.Grid.AlignToGrid(EndpointLocation);
+
+            if (SubElements.Any(e => e is DraggedLinkElement)) {
+                foreach (DraggedLinkElement slaveLink in SubElements.Where(e => e is DraggedLinkElement)) {
+                    BaseNodeElement? anchor = StartConnectionType == LinkType.Input ? slaveLink.ConsumerElement : slaveLink.SupplierElement;
+                    if (anchor != null)
+                        slaveLink.EndpointLocation = Point.Add(anchor.Location, (Size)Point.Subtract(EndpointLocation, (Size)originElement.Location));
+                }
+            }
+        }
+    }
 }
