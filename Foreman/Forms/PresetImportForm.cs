@@ -261,12 +261,12 @@ namespace Foreman {
 #endif
                     UserMessages.Show("Foreman export could not be completed - possible mod conflict detected. Please run factorio and ensure it can successfully load to menu before retrying.");
                     ErrorLogging.LogLine("Foreman export failed partway. Consult errorExporting.json for full output (and search for <<<END-EXPORT-P1>>> or <<<END-EXPORT-P2>>>, at least one of which is missing)");
-                    File.WriteAllText(Path.Combine(Application.StartupPath, "errorExporting.json"), resultString);
+                    Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "errorExporting.json"), resultString);
                     CleanupFailedImport(modsPath);
                     return "";
                 }
 #if DEBUG
-                File.WriteAllText(Path.Combine(Application.StartupPath, "debugExporting.json"), resultString);
+                Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "debugExporting.json"), resultString);
 #endif
 
                 string lnamesString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-LN>>>") + 23);
@@ -285,8 +285,8 @@ namespace Foreman {
                     localisedNames.Add('$' + i.ToString(), lnames[(i * 2) + 1].Replace("Unknown key: \"", "").Replace("\"", ""));
 
 #if DEBUG
-                File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
-                File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
+                Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
+                Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
 #endif
                 JsonObject? iconJObject = null;
                 JsonObject? dataJObject = null;
@@ -296,8 +296,8 @@ namespace Foreman {
                 } catch (Exception ex) {
                     UserMessages.Show("Foreman export could not be completed - unknown json parsing error.\nSorry");
                     ErrorLogging.LogException(ex, "json parsing of export mod output failed (" + foremanModName + "); consult _iconJObjectOut.json and _dataJObjectOut.json");
-                    File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
-                    File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
+                    Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
+                    Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
                     CleanupFailedImport(modsPath);
                     return "";
                 }
@@ -315,11 +315,11 @@ namespace Foreman {
                 }
 
                 //save new preset (data)
-                File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".pjson"), PresetJson.WriteIndented(dataJObject));
+                Utf8File.WriteAllText(Path.Combine(Application.StartupPath, presetPath + ".pjson"), PresetJson.WriteIndented(dataJObject));
                 File.Copy(Path.Combine(Application.StartupPath, "baseCustom.json"), Path.Combine(Application.StartupPath, presetPath + ".json"), true);
 #if DEBUG
-                File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), PresetJson.WriteIndented(iconJObject));
-                File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), PresetJson.WriteIndented(dataJObject));
+                Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), PresetJson.WriteIndented(iconJObject));
+                Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), PresetJson.WriteIndented(dataJObject));
 #endif
 
                 if (token.IsCancellationRequested) {

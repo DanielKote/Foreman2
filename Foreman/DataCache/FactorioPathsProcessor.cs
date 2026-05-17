@@ -26,7 +26,7 @@ namespace Foreman {
             if (steamPath is not null) {
                 string libraryFoldersFilePath = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
                 if (File.Exists(libraryFoldersFilePath)) {
-                    string[] steamLSettings = File.ReadAllLines(libraryFoldersFilePath);
+                    string[] steamLSettings = Utf8File.ReadAllLines(libraryFoldersFilePath);
                     foreach (string line in steamLSettings) {
                         if (line.Contains("\"path\"")) {
                             string libraryPath = line.Substring(0, line.LastIndexOf("\""));
@@ -52,7 +52,7 @@ namespace Foreman {
                 return "";
             }
 
-            string config = File.ReadAllText(configPath);
+            string config = Utf8File.ReadAllText(configPath);
             string configIniPath = Path.Combine(ProcessPathString(config.Substring(12, config.IndexOf('\n') - 12), installPath), "config.ini");
 
             //read config.ini file
@@ -62,7 +62,7 @@ namespace Foreman {
                 ErrorLogging.LogLine(string.Format("config.ini file was not found at {0}. config-path.cfg was at {1} and linked here.", configIniPath, configPath));
                 return "";
             }
-            string[] configIni = File.ReadAllLines(configIniPath);
+            string[] configIni = Utf8File.ReadAllLines(configIniPath);
             string writePath = "";
             foreach (string line in configIni)
                 if (line.IndexOf("write-data") != -1 && line.IndexOf(";") != 0)

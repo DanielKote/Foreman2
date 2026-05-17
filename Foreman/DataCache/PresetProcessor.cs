@@ -18,7 +18,7 @@ namespace Foreman {
                 return new PresetInfo(null, false, false);
 
             try {
-                JsonObject jsonData = PresetJson.ParseObject(File.ReadAllText(presetPath));
+                JsonObject jsonData = PresetJson.ParseObject(Utf8File.ReadAllText(presetPath));
                 foreach (JsonNode objJsonNode in PresetJson.EnumerateArray(jsonData, "mods"))
                     if (PresetJson.GetString(objJsonNode, "name") is string name && PresetJson.GetString(objJsonNode, "version") is string version)
                         mods.Add(name, version);
@@ -36,9 +36,9 @@ namespace Foreman {
             string presetPath = GetPresetPath(preset.Name, ".pjson");
             string presetCustomPath = GetPresetPath(preset.Name, ".json");
 
-            JsonObject jsonData = PresetJson.ParseObject(File.ReadAllText(presetPath));
+            JsonObject jsonData = PresetJson.ParseObject(Utf8File.ReadAllText(presetPath));
             if (File.Exists(presetCustomPath))
-                PresetJson.MergePresetOverlay(jsonData, PresetJson.ParseObject(File.ReadAllText(presetCustomPath)));
+                PresetJson.MergePresetOverlay(jsonData, PresetJson.ParseObject(Utf8File.ReadAllText(presetCustomPath)));
             return jsonData;
         }
 

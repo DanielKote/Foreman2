@@ -653,7 +653,7 @@ namespace Foreman {
                     //export to csv.
                     StringBuilder csvBuilder = new StringBuilder();
                     csvLines.ForEach(line => { csvBuilder.AppendLine(string.Join(",", line)); });
-                    File.WriteAllText(dialog.FileName, csvBuilder.ToString());
+                    Utf8File.WriteAllText(dialog.FileName, csvBuilder.ToString());
                 }
             }
         }

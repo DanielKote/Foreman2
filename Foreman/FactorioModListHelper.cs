@@ -6,7 +6,7 @@ namespace Foreman {
     internal static class FactorioModListHelper {
         public static void SetModState(string modsPath, string modName, bool enabled, bool removeFromListWhenDisabled = false) {
             string modListPath = Path.Combine(modsPath, "mod-list.json");
-            JsonObject modlist = File.Exists(modListPath) ? PresetJson.ParseObject(File.ReadAllText(modListPath)) : new JsonObject();
+            JsonObject modlist = File.Exists(modListPath) ? PresetJson.ParseObject(Utf8File.ReadAllText(modListPath)) : new JsonObject();
             if (modlist["mods"] is not JsonArray modsArray) {
                 modsArray = new JsonArray();
                 modlist["mods"] = modsArray;
@@ -26,7 +26,7 @@ namespace Foreman {
             }
 
             try {
-                File.WriteAllText(modListPath, PresetJson.WriteIndented(modlist));
+                Utf8File.WriteAllText(modListPath, PresetJson.WriteIndented(modlist));
             } catch (Exception ex) {
                 ErrorLogging.LogException(ex, string.Format("Failed to update mod-list.json at {0}", modListPath));
             }

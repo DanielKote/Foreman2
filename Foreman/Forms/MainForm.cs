@@ -177,7 +177,7 @@ namespace Foreman {
             try {
                 GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
                 string json = GraphSaveCodec.WriteViewerToString(GraphViewer, writeIndented: true);
-                File.WriteAllText(path, json);
+                Utf8File.WriteAllText(path, json);
                 savefilePath = path;
                 savefileBaselineJson = json;
                 this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
@@ -208,7 +208,7 @@ namespace Foreman {
 
         private async void LoadGraph(string path) {
             try {
-                await GraphViewer.LoadFromJson(File.ReadAllText(path), false, true);
+                await GraphViewer.LoadFromJson(Utf8File.ReadAllText(path), false, true);
                 savefilePath = path;
                 CaptureSaveBaseline();
             } catch (Exception exception) {
@@ -272,7 +272,7 @@ namespace Foreman {
 
         private void ImportGraph(string path) {
             try {
-                ProductionGraphSaveDocument? graphDocument = GraphSaveCodec.ReadGraphPayload(File.ReadAllText(path));
+                ProductionGraphSaveDocument? graphDocument = GraphSaveCodec.ReadGraphPayload(Utf8File.ReadAllText(path));
                 if (graphDocument is null)
                     throw new Exception(
                         "This save file is too old or corrupt. Try opening it in Foreman 2.2.16.1 and saving it again, then open the new file here.");
@@ -301,7 +301,7 @@ namespace Foreman {
 
             GraphViewer.Graph.SerializeNodeIdSet = null;
             string currentSaveJson = GraphSaveCodec.WriteViewerToString(GraphViewer, writeIndented: true);
-            string? savedJson = savefileBaselineJson ?? File.ReadAllText(savefilePath);
+            string? savedJson = savefileBaselineJson ?? Utf8File.ReadAllText(savefilePath);
 
             if (savedJson != currentSaveJson) {
                 DialogResult result = UserMessages.Show("The current graph has been modified!\nDo you wish to save before continuing?", exitTitle, MessageBoxButtons.YesNoCancel);

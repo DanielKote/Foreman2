@@ -8,13 +8,13 @@ namespace Foreman {
     public static class ErrorLogging {
         public static void ClearLog() {
             if (File.Exists(Path.Combine(Application.StartupPath, "errorlog.txt")))
-                File.WriteAllText(Path.Combine(Application.StartupPath, "errorlog.txt"), "");
+                Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "errorlog.txt"), "");
         }
 
         public static void LogLine(string message) {
             string line = "[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "]: " + message + "\n";
             try {
-                File.AppendAllText(Path.Combine(Application.StartupPath, "errorlog.txt"), line);
+                Utf8File.AppendAllText(Path.Combine(Application.StartupPath, "errorlog.txt"), line);
             } catch (Exception writeFailure) {
                 Trace.WriteLine("Failed to write errorlog.txt: " + writeFailure);
                 Trace.WriteLine(line.TrimEnd());

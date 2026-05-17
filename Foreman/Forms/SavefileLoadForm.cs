@@ -100,7 +100,7 @@ namespace Foreman {
                     userDataPath = Path.GetDirectoryName(userDataPath); //done one more time to get the actual user directory, not the saves folder
 
                     string currentLog = Path.Combine(userDataPath ?? "", "factorio-current.log");
-                    string[] currentLogLines = File.ReadAllLines(currentLog);
+                    string[] currentLogLines = Utf8File.ReadAllLines(currentLog);
                     foreach (string line in currentLogLines) {
                         if (line.Contains("Program arguments")) {
                             factorioPath = line.Substring(line.IndexOf("\"") + 1);
