@@ -1282,7 +1282,7 @@ namespace Foreman {
             GraphViewerSaveDocument? saveDocument = GraphSaveCodec.ReadViewer(json);
             if (saveDocument is null) {
                 ShowCannotLoadSave(
-                    "This save file is too old or corrupt. Try opening it in Foreman 2.2.16.1 and saving it again, then open the new file here.");
+                        "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here.");
                 return;
             }
             await LoadFromSaveDocument(saveDocument, useFirstPreset, setEnablesFromJson);

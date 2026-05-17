@@ -13,9 +13,7 @@
     <Company></Company>
     <Product>Foreman</Product>
     <Copyright>Copyright ©2021 Daniel Kotes; ©2014 Nick Powell</Copyright>
-    <Version>2.2.16.1</Version>
-    <AssemblyVersion>2.2.16.1</AssemblyVersion>
-    <FileVersion>2.2.16.1</FileVersion>
+    <VersionPrefix>99.99.99</VersionPrefix>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>

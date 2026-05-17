@@ -63,9 +63,7 @@ namespace Foreman {
         private void MainForm_Load(object? sender, EventArgs e) {
             WindowState = FormWindowState.Maximized;
 
-            Version? assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            if (assemblyVersion is not null)
-                VersionLabel.Text = string.Format("v{0}.{1}.{2}.{3}", assemblyVersion.Major, assemblyVersion.Minor, assemblyVersion.Build, assemblyVersion.Revision);
+            VersionLabel.Text = AppVersion.Display;
 
             if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
                 Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
@@ -213,7 +211,7 @@ namespace Foreman {
                 CaptureSaveBaseline();
             } catch (Exception exception) {
                 UserMessages.Show(
-                    "This save file is too old or corrupt. Try opening it in Foreman 2.2.16.1 and saving it again, then open the new file here.");
+                    "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here.");
                 ErrorLogging.LogException(exception, string.Format("Error loading file '{0}'", path));
             }
 
@@ -275,7 +273,7 @@ namespace Foreman {
                 ProductionGraphSaveDocument? graphDocument = GraphSaveCodec.ReadGraphPayload(Utf8File.ReadAllText(path));
                 if (graphDocument is null)
                     throw new Exception(
-                        "This save file is too old or corrupt. Try opening it in Foreman 2.2.16.1 and saving it again, then open the new file here.");
+                    "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here.");
                 GraphViewer.ImportNodesFromDocument(
                     graphDocument,
                     GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2)),

@@ -1,0 +1,54 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches-ignore: ['*']
+    tags: ['v*']
+
+jobs:
+  Windows:
+    name: Windows Release
+    if: ${{ !contains(github.event.head_commit.message, '[CI Skip]') }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{github.ref}}
+          fetch-depth: 0
+      - name: Get Tag Info
+        id: ghd
+        uses: proudust/gh-describe@v2
+      - name: Extract Tag Version
+        id: tag
+        uses: bhowell2/github-substring-action@1.0.2
+        with:
+          value: ${{steps.ghd.outputs.tag}}
+          output_name: tag
+          index_of_str: v
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5.2.0
+        with:
+          dotnet-version: '10.x'
+      - name: Restore Dependencies
+        run: dotnet restore -r win-x64
+      - name: Build Foreman Snapshot
+        run: dotnet build Foreman -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:IncludeSourceRevisionInInformationalVersion=false --configuration Release -r win-x64
+      - name: Test Foreman
+        run: dotnet test --configuration Release -r win-x64
+      - name: Package Foreman (Self-Contained)
+        run: dotnet publish Foreman --sc true -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:IncludeSourceRevisionInInformationalVersion=false -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
+      - name: Package Foreman (.NET Dependent)
+        run: dotnet publish Foreman --sc false -p:PublishSingleFile=true -o dist -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:IncludeSourceRevisionInInformationalVersion=false --configuration Release -r win-x64
+      - name: Archive Foreman (Self-Contained)
+        run: Compress-Archive -Path distsc/* -DestinationPath ForemanSC.zip
+      - name: Archive Foreman (.NET Dependent)
+        run: Compress-Archive -Path dist/* -DestinationPath Foreman.zip
+      - name: Draft Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            ForemanSC.zip
+            Foreman.zip
+          draft: true
+
