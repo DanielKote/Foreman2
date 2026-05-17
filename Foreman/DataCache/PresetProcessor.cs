@@ -148,7 +148,12 @@ namespace Foreman {
 
                     RecipeShort recipe = new RecipeShort(string.Format("§§r:b:{0}:{1}:{2}", ingredient, product, temp.ToString()));
                     recipe.Ingredients.Add(ingredient, 60);
-                    recipe.Products.Add(product, 60);
+                    double ingredientHeatCapacity = GetFluidHeatCapacity(jsonData, ingredient);
+                    double productHeatCapacity = GetFluidHeatCapacity(jsonData, product);
+                    double productQuantity = productHeatCapacity > 0
+                        ? 60 * ingredientHeatCapacity / productHeatCapacity
+                        : 60;
+                    recipe.Products.Add(product, productQuantity);
 
                     if (!presetRecipes.ContainsKey(recipe.Name))
                         presetRecipes.Add(recipe.Name, recipe);
@@ -254,6 +259,14 @@ namespace Foreman {
                     errors.MissingQualities.Add(qualityName);
             }
             return errors;
+        }
+
+        private static double GetFluidHeatCapacity(JsonObject jsonData, string fluidName) {
+            foreach (JsonNode fluidNode in PresetJson.EnumerateArray(jsonData, "fluids")) {
+                if (PresetJson.GetString(fluidNode, "name") == fluidName)
+                    return PresetJson.GetDouble(fluidNode, "heat_capacity") ?? 0;
+            }
+            return 0;
         }
 
         private static void AddResourceExtractionRecipe(JsonNode objJsonNode, Dictionary<string, RecipeShort> presetRecipes) {

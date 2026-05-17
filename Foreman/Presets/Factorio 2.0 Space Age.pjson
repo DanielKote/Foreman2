@@ -10320,7 +10320,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 4000,
+          "max": 4000
+        }
+      ],
       "ingredients": [
         {
           "name": "tungsten-plate",
@@ -10491,7 +10497,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 4000,
+          "max": 4000
+        }
+      ],
       "ingredients": [
         {
           "name": "tungsten-plate",
@@ -10677,7 +10689,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 4000,
+          "max": 4000
+        }
+      ],
       "ingredients": [
         {
           "name": "processing-unit",
@@ -12845,7 +12863,7 @@
       "icon_alt_name": "icon.i.stone-brick",
       "enabled": true,
       "category": "smelting",
-      "energy": 3.2,
+      "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "a[stone-brick]",
       "subgroup": "terrain",
       "maximum_productivity": 3,
@@ -13267,7 +13285,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "spoilage",
@@ -13320,7 +13344,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "ingredients": [
         {
           "name": "yumako-seed",
@@ -13376,7 +13406,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "spoilage",
@@ -13429,7 +13465,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "ingredients": [
         {
           "name": "jellynut-seed",
@@ -14160,7 +14202,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 100,
+          "max": 600
+        }
+      ],
       "ingredients": [
         {
           "name": "tungsten-plate",
@@ -14206,7 +14254,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 100,
+          "max": 600
+        }
+      ],
       "ingredients": [
         {
           "name": "tungsten-plate",
@@ -14342,7 +14396,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 4000,
+          "max": 4000
+        }
+      ],
       "ingredients": [
         {
           "name": "advanced-circuit",
@@ -14608,7 +14668,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 4000,
+          "max": 4000
+        }
+      ],
       "ingredients": [
         {
           "name": "steel-plate",
@@ -14664,7 +14730,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "magnetic-field",
+          "min": 99,
+          "max": 99
+        }
+      ],
       "ingredients": [
         {
           "name": "steel-plate",
@@ -14765,7 +14837,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "spoilage",
@@ -15203,7 +15281,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "magnetic-field",
+          "min": 99,
+          "max": 1.79769313486231556709071810473687946796417236328125e+308
+        }
+      ],
       "ingredients": [
         {
           "name": "steel-plate",
@@ -15254,7 +15338,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 100,
+          "max": 600
+        }
+      ],
       "ingredients": [
         {
           "name": "processing-unit",
@@ -15440,7 +15530,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "magnetic-field",
+          "min": 99,
+          "max": 99
+        }
+      ],
       "ingredients": [
         {
           "name": "steel-plate",
@@ -15486,7 +15582,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "magnetic-field",
+          "min": 99,
+          "max": 99
+        }
+      ],
       "ingredients": [
         {
           "name": "supercapacitor",
@@ -16661,7 +16763,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 4000,
+          "max": 4000
+        }
+      ],
       "ingredients": [
         {
           "name": "calcite",
@@ -16679,7 +16787,8 @@
           "name": "steam",
           "type": "fluid",
           "amount": 10000,
-          "p_amount": 10000
+          "p_amount": 10000,
+          "temperature": 500
         }
       ],
       "localised_name": "Acid neutralisation"
@@ -17257,7 +17366,7 @@
       "icon_alt_name": "icon.i.iron-plate",
       "enabled": true,
       "category": "smelting",
-      "energy": 3.2,
+      "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "a[smelting]-a[iron-plate]",
       "subgroup": "raw-material",
       "maximum_productivity": 3,
@@ -17467,7 +17576,7 @@
       "icon_alt_name": "icon.i.copper-plate",
       "enabled": true,
       "category": "smelting",
-      "energy": 3.2,
+      "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "a[smelting]-b[copper-plate]",
       "subgroup": "raw-material",
       "maximum_productivity": 3,
@@ -19750,14 +19859,14 @@
         {
           "name": "uranium-235",
           "type": "item",
-          "amount": 0.007000000000000001,
-          "p_amount": 0.007000000000000001
+          "amount": 0.00700000000000000088817841970012523233890533447265625,
+          "p_amount": 0.00700000000000000088817841970012523233890533447265625
         },
         {
           "name": "uranium-238",
           "type": "item",
-          "amount": 0.993,
-          "p_amount": 0.993
+          "amount": 0.992999999999999971578290569595992565155029296875,
+          "p_amount": 0.992999999999999971578290569595992565155029296875
         }
       ],
       "localised_name": "Uranium processing"
@@ -20281,7 +20390,7 @@
       "icon_alt_name": "icon.i.iron-plate",
       "enabled": false,
       "category": "metallurgy",
-      "energy": 3.2,
+      "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "b[casting]-a[casting-iron]",
       "subgroup": "vulcanus-processes",
       "maximum_productivity": 3,
@@ -20316,7 +20425,7 @@
       "icon_alt_name": "icon.i.copper-plate",
       "enabled": false,
       "category": "metallurgy",
-      "energy": 3.2,
+      "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "b[casting]-b[casting-copper]",
       "subgroup": "vulcanus-processes",
       "maximum_productivity": 3,
@@ -20352,7 +20461,7 @@
       "prod_research": true,
       "enabled": false,
       "category": "metallurgy",
-      "energy": 3.2,
+      "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "b[casting]-c[casting-steel]",
       "subgroup": "vulcanus-processes",
       "maximum_productivity": 3,
@@ -20856,8 +20965,8 @@
         {
           "name": "solid-fuel",
           "type": "item",
-          "amount": 0.07,
-          "p_amount": 0.07
+          "amount": 0.0700000000000000088817841970012523233890533447265625,
+          "p_amount": 0.0700000000000000088817841970012523233890533447265625
         },
         {
           "name": "concrete",
@@ -21525,7 +21634,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "iron-ore",
@@ -21616,7 +21731,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "iron-ore",
@@ -21669,7 +21790,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "copper-ore",
@@ -21760,7 +21887,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "copper-ore",
@@ -22009,7 +22142,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "spoilage",
@@ -22641,7 +22780,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 1000,
+          "max": 1000
+        }
+      ],
       "ingredients": [
         {
           "name": "wood",
@@ -22712,7 +22857,13 @@
         "pollution": true,
         "quality": false
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 1000,
+          "max": 1000
+        }
+      ],
       "trash": [
         {
           "name": "spoilage",
@@ -23062,7 +23213,8 @@
           "name": "fluoroketone-hot",
           "type": "fluid",
           "amount": 50,
-          "p_amount": 50
+          "p_amount": 50,
+          "temperature": 180
         }
       ],
       "localised_name": "Fluoroketone"
@@ -23097,7 +23249,8 @@
           "name": "fluoroketone-cold",
           "type": "fluid",
           "amount": 10,
-          "p_amount": 0
+          "p_amount": 0,
+          "temperature": -150
         }
       ],
       "localised_name": "Cooling hot fluoroketone"
@@ -23188,7 +23341,7 @@
       "icon_alt_name": "icon.i.lithium-plate",
       "enabled": false,
       "category": "smelting",
-      "energy": 6.4,
+      "energy": 6.4000000000000003552713678800500929355621337890625,
       "order": "c[lithium]-b[lithium-plate]",
       "subgroup": "aquilo-processes",
       "maximum_productivity": 3,
@@ -23270,7 +23423,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": -1.79769313486231556709071810473687946796417236328125e+308,
+          "max": 600
+        }
+      ],
       "ingredients": [
         {
           "name": "processing-unit",
@@ -23314,7 +23473,8 @@
           "name": "fluoroketone-hot",
           "type": "fluid",
           "amount": 5,
-          "p_amount": 0
+          "p_amount": 0,
+          "temperature": 180
         }
       ],
       "localised_name": "Quantum processor"
@@ -23887,7 +24047,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "gravity",
+          "min": 0,
+          "max": 0
+        }
+      ],
       "ingredients": [
         {
           "name": "ice",
@@ -23968,7 +24134,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 4000,
+          "max": 4000
+        }
+      ],
       "ingredients": [
         {
           "name": "tungsten-carbide",
@@ -24049,7 +24221,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 2000,
+          "max": 2000
+        }
+      ],
       "trash": [
         {
           "name": "spoilage",
@@ -24139,7 +24317,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "magnetic-field",
+          "min": 99,
+          "max": 99
+        }
+      ],
       "ingredients": [
         {
           "name": "supercapacitor",
@@ -24225,7 +24409,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "pressure",
+          "min": 300,
+          "max": 300
+        }
+      ],
       "ingredients": [
         {
           "name": "ice",
@@ -24312,7 +24502,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "gravity",
+          "min": 0,
+          "max": 0
+        }
+      ],
       "ingredients": [
         {
           "name": "biter-egg",
@@ -25460,7 +25656,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "gravity",
+          "min": 0,
+          "max": 0
+        }
+      ],
       "ingredients": [
         {
           "name": "carbon",
@@ -25501,7 +25703,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "gravity",
+          "min": 0,
+          "max": 0
+        }
+      ],
       "ingredients": [
         {
           "name": "carbon",
@@ -25547,7 +25755,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "gravity",
+          "min": 0,
+          "max": 0
+        }
+      ],
       "ingredients": [
         {
           "name": "iron-ore",
@@ -25588,7 +25802,13 @@
         "pollution": true,
         "quality": true
       },
-      "surface_conditions": {},
+      "surface_conditions": [
+        {
+          "property": "gravity",
+          "min": 0,
+          "max": 0
+        }
+      ],
       "ingredients": [
         {
           "name": "iron-ore",
@@ -29048,8 +29268,8 @@
         {
           "name": "jellynut-seed",
           "type": "item",
-          "amount": 0.05000000074505806,
-          "p_amount": 0.05000000074505806
+          "amount": 0.0500000007450580596923828125,
+          "p_amount": 0.0500000007450580596923828125
         },
         {
           "name": "nutrients",
@@ -29102,8 +29322,8 @@
         {
           "name": "yumako-seed",
           "type": "item",
-          "amount": 0.05000000074505806,
-          "p_amount": 0.05000000074505806
+          "amount": 0.0500000007450580596923828125,
+          "p_amount": 0.0500000007450580596923828125
         },
         {
           "name": "nutrients",
@@ -30768,8 +30988,8 @@
         {
           "name": "iron-ore",
           "type": "item",
-          "amount": 0.02500000037252903,
-          "p_amount": 0.02500000037252903
+          "amount": 0.02500000037252902984619140625,
+          "p_amount": 0.02500000037252902984619140625
         }
       ],
       "localised_name": "Concrete recycling"
@@ -35800,14 +36020,14 @@
         {
           "name": "iron-stick",
           "type": "item",
-          "amount": 0.20000000298023224,
-          "p_amount": 0.20000000298023224
+          "amount": 0.20000000298023223876953125,
+          "p_amount": 0.20000000298023223876953125
         },
         {
           "name": "steel-plate",
           "type": "item",
-          "amount": 0.02500000037252903,
-          "p_amount": 0.02500000037252903
+          "amount": 0.02500000037252902984619140625,
+          "p_amount": 0.02500000037252902984619140625
         }
       ],
       "localised_name": "Refined concrete recycling"
@@ -38535,8 +38755,8 @@
       "order": "b",
       "hidden": false,
       "level": 1,
-      "beacon_power_multiplier": 0.8333333134651184,
-      "mining_drill_resource_drain_multiplier": 0.8333333134651184,
+      "beacon_power_multiplier": 0.833333313465118408203125,
+      "mining_drill_resource_drain_multiplier": 0.833333313465118408203125,
       "next_probability": 0.1,
       "next": "rare",
       "localised_name": "Uncommon"
@@ -38547,8 +38767,8 @@
       "order": "c",
       "hidden": false,
       "level": 2,
-      "beacon_power_multiplier": 0.6666666865348816,
-      "mining_drill_resource_drain_multiplier": 0.6666666865348816,
+      "beacon_power_multiplier": 0.666666686534881591796875,
+      "mining_drill_resource_drain_multiplier": 0.666666686534881591796875,
       "next_probability": 0.1,
       "next": "epic",
       "localised_name": "Rare"
@@ -38571,8 +38791,8 @@
       "order": "e",
       "hidden": false,
       "level": 5,
-      "beacon_power_multiplier": 0.1666666716337204,
-      "mining_drill_resource_drain_multiplier": 0.1666666716337204,
+      "beacon_power_multiplier": 0.16666667163372039794921875,
+      "mining_drill_resource_drain_multiplier": 0.16666667163372039794921875,
       "localised_name": "Legendary"
     },
     {
@@ -39979,7 +40199,7 @@
       "order": "h[raw-fish]",
       "subgroup": "raw-resource",
       "stack_size": 100,
-      "weight": 3333.3333282470703,
+      "weight": 3333.3333282470703125,
       "ingredient_to_weight_coefficient": 0.5,
       "spoil_result": "spoilage",
       "q_spoil_time": [
@@ -39989,7 +40209,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 9814.983333333334
+          "value": 9814.98333333333357586525380611419677734375
         },
         {
           "quality": "rare",
@@ -39997,7 +40217,7 @@
         },
         {
           "quality": "epic",
-          "value": 14344.983333333334
+          "value": 14344.98333333333357586525380611419677734375
         },
         {
           "quality": "legendary",
@@ -40253,7 +40473,7 @@
       "subgroup": "intermediate-product",
       "stack_size": 200,
       "weight": 500,
-      "ingredient_to_weight_coefficient": 0.28,
+      "ingredient_to_weight_coefficient": 0.28000000000000003552713678800500929355621337890625,
       "localised_name": "Electronic circuit"
     },
     {
@@ -40263,7 +40483,7 @@
       "subgroup": "intermediate-product",
       "stack_size": 200,
       "weight": 1000,
-      "ingredient_to_weight_coefficient": 0.28,
+      "ingredient_to_weight_coefficient": 0.28000000000000003552713678800500929355621337890625,
       "localised_name": "Advanced circuit"
     },
     {
@@ -40272,7 +40492,7 @@
       "order": "b[circuits]-c[processing-unit]",
       "subgroup": "intermediate-product",
       "stack_size": 100,
-      "weight": 3333.3333282470703,
+      "weight": 3333.3333282470703125,
       "ingredient_to_weight_coefficient": 0.25,
       "localised_name": "Processing unit"
     },
@@ -40302,7 +40522,7 @@
       "order": "c[advanced-intermediates]-c[flying-robot-frame]",
       "subgroup": "intermediate-product",
       "stack_size": 50,
-      "weight": 6666.666656494141,
+      "weight": 6666.666656494140625,
       "ingredient_to_weight_coefficient": 0.5,
       "localised_name": "Flying robot frame"
     },
@@ -40539,7 +40759,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 4679.983333333334
+          "value": 4679.98333333333357586525380611419677734375
         },
         {
           "quality": "rare",
@@ -40547,7 +40767,7 @@
         },
         {
           "quality": "epic",
-          "value": 6839.983333333334
+          "value": 6839.98333333333357586525380611419677734375
         },
         {
           "quality": "legendary",
@@ -40579,7 +40799,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 4679.983333333334
+          "value": 4679.98333333333357586525380611419677734375
         },
         {
           "quality": "rare",
@@ -40587,7 +40807,7 @@
         },
         {
           "quality": "epic",
-          "value": 6839.983333333334
+          "value": 6839.98333333333357586525380611419677734375
         },
         {
           "quality": "legendary",
@@ -40616,7 +40836,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 77.98333333333333
+          "value": 77.9833333333333342807236476801335811614990234375
         },
         {
           "quality": "rare",
@@ -40624,7 +40844,7 @@
         },
         {
           "quality": "epic",
-          "value": 113.98333333333333
+          "value": 113.9833333333333342807236476801335811614990234375
         },
         {
           "quality": "legendary",
@@ -40653,7 +40873,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 77.98333333333333
+          "value": 77.9833333333333342807236476801335811614990234375
         },
         {
           "quality": "rare",
@@ -40661,7 +40881,7 @@
         },
         {
           "quality": "epic",
-          "value": 113.98333333333333
+          "value": 113.9833333333333342807236476801335811614990234375
         },
         {
           "quality": "legendary",
@@ -40706,7 +40926,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 389.98333333333335
+          "value": 389.983333333333348491578362882137298583984375
         },
         {
           "quality": "rare",
@@ -40714,7 +40934,7 @@
         },
         {
           "quality": "epic",
-          "value": 569.9833333333333
+          "value": 569.983333333333348491578362882137298583984375
         },
         {
           "quality": "legendary",
@@ -40746,7 +40966,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 9359.983333333334
+          "value": 9359.98333333333357586525380611419677734375
         },
         {
           "quality": "rare",
@@ -40754,7 +40974,7 @@
         },
         {
           "quality": "epic",
-          "value": 13679.983333333334
+          "value": 13679.98333333333357586525380611419677734375
         },
         {
           "quality": "legendary",
@@ -40786,7 +41006,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 233.98333333333332
+          "value": 233.983333333333320069868932478129863739013671875
         },
         {
           "quality": "rare",
@@ -40794,7 +41014,7 @@
         },
         {
           "quality": "epic",
-          "value": 341.98333333333335
+          "value": 341.983333333333348491578362882137298583984375
         },
         {
           "quality": "legendary",
@@ -40826,7 +41046,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 311.98333333333335
+          "value": 311.983333333333348491578362882137298583984375
         },
         {
           "quality": "rare",
@@ -40834,7 +41054,7 @@
         },
         {
           "quality": "epic",
-          "value": 455.98333333333335
+          "value": 455.983333333333348491578362882137298583984375
         },
         {
           "quality": "legendary",
@@ -41044,7 +41264,7 @@
         },
         {
           "quality": "uncommon",
-          "value": 4679.983333333334
+          "value": 4679.98333333333357586525380611419677734375
         },
         {
           "quality": "rare",
@@ -41052,7 +41272,7 @@
         },
         {
           "quality": "epic",
-          "value": 6839.983333333334
+          "value": 6839.98333333333357586525380611419677734375
         },
         {
           "quality": "legendary",
@@ -42725,10 +42945,10 @@
       "tier": 1,
       "module_effects": {
         "consumption": 0.5,
-        "speed": 0.20000000298023224,
+        "speed": 0.20000000298023223876953125,
         "productivity": 0,
         "pollution": 0,
-        "quality": -0.10000000149011612
+        "quality": -0.100000001490116119384765625
       },
       "localised_name": "Speed module"
     },
@@ -42740,11 +42960,11 @@
       "category": "speed",
       "tier": 2,
       "module_effects": {
-        "consumption": 0.6000000238418579,
-        "speed": 0.30000001192092896,
+        "consumption": 0.60000002384185791015625,
+        "speed": 0.300000011920928955078125,
         "productivity": 0,
         "pollution": 0,
-        "quality": -0.15000000596046448
+        "quality": -0.1500000059604644775390625
       },
       "localised_name": "Speed module 2"
     },
@@ -42756,7 +42976,7 @@
       "category": "speed",
       "tier": 3,
       "module_effects": {
-        "consumption": 0.699999988079071,
+        "consumption": 0.699999988079071044921875,
         "speed": 0.5,
         "productivity": 0,
         "pollution": 0,
@@ -42772,7 +42992,7 @@
       "category": "efficiency",
       "tier": 1,
       "module_effects": {
-        "consumption": -0.30000001192092896,
+        "consumption": -0.300000011920928955078125,
         "speed": 0,
         "productivity": 0,
         "pollution": 0,
@@ -42788,7 +43008,7 @@
       "category": "efficiency",
       "tier": 2,
       "module_effects": {
-        "consumption": -0.4000000059604645,
+        "consumption": -0.4000000059604644775390625,
         "speed": 0,
         "productivity": 0,
         "pollution": 0,
@@ -42820,10 +43040,10 @@
       "category": "productivity",
       "tier": 1,
       "module_effects": {
-        "consumption": 0.4000000059604645,
-        "speed": -0.05000000074505806,
-        "productivity": 0.03999999910593033,
-        "pollution": 0.05000000074505806,
+        "consumption": 0.4000000059604644775390625,
+        "speed": -0.0500000007450580596923828125,
+        "productivity": 0.039999999105930328369140625,
+        "pollution": 0.0500000007450580596923828125,
         "quality": 0
       },
       "localised_name": "Productivity module"
@@ -42836,10 +43056,10 @@
       "category": "productivity",
       "tier": 2,
       "module_effects": {
-        "consumption": 0.6000000238418579,
-        "speed": -0.10000000149011612,
-        "productivity": 0.05999999865889549,
-        "pollution": 0.07000000029802322,
+        "consumption": 0.60000002384185791015625,
+        "speed": -0.100000001490116119384765625,
+        "productivity": 0.0599999986588954925537109375,
+        "pollution": 0.070000000298023223876953125,
         "quality": 0
       },
       "localised_name": "Productivity module 2"
@@ -42852,10 +43072,10 @@
       "category": "productivity",
       "tier": 3,
       "module_effects": {
-        "consumption": 0.800000011920929,
-        "speed": -0.15000000596046448,
-        "productivity": 0.10000000149011612,
-        "pollution": 0.10000000149011612,
+        "consumption": 0.800000011920928955078125,
+        "speed": -0.1500000059604644775390625,
+        "productivity": 0.100000001490116119384765625,
+        "pollution": 0.100000001490116119384765625,
         "quality": 0
       },
       "localised_name": "Productivity module 3"
@@ -42869,10 +43089,10 @@
       "tier": 1,
       "module_effects": {
         "consumption": 0,
-        "speed": -0.05000000074505806,
+        "speed": -0.0500000007450580596923828125,
         "productivity": 0,
         "pollution": 0,
-        "quality": 0.10000000149011612
+        "quality": 0.100000001490116119384765625
       },
       "localised_name": "Quality module"
     },
@@ -42885,10 +43105,10 @@
       "tier": 2,
       "module_effects": {
         "consumption": 0,
-        "speed": -0.05000000074505806,
+        "speed": -0.0500000007450580596923828125,
         "productivity": 0,
         "pollution": 0,
-        "quality": 0.20000000298023224
+        "quality": 0.20000000298023223876953125
       },
       "localised_name": "Quality module 2"
     },
@@ -42901,7 +43121,7 @@
       "tier": 3,
       "module_effects": {
         "consumption": 0,
-        "speed": -0.05000000074505806,
+        "speed": -0.0500000007450580596923828125,
         "productivity": 0,
         "pollution": 0,
         "quality": 0.25
@@ -42931,15 +43151,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 2339999.9141693115
+          "value": 2339999.9141693115234375
         },
         {
           "quality": "rare",
-          "value": 2880000.0429153442
+          "value": 2880000.04291534423828125
         },
         {
           "quality": "epic",
-          "value": 3419999.9570846558
+          "value": 3419999.95708465576171875
         },
         {
           "quality": "legendary",
@@ -42979,7 +43199,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": 2.777777777777778E-07,
+        "pollution": 2.777777777777778123180496550048701465129852294921875e-07,
         "spores": 0
       },
       "fuel_categories": [
@@ -43036,15 +43256,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 1169999.9570846558
+          "value": 1169999.95708465576171875
         },
         {
           "quality": "rare",
-          "value": 1440000.0214576721
+          "value": 1440000.021457672119140625
         },
         {
           "quality": "epic",
-          "value": 1709999.9785423279
+          "value": 1709999.978542327880859375
         },
         {
           "quality": "legendary",
@@ -43089,19 +43309,19 @@
         },
         {
           "quality": "uncommon",
-          "value": 51999998.09265136
+          "value": 51999998.092651359736919403076171875
         },
         {
           "quality": "rare",
-          "value": 64000000.95367431
+          "value": 64000000.953674308955669403076171875
         },
         {
           "quality": "epic",
-          "value": 75999999.04632568
+          "value": 75999999.04632568359375
         },
         {
           "quality": "legendary",
-          "value": 99999999.99999999
+          "value": 99999999.99999998509883880615234375
         },
         {
           "quality": "quality-unknown",
@@ -43166,19 +43386,19 @@
         },
         {
           "quality": "uncommon",
-          "value": 12999999.52316284
+          "value": 12999999.52316283993422985076904296875
         },
         {
           "quality": "rare",
-          "value": 16000000.238418577
+          "value": 16000000.23841857723891735076904296875
         },
         {
           "quality": "epic",
-          "value": 18999999.76158142
+          "value": 18999999.7615814208984375
         },
         {
           "quality": "legendary",
-          "value": 24999999.999999996
+          "value": 24999999.9999999962747097015380859375
         },
         {
           "quality": "quality-unknown",
@@ -43268,15 +43488,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 7565999.722480774
+          "value": 7565999.72248077392578125
         },
         {
           "quality": "rare",
-          "value": 9312000.138759613
+          "value": 9312000.138759613037109375
         },
         {
           "quality": "epic",
-          "value": 11057999.861240387
+          "value": 11057999.861240386962890625
         },
         {
           "quality": "legendary",
@@ -43389,7 +43609,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": 1.3333333333333334E-06,
+        "pollution": 1.333333333333333481363069950020872056484222412109375e-06,
         "spores": 0
       },
       "fuel_categories": [
@@ -43491,7 +43711,7 @@
       "fuel_effectivity": 1,
       "drain": 0,
       "pollution": {
-        "pollution": 1.8518518518518519E-06,
+        "pollution": 1.85185185185185190448464709334075450897216796875e-06,
         "spores": 0
       },
       "localised_name": "Electric mining drill"
@@ -43591,7 +43811,7 @@
       "fuel_effectivity": 1,
       "drain": 0,
       "pollution": {
-        "pollution": 2.2222222222222225E-06,
+        "pollution": 2.22222222222222232090871330001391470432281494140625e-06,
         "spores": 0
       },
       "localised_name": "Big mining drill"
@@ -43768,7 +43988,7 @@
       "fuel_effectivity": 1,
       "drain": 0,
       "pollution": {
-        "pollution": 1.8518518518518519E-06,
+        "pollution": 1.85185185185185190448464709334075450897216796875e-06,
         "spores": 0
       },
       "localised_name": "Pumpjack"
@@ -43787,11 +44007,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 1.3
+          "value": 1.3000000000000000444089209850062616169452667236328125
         },
         {
           "quality": "rare",
-          "value": 1.6
+          "value": 1.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "epic",
@@ -43892,7 +44112,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": 3.7037037037037036E-07,
+        "pollution": 3.703703703703703720151452216668985784053802490234375e-07,
         "spores": 0
       },
       "fuel_categories": [
@@ -43913,15 +44133,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 2.6
+          "value": 2.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "rare",
-          "value": 3.2
+          "value": 3.20000000000000017763568394002504646778106689453125
         },
         {
           "quality": "epic",
-          "value": 3.8
+          "value": 3.79999999999999982236431605997495353221893310546875
         },
         {
           "quality": "legendary",
@@ -44018,7 +44238,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": 7.407407407407407E-07,
+        "pollution": 7.40740740740740744030290443333797156810760498046875e-07,
         "spores": 0
       },
       "fuel_categories": [
@@ -44039,15 +44259,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 2.6
+          "value": 2.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "rare",
-          "value": 3.2
+          "value": 3.20000000000000017763568394002504646778106689453125
         },
         {
           "quality": "epic",
-          "value": 3.8
+          "value": 3.79999999999999982236431605997495353221893310546875
         },
         {
           "quality": "legendary",
@@ -44145,7 +44365,7 @@
       "fuel_effectivity": 1,
       "drain": 6000,
       "pollution": {
-        "pollution": 9.259259259259259E-08,
+        "pollution": 9.25925925925925952242323546670377254486083984375e-08,
         "spores": 0
       },
       "localised_name": "Electric furnace"
@@ -44163,15 +44383,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 5.2
+          "value": 5.20000000000000017763568394002504646778106689453125
         },
         {
           "quality": "rare",
-          "value": 6.4
+          "value": 6.4000000000000003552713678800500929355621337890625
         },
         {
           "quality": "epic",
-          "value": 7.6
+          "value": 7.5999999999999996447286321199499070644378662109375
         },
         {
           "quality": "legendary",
@@ -44216,7 +44436,7 @@
       "out_pipe_filters": {},
       "io_pipes": 0,
       "io_pipe_filters": {},
-      "energy_usage": 41666.666666666664,
+      "energy_usage": 41666.6666666666642413474619388580322265625,
       "q_max_energy_usage": [
         {
           "quality": "normal",
@@ -44271,9 +44491,9 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 83333.33333333331,
+      "drain": 83333.3333333333139307796955108642578125,
       "pollution": {
-        "pollution": 4E-08,
+        "pollution": 4e-08,
         "spores": 0
       },
       "localised_name": "Foundry"
@@ -44398,7 +44618,7 @@
       "fuel_effectivity": 1,
       "drain": 6000,
       "pollution": {
-        "pollution": 1.8518518518518518E-07,
+        "pollution": 1.85185185185185190448464709334075450897216796875e-07,
         "spores": 0
       },
       "localised_name": "Recycler"
@@ -44416,15 +44636,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 2.6
+          "value": 2.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "rare",
-          "value": 3.2
+          "value": 3.20000000000000017763568394002504646778106689453125
         },
         {
           "quality": "epic",
-          "value": 3.8
+          "value": 3.79999999999999982236431605997495353221893310546875
         },
         {
           "quality": "legendary",
@@ -44469,31 +44689,31 @@
       "out_pipe_filters": {},
       "io_pipes": 0,
       "io_pipe_filters": {},
-      "energy_usage": 8333.333333333334,
+      "energy_usage": 8333.333333333333939663134515285491943359375,
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 500000.00000000006
+          "value": 500000.0000000000582076609134674072265625
         },
         {
           "quality": "uncommon",
-          "value": 500000.00000000006
+          "value": 500000.0000000000582076609134674072265625
         },
         {
           "quality": "rare",
-          "value": 500000.00000000006
+          "value": 500000.0000000000582076609134674072265625
         },
         {
           "quality": "epic",
-          "value": 500000.00000000006
+          "value": 500000.0000000000582076609134674072265625
         },
         {
           "quality": "legendary",
-          "value": 500000.00000000006
+          "value": 500000.0000000000582076609134674072265625
         },
         {
           "quality": "quality-unknown",
-          "value": 500000.00000000006
+          "value": 500000.0000000000582076609134674072265625
         }
       ],
       "q_energy_production": [
@@ -44525,7 +44745,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": -3.3333333333333334E-08,
+        "pollution": -3.333333333333333481363069950020872056484222412109375e-08,
         "spores": 0
       },
       "fuel_categories": [
@@ -44546,11 +44766,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 1.3
+          "value": 1.3000000000000000444089209850062616169452667236328125
         },
         {
           "quality": "rare",
-          "value": 1.6
+          "value": 1.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "epic",
@@ -44596,7 +44816,7 @@
       "out_pipe_filters": {},
       "io_pipes": 0,
       "io_pipe_filters": {},
-      "energy_usage": 1666.6666666666667,
+      "energy_usage": 1666.666666666666742457891814410686492919921875,
       "q_max_energy_usage": [
         {
           "quality": "normal",
@@ -44652,7 +44872,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 1,
       "pollution": {
-        "pollution": -1.6666666666666668E-07,
+        "pollution": -1.6666666666666667850904559600166976451873779296875e-07,
         "spores": 0
       },
       "fuel_categories": [
@@ -44785,7 +45005,7 @@
       "fuel_effectivity": 1,
       "drain": 2500,
       "pollution": {
-        "pollution": 8.88888888888889E-07,
+        "pollution": 8.888888888888889283634853200055658817291259765625e-07,
         "spores": 0
       },
       "localised_name": "Assembling machine 1"
@@ -44808,11 +45028,11 @@
         },
         {
           "quality": "rare",
-          "value": 1.2000000000000002
+          "value": 1.20000000000000017763568394002504646778106689453125
         },
         {
           "quality": "epic",
-          "value": 1.4249999999999998
+          "value": 1.42499999999999982236431605997495353221893310546875
         },
         {
           "quality": "legendary",
@@ -44923,7 +45143,7 @@
       "fuel_effectivity": 1,
       "drain": 5000,
       "pollution": {
-        "pollution": 3.3333333333333335E-07,
+        "pollution": 3.333333333333333481363069950020872056484222412109375e-07,
         "spores": 0
       },
       "localised_name": "Assembling machine 2"
@@ -45060,7 +45280,7 @@
       "fuel_effectivity": 1,
       "drain": 12500,
       "pollution": {
-        "pollution": 8.88888888888889E-08,
+        "pollution": 8.888888888888889283634853200055658817291259765625e-08,
         "spores": 0
       },
       "localised_name": "Assembling machine 3"
@@ -45078,11 +45298,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 1.3
+          "value": 1.3000000000000000444089209850062616169452667236328125
         },
         {
           "quality": "rare",
-          "value": 1.6
+          "value": 1.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "epic",
@@ -45185,7 +45405,7 @@
       "fuel_effectivity": 1,
       "drain": 14000,
       "pollution": {
-        "pollution": 2.380952380952381E-07,
+        "pollution": 2.380952380952380931233847149997018277645111083984375e-07,
         "spores": 0
       },
       "localised_name": "Oil refinery"
@@ -45203,11 +45423,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 1.3
+          "value": 1.3000000000000000444089209850062616169452667236328125
         },
         {
           "quality": "rare",
-          "value": 1.6
+          "value": 1.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "epic",
@@ -45312,7 +45532,7 @@
       "fuel_effectivity": 1,
       "drain": 7000,
       "pollution": {
-        "pollution": 3.1746031746031743E-07,
+        "pollution": 3.174603174603174426948726249975152313709259033203125e-07,
         "spores": 0
       },
       "localised_name": "Chemical plant"
@@ -45330,11 +45550,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 1.3
+          "value": 1.3000000000000000444089209850062616169452667236328125
         },
         {
           "quality": "rare",
-          "value": 1.6
+          "value": 1.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "epic",
@@ -45380,7 +45600,7 @@
       "out_pipe_filters": {},
       "io_pipes": 0,
       "io_pipe_filters": {},
-      "energy_usage": 5833.333333333333,
+      "energy_usage": 5833.3333333333330301684327423572540283203125,
       "q_max_energy_usage": [
         {
           "quality": "normal",
@@ -45435,9 +45655,9 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 11666.666666666666,
+      "drain": 11666.666666666666060336865484714508056640625,
       "pollution": {
-        "pollution": 1.9047619047619048E-07,
+        "pollution": 1.90476190476190492262276166002266108989715576171875e-07,
         "spores": 0
       },
       "localised_name": "Centrifuge"
@@ -45455,15 +45675,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 2.6
+          "value": 2.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "rare",
-          "value": 3.2
+          "value": 3.20000000000000017763568394002504646778106689453125
         },
         {
           "quality": "epic",
-          "value": 3.8
+          "value": 3.79999999999999982236431605997495353221893310546875
         },
         {
           "quality": "legendary",
@@ -45508,31 +45728,31 @@
       "out_pipe_filters": {},
       "io_pipes": 0,
       "io_pipe_filters": {},
-      "energy_usage": 33333.333333333336,
+      "energy_usage": 33333.3333333333357586525380611419677734375,
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 2000000.0000000002
+          "value": 2000000.00000000023283064365386962890625
         },
         {
           "quality": "uncommon",
-          "value": 2000000.0000000002
+          "value": 2000000.00000000023283064365386962890625
         },
         {
           "quality": "rare",
-          "value": 2000000.0000000002
+          "value": 2000000.00000000023283064365386962890625
         },
         {
           "quality": "epic",
-          "value": 2000000.0000000002
+          "value": 2000000.00000000023283064365386962890625
         },
         {
           "quality": "legendary",
-          "value": 2000000.0000000002
+          "value": 2000000.00000000023283064365386962890625
         },
         {
           "quality": "quality-unknown",
-          "value": 2000000.0000000002
+          "value": 2000000.00000000023283064365386962890625
         }
       ],
       "q_energy_production": [
@@ -45563,9 +45783,9 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 66666.66666666667,
+      "drain": 66666.666666666671517305076122283935546875,
       "pollution": {
-        "pollution": 3.3333333333333334E-08,
+        "pollution": 3.333333333333333481363069950020872056484222412109375e-08,
         "spores": 0
       },
       "localised_name": "Electromagnetic plant"
@@ -45583,15 +45803,15 @@
         },
         {
           "quality": "uncommon",
-          "value": 2.6
+          "value": 2.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "rare",
-          "value": 3.2
+          "value": 3.20000000000000017763568394002504646778106689453125
         },
         {
           "quality": "epic",
-          "value": 3.8
+          "value": 3.79999999999999982236431605997495353221893310546875
         },
         {
           "quality": "legendary",
@@ -45692,7 +45912,7 @@
       "fuel_effectivity": 1,
       "drain": 50000,
       "pollution": {
-        "pollution": 6.666666666666667E-08,
+        "pollution": 6.66666666666666696272613990004174411296844482421875e-08,
         "spores": 0
       },
       "localised_name": "Cryogenic plant"
@@ -45722,19 +45942,19 @@
         },
         {
           "quality": "uncommon",
-          "value": 51999998.09265136
+          "value": 51999998.092651359736919403076171875
         },
         {
           "quality": "rare",
-          "value": 64000000.95367431
+          "value": 64000000.953674308955669403076171875
         },
         {
           "quality": "epic",
-          "value": 75999999.04632568
+          "value": 75999999.04632568359375
         },
         {
           "quality": "legendary",
-          "value": 99999999.99999999
+          "value": 99999999.99999998509883880615234375
         },
         {
           "quality": "quality-unknown",
@@ -45770,7 +45990,7 @@
       "fuel_type": "item",
       "fuel_effectivity": 2.5,
       "pollution": {
-        "pollution": 4.166666666666667E-08,
+        "pollution": 4.16666666666666696272613990004174411296844482421875e-08,
         "spores": 0
       },
       "fuel_categories": [
@@ -45809,104 +46029,104 @@
       ],
       "profile": [
         1,
-        0.7071,
-        0.5773,
+        0.70709999999999997299937604111619293689727783203125,
+        0.577300000000000057553961596568115055561065673828125,
         0.5,
-        0.44719999999999993,
-        0.4082,
-        0.3779,
-        0.3535,
-        0.3333,
-        0.3162,
-        0.3015,
-        0.2886,
-        0.2773,
-        0.2672,
-        0.2581,
+        0.44719999999999995310417943983338773250579833984375,
+        0.408199999999999985078602549037896096706390380859375,
+        0.3778999999999999914734871708787977695465087890625,
+        0.3534999999999999698019337301957421004772186279296875,
+        0.3332999999999999740651901447563432157039642333984375,
+        0.316199999999999992184029906638897955417633056640625,
+        0.301499999999999968025576890795491635799407958984375,
+        0.288600000000000012079226507921703159809112548828125,
+        0.2772999999999999687361196265555918216705322265625,
+        0.267199999999999970867747833835892379283905029296875,
+        0.2580999999999999960920149533194489777088165283203125,
         0.25,
-        0.2425,
-        0.23569999999999997,
-        0.2294,
-        0.22359999999999997,
-        0.2182,
-        0.2132,
-        0.2085,
-        0.2041,
+        0.242499999999999982236431605997495353221893310546875,
+        0.2356999999999999761968183520366437733173370361328125,
+        0.2294000000000000039079850466805510222911834716796875,
+        0.223599999999999976552089719916693866252899169921875,
+        0.2181999999999999939603867460391484200954437255859375,
+        0.2132000000000000117239551400416530668735504150390625,
+        0.208499999999999996447286321199499070644378662109375,
+        0.2040999999999999925393012745189480483531951904296875,
         0.2,
-        0.1961,
-        0.1924,
-        0.1889,
-        0.1856,
+        0.196099999999999994315658113919198513031005859375,
+        0.19239999999999998436805981327779591083526611328125,
+        0.188900000000000023447910280083306133747100830078125,
+        0.18559999999999998721023075631819665431976318359375,
         0.1825,
-        0.1796,
-        0.1767,
-        0.174,
-        0.1714,
-        0.169,
-        0.1666,
-        0.1643,
-        0.1622,
-        0.1601,
-        0.1581,
-        0.1561,
-        0.1543,
-        0.1524,
-        0.1507,
-        0.149,
-        0.1474,
-        0.1458,
-        0.1443,
-        0.1428,
-        0.1414,
-        0.14,
-        0.1386,
-        0.1373,
-        0.136,
-        0.1348,
-        0.1336,
-        0.1324,
-        0.1313,
-        0.1301,
-        0.129,
-        0.128,
-        0.127,
-        0.1259,
+        0.1796000000000000085265128291212022304534912109375,
+        0.1766999999999999904076730672386474907398223876953125,
+        0.1739999999999999769073610877967439591884613037109375,
+        0.1713999999999999968025576890795491635799407958984375,
+        0.16900000000000002131628207280300557613372802734375,
+        0.1665999999999999925393012745189480483531951904296875,
+        0.1642999999999999971578290569595992565155029296875,
+        0.162200000000000006394884621840901672840118408203125,
+        0.160099999999999997868371792719699442386627197265625,
+        0.1580999999999999960920149533194489777088165283203125,
+        0.156099999999999994315658113919198513031005859375,
+        0.1542999999999999971578290569595992565155029296875,
+        0.152400000000000002131628207280300557613372802734375,
+        0.1507000000000000117239551400416530668735504150390625,
+        0.149000000000000003552713678800500929355621337890625,
+        0.147400000000000002131628207280300557613372802734375,
+        0.14580000000000001847411112976260483264923095703125,
+        0.1443000000000000060396132539608515799045562744140625,
+        0.14280000000000001136868377216160297393798828125,
+        0.141399999999999987920773492078296840190887451171875,
+        0.140000000000000017763568394002504646778106689453125,
+        0.138600000000000012079226507921703159809112548828125,
+        0.13729999999999999982236431605997495353221893310546875,
+        0.13600000000000000976996261670137755572795867919921875,
+        0.13480000000000000870414851306122727692127227783203125,
+        0.1335999999999999854338739169179461896419525146484375,
+        0.13239999999999998436805981327779591083526611328125,
+        0.13129999999999999449329379785922355949878692626953125,
+        0.13009999999999999342747969421907328069210052490234375,
+        0.129000000000000003552713678800500929355621337890625,
+        0.128000000000000003552713678800500929355621337890625,
+        0.1270000000000000017763568394002504646778106689453125,
+        0.12590000000000001190159082398167811334133148193359375,
         0.125,
-        0.124,
-        0.123,
-        0.12210000000000001,
-        0.1212,
-        0.1203,
-        0.11949999999999998,
-        0.1186,
-        0.11779999999999999,
-        0.11700000000000002,
-        0.1162,
-        0.11539999999999999,
-        0.1147,
-        0.1139,
-        0.1132,
+        0.12399999999999999911182158029987476766109466552734375,
+        0.1229999999999999982236431605997495353221893310546875,
+        0.1221000000000000085265128291212022304534912109375,
+        0.12119999999999999662492200513952411711215972900390625,
+        0.12030000000000000692779167366097681224346160888671875,
+        0.1194999999999999840127884453977458178997039794921875,
+        0.118599999999999994315658113919198513031005859375,
+        0.117799999999999993605115378159098327159881591796875,
+        0.11700000000000001509903313490212894976139068603515625,
+        0.116199999999999992184029906638897955417633056640625,
+        0.1153999999999999914734871708787977695465087890625,
+        0.11470000000000000195399252334027551114559173583984375,
+        0.11390000000000000124344978758017532527446746826171875,
+        0.11319999999999998951949464753852225840091705322265625,
         0.1125,
-        0.11179999999999998,
-        0.1111,
-        0.11040000000000001,
-        0.10969999999999999,
-        0.1091,
-        0.10840000000000001,
-        0.1078,
-        0.1072,
-        0.1066,
-        0.1059,
-        0.10539999999999998,
-        0.1048,
-        0.1042,
-        0.1036,
-        0.1031,
-        0.1025,
-        0.10200000000000001,
-        0.1015,
-        0.101,
-        0.1005,
+        0.1117999999999999882760448599583469331264495849609375,
+        0.11109999999999999875655021241982467472553253173828125,
+        0.110400000000000009237055564881302416324615478515625,
+        0.1096999999999999975131004248396493494510650634765625,
+        0.109099999999999997868371792719699442386627197265625,
+        0.1084000000000000074606987254810519516468048095703125,
+        0.10780000000000000692779167366097681224346160888671875,
+        0.107200000000000006394884621840901672840118408203125,
+        0.10660000000000000586197757002082653343677520751953125,
+        0.10589999999999999413802242997917346656322479248046875,
+        0.1053999999999999825917029738775454461574554443359375,
+        0.10480000000000000426325641456060111522674560546875,
+        0.10420000000000000373034936274052597582340240478515625,
+        0.1036000000000000031974423109204508364200592041015625,
+        0.10309999999999999165112285481882281601428985595703125,
+        0.1024999999999999911182158029987476766109466552734375,
+        0.1020000000000000017763568394002504646778106689453125,
+        0.1015000000000000124344978758017532527446746826171875,
+        0.10100000000000000088817841970012523233890533447265625,
+        0.10050000000000001154631945610162802040576934814453125,
         0.1
       ],
       "in_pipes": 0,
@@ -45923,11 +46143,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 399999.99046325684
+          "value": 399999.9904632568359375
         },
         {
           "quality": "rare",
-          "value": 320000.00953674316
+          "value": 320000.0095367431640625
         },
         {
           "quality": "epic",
@@ -45935,7 +46155,7 @@
         },
         {
           "quality": "legendary",
-          "value": 80000.00238418579
+          "value": 80000.002384185791015625
         },
         {
           "quality": "quality-unknown",
@@ -45990,11 +46210,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 1.3
+          "value": 1.3000000000000000444089209850062616169452667236328125
         },
         {
           "quality": "rare",
-          "value": 1.6
+          "value": 1.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "epic",
@@ -46040,7 +46260,7 @@
       "out_pipe_filters": {},
       "io_pipes": 0,
       "io_pipe_filters": {},
-      "energy_usage": 4166.666666666667,
+      "energy_usage": 4166.6666666666669698315672576427459716796875,
       "q_max_energy_usage": [
         {
           "quality": "normal",
@@ -46095,7 +46315,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 8333.333333333334,
+      "drain": 8333.333333333333939663134515285491943359375,
       "pollution": {
         "pollution": 0,
         "spores": 0
@@ -46115,11 +46335,11 @@
         },
         {
           "quality": "uncommon",
-          "value": 1.3
+          "value": 1.3000000000000000444089209850062616169452667236328125
         },
         {
           "quality": "rare",
-          "value": 1.6
+          "value": 1.600000000000000088817841970012523233890533447265625
         },
         {
           "quality": "epic",
@@ -46222,7 +46442,7 @@
       "fuel_effectivity": 1,
       "drain": 18000,
       "pollution": {
-        "pollution": 3.08641975308642E-08,
+        "pollution": 3.08641975308642013686721838894300162792205810546875e-08,
         "spores": 0
       },
       "localised_name": "Crusher"
@@ -46247,59 +46467,59 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 1000000.0000000001
+          "value": 1000000.000000000116415321826934814453125
         },
         {
           "quality": "uncommon",
-          "value": 1299999.9523162844
+          "value": 1299999.95231628441251814365386962890625
         },
         {
           "quality": "rare",
-          "value": 1600000.0238418581
+          "value": 1600000.02384185814298689365386962890625
         },
         {
           "quality": "epic",
-          "value": 1899999.9761581423
+          "value": 1899999.97615814232267439365386962890625
         },
         {
           "quality": "legendary",
-          "value": 2500000.0000000005
+          "value": 2500000.0000000004656612873077392578125
         },
         {
           "quality": "quality-unknown",
-          "value": 1000000.0000000001
+          "value": 1000000.000000000116415321826934814453125
         }
       ],
       "q_energy_production": [
         {
           "quality": "normal",
-          "value": 1000000.0000000001
+          "value": 1000000.000000000116415321826934814453125
         },
         {
           "quality": "uncommon",
-          "value": 1299999.9523162844
+          "value": 1299999.95231628441251814365386962890625
         },
         {
           "quality": "rare",
-          "value": 1600000.0238418581
+          "value": 1600000.02384185814298689365386962890625
         },
         {
           "quality": "epic",
-          "value": 1899999.9761581423
+          "value": 1899999.97615814232267439365386962890625
         },
         {
           "quality": "legendary",
-          "value": 2500000.0000000005
+          "value": 2500000.0000000004656612873077392578125
         },
         {
           "quality": "quality-unknown",
-          "value": 1000000.0000000001
+          "value": 1000000.000000000116415321826934814453125
         }
       ],
       "fuel_type": "item",
       "fuel_effectivity": 0.5,
       "pollution": {
-        "pollution": 1.6666666666666665E-07,
+        "pollution": 1.666666666666666518636930049979127943515777587890625e-07,
         "spores": 0
       },
       "fuel_categories": [
@@ -46567,56 +46787,56 @@
   "water_resources": [
     {
       "name": "water",
-      "resource_category": "<<foreman_resource_category_water_tile>>",
+      "resource_category": "\u003C\u003Cforeman_resource_category_water_tile\u003E\u003E",
       "mining_time": 1,
       "products": [
         {
           "name": "water",
           "type": "fluid",
           "amount": 60,
-          "temperate": 15
+          "temperature": 15
         }
       ],
       "localised_name": "Water"
     },
     {
       "name": "lava",
-      "resource_category": "<<foreman_resource_category_water_tile>>",
+      "resource_category": "\u003C\u003Cforeman_resource_category_water_tile\u003E\u003E",
       "mining_time": 1,
       "products": [
         {
           "name": "lava",
           "type": "fluid",
           "amount": 60,
-          "temperate": 1500
+          "temperature": 1500
         }
       ],
       "localised_name": "Lava"
     },
     {
       "name": "heavy-oil",
-      "resource_category": "<<foreman_resource_category_water_tile>>",
+      "resource_category": "\u003C\u003Cforeman_resource_category_water_tile\u003E\u003E",
       "mining_time": 1,
       "products": [
         {
           "name": "heavy-oil",
           "type": "fluid",
           "amount": 60,
-          "temperate": 25
+          "temperature": 25
         }
       ],
       "localised_name": "Heavy oil"
     },
     {
       "name": "ammoniacal-solution",
-      "resource_category": "<<foreman_resource_category_water_tile>>",
+      "resource_category": "\u003C\u003Cforeman_resource_category_water_tile\u003E\u003E",
       "mining_time": 1,
       "products": [
         {
           "name": "ammoniacal-solution",
           "type": "fluid",
           "amount": 60,
-          "temperate": -50
+          "temperature": -50
         }
       ],
       "localised_name": "Ammoniacal solution"

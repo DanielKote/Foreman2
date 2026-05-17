@@ -33,7 +33,7 @@ local function ProcessQualityValue(qualityfunction, multiplier)
 		end
 	else
 		qualityEntity = {}
-		table.insert(qualityTable, {['quality'] = 'default', ['value'] = qualityfunction() * multiplier})
+		table.insert(qualityTable, {['quality'] = 'normal', ['value'] = qualityfunction() * multiplier})
 	end
 
 	return qualityTable
@@ -65,7 +65,7 @@ local function ProcessProductList(products)
 		tproduct['type'] = product.type
 
 		amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-		amount = amount * product.probability
+		amount = amount * ((product.probability == nil) and 1 or product.probability)
 		amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
 		if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
 		amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
@@ -73,7 +73,7 @@ local function ProcessProductList(products)
 		tproduct['amount'] = amount + amount_added_by_extra_fraction
 		tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
 
-		if product.type == 'fluid' and product.temperate ~= nil then
+		if product.type == 'fluid' and product.temperature ~= nil then
 			tproduct['temperature'] = ProcessTemperature(product.temperature)
 		end
 		table.insert(productlist, tproduct)
@@ -173,16 +173,13 @@ local function ExportRecipes()
 
 		if recipe.allowed_module_categories ~= nil then
 			trecipe['allowed_module_categories'] = {}
-			for name, _ in pairs(trecipe['allowed_module_categories']) do
-				table.insert(trecipe['allowed_module_categories'], name)
-			end	
+			for name, _ in pairs(recipe.allowed_module_categories) do
+				trecipe['allowed_module_categories'][name] = true
+			end
 		end
 
 		if recipe.surface_conditions ~= nil then
-			trecipe['surface_conditions'] = {}
-			for name, _ in pairs(trecipe['surface_conditions']) do
-				table.insert(trecipe['surface_conditions'], name)
-			end	
+			trecipe['surface_conditions'] = recipe.surface_conditions
 		end
 
 		if recipe.trash ~= nil then
@@ -491,7 +488,7 @@ local function ExportEntities()
 			tentity['q_max_energy_usage'] = ProcessQualityValue(entity.get_max_energy_usage, 60)
 			tentity['q_energy_production'] = ProcessQualityValue(entity.get_max_energy_production, 60)
 
-			if entity.burner_prototype ~= null then
+			if entity.burner_prototype ~= nil then
 				tentity['fuel_type'] = 'item'
 				tentity['fuel_effectivity'] = entity.burner_prototype.effectivity
 
@@ -609,7 +606,7 @@ local function ExportWaterResources()
 				tproduct['name'] = wresource.fluid.name
 				tproduct['type'] = 'fluid'
 				tproduct['amount'] = 60
-				tproduct['temperate'] = ProcessTemperature(wresource.fluid.default_temperature)
+				tproduct['temperature'] = ProcessTemperature(wresource.fluid.default_temperature)
 				table.insert(twresource['products'], tproduct)
 
 				twresource['lid'] = '$'..localindex

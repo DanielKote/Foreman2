@@ -89,6 +89,22 @@ namespace ForemanTest {
             Assert.IsFalse(errors.MissingRecipes.Contains("iron-plate"), "iron-plate should exist in the vanilla preset recipe set.");
         }
 
+        [TestMethod]
+        public async Task TestPreset_Vanilla_BoilerPseudoRecipeMatchesDataCacheAmounts() {
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            Assert.IsTrue(cache.Recipes.TryGetValue("§§r:b:water:steam:165", out Recipe? boilerRecipe));
+            var fromCache = new RecipeShort(boilerRecipe);
+
+            var preset = new Preset(VanillaPresetName, true, true);
+            var modList = PresetProcessor.ReadPresetInfo(preset).ModList ?? new Dictionary<string, string>();
+            var errors = await PresetProcessor.TestPreset(
+                preset, modList, [], [], [], [fromCache], []);
+
+            Assert.AreEqual(0, errors.IncorrectRecipes.Count,
+                "Incorrect recipes: " + string.Join(", ", errors.IncorrectRecipes));
+            Assert.AreEqual(600, fromCache.Products["steam"]);
+        }
+
         // --- import placeholders (isolated cache, no preset load) ---
 
         [TestMethod]
