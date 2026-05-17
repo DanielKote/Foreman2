@@ -174,7 +174,7 @@ namespace Foreman {
 
         public void AddItem(Point drawOrigin, Point newLocation) {
             if (DCache is not DataCache cache || string.IsNullOrEmpty(cache.PresetName)) {
-                MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt.");
+                UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt.");
                 return;
             }
 
@@ -191,7 +191,7 @@ namespace Foreman {
         public void AddNewNode(Point drawOrigin, ItemQualityPair baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement? originElement = null, bool offsetLocationToItemTabLevel = false) {
             if (DCache is not DataCache cache || string.IsNullOrEmpty(cache.PresetName)) {
                 DisposeLinkDrag();
-                MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt.");
+                UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt.");
                 return;
             }
 
@@ -455,7 +455,7 @@ namespace Foreman {
         public void TryDeleteSelectedNodes() {
             bool proceed = true;
             if (selectedNodes.Count > 10)
-                proceed = (MessageBox.Show("You are deleting " + selectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
+                proceed = (UserMessages.Show("You are deleting " + selectedNodes.Count + " nodes. \nAre you sure?", "Confirm delete.", MessageBoxButtons.YesNo) == DialogResult.Yes);
             if (proceed) {
                 foreach (BaseNodeElement node in selectedNodes.ToList())
                     Session.Editor.DeleteNode(node.ViewModel.Id);
@@ -1249,7 +1249,7 @@ namespace Foreman {
                 }
 
                 if (result == DialogResult.Abort) {
-                    MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 2.0 Vanilla)");
+                    UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 2.0 Vanilla)");
                     Properties.Settings.Default.CurrentPresetName = MainForm.DefaultPreset;
                     using (DataLoadForm form2 = new DataLoadForm(new Preset(MainForm.DefaultPreset, false, true))) {
                         form2.StartPosition = FormStartPosition.Manual;
@@ -1261,7 +1261,7 @@ namespace Foreman {
                         DCache?.Clear();
                         DCache = form2.GetDataCache();
                         if (result2 == DialogResult.Abort)
-                            MessageBox.Show("The default preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. No Preset is loaded!");
+                            UserMessages.Show("The default preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. No Preset is loaded!");
                     }
                 }
                 GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
@@ -1270,7 +1270,7 @@ namespace Foreman {
         }
 
         private static void ShowCannotLoadSave(string message) {
-            MessageBox.Show(message, "Cannot load save", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            UserMessages.Show(message, "Cannot load save", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         public async Task ReloadGraphForCurrentPreset() {
@@ -1353,7 +1353,7 @@ namespace Foreman {
                     }
                 } else if (chosenPreset.Name != Properties.Settings.Default.CurrentPresetName) //we had to switch the preset to a new one (without the user having to select a preset from a list)
                   {
-                    MessageBox.Show(string.Format("Loaded graph uses a different Preset.\nPreset switched from \"{0}\" to \"{1}\"", Properties.Settings.Default.CurrentPresetName, chosenPreset.Name));
+                    UserMessages.Show(string.Format("Loaded graph uses a different Preset.\nPreset switched from \"{0}\" to \"{1}\"", Properties.Settings.Default.CurrentPresetName, chosenPreset.Name));
                     Properties.Settings.Default.CurrentPresetName = chosenPreset.Name;
                     Properties.Settings.Default.Save();
                 }

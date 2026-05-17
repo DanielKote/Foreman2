@@ -150,7 +150,7 @@ namespace Foreman {
                     using Stream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
                     if (!StreamLooksLikeJson(stream)) {
                         iconCache.Clear();
-                        MessageBox.Show(
+                        UserMessages.Show(
                             $"The icon cache \"{Path.GetFileName(path)}\" was created by an older Foreman build and cannot be read after upgrading to .NET.\n\n" +
                             "Delete that file in the Presets folder (or re-import the preset) to rebuild the cache. " +
                             "Icons will be loaded from game files until then.",
@@ -173,7 +173,7 @@ namespace Foreman {
                 } catch (Exception ex) {
                     iconCache.Clear();
                     ErrorLogging.LogException(ex, $"Failed to load icon cache from {path}");
-                    MessageBox.Show(
+                    UserMessages.Show(
                         $"The icon cache \"{Path.GetFileName(path)}\" could not be read.\n\n" +
                         "Delete that file in the Presets folder (or re-import the preset) to rebuild the cache. " +
                         "Icons will be loaded from game files until then.",

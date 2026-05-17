@@ -331,7 +331,7 @@ namespace Foreman {
         private void DeletePresetMenuItem_Click(object? sender, EventArgs e) {
             if (PresetListBox.SelectedItem is Preset selectedPreset && selectedPreset.IsCurrentlySelected && !selectedPreset.IsDefaultPreset) //safety check - should always pass
             {
-                if (MessageBox.Show("Are you sure you wish to delete the \"" + selectedPreset.Name + "\" preset? This is irreversible.", "Confirm Delete", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                if (UserMessages.Show("Are you sure you wish to delete the \"" + selectedPreset.Name + "\" preset? This is irreversible.", "Confirm Delete", MessageBoxButtons.YesNo) == DialogResult.Yes) {
                     string jsonPath = PresetProcessor.GetPresetPath(selectedPreset.Name, ".pjson");
                     string customjsonPath = PresetProcessor.GetPresetPath(selectedPreset.Name, ".json");
                     string iconPath = PresetProcessor.GetPresetPath(selectedPreset.Name, ".dat");
@@ -529,7 +529,7 @@ namespace Foreman {
                         UpdateSettings();
                         DialogResult = DialogResult.OK;
                         Close();
-                    } else if (MessageBox.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                    } else if (UserMessages.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes) {
                         Options.SelectedPreset = newPreset;
                         UpdateSettings();
                         DialogResult = DialogResult.OK;
@@ -541,7 +541,7 @@ namespace Foreman {
 
         private void ComparePresetsButton_Click(object? sender, EventArgs e) {
             if (Options.Presets?.Count < 2) {
-                MessageBox.Show("Can not compare presets!\n...you only have 1 preset :/");
+                UserMessages.Show("Can not compare presets!\n...you only have 1 preset :/");
                 return;
             }
 
@@ -565,7 +565,7 @@ namespace Foreman {
                 if (result == DialogResult.OK)
                     UpdateEnabledStatus();
                 else if (result == DialogResult.Abort)
-                    MessageBox.Show("Error while reading save file. Try running factorio, opening the save game, saving again, and retrying?");
+                    UserMessages.Show("Error while reading save file. Try running factorio, opening the save game, saving again, and retrying?");
             }
         }
 

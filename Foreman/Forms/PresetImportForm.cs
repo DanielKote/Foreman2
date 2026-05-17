@@ -56,7 +56,7 @@ namespace Foreman {
                     if (FactorioPathsProcessor.TryNormalizeInstallPath(dialog.SelectedPath, out string installRoot))
                         FactorioLocationComboBox.Text = installRoot;
                     else
-                        MessageBox.Show("Selected directory doesnt seem to be a factorio install folder (it should at the very least have \"bin\" and \"data\" folders, along with a \"config-path.cfg\" file)");
+                        UserMessages.Show("Selected directory doesnt seem to be a factorio install folder (it should at the very least have \"bin\" and \"data\" folders, along with a \"config-path.cfg\" file)");
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Foreman {
                     if (File.Exists(Path.Combine(dialog.SelectedPath, "mod-list.json")))
                         ModsLocationComboBox.Text = dialog.SelectedPath;
                     else
-                        MessageBox.Show("Selected directory doesnt seem to be a factorio mods folder (it should at the very least have \"mod-list.json\" file)");
+                        UserMessages.Show("Selected directory doesnt seem to be a factorio mods folder (it should at the very least have \"mod-list.json\" file)");
                 }
             }
         }
@@ -85,23 +85,23 @@ namespace Foreman {
         private async void OKButton_Click(object? sender, EventArgs e) {
             NewPresetName = PresetNameTextBox.Text;
             if (!Directory.Exists(FactorioLocationComboBox.Text)) {
-                MessageBox.Show("That directory doesn't seem to exist");
+                UserMessages.Show("That directory doesn't seem to exist");
                 CleanupFailedImport();
                 return;
             }
             if (NewPresetName.Length < 5) {
-                MessageBox.Show("Preset name has to be longer than 5!");
+                UserMessages.Show("Preset name has to be longer than 5!");
                 CleanupFailedImport();
                 return;
             }
 
             var existingPresets = MainForm.GetValidPresetsList();
             if (NewPresetName.ToLower() == MainForm.DefaultPreset.ToLower()) {
-                MessageBox.Show("Cant overwrite default preset!", "", MessageBoxButtons.OK);
+                UserMessages.Show("Cant overwrite default preset!", "", MessageBoxButtons.OK);
                 CleanupFailedImport();
                 return;
             } else if (existingPresets?.Any(p => p.Name.ToLower() == NewPresetName.ToLower()) is true) {
-                if (MessageBox.Show("This preset name is already in use. Do you wish to overwrite?", "Confirm Overwrite", MessageBoxButtons.YesNo) != DialogResult.Yes) {
+                if (UserMessages.Show("This preset name is already in use. Do you wish to overwrite?", "Confirm Overwrite", MessageBoxButtons.YesNo) != DialogResult.Yes) {
                     CleanupFailedImport();
                     return;
                 }
@@ -117,7 +117,7 @@ namespace Foreman {
 
             if (!File.Exists(Path.Combine(installPath, "bin", "x64", "factorio.exe"))) {
                 EnableProgressBar(false);
-                MessageBox.Show("Couldnt find factorio.exe (/bin/x64/factorio.exe) - please select a valid Factorio install location");
+                UserMessages.Show("Couldnt find factorio.exe (/bin/x64/factorio.exe) - please select a valid Factorio install location");
                 CleanupFailedImport();
                 return;
             }
@@ -125,7 +125,7 @@ namespace Foreman {
             string factorioExePath = Path.Combine(installPath, "bin", "x64", "factorio.exe");
             if (!FactorioInstallValidator.TryValidateExecutable(factorioExePath, out string? factorioVersionError)) {
                 EnableProgressBar(false);
-                MessageBox.Show(factorioVersionError);
+                UserMessages.Show(factorioVersionError);
                 CleanupFailedImport();
                 return;
             }
@@ -136,7 +136,7 @@ namespace Foreman {
             if (string.IsNullOrEmpty(modsPath) || !File.Exists(Path.Combine(modsPath, "mod-list.json"))) {
                 string userDataPath = FactorioPathsProcessor.GetFactorioUserPath(installPath, true);
                 if (string.IsNullOrEmpty(userDataPath)) {
-                    MessageBox.Show("Couldnt auto-locate the mods folder - please manually locate the folder");
+                    UserMessages.Show("Couldnt auto-locate the mods folder - please manually locate the folder");
                     CleanupFailedImport();
                     return;
                 }
@@ -180,7 +180,7 @@ namespace Foreman {
                 string exePath = FactorioPathsProcessor.GetExecutablePath(installPath);
                 string presetPath = PresetProcessor.GetPresetPath(NewPresetName, "");
                 if (!File.Exists(exePath)) {
-                    MessageBox.Show("factorio.exe not found..."); //considering that we got here with factorio.exe checks, this is a bit redundant. but whatevs.
+                    UserMessages.Show("factorio.exe not found..."); //considering that we got here with factorio.exe checks, this is a bit redundant. but whatevs.
                     CleanupFailedImport();
                     return "";
                 }
@@ -192,10 +192,10 @@ namespace Foreman {
                         Directory.Delete(Path.Combine(modsPath, foremanModName));
                 } catch (Exception e) {
                     if (e is UnauthorizedAccessException) {
-                        MessageBox.Show("Insufficient access to the factorio mods folder. Please ensure factorio mods are in an accessible folder, or launch Foreman with Administrator privileges.");
+                        UserMessages.Show("Insufficient access to the factorio mods folder. Please ensure factorio mods are in an accessible folder, or launch Foreman with Administrator privileges.");
                         ErrorLogging.LogException(e, "insufficient access to factorio mods folder");
                     } else {
-                        MessageBox.Show("Unknown error trying to access factorio mods folder. Sorry");
+                        UserMessages.Show("Unknown error trying to access factorio mods folder. Sorry");
                         ErrorLogging.LogException(e, "error while accessing factorio mods folder");
                     }
                     CleanupFailedImport(modsPath);
@@ -213,7 +213,7 @@ namespace Foreman {
                     return "";
 
                 if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
-                    MessageBox.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
+                    UserMessages.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
                     CleanupFailedImport(modsPath);
                     return "";
                 }
@@ -224,10 +224,10 @@ namespace Foreman {
                     FactorioBundledModHelper.CopyToModsFolder(foremanModName, modsPath, "info.json", "instrument-after-data.lua", "instrument-control.lua");
                 } catch (Exception e) {
                     if (e is UnauthorizedAccessException) {
-                        MessageBox.Show("Insufficient access to copy foreman export mod files (Mods/" + foremanModName + "/) to the factorio mods folder. Please ensure factorio mods are in an accessible folder, or launch Foreman with Administrator privileges.");
+                        UserMessages.Show("Insufficient access to copy foreman export mod files (Mods/" + foremanModName + "/) to the factorio mods folder. Please ensure factorio mods are in an accessible folder, or launch Foreman with Administrator privileges.");
                         ErrorLogging.LogException(e, "copying of foreman export mod files failed - insufficient access");
                     } else {
-                        MessageBox.Show("could not copy foreman export mod files (Mods/" + foremanModName + "/) to the factorio mods folder. Reinstall foreman?");
+                        UserMessages.Show("could not copy foreman export mod files (Mods/" + foremanModName + "/) to the factorio mods folder. Reinstall foreman?");
                         ErrorLogging.LogException(e, "copying of foreman export mod files failed");
                     }
                     CleanupFailedImport(modsPath);
@@ -252,14 +252,14 @@ namespace Foreman {
                 progress.Report(new KeyValuePair<int, string>(25, "Processing mod files."));
 
                 if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
-                    MessageBox.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
+                    UserMessages.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
                     CleanupFailedImport(modsPath);
                     return "";
                 } else if (resultString.IndexOf("<<<END-EXPORT-P1>>>") == -1 || resultString.IndexOf("<<<END-EXPORT-P2>>>") == -1) {
 #if DEBUG
                     Console.WriteLine(resultString);
 #endif
-                    MessageBox.Show("Foreman export could not be completed - possible mod conflict detected. Please run factorio and ensure it can successfully load to menu before retrying.");
+                    UserMessages.Show("Foreman export could not be completed - possible mod conflict detected. Please run factorio and ensure it can successfully load to menu before retrying.");
                     ErrorLogging.LogLine("Foreman export failed partway. Consult errorExporting.json for full output (and search for <<<END-EXPORT-P1>>> or <<<END-EXPORT-P2>>>, at least one of which is missing)");
                     File.WriteAllText(Path.Combine(Application.StartupPath, "errorExporting.json"), resultString);
                     CleanupFailedImport(modsPath);
@@ -294,7 +294,7 @@ namespace Foreman {
                     iconJObject = PresetJson.ParseObject(iconString);
                     dataJObject = PresetJson.ParseObject(dataString);
                 } catch (Exception ex) {
-                    MessageBox.Show("Foreman export could not be completed - unknown json parsing error.\nSorry");
+                    UserMessages.Show("Foreman export could not be completed - unknown json parsing error.\nSorry");
                     ErrorLogging.LogException(ex, "json parsing of export mod output failed (" + foremanModName + "); consult _iconJObjectOut.json and _dataJObjectOut.json");
                     File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
                     File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
@@ -336,7 +336,7 @@ namespace Foreman {
                 using (IconCacheProcessor icProcessor = new IconCacheProcessor()) {
                     if (!icProcessor.PrepareModPaths(modSet, modsPath, Path.Combine(installPath, "data"), token)) {
                         if (!token.IsCancellationRequested) {
-                            MessageBox.Show("Mod inconsistency detected. Try to see if launching Factorio gives an error?");
+                            UserMessages.Show("Mod inconsistency detected. Try to see if launching Factorio gives an error?");
                             ErrorLogging.LogLine("Mod parsing failed - the list of mods provided could not be mapped to the existing mod folders & zip files.");
                         }
                         CleanupFailedImport(modsPath, presetPath);
@@ -346,7 +346,7 @@ namespace Foreman {
                     if (!icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, token, 30, 100)) {
                         if (!token.IsCancellationRequested) {
                             ErrorLogging.LogLine(string.Format("{0}/{1} images were not found while processing icons.", icProcessor.FailedPathCount, icProcessor.TotalPathCount));
-                            if (MessageBox.Show(string.Format("{0}/{1} images that were processed for icons were not found and thus some icons are likely wrong/empty. Do you still wish to continue with the preset import?", icProcessor.FailedPathCount, icProcessor.TotalPathCount), "Confirm Preset Import", MessageBoxButtons.YesNo) != DialogResult.Yes) {
+                            if (UserMessages.Show(string.Format("{0}/{1} images that were processed for icons were not found and thus some icons are likely wrong/empty. Do you still wish to continue with the preset import?", icProcessor.FailedPathCount, icProcessor.TotalPathCount), "Confirm Preset Import", MessageBoxButtons.YesNo) != DialogResult.Yes) {
                                 CleanupFailedImport(modsPath, presetPath);
                                 return "";
                             }

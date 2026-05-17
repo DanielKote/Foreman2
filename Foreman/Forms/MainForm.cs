@@ -183,7 +183,7 @@ namespace Foreman {
                 this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
                 return true;
             } catch (Exception exception) {
-                MessageBox.Show("Could not save this file. See log for more details");
+                UserMessages.Show("Could not save this file. See log for more details");
                 ErrorLogging.LogException(exception, string.Format("Error saving file '{0}'", path));
                 return false;
             } finally {
@@ -212,7 +212,7 @@ namespace Foreman {
                 savefilePath = path;
                 CaptureSaveBaseline();
             } catch (Exception exception) {
-                MessageBox.Show(
+                UserMessages.Show(
                     "This save file is too old or corrupt. Try opening it in Foreman 2.2.16.1 and saving it again, then open the new file here.");
                 ErrorLogging.LogException(exception, string.Format("Error loading file '{0}'", path));
             }
@@ -281,7 +281,7 @@ namespace Foreman {
                     GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2)),
                     applySolverSettings: true);
             } catch (Exception exception) {
-                MessageBox.Show("Could not import this file. See log for more details.");
+                UserMessages.Show("Could not import this file. See log for more details.");
                 ErrorLogging.LogException(exception, string.Format("Error importing from file '{0}'", path));
             }
         }
@@ -289,20 +289,20 @@ namespace Foreman {
         private bool TestGraphSavedStatus() {
             if (savefilePath == null) {
                 if (GraphViewer.Graph.Nodes.Any())
-                    return MessageBox.Show("The current graph hasnt been saved!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+                    return UserMessages.Show("The current graph hasnt been saved!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
                 else
                     return true;
             }
 
             if (!File.Exists(savefilePath))
-                return MessageBox.Show("The current graph's save file has been deleted!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+                return UserMessages.Show("The current graph's save file has been deleted!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
 
             GraphViewer.Graph.SerializeNodeIdSet = null;
             string currentSaveJson = GraphSaveCodec.WriteViewerToString(GraphViewer, writeIndented: true);
             string? savedJson = savefileBaselineJson ?? File.ReadAllText(savefilePath);
 
             if (savedJson != currentSaveJson) {
-                DialogResult result = MessageBox.Show("The current graph has been modified!\nDo you wish to save before continuing?", "Are you sure?", MessageBoxButtons.YesNoCancel);
+                DialogResult result = UserMessages.Show("The current graph has been modified!\nDo you wish to save before continuing?", "Are you sure?", MessageBoxButtons.YesNoCancel);
                 if (result == DialogResult.Cancel)
                     return false;
                 if (result == DialogResult.OK)
@@ -323,11 +323,11 @@ namespace Foreman {
             existingPresetFiles.Sort();
 
             if (!existingPresetFiles.Contains(Properties.Settings.Default.CurrentPresetName)) {
-                MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to the default preset (Factorio 2.0 Vanilla)");
+                UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to the default preset (Factorio 2.0 Vanilla)");
                 Properties.Settings.Default.CurrentPresetName = DefaultPreset;
             }
             if (!existingPresetFiles.Contains(DefaultPreset)) {
-                MessageBox.Show("The default preset (Factorio 2.0 Vanilla) has been removed. Please re-install / re-download Foreman");
+                UserMessages.Show("The default preset (Factorio 2.0 Vanilla) has been removed. Please re-install / re-download Foreman");
                 Application.Exit();
                 return null;
             }
@@ -346,7 +346,7 @@ namespace Foreman {
 
         private async void SettingsButton_Click(object? sender, EventArgs e) {
             if (GraphViewer.DCache is not DataCache cache) {
-                MessageBox.Show("No preset data is loaded. Load a preset before opening settings.");
+                UserMessages.Show("No preset data is loaded. Load a preset before opening settings.");
                 return;
             }
 

@@ -47,7 +47,7 @@ namespace Foreman {
             string configPath = Path.Combine(installPath, "config-path.cfg");
             if (!File.Exists(configPath)) {
                 if (verboseFail)
-                    MessageBox.Show("config-path.cfg missing from the install location. Maybe run Factorio once to ensure all files are there?\nAlternatively a reinstall might be required.");
+                    UserMessages.Show("config-path.cfg missing from the install location. Maybe run Factorio once to ensure all files are there?\nAlternatively a reinstall might be required.");
                 ErrorLogging.LogLine(string.Format("config-path.cfg was not found at {0}. this was supposed to be the install folder", installPath));
                 return "";
             }
@@ -58,7 +58,7 @@ namespace Foreman {
             //read config.ini file
             if (!File.Exists(configIniPath)) {
                 if (verboseFail)
-                    MessageBox.Show("config.ini could not be found. Factorio setup is corrupted?");
+                    UserMessages.Show("config.ini could not be found. Factorio setup is corrupted?");
                 ErrorLogging.LogLine(string.Format("config.ini file was not found at {0}. config-path.cfg was at {1} and linked here.", configIniPath, configPath));
                 return "";
             }

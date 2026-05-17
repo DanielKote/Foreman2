@@ -46,7 +46,7 @@ namespace Foreman {
 
         private void ExportButton_Click(object? sender, EventArgs e) {
             if (string.IsNullOrEmpty(fileTextBox.Text) || string.IsNullOrEmpty(Path.GetDirectoryName(fileTextBox.Text)) || !Directory.Exists(Path.GetDirectoryName(fileTextBox.Text))) {
-                MessageBox.Show("Directory doesn't exist!");
+                UserMessages.Show("Directory doesn't exist!");
             } else {
                 graphViewer.ClearSelection();
 
@@ -76,7 +76,7 @@ namespace Foreman {
                         image.Save(fileTextBox.Text, ImageFormat.Png);
                         Close();
                     } catch (Exception exception) {
-                        MessageBox.Show("Error saving image. See log for more details.");
+                        UserMessages.Show("Error saving image. See log for more details.");
                         ErrorLogging.LogException(exception, "Error saving image");
                     }
                 }

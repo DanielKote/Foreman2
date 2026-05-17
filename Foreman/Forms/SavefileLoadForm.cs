@@ -109,7 +109,7 @@ namespace Foreman {
                     }
 
                     if (!FactorioInstallValidator.TryValidateExecutable(factorioPath, out string? factorioVersionError)) {
-                        MessageBox.Show(factorioVersionError);
+                        UserMessages.Show(factorioVersionError);
                         return DialogResult.Cancel;
                     }
 
@@ -120,7 +120,7 @@ namespace Foreman {
                     try {
                         FactorioBundledModHelper.CopyToModsFolder("foremansavereader_2.0.0", modsPath, "info.json", "instrument-control.lua");
                     } catch (Exception ex) {
-                        MessageBox.Show("could not copy foreman save reader mod files (Mods/foremansavereader_2.0.0/) to the factorio mods folder. Reinstall foreman?");
+                        UserMessages.Show("could not copy foreman save reader mod files (Mods/foremansavereader_2.0.0/) to the factorio mods folder. Reinstall foreman?");
                         ErrorLogging.LogException(ex, "copying of foreman save reader mod files failed");
                         return DialogResult.Abort;
                     }
@@ -143,7 +143,7 @@ namespace Foreman {
                         Directory.Delete(Path.Combine(modsPath, "foremansavereader_2.0.0"), true);
 
                     if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
-                        MessageBox.Show("File read could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment...");
+                        UserMessages.Show("File read could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment...");
                         return DialogResult.Cancel;
                     } else if (resultString.IndexOf("<<<END-EXPORT-P0>>>") == -1) {
 #if DEBUG
@@ -214,7 +214,7 @@ namespace Foreman {
                 newMods = "";
 
             if (missingMods != "" || wrongVersionMods != "" || newMods != "")
-                if (MessageBox.Show("selected save file mods do not match preset mods; out of {0} mods:" + missingMods + wrongVersionMods + newMods + "\nAre you sure you wish to use this save file?", "Save file mod inconsistencies found!", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                if (UserMessages.Show("selected save file mods do not match preset mods; out of {0} mods:" + missingMods + wrongVersionMods + newMods + "\nAre you sure you wish to use this save file?", "Save file mod inconsistencies found!", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
                     return;
 
             //we will not be updating technology based on the read data. we will instead be updating the recipes based on their enabled status. This is due to the possibility that a recipe was 'manually' enabled outside of the default technology unlocks. Is this possible? I dont know.
