@@ -452,6 +452,15 @@ namespace Foreman {
             Invalidate();
         }
 
+        public int AutoconnectDisconnectedInputs() {
+            int linksCreated = GraphAutoconnect.ConnectDisconnectedInputs(Session);
+            if (linksCreated > 0) {
+                Graph.UpdateNodeStates(false);
+                Invalidate();
+            }
+            return linksCreated;
+        }
+
         public void TryDeleteSelectedNodes() {
             bool proceed = true;
             if (selectedNodes.Count > 10)

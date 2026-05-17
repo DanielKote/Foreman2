@@ -42,6 +42,7 @@
             this.ImportGraphButton = new System.Windows.Forms.Button();
             this.NewGraphButton = new System.Windows.Forms.Button();
             this.LoadGraphButton = new System.Windows.Forms.Button();
+            this.AutoconnectButton = new System.Windows.Forms.Button();
             this.SaveAsGraphButton = new System.Windows.Forms.Button();
             this.GridLinesGroupBox = new System.Windows.Forms.GroupBox();
             this.GridlinesTable = new System.Windows.Forms.TableLayoutPanel();
@@ -148,6 +149,7 @@
             this.MenuButtonsTable.Controls.Add(this.ImportGraphButton, 1, 0);
             this.MenuButtonsTable.Controls.Add(this.NewGraphButton, 0, 0);
             this.MenuButtonsTable.Controls.Add(this.LoadGraphButton, 0, 3);
+            this.MenuButtonsTable.Controls.Add(this.AutoconnectButton, 1, 3);
             this.MenuButtonsTable.Controls.Add(this.SaveAsGraphButton, 0, 2);
             this.MenuButtonsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MenuButtonsTable.Location = new System.Drawing.Point(3, 7);
@@ -289,6 +291,20 @@
             this.LoadGraphButton.Text = "Load";
             this.LoadGraphButton.UseVisualStyleBackColor = true;
             this.LoadGraphButton.Click += new System.EventHandler(this.LoadGraphButton_Click);
+            // 
+            // AutoconnectButton
+            // 
+            this.AutoconnectButton.AutoSize = true;
+            this.AutoconnectButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.AutoconnectButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AutoconnectButton.Location = new System.Drawing.Point(77, 92);
+            this.AutoconnectButton.Margin = new System.Windows.Forms.Padding(2);
+            this.AutoconnectButton.Name = "AutoconnectButton";
+            this.AutoconnectButton.Size = new System.Drawing.Size(83, 26);
+            this.AutoconnectButton.TabIndex = 14;
+            this.AutoconnectButton.Text = "Autoconnect";
+            this.AutoconnectButton.UseVisualStyleBackColor = true;
+            this.AutoconnectButton.Click += new System.EventHandler(this.AutoconnectButton_Click);
             // 
             // SaveAsGraphButton
             // 
@@ -592,6 +608,7 @@
         private System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
         private System.Windows.Forms.Button SaveAsGraphButton;
         private System.Windows.Forms.Button LoadGraphButton;
+        private System.Windows.Forms.Button AutoconnectButton;
         private System.Windows.Forms.Button NewGraphButton;
         private System.Windows.Forms.Button EnableDisableButton;
         private System.Windows.Forms.Button ExportImageButton;

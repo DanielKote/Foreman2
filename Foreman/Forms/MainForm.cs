@@ -599,6 +599,10 @@ namespace Foreman {
             GraphViewer.AlignSelected();
         }
 
+        private void AutoconnectButton_Click(object? sender, EventArgs e) {
+            GraphViewer.AutoconnectDisconnectedInputs();
+        }
+
         private void GraphViewer_KeyDown(object? sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Space) {
                 GraphViewer.Grid.ShowGrid = !GraphViewer.Grid.ShowGrid;
