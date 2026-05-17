@@ -61,6 +61,7 @@ namespace Foreman
 			this.BeaconsHeaderPower = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.PowerConsumptionLabel = new System.Windows.Forms.Label();
 			this.PowerProductionLabel = new System.Windows.Forms.Label();
+			this.PowerNetLabel = new System.Windows.Forms.Label();
 			this.BuildingsExportButton = new System.Windows.Forms.Button();
 			this.ItemsTabPage = new System.Windows.Forms.TabPage();
 			this.ItemsTable = new System.Windows.Forms.TableLayoutPanel();
@@ -460,6 +461,17 @@ namespace Foreman
 			this.PowerProductionLabel.Size = new System.Drawing.Size(110, 15);
 			this.PowerProductionLabel.TabIndex = 32;
 			this.PowerProductionLabel.Text = "Power Production: ";
+			// 
+			// PowerNetLabel
+			// 
+			this.PowerNetLabel.AutoSize = true;
+			this.PowerNetLabel.Location = new System.Drawing.Point(482, 5);
+			this.PowerNetLabel.Margin = new System.Windows.Forms.Padding(7, 5, 15, 5);
+			this.PowerNetLabel.Name = "PowerNetLabel";
+			this.PowerNetLabel.Size = new System.Drawing.Size(70, 15);
+			this.PowerNetLabel.TabIndex = 35;
+			this.PowerNetLabel.Text = "Net Power: ";
+			this.PowerNetLabel.Visible = false;
 			// 
 			// BuildingsExportButton
 			// 
@@ -1058,8 +1070,9 @@ namespace Foreman
 			// 
 			this.tableLayoutPanel2.AutoSize = true;
 			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel2.ColumnCount = 4;
+			this.tableLayoutPanel2.ColumnCount = 5;
 			this.BuildingsTable.SetColumnSpan(this.tableLayoutPanel2, 2);
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -1068,6 +1081,7 @@ namespace Foreman
 			this.tableLayoutPanel2.Controls.Add(this.BuildingCountLabel, 0, 0);
 			this.tableLayoutPanel2.Controls.Add(this.PowerConsumptionLabel, 2, 0);
 			this.tableLayoutPanel2.Controls.Add(this.PowerProductionLabel, 3, 0);
+			this.tableLayoutPanel2.Controls.Add(this.PowerNetLabel, 4, 0);
 			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
 			this.tableLayoutPanel2.Location = new System.Drawing.Point(44, 3);
@@ -1176,6 +1190,7 @@ namespace Foreman
 		private System.Windows.Forms.ColumnHeader BeaconsHeaderName;
 		private System.Windows.Forms.Label PowerConsumptionLabel;
 		private System.Windows.Forms.Label PowerProductionLabel;
+		private System.Windows.Forms.Label PowerNetLabel;
 		private System.Windows.Forms.TableLayoutPanel ItemsTable;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TabControl ItemsTabControl;

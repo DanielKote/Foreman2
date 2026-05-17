@@ -123,6 +123,10 @@ namespace Foreman {
             double powerProduction = recipeNodes.Sum(n => n.GetTotalGeneratorElectricalProduction());
             PowerConsumptionLabel.Text += GraphicsStuff.DoubleToEnergy(powerConsumption, "W");
             PowerProductionLabel.Text += GraphicsStuff.DoubleToEnergy(powerProduction, "W");
+            if (powerConsumption > 0 && powerProduction > 0) {
+                PowerNetLabel.Visible = true;
+                PowerNetLabel.Text += GraphicsStuff.DoubleToEnergy(powerProduction - powerConsumption, "W");
+            }
 
             //update filtered
             UpdateFilteredBuildingLists();

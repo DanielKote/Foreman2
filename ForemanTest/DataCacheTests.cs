@@ -209,6 +209,20 @@ namespace ForemanTest {
         }
 
         [TestMethod]
+        public async Task LoadAllData_Vanilla_NuclearReactorAndSteamTurbineEnergyValues() {
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            Assert.IsNotNull(cache.DefaultQuality);
+            var quality = cache.DefaultQuality;
+            var reactor = cache.Assemblers["nuclear-reactor"];
+            var turbine = cache.Assemblers["steam-turbine"];
+
+            Assert.AreEqual(40_000_000, reactor.GetEnergyConsumption(quality));
+            Assert.AreEqual(40, reactor.GetSpeed(quality), 1e-6);
+            Assert.AreEqual(5_820_000, turbine.GetEnergyProduction(quality));
+            Assert.AreEqual(0, turbine.GetEnergyConsumption(quality));
+        }
+
+        [TestMethod]
         public async Task LoadAllData_Vanilla_CollectionsHaveExpectedScale() {
             var cache = await VanillaDataCacheFixture.GetLoadedAsync();
             Assert.IsTrue(cache.Items.Count > 100, $"Vanilla item count was {cache.Items.Count}.");

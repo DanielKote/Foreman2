@@ -206,7 +206,7 @@ namespace Foreman {
 
             //energy consumption
             entity.energyDrain = PresetJson.GetDouble(objJsonNode, "drain") ?? 0; //seconds
-            foreach (JsonNode speedToken in PresetJson.EnumerateArray(objJsonNode, "q_energy_production"))
+            foreach (JsonNode speedToken in PresetJson.EnumerateArray(objJsonNode, "q_max_energy_usage"))
                 if (PresetJson.GetString(speedToken, "quality") is string quality && PresetJson.GetDouble(speedToken, "value") is double value)
                     entity.energyConsumption.Add(_store.Qualities[quality], value);
 
