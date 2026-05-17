@@ -168,19 +168,22 @@ namespace Foreman {
 
             //process launch product recipes
             if (presetItems.Contains("rocket-part") && presetRecipes.ContainsKey("rocket-part") && presetEntities.Contains("rocket-silo")) {
-                foreach (JsonNode objJsonNode in PresetJson.EnumerateArray(jsonData, "items").Concat(PresetJson.EnumerateArray(jsonData, "fluids")).Where(t => PresetJson.GetNode(t, "launch_products") is not null)) {
+                foreach (JsonNode objJsonNode in PresetJson.EnumerateArray(jsonData, "items").Concat(PresetJson.EnumerateArray(jsonData, "fluids")).Where(t => PresetJson.GetNode(t, "rocket_launch_products") is not null)) {
                     if (PresetJson.GetString(objJsonNode, "name") is not string name)
                         continue;
                     RecipeShort recipe = new RecipeShort(string.Format("§§r:rl:launch-{0}", name));
 
-                    int inputSize = PresetJson.GetInt32(objJsonNode, "stack") ?? default;
-                    foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "launch_products")) {
+                    double inputSize = PresetJson.GetInt32(objJsonNode, "stack_size") ?? default;
+                    foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "rocket_launch_products")) {
                         double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
-                        int productStack = PresetJson.GetInt32(PresetJson.EnumerateArray(jsonData, "items").FirstOrDefault(t => PresetJson.GetString(t, "name") == PresetJson.GetString(productJsonNode, "name")), "stack") ?? 1;
-                        if (amount != 0 && inputSize * amount > productStack)
-                            inputSize = (int)(productStack / amount);
+                        if (amount == 0 || PresetJson.GetString(productJsonNode, "name") is not string prodName)
+                            continue;
+                        JsonNode? productItemNode = PresetJson.EnumerateArray(jsonData, "items").FirstOrDefault(t => PresetJson.GetString(t, "name") == prodName);
+                        double productStack = PresetJson.GetInt32(productItemNode, "stack_size") ?? 1;
+                        if (inputSize * amount > productStack)
+                            inputSize = Math.Floor(productStack / amount);
                     }
-                    foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "launch_products")) {
+                    foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "rocket_launch_products")) {
                         double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
                         if (amount != 0 && PresetJson.GetString(productJsonNode, "name") is string prodName)
                             recipe.Products.Add(prodName, amount * inputSize);

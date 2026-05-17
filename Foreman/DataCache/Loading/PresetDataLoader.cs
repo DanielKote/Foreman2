@@ -566,30 +566,30 @@ namespace Foreman {
             recipe.Time = 1; //placeholder really...
 
             //process products - have to calculate what the maximum input size of the launch item is so as not to waste any products (ex: you can launch 2000 science packs, but you will only get 100 fish. so input size must be set to 100 -> 100 science packs to 100 fish)
-            int inputSize = launchItem.StackSize;
-            Dictionary<ItemPrototype, double> products = new Dictionary<ItemPrototype, double>();
+            double inputSize = launchItem.StackSize;
+            Dictionary<ItemPrototype, double> amountPerLaunchItem = new Dictionary<ItemPrototype, double>();
             Dictionary<ItemPrototype, double> productTemp = new Dictionary<ItemPrototype, double>();
-            foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "launch_products")) {
-                if (PresetJson.GetString(productJsonNode, "name") is not string prodName)
+            foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "rocket_launch_products")) {
+                if (PresetJson.GetString(productJsonNode, "name") is not string prodName || !_store.Items.TryGetValue(prodName, out Item? productItem))
                     continue;
-                ItemPrototype product = (ItemPrototype)_store.Items[prodName];
+                ItemPrototype product = (ItemPrototype)productItem;
                 double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
-                if (amount != 0) {
-                    if (inputSize * amount > product.StackSize)
-                        inputSize = (int)(product.StackSize / amount);
+                if (amount == 0)
+                    continue;
 
-                    amount = inputSize * amount;
+                if (inputSize * amount > product.StackSize)
+                    inputSize = Math.Floor(product.StackSize / amount);
 
-                    if (PresetJson.GetString(productJsonNode, "type") == "fluid")
-                        productTemp.Add(product, PresetJson.GetDouble(productJsonNode, "temperature") ?? ((FluidPrototype)product).DefaultTemperature);
-                    products.Add(product, amount);
+                amountPerLaunchItem.Add(product, amount);
 
-                    product.productionRecipes.Add(recipe);
-                    recipe.SetIconAndColor(new IconColorPair(product.Icon, Color.DarkGray));
-                }
+                if (PresetJson.GetString(productJsonNode, "type") == "fluid")
+                    productTemp.Add(product, PresetJson.GetDouble(productJsonNode, "temperature") ?? ((FluidPrototype)product).DefaultTemperature);
+
+                product.productionRecipes.Add(recipe);
+                recipe.SetIconAndColor(new IconColorPair(product.Icon, Color.DarkGray));
             }
-            foreach (ItemPrototype product in products.Keys)
-                recipe.InternalOneWayAddProduct(product, inputSize * products[product], 0, productTemp.ContainsKey(product) ? productTemp[product] : double.NaN);
+            foreach (var (product, amount) in amountPerLaunchItem)
+                recipe.InternalOneWayAddProduct(product, inputSize * amount, 0, productTemp.TryGetValue(product, out double temp) ? temp : double.NaN);
 
             recipe.InternalOneWayAddIngredient(launchItem, inputSize);
             launchItem.consumptionRecipes.Add(recipe);

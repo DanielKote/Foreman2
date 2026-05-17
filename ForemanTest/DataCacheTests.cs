@@ -413,6 +413,20 @@ namespace ForemanTest {
         }
 
         [TestMethod]
+        public async Task LoadAllData_Vanilla_SatelliteRocketLaunchProductsAndIngredients() {
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            Assert.IsTrue(cache.Recipes.TryGetValue("§§r:rl:launch-satellite", out Recipe? launchRecipe));
+            Assert.IsNotNull(launchRecipe);
+            Assert.IsTrue(cache.Items.TryGetValue("satellite", out Item? satellite));
+            Assert.IsTrue(cache.Items.TryGetValue("space-science-pack", out Item? spaceScience));
+            Assert.IsTrue(cache.Items.TryGetValue("rocket-part", out Item? rocketPart));
+
+            Assert.AreEqual(1, launchRecipe.IngredientSet[satellite]);
+            Assert.AreEqual(100, launchRecipe.IngredientSet[rocketPart]);
+            Assert.AreEqual(1000, launchRecipe.ProductSet[spaceScience]);
+        }
+
+        [TestMethod]
         public async Task LoadAllData_Vanilla_ProductivityModuleLinkedToCraftingRecipes() {
             var cache = await VanillaDataCacheFixture.GetLoadedAsync();
             Assert.IsTrue(cache.Modules.ContainsKey("productivity-module-3"));
