@@ -4,10 +4,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,33 +13,10 @@ namespace Foreman {
     public struct IconColorPair {
         public Bitmap? Icon;
         public Color Color;
-        public byte[] IconBytes {
-            get {
-                using var stream = new MemoryStream();
-                Icon?.Save(stream, ImageFormat.Png);
-                return stream.ToArray();
-            }
-            set {
-                using var stream = new MemoryStream(value);
-                Icon = new Bitmap(stream);
-            }
-        }
-        public int ColorBytes {
-            get => Color.ToArgb();
-            set {
-                Color = Color.FromArgb(value);
-            }
-        }
         public IconColorPair(Bitmap? icon, Color color) {
             this.Icon = icon;
             this.Color = color;
         }
-    }
-    [Serializable]
-    public class IconBitmapCollection {
-        [JsonInclude]
-        public Dictionary<string, IconColorPair> Icons;
-        public IconBitmapCollection() { Icons = new Dictionary<string, IconColorPair>(); }
     }
 
     public static class IconCache {
@@ -88,7 +61,7 @@ namespace Foreman {
             }
         }
 
-        public static Bitmap ConbineIcons(Bitmap aIcon, Bitmap bIcon, int size, bool diagonalSlice = true) {
+        public static Bitmap CombineIcons(Bitmap aIcon, Bitmap bIcon, int size, bool diagonalSlice = true) {
             Bitmap result = new Bitmap(size, size);
             using (Graphics g = Graphics.FromImage(result)) {
                 using (GraphicsPath tlPath = new GraphicsPath()) {
@@ -114,75 +87,35 @@ namespace Foreman {
             return result;
         }
 
-
-        public static void SaveIconCache(string path, Dictionary<string, IconColorPair> iconCache) {
-            IconBitmapCollection iCollection = new IconBitmapCollection();
-
-            foreach (KeyValuePair<string, IconColorPair> iconKVP in iconCache)
-                iCollection.Icons.Add(iconKVP.Key, iconKVP.Value);
-
-            if (File.Exists(path))
-                File.Delete(path);
-            using (Stream stream = File.Open(path, FileMode.Create, FileAccess.Write)) {
-                JsonSerializer.Serialize(stream, iCollection);
-            }
-        }
-
-        private static bool StreamLooksLikeJson(Stream stream) {
-            long start = stream.Position;
-            try {
-                int b;
-                while ((b = stream.ReadByte()) >= 0) {
-                    if (b is ' ' or '\t' or '\r' or '\n')
-                        continue;
-                    return b == '{';
-                }
-                return false;
-            } finally {
-                stream.Position = start;
-            }
-        }
+        public static Task SaveIconCacheAsync(string path, Dictionary<string, IconColorPair> iconCache, CancellationToken cancellationToken = default) =>
+            ForemanIconCacheFile.WriteAsync(path, iconCache, cancellationToken);
 
         public static async Task<Dictionary<string, IconColorPair>> LoadIconCache(string path, IProgress<KeyValuePair<int, string>> progress, int startingPercent, int endingPercent) {
-            Dictionary<string, IconColorPair> iconCache = [];
-            await Task.Run(() => {
-                try {
-                    using Stream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    if (!StreamLooksLikeJson(stream)) {
-                        iconCache.Clear();
-                        UserMessages.Show(
-                            $"The icon cache \"{Path.GetFileName(path)}\" was created by an older Foreman build and cannot be read after upgrading to .NET.\n\n" +
-                            "Delete that file in the Presets folder (or re-import the preset) to rebuild the cache. " +
-                            "Icons will be loaded from game files until then.",
-                            "Icon cache format changed",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information);
+            try {
+                if (!File.Exists(path))
+                    return [];
+                if (!ForemanIconCacheFile.IsFoicFile(path))
+                    throw new InvalidDataException("Unrecognized icon cache format.");
+
+                int lastReportedPercent = startingPercent - 1;
+                var iconProgress = new Progress<(int Decoded, int Total)>(state => {
+                    int percent = startingPercent + (int)((endingPercent - startingPercent) * (double)state.Decoded / Math.Max(state.Total, 1));
+                    if (percent <= lastReportedPercent)
                         return;
-                    }
-
-                    IconBitmapCollection? iCollection = JsonSerializer.Deserialize<IconBitmapCollection>(stream);
-                    if (iCollection?.Icons is null)
-                        throw new InvalidDataException("Icon cache JSON did not contain any icons.");
-
-                    int totalCount = iCollection.Icons.Count;
-                    int counter = 0;
-                    foreach (KeyValuePair<string, IconColorPair> iconKVP in iCollection.Icons) {
-                        progress.Report(new(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, "Loading Icons..."));
-                        iconCache.Add(iconKVP.Key, iconKVP.Value);
-                    }
-                } catch (Exception ex) {
-                    iconCache.Clear();
-                    ErrorLogging.LogException(ex, $"Failed to load icon cache from {path}");
-                    UserMessages.Show(
-                        $"The icon cache \"{Path.GetFileName(path)}\" could not be read.\n\n" +
-                        "Delete that file in the Presets folder (or re-import the preset) to rebuild the cache. " +
-                        "Icons will be loaded from game files until then.",
-                        "Icon cache unreadable",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                }
-            });
-            return iconCache;
+                    lastReportedPercent = percent;
+                    progress.Report(new(percent, "Loading Icons..."));
+                });
+                return await ForemanIconCacheFile.ReadAsync(path, iconProgress);
+            } catch (Exception ex) {
+                ErrorLogging.LogException(ex, $"Failed to load icon cache from {path}");
+                UserMessages.Show(
+                    $"The icon cache \"{Path.GetFileName(path)}\" could not be read.\n\n" +
+                    "Re-import the preset to rebuild the cache.",
+                    "Icon cache unreadable",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return [];
+            }
         }
     }
 }

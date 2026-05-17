@@ -34,6 +34,31 @@ namespace ForemanTest {
         }
 
         [TestMethod]
+        public async Task IconCacheFiles_BundledPresets_AreValidFoic() {
+            if (!VanillaDataCacheFixture.PresetsAvailable)
+                Assert.Inconclusive($"Preset folder not found: {VanillaDataCacheFixture.PresetsDirectory}");
+
+            string[] presetNames =
+            [
+                VanillaPresetName,
+                SpaceAgeDataCacheFixture.PresetName
+            ];
+
+            foreach (string presetName in presetNames) {
+                string path = Path.Combine(VanillaDataCacheFixture.PresetsDirectory, presetName + ".dat");
+                Assert.IsTrue(File.Exists(path), $"Missing icon cache: {path}");
+                Assert.IsTrue(
+                    ForemanIconCacheFile.IsFoicFile(path),
+                    $"{presetName}.dat is not FOIC format. Re-import the preset to regenerate icon caches before running tests.");
+
+                var icons = await ForemanIconCacheFile.ReadAsync(path);
+                Assert.IsTrue(icons.Count > 100, $"{presetName}: expected a large icon set, got {icons.Count}.");
+                Assert.IsTrue(icons.ContainsKey("icon.i.iron-plate"), $"{presetName}: missing icon.i.iron-plate.");
+                Assert.IsNotNull(icons["icon.i.iron-plate"].Icon, $"{presetName}: iron-plate icon bitmap is null.");
+            }
+        }
+
+        [TestMethod]
         public void ReadPresetInfo_Vanilla_IncludesBaseMod() {
             var info = PresetProcessor.ReadPresetInfo(new Preset(VanillaPresetName, true, true));
             Assert.IsNotNull(info.ModList);

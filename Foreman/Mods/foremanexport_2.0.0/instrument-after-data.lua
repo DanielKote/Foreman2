@@ -46,7 +46,7 @@ local function ExportIcon(icon, icon_size, icons)
 				if ic.shift == nil then
 					ExportLine('"shift": [0,0]', 6)
 				else
-					ExportLine('"shift": ['..ic.shift[1]..','..ic.shift[2]..']', 6)
+					ExportLine('"shift": ['..(ic.shift[1] or ic.shift.x)..','..(ic.shift[2] or ic.shift.y)..']', 6)
 				end
 
 				ccounter = ccounter - 1 if ccounter > 0 then ExportLine('},', 5) else ExportLine('}', 5) end
@@ -73,8 +73,8 @@ output['entities'] = {}
 output['qualities'] = data.raw.quality
 
 --depreciated: 'item-with-inventory', 'item-with-label', 'item-with-tags'
-for _, section in ipairs({ 'ammo', 'armor', 'capsule', 'gun', 'item', 'item-with-entity-data', 'module', 'rail-planner', 'repair-tool', 'selection-tool', 'spider-vehicle', 'spidertron-remote', 'tool', 'upgrade-item' }) do
-	for name, obj in pairs(data.raw[section]) do
+for _, section in ipairs({ 'ammo', 'armor', 'capsule', 'gun', 'item', 'item-with-entity-data', 'module', 'rail-planner', 'repair-tool', 'selection-tool', 'space-platform-starter-pack', 'spider-vehicle', 'spidertron-remote', 'tool', 'upgrade-item' }) do
+	for name, obj in pairs(data.raw[section] or {}) do
 		output['items'][name] = obj
 	end
 end

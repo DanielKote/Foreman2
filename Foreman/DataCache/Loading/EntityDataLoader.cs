@@ -388,7 +388,7 @@ namespace Foreman {
                     _store.EnergySubgroupBoiling,
                     boilRecipeName);
 
-                recipe.SetIconAndColor(new IconColorPair(IconCache.ConbineIcons(ingredient.Icon, product.Icon, ingredient.Icon.Height), product.AverageColor));
+                recipe.SetIconAndColor(new IconColorPair(IconCache.CombineIcons(ingredient.Icon, product.Icon, ingredient.Icon.Height), product.AverageColor));
 
                 recipe.Time = 1;
 
@@ -449,7 +449,7 @@ namespace Foreman {
                     _store.EnergySubgroupEnergy,
                     generationRecipeName);
 
-                recipe.SetIconAndColor(new IconColorPair(IconCache.ConbineIcons(ingredient.Icon, _store.ElectricityIcon ?? IconCache.UnknownIcon, ingredient.Icon.Height, false), ingredient.AverageColor));
+                recipe.SetIconAndColor(new IconColorPair(IconCache.CombineIcons(ingredient.Icon, _store.ElectricityIcon ?? IconCache.UnknownIcon, ingredient.Icon.Height, false), ingredient.AverageColor));
 
                 recipe.Time = 1;
 

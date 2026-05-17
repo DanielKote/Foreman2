@@ -175,7 +175,7 @@ namespace Foreman {
         }
 
         private async Task<string> ProcessPreset(string installPath, string foremanModName, string modsPath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token) {
-            return await Task.Run(() => {
+            return await Task.Run(async () => {
                 //prepare for running factorio
                 string exePath = FactorioPathsProcessor.GetExecutablePath(installPath);
                 string presetPath = PresetProcessor.GetPresetPath(NewPresetName, "");
@@ -343,7 +343,7 @@ namespace Foreman {
                         return "";
                     }
 
-                    if (!icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, token, 30, 100)) {
+                    if (!await icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, token, 30, 100)) {
                         if (!token.IsCancellationRequested) {
                             ErrorLogging.LogLine(string.Format("{0}/{1} images were not found while processing icons.", icProcessor.FailedPathCount, icProcessor.TotalPathCount));
                             if (UserMessages.Show(string.Format("{0}/{1} images that were processed for icons were not found and thus some icons are likely wrong/empty. Do you still wish to continue with the preset import?", icProcessor.FailedPathCount, icProcessor.TotalPathCount), "Confirm Preset Import", MessageBoxButtons.YesNo) != DialogResult.Yes) {

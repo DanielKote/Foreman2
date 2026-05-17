@@ -121,7 +121,7 @@ namespace Foreman {
             return true;
         }
 
-        public bool CreateIconCache(JsonObject iconJObject, string cachePath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token, int startingPercent, int endingPercent) {
+        public async Task<bool> CreateIconCache(JsonObject iconJObject, string cachePath, IProgress<KeyValuePair<int, string>> progress, CancellationToken token, int startingPercent, int endingPercent) {
             ObjectDisposedException.ThrowIf(disposedValue, this);
             TotalPathCount = 0;
             FailedPathCount = 0;
@@ -183,43 +183,52 @@ namespace Foreman {
                 ProcessIcon(iconJToken, 32);
             }
 
-            IconCache.SaveIconCache(cachePath, myIconCache);
+            await IconCache.SaveIconCacheAsync(cachePath, myIconCache, token);
 
             return (FailedPathCount == 0);
         }
 
         private void ProcessIcon(JsonNode objJToken, int defaultIconSize) {
-            if (PresetJson.GetNode(objJToken, "icon_data") is JsonNode iconDataJToken) {
-                string? iconName = PresetJson.GetString(objJToken, "icon_name");
-                var iconData = new IconColorPair(null, Color.Black);
+            if (PresetJson.GetNode(objJToken, "icon_data") is not JsonNode iconDataJToken)
+                return;
 
-                string? mainIconPath = PresetJson.GetString(iconDataJToken, "icon");
-                int baseIconSize = PresetJson.GetInt32(iconDataJToken, "icon_size") ?? 32;
+            string? iconName = PresetJson.GetString(objJToken, "icon_name");
+            if (iconName is null || myIconCache.ContainsKey(iconName))
+                return;
 
-                if (mainIconPath is null)
-                    return;
+            string? mainIconPath = PresetJson.GetString(iconDataJToken, "icon");
+            int baseIconSize = PresetJson.GetInt32(iconDataJToken, "icon_size") ?? 32;
 
-                IconInfo iicon = new IconInfo(mainIconPath, baseIconSize);
+            IconInfo iicon = mainIconPath is not null
+                ? new IconInfo(mainIconPath, baseIconSize)
+                : new IconInfo("", baseIconSize);
+            if (mainIconPath is not null)
                 iicon.iconScale = defaultIconSize / iicon.iconSize;
 
-                var iicons = new List<IconInfo>();
-                foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconDataJToken, "icons")) {
-                    if (PresetJson.GetString(iconJToken, "icon") is not string icon ||
-                        PresetJson.GetNode(iconJToken, "shift") is not JsonArray shift ||
-                        shift.Count < 2 ||
-                        PresetJson.GetNode(iconJToken, "tint") is not JsonArray tint ||
-                        tint.Count < 4)
-                        return;
-                    IconInfo picon = new IconInfo(icon, PresetJson.GetInt32(iconJToken, "icon_size") ?? baseIconSize);
-                    picon.iconScale = PresetJson.GetDouble(iconJToken, "scale") ?? defaultIconSize / picon.iconSize;
+            var layerIcons = new List<IconInfo>();
+            foreach (JsonNode iconJToken in PresetJson.EnumerateArray(iconDataJToken, "icons")) {
+                if (PresetJson.GetString(iconJToken, "icon") is not string icon ||
+                    PresetJson.GetNode(iconJToken, "shift") is not JsonArray shift ||
+                    shift.Count < 2 ||
+                    PresetJson.GetNode(iconJToken, "tint") is not JsonArray tint ||
+                    tint.Count < 4)
+                    continue;
 
-                    picon.iconOffset = new Point(PresetJson.GetInt32Value(shift[0]) ?? default, PresetJson.GetInt32Value(shift[1]) ?? default);
-                    picon.SetIconTint(PresetJson.GetDoubleValue(tint[3]) ?? default, PresetJson.GetDoubleValue(tint[0]) ?? default, PresetJson.GetDoubleValue(tint[1]) ?? default, PresetJson.GetDoubleValue(tint[2]) ?? default);
-                    iicons.Add(picon);
-                }
-                if (iconName is not null && !myIconCache.ContainsKey(iconName))
-                    myIconCache.Add(iconName, GetIconAndColor(iicon, iicons, defaultIconSize));
+                IconInfo layerIcon = new IconInfo(icon, PresetJson.GetInt32(iconJToken, "icon_size") ?? baseIconSize);
+                layerIcon.iconScale = PresetJson.GetDouble(iconJToken, "scale") ?? defaultIconSize / layerIcon.iconSize;
+                layerIcon.iconOffset = new Point(PresetJson.GetInt32Value(shift[0]) ?? default, PresetJson.GetInt32Value(shift[1]) ?? default);
+                layerIcon.SetIconTint(
+                    PresetJson.GetDoubleValue(tint[3]) ?? default,
+                    PresetJson.GetDoubleValue(tint[0]) ?? default,
+                    PresetJson.GetDoubleValue(tint[1]) ?? default,
+                    PresetJson.GetDoubleValue(tint[2]) ?? default);
+                layerIcons.Add(layerIcon);
             }
+
+            if (mainIconPath is null && layerIcons.Count == 0)
+                return;
+
+            myIconCache.Add(iconName, GetIconAndColor(iicon, layerIcons, defaultIconSize));
         }
 
 

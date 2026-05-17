@@ -210,6 +210,8 @@ namespace Foreman {
 
             if (PresetJson.GetString(objJsonNode, "icon_name") is string iconName && iconCache.TryGetValue(iconName, out var icp))
                 item.SetIconAndColor(icp);
+            else if (PresetJson.GetString(objJsonNode, "icon_alt_name") is string iconAltName && iconCache.TryGetValue(iconAltName, out var icpAlt))
+                item.SetIconAndColor(icpAlt);
 
             item.StackSize = stackSize;
             item.Weight = weight;
