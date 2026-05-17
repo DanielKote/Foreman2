@@ -80,6 +80,7 @@ namespace Foreman {
 
         public new void Show() {
             InitializeButtons();
+            StartingGroup ??= SortedGroups?.FirstOrDefault(g => g.Name == "logistics");
             SetSelectedGroup(null);
 
             //set up the event handlers last so as not to cause unexpected calls when setting checked status ob checkboxes

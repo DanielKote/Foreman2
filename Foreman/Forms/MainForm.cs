@@ -287,22 +287,24 @@ namespace Foreman {
         }
 
         private bool TestGraphSavedStatus() {
+            const string exitMsg = "The current graph hasn't been saved!\nIf you continue, you will lose it forever!";
+            const string exitTitle = "Are you sure?";
             if (savefilePath == null) {
                 if (GraphViewer.Graph.Nodes.Any())
-                    return UserMessages.Show("The current graph hasnt been saved!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+                    return UserMessages.Show(exitMsg, exitTitle, MessageBoxButtons.OKCancel) == DialogResult.OK;
                 else
                     return true;
             }
 
             if (!File.Exists(savefilePath))
-                return UserMessages.Show("The current graph's save file has been deleted!\nIf you continue, you will loose it forever!", "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK;
+                return UserMessages.Show(exitMsg, exitTitle, MessageBoxButtons.OKCancel) == DialogResult.OK;
 
             GraphViewer.Graph.SerializeNodeIdSet = null;
             string currentSaveJson = GraphSaveCodec.WriteViewerToString(GraphViewer, writeIndented: true);
             string? savedJson = savefileBaselineJson ?? File.ReadAllText(savefilePath);
 
             if (savedJson != currentSaveJson) {
-                DialogResult result = UserMessages.Show("The current graph has been modified!\nDo you wish to save before continuing?", "Are you sure?", MessageBoxButtons.YesNoCancel);
+                DialogResult result = UserMessages.Show("The current graph has been modified!\nDo you wish to save before continuing?", exitTitle, MessageBoxButtons.YesNoCancel);
                 if (result == DialogResult.Cancel)
                     return false;
                 if (result == DialogResult.OK)
