@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="CurrentPresetName" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Factorio 2.0 Space Age</Value>
     </Setting>
     <Setting Name="DefaultModuleOption" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
