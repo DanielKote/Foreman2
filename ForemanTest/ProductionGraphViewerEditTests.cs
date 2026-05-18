@@ -31,6 +31,14 @@ namespace ForemanTest {
         public void AddDisconnectedRecipe_CreatesRecipeNode_WithoutBaseItem() =>
             StaTest.Run(AddDisconnectedRecipe_CreatesRecipeNode_WithoutBaseItem_Impl);
 
+        [TestMethod]
+        public void ItemChooser_ClosesOnGraphClick_AndSelectsWithoutException() =>
+            StaTest.Run(ItemChooser_ClosesOnGraphClick_AndSelectsWithoutException_Impl);
+
+        [TestMethod]
+        public void ItemChooser_SizeMatchesContentAfterShow() =>
+            StaTest.Run(ItemChooser_SizeMatchesContentAfterShow_Impl);
+
         private static void EditNode_DoesNotChangeViewOffset_WhenPanelsWouldClip_Impl() {
             var ctx = GraphSessionTestHelper.CreateContext();
             using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(120, 300));
@@ -91,6 +99,10 @@ namespace ForemanTest {
                 viewer.AddNewNode(new Point(10, 10), disconnectedRecipeAnchor, new Point(200, 150), NewNodeType.Disconnected);
                 RecipeChooserPanel? chooser = viewer.Controls.OfType<RecipeChooserPanel>().FirstOrDefault();
                 Assert.IsNotNull(chooser, "AddNewNode should open a recipe chooser for disconnected placement.");
+                Assert.IsTrue(chooser.Width >= 200 && chooser.Height >= 200,
+                    "Recipe chooser should have a visible size after Show().");
+                Assert.IsTrue(chooser.Visible && !chooser.IsDisposed,
+                    "Recipe chooser should stay open after focusing the filter box.");
 
                 Recipe recipe = CreateTestRecipeDefinition(ctx);
                 int nodesBefore = viewer.Session.View.Nodes.Count;
@@ -104,6 +116,49 @@ namespace ForemanTest {
             } finally {
                 viewer.ToolTipRenderer.ClearFloatingControls();
             }
+        }
+
+        private static void ItemChooser_SizeMatchesContentAfterShow_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+
+            viewer.AddItem(new Point(10, 10), new Point(200, 150));
+            ItemChooserPanel? chooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+
+            Assert.AreEqual(chooser.Size, chooser.MaximumSize,
+                "Chooser should not reserve extra viewer-sized dead space.");
+            Assert.IsTrue(chooser.Width >= 200 && chooser.Height >= 200,
+                "Chooser should have a usable size after Show().");
+            AssertFloatingPanelsOnScreen(viewer);
+        }
+
+        private static void ItemChooser_ClosesOnGraphClick_AndSelectsWithoutException_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+
+            viewer.AddItem(new Point(10, 10), new Point(200, 150));
+            ItemChooserPanel? chooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+
+            MethodInfo? viewerMouseDown = typeof(ProductionGraphViewer).GetMethod(
+                "ProductionGraphViewer_MouseDown", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(viewerMouseDown);
+            viewerMouseDown.Invoke(viewer, new object[] { viewer, new MouseEventArgs(MouseButtons.Left, 1, 500, 500, 0) });
+            Assert.IsTrue(chooser.IsDisposed, "Clicking empty graph space should close the item chooser.");
+
+            viewer.AddItem(new Point(10, 10), new Point(200, 150));
+            chooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+
+            Item item = ctx.Item("iron").Item!;
+            var button = new Button { Tag = item };
+            var mouseUp = typeof(ItemChooserPanel).GetMethod("IRButton_MouseUp", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(mouseUp);
+            mouseUp.Invoke(chooser, new object[] { button, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0) });
+            Assert.IsTrue(chooser.IsDisposed, "Selecting an item should close the chooser without throwing.");
         }
 
         private static void SelectRecipeInChooser(RecipeChooserPanel chooser, Recipe recipe) {

@@ -45,9 +45,18 @@
     <Compile Update="Controls\EditFlowPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="Controls\ChooserIconGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <EmbeddedResource Update="Controls\ChooserIconGrid.resx">
+      <DependentUpon>ChooserIconGrid.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Update="Controls\IRChooserPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <EmbeddedResource Update="Controls\IRChooserPanel.resx">
+      <DependentUpon>IRChooserPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Update="Controls\RecipePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

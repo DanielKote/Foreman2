@@ -795,6 +795,8 @@ namespace Foreman {
 
             ToolTipRenderer.ClearFloatingControls();
             ActiveControl = null; //helps panels like IRChooserPanel (for item/recipe choosing) close when we click on the graph
+            foreach (IRChooserPanel chooser in Controls.OfType<IRChooserPanel>().ToArray())
+                chooser.CloseIfClickOutside(e.Location);
 
             mouseDownStartScreenPoint = Control.MousePosition;
             Point graph_location = ScreenToGraph(e.Location);

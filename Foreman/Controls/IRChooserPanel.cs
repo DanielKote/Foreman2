@@ -19,6 +19,8 @@ namespace Foreman {
         }
         public event EventHandler<PanelChooserCloseArgs>? PanelClosed;
         internal ChooserPanelCloseReason panelCloseReason;
+        private bool isClosing;
+        private EventHandler? viewerResizeHandler;
 
         private static readonly Color SelectedGroupButtonBGColor = Color.SandyBrown;
         protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 70, 70, 70);
@@ -27,7 +29,6 @@ namespace Foreman {
         protected static readonly Color IRButtonUnavailableColor = Color.FromArgb(255, 170, 10, 160);
 
 
-        private NFButton[,] IRButtons;
         private List<NFButton> GroupButtons = new List<NFButton>();
         private Dictionary<Group, NFButton> GroupButtonLinks = new Dictionary<Group, NFButton>();
         private List<KeyValuePair<DataObjectBase, Color>[]> filteredIRRowsList = new List<KeyValuePair<DataObjectBase, Color>[]>(); //updated on every filter command & group selection. Represents the full set of items/recipes in the IRFlowPanel (the visible ones will come from this set based on scrolling), with each array being size 10 (#buttons/line). bool (value) is the 'use BW icon'
@@ -54,11 +55,11 @@ namespace Foreman {
             panelCloseReason = ChooserPanelCloseReason.Cancelled;
 
             InitializeComponent();
+            FilterTextBox.TextChanged += FilterTextBox_TextChanged;
+            Leave += IRChooserPanel_Leave;
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.Disposed += IRChooserPanel_Disposed;
             this.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-
-            IRButtons = new NFButton[IRTable.ColumnCount - 1, IRTable.RowCount];
 
             GroupButtonToolTip = new CustomToolTip();
 
@@ -66,10 +67,20 @@ namespace Foreman {
             IRScrollBar.Maximum = 0;
             IRScrollBar.Enabled = false;
             IRScrollBar.SmallChange = 1;
-            IRScrollBar.LargeChange = IRTable.RowCount;
+            IRScrollBar.LargeChange = ChooserIconGrid.VisibleRowCount;
             CurrentRow = 0;
 
-            IRTable.MouseWheel += new MouseEventHandler(IRFlowPanel_MouseWheel);
+            iconGrid.WireMouseWheel(IRFlowPanel_MouseWheel);
+            IRScrollBar.Scroll += IRPanelScrollBar_Scroll;
+
+            for (int column = 0; column < ChooserIconGrid.ColumnCount; column++) {
+                for (int row = 0; row < ChooserIconGrid.VisibleRowCount; row++) {
+                    NFButton button = IRButtons[column, row];
+                    button.MouseUp += IRButton_MouseUp;
+                    button.MouseHover += IRButton_MouseHover;
+                    button.MouseLeave += IRButton_MouseLeave;
+                }
+            }
 
             ShowHiddenCheckBox.Checked = Properties.Settings.Default.ShowHidden;
             IgnoreAssemblerCheckBox.Checked = Properties.Settings.Default.IgnoreAssemblerStatus;
@@ -78,7 +89,17 @@ namespace Foreman {
             this.Location = originPoint;
         }
 
+        protected override void OnDpiChangedAfterParent(EventArgs e) {
+            base.OnDpiChangedAfterParent(e);
+            if (isClosing || !IsHandleCreated)
+                return;
+            ApplyDpiScaling();
+            if (PGViewer != null && PGViewer.Controls.Contains(this))
+                ApplyViewerBounds();
+        }
+
         public new void Show() {
+            ApplyDpiScaling();
             InitializeButtons();
             StartingGroup ??= SortedGroups?.FirstOrDefault(g => g.Name == "logistics");
             SetSelectedGroup(null);
@@ -87,11 +108,21 @@ namespace Foreman {
             ShowHiddenCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
             IgnoreAssemblerCheckBox.CheckedChanged += new EventHandler(FilterCheckBox_CheckedChanged);
 
+            Visible = true;
             PGViewer.Controls.Add(this);
-            this.BringToFront();
+            viewerResizeHandler ??= (_, _) => ApplyViewerBounds();
+            PGViewer.Resize += viewerResizeHandler;
+            BringToFront();
+            ApplyViewerBounds();
             PGViewer.PerformLayout();
-            this.Focus();
             FilterTextBox.Focus();
+        }
+
+        private void DetachViewerResizeHandler() {
+            if (PGViewer != null && viewerResizeHandler != null) {
+                PGViewer.Resize -= viewerResizeHandler;
+                viewerResizeHandler = null;
+            }
         }
 
         //-----------------------------------------------------------------------------------------------------Button initialization & update
@@ -100,68 +131,37 @@ namespace Foreman {
             //initialize the group buttons
             SortedGroups = GetSortedGroups();
 
-            GroupTable.SuspendLayout();
+            groupsPanel.SuspendLayout();
+            groupsPanel.Controls.Clear();
+            GroupButtons.Clear();
+            GroupButtonLinks.Clear();
 
-            //add any extra rows to handle the amount of sorted groups
-            for (int i = 0; i < (SortedGroups.Count - 1) / GroupTable.ColumnCount; i++)
-                GroupTable.RowStyles.Add(new RowStyle(GroupTable.RowStyles[0].SizeType, GroupTable.RowStyles[0].Height));
-
-            //add in the group buttons
+            int groupButtonSize = ChooserLayout.Scale(this, ChooserLayout.DesignGroupIconPixels);
             for (int i = 0; i < SortedGroups.Count; i++) {
-                NFButton button = new NFButton();
-                button.BackColor = Color.DimGray;
-                button.UseVisualStyleBackColor = false;
-                button.FlatStyle = FlatStyle.Flat;
+                NFButton button = new NFButton {
+                    BackColor = Color.DimGray,
+                    UseVisualStyleBackColor = false,
+                    FlatStyle = FlatStyle.Flat,
+                    TabStop = false,
+                    Margin = new Padding(1),
+                    Size = new Size(groupButtonSize, groupButtonSize),
+                    BackgroundImage = SortedGroups[i].Icon,
+                    BackgroundImageLayout = ImageLayout.Zoom,
+                    Tag = SortedGroups[i],
+                };
                 button.FlatAppearance.BorderSize = 0;
-                button.TabStop = false;
-                button.Margin = new Padding(0);
-                button.Size = new Size(1, 64);
-                button.Dock = DockStyle.Fill;
-                button.BackgroundImage = SortedGroups[i].Icon;
-                button.BackgroundImageLayout = ImageLayout.Center;
-                button.Tag = SortedGroups[i];
 
                 GroupButtonToolTip.SetToolTip(button, string.IsNullOrEmpty(SortedGroups[i].FriendlyName) ? "-" : SortedGroups[i].FriendlyName);
 
-                button.Click += new EventHandler(GroupButton_Click);
-                button.MouseHover += new EventHandler(GroupButton_MouseHover);
-                button.MouseLeave += new EventHandler(GroupButton_MouseLeave);
+                button.Click += GroupButton_Click;
+                button.MouseHover += GroupButton_MouseHover;
+                button.MouseLeave += GroupButton_MouseLeave;
 
                 GroupButtons.Add(button);
                 GroupButtonLinks.Add(SortedGroups[i], button);
-
-                GroupTable.Controls.Add(button, i % GroupTable.ColumnCount, i / GroupTable.ColumnCount);
+                groupsPanel.Controls.Add(button);
             }
-            GroupTable.ResumeLayout();
-
-            //initialize the item/recipe buttons
-            IRTable.SuspendLayout();
-            for (int column = 0; column < IRButtons.GetLength(0); column++) {
-                for (int row = 0; row < IRButtons.GetLength(1); row++) {
-                    NFButton button = new NFButton();
-                    button.BackgroundImageLayout = ImageLayout.Zoom;
-                    button.UseVisualStyleBackColor = false;
-                    button.FlatStyle = FlatStyle.Flat;
-                    button.FlatAppearance.BorderSize = Math.Max(1, IRTable.Width / (IRButtons.GetLength(0) * 24));
-                    button.TabStop = false;
-                    button.ForeColor = Color.Gray;
-                    button.BackColor = Color.DimGray;
-                    button.Margin = new Padding(1);
-                    button.Size = new Size(40, 40);
-                    button.Dock = DockStyle.Fill;
-                    button.BackgroundImage = null;
-                    button.Tag = null;
-                    button.Enabled = false;
-
-                    button.MouseUp += new MouseEventHandler(IRButton_MouseUp);
-                    button.MouseHover += new EventHandler(IRButton_MouseHover);
-                    button.MouseLeave += new EventHandler(IRButton_MouseLeave);
-                    IRButtons[column, row] = button;
-
-                    IRTable.Controls.Add(button, column, row);
-                }
-            }
-            IRTable.ResumeLayout();
+            groupsPanel.ResumeLayout(true);
         }
 
         protected abstract List<Group> GetSortedGroups();
@@ -204,8 +204,6 @@ namespace Foreman {
                     CurrentRow = startRow;
                     IRScrollBar.Value = startRow;
 
-                    IRTable.ResumeLayout();
-                    IRTable.SuspendLayout();
                 });
 
                 //update all the buttons to be based off of the filteredIRSet
@@ -241,11 +239,6 @@ namespace Foreman {
                         });
                     }
                 }
-            });
-            this.UIThread(delegate {
-                if (currentID != updateID)
-                    return;
-                IRTable.ResumeLayout();
             });
         }
 
@@ -334,25 +327,47 @@ namespace Foreman {
 
         //-----------------------------------------------------------------------------------------------------Closing functions
 
-        private void IRChooserPanel_Leave(object? sender, EventArgs e) {
+        internal void CloseIfClickOutside(Point viewerClientPoint) {
+            if (isClosing || IsDisposed)
+                return;
+            if (!Bounds.Contains(viewerClientPoint))
+                ClosePanel(ChooserPanelCloseReason.Cancelled);
+        }
+
+        protected void ClosePanel(ChooserPanelCloseReason reason) {
+            if (isClosing || IsDisposed)
+                return;
+            isClosing = true;
+            panelCloseReason = reason;
+            DetachViewerResizeHandler();
+            PersistChooserSettings();
+            PanelClosed?.Invoke(this, new PanelChooserCloseArgs(panelCloseReason));
             Dispose();
         }
 
-        protected virtual void IRChooserPanel_Disposed(object? sender, EventArgs e) {
+        private void PersistChooserSettings() {
             Properties.Settings.Default.ShowHidden = ShowHiddenCheckBox.Checked;
             Properties.Settings.Default.IgnoreAssemblerStatus = IgnoreAssemblerCheckBox.Checked;
             Properties.Settings.Default.RecipeNameOnlyFilter = RecipeNameOnlyFilterCheckBox.Checked;
             Properties.Settings.Default.Save();
-            PanelClosed?.Invoke(this, new PanelChooserCloseArgs(panelCloseReason));
         }
 
-        private void MainTable_Paint(object? sender, PaintEventArgs e) {
-
+        private void IRChooserPanel_Leave(object? sender, EventArgs e) {
+            if (isClosing || IsDisposed)
+                return;
+            // UserControl.Leave also fires when focus moves to a child; defer so ContainsFocus is accurate.
+            try {
+                BeginInvoke(new Action(() => {
+                    if (!isClosing && !IsDisposed && !ContainsFocus)
+                        ClosePanel(ChooserPanelCloseReason.Cancelled);
+                }));
+            } catch (InvalidOperationException) {
+                // Control disposed before the deferred check (e.g. icon click closed the panel).
+            }
         }
 
-        private void comboBox1_SelectedIndexChanged(object? sender, EventArgs e) {
+        protected virtual void IRChooserPanel_Disposed(object? sender, EventArgs e) { }
 
-        }
     }
 
     public class ItemChooserPanel : IRChooserPanel {
@@ -374,7 +389,7 @@ namespace Foreman {
             qualitySelectorIndexSet = new List<Quality>();
 
             if (itemQuality == null) {
-                QualitySelectorTable.Visible = true;
+                QualityRow.Visible = true;
                 foreach (Quality quality in DCache.AvailableQualities.Where(q => q.Enabled)) {
                     QualitySelector.Items.Add(quality.FriendlyName);
                     qualitySelectorIndexSet.Add(quality);
@@ -395,8 +410,6 @@ namespace Foreman {
 
         protected override void IRChooserPanel_Disposed(object? sender, EventArgs e) {
             base.IRChooserPanel_Disposed(sender, e);
-            if (selectedItem)
-                ItemRequested?.Invoke(this, new ItemRequestArgs(selectedItem));
         }
 
         protected override List<Group> GetSortedGroups() {
@@ -487,9 +500,9 @@ namespace Foreman {
 
         protected override void IRButton_MouseUp(object? sender, MouseEventArgs e) {
             if (sender is Button b && b.Tag is Item i && e.Button == MouseButtons.Left) {
-                panelCloseReason = ChooserPanelCloseReason.ItemSelected;
                 selectedItem = new ItemQualityPair(i, qualitySelectorIndexSet[QualitySelector.SelectedIndex]);
-                Dispose();
+                ItemRequested?.Invoke(this, new ItemRequestArgs(selectedItem));
+                ClosePanel(ChooserPanelCloseReason.ItemSelected);
             }
         }
     }
@@ -512,7 +525,7 @@ namespace Foreman {
             qualitySelectorIndexSet = new List<Quality>();
 
             if (!item) {
-                QualitySelectorTable.Visible = true;
+                QualityRow.Visible = true;
                 foreach (Quality quality in DCache.AvailableQualities.Where(q => q.Enabled)) {
                     QualitySelector.Items.Add(quality.FriendlyName);
                     qualitySelectorIndexSet.Add(quality);
@@ -556,17 +569,17 @@ namespace Foreman {
             if (KeyItem is { Item: Item keyItem, Quality: Quality keyQuality }) {
                 ItemIconPanel.Visible = true;
                 ItemIconPanel.BackgroundImage = KeyItem.Icon;
-                OtherNodeOptionsATable.Visible = true;
+                nodeOptionsRowA.Visible = true;
                 AddConsumerButton.Visible = asIngredient;
                 AddSupplyButton.Visible = asProduct;
 
-                OtherNodeOptionsBTable.Visible = true;
+                nodeOptionsRowB.Visible = true;
                 AddSpoilButton.Visible = asIngredient && keyItem.SpoilResult != null;
                 AddUnspoilButton.Visible = asProduct && keyItem.SpoilOrigins.Count > 0;
                 AddPlantButton.Visible = asIngredient && keyItem.PlantResult != null;
                 AddUnplantButton.Visible = asProduct && isDefaultQuality && keyItem.PlantOrigins.Count > 0;
                 int totalVisible = (AddSpoilButton.Visible ? 1 : 0) + (AddUnspoilButton.Visible ? 1 : 0) + (AddPlantButton.Visible ? 1 : 0) + (AddUnplantButton.Visible ? 1 : 0);
-                OtherNodeOptionsBTable.Visible = totalVisible > 0;
+                nodeOptionsRowB.Visible = totalVisible > 0;
 
                 bool hasConsumptionRecipes = Properties.Settings.Default.ShowUnavailable ? keyItem.ConsumptionRecipes.Count > 0 : keyItem.ConsumptionRecipes.Count(r => r.Available) > 0;
                 bool hasFuelConsumptionRecipes = isDefaultQuality && (keyItem.FuelsEntities.Any(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.Any(r => r.Enabled)));
@@ -575,25 +588,30 @@ namespace Foreman {
 
                 if (!(asIngredient && (hasConsumptionRecipes || hasFuelConsumptionRecipes)) && !(asProduct && (hasProductionRecipes || hasFuelProductionRecipes))) //no valid recipes
                 {
-                    GroupTable.Visible = false;
-                    IRTable.Visible = false;
-                    IRScrollBar.Visible = false;
+                    groupsPanel.Visible = false;
+                    iconGrid.Visible = false;
                     FilterTextBox.Visible = false;
                     FilterLabel.Visible = false;
                     RecipeNameOnlyFilterCheckBox.Visible = false;
                     ShowHiddenCheckBox.Visible = false;
                     IgnoreAssemblerCheckBox.Visible = false;
+                    recipeRoleRow.Visible = false;
                     ItemIconPanel.Location = new Point(4, 4);
                 } else if (asIngredient && asProduct) {
+                    recipeRoleRow.Visible = true;
                     AsFuelCheckBox.Visible = (asIngredient && hasFuelConsumptionRecipes) || (asProduct && hasFuelProductionRecipes);
                     AsIngredientCheckBox.Visible = true;
                     AsProductCheckBox.Visible = true;
                 } else if (asIngredient) {
+                    recipeRoleRow.Visible = true;
                     AsFuelCheckBox.Visible = (asIngredient && keyItem.FuelsEntities.Count > 0);
+                } else if (asProduct) {
+                    recipeRoleRow.Visible = true;
                 }
             } else {
-                OtherNodeOptionsATable.Visible = false;
-                OtherNodeOptionsBTable.Visible = false;
+                nodeOptionsRowA.Visible = false;
+                nodeOptionsRowB.Visible = false;
+                recipeRoleRow.Visible = true;
             }
         }
 
@@ -689,10 +707,8 @@ namespace Foreman {
             {
                 RecipeRequested?.Invoke(this, new RecipeRequestArgs(new RecipeQualityPair(sRecipe, qualitySelectorIndexSet[QualitySelector.SelectedIndex])));
 
-                if ((ModifierKeys & Keys.Shift) != Keys.Shift) {
-                    panelCloseReason = ChooserPanelCloseReason.RecipeSelected;
-                    Dispose();
-                }
+                if ((ModifierKeys & Keys.Shift) != Keys.Shift)
+                    ClosePanel(ChooserPanelCloseReason.RecipeSelected);
             } else if (sender is NFButton nfBtn && nfBtn.Tag is Recipe selectedRecipe && e.Button == MouseButtons.Right) //flip hidden status of recipe
               {
                 selectedRecipe.Enabled = !selectedRecipe.Enabled;
@@ -703,46 +719,37 @@ namespace Foreman {
         private void AddSupplyButton_Click(object? sender, EventArgs e) {
             RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Supplier));
 
-            if ((ModifierKeys & Keys.Shift) != Keys.Shift) {
-                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
-                Dispose();
-            }
+            if ((ModifierKeys & Keys.Shift) != Keys.Shift)
+                ClosePanel(ChooserPanelCloseReason.AltNodeSelected);
         }
 
         private void AddConsumerButton_Click(object? sender, EventArgs e) {
             RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Consumer));
 
-            if ((ModifierKeys & Keys.Shift) != Keys.Shift) {
-                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
-                Dispose();
-            }
+            if ((ModifierKeys & Keys.Shift) != Keys.Shift)
+                ClosePanel(ChooserPanelCloseReason.AltNodeSelected);
         }
 
         private void AddPassthroughButton_Click(object? sender, EventArgs e) {
             RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Passthrough));
 
-            if ((ModifierKeys & Keys.Shift) != Keys.Shift) {
-                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
-                Dispose();
-            }
+            if ((ModifierKeys & Keys.Shift) != Keys.Shift)
+                ClosePanel(ChooserPanelCloseReason.AltNodeSelected);
         }
 
         private void AddSpoilButton_Click(object? sender, EventArgs e) {
             RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Spoil, NodeDirection.Up));
 
-            if ((ModifierKeys & Keys.Shift) != Keys.Shift) {
-                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
-                Dispose();
-            }
+            if ((ModifierKeys & Keys.Shift) != Keys.Shift)
+                ClosePanel(ChooserPanelCloseReason.AltNodeSelected);
         }
 
         private void AddUnSpoilButton_Click(object? sender, EventArgs e) {
             if (KeyItem is not { Item: Item spoilKeyItem })
                 return;
             if (spoilKeyItem.SpoilOrigins.Count < 2) {
-                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
                 RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Spoil, NodeDirection.Down));
-                Dispose(true);
+                ClosePanel(ChooserPanelCloseReason.AltNodeSelected);
             } else {
                 panelCloseReason = ChooserPanelCloseReason.RequiresItemSelection;
                 RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Spoil, NodeDirection.Down));
@@ -753,19 +760,16 @@ namespace Foreman {
         private void AddPlantButton_Click(object? sender, EventArgs e) {
             RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Plant, NodeDirection.Up));
 
-            if ((ModifierKeys & Keys.Shift) != Keys.Shift) {
-                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
-                Dispose();
-            }
+            if ((ModifierKeys & Keys.Shift) != Keys.Shift)
+                ClosePanel(ChooserPanelCloseReason.AltNodeSelected);
         }
 
         private void AddUnPlantButton_Click(object? sender, EventArgs e) {
             if (KeyItem is not { Item: Item plantKeyItem })
                 return;
             if (plantKeyItem.PlantOrigins.Count < 2) {
-                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
                 RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Plant, NodeDirection.Down));
-                Dispose(true);
+                ClosePanel(ChooserPanelCloseReason.AltNodeSelected);
             } else {
                 panelCloseReason = ChooserPanelCloseReason.RequiresItemSelection;
                 RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Plant, NodeDirection.Down));
