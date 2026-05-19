@@ -104,5 +104,35 @@
     <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="AnnotTextFontFamily" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Segoe UI</Value>
+    </Setting>
+    <Setting Name="AnnotTextFontSize" Type="System.String" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="AnnotTextFontStyle" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="AnnotTextColorARGB" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-16777216</Value>
+    </Setting>
+    <Setting Name="AnnotTextBackColorARGB" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AnnotTextAlign" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="AnnotShapeType" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AnnotShapeFillColorARGB" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5278975</Value>
+    </Setting>
+    <Setting Name="AnnotShapeBorderColorARGB" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-600016676</Value>
+    </Setting>
+    <Setting Name="AnnotShapeBorderWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -17,7 +19,7 @@ namespace Foreman {
     public enum NodeDrawingStyle { Regular, PrintStyle, Simple, IconsOnly } //printstyle is meant for any additional chages (from regular) for exporting to image format, simple will only draw the node boxes (no icons or text) and link lines, iconsonly will draw node icons instead of nodes (for zoomed view)
 
     public partial class ProductionGraphViewer : UserControl {
-        private enum DragOperation { None, Item, Selection }
+        private enum DragOperation { None, Item, Selection, DrawShape }
         public enum LOD { Low, Medium, High } //low: only names. medium: assemblers, beacons, etc. high: include assembler percentages
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -141,6 +143,7 @@ namespace Foreman {
             Graph.ClearGraph();
             //at this point every node element and link element has been removed.
 
+            ClearAnnotations();
             selectedNodes.Clear();
             currentSelectionNodes.Clear();
         }
@@ -586,6 +589,7 @@ namespace Foreman {
                 element.Highlighted = false;
             selectedNodes.Clear();
             currentSelectionNodes.Clear();
+            ClearAnnotationSelection();
             Invalidate();
         }
 
@@ -598,6 +602,8 @@ namespace Foreman {
         //----------------------------------------------Paint functions
 
         protected IEnumerable<GraphElement> GetPaintingOrder() {
+            foreach (AnnotationElement element in annotationElements)
+                yield return element;
             if (draggedLinkElement != null)
                 yield return draggedLinkElement;
             foreach (LinkElement element in linkElements)
@@ -630,10 +636,12 @@ namespace Foreman {
 
         public new void Paint(Graphics graphics, bool FullGraph = false) {
             //update visibility of all elements
-            if (FullGraph)
+            if (FullGraph) {
                 foreach (GraphElement element in GetPaintingOrder())
                     element.UpdateVisibility(Graph.Bounds);
-            else
+                foreach (AnnotationElement ann in annotationElements)
+                    ann.ForceVisible();
+            } else
                 foreach (GraphElement element in GetPaintingOrder())
                     element.UpdateVisibility(VisibleGraphBounds);
 
@@ -678,6 +686,11 @@ namespace Foreman {
             int visibleElements = GetPaintingOrder().Count(e => e.Visible && e is BaseNodeElement);
             foreach (GraphElement element in GetPaintingOrder())
                 element.Paint(graphics, FullGraph ? NodeDrawingStyle.PrintStyle : IconsOnly ? NodeDrawingStyle.IconsOnly : (visibleElements > NodeCountForSimpleView || ViewScale < 0.2) ? NodeDrawingStyle.Simple : NodeDrawingStyle.Regular); //if viewscale is 0.2, then the text, images, etc being drawn are ~1/5th the size: aka: ~6x6 pixel images, etc. Use simple draw. Also simple draw if too many objects
+
+            if (currentDragOperation == DragOperation.DrawShape && !FullGraph && SelectionZone.Width > 0 && SelectionZone.Height > 0) {
+                drawShapePen.Width = 2 / ViewScale;
+                graphics.DrawRectangle(drawShapePen, SelectionZone);
+            }
 
             //selection zone
             if (currentDragOperation == DragOperation.Selection && !FullGraph) {
@@ -725,6 +738,7 @@ namespace Foreman {
             nodeElements.Clear();
             linkElementDictionary.Clear();
             linkElements.Clear();
+            ClearAnnotations();
             selectedNodes.Clear();
             Invalidate();
         }
@@ -803,20 +817,29 @@ namespace Foreman {
             mouseDownStartScreenPoint = Control.MousePosition;
             Point graph_location = ScreenToGraph(e.Location);
 
-            GraphElement? clickedElement = (GraphElement?)draggedLinkElement ?? GetNodeAtPoint(ScreenToGraph(e.Location));
+            GraphElement? clickedElement = (GraphElement?)draggedLinkElement
+                ?? (GraphElement?)GetNodeAtPoint(graph_location)
+                ?? GetAnnotationAtPoint(graph_location);
+
+            // Before element MouseDown — that sets MouseDownElement and the modal dialog can swallow MouseUp.
+            if (Annotation_OnMouseDownDoubleClick(e, clickedElement))
+                return;
+
+            if (Annotation_OnMouseDown(e, graph_location, ref clickedElement))
+                return;
+
             clickedElement?.MouseDown(graph_location, e.Button);
 
             if (e.Button == MouseButtons.Middle || (e.Button == MouseButtons.Right)) {
                 ViewDragOriginPoint = graph_location;
-            } else if (e.Button == MouseButtons.Left && clickedElement == null) //selection
-              {
+            } else if (e.Button == MouseButtons.Left && clickedElement is not AnnotationElement) {
                 SelectionZoneOriginPoint = graph_location;
                 SelectionZone = new Rectangle();
-                if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0) //clear all selected nodes if we arent using modifier keys
-                {
+                if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0) {
                     foreach (BaseNodeElement ne in selectedNodes)
                         ne.Highlighted = false;
                     selectedNodes.Clear();
+                    ClearAnnotationSelection();
                 }
             }
         }
@@ -826,7 +849,9 @@ namespace Foreman {
 
             ToolTipRenderer.ClearFloatingControls();
             Point graph_location = ScreenToGraph(e.Location);
-            GraphElement? element = (GraphElement?)draggedLinkElement ?? GetNodeAtPoint(graph_location);
+            GraphElement? element = (GraphElement?)draggedLinkElement
+                ?? (GraphElement?)GetNodeAtPoint(graph_location)
+                ?? GetAnnotationAtPoint(graph_location);
 
             switch (e.Button) {
                 case MouseButtons.Right:
@@ -846,6 +871,7 @@ namespace Foreman {
                             new EventHandler((o, ee) => {
                                 AddNewNode(screenPoint, new ItemQualityPair("adding disconnected recipe"), ScreenToGraph(e.Location), NewNodeType.Disconnected);
                             })));
+                        Annotation_AppendContextMenuItems(graph_location);
                         rightClickMenu.Show(this, e.Location);
                     } else if (currentDragOperation != DragOperation.Selection)
                         element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
@@ -854,6 +880,12 @@ namespace Foreman {
                     viewBeingDragged = false;
                     break;
                 case MouseButtons.Left:
+                    if (Annotation_FinishDrawShape()) {
+                        currentDragOperation = DragOperation.None;
+                        MouseDownElement = null;
+                        break;
+                    }
+
                     //finished selecting the given zone (process selected nodes)
                     if (currentDragOperation == DragOperation.Selection) {
                         if ((Control.ModifierKeys & Keys.Alt) != 0) //removal zone processing
@@ -864,6 +896,7 @@ namespace Foreman {
                             selectedNodes.UnionWith(currentSelectionNodes);
                         }
                         currentSelectionNodes.Clear();
+                        CommitAnnotationLassoSelection();
                     }
                     //this is a release of a left click (non-drag operation) -> modify selection if clicking on node & using modifier keys
                     else if (currentDragOperation == DragOperation.None && MouseDownElement is BaseNodeElement clickedNode) {
@@ -887,9 +920,11 @@ namespace Foreman {
                           {
                             clickedNode.MouseUp(graph_location, e.Button, false);
                         }
-                    } else if (!viewBeingDragged)
-                        element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
-
+                    } else {
+                        Annotation_OnMouseUpLeft(graph_location, element, viewBeingDragged);
+                        if (!viewBeingDragged)
+                            element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
+                    }
 
                     currentDragOperation = DragOperation.None;
                     MouseDownElement = null;
@@ -902,8 +937,7 @@ namespace Foreman {
 
             Point graph_location = ScreenToGraph(e.Location);
 
-            if (currentDragOperation != DragOperation.Selection) //dont care about element mouse move operations during selection operation
-            {
+            if (currentDragOperation != DragOperation.Selection && currentDragOperation != DragOperation.DrawShape) {
                 GraphElement? element = (GraphElement?)draggedLinkElement ?? MouseDownElement;
                 element?.MouseMoved(graph_location);
             }
@@ -915,30 +949,35 @@ namespace Foreman {
                         if ((downButtons & MouseButtons.Middle) == MouseButtons.Middle || (downButtons & MouseButtons.Right) == MouseButtons.Right)
                             viewBeingDragged = true;
 
-                        if (MouseDownElement != null) //there is an item under the mouse during drag
+                        if (MouseDownElement != null && !inDrawShapeMode)
                             currentDragOperation = DragOperation.Item;
                         else if ((downButtons & MouseButtons.Left) != 0)
-                            currentDragOperation = DragOperation.Selection;
+                            currentDragOperation = inDrawShapeMode ? DragOperation.DrawShape : DragOperation.Selection;
                     }
                     break;
 
                 case DragOperation.Item:
                     if (MouseDownElement is GraphElement dragTarget) {
-                        if (dragTarget is BaseNodeElement groupDragNode && selectedNodes.Contains(groupDragNode)) //dragging a group
-                        {
+                        if (dragTarget is BaseNodeElement groupDragNode && selectedNodes.Contains(groupDragNode)) {
                             Point startPoint = groupDragNode.Location;
                             GraphElement element = groupDragNode;
                             dragTarget.Dragged(graph_location);
-                            if (element == groupDragNode) //check to ensure that the dragged operation hasnt changed the mousedown element -> as is the case with item tab to dragged link
-                            {
+                            if (element == groupDragNode) {
                                 Point endPoint = groupDragNode.Location;
-                                if (startPoint != endPoint)
+                                if (startPoint != endPoint) {
+                                    int dx = endPoint.X - startPoint.X;
+                                    int dy = endPoint.Y - startPoint.Y;
                                     foreach (BaseNodeElement node in selectedNodes.Where(node => node != groupDragNode))
-                                        node.SetLocation(new Point(node.X + endPoint.X - startPoint.X, node.Y + endPoint.Y - startPoint.Y));
+                                        node.SetLocation(new Point(node.X + dx, node.Y + dy));
+                                    foreach (AnnotationElement ann in selectedAnnotations)
+                                        ann.Location = new Point(ann.X + dx, ann.Y + dy);
+                                }
                                 Invalidate();
                             }
-                        } else //dragging single item
-                          {
+                        } else if (dragTarget is AnnotationElement) {
+                            Annotation_OnItemDrag(graph_location);
+                            Invalidate();
+                        } else {
                             dragTarget.Dragged(graph_location);
                             Invalidate();
                         }
@@ -949,12 +988,20 @@ namespace Foreman {
                         viewBeingDragged = true;
                     break;
 
+                case DragOperation.DrawShape:
+                    SelectionZone = new Rectangle(
+                        Math.Min(SelectionZoneOriginPoint.X, graph_location.X),
+                        Math.Min(SelectionZoneOriginPoint.Y, graph_location.Y),
+                        Math.Abs(SelectionZoneOriginPoint.X - graph_location.X),
+                        Math.Abs(SelectionZoneOriginPoint.Y - graph_location.Y));
+                    break;
+
                 case DragOperation.Selection:
                     SelectionZone = new Rectangle(Math.Min(SelectionZoneOriginPoint.X, graph_location.X), Math.Min(SelectionZoneOriginPoint.Y, graph_location.Y), Math.Abs(SelectionZoneOriginPoint.X - graph_location.X), Math.Abs(SelectionZoneOriginPoint.Y - graph_location.Y));
                     currentSelectionNodes.Clear();
                     currentSelectionNodes.UnionWith(nodeElements.Where(element => element.IntersectsWithZone(SelectionZone, -20, -20)));
-
                     UpdateSelection();
+                    UpdateAnnotationLassoPreview();
 
                     //accept middle mouse button for view dragging purposes (while dragging item or selection)
                     if ((downButtons & MouseButtons.Middle) == MouseButtons.Middle)
@@ -968,6 +1015,7 @@ namespace Foreman {
                 UpdateGraphBounds(MouseDownElement == null); //only hard limit the graph bounds if we arent dragging an object
             }
 
+            Annotation_UpdateCursor(graph_location);
             Invalidate();
         }
 
@@ -995,6 +1043,10 @@ namespace Foreman {
         }
 
         private void ProductionGraphViewer_KeyDown(object? sender, KeyEventArgs e) {
+            Annotation_OnKeyDown(e);
+            if (e.Handled)
+                return;
+
             if (currentDragOperation == DragOperation.None) {
                 if ((e.KeyCode == Keys.C || e.KeyCode == Keys.X) && (e.Modifiers & Keys.Control) == Keys.Control) //copy or cut
                 {
@@ -1006,19 +1058,31 @@ namespace Foreman {
                     Graph.SerializeNodeIdSet.Clear();
                     Graph.SerializeNodeIdSet = null;
 
+                    if (selectedAnnotations.Count > 0) {
+                        fragmentJson = AnnotationClipboardCodec.MergeAnnotationsIntoFragment(
+                            fragmentJson,
+                            selectedAnnotations.Select(a => a.ToSaveData()));
+                    }
+
                     Clipboard.SetText(fragmentJson);
 
-                    if (e.KeyCode == Keys.X) //cut
+                    if (e.KeyCode == Keys.X) {
                         foreach (BaseNodeElement node in selectedNodes.ToList())
                             Session.Editor.DeleteNode(node.ViewModel.Id);
+                        foreach (AnnotationElement ann in selectedAnnotations.ToList())
+                            RemoveAnnotationElement(ann);
+                        selectedAnnotations.Clear();
+                    }
                 } else if (e.KeyCode == Keys.V && (e.Modifiers & Keys.Control) == Keys.Control) //paste
                   {
                     try {
                         ImportNodesFromFragment(Clipboard.GetText(), ScreenToGraph(PointToClient(Cursor.Position)), applySolverSettings: false);
                     } catch (Exception ex) { ErrorLogging.LogException(ex, "Non-Foreman paste or invalid clipboard JSON"); }
                 }
-            } else if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
+            } else if (currentDragOperation == DragOperation.Selection) {
                 UpdateSelection();
+                UpdateAnnotationLassoPreview();
+            }
 
             bool lockDragAxis = (Control.ModifierKeys & Keys.Shift) != 0;
             if (Grid.LockDragToAxis != lockDragAxis) {
@@ -1034,12 +1098,17 @@ namespace Foreman {
             if (currentDragOperation == DragOperation.None) {
                 switch (e.KeyCode) {
                     case Keys.Delete:
-                        TryDeleteSelectedNodes();
+                        if (selectedAnnotations.Count > 0)
+                            TryDeleteSelection();
+                        else
+                            TryDeleteSelectedNodes();
                         e.Handled = true;
                         break;
                 }
-            } else if (currentDragOperation == DragOperation.Selection) //possible changes to selection type
+            } else if (currentDragOperation == DragOperation.Selection) {
                 UpdateSelection();
+                UpdateAnnotationLassoPreview();
+            }
 
             bool lockDragAxis = (Control.ModifierKeys & Keys.Shift) != 0;
             if (Grid.LockDragToAxis != lockDragAxis) {
@@ -1065,15 +1134,19 @@ namespace Foreman {
             }
 
             if ((keyData & Keys.KeyCode) == Keys.Left) {
+                Annotation_MoveSelection(-moveUnit, 0);
                 foreach (BaseNodeElement node in selectedNodes)
                     node.SetLocation(new Point(node.X - moveUnit, node.Y));
             } else if ((keyData & Keys.KeyCode) == Keys.Right) {
+                Annotation_MoveSelection(moveUnit, 0);
                 foreach (BaseNodeElement node in selectedNodes)
                     node.SetLocation(new Point(node.X + moveUnit, node.Y));
             } else if ((keyData & Keys.KeyCode) == Keys.Up) {
+                Annotation_MoveSelection(0, -moveUnit);
                 foreach (BaseNodeElement node in selectedNodes)
                     node.SetLocation(new Point(node.X, node.Y - moveUnit));
             } else if ((keyData & Keys.KeyCode) == Keys.Down) {
+                Annotation_MoveSelection(0, moveUnit);
                 foreach (BaseNodeElement node in selectedNodes)
                     node.SetLocation(new Point(node.X, node.Y + moveUnit));
             } else if ((keyData & Keys.KeyCode) == Keys.W && !SubwindowOpen) {
@@ -1202,6 +1275,9 @@ namespace Foreman {
                 return;
             }
             ImportNodesFromDocument(document, origin, applySolverSettings);
+
+            if (AnnotationClipboardCodec.ReadAnnotations(json) is IReadOnlyList<AnnotationSaveData> clipboardAnnotations)
+                ImportAnnotationsAtOrigin(clipboardAnnotations, origin);
         }
 
         public void ImportNodesFromDocument(ProductionGraphSaveDocument document, Point origin, bool applySolverSettings) {
@@ -1391,6 +1467,8 @@ namespace Foreman {
 
             if (saveDocument.Ui is not null)
                 ApplySaveUi(saveDocument.Ui, cache, setEnablesFromJson);
+
+            LoadAnnotationsFromSave(saveDocument.Annotations, saveDocument.AnnotationDpi);
 
             ProductionGraph.NewNodeCollection collection = GraphSaveLoader.LoadProductionGraph(Graph, cache, productionGraph, applySolverSettings: true);
             if (collection.newNodes.Count == 0 && productionGraph.Nodes.Count > 0) {

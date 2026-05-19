@@ -31,7 +31,9 @@ namespace Foreman {
                 SavedPresetName = cache.PresetName,
                 IncludedMods = new Dictionary<string, string>(cache.IncludedMods),
                 ProductionGraph = WriteProductionGraph(viewer.Graph),
-                Ui = WriteViewerUi(viewer, cache)
+                Ui = WriteViewerUi(viewer, cache),
+                Annotations = viewer.GetAnnotationSaveData(),
+                AnnotationDpi = viewer.DeviceDpi
             };
         }
 

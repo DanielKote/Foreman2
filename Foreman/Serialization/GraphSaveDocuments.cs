@@ -123,6 +123,8 @@ namespace Foreman {
         public IReadOnlyDictionary<string, string> IncludedMods { get; init; } = new Dictionary<string, string>();
         public required ProductionGraphSaveDocument ProductionGraph { get; init; }
         public GraphViewerUiSaveData? Ui { get; init; }
+        public IReadOnlyList<AnnotationSaveData> Annotations { get; init; } = [];
+        public int AnnotationDpi { get; init; } = 96;
     }
 
     public sealed class NodeCopyOptionsSaveDocument {

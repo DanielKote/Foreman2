@@ -430,5 +430,85 @@ namespace Foreman.Properties {
                 this["UpgradeRequired"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string AnnotTextFontFamily {
+            get { return ((string)(this["AnnotTextFontFamily"])); }
+            set { this["AnnotTextFontFamily"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        public string AnnotTextFontSize {
+            get { return ((string)(this["AnnotTextFontSize"])); }
+            set { this["AnnotTextFontSize"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int AnnotTextFontStyle {
+            get { return ((int)(this["AnnotTextFontStyle"])); }
+            set { this["AnnotTextFontStyle"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-16777216")]
+        public int AnnotTextColorARGB {
+            get { return ((int)(this["AnnotTextColorARGB"])); }
+            set { this["AnnotTextColorARGB"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AnnotTextBackColorARGB {
+            get { return ((int)(this["AnnotTextBackColorARGB"])); }
+            set { this["AnnotTextBackColorARGB"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int AnnotTextAlign {
+            get { return ((int)(this["AnnotTextAlign"])); }
+            set { this["AnnotTextAlign"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AnnotShapeType {
+            get { return ((int)(this["AnnotShapeType"])); }
+            set { this["AnnotShapeType"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5278975")]
+        public int AnnotShapeFillColorARGB {
+            get { return ((int)(this["AnnotShapeFillColorARGB"])); }
+            set { this["AnnotShapeFillColorARGB"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-600016676")]
+        public int AnnotShapeBorderColorARGB {
+            get { return ((int)(this["AnnotShapeBorderColorARGB"])); }
+            set { this["AnnotShapeBorderColorARGB"] = value; }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int AnnotShapeBorderWidth {
+            get { return ((int)(this["AnnotShapeBorderWidth"])); }
+            set { this["AnnotShapeBorderWidth"] = value; }
+        }
     }
 }

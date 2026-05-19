@@ -1,16 +1,20 @@
 ﻿using System.Text.Json;
 
 namespace Foreman {
-    /// <summary>Validates that graph save JSON matches <see cref="GraphSaveFormat.SaveFormatVersion"/>. Invalid JSON returns false without logging (caller treats as unsupported format).</summary>
+    /// <summary>Validates that graph save JSON is a supported version. Invalid JSON returns false without logging (caller treats as unsupported format).</summary>
     internal static class GraphSaveMigration {
+        private static bool IsReadableVersion(int version) =>
+            version >= GraphSaveFormat.MinReadableSaveVersion
+            && version <= GraphSaveFormat.SaveFormatVersion;
+
         internal static bool IsCurrentGraph(string json) =>
             TryGetRootMetadata(json, out int version, out string? objectType)
-            && version == GraphSaveFormat.SaveFormatVersion
+            && IsReadableVersion(version)
             && objectType == GraphSaveFormat.GraphObject;
 
         internal static bool IsCurrentViewer(string json) {
             if (!TryGetRootMetadata(json, out int version, out string? objectType)
-                || version != GraphSaveFormat.SaveFormatVersion
+                || !IsReadableVersion(version)
                 || objectType != GraphSaveFormat.ViewerObject)
                 return false;
 
@@ -22,7 +26,7 @@ namespace Foreman {
 
                 if (!graph.TryGetProperty("Version", out JsonElement graphVersion)
                     || graphVersion.ValueKind != JsonValueKind.Number
-                    || graphVersion.GetInt32() != GraphSaveFormat.SaveFormatVersion)
+                    || !IsReadableVersion(graphVersion.GetInt32()))
                     return false;
 
                 return graph.TryGetProperty("Object", out JsonElement graphObject)

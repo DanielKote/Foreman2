@@ -37,6 +37,10 @@ namespace Foreman {
             };
             if (document.Ui is not null)
                 ApplyUi(wire, document.Ui);
+            if (document.Annotations.Count > 0) {
+                wire.Annotations = document.Annotations.ToList();
+                wire.AnnotationDpi = document.AnnotationDpi;
+            }
             return wire;
         }
 
@@ -90,7 +94,9 @@ namespace Foreman {
                 SavedPresetName = wire.SavedPresetName,
                 IncludedMods = ParseModList(wire.IncludedMods),
                 ProductionGraph = ToProductionGraphDocument(wire.ProductionGraph),
-                Ui = ToViewerUi(wire)
+                Ui = ToViewerUi(wire),
+                Annotations = wire.Annotations ?? [],
+                AnnotationDpi = wire.AnnotationDpi ?? 96
             };
         }
 
@@ -381,5 +387,6 @@ namespace Foreman {
                 return new Point(x, y);
             return Point.Empty;
         }
+
     }
 }

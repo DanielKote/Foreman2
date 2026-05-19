@@ -69,6 +69,56 @@ namespace ForemanTest {
         }
 
         [TestMethod]
+        public void GraphSaveCodec_Annotations_RoundTripThroughViewerDocument() {
+            var data = BuildSimpleChain();
+            var annotations = new List<AnnotationSaveData> {
+                new TextAnnotationSaveData {
+                    X = 100,
+                    Y = 200,
+                    Width = 150,
+                    Height = 40,
+                    Text = "Hello",
+                    FontFamily = "Segoe UI",
+                    FontSize = 14f,
+                    TextColor = new ColorSaveData(255, 0, 0, 0),
+                    BackColor = new ColorSaveData(0, 255, 255, 255),
+                    TextAlign = 1
+                },
+                new ShapeAnnotationSaveData {
+                    X = 50,
+                    Y = 60,
+                    Width = 200,
+                    Height = 100,
+                    ShapeType = "Ellipse",
+                    FillColor = new ColorSaveData(80, 80, 160, 255),
+                    BorderColor = new ColorSaveData(255, 60, 120, 220),
+                    BorderWidth = 2
+                }
+            };
+            GraphViewerSaveDocument original = new() {
+                Version = GraphSaveFormat.SaveFormatVersion,
+                ProductionGraph = GraphSaveCodec.BuildProductionGraph(data.Graph),
+                Annotations = annotations,
+                AnnotationDpi = 120
+            };
+
+            string json = GraphSaveCodec.WriteViewerDocumentToString(original, writeIndented: false);
+            GraphViewerSaveDocument? restored = GraphSaveCodec.ReadViewer(json);
+
+            Assert.IsNotNull(restored);
+            Assert.AreEqual(120, restored.AnnotationDpi);
+            Assert.AreEqual(2, restored.Annotations.Count);
+
+            var text = restored.Annotations.OfType<TextAnnotationSaveData>().Single();
+            Assert.AreEqual("Hello", text.Text);
+            Assert.AreEqual(100, text.X);
+
+            var shape = restored.Annotations.OfType<ShapeAnnotationSaveData>().Single();
+            Assert.AreEqual("Ellipse", shape.ShapeType);
+            Assert.AreEqual(2, shape.BorderWidth);
+        }
+
+        [TestMethod]
         public void GraphSaveCodec_ReadGraphPayload_AcceptsViewerSaveFile() {
             var data = BuildSimpleChain();
             GraphViewerSaveDocument viewerDoc = new() {

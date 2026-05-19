@@ -1,5 +1,5 @@
 {
-  "Version": 7,
+  "Version": 8,
   "Object": "ProductionGraphViewer",
   "SavedPresetName": "Factorio 2.0 Space Age",
   "IncludedMods": [
@@ -678,7 +678,7 @@
     "beacon"
   ],
   "ProductionGraph": {
-    "Version": 7,
+    "Version": 8,
     "Object": "ProductionGraph",
     "EnableExtraProductivityForNonMiners": false,
     "DefaultNodeDirection": 0,

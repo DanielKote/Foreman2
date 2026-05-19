@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Foreman {
     public partial class ImageExportForm : Form {
-        private readonly float[] multipliers = new float[] { 0.05f, 0.1f, 0.2f, 0.5f, 1f, 2f, 3f };
-        private readonly string[] multiplierNames = new string[] { "1/20", "1/10", "1/5", "1/2", "1", "2", "3" };
-        private readonly int initialIndex = 4;
+        private static readonly float[] Multipliers = [0.05f, 0.1f, 0.2f, 0.5f, 1f, 2f, 3f];
+        private static readonly string[] MultiplierNames = ["1/20", "1/10", "1/5", "1/2", "1", "2", "3"];
+        private const int DefaultScaleIndex = 4;
 
         private readonly ProductionGraphViewer graphViewer;
 
@@ -21,89 +17,106 @@ namespace Foreman {
             InitializeComponent();
             this.graphViewer = graphViewer;
 
-            ScaleSelectionBox.Items.AddRange(multiplierNames);
-            ScaleSelectionBox.SelectedIndex = initialIndex;
+            ScaleSelectionBox.Items.AddRange(MultiplierNames);
+            ScaleSelectionBox.SelectedIndex = DefaultScaleIndex;
             UpdateSizeLabel();
         }
 
         private void button1_Click(object? sender, EventArgs e) {
-            using (SaveFileDialog dialog = new SaveFileDialog()) {
-                dialog.AddExtension = true;
-                dialog.Filter = "PNG files (*.png)|*.png";
-                dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Exported Graphs");
-                if (!Directory.Exists(dialog.InitialDirectory))
-                    Directory.CreateDirectory(dialog.InitialDirectory);
-                dialog.FileName = "Foreman Production Flowchart.png";
-                dialog.ValidateNames = true;
-                dialog.OverwritePrompt = true;
-                var result = dialog.ShowDialog();
+            using SaveFileDialog dialog = new() {
+                AddExtension = true,
+                Filter = "PNG files (*.png)|*.png",
+                InitialDirectory = Path.Combine(Application.StartupPath, "Exported Graphs"),
+                FileName = "Foreman Production Flowchart.png",
+                ValidateNames = true,
+                OverwritePrompt = true
+            };
+            if (!Directory.Exists(dialog.InitialDirectory))
+                Directory.CreateDirectory(dialog.InitialDirectory);
 
-                if (result == System.Windows.Forms.DialogResult.OK) {
-                    fileTextBox.Text = dialog.FileName;
-                }
-            }
+            if (dialog.ShowDialog() == DialogResult.OK)
+                fileTextBox.Text = dialog.FileName;
         }
 
         private void ExportButton_Click(object? sender, EventArgs e) {
-            if (string.IsNullOrEmpty(fileTextBox.Text) || string.IsNullOrEmpty(Path.GetDirectoryName(fileTextBox.Text)) || !Directory.Exists(Path.GetDirectoryName(fileTextBox.Text))) {
+            string? directory = Path.GetDirectoryName(fileTextBox.Text);
+            if (string.IsNullOrEmpty(fileTextBox.Text)
+                || string.IsNullOrEmpty(directory)
+                || !Directory.Exists(directory)) {
                 UserMessages.Show("Directory doesn't exist!");
-            } else {
-                graphViewer.ClearSelection();
-
-                float scale = multipliers[ScaleSelectionBox.SelectedIndex];
-
-                Bitmap image = ViewLimitCheckBox.Checked ? new Bitmap((int)(graphViewer.Width * scale / graphViewer.ViewScale), (int)(graphViewer.Height * scale / graphViewer.ViewScale)) : new Bitmap((int)(graphViewer.Graph.Bounds.Width * scale), (int)(graphViewer.Graph.Bounds.Height * scale));
-                using (Graphics graphics = Graphics.FromImage(image)) {
-                    graphics.ResetTransform();
-
-                    if (ViewLimitCheckBox.Checked) {
-                        graphics.TranslateTransform(graphViewer.Width / (graphViewer.ViewScale * 2), graphViewer.Height / (graphViewer.ViewScale * 2));
-                        graphics.TranslateTransform(graphViewer.ViewOffset.X, graphViewer.ViewOffset.Y);
-                        graphics.ScaleTransform(scale, scale);
-                    } else {
-                        graphics.ScaleTransform(scale, scale);
-                        graphics.TranslateTransform(-graphViewer.Graph.Bounds.X, -graphViewer.Graph.Bounds.Y);
-                    }
-
-                    graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-
-                    if (!TransparencyCheckBox.Checked)
-                        graphics.Clear(Color.White);
-
-                    graphViewer.Paint(graphics, true);
-
-                    try {
-                        image.Save(fileTextBox.Text, ImageFormat.Png);
-                        Close();
-                    } catch (Exception exception) {
-                        UserMessages.Show("Error saving image. See log for more details.");
-                        ErrorLogging.LogException(exception, "Error saving image");
-                    }
-                }
+                return;
             }
-        }
 
-        private void UpdateSizeLabel() {
-            float scale = multipliers[ScaleSelectionBox.SelectedIndex];
-            int x, y;
+            graphViewer.ClearSelection();
+            float scale = Multipliers[ScaleSelectionBox.SelectedIndex];
 
             if (ViewLimitCheckBox.Checked) {
-                x = (int)(graphViewer.Width * scale / graphViewer.ViewScale);
-                y = (int)(graphViewer.Height * scale / graphViewer.ViewScale);
-            } else {
-                x = (int)(graphViewer.Graph.Bounds.Width * scale);
-                y = (int)(graphViewer.Graph.Bounds.Height * scale);
+                ExportBitmap(ViewLimitedBounds(), scale, ConfigureViewLimitedTransform);
+                return;
             }
 
-            ImageSizeLabel.Text = string.Format("Image Size: {0} x {1}", x.ToString("N0"), y.ToString("N0"));
+            Rectangle exportBounds = graphViewer.GetExportBounds();
+            if (!GraphExportBounds.IsExportable(exportBounds)) {
+                UserMessages.Show("There is nothing to export. Add nodes or annotations to the graph first.");
+                return;
+            }
+
+            ExportBitmap(exportBounds, scale, (graphics, bounds) => {
+                graphics.ScaleTransform(scale, scale);
+                graphics.TranslateTransform(-bounds.X, -bounds.Y);
+            });
         }
 
-        private void ViewLimitCheckBox_CheckedChanged(object? sender, EventArgs e) {
-            UpdateSizeLabel();
+        private void ExportBitmap(Rectangle bounds, float scale, Action<Graphics, Rectangle> configureTransform) {
+            using Bitmap image = new(GraphExportBounds.ScaledWidth(bounds, scale), GraphExportBounds.ScaledHeight(bounds, scale));
+            using Graphics graphics = Graphics.FromImage(image);
+            graphics.ResetTransform();
+            configureTransform(graphics, bounds);
+            graphics.SmoothingMode = SmoothingMode.HighQuality;
+
+            if (!TransparencyCheckBox.Checked)
+                graphics.Clear(graphViewer.BackColor);
+
+            graphViewer.Paint(graphics, FullGraph: true);
+
+            try {
+                image.Save(fileTextBox.Text, ImageFormat.Png);
+                Close();
+            } catch (Exception exception) {
+                UserMessages.Show("Error saving image. See log for more details.");
+                ErrorLogging.LogException(exception, "Error saving image");
+            }
         }
 
-        private void ScaleSelectionBox_SelectedIndexChanged(object? sender, EventArgs e) {
-            UpdateSizeLabel();
+        private void ConfigureViewLimitedTransform(Graphics graphics, Rectangle _) {
+            graphics.TranslateTransform(
+                graphViewer.Width / (graphViewer.ViewScale * 2),
+                graphViewer.Height / (graphViewer.ViewScale * 2));
+            graphics.TranslateTransform(graphViewer.ViewOffset.X, graphViewer.ViewOffset.Y);
+            graphics.ScaleTransform(Multipliers[ScaleSelectionBox.SelectedIndex], Multipliers[ScaleSelectionBox.SelectedIndex]);
         }
+
+        private Rectangle ViewLimitedBounds() =>
+            new(0, 0, (int)(graphViewer.Width / graphViewer.ViewScale), (int)(graphViewer.Height / graphViewer.ViewScale));
+
+        private void UpdateSizeLabel() {
+            float scale = Multipliers[ScaleSelectionBox.SelectedIndex];
+            Rectangle bounds = ViewLimitCheckBox.Checked
+                ? ViewLimitedBounds()
+                : graphViewer.GetExportBounds();
+
+            if (!GraphExportBounds.IsExportable(bounds)) {
+                ImageSizeLabel.Text = "Image Size: — (nothing to export)";
+                return;
+            }
+
+            int x = GraphExportBounds.ScaledWidth(bounds, scale);
+            int y = GraphExportBounds.ScaledHeight(bounds, scale);
+            ImageSizeLabel.Text = $"Image Size: {x:N0} x {y:N0}";
+        }
+
+        private void ViewLimitCheckBox_CheckedChanged(object? sender, EventArgs e) => UpdateSizeLabel();
+
+        private void ScaleSelectionBox_SelectedIndexChanged(object? sender, EventArgs e) => UpdateSizeLabel();
     }
 }
