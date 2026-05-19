@@ -1,4 +1,5 @@
 ﻿using Foreman;
+using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -6,7 +7,7 @@ using System.Windows.Forms;
 
 namespace ForemanTest {
     [TestClass]
-    public class ErrorLoggingTests {
+    public class ErrorLoggingTests : ForemanTestBase {
         [TestMethod]
         public void LogException_AndLogLine_DoNotThrow() {
             string logPath = Path.Combine(Application.StartupPath, "errorlog.txt");

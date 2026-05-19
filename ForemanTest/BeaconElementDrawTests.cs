@@ -8,7 +8,7 @@ using System.Linq;
 namespace ForemanTest {
     [TestClass]
     [DoNotParallelize]
-    public class BeaconElementDrawTests {
+    public class BeaconElementDrawTests : ForemanTestBase {
         [TestMethod]
         public void BeaconElement_Draw_WithMoreThanSixBeaconModules_DoesNotThrow() =>
             StaTest.Run(BeaconElement_Draw_WithMoreThanSixBeaconModules_DoesNotThrow_Impl);

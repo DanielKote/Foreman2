@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ForemanTest.Graph {
     [TestClass]
-    public class LinkCheckerTests {
+    public class LinkCheckerTests : ForemanTestBase {
         [TestMethod]
         public void IsPossibleConnection_ValidItemFlow_ReturnsTrue() {
             GraphBuilder.BuiltData built = GraphSessionTestHelper.BuildSimpleChain();
@@ -150,7 +150,7 @@ namespace ForemanTest.Graph {
     }
 
     [TestClass]
-    public class NodeViewModelPropertyChangedTests {
+    public class NodeViewModelPropertyChangedTests : ForemanTestBase {
         [TestMethod]
         public void KeyNode_PropertyChanged_FiresWhenControllerSetsKeyNode() {
             GraphBuilder.BuiltData built = GraphSessionTestHelper.BuildSimpleChain();

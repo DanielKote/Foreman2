@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace ForemanTest {
     [TestClass]
-    public class UserMessagesTests {
+    public class UserMessagesTests : ForemanTestBase {
         [TestMethod]
         public void Show_WithAssemblyTestHandler_ThrowsUnexpectedUserMessageException() {
             var ex = Assert.ThrowsExactly<UnexpectedUserMessageException>(() =>
@@ -19,19 +19,27 @@ namespace ForemanTest {
 
         [TestMethod]
         public void Show_WithTemporaryHandler_UsesHandlerThenRestoresDefault() {
-            UserMessages.ShowHandler? previous = UserMessages.TestHandler;
-            try {
-                UserMessages.TestHandler = (_, _, buttons, _) =>
-                    buttons == MessageBoxButtons.YesNo ? DialogResult.No : DialogResult.OK;
-
+            using (UserMessages.UseHandler((_, _, buttons, _) =>
+                       buttons == MessageBoxButtons.YesNo ? DialogResult.No : DialogResult.OK)) {
                 Assert.AreEqual(DialogResult.No,
                     UserMessages.Show("confirm?", "caption", MessageBoxButtons.YesNo));
-            } finally {
-                UserMessages.TestHandler = previous;
             }
 
             Assert.ThrowsExactly<UnexpectedUserMessageException>(() =>
                 UserMessages.Show("still blocked in CI mode"));
+        }
+
+        [TestMethod]
+        public void UseHandler_NestedScopesRestoreInOrder() {
+            using (UserMessages.UseHandler((_, _, _, _) => DialogResult.Yes)) {
+                Assert.AreEqual(DialogResult.Yes, UserMessages.Show("outer"));
+                using (UserMessages.UseHandler((_, _, _, _) => DialogResult.No)) {
+                    Assert.AreEqual(DialogResult.No, UserMessages.Show("inner"));
+                }
+                Assert.AreEqual(DialogResult.Yes, UserMessages.Show("outer again"));
+            }
+
+            Assert.ThrowsExactly<UnexpectedUserMessageException>(() => UserMessages.Show("blocked again"));
         }
     }
 }

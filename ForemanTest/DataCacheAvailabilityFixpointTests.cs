@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace ForemanTest {
     [TestClass]
-    public class DataCacheAvailabilityFixpointTests {
+    public class DataCacheAvailabilityFixpointTests : ForemanTestBase {
         [TestMethod]
         public void ItemAvailabilityFixpoint_SpoilResultStaysAvailable_WithoutCycling() {
             var ctx = GraphSessionTestHelper.CreateContext();
@@ -85,13 +85,11 @@ namespace ForemanTest {
 
         private static void DataLoadForm_OnFormClosing_WarnsWhenLoadStillInProgress_Impl() {
             bool warned = false;
-            UserMessages.ShowHandler? previousHandler = UserMessages.TestHandler;
-            UserMessages.TestHandler = (text, caption, buttons, icon) => {
+            using (UserMessages.UseHandler((text, caption, buttons, icon) => {
                 if (text.Contains("incomplete", System.StringComparison.OrdinalIgnoreCase))
                     warned = true;
                 return DialogResult.OK;
-            };
-            try {
+            })) {
                 using var form = new DataLoadForm(new Preset("test-preset", true, false));
                 SetPrivateField(form, "loadInProgress", true);
                 SetPrivateField(form, "loadCompleted", false);
@@ -102,8 +100,6 @@ namespace ForemanTest {
 
                 Assert.IsTrue(warned, "Closing during load should warn about incomplete preset data.");
                 Assert.IsFalse(args.Cancel, "Warning only; the user must still be able to close the dialog.");
-            } finally {
-                UserMessages.TestHandler = previousHandler;
             }
         }
 

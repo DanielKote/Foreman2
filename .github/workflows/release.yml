@@ -36,6 +36,7 @@ jobs:
         run: dotnet build Foreman -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:IncludeSourceRevisionInInformationalVersion=false --configuration Release -r win-x64
       - name: Test Foreman
         run: dotnet test --configuration Release -r win-x64
+        timeout-minutes: 1
       - name: Package Foreman (Self-Contained)
         run: dotnet publish Foreman --sc true -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:IncludeSourceRevisionInInformationalVersion=false -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
       - name: Package Foreman (.NET Dependent)

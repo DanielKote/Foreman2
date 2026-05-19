@@ -11,7 +11,7 @@ using System.Windows.Forms;
 namespace ForemanTest {
     [TestClass]
     [DoNotParallelize]
-    public class SettingsFormEnabledObjectsTests {
+    public class SettingsFormEnabledObjectsTests : ForemanTestBase {
         [TestMethod]
         public void EnabledObjectsIconIndex_ReusesSameBitmapReference() =>
             StaTest.Run(EnabledObjectsIconIndex_ReusesSameBitmapReference_Impl);

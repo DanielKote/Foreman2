@@ -1,12 +1,13 @@
 ﻿using Foreman;
 using Foreman.Graph;
+using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 
 namespace ForemanTest.Graph {
     [TestClass]
-    public class ProductionGraphSessionBridgeTests {
+    public class ProductionGraphSessionBridgeTests : ForemanTestBase {
         [TestMethod]
         public void TryGetDomainLink_RoundTripsLinkFromViewModel() {
             var ctx = GraphSessionTestHelper.CreateContext();

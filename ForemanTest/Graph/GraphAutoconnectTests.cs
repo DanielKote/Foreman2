@@ -1,11 +1,12 @@
 ﻿using Foreman;
 using Foreman.Graph;
+using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
 namespace ForemanTest.Graph {
     [TestClass]
-    public class GraphAutoconnectTests {
+    public class GraphAutoconnectTests : ForemanTestBase {
         [TestMethod]
         public void ConnectDisconnectedInputs_LinksSupplierToConsumer() {
             var ctx = GraphSessionTestHelper.CreateContext();

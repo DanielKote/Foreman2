@@ -1,10 +1,11 @@
 ﻿using Foreman;
+using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Drawing;
 
 namespace ForemanTest {
     [TestClass]
-    public class EditPanelScreenLayoutTests {
+    public class EditPanelScreenLayoutTests : ForemanTestBase {
         private const int ViewerW = 1200;
         private const int ViewerH = 800;
         private const int Margin = EditPanelScreenLayout.DefaultMargin;

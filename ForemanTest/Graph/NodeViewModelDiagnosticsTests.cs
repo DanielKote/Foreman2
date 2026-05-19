@@ -1,12 +1,13 @@
 ﻿using Foreman;
 using Foreman.Graph;
+using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ForemanTest.Graph {
     [TestClass]
-    public class NodeViewModelDiagnosticsTests {
+    public class NodeViewModelDiagnosticsTests : ForemanTestBase {
         [TestMethod]
         public void ViewModel_GetErrorsAndWarnings_MatchDomainNodes_ForSimpleChain() {
             GraphBuilder.BuiltData built = GraphSessionTestHelper.BuildSimpleChain();

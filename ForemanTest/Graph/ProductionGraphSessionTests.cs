@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ForemanTest.Graph {
     [TestClass]
-    public class ProductionGraphSessionTests {
+    public class ProductionGraphSessionTests : ForemanTestBase {
         private static ItemQualityPair TestItem() {
             var cache = new DataCache(filterRecipes: true);
             var subgroup = new SubgroupPrototype(cache, "§§test:subgroup", "z");

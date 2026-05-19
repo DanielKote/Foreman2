@@ -43,7 +43,8 @@
     <None Include="..\Foreman\Presets\Factorio 2.0 Space Age.pjson" Link="Presets\Factorio 2.0 Space Age.pjson" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Foreman\Presets\Factorio 2.0 Space Age.dat" Link="Presets\Factorio 2.0 Space Age.dat" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Foreman\Presets\Factorio 2.0 Space Age.json" Link="Presets\Factorio 2.0 Space Age.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Foreman\Presets\Factorio 2.0 Space Age.json')" />
-    <None Include="Flowchart.fjson" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="assets\Flowchart.fjson" CopyToOutputDirectory="PreserveNewest" Link="assets\Flowchart.fjson" />
+    <None Include="assets\Seablock chart.fjson" CopyToOutputDirectory="PreserveNewest" Link="assets\Seablock chart.fjson" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foreman\Foreman.csproj" />

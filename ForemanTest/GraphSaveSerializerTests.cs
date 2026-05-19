@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ForemanTest {
     [TestClass]
-    public class GraphSaveCodecTests {
+    public class GraphSaveCodecTests : ForemanTestBase {
         [TestMethod]
         public void SerializeProductionGraph_ProducesExpectedDocumentShape() {
             var data = BuildSimpleChain();
@@ -115,9 +115,6 @@ namespace ForemanTest {
         [TestMethod]
         public async Task Flowchart_LoadedGraphSerialize_IsStableAndDiffersFromRawFile() {
             string path = FlowchartSample.ResolvePath();
-            if (!File.Exists(path))
-                Assert.Inconclusive($"Flowchart.fjson not found. Expected at: {path}");
-
             string disk = File.ReadAllText(path);
             var cache = await SpaceAgeDataCacheFixture.GetLoadedAsync();
             GraphViewerSaveDocument? saveDocument = GraphSaveCodec.ReadViewer(disk);
@@ -226,11 +223,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public void ReadViewer_LegacySaveVersion_ReturnsNull() {
-            string path = Path.GetFullPath(Path.Combine(
-                AppContext.BaseDirectory, "..", "..", "..", "..", "Saved Graphs", "Seablock chart.fjson"));
-            if (!File.Exists(path))
-                Assert.Inconclusive($"Legacy sample save not found: {path}");
-
+            string path = LegacySaveSample.ResolvePath();
             JsonElement save = JsonDocument.Parse(File.ReadAllText(path)).RootElement;
             Assert.AreNotEqual(GraphSaveFormat.SaveFormatVersion, save.GetProperty("Version").GetInt32());
             Assert.IsNull(GraphSaveCodec.ReadViewer(File.ReadAllText(path)));

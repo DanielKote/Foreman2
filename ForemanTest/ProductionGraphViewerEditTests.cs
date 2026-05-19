@@ -13,7 +13,7 @@ using static Foreman.EditPanelViewportLayout;
 namespace ForemanTest {
     [TestClass]
     [DoNotParallelize]
-    public class ProductionGraphViewerEditTests {
+    public class ProductionGraphViewerEditTests : ForemanTestBase {
         private const int ViewerWidth = 1200;
         private const int ViewerHeight = 800;
 

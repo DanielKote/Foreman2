@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ForemanTest {
     [TestClass]
-    public class FlowchartLoadTests {
+    public class FlowchartLoadTests : ForemanTestBase {
         [TestInitialize]
         public void TestInitialize() {
             if (!SpaceAgeDataCacheFixture.PresetsAvailable)
@@ -18,9 +18,6 @@ namespace ForemanTest {
         [TestMethod]
         public async Task Flowchart_Load_EndToEnd_MatchesPresetAndImportsAllNodes() {
             string path = FlowchartSample.ResolvePath();
-            if (!File.Exists(path))
-                Assert.Inconclusive($"Flowchart sample not found. Expected at: {path}");
-
             GraphViewerSaveDocument? saveDocument = GraphSaveCodec.ReadViewer(File.ReadAllText(path));
             Assert.IsNotNull(saveDocument, "Flowchart.fjson should parse as a viewer save document.");
             Assert.AreEqual(GraphSaveFormat.SaveFormatVersion, saveDocument.Version);

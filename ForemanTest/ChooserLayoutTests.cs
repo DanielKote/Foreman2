@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace ForemanTest {
     [TestClass]
-    public class ChooserLayoutTests {
+    public class ChooserLayoutTests : ForemanTestBase {
         [TestMethod]
         public void GroupIconSizeForCell_MatchesDesignRatioAtFullCell() {
             Assert.AreEqual(64, ChooserLayout.GroupIconSizeForCell(40, 64, 24));

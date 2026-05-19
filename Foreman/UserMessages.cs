@@ -30,6 +30,12 @@ namespace Foreman {
         /// <summary>When set (e.g. by ForemanTest), all <see cref="Show"/> calls use this instead of WinForms.</summary>
         public static ShowHandler? TestHandler { get; set; }
 
+        /// <summary>Temporarily replaces <see cref="TestHandler"/>; disposing restores the previous handler.</summary>
+        public static IDisposable UseHandler(ShowHandler handler) {
+            ArgumentNullException.ThrowIfNull(handler);
+            return new HandlerScope(handler);
+        }
+
         public static DialogResult Show(string text) => Show(text, string.Empty);
 
         public static DialogResult Show(string text, string caption) =>
@@ -46,5 +52,22 @@ namespace Foreman {
 
         internal static DialogResult FailTestOnAnyMessage(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon) =>
             throw new UnexpectedUserMessageException(text, caption, buttons, icon);
+
+        private sealed class HandlerScope : IDisposable {
+            private readonly ShowHandler? previous;
+            private bool disposed;
+
+            public HandlerScope(ShowHandler handler) {
+                previous = TestHandler;
+                TestHandler = handler;
+            }
+
+            public void Dispose() {
+                if (disposed)
+                    return;
+                TestHandler = previous;
+                disposed = true;
+            }
+        }
     }
 }

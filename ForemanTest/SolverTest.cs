@@ -1,11 +1,12 @@
 ﻿using Foreman;
+using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 
 namespace ForemanTest {
     [TestClass]
-    public class SolverTest {
+    public class SolverTest : ForemanTestBase {
         [TestMethod]
         public void TestBasicSolve() {
             var builder = GraphBuilder.Create();

@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ForemanTest.Graph {
     [TestClass]
-    public class ProductionGraphSessionCoverageTests {
+    public class ProductionGraphSessionCoverageTests : ForemanTestBase {
         [TestMethod]
         public void Attach_BackfillsExistingDomainNodesAndLinks() {
             GraphBuilder.BuiltData built = GraphSessionTestHelper.BuildSimpleChain();
@@ -260,9 +260,6 @@ namespace ForemanTest.Graph {
                 Assert.Inconclusive($"Space Age preset folder not found: {SpaceAgeDataCacheFixture.PresetsDirectory}");
 
             string path = FlowchartSample.ResolvePath();
-            if (!System.IO.File.Exists(path))
-                Assert.Inconclusive($"Flowchart sample not found. Expected at: {path}");
-
             GraphViewerSaveDocument? saveDocument = GraphSaveCodec.ReadViewer(System.IO.File.ReadAllText(path));
             Assert.IsNotNull(saveDocument);
 

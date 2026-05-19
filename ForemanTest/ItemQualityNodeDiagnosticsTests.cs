@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ForemanTest {
     [TestClass]
-    public class ItemQualityNodeDiagnosticsTests {
+    public class ItemQualityNodeDiagnosticsTests : ForemanTestBase {
         [TestMethod]
         public void SupplierAndConsumer_SameErrorState_WhenQualityNotAvailable() {
             var ctx = GraphSessionTestHelper.CreateContext();

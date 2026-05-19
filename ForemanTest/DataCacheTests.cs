@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ForemanTest {
     [TestClass]
-    public class DataCacheTests {
+    public class DataCacheTests : ForemanTestBase {
         private const string VanillaPresetName = VanillaDataCacheFixture.PresetName;
 
         public TestContext? TestContext { get; set; }
