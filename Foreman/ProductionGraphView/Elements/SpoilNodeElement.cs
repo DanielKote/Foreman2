@@ -1,18 +1,16 @@
-﻿using Foreman.Graph;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.Graph;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public class SpoilNodeElement : BaseNodeElement {
         protected override Brush CleanBgBrush { get { return spoilBGBrush; } }
-        private static Brush spoilBGBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
+        private static readonly Brush spoilBGBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
 
-        private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
+        private static readonly StringFormat textFormat = new() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
 
         private ISpoilNodeViewModel SpoilViewModel => (ISpoilNodeViewModel)ViewModel;
         private string InputName => SpoilViewModel.InputItem.FriendlyName ?? "";
@@ -43,21 +41,18 @@ namespace Foreman {
         protected override void DetailsDraw(Graphics graphics, Point trans) {
             //text
             bool overproducing = SpoilViewModel.IsOverproducing();
-            Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (overproducing ? 32 : 27), (Width - 10 - 40), Height - (overproducing ? 64 : 54));
+            var textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (overproducing ? 32 : 27), (Width - 10 - 40), Height - (overproducing ? 64 : 54));
             //graphics.DrawRectangle(devPen, textSlot);
 
-            int textLength;
-
-            if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low)
-                textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, InputName + " Spoilage", BaseFont, textSlot);
-            else
-                textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, BuildingQuantityToText(SpoilViewModel.ActualSetValue) + " stacks", CounterBaseFont, textSlot);
+            var textLength = graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low
+                ? GraphicsStuff.DrawText(graphics, TextBrush, textFormat, InputName + " Spoilage", BaseFont, textSlot)
+                : GraphicsStuff.DrawText(graphics, TextBrush, textFormat, BuildingQuantityToText(SpoilViewModel.ActualSetValue) + " stacks", CounterBaseFont, textSlot);
 
             //spoilage icon
             graphics.DrawImage(IconCache.SpoilageIcon, trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);
         }
 
-        protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive) =>
-            ExclusiveHelpTooltip(string.Format("Left click on this node to edit the throughput of {0} Spoilage.\nxN quantity lists number of slots required for throughput.\nRight click for options.", InputName), exclusive);
+        protected override List<TooltipInfo> GetMyToolTips(Point graphPoint, bool exclusive) =>
+            ExclusiveHelpTooltip(string.Format(DisplayCulture.Format, "Left click on this node to edit the throughput of {0} Spoilage.\nxN quantity lists number of slots required for throughput.\nRight click for options.", InputName), exclusive);
     }
 }

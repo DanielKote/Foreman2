@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Annotations {
     internal static class AnnotationSelectionModifiers {
         public static bool IsRemoveFromSelection =>
             (Control.ModifierKeys & Keys.Alt) != 0;

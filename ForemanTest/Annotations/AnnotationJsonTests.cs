@@ -1,7 +1,6 @@
-﻿using Foreman;
+﻿using Foreman.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Nodes;
 
 namespace ForemanTest.Annotations {
@@ -28,7 +27,7 @@ namespace ForemanTest.Annotations {
             Assert.AreEqual("Text", node["Type"]?.GetValue<string>());
 
             AnnotationSaveData? restored = AnnotationJson.Deserialize(node);
-            Assert.IsInstanceOfType(restored, typeof(TextAnnotationSaveData));
+            Assert.IsInstanceOfType<TextAnnotationSaveData>(restored);
             var text = (TextAnnotationSaveData)restored;
             Assert.AreEqual("Label", text.Text);
             Assert.AreEqual(12, text.X);
@@ -50,7 +49,7 @@ namespace ForemanTest.Annotations {
             };
 
             AnnotationSaveData? restored = AnnotationJson.Deserialize(AnnotationJson.SerializeToNode(original)!);
-            Assert.IsInstanceOfType(restored, typeof(ShapeAnnotationSaveData));
+            Assert.IsInstanceOfType<ShapeAnnotationSaveData>(restored);
             var shape = (ShapeAnnotationSaveData)restored;
             Assert.AreEqual("Ellipse", shape.ShapeType);
             Assert.AreEqual(3, shape.BorderWidth);
@@ -69,8 +68,8 @@ namespace ForemanTest.Annotations {
 
             IReadOnlyList<AnnotationSaveData>? list = AnnotationJson.DeserializeListFromRoot(root);
             Assert.IsNotNull(list);
-            Assert.AreEqual(1, list.Count);
-            Assert.IsInstanceOfType(list[0], typeof(TextAnnotationSaveData));
+            Assert.HasCount(1, list);
+            Assert.IsInstanceOfType<TextAnnotationSaveData>(list[0]);
         }
     }
 }

@@ -1,19 +1,22 @@
 ﻿using Foreman;
-using ForemanTest.support;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace ForemanTest {
+namespace ForemanTest.support {
     // Fluent builder for small production graphs used by solver tests.
     public class GraphBuilder {
-        private readonly List<Tuple<ProductionNodeBuilder, ProductionNodeBuilder>> links = new();
-        private readonly HashSet<ProductionNodeBuilder> nodes = new();
+        private readonly List<Tuple<ProductionNodeBuilder, ProductionNodeBuilder>> links = [];
+        private readonly HashSet<ProductionNodeBuilder> nodes = [];
 
         private GraphBuilder() { }
 
-        public static GraphBuilder Create() => new GraphBuilder();
+        public static GraphBuilder Create() => new();
 
         internal SingletonNodeBuilder Supply(string item) {
             var node = new SingletonNodeBuilder(isSupplier: true).Item(item);
@@ -64,18 +67,11 @@ namespace ForemanTest {
             return new BuiltData(graph, context);
         }
 
-        public sealed class BuildContext {
-            public DataCache Cache { get; }
-            public SubgroupPrototype Subgroup { get; }
-            public Quality Quality { get; }
-            public Assembler TestAssembler { get; }
-
-            public BuildContext(DataCache cache, SubgroupPrototype subgroup, Quality quality) {
-                Cache = cache;
-                Subgroup = subgroup;
-                Quality = quality;
-                TestAssembler = TestPrototypeFactory.CreateTestAssembler(cache);
-            }
+        public sealed class BuildContext(DataCache cache, SubgroupPrototype subgroup, IQuality quality) {
+            public DataCache Cache { get; } = cache;
+            public SubgroupPrototype Subgroup { get; } = subgroup;
+            public IQuality Quality { get; } = quality;
+            public IAssembler TestAssembler { get; } = TestPrototypeFactory.CreateTestAssembler(cache);
 
             public ItemQualityPair ItemPair(string name) {
                 var item = TestDataCacheHelper.GetOrCreateItem(Cache, Subgroup, name);
@@ -90,8 +86,8 @@ namespace ForemanTest {
                 get => builtNode ?? throw new InvalidOperationException("Call Build before reading BuiltNode.");
                 protected set => builtNode = value;
             }
-            public IEnumerable<ItemQualityPair> BuiltInputs { get; protected set; } = Array.Empty<ItemQualityPair>();
-            public IEnumerable<ItemQualityPair> BuiltOutputs { get; protected set; } = Array.Empty<ItemQualityPair>();
+            public IEnumerable<ItemQualityPair> BuiltInputs { get; protected set; } = [];
+            public IEnumerable<ItemQualityPair> BuiltOutputs { get; protected set; } = [];
 
             internal abstract void Build(BuildContext context, ProductionGraph graph);
         }
@@ -134,22 +130,21 @@ namespace ForemanTest {
             }
         }
 
-        internal class RecipeBuilder : ProductionNodeBuilder {
-            private readonly Dictionary<string, float> inputs = new();
-            private readonly Dictionary<string, float> outputs = new();
+        sealed internal class RecipeBuilder : ProductionNodeBuilder {
+            private readonly Dictionary<string, float> inputs = [];
+            private readonly Dictionary<string, float> outputs = [];
             private string? name;
             private double efficiency;
-            public float target { get; private set; }
+            public float Target { get; private set; }
 
             internal RecipeBuilder(string? name) => this.name = name;
 
             internal override void Build(BuildContext context, ProductionGraph graph) {
-                if (name is null)
-                    name = "recipe-" + Guid.NewGuid().ToString("N")[..8];
+                name ??= "recipe-" + Guid.NewGuid().ToString("N")[..8];
 
                 var recipe = new RecipePrototype(context.Cache, name, name, context.Subgroup, "z");
                 TestPrototypeFactory.SetRecipeTime(recipe, 1);
-                TestPrototypeFactory.LinkRecipeAndAssembler(recipe, context.TestAssembler);
+                TestPrototypeFactory.LinkRecipeAndAssembler(recipe, (AssemblerPrototype)context.TestAssembler);
                 TestDataCacheHelper.RegisterRecipe(context.Cache, recipe);
 
                 foreach (var kvp in inputs) {
@@ -171,9 +166,9 @@ namespace ForemanTest {
 
                 if (graph.RequestNodeController(recipeNode) is RecipeNodeController recipeController) {
                     recipeController.SetExtraProductivityBonus(efficiency);
-                    if (target > 0) {
+                    if (Target > 0) {
                         recipeController.SetRateType(RateType.Manual);
-                        recipeController.SetDesiredSetValue(target);
+                        recipeController.SetDesiredSetValue(Target);
                     } else
                         recipeController.SetRateType(RateType.Auto);
                 }
@@ -189,27 +184,21 @@ namespace ForemanTest {
                 return this;
             }
 
-            internal RecipeBuilder Target(float targetValue) {
-                target = targetValue;
+            internal RecipeBuilder SetTarget(float targetValue) {
+                Target = targetValue;
                 return this;
             }
 
-            internal RecipeBuilder Efficiency(double bonus) {
+            internal RecipeBuilder SetEfficiency(double bonus) {
                 efficiency = bonus;
                 return this;
             }
         }
 
-        public class BuiltData {
-            public ProductionGraph Graph { get; }
-            public DataCache Cache { get; }
-            private readonly BuildContext context;
-
-            public BuiltData(ProductionGraph graph, BuildContext context) {
-                Graph = graph;
-                this.context = context;
-                Cache = context.Cache;
-            }
+        public class BuiltData(ProductionGraph graph, GraphBuilder.BuildContext context) {
+            public ProductionGraph Graph { get; } = graph;
+            public DataCache Cache { get; } = context.Cache;
+            private readonly BuildContext context = context;
 
             public void Solve() => Graph.OptimizeGraphNodeValues();
 

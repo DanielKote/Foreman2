@@ -1,11 +1,12 @@
-﻿using System.Drawing;
+﻿using Foreman.DataCaching.DataTypes;
+using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.Controls {
     public class RecipePanel : UserControl //helper class to draw the recipe in a panel (container)
     {
-        private Recipe[] Recipes;
-        public RecipePanel(Recipe[] recipes) {
+        private readonly IRecipe[] Recipes;
+        public RecipePanel(IRecipe[] recipes) {
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.DoubleBuffered = true;
 

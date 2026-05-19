@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using System;
 using System.Text.Json;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     /// <summary>System.Text.Json wire-format for graph save documents.</summary>
     internal static class GraphSaveJson {
         public static string SerializeProductionGraph(ProductionGraphSaveDocument document, bool writeIndented) {

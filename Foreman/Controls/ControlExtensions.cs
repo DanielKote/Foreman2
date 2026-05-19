@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman {
-    static class ControlExtensions {
+namespace Foreman.Controls {
+    public static class ControlExtensions {
         static public void UIThread(this Control control, Action code) {
             if (control.InvokeRequired) {
                 control.BeginInvoke(code);
@@ -22,5 +19,14 @@ namespace Foreman {
             }
             code.Invoke();
         }
+
+        /// <summary>Runs <paramref name="action"/> on the control's UI thread (required after <c>ConfigureAwait(false)</c>).</summary>
+        static public Task InvokeOnUiThreadAsync(this Control control, Action action) {
+            if (control.InvokeRequired)
+                return control.InvokeAsync(action);
+            action();
+            return Task.CompletedTask;
+        }
+
     }
 }

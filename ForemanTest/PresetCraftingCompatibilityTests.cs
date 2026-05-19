@@ -1,6 +1,8 @@
-﻿using Foreman;
+﻿using Foreman.DataCaching.Loading;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
 
@@ -15,10 +17,8 @@ namespace ForemanTest {
                 additionalCategories: ["smelting"]);
 
             var categories = PresetCraftingCompatibility.CollectRecipeCraftingCategories(recipe, "chemistry").ToArray();
-
-            CollectionAssert.AreEquivalent(
-                new[] { "chemistry", "advanced-chemistry", "smelting" },
-                categories);
+            ICollection<string> expected = ["chemistry", "advanced-chemistry", "smelting"];
+            CollectionAssert.AreEquivalent(expected as ICollection, categories);
         }
 
         [TestMethod]
@@ -28,8 +28,8 @@ namespace ForemanTest {
                 additionalCategories: ["advanced-crafting"]);
 
             var categories = PresetCraftingCompatibility.CollectRecipeCraftingCategories(recipe, "crafting").ToArray();
-
-            CollectionAssert.AreEquivalent(new[] { "crafting", "advanced-crafting" }, categories);
+            ICollection<string> expected = ["crafting", "advanced-crafting"];
+            CollectionAssert.AreEquivalent(expected as ICollection, categories);
         }
 
         private static JsonObject MinimalRecipeJson(

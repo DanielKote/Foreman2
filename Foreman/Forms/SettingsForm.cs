@@ -1,5 +1,11 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Forms;
+using Foreman.Models;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -7,80 +13,67 @@ using System.Windows.Forms;
 
 namespace Foreman {
     public partial class SettingsForm : Form {
-        public class SettingsFormOptions {
-            public DataCache DCache { get; private set; }
+        public class SettingsFormOptions(DataCache cache) {
+            public DataCache DCache { get; private set; } = cache;
 
-            public List<Preset>? Presets;
-            public Preset? SelectedPreset;
-            public bool RequireReload;
+            public List<Preset>? Presets { get; set; } = [];
+            public Preset? SelectedPreset { get; set; }
+            public bool RequireReload { get; set; }
+            public uint QualitySteps { get; set; }
+            public ProductionGraphViewer.LOD LevelOfDetail { get; set; }
+            public int NodeCountForSimpleView { get; set; }
+            public int IconsOnlyIconSize { get; set; }
+            public bool ArrowsOnLinks { get; set; }
+            public bool SimplePassthroughNodes { get; set; }
+            public bool DynamicLinkWidth { get; set; }
+            public bool AbbreviateSciPacks { get; set; }
+            public bool ShowRecipeToolTip { get; set; }
+            public bool RoundAssemblerCount { get; set; }
+            public bool LockedRecipeEditPanelPosition { get; set; }
+            public bool FlagOUSuppliedNodes { get; set; }
+            public bool FlagDarkMode { get; set; }
+            public bool ShowErrorArrows { get; set; }
+            public bool ShowWarningArrows { get; set; }
+            public bool ShowDisconnectedArrows { get; set; }
+            public bool ShowOUSuppliedArrows { get; set; }
+            public AssemblerSelector.Style DefaultAssemblerStyle { get; set; }
+            public ModuleSelector.Style DefaultModuleStyle { get; set; }
+            public NodeDirection DefaultNodeDirection { get; set; }
+            public bool SmartNodeDirection { get; set; }
+            public bool EnableExtraProductivityForNonMiners { get; set; }
+            public bool DevShowUnavailableItems { get; set; }
+            public bool DevUseRecipeBWFilters { get; set; }
 
-            public uint QualitySteps;
+            public double SolverLowPriorityPower { get; set; }
+            public double SolverPullConsumerNodesPower { get; set; }
+            public bool SolverPullConsumerNodes { get; set; }
 
-            public ProductionGraphViewer.LOD LevelOfDetail;
-            public int NodeCountForSimpleView;
-            public int IconsOnlyIconSize;
-
-            public bool ArrowsOnLinks;
-            public bool SimplePassthroughNodes;
-            public bool DynamicLinkWidth;
-            public bool AbbreviateSciPacks;
-            public bool ShowRecipeToolTip;
-            public bool RoundAssemblerCount;
-            public bool LockedRecipeEditPanelPosition;
-            public bool FlagOUSuppliedNodes;
-            public bool FlagDarkMode;
-
-            public bool ShowErrorArrows;
-            public bool ShowWarningArrows;
-            public bool ShowDisconnectedArrows;
-            public bool ShowOUSuppliedArrows;
-
-            public AssemblerSelector.Style DefaultAssemblerStyle;
-            public ModuleSelector.Style DefaultModuleStyle;
-            public NodeDirection DefaultNodeDirection;
-            public bool SmartNodeDirection;
-
-            public bool EnableExtraProductivityForNonMiners;
-            public bool DEV_ShowUnavailableItems;
-            public bool DEV_UseRecipeBWFilters;
-
-            public double Solver_LowPriorityPower;
-            public double Solver_PullConsumerNodesPower;
-            public bool Solver_PullConsumerNodes;
-
-            public HashSet<DataObjectBase> EnabledObjects;
-
-            public SettingsFormOptions(DataCache cache) {
-                DCache = cache;
-                Presets = new List<Preset>();
-                EnabledObjects = new HashSet<DataObjectBase>();
-                RequireReload = false;
-            }
+            public HashSet<IDataObjectBase> EnabledObjects { get; set; } = [];
         }
 
         private static readonly Color AvailableObjectColor = Color.White;
         private static readonly Color UnavailableObjectColor = Color.Pink;
 
-        public SettingsFormOptions Options;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public SettingsFormOptions Options { get; set; }
+        private readonly List<ListViewItem> unfilteredAssemblerList;
+        private readonly List<ListViewItem> unfilteredMinerList;
+        private readonly List<ListViewItem> unfilteredPowerList;
+        private readonly List<ListViewItem> unfilteredBeaconList;
+        private readonly List<ListViewItem> unfilteredModuleList;
+        private readonly List<ListViewItem> unfilteredRecipeList;
+        private readonly List<ListViewItem> unfilteredQualityList;
 
-        private List<ListViewItem> unfilteredAssemblerList;
-        private List<ListViewItem> unfilteredMinerList;
-        private List<ListViewItem> unfilteredPowerList;
-        private List<ListViewItem> unfilteredBeaconList;
-        private List<ListViewItem> unfilteredModuleList;
-        private List<ListViewItem> unfilteredRecipeList;
-        private List<ListViewItem> unfilteredQualityList;
+        private readonly List<ListViewItem> filteredAssemblerList;
+        private readonly List<ListViewItem> filteredMinerList;
+        private readonly List<ListViewItem> filteredPowerList;
+        private readonly List<ListViewItem> filteredBeaconList;
+        private readonly List<ListViewItem> filteredModuleList;
+        private readonly List<ListViewItem> filteredRecipeList;
+        private readonly List<ListViewItem> filteredQualityList;
 
-        private List<ListViewItem> filteredAssemblerList;
-        private List<ListViewItem> filteredMinerList;
-        private List<ListViewItem> filteredPowerList;
-        private List<ListViewItem> filteredBeaconList;
-        private List<ListViewItem> filteredModuleList;
-        private List<ListViewItem> filteredRecipeList;
-        private List<ListViewItem> filteredQualityList;
-
-        private MouseHoverDetector mhDetector;
-        private MainForm mainForm;
+        private readonly MouseHoverDetector mhDetector;
+        private readonly MainForm mainForm;
 
         public SettingsForm(SettingsFormOptions options, MainForm mainForm) {
             Options = options;
@@ -100,21 +93,21 @@ namespace Foreman {
             RecipeListView.Columns[0].Width = RecipeListView.Width - 32;
             QualityListView.Columns[0].Width = QualityListView.Width - 32;
 
-            unfilteredAssemblerList = new List<ListViewItem>();
-            unfilteredMinerList = new List<ListViewItem>();
-            unfilteredPowerList = new List<ListViewItem>();
-            unfilteredBeaconList = new List<ListViewItem>();
-            unfilteredModuleList = new List<ListViewItem>();
-            unfilteredRecipeList = new List<ListViewItem>();
-            unfilteredQualityList = new List<ListViewItem>();
+            unfilteredAssemblerList = [];
+            unfilteredMinerList = [];
+            unfilteredPowerList = [];
+            unfilteredBeaconList = [];
+            unfilteredModuleList = [];
+            unfilteredRecipeList = [];
+            unfilteredQualityList = [];
 
-            filteredAssemblerList = new List<ListViewItem>();
-            filteredMinerList = new List<ListViewItem>();
-            filteredPowerList = new List<ListViewItem>();
-            filteredBeaconList = new List<ListViewItem>();
-            filteredModuleList = new List<ListViewItem>();
-            filteredRecipeList = new List<ListViewItem>();
-            filteredQualityList = new List<ListViewItem>();
+            filteredAssemblerList = [];
+            filteredMinerList = [];
+            filteredPowerList = [];
+            filteredBeaconList = [];
+            filteredModuleList = [];
+            filteredRecipeList = [];
+            filteredQualityList = [];
 
             SelectPresetMenuItem.Click += SelectPresetMenuItem_Click;
             DeletePresetMenuItem.Click += DeletePresetMenuItem_Click;
@@ -161,16 +154,10 @@ namespace Foreman {
                     break;
             }
 
-            switch (Options.DefaultNodeDirection) {
-                case NodeDirection.Down:
-                    NodeDirectionDropDown.SelectedIndex = 1;
-                    break;
-                case NodeDirection.Up:
-                default:
-                    NodeDirectionDropDown.SelectedIndex = 0;
-                    break;
-            }
-
+            NodeDirectionDropDown.SelectedIndex = Options.DefaultNodeDirection switch {
+                NodeDirection.Down => 1,
+                _ => 0,
+            };
             SmartNodeDirectionCheckBox.Checked = Options.SmartNodeDirection;
 
             AssemblerSelectorStyleDropDown.Items.AddRange(AssemblerSelector.StyleNames);
@@ -179,12 +166,12 @@ namespace Foreman {
             ModuleSelectorStyleDropDown.SelectedIndex = (int)Options.DefaultModuleStyle;
 
             ShowProductivityBonusOnAllCheckBox.Checked = Options.EnableExtraProductivityForNonMiners;
-            ShowUnavailablesCheckBox.Checked = Options.DEV_ShowUnavailableItems;
-            LoadBarrelingCheckBox.Checked = !Options.DEV_UseRecipeBWFilters;
+            ShowUnavailablesCheckBox.Checked = Options.DevShowUnavailableItems;
+            LoadBarrelingCheckBox.Checked = !Options.DevUseRecipeBWFilters;
 
-            LowPriorityPowerInput.Value = Math.Min(LowPriorityPowerInput.Maximum, (decimal)Options.Solver_LowPriorityPower);
-            PullConsumerNodesCheckBox.Checked = Options.Solver_PullConsumerNodes;
-            PullConsumerNodesPowerInput.Value = Math.Min(PullConsumerNodesPowerInput.Maximum, (decimal)Options.Solver_PullConsumerNodesPower);
+            LowPriorityPowerInput.Value = Math.Min(LowPriorityPowerInput.Maximum, (decimal)Options.SolverLowPriorityPower);
+            PullConsumerNodesCheckBox.Checked = Options.SolverPullConsumerNodes;
+            PullConsumerNodesPowerInput.Value = Math.Min(PullConsumerNodesPowerInput.Maximum, (decimal)Options.SolverPullConsumerNodesPower);
 
             //lists
             LoadUnfilteredLists();
@@ -199,9 +186,9 @@ namespace Foreman {
             PresetInfo presetInfo = PresetProcessor.ReadPresetInfo(selectedPreset);
             ModSelectionBox.Items.Clear();
             if (presetInfo.ModList != null) {
-                List<string> modList = presetInfo.ModList.Select(kvp => kvp.Key + "_" + kvp.Value).ToList();
+                List<string> modList = [.. presetInfo.ModList.Select(kvp => kvp.Key + "_" + kvp.Value)];
                 modList.Sort();
-                ModSelectionBox.Items.AddRange(modList.ToArray());
+                ModSelectionBox.Items.AddRange([.. modList]);
             }
             RecipeDifficultyLabel.Text = presetInfo.ExpensiveRecipes ? "Expensive" : "Normal";
             TechnologyDifficultyLabel.Text = presetInfo.ExpensiveTechnology ? "Expensive" : "Normal";
@@ -222,21 +209,20 @@ namespace Foreman {
             UpdateFilteredLists();
         }
 
-        private void LoadUnfilteredList(EnabledObjectsIconIndex iconIndex, IEnumerable<DataObjectBase> origin, List<ListViewItem> lviList) {
-            IOrderedEnumerable<DataObjectBase> orderedList;
-            if (origin is IEnumerable<Quality>)
-                orderedList = origin.OrderByDescending(a => a.Available).ThenBy(a => a);
-            else
-                orderedList = origin.OrderByDescending(a => a.Available).ThenBy(a => a.FriendlyName);
+        private void LoadUnfilteredList(EnabledObjectsIconIndex iconIndex, IEnumerable<IDataObjectBase> origin, List<ListViewItem> lviList) {
+            var orderedList = origin is IEnumerable<IQuality>
+                ? origin.OrderByDescending(a => a.Available).ThenBy(a => a)
+                : origin.OrderByDescending(a => a.Available).ThenBy(a => a.FriendlyName);
 
-            foreach (DataObjectBase dObject in orderedList) {
-                ListViewItem lvItem = new ListViewItem();
-                lvItem.ImageIndex = iconIndex.GetImageIndex(dObject.Icon);
+            foreach (IDataObjectBase dObject in orderedList) {
+                var lvItem = new ListViewItem {
+                    ImageIndex = iconIndex.GetImageIndex(dObject.Icon),
 
-                lvItem.Text = dObject.FriendlyName;
-                lvItem.Tag = dObject;
-                lvItem.Name = dObject.Name; //key
-                lvItem.Checked = true; //have to set this to true before (potentially) changing to false in order for the check boxes to appear
+                    Text = dObject.FriendlyName,
+                    Tag = dObject,
+                    Name = dObject.Name, //key
+                    Checked = true //have to set this to true before (potentially) changing to false in order for the check boxes to appear
+                };
                 lvItem.Checked = Options.EnabledObjects.Contains(dObject);
                 lvItem.BackColor = dObject.Available ? AvailableObjectColor : UnavailableObjectColor;
                 lviList.Add(lvItem);
@@ -254,13 +240,13 @@ namespace Foreman {
         }
 
         private void UpdateFilteredList(List<ListViewItem> unfilteredList, List<ListViewItem> filteredList, ListView owner) {
-            string filterString = FilterTextBox.Text.ToLower();
+            string filterString = FilterTextBox.Text.ToLowerInvariant();
             bool showUnavailables = ShowUnavailablesFilterCheckBox.Checked;
 
             filteredList.Clear();
 
             foreach (ListViewItem lvItem in unfilteredList)
-                if ((showUnavailables || (lvItem.Tag as DataObjectBase)?.Available is true) && (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString)))
+                if ((showUnavailables || lvItem.Tag is IDataObjectBase { Available: true }) && (string.IsNullOrEmpty(filterString) || lvItem.Text.Contains(filterString, StringComparison.OrdinalIgnoreCase)))
                     filteredList.Add(lvItem);
 
 
@@ -274,10 +260,9 @@ namespace Foreman {
 
         private void PresetListBox_SelectedValueChanged(object? sender, EventArgs e) {
             UpdateModList();
-            if (PresetListBox.SelectedItem == null)
-                CurrentPresetLabel.Font = new Font(CurrentPresetLabel.Font, FontStyle.Bold);
-            else
-                CurrentPresetLabel.Font = new Font(CurrentPresetLabel.Font, FontStyle.Regular);
+            CurrentPresetLabel.Font = PresetListBox.SelectedItem == null
+                ? new Font(CurrentPresetLabel.Font, FontStyle.Bold)
+                : new Font(CurrentPresetLabel.Font, FontStyle.Regular);
         }
 
         private void PresetListBox_MouseDown(object? sender, MouseEventArgs e) {
@@ -286,7 +271,7 @@ namespace Foreman {
 
             var index = PresetListBox.IndexFromPoint(e.Location);
             if (index != ListBox.NoMatches) {
-                Preset rclickedPreset = ((Preset)PresetListBox.Items[index]);
+                var rclickedPreset = ((Preset)PresetListBox.Items[index]);
                 PresetListBox.SelectedIndex = index;
 
                 if (rclickedPreset.IsCurrentlySelected) {
@@ -368,7 +353,7 @@ namespace Foreman {
                     bool setCheck = !lvi.Checked;
                     foreach (int index in lv.SelectedIndices) {
                         lvi = lv.Items[index];
-                        if (lvi.Tag is not DataObjectBase dob)
+                        if (lvi.Tag is not IDataObjectBase dob)
                             continue;
                         lvi.Checked = setCheck;
                         if (lvi.Checked)
@@ -378,7 +363,7 @@ namespace Foreman {
                     }
                 } else {
                     lvi.Checked = !lvi.Checked;
-                    if (lvi.Tag is DataObjectBase dob) {
+                    if (lvi.Tag is IDataObjectBase dob) {
                         if (lvi.Checked)
                             Options.EnabledObjects.Add(dob);
                         else
@@ -396,7 +381,7 @@ namespace Foreman {
                     bool setCheck = lvi.Checked;
                     foreach (int index in lv.SelectedIndices) {
                         lvi = lv.Items[index];
-                        if (lvi.Tag is not DataObjectBase dob)
+                        if (lvi.Tag is not IDataObjectBase dob)
                             continue;
                         lvi.Checked = setCheck;
                         if (lvi.Checked)
@@ -405,7 +390,7 @@ namespace Foreman {
                             Options.EnabledObjects.Remove(dob);
                     }
                 } else {
-                    if (lvi.Tag is DataObjectBase dob) {
+                    if (lvi.Tag is IDataObjectBase dob) {
                         if (lvi.Checked)
                             Options.EnabledObjects.Add(dob);
                         else
@@ -428,8 +413,8 @@ namespace Foreman {
             if (sender is not ListView lv)
                 return;
             var lvi = lv.GetItemAt(e.Location.X, e.Location.Y);
-            Point location = new Point(e.X + 15, e.Y);
-            if (lvi?.Tag is Recipe recipe) {
+            var location = new Point(e.X + 15, e.Y);
+            if (lvi?.Tag is IRecipe recipe) {
                 RecipeToolTip.SetRecipe(recipe);
                 RecipeToolTip.Show(lv, location);
             }
@@ -478,12 +463,12 @@ namespace Foreman {
             Options.SmartNodeDirection = SmartNodeDirectionCheckBox.Checked;
 
             Options.EnableExtraProductivityForNonMiners = ShowProductivityBonusOnAllCheckBox.Checked;
-            Options.DEV_ShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
-            Options.DEV_UseRecipeBWFilters = !LoadBarrelingCheckBox.Checked;
+            Options.DevShowUnavailableItems = ShowUnavailablesCheckBox.Checked;
+            Options.DevUseRecipeBWFilters = !LoadBarrelingCheckBox.Checked;
 
-            Options.Solver_LowPriorityPower = (double)LowPriorityPowerInput.Value;
-            Options.Solver_PullConsumerNodes = PullConsumerNodesCheckBox.Checked;
-            Options.Solver_PullConsumerNodesPower = (double)PullConsumerNodesPowerInput.Value;
+            Options.SolverLowPriorityPower = (double)LowPriorityPowerInput.Value;
+            Options.SolverPullConsumerNodes = PullConsumerNodesCheckBox.Checked;
+            Options.SolverPullConsumerNodesPower = (double)PullConsumerNodesPowerInput.Value;
 
             if (Options.FlagDarkMode != FlagDarkModeCheckBox.Checked) {
                 Options.FlagDarkMode = FlagDarkModeCheckBox.Checked;
@@ -498,37 +483,36 @@ namespace Foreman {
         //PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------
 
         private void ImportPresetButton_Click(object? sender, EventArgs e) {
-            using (PresetImportForm form = new PresetImportForm()) {
-                form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 250;
-                form.Top = this.Top + 50;
-                DialogResult result = form.ShowDialog();
+            using var form = new PresetImportForm();
+            form.StartPosition = FormStartPosition.Manual;
+            form.Left = this.Left + 250;
+            form.Top = this.Top + 50;
+            DialogResult result = form.ShowDialog();
 
-                if (form.ImportStarted)
-                    GC.Collect(); //we just processed a new preset (either fully or cancelled) - this required the opening of (potentially) alot of zip files and processing of a ton of bitmaps that are now stuck in garbate. In large mod packs like A&B this could clear out 2GB+ of memory.
+            if (form.ImportStarted)
+                GC.Collect(); //we just processed a new preset (either fully or cancelled) - this required the opening of (potentially) alot of zip files and processing of a ton of bitmaps that are now stuck in garbate. In large mod packs like A&B this could clear out 2GB+ of memory.
 
-                if (result == DialogResult.OK && !string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
+            if (result == DialogResult.OK && !string.IsNullOrEmpty(form.NewPresetName)) //we have added a new preset
+            {
+                var newPreset = Options.Presets?.FirstOrDefault(p => string.Equals(p.Name, form.NewPresetName, StringComparison.OrdinalIgnoreCase)); //extra check just in case we were overwriting
+                if (newPreset == null) {
+                    newPreset = new Preset(form.NewPresetName, false, false);
+                    Options.Presets?.Add(newPreset);
+                    PresetListBox.Items.Add(newPreset);
+                }
+
+
+                if (newPreset == Options.Presets?[0]) //we have overwritten the currently active preset. Must force a reload
                 {
-                    var newPreset = Options.Presets?.FirstOrDefault(p => p.Name.ToLower() == form.NewPresetName.ToLower()); //extra check just in case we were overwriting
-                    if (newPreset == null) {
-                        newPreset = new Preset(form.NewPresetName, false, false);
-                        Options.Presets?.Add(newPreset);
-                        PresetListBox.Items.Add(newPreset);
-                    }
-
-
-                    if (newPreset == Options.Presets?[0]) //we have overwritten the currently active preset. Must force a reload
-                    {
-                        Options.RequireReload = true;
-                        UpdateSettings();
-                        DialogResult = DialogResult.OK;
-                        Close();
-                    } else if (UserMessages.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                        Options.SelectedPreset = newPreset;
-                        UpdateSettings();
-                        DialogResult = DialogResult.OK;
-                        Close();
-                    }
+                    Options.RequireReload = true;
+                    UpdateSettings();
+                    DialogResult = DialogResult.OK;
+                    Close();
+                } else if (UserMessages.Show("Preset import complete! Do you wish to switch to the new preset?", "", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                    Options.SelectedPreset = newPreset;
+                    UpdateSettings();
+                    DialogResult = DialogResult.OK;
+                    Close();
                 }
             }
         }
@@ -539,40 +523,37 @@ namespace Foreman {
                 return;
             }
 
-            using (PresetComparatorForm form = new PresetComparatorForm()) {
-                form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 50;
-                form.Top = this.Top + 50;
-                form.ShowDialog();
-            }
+            using var form = new PresetComparatorForm();
+            form.StartPosition = FormStartPosition.Manual;
+            form.Left = this.Left + 50;
+            form.Top = this.Top + 50;
+            form.ShowDialog();
         }
 
         //SET ENABLED STATUS------------------------------------------------------------------------------------------
 
         private void LoadEnabledFromSaveButton_Click(object? sender, EventArgs e) {
-            using (SaveFileLoadForm form = new SaveFileLoadForm(Options.DCache, Options.EnabledObjects)) {
-                form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 50;
-                form.Top = this.Top + 50;
-                DialogResult result = form.ShowDialog();
+            using var form = new SaveFileLoadForm(Options.DCache, Options.EnabledObjects);
+            form.StartPosition = FormStartPosition.Manual;
+            form.Left = this.Left + 50;
+            form.Top = this.Top + 50;
+            DialogResult result = form.ShowDialog();
 
-                if (result == DialogResult.OK)
-                    UpdateEnabledStatus();
-                else if (result == DialogResult.Abort)
-                    UserMessages.Show("Error while reading save file. Try running factorio, opening the save game, saving again, and retrying?");
-            }
+            if (result == DialogResult.OK)
+                UpdateEnabledStatus();
+            else if (result == DialogResult.Abort)
+                UserMessages.Show("Error while reading save file. Try running factorio, opening the save game, saving again, and retrying?");
         }
 
         private void SetEnabledFromSciencePacksButton_Click(object? sender, EventArgs e) {
-            using (SciencePacksLoadForm form = new SciencePacksLoadForm(Options.DCache, Options.EnabledObjects)) {
-                form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 50;
-                form.Top = this.Top + 50;
-                DialogResult result = form.ShowDialog();
+            using var form = new SciencePacksLoadForm(Options.DCache, Options.EnabledObjects);
+            form.StartPosition = FormStartPosition.Manual;
+            form.Left = this.Left + 50;
+            form.Top = this.Top + 50;
+            DialogResult result = form.ShowDialog();
 
-                if (result == DialogResult.OK)
-                    UpdateEnabledStatus();
-            }
+            if (result == DialogResult.OK)
+                UpdateEnabledStatus();
         }
 
         private void EnableAllButton_Click(object? sender, EventArgs e) {
@@ -580,19 +561,19 @@ namespace Foreman {
             if (Options.DCache.PlayerAssembler is not null)
                 Options.EnabledObjects.Add(Options.DCache.PlayerAssembler);
 
-            foreach (Assembler assembler in Options.DCache.Assemblers.Values.Where(m => m.AssociatedItems.Any(i => i.Available)))
+            foreach (IAssembler assembler in Options.DCache.Assemblers.Values.Where(m => m.AssociatedItems.Any(i => i.Available)))
                 Options.EnabledObjects.Add(assembler);
 
-            foreach (Beacon beacon in Options.DCache.Beacons.Values.Where(m => m.AssociatedItems.Any(i => i.Available)))
+            foreach (IBeacon beacon in Options.DCache.Beacons.Values.Where(m => m.AssociatedItems.Any(i => i.Available)))
                 Options.EnabledObjects.Add(beacon);
 
-            foreach (Module module in Options.DCache.Modules.Values.Where(m => m.AssociatedItem.Available))
+            foreach (IModule module in Options.DCache.Modules.Values.Where(m => m.AssociatedItem.Available))
                 Options.EnabledObjects.Add(module);
 
-            foreach (Recipe recipe in Options.DCache.Recipes.Values.Where(r => r.Available))
+            foreach (IRecipe recipe in Options.DCache.Recipes.Values.Where(r => r.Available))
                 Options.EnabledObjects.Add(recipe);
 
-            foreach (Quality quality in Options.DCache.Qualities.Values.Where(r => r.Available))
+            foreach (IQuality quality in Options.DCache.Qualities.Values.Where(r => r.Available))
                 Options.EnabledObjects.Add(quality);
 
             UpdateEnabledStatus();
@@ -630,25 +611,25 @@ namespace Foreman {
             QualityListView.VirtualListSize = filteredQualityList.Count;
 
             foreach (ListViewItem item in unfilteredAssemblerList)
-                if (item.Tag is DataObjectBase dob)
+                if (item.Tag is IDataObjectBase dob)
                     item.Checked = Options.EnabledObjects.Contains(dob);
             foreach (ListViewItem item in unfilteredBeaconList)
-                if (item.Tag is DataObjectBase dob)
+                if (item.Tag is IDataObjectBase dob)
                     item.Checked = Options.EnabledObjects.Contains(dob);
             foreach (ListViewItem item in unfilteredMinerList)
-                if (item.Tag is DataObjectBase dob)
+                if (item.Tag is IDataObjectBase dob)
                     item.Checked = Options.EnabledObjects.Contains(dob);
             foreach (ListViewItem item in unfilteredModuleList)
-                if (item.Tag is DataObjectBase dob)
+                if (item.Tag is IDataObjectBase dob)
                     item.Checked = Options.EnabledObjects.Contains(dob);
             foreach (ListViewItem item in unfilteredPowerList)
-                if (item.Tag is DataObjectBase dob)
+                if (item.Tag is IDataObjectBase dob)
                     item.Checked = Options.EnabledObjects.Contains(dob);
             foreach (ListViewItem item in unfilteredRecipeList)
-                if (item.Tag is DataObjectBase dob)
+                if (item.Tag is IDataObjectBase dob)
                     item.Checked = Options.EnabledObjects.Contains(dob);
             foreach (ListViewItem item in unfilteredQualityList)
-                if (item.Tag is DataObjectBase dob)
+                if (item.Tag is IDataObjectBase dob)
                     item.Checked = Options.EnabledObjects.Contains(dob);
 
 

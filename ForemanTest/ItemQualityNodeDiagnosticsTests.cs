@@ -1,7 +1,11 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
 using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
 
 namespace ForemanTest {
@@ -21,8 +25,8 @@ namespace ForemanTest {
             Assert.AreEqual(NodeState.Error, supplier.State);
             Assert.AreEqual(NodeState.Error, consumer.State);
             Assert.AreEqual(supplier.ErrorSet, (SupplierNode.Errors)(int)consumer.ErrorSet);
-            StringAssert.Contains(supplier.GetErrors().Single(), "Quality");
-            StringAssert.Contains(consumer.GetErrors().Single(), "Quality");
+            Assert.Contains("Quality", supplier.GetErrors().Single());
+            Assert.Contains("Quality", consumer.GetErrors().Single());
         }
 
         [TestMethod]
@@ -44,10 +48,10 @@ namespace ForemanTest {
 
             string supplierWarning = supplier.GetWarnings().Single(w => w.Contains("Item"));
             string consumerWarning = consumer.GetWarnings().Single(w => w.Contains("Item"));
-            StringAssert.Contains(supplierWarning, "iron");
-            StringAssert.Contains(consumerWarning, "iron");
-            Assert.IsFalse(supplierWarning.Contains("Normal"));
-            Assert.IsFalse(consumerWarning.Contains("Normal"));
+            Assert.Contains("iron", supplierWarning);
+            Assert.Contains("iron", consumerWarning);
+            Assert.DoesNotContain("Normal", supplierWarning);
+            Assert.DoesNotContain("Normal", consumerWarning);
         }
 
         [TestMethod]
@@ -59,9 +63,9 @@ namespace ForemanTest {
 
             var warnings = ItemQualityNodeMessages.GetWarnings(pair, warningSet);
 
-            Assert.AreEqual(1, warnings.Count);
-            StringAssert.Contains(warnings[0], "iron-ore");
-            Assert.IsFalse(warnings[0].Contains("Normal"));
+            Assert.HasCount(1, warnings);
+            Assert.Contains("iron-ore", warnings[0]);
+            Assert.DoesNotContain("Normal", warnings[0]);
         }
 
         [TestMethod]
@@ -69,8 +73,8 @@ namespace ForemanTest {
             var ctx = GraphSessionTestHelper.CreateContext();
             var node = new PassthroughNode(ctx.NewGraph(), 1, ctx.Item("belt"));
 
-            StringAssert.Contains(node.ToString(), "Passthrough");
-            Assert.IsFalse(node.ToString().StartsWith("Supply node"));
+            Assert.Contains("Passthrough", node.ToString());
+            Assert.IsFalse(node.ToString().StartsWith("Supply node", StringComparison.Ordinal));
         }
 
         [TestMethod]
@@ -82,9 +86,9 @@ namespace ForemanTest {
             var node = new SpoilNode(ctx.NewGraph(), 1, new ItemQualityPair(fresh, ctx.Quality), rotten);
 
             string text = node.ToString();
-            StringAssert.Contains(text, "fresh");
-            StringAssert.Contains(text, "rotten");
-            StringAssert.Contains(text, "normal");
+            Assert.Contains("fresh", text);
+            Assert.Contains("rotten", text);
+            Assert.Contains("normal", text);
         }
 
         [TestMethod]
@@ -97,10 +101,10 @@ namespace ForemanTest {
             var node = new SpoilNode(ctx.NewGraph(), 1, new ItemQualityPair(fresh, ctx.Quality), other);
             node.UpdateState();
 
-            Assert.IsTrue((node.ErrorSet & SpoilNode.Errors.InvalidSpoilResult) != 0);
+            Assert.AreNotEqual(SpoilNode.Errors.Clean, node.ErrorSet & SpoilNode.Errors.InvalidSpoilResult);
             string message = node.GetErrors().Single(e => e.Contains("Spoil result"));
-            StringAssert.Contains(message, "doesnt match");
-            Assert.IsFalse(message.Contains("doesnt exist in preset"));
+            Assert.Contains("doesnt match", message);
+            Assert.DoesNotContain("doesnt exist in preset", message);
         }
     }
 }

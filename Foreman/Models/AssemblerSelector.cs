@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
-namespace Foreman {
+namespace Foreman.Models {
     public class AssemblerSelector {
         public enum Style { Worst, WorstNonBurner, WorstBurner, Best, BestNonBurner, BestBurner, MostModules }
         public static readonly string[] StyleNames = ["Worst", "Worst Non-Burner", "Worst Burner", "Best", "Best Non-Burner", "Best Burner", "Most Modules"];
@@ -13,17 +12,16 @@ namespace Foreman {
         public AssemblerSelector() { DefaultSelectionStyle = Style.WorstNonBurner; }
 
 
-        public Assembler GetAssembler(Recipe recipe) { return GetAssembler(recipe, DefaultSelectionStyle); }
-        public Assembler GetAssembler(Recipe recipe, Style style) { return GetOrderedAssemblerList(recipe, style).First(); }
-        public List<Assembler> GetOrderedAssemblerList(Recipe recipe) { return GetOrderedAssemblerList(recipe, DefaultSelectionStyle); }
+        public IAssembler GetAssembler(IRecipe recipe) { return GetAssembler(recipe, DefaultSelectionStyle); }
+        public static IAssembler GetAssembler(IRecipe recipe, Style style) { return GetOrderedAssemblerList(recipe, style).First(); }
+        public List<IAssembler> GetOrderedAssemblerList(IRecipe recipe) { return GetOrderedAssemblerList(recipe, DefaultSelectionStyle); }
 
-        public List<Assembler> GetOrderedAssemblerList(Recipe recipe, Style style) {
+        public static List<IAssembler> GetOrderedAssemblerList(IRecipe recipe, Style style) {
             if (style == Style.MostModules) {
-                return recipe.Assemblers
+                return [.. recipe.Assemblers
                     .OrderByDescending(a => a.Enabled)
                     .ThenByDescending(a => a.Available)
-                    .ThenByDescending(a => ((a.ModuleSlots * 1000000) + (a.Owner.DefaultQuality is not null ? a.GetSpeed(a.Owner.DefaultQuality) : 1)))  //QUALITY UPDATE REQUIRED
-                    .ToList();
+                    .ThenByDescending(a => ((a.ModuleSlots * 1000000) + (a.Owner.DefaultQuality is not null ? a.GetSpeed(a.Owner.DefaultQuality) : 1)))];
             } else {
                 int orderDirection;
                 bool includeNonBurners;
@@ -62,12 +60,11 @@ namespace Foreman {
                         includeBurners = false;
                         break;
                 }
-                return recipe.Assemblers
+                return [.. recipe.Assemblers
                     .OrderByDescending(a => a.Enabled)
                     .ThenByDescending(a => (a.IsBurner && includeBurners) || (!a.IsBurner && includeNonBurners))
                     .ThenByDescending(a => a.Available)
-                    .ThenByDescending(a => orderDirection * (((a.Owner.DefaultQuality is not null ? a.GetSpeed(a.Owner.DefaultQuality) : 1) * 1000000) + a.ModuleSlots))  //QUALITY UPDATE REQUIRED
-                    .ToList();
+                    .ThenByDescending(a => orderDirection * (((a.Owner.DefaultQuality is not null ? a.GetSpeed(a.Owner.DefaultQuality) : 1) * 1000000) + a.ModuleSlots))];
             }
         }
     }

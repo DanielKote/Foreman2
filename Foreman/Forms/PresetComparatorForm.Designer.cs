@@ -1,4 +1,6 @@
-﻿
+
+using Foreman.Controls;
+
 namespace Foreman
 {
     partial class PresetComparatorForm
@@ -48,15 +50,15 @@ namespace Foreman
 			this.CloseButton = new System.Windows.Forms.Button();
 			this.TabTable = new System.Windows.Forms.TableLayoutPanel();
 			this.label2 = new System.Windows.Forms.Label();
-			this.LeftOnlyListView = new Foreman.FFListView();
+			this.LeftOnlyListView = new Foreman.Controls.FFListView();
 			this.LeftOnlyHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.IconList = new System.Windows.Forms.ImageList(this.components);
 			this.label5 = new System.Windows.Forms.Label();
-			this.LeftListView = new Foreman.SyncListView();
-			this.RightListView = new Foreman.SyncListView();
+			this.LeftListView = new Foreman.Controls.SyncListView();
+			this.RightListView = new Foreman.Controls.SyncListView();
 			this.RightHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.LeftHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.RightOnlyListView = new Foreman.FFListView();
+			this.RightOnlyListView = new Foreman.Controls.FFListView();
 			this.RightOnlyHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.BothPresetsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.HideSimilarObjectsCheckBox = new System.Windows.Forms.CheckBox();
@@ -66,8 +68,8 @@ namespace Foreman
 			this.ShowUnavailableCheckBox = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.FilterTextBox = new System.Windows.Forms.TextBox();
-			this.TextToolTip = new Foreman.CustomToolTip();
-			this.RecipeToolTip = new Foreman.RecipeToolTip();
+			this.TextToolTip = new Foreman.Controls.CustomToolTip();
+			this.RecipeToolTip = new Foreman.Controls.RecipeToolTip();
 			this.MainTable = new System.Windows.Forms.TableLayoutPanel();
 			this.PresetSelectionGroup.SuspendLayout();
 			this.VsTable.SuspendLayout();

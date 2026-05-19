@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.ProductionGraphView.Elements;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -37,7 +38,7 @@ namespace Foreman {
                 ? Color.Black
                 : Color.White;
             FillAlphaTrack.Value = element.FillColor.A;
-            FillAlphaLabel.Text = string.Format("Opacity: {0}", element.FillColor.A);
+            FillAlphaLabel.Text = string.Format(DisplayCulture.Format, "Opacity: {0}", element.FillColor.A);
             UpdateBorderButton();
         }
 
@@ -68,13 +69,13 @@ namespace Foreman {
             FillColorButton.ForeColor = _element.FillColor.R + _element.FillColor.G + _element.FillColor.B > 382
                 ? Color.Black
                 : Color.White;
-            FillAlphaLabel.Text = string.Format("Opacity: {0}", _element.FillColor.A);
+            FillAlphaLabel.Text = string.Format(DisplayCulture.Format, "Opacity: {0}", _element.FillColor.A);
             FillAlphaTrack.Value = _element.FillColor.A;
         }
 
         private void FillAlphaTrack_Scroll(object? sender, EventArgs e) {
             _element.FillColor = Color.FromArgb(FillAlphaTrack.Value, _element.FillColor.R, _element.FillColor.G, _element.FillColor.B);
-            FillAlphaLabel.Text = string.Format("Opacity: {0}", _element.FillColor.A);
+            FillAlphaLabel.Text = string.Format(DisplayCulture.Format, "Opacity: {0}", _element.FillColor.A);
             _element.RebuildGdiObjects();
             _graphViewer.Invalidate();
         }

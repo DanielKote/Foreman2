@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Foreman.Serialization;
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     /// <summary>
     /// Abstract base for all annotation elements (shapes and text labels).
     /// Annotations live in ProductionGraphViewer, not in the graph model.
@@ -80,15 +81,15 @@ namespace Foreman {
         // Hit testing ? override to include resize handle areas
         // ----------------------------------------------------------------
 
-        public override bool ContainsPoint(Point graph_point) {
+        public override bool ContainsPoint(Point graphPoint) {
             if (!Visible)
                 return false;
 
             // Resize handles sit outside bounds ? check them first when selected
-            if (IsSelected && GetHandleAtPoint(graph_point) != HandleType.None)
+            if (IsSelected && GetHandleAtPoint(graphPoint) != HandleType.None)
                 return true;
 
-            Point local = GraphToLocal(graph_point);
+            Point local = GraphToLocal(graphPoint);
 
             if (!Bounds.Contains(local))
                 return false;
@@ -113,15 +114,15 @@ namespace Foreman {
         // Mouse handling
         // ----------------------------------------------------------------
 
-        public override void MouseDown(Point graph_point, MouseButtons button) {
+        public override void MouseDown(Point graphPoint, MouseButtons button) {
             if (button == MouseButtons.Left) {
-                _dragStartMouseLocation = graph_point;
+                _dragStartMouseLocation = graphPoint;
                 _dragStartElementLocation = new Point(X, Y);
                 _dragStartWidth = Width;
                 _dragStartHeight = Height;
                 _dragStarted = false;
                 // Only activate a handle if the annotation is already selected
-                _activeHandle = IsSelected ? GetHandleAtPoint(graph_point) : HandleType.None;
+                _activeHandle = IsSelected ? GetHandleAtPoint(graphPoint) : HandleType.None;
 
                 // Only claim the mouse if already selected ? this lets rubber-band
                 // selection start when clicking inside an unselected annotation
@@ -130,7 +131,7 @@ namespace Foreman {
             }
         }
 
-        public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged) {
+        public override void MouseUp(Point graphPoint, MouseButtons button, bool wasDragged) {
             _dragStarted = false;
             _activeHandle = HandleType.None;
 
@@ -156,11 +157,11 @@ namespace Foreman {
                         }
                     })));
 
-                RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
+                RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graphPoint));
             }
         }
 
-        public override void Dragged(Point graph_point) {
+        public override void Dragged(Point graphPoint) {
             // First call after minDragDiff is confirmed ? skip to avoid snap
             if (!_dragStarted) {
                 _dragStarted = true;
@@ -169,12 +170,12 @@ namespace Foreman {
 
             if (_activeHandle == HandleType.None) {
                 // Move ? offset from original click position
-                Point offset = Point.Subtract(graph_point, (Size)_dragStartMouseLocation);
+                var offset = Point.Subtract(graphPoint, (Size)_dragStartMouseLocation);
                 X = _dragStartElementLocation.X + offset.X;
                 Y = _dragStartElementLocation.Y + offset.Y;
             } else {
                 // Resize
-                ApplyResize(graph_point);
+                ApplyResize(graphPoint);
             }
         }
 
@@ -318,11 +319,11 @@ namespace Foreman {
             if (!IsSelected)
                 return HandleType.None;
 
-            HandleType[] handles = {
+            HandleType[] handles = [
                 HandleType.TopLeft,    HandleType.TopCenter,    HandleType.TopRight,
                 HandleType.MiddleLeft, HandleType.MiddleRight,
                 HandleType.BottomLeft, HandleType.BottomCenter, HandleType.BottomRight
-            };
+            ];
 
             int hitHalf = GetHandleHitHalfSize();
             foreach (HandleType handle in handles)
@@ -354,13 +355,12 @@ namespace Foreman {
                 return;
 
             float pw = SelectionHighlightScreenPx / graphViewer.ViewScale;
-            using (Pen p = new Pen(SelectionHighlightColor, pw)) {
-                graphics.DrawRectangle(p,
-                    graphRect.X - pw,
-                    graphRect.Y - pw,
-                    graphRect.Width + pw * 2,
-                    graphRect.Height + pw * 2);
-            }
+            using var p = new Pen(SelectionHighlightColor, pw);
+            graphics.DrawRectangle(p,
+                graphRect.X - pw,
+                graphRect.Y - pw,
+                graphRect.Width + pw * 2,
+                graphRect.Height + pw * 2);
         }
 
         /// <summary>
@@ -373,20 +373,19 @@ namespace Foreman {
 
             float penWidth = Math.Max(0.5f, 1f / graphViewer.ViewScale);
 
-            using (SolidBrush fill = new SolidBrush(Color.White))
-            using (Pen border = new Pen(Color.FromArgb(60, 100, 200), penWidth)) {
-                HandleType[] handles = {
+            using var fill = new SolidBrush(Color.White);
+            using var border = new Pen(Color.FromArgb(60, 100, 200), penWidth);
+            HandleType[] handles = [
                     HandleType.TopLeft,    HandleType.TopCenter,    HandleType.TopRight,
                     HandleType.MiddleLeft, HandleType.MiddleRight,
                     HandleType.BottomLeft, HandleType.BottomCenter, HandleType.BottomRight
-                };
+                ];
 
-                int drawHalf = GetHandleDrawHalfSize();
-                foreach (HandleType handle in handles) {
-                    Rectangle r = GetHandleRect(handle, drawHalf);
-                    graphics.FillRectangle(fill, r);
-                    graphics.DrawRectangle(border, r);
-                }
+            int drawHalf = GetHandleDrawHalfSize();
+            foreach (HandleType handle in handles) {
+                Rectangle r = GetHandleRect(handle, drawHalf);
+                graphics.FillRectangle(fill, r);
+                graphics.DrawRectangle(border, r);
             }
         }
 
@@ -445,15 +444,13 @@ namespace Foreman {
             return !lassoInsideAnnotation;
         }
 
-        public bool ContainsPointFull(Point graph_point) {
-            if (!Visible)
-                return false;
-            return Bounds.Contains(GraphToLocal(graph_point));
+        public bool ContainsPointFull(Point graphPoint) {
+            return Visible && Bounds.Contains(GraphToLocal(graphPoint));
         }
 
         /// <summary>Hit-test for mouse picking. When selected, includes resize handles drawn outside bounds.</summary>
-        public bool PickAtPoint(Point graph_point) =>
-            IsSelected ? ContainsPoint(graph_point) : ContainsPointFull(graph_point);
+        public bool PickAtPoint(Point graphPoint) =>
+            IsSelected ? ContainsPoint(graphPoint) : ContainsPointFull(graphPoint);
 
         /// <summary>Forces this annotation to be visible regardless of bounds check.
         /// Used during full-graph export so off-graph annotations aren't clipped.</summary>
@@ -489,10 +486,7 @@ namespace Foreman {
             }
 
             // Edge band (shapes) or full bounds (text) ? move cursor
-            if (ContainsPoint(graphPoint))
-                return Cursors.SizeAll;
-
-            return null;
+            return ContainsPoint(graphPoint) ? Cursors.SizeAll : null;
         }
     }
 }

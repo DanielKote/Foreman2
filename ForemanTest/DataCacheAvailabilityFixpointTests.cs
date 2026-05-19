@@ -1,4 +1,7 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.DataCaching.Loading;
 using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,23 +20,25 @@ namespace ForemanTest {
             ItemPrototype spoiled = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, "spoiled-fish");
             fresh.Available = true;
             spoiled.Available = true;
-            spoiled.spoilOrigins.Add(fresh);
+            spoiled.SpoilOriginsInternal.Add(fresh);
 
-            Assembler assembler = TestPrototypeFactory.CreateTestAssembler(ctx.Cache);
+            AssemblerPrototype assembler = TestPrototypeFactory.CreateTestAssembler(ctx.Cache);
             TestDataCacheHelper.RegisterAssembler(ctx.Cache, assembler);
             ((AssemblerPrototype)assembler).Available = true;
 
-            var makeFresh = new RecipePrototype(ctx.Cache, "make-fresh-fish", "Catch", ctx.Subgroup, "z");
-            makeFresh.Available = true;
+            var makeFresh = new RecipePrototype(ctx.Cache, "make-fresh-fish", "Catch", ctx.Subgroup, "z") {
+                Available = true
+            };
             makeFresh.InternalOneWayAddProduct(fresh, 1, 0);
-            fresh.productionRecipes.Add(makeFresh);
+            fresh.ProductionRecipesInternal.Add(makeFresh);
             TestPrototypeFactory.LinkRecipeAndAssembler(makeFresh, assembler);
             TestDataCacheHelper.RegisterRecipe(ctx.Cache, makeFresh);
 
-            var burnRecipe = new RecipePrototype(ctx.Cache, "burn-spoiled-fish", "Burn", ctx.Subgroup, "z");
-            burnRecipe.Available = true;
+            var burnRecipe = new RecipePrototype(ctx.Cache, "burn-spoiled-fish", "Burn", ctx.Subgroup, "z") {
+                Available = true
+            };
             burnRecipe.InternalOneWayAddIngredient(spoiled, 1);
-            spoiled.consumptionRecipes.Add(burnRecipe);
+            spoiled.ConsumptionRecipesInternal.Add(burnRecipe);
 
             TestPrototypeFactory.LinkRecipeAndAssembler(burnRecipe, assembler);
             TestDataCacheHelper.RegisterRecipe(ctx.Cache, burnRecipe);
@@ -42,7 +47,7 @@ namespace ForemanTest {
 
             Assert.IsTrue(spoiled.Available, "Spoil results with an available origin should remain available.");
             Assert.IsFalse(ItemAvailabilityFixpoint.LastRunDetectedCycle);
-            Assert.IsTrue(ItemAvailabilityFixpoint.LastIterationCount <= 4,
+            Assert.IsLessThanOrEqualTo(4, ItemAvailabilityFixpoint.LastIterationCount,
                 "Fixpoint should converge quickly when spoil/plant rules are consistent.");
         }
 
@@ -52,7 +57,7 @@ namespace ForemanTest {
             ItemPrototype origin = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, "origin");
             ItemPrototype spoilResult = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, "spoil-result");
             origin.Available = true;
-            spoilResult.spoilOrigins.Add(origin);
+            spoilResult.SpoilOriginsInternal.Add(origin);
 
             Assert.IsTrue(ItemAvailabilityFixpoint.ShouldRemainAvailable(spoilResult));
         }
@@ -74,8 +79,8 @@ namespace ForemanTest {
 
             loader.PostProcessQuality();
 
-            Assert.IsTrue(store.QualityMaxChainLength >= 1);
-            Assert.IsTrue(store.QualityMaxChainLength <= 2,
+            Assert.IsGreaterThanOrEqualTo(1u, store.QualityMaxChainLength);
+            Assert.IsLessThanOrEqualTo(2u, store.QualityMaxChainLength,
                 "A cyclic quality chain should truncate chain-length measurement instead of looping forever.");
         }
 
@@ -96,7 +101,7 @@ namespace ForemanTest {
 
                 var args = new FormClosingEventArgs(CloseReason.UserClosing, cancel: false);
                 typeof(DataLoadForm).GetMethod("OnFormClosing", BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .Invoke(form, new object[] { args });
+                    .Invoke(form, [args]);
 
                 Assert.IsTrue(warned, "Closing during load should warn about incomplete preset data.");
                 Assert.IsFalse(args.Cancel, "Warning only; the user must still be able to close the dialog.");

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.Models.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,8 +8,8 @@ namespace Foreman.Graph {
         private readonly GraphEntityRegistry _registry = new();
         private readonly GraphViewModel _view = new();
         private readonly ProductionGraphEditor _editor;
-        private readonly Dictionary<NodeLink, NodeLinkViewModel> _linkViewModels = new();
-        private readonly Dictionary<NodeLink, LinkId> _domainLinkIds = new();
+        private readonly Dictionary<NodeLink, NodeLinkViewModel> _linkViewModels = [];
+        private readonly Dictionary<NodeLink, LinkId> _domainLinkIds = [];
         private bool _attached;
 
         public ProductionGraphSession(ProductionGraph graph) {

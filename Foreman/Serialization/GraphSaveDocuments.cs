@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using System.Collections.Generic;
 using System.Drawing;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     public sealed class ModuleQualitySaveData(string moduleName, string qualityName) {
         public string ModuleName { get; } = moduleName;
         public string QualityName { get; } = qualityName;

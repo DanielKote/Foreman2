@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using Foreman.Controls;
+using System.Drawing;
 
 namespace Foreman
 {

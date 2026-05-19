@@ -1,8 +1,8 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using Foreman.ProductionGraphView;
+using System;
 
 namespace Foreman {
-    partial class EditRecipePanel {
+    public partial class EditRecipePanel {
         private EventHandler? viewerResizeHandler;
 
         public void ApplyViewportBounds() {

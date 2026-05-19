@@ -1,14 +1,9 @@
 ﻿using System;
 
 namespace Foreman.Graph {
-    public readonly struct NodeId : IEquatable<NodeId> {
-        public int Value { get; }
-        public uint Epoch { get; }
-
-        public NodeId(int value, uint epoch) {
-            Value = value;
-            Epoch = epoch;
-        }
+    public readonly struct NodeId(int value, uint epoch) : IEquatable<NodeId> {
+        public int Value { get; } = value;
+        public uint Epoch { get; } = epoch;
 
         public bool IsValid => Epoch != 0;
 
@@ -22,14 +17,9 @@ namespace Foreman.Graph {
         public override string ToString() => IsValid ? $"Node({Value}@{Epoch})" : "Node(invalid)";
     }
 
-    public readonly struct LinkId : IEquatable<LinkId> {
-        public int Value { get; }
-        public uint Epoch { get; }
-
-        public LinkId(int value, uint epoch) {
-            Value = value;
-            Epoch = epoch;
-        }
+    public readonly struct LinkId(int value, uint epoch) : IEquatable<LinkId> {
+        public int Value { get; } = value;
+        public uint Epoch { get; } = epoch;
 
         public bool IsValid => Epoch != 0;
 

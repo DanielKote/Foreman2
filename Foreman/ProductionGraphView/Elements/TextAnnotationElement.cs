@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Foreman.ProductionGraphView.Annotations;
+using Foreman.Serialization;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     /// <summary>Freehand text label on the canvas, centred inside element bounds.</summary>
     public class TextAnnotationElement : AnnotationElement {
         private const int DefaultWidth = 200;
@@ -99,8 +101,8 @@ namespace Foreman {
             RebuildGdiObjects();
         }
 
-        public override void MouseDown(Point graph_point, MouseButtons button) {
-            base.MouseDown(graph_point, button);
+        public override void MouseDown(Point graphPoint, MouseButtons button) {
+            base.MouseDown(graphPoint, button);
             if (button == MouseButtons.Left && IsResizing)
                 _resizeStartFontSize = TextFont.SizeInPoints;
         }
@@ -137,12 +139,8 @@ namespace Foreman {
             _textFormat = null;
         }
 
-        public override bool ContainsPoint(Point graph_point) {
-            if (!Visible)
-                return false;
-            if (IsSelected && GetHandleAtPoint(graph_point) != HandleType.None)
-                return true;
-            return Bounds.Contains(GraphToLocal(graph_point));
+        public override bool ContainsPoint(Point graphPoint) {
+            return Visible && (IsSelected && GetHandleAtPoint(graphPoint) != HandleType.None || Bounds.Contains(GraphToLocal(graphPoint)));
         }
 
         protected override void Draw(Graphics graphics, NodeDrawingStyle style) {
@@ -204,6 +202,7 @@ namespace Foreman {
         }
 
         public override void Dispose() {
+            GC.SuppressFinalize(this);
             DisposeGdiObjects();
             TextFont.Dispose();
             base.Dispose();

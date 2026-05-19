@@ -1,4 +1,6 @@
 ﻿using Foreman;
+using Foreman.Controls;
+using Foreman.Serialization;
 using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -105,7 +107,7 @@ namespace ForemanTest {
             int systemWidth = SystemInformation.VerticalScrollBarWidth;
             Assert.AreEqual(systemWidth, iconGrid.ScrollBar.Width,
                 "Live item chooser scrollbar must use the system vertical scrollbar width, not scaled layout slack.");
-            Assert.IsTrue(iconGrid.ScrollBar.Width <= systemWidth + 2,
+            Assert.IsLessThanOrEqualTo(systemWidth + 2, iconGrid.ScrollBar.Width,
                 "Scrollbar must not be wider than the system metric (was previously DPI-scaled or stretched by flow layout).");
         }
 
@@ -132,7 +134,7 @@ namespace ForemanTest {
             ItemChooserPanel? chooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
             Assert.IsNotNull(chooser);
 
-            (int Width, int Height)[] viewerSizes = { (1200, 800), (700, 700), (500, 500), (400, 400), (320, 350), (280, 300), (240, 280) };
+            (int Width, int Height)[] viewerSizes = [(1200, 800), (700, 700), (500, 500), (400, 400), (320, 350), (280, 300), (240, 280)];
             foreach ((int viewerWidth, int viewerHeight) in viewerSizes) {
                 viewer.Size = new Size(viewerWidth, viewerHeight);
                 viewer.PerformLayout();
@@ -143,17 +145,17 @@ namespace ForemanTest {
                 int deadSpace = MeasureChooserRightDeadSpace(chooser);
                 int gapBesideGrid = MeasureGapRightOfIconGrid(contentStack, iconGrid);
 
-                Assert.IsTrue(deadSpace <= 2,
+                Assert.IsLessThanOrEqualTo(2, deadSpace,
                     $"At viewer {viewerWidth}x{viewerHeight}, chooser had {deadSpace}px black bar past content " +
                     $"(panel {chooser.Width}, stack {contentStack.Width}, grid {iconGrid.Width}).");
-                Assert.IsTrue(gapBesideGrid <= 2,
+                Assert.IsLessThanOrEqualTo(2, gapBesideGrid,
                     $"At viewer {viewerWidth}x{viewerHeight}, {gapBesideGrid}px black bar sat to the right of the icon grid " +
                     $"(stack {contentStack.Width}, grid right {iconGrid.Right}, header/min width mismatch).");
-                Assert.IsTrue(chooser.Width - contentStack.Width <= 2,
+                Assert.IsLessThanOrEqualTo(2, chooser.Width - contentStack.Width,
                     "Panel width should match the content stack.");
-                Assert.IsTrue(contentStack.Width - iconGrid.Width <= 2,
+                Assert.IsLessThanOrEqualTo(2, contentStack.Width - iconGrid.Width,
                     "Content stack width should match the icon grid; extra width becomes a black strip beside the cells.");
-                Assert.IsTrue(chooser.MinimumSize.Width <= chooser.Width,
+                Assert.IsLessThanOrEqualTo(chooser.Width, chooser.MinimumSize.Width,
                     $"MinimumSize.Width ({chooser.MinimumSize.Width}) must not exceed actual width ({chooser.Width}).");
             }
         }
@@ -203,9 +205,9 @@ namespace ForemanTest {
             Assert.AreEqual(40 * ChooserIconGrid.VisibleRowCount, grid.Height);
             Assert.AreEqual(40 * ChooserIconGrid.ColumnCount + scrollbar, grid.Width);
             Assert.AreEqual(outerWidth, grid.Width);
-            Assert.AreEqual(40, grid.Buttons[0, 0].Width);
-            Assert.AreEqual(40, grid.Buttons[0, 0].Height);
-            Assert.IsTrue(grid.ScrollBar.Left >= grid.Width - scrollbar);
+            Assert.AreEqual(40, grid.Buttons.ElementAt(0).ElementAt(0).Width);
+            Assert.AreEqual(40, grid.Buttons.ElementAt(0).ElementAt(0).Height);
+            Assert.IsGreaterThanOrEqualTo(grid.Width - scrollbar, grid.ScrollBar.Left);
         }
 
         [TestMethod]

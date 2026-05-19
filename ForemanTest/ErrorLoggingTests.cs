@@ -1,4 +1,4 @@
-﻿using Foreman;
+﻿using Foreman.DataCaching;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

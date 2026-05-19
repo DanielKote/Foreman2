@@ -1,4 +1,6 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
@@ -33,50 +35,50 @@ namespace ForemanTest {
                 VanillaUraniumFluid,
                 PresetJson.GetString(uranium, "required_fluid"),
                 "required_fluid must be a JSON string (fluid name), not an object. Re-export with fixed foremanexport mod if null.");
-            Assert.IsTrue(
-                (PresetJson.GetDouble(uranium, "fluid_amount") ?? 0) > 0,
+            Assert.IsGreaterThan(
+                0, PresetJson.GetDouble(uranium, "fluid_amount") ?? 0,
                 "uranium-ore should declare fluid_amount.");
         }
 
         [TestMethod]
         public async Task Vanilla_UraniumExtraction_IncludesFluidIngredient() {
-            DataCache cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            DataCache cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             RecipePrototype recipe = ExtractionRecipeTestSupport.RequireExtractionRecipe(cache, VanillaUraniumResource);
 
-            Assert.IsTrue(
-                recipe.ingredientList.Any(i => i.Name == VanillaUraniumFluid),
+            Assert.Contains(
+                i => i.Name == VanillaUraniumFluid, recipe.IngredientListInternal,
                 $"Uranium extraction should consume {VanillaUraniumFluid}. " +
                 "If missing, preset JSON may lack required_fluid or loader skipped an unknown fluid name.");
         }
 
         [TestMethod]
         public async Task Vanilla_UraniumExtraction_IsAvailableForNodeSelection() {
-            DataCache cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            DataCache cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             RecipePrototype recipe = ExtractionRecipeTestSupport.RequireExtractionRecipe(cache, VanillaUraniumResource);
 
             Assert.IsTrue(
                 recipe.Available,
                 "Fluid-mining extraction should be Available so it appears in the recipe/node chooser.");
-            Assert.IsTrue(
-                recipe.myUnlockTechnologies.Count > 0,
+            Assert.IsNotEmpty(
+                recipe.MyUnlockTechnologiesInternal,
                 "Fluid-mining extraction should be linked to at least one unlock technology (typically via miner entity).");
         }
 
         [TestMethod]
         public async Task Vanilla_UraniumExtraction_IsLinkedToAMiner() {
-            DataCache cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            DataCache cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             RecipePrototype recipe = ExtractionRecipeTestSupport.RequireExtractionRecipe(cache, VanillaUraniumResource);
 
-            Assert.IsTrue(
-                recipe.assemblers.Count > 0,
+            Assert.IsNotEmpty(
+                recipe.AssemblersInternal,
                 "Uranium extraction should be assigned to at least one mining entity (electric miner, etc.).");
         }
 
         [TestMethod]
         public void PyanodonPreset_JsonListsResourcesWithRequiredFluid() {
             JsonObject root = PyanodonPresetTestSupport.LoadPreparedPresetJson();
-            Assert.IsTrue(
-                PyanodonPresetTestSupport.EnumerateFluidMiningResources(root).Any(),
+            Assert.IsNotEmpty(
+                PyanodonPresetTestSupport.EnumerateFluidMiningResources(root),
                 "Pyanodon preset should include at least one resource with required_fluid after export.");
         }
 
@@ -99,7 +101,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_AllFluidMiningExtractions_HaveFluidIngredients() {
-            var (root, cache) = await PyanodonPresetTestSupport.LoadPresetAndCacheAsync();
+            var (root, cache) = await PyanodonPresetTestSupport.LoadPresetAndCacheAsync().ConfigureAwait(false);
             var expected = PyanodonPresetTestSupport.EnumerateFluidMiningResources(root).ToList();
 
             var missingRecipe = new List<string>();
@@ -110,7 +112,7 @@ namespace ForemanTest {
                     missingRecipe.Add(resourceName);
                     continue;
                 }
-                if (!recipe!.ingredientList.Any(i => i.Name == fluidName))
+                if (!recipe!.IngredientListInternal.Any(i => i.Name == fluidName))
                     missingIngredient.Add($"{resourceName} (expected fluid {fluidName})");
             }
 
@@ -121,7 +123,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_AllFluidMiningExtractions_AreAvailableForNodeSelection() {
-            var (root, cache) = await PyanodonPresetTestSupport.LoadPresetAndCacheAsync();
+            var (root, cache) = await PyanodonPresetTestSupport.LoadPresetAndCacheAsync().ConfigureAwait(false);
             var expected = PyanodonPresetTestSupport.EnumerateFluidMiningResources(root).ToList();
 
             var missingRecipe = new List<string>();
@@ -132,7 +134,7 @@ namespace ForemanTest {
                     missingRecipe.Add(resourceName);
                     continue;
                 }
-                if (!recipe!.Available || recipe.myUnlockTechnologies.Count == 0)
+                if (!recipe!.Available || recipe.MyUnlockTechnologiesInternal.Count == 0)
                     unavailable.Add(resourceName);
             }
 
@@ -143,7 +145,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_AllFluidMiningExtractions_AreLinkedToMiners() {
-            var (root, cache) = await PyanodonPresetTestSupport.LoadPresetAndCacheAsync();
+            var (root, cache) = await PyanodonPresetTestSupport.LoadPresetAndCacheAsync().ConfigureAwait(false);
             var expected = PyanodonPresetTestSupport.EnumerateFluidMiningResources(root).ToList();
 
             var missingRecipe = new List<string>();
@@ -154,7 +156,7 @@ namespace ForemanTest {
                     missingRecipe.Add(resourceName);
                     continue;
                 }
-                if (recipe!.assemblers.Count == 0)
+                if (recipe!.AssemblersInternal.Count == 0)
                     unlinked.Add(resourceName);
             }
 
@@ -174,7 +176,7 @@ namespace ForemanTest {
                     (c.Names.Count > 40 ? $" … and {c.Names.Count - 40} more" : ""))
                 .ToList();
 
-            Assert.AreEqual(0, lines.Count, string.Join(System.Environment.NewLine, lines));
+            Assert.IsEmpty(lines, string.Join(System.Environment.NewLine, lines));
         }
     }
 }

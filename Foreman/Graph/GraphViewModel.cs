@@ -2,8 +2,8 @@
 
 namespace Foreman.Graph {
     internal sealed class GraphViewModel : IGraphViewModel {
-        private readonly Dictionary<NodeId, INodeViewModel> _nodes = new();
-        private readonly Dictionary<LinkId, INodeLinkViewModel> _links = new();
+        private readonly Dictionary<NodeId, INodeViewModel> _nodes = [];
+        private readonly Dictionary<LinkId, INodeLinkViewModel> _links = [];
 
         public IReadOnlyList<INodeViewModel> Nodes => [.. _nodes.Values];
         public IReadOnlyList<INodeLinkViewModel> Links => [.. _links.Values];

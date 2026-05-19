@@ -2,19 +2,12 @@
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Foreman {
-    internal readonly struct FactorioRunResult {
-        public string Output { get; }
-        public int ExitCode { get; }
-        public bool Crashed { get; }
-
-        public FactorioRunResult(string output, int exitCode, bool crashed) {
-            Output = output;
-            ExitCode = exitCode;
-            Crashed = crashed;
-        }
+    internal readonly struct FactorioRunResult(string output, int exitCode, bool crashed) {
+        public string Output { get; } = output;
+        public int ExitCode { get; } = exitCode;
+        public bool Crashed { get; } = crashed;
     }
 
     internal static class FactorioBenchmarkRunner {
@@ -25,17 +18,15 @@ namespace Foreman {
 
         /// <summary>True when Factorio's stdout/stderr indicates a native crash (SIGSEGV, crash handler, etc.).</summary>
         public static bool IsCrashOutput(string output) {
-            if (string.IsNullOrEmpty(output))
-                return false;
-            return output.Contains("Received SIGSEGV", StringComparison.Ordinal)
+            return !string.IsNullOrEmpty(output) && (output.Contains("Received SIGSEGV", StringComparison.Ordinal)
                 || output.Contains("Factorio crashed", StringComparison.Ordinal)
                 || output.Contains("Generating symbolized stacktrace", StringComparison.Ordinal)
                 || output.Contains("Error CrashHandler.cpp", StringComparison.Ordinal)
-                || output.Contains("CrashDump success", StringComparison.Ordinal);
+                || output.Contains("CrashDump success", StringComparison.Ordinal));
         }
 
         public static FactorioRunResult Run(string exePath, string arguments, CancellationToken token, Action? onCancelled = null) {
-            using Process process = new Process();
+            using var process = new Process();
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.FileName = exePath;
             process.StartInfo.Arguments = arguments;

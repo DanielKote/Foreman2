@@ -1,4 +1,4 @@
-﻿
+
 namespace Foreman
 {
 	partial class GraphSummaryForm
@@ -35,12 +35,12 @@ namespace Foreman
 			this.BuildingsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.label4 = new System.Windows.Forms.Label();
 			this.BuildingsTabControl = new System.Windows.Forms.TabControl();
-			this.AssemblersPage = new System.Windows.Forms.TabPage();
+			this.IAssemblersPage = new System.Windows.Forms.TabPage();
 			this.AssemblerListView = new System.Windows.Forms.ListView();
-			this.AssemblersHeaderCounter = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.AssemblersHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.AssemblersHeaderPower = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.AssemblersHeaderPowerB = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IAssemblersHeaderCounter = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IAssemblersHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IAssemblersHeaderPower = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IAssemblersHeaderPowerB = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.IconList = new System.Windows.Forms.ImageList(this.components);
 			this.MinersPage = new System.Windows.Forms.TabPage();
 			this.MinerListView = new System.Windows.Forms.ListView();
@@ -63,33 +63,33 @@ namespace Foreman
 			this.PowerProductionLabel = new System.Windows.Forms.Label();
 			this.PowerNetLabel = new System.Windows.Forms.Label();
 			this.BuildingsExportButton = new System.Windows.Forms.Button();
-			this.ItemsTabPage = new System.Windows.Forms.TabPage();
-			this.ItemsTable = new System.Windows.Forms.TableLayoutPanel();
+			this.IItemsTabPage = new System.Windows.Forms.TabPage();
+			this.IItemsTable = new System.Windows.Forms.TableLayoutPanel();
 			this.label1 = new System.Windows.Forms.Label();
-			this.ItemsTabControl = new System.Windows.Forms.TabControl();
+			this.IItemsTabControl = new System.Windows.Forms.TabControl();
 			this.tabPage4 = new System.Windows.Forms.TabPage();
-			this.ItemsListView = new System.Windows.Forms.ListView();
-			this.ItemsHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsHeaderIn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsHeaderInUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsHeaderOut = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsHeaderOutUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsHeaderOverproduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsHeaderProduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsHeaderConsumed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsListView = new System.Windows.Forms.ListView();
+			this.IItemsHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsHeaderIn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsHeaderInUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsHeaderOut = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsHeaderOutUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsHeaderOverproduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsHeaderProduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsHeaderConsumed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tabPage5 = new System.Windows.Forms.TabPage();
-			this.FluidsListView = new System.Windows.Forms.ListView();
-			this.FluidsHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FluidsHeaderIn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FluidsHeaderInUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FluidsHeaderOut = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FluidsHeaderOutUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FluidsHeaderOverproduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FluidsHeaderProduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FluidsHeaderConsumed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsFilterTextBox = new System.Windows.Forms.TextBox();
-			this.ItemsExportButton = new System.Windows.Forms.Button();
-			this.ItemsFilterCBTable = new System.Windows.Forms.TableLayoutPanel();
+			this.IFluidsListView = new System.Windows.Forms.ListView();
+			this.IFluidsHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IFluidsHeaderIn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IFluidsHeaderInUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IFluidsHeaderOut = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IFluidsHeaderOutUL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IFluidsHeaderOverproduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IFluidsHeaderProduced = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IFluidsHeaderConsumed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsFilterTextBox = new System.Windows.Forms.TextBox();
+			this.IItemsExportButton = new System.Windows.Forms.Button();
+			this.IItemsFilterCBTable = new System.Windows.Forms.TableLayoutPanel();
 			this.ItemFilterConsumptionCheckBox = new System.Windows.Forms.CheckBox();
 			this.ItemFilterOutputOverproducedCheckBox = new System.Windows.Forms.CheckBox();
 			this.ItemFilterOutputUnlinkedCheckBox = new System.Windows.Forms.CheckBox();
@@ -122,16 +122,16 @@ namespace Foreman
 			this.BuildingsTabPage.SuspendLayout();
 			this.BuildingsTable.SuspendLayout();
 			this.BuildingsTabControl.SuspendLayout();
-			this.AssemblersPage.SuspendLayout();
+			this.IAssemblersPage.SuspendLayout();
 			this.MinersPage.SuspendLayout();
 			this.PowersPage.SuspendLayout();
 			this.BeaconsPage.SuspendLayout();
-			this.ItemsTabPage.SuspendLayout();
-			this.ItemsTable.SuspendLayout();
-			this.ItemsTabControl.SuspendLayout();
+			this.IItemsTabPage.SuspendLayout();
+			this.IItemsTable.SuspendLayout();
+			this.IItemsTabControl.SuspendLayout();
 			this.tabPage4.SuspendLayout();
 			this.tabPage5.SuspendLayout();
-			this.ItemsFilterCBTable.SuspendLayout();
+			this.IItemsFilterCBTable.SuspendLayout();
 			this.KeyNodesTabPage.SuspendLayout();
 			this.KeyNodesTable.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
@@ -141,7 +141,7 @@ namespace Foreman
 			// MainTabControl
 			// 
 			this.MainTabControl.Controls.Add(this.BuildingsTabPage);
-			this.MainTabControl.Controls.Add(this.ItemsTabPage);
+			this.MainTabControl.Controls.Add(this.IItemsTabPage);
 			this.MainTabControl.Controls.Add(this.KeyNodesTabPage);
 			this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MainTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
@@ -203,7 +203,7 @@ namespace Foreman
 			// BuildingsTabControl
 			// 
 			this.BuildingsTable.SetColumnSpan(this.BuildingsTabControl, 3);
-			this.BuildingsTabControl.Controls.Add(this.AssemblersPage);
+			this.BuildingsTabControl.Controls.Add(this.IAssemblersPage);
 			this.BuildingsTabControl.Controls.Add(this.MinersPage);
 			this.BuildingsTabControl.Controls.Add(this.PowersPage);
 			this.BuildingsTabControl.Controls.Add(this.BeaconsPage);
@@ -218,25 +218,25 @@ namespace Foreman
 			this.BuildingsTabControl.Size = new System.Drawing.Size(736, 393);
 			this.BuildingsTabControl.TabIndex = 27;
 			// 
-			// AssemblersPage
+			// IAssemblersPage
 			// 
-			this.AssemblersPage.Controls.Add(this.AssemblerListView);
-			this.AssemblersPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-			this.AssemblersPage.Location = new System.Drawing.Point(4, 24);
-			this.AssemblersPage.Margin = new System.Windows.Forms.Padding(2);
-			this.AssemblersPage.Name = "AssemblersPage";
-			this.AssemblersPage.Size = new System.Drawing.Size(728, 365);
-			this.AssemblersPage.TabIndex = 0;
-			this.AssemblersPage.Text = "Assemblers";
-			this.AssemblersPage.UseVisualStyleBackColor = true;
+			this.IAssemblersPage.Controls.Add(this.AssemblerListView);
+			this.IAssemblersPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+			this.IAssemblersPage.Location = new System.Drawing.Point(4, 24);
+			this.IAssemblersPage.Margin = new System.Windows.Forms.Padding(2);
+			this.IAssemblersPage.Name = "AssemblersPage";
+			this.IAssemblersPage.Size = new System.Drawing.Size(728, 365);
+			this.IAssemblersPage.TabIndex = 0;
+			this.IAssemblersPage.Text = "Assemblers";
+			this.IAssemblersPage.UseVisualStyleBackColor = true;
 			// 
 			// AssemblerListView
 			// 
 			this.AssemblerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.AssemblersHeaderCounter,
-            this.AssemblersHeaderName,
-            this.AssemblersHeaderPower,
-            this.AssemblersHeaderPowerB});
+            this.IAssemblersHeaderCounter,
+            this.IAssemblersHeaderName,
+            this.IAssemblersHeaderPower,
+            this.IAssemblersHeaderPowerB});
 			this.AssemblerListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AssemblerListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.AssemblerListView.FullRowSelect = true;
@@ -255,25 +255,25 @@ namespace Foreman
 			this.AssemblerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.AssemblerListView_ColumnClick);
 			this.AssemblerListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.AssemblerListView_RetrieveVirtualItem);
 			// 
-			// AssemblersHeaderCounter
+			// IAssemblersHeaderCounter
 			// 
-			this.AssemblersHeaderCounter.Text = "#";
-			this.AssemblersHeaderCounter.Width = 100;
+			this.IAssemblersHeaderCounter.Text = "#";
+			this.IAssemblersHeaderCounter.Width = 100;
 			// 
-			// AssemblersHeaderName
+			// IAssemblersHeaderName
 			// 
-			this.AssemblersHeaderName.Text = "Name";
-			this.AssemblersHeaderName.Width = 250;
+			this.IAssemblersHeaderName.Text = "Name";
+			this.IAssemblersHeaderName.Width = 250;
 			// 
-			// AssemblersHeaderPower
+			// IAssemblersHeaderPower
 			// 
-			this.AssemblersHeaderPower.Text = "Power (Assembler)";
-			this.AssemblersHeaderPower.Width = 100;
+			this.IAssemblersHeaderPower.Text = "Power (Assembler)";
+			this.IAssemblersHeaderPower.Width = 100;
 			// 
-			// AssemblersHeaderPowerB
+			// IAssemblersHeaderPowerB
 			// 
-			this.AssemblersHeaderPowerB.Text = "Power (Beacons)";
-			this.AssemblersHeaderPowerB.Width = 100;
+			this.IAssemblersHeaderPowerB.Text = "Power (Beacons)";
+			this.IAssemblersHeaderPowerB.Width = 100;
 			// 
 			// IconList
 			// 
@@ -485,40 +485,40 @@ namespace Foreman
 			this.BuildingsExportButton.UseVisualStyleBackColor = true;
 			this.BuildingsExportButton.Click += new System.EventHandler(this.BuildingsExportButton_Click);
 			// 
-			// ItemsTabPage
-			// 
-			this.ItemsTabPage.Controls.Add(this.ItemsTable);
-			this.ItemsTabPage.Location = new System.Drawing.Point(4, 29);
-			this.ItemsTabPage.Name = "ItemsTabPage";
-			this.ItemsTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.ItemsTabPage.Size = new System.Drawing.Size(750, 462);
-			this.ItemsTabPage.TabIndex = 1;
-			this.ItemsTabPage.Text = "Items/Fluids";
-			this.ItemsTabPage.UseVisualStyleBackColor = true;
-			// 
-			// ItemsTable
-			// 
-			this.ItemsTable.AutoSize = true;
-			this.ItemsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ItemsTable.ColumnCount = 3;
-			this.ItemsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.ItemsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.ItemsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
-			this.ItemsTable.Controls.Add(this.label1, 0, 0);
-			this.ItemsTable.Controls.Add(this.ItemsTabControl, 0, 2);
-			this.ItemsTable.Controls.Add(this.ItemsFilterTextBox, 1, 0);
-			this.ItemsTable.Controls.Add(this.ItemsExportButton, 2, 0);
-			this.ItemsTable.Controls.Add(this.ItemsFilterCBTable, 0, 1);
-			this.ItemsTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ItemsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.ItemsTable.Location = new System.Drawing.Point(3, 3);
-			this.ItemsTable.Name = "ItemsTable";
-			this.ItemsTable.RowCount = 3;
-			this.ItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.ItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.ItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.ItemsTable.Size = new System.Drawing.Size(744, 456);
-			this.ItemsTable.TabIndex = 2;
+			// IItemsTabPage
+			//
+			this.IItemsTabPage.Controls.Add(this.IItemsTable);
+			this.IItemsTabPage.Location = new System.Drawing.Point(4, 29);
+			this.IItemsTabPage.Name = "ItemsTabPage";
+			this.IItemsTabPage.Padding = new System.Windows.Forms.Padding(3);
+			this.IItemsTabPage.Size = new System.Drawing.Size(750, 462);
+			this.IItemsTabPage.TabIndex = 1;
+			this.IItemsTabPage.Text = "Items/Fluids";
+			this.IItemsTabPage.UseVisualStyleBackColor = true;
+			//
+			// IItemsTable
+			//
+			this.IItemsTable.AutoSize = true;
+			this.IItemsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.IItemsTable.ColumnCount = 3;
+			this.IItemsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.IItemsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.IItemsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
+			this.IItemsTable.Controls.Add(this.label1, 0, 0);
+			this.IItemsTable.Controls.Add(this.IItemsTabControl, 0, 2);
+			this.IItemsTable.Controls.Add(this.IItemsFilterTextBox, 1, 0);
+			this.IItemsTable.Controls.Add(this.IItemsExportButton, 2, 0);
+			this.IItemsTable.Controls.Add(this.IItemsFilterCBTable, 0, 1);
+			this.IItemsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IItemsTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.IItemsTable.Location = new System.Drawing.Point(3, 3);
+			this.IItemsTable.Name = "ItemsTable";
+			this.IItemsTable.RowCount = 3;
+			this.IItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.IItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.IItemsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.IItemsTable.Size = new System.Drawing.Size(744, 456);
+			this.IItemsTable.TabIndex = 2;
 			// 
 			// label1
 			// 
@@ -532,25 +532,25 @@ namespace Foreman
 			this.label1.Text = "Filter:";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// ItemsTabControl
-			// 
-			this.ItemsTable.SetColumnSpan(this.ItemsTabControl, 3);
-			this.ItemsTabControl.Controls.Add(this.tabPage4);
-			this.ItemsTabControl.Controls.Add(this.tabPage5);
-			this.ItemsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ItemsTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-			this.ItemsTabControl.Location = new System.Drawing.Point(4, 57);
-			this.ItemsTabControl.Margin = new System.Windows.Forms.Padding(4);
-			this.ItemsTabControl.Multiline = true;
-			this.ItemsTabControl.Name = "ItemsTabControl";
-			this.ItemsTabControl.Padding = new System.Drawing.Point(12, 3);
-			this.ItemsTabControl.SelectedIndex = 0;
-			this.ItemsTabControl.Size = new System.Drawing.Size(736, 395);
-			this.ItemsTabControl.TabIndex = 27;
+			// IItemsTabControl
+			//
+			this.IItemsTable.SetColumnSpan(this.IItemsTabControl, 3);
+			this.IItemsTabControl.Controls.Add(this.tabPage4);
+			this.IItemsTabControl.Controls.Add(this.tabPage5);
+			this.IItemsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IItemsTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+			this.IItemsTabControl.Location = new System.Drawing.Point(4, 57);
+			this.IItemsTabControl.Margin = new System.Windows.Forms.Padding(4);
+			this.IItemsTabControl.Multiline = true;
+			this.IItemsTabControl.Name = "ItemsTabControl";
+			this.IItemsTabControl.Padding = new System.Drawing.Point(12, 3);
+			this.IItemsTabControl.SelectedIndex = 0;
+			this.IItemsTabControl.Size = new System.Drawing.Size(736, 395);
+			this.IItemsTabControl.TabIndex = 27;
 			// 
 			// tabPage4
 			// 
-			this.tabPage4.Controls.Add(this.ItemsListView);
+			this.tabPage4.Controls.Add(this.IItemsListView);
 			this.tabPage4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
 			this.tabPage4.Location = new System.Drawing.Point(4, 24);
 			this.tabPage4.Margin = new System.Windows.Forms.Padding(2);
@@ -560,78 +560,78 @@ namespace Foreman
 			this.tabPage4.Text = "Items";
 			this.tabPage4.UseVisualStyleBackColor = true;
 			// 
-			// ItemsListView
+			// IItemsListView
 			// 
-			this.ItemsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.ItemsHeaderName,
-            this.ItemsHeaderIn,
-            this.ItemsHeaderInUL,
-            this.ItemsHeaderOut,
-            this.ItemsHeaderOutUL,
-            this.ItemsHeaderOverproduced,
-            this.ItemsHeaderProduced,
-            this.ItemsHeaderConsumed});
-			this.ItemsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ItemsListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.ItemsListView.FullRowSelect = true;
-			this.ItemsListView.GridLines = true;
-			this.ItemsListView.HideSelection = false;
-			this.ItemsListView.LabelWrap = false;
-			this.ItemsListView.Location = new System.Drawing.Point(0, 0);
-			this.ItemsListView.MultiSelect = false;
-			this.ItemsListView.Name = "ItemsListView";
-			this.ItemsListView.Size = new System.Drawing.Size(728, 367);
-			this.ItemsListView.SmallImageList = this.IconList;
-			this.ItemsListView.TabIndex = 17;
-			this.ItemsListView.UseCompatibleStateImageBehavior = false;
-			this.ItemsListView.View = System.Windows.Forms.View.Details;
-			this.ItemsListView.VirtualMode = true;
-			this.ItemsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.ItemsListView_ColumnClick);
-			this.ItemsListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.ItemsListView_RetrieveVirtualItem);
+			this.IItemsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.IItemsHeaderName,
+            this.IItemsHeaderIn,
+            this.IItemsHeaderInUL,
+            this.IItemsHeaderOut,
+            this.IItemsHeaderOutUL,
+            this.IItemsHeaderOverproduced,
+            this.IItemsHeaderProduced,
+            this.IItemsHeaderConsumed});
+			this.IItemsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IItemsListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.IItemsListView.FullRowSelect = true;
+			this.IItemsListView.GridLines = true;
+			this.IItemsListView.HideSelection = false;
+			this.IItemsListView.LabelWrap = false;
+			this.IItemsListView.Location = new System.Drawing.Point(0, 0);
+			this.IItemsListView.MultiSelect = false;
+			this.IItemsListView.Name = "ItemsListView";
+			this.IItemsListView.Size = new System.Drawing.Size(728, 367);
+			this.IItemsListView.SmallImageList = this.IconList;
+			this.IItemsListView.TabIndex = 17;
+			this.IItemsListView.UseCompatibleStateImageBehavior = false;
+			this.IItemsListView.View = System.Windows.Forms.View.Details;
+			this.IItemsListView.VirtualMode = true;
+			this.IItemsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.IItemsListView_ColumnClick);
+			this.IItemsListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.IItemsListView_RetrieveVirtualItem);
 			// 
-			// ItemsHeaderName
+			// IItemsHeaderName
 			// 
-			this.ItemsHeaderName.Text = "Item";
-			this.ItemsHeaderName.Width = 150;
+			this.IItemsHeaderName.Text = "Item";
+			this.IItemsHeaderName.Width = 150;
 			// 
-			// ItemsHeaderIn
+			// IItemsHeaderIn
 			// 
-			this.ItemsHeaderIn.Text = "In";
-			this.ItemsHeaderIn.Width = 75;
+			this.IItemsHeaderIn.Text = "In";
+			this.IItemsHeaderIn.Width = 75;
 			// 
-			// ItemsHeaderInUL
+			// IItemsHeaderInUL
 			// 
-			this.ItemsHeaderInUL.Text = "In (x link)";
-			this.ItemsHeaderInUL.Width = 75;
+			this.IItemsHeaderInUL.Text = "In (x link)";
+			this.IItemsHeaderInUL.Width = 75;
 			// 
-			// ItemsHeaderOut
+			// IItemsHeaderOut
 			// 
-			this.ItemsHeaderOut.Text = "Out";
-			this.ItemsHeaderOut.Width = 75;
+			this.IItemsHeaderOut.Text = "Out";
+			this.IItemsHeaderOut.Width = 75;
 			// 
-			// ItemsHeaderOutUL
+			// IItemsHeaderOutUL
 			// 
-			this.ItemsHeaderOutUL.Text = "Out (x link)";
-			this.ItemsHeaderOutUL.Width = 75;
+			this.IItemsHeaderOutUL.Text = "Out (x link)";
+			this.IItemsHeaderOutUL.Width = 75;
 			// 
-			// ItemsHeaderOverproduced
+			// IItemsHeaderOverproduced
 			// 
-			this.ItemsHeaderOverproduced.Text = "Overprod.";
-			this.ItemsHeaderOverproduced.Width = 75;
+			this.IItemsHeaderOverproduced.Text = "Overprod.";
+			this.IItemsHeaderOverproduced.Width = 75;
 			// 
-			// ItemsHeaderProduced
+			// IItemsHeaderProduced
 			// 
-			this.ItemsHeaderProduced.Text = "Produced";
-			this.ItemsHeaderProduced.Width = 75;
+			this.IItemsHeaderProduced.Text = "Produced";
+			this.IItemsHeaderProduced.Width = 75;
 			// 
-			// ItemsHeaderConsumed
+			// IItemsHeaderConsumed
 			// 
-			this.ItemsHeaderConsumed.Text = "Consumed";
-			this.ItemsHeaderConsumed.Width = 75;
+			this.IItemsHeaderConsumed.Text = "Consumed";
+			this.IItemsHeaderConsumed.Width = 75;
 			// 
 			// tabPage5
 			// 
-			this.tabPage5.Controls.Add(this.FluidsListView);
+			this.tabPage5.Controls.Add(this.IFluidsListView);
 			this.tabPage5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
 			this.tabPage5.Location = new System.Drawing.Point(4, 24);
 			this.tabPage5.Margin = new System.Windows.Forms.Padding(2);
@@ -641,126 +641,126 @@ namespace Foreman
 			this.tabPage5.Text = "Fluids";
 			this.tabPage5.UseVisualStyleBackColor = true;
 			// 
-			// FluidsListView
-			// 
-			this.FluidsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.FluidsHeaderName,
-            this.FluidsHeaderIn,
-            this.FluidsHeaderInUL,
-            this.FluidsHeaderOut,
-            this.FluidsHeaderOutUL,
-            this.FluidsHeaderOverproduced,
-            this.FluidsHeaderProduced,
-            this.FluidsHeaderConsumed});
-			this.FluidsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FluidsListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.FluidsListView.FullRowSelect = true;
-			this.FluidsListView.GridLines = true;
-			this.FluidsListView.HideSelection = false;
-			this.FluidsListView.LabelWrap = false;
-			this.FluidsListView.Location = new System.Drawing.Point(0, 0);
-			this.FluidsListView.MultiSelect = false;
-			this.FluidsListView.Name = "FluidsListView";
-			this.FluidsListView.Size = new System.Drawing.Size(728, 367);
-			this.FluidsListView.SmallImageList = this.IconList;
-			this.FluidsListView.TabIndex = 18;
-			this.FluidsListView.UseCompatibleStateImageBehavior = false;
-			this.FluidsListView.View = System.Windows.Forms.View.Details;
-			this.FluidsListView.VirtualMode = true;
-			this.FluidsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.FluidsListView_ColumnClick);
-			this.FluidsListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.FluidsListView_RetrieveVirtualItem);
-			// 
-			// FluidsHeaderName
-			// 
-			this.FluidsHeaderName.Text = "Fluid";
-			this.FluidsHeaderName.Width = 150;
-			// 
-			// FluidsHeaderIn
-			// 
-			this.FluidsHeaderIn.Text = "In";
-			this.FluidsHeaderIn.Width = 75;
-			// 
-			// FluidsHeaderInUL
-			// 
-			this.FluidsHeaderInUL.Text = "In (x link)";
-			this.FluidsHeaderInUL.Width = 75;
-			// 
-			// FluidsHeaderOut
-			// 
-			this.FluidsHeaderOut.Text = "Out";
-			this.FluidsHeaderOut.Width = 75;
-			// 
-			// FluidsHeaderOutUL
-			// 
-			this.FluidsHeaderOutUL.Text = "Out (x link)";
-			this.FluidsHeaderOutUL.Width = 75;
-			// 
-			// FluidsHeaderOverproduced
-			// 
-			this.FluidsHeaderOverproduced.Text = "Overprod.";
-			this.FluidsHeaderOverproduced.Width = 75;
-			// 
-			// FluidsHeaderProduced
-			// 
-			this.FluidsHeaderProduced.Text = "Produced";
-			this.FluidsHeaderProduced.Width = 75;
-			// 
-			// FluidsHeaderConsumed
-			// 
-			this.FluidsHeaderConsumed.Text = "Consumed";
-			this.FluidsHeaderConsumed.Width = 75;
-			// 
-			// ItemsFilterTextBox
-			// 
-			this.ItemsFilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ItemsFilterTextBox.Location = new System.Drawing.Point(43, 2);
-			this.ItemsFilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 7, 2);
-			this.ItemsFilterTextBox.Name = "ItemsFilterTextBox";
-			this.ItemsFilterTextBox.Size = new System.Drawing.Size(554, 20);
-			this.ItemsFilterTextBox.TabIndex = 29;
-			this.ItemsFilterTextBox.TextChanged += new System.EventHandler(this.ItemsFilterTextBox_TextChanged);
-			// 
-			// ItemsExportButton
-			// 
-			this.ItemsExportButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ItemsExportButton.Location = new System.Drawing.Point(604, 0);
-			this.ItemsExportButton.Margin = new System.Windows.Forms.Padding(0, 0, 7, 0);
-			this.ItemsExportButton.Name = "ItemsExportButton";
-			this.ItemsExportButton.Size = new System.Drawing.Size(133, 24);
-			this.ItemsExportButton.TabIndex = 31;
-			this.ItemsExportButton.Text = "Export CSV";
-			this.ItemsExportButton.UseVisualStyleBackColor = true;
-			this.ItemsExportButton.Click += new System.EventHandler(this.ItemsExportButton_Click);
-			// 
-			// ItemsFilterCBTable
-			// 
-			this.ItemsFilterCBTable.AutoSize = true;
-			this.ItemsFilterCBTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ItemsFilterCBTable.ColumnCount = 7;
-			this.ItemsTable.SetColumnSpan(this.ItemsFilterCBTable, 3);
-			this.ItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.ItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.ItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.ItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.ItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.ItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.ItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 142F));
-			this.ItemsFilterCBTable.Controls.Add(this.ItemFilterConsumptionCheckBox, 6, 0);
-			this.ItemsFilterCBTable.Controls.Add(this.ItemFilterOutputOverproducedCheckBox, 4, 0);
-			this.ItemsFilterCBTable.Controls.Add(this.ItemFilterOutputUnlinkedCheckBox, 3, 0);
-			this.ItemsFilterCBTable.Controls.Add(this.ItemFilterOutputCheckBox, 2, 0);
-			this.ItemsFilterCBTable.Controls.Add(this.ItemFilterInputUnlinkedCheckBox, 1, 0);
-			this.ItemsFilterCBTable.Controls.Add(this.ItemFilterInputCheckBox, 0, 0);
-			this.ItemsFilterCBTable.Controls.Add(this.ItemFilterProductionCheckBox, 5, 0);
-			this.ItemsFilterCBTable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ItemsFilterCBTable.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.AddColumns;
-			this.ItemsFilterCBTable.Location = new System.Drawing.Point(3, 27);
-			this.ItemsFilterCBTable.Name = "ItemsFilterCBTable";
-			this.ItemsFilterCBTable.RowCount = 1;
-			this.ItemsFilterCBTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.ItemsFilterCBTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
-			this.ItemsFilterCBTable.Size = new System.Drawing.Size(738, 23);
-			this.ItemsFilterCBTable.TabIndex = 32;
+			// IFluidsListView
+			//
+			this.IFluidsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.IFluidsHeaderName,
+            this.IFluidsHeaderIn,
+            this.IFluidsHeaderInUL,
+            this.IFluidsHeaderOut,
+            this.IFluidsHeaderOutUL,
+            this.IFluidsHeaderOverproduced,
+            this.IFluidsHeaderProduced,
+            this.IFluidsHeaderConsumed});
+			this.IFluidsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IFluidsListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.IFluidsListView.FullRowSelect = true;
+			this.IFluidsListView.GridLines = true;
+			this.IFluidsListView.HideSelection = false;
+			this.IFluidsListView.LabelWrap = false;
+			this.IFluidsListView.Location = new System.Drawing.Point(0, 0);
+			this.IFluidsListView.MultiSelect = false;
+			this.IFluidsListView.Name = "FluidsListView";
+			this.IFluidsListView.Size = new System.Drawing.Size(728, 367);
+			this.IFluidsListView.SmallImageList = this.IconList;
+			this.IFluidsListView.TabIndex = 18;
+			this.IFluidsListView.UseCompatibleStateImageBehavior = false;
+			this.IFluidsListView.View = System.Windows.Forms.View.Details;
+			this.IFluidsListView.VirtualMode = true;
+			this.IFluidsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.IFluidsListView_ColumnClick);
+			this.IFluidsListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.IFluidsListView_RetrieveVirtualItem);
+			//
+			// IFluidsHeaderName
+			//
+			this.IFluidsHeaderName.Text = "Fluid";
+			this.IFluidsHeaderName.Width = 150;
+			//
+			// IFluidsHeaderIn
+			//
+			this.IFluidsHeaderIn.Text = "In";
+			this.IFluidsHeaderIn.Width = 75;
+			//
+			// IFluidsHeaderInUL
+			//
+			this.IFluidsHeaderInUL.Text = "In (x link)";
+			this.IFluidsHeaderInUL.Width = 75;
+			//
+			// IFluidsHeaderOut
+			//
+			this.IFluidsHeaderOut.Text = "Out";
+			this.IFluidsHeaderOut.Width = 75;
+			//
+			// IFluidsHeaderOutUL
+			//
+			this.IFluidsHeaderOutUL.Text = "Out (x link)";
+			this.IFluidsHeaderOutUL.Width = 75;
+			//
+			// IFluidsHeaderOverproduced
+			//
+			this.IFluidsHeaderOverproduced.Text = "Overprod.";
+			this.IFluidsHeaderOverproduced.Width = 75;
+			//
+			// IFluidsHeaderProduced
+			//
+			this.IFluidsHeaderProduced.Text = "Produced";
+			this.IFluidsHeaderProduced.Width = 75;
+			//
+			// IFluidsHeaderConsumed
+			//
+			this.IFluidsHeaderConsumed.Text = "Consumed";
+			this.IFluidsHeaderConsumed.Width = 75;
+			//
+			// IItemsFilterTextBox
+			//
+			this.IItemsFilterTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IItemsFilterTextBox.Location = new System.Drawing.Point(43, 2);
+			this.IItemsFilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 7, 2);
+			this.IItemsFilterTextBox.Name = "ItemsFilterTextBox";
+			this.IItemsFilterTextBox.Size = new System.Drawing.Size(554, 20);
+			this.IItemsFilterTextBox.TabIndex = 29;
+			this.IItemsFilterTextBox.TextChanged += new System.EventHandler(this.IItemsFilterTextBox_TextChanged);
+			//
+			// IItemsExportButton
+			//
+			this.IItemsExportButton.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IItemsExportButton.Location = new System.Drawing.Point(604, 0);
+			this.IItemsExportButton.Margin = new System.Windows.Forms.Padding(0, 0, 7, 0);
+			this.IItemsExportButton.Name = "ItemsExportButton";
+			this.IItemsExportButton.Size = new System.Drawing.Size(133, 24);
+			this.IItemsExportButton.TabIndex = 31;
+			this.IItemsExportButton.Text = "Export CSV";
+			this.IItemsExportButton.UseVisualStyleBackColor = true;
+			this.IItemsExportButton.Click += new System.EventHandler(this.IItemsExportButton_Click);
+			//
+			// IItemsFilterCBTable
+			//
+			this.IItemsFilterCBTable.AutoSize = true;
+			this.IItemsFilterCBTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.IItemsFilterCBTable.ColumnCount = 7;
+			this.IItemsTable.SetColumnSpan(this.IItemsFilterCBTable, 3);
+			this.IItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.IItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.IItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.IItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.IItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.IItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.IItemsFilterCBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 142F));
+			this.IItemsFilterCBTable.Controls.Add(this.ItemFilterConsumptionCheckBox, 6, 0);
+			this.IItemsFilterCBTable.Controls.Add(this.ItemFilterOutputOverproducedCheckBox, 4, 0);
+			this.IItemsFilterCBTable.Controls.Add(this.ItemFilterOutputUnlinkedCheckBox, 3, 0);
+			this.IItemsFilterCBTable.Controls.Add(this.ItemFilterOutputCheckBox, 2, 0);
+			this.IItemsFilterCBTable.Controls.Add(this.ItemFilterInputUnlinkedCheckBox, 1, 0);
+			this.IItemsFilterCBTable.Controls.Add(this.ItemFilterInputCheckBox, 0, 0);
+			this.IItemsFilterCBTable.Controls.Add(this.ItemFilterProductionCheckBox, 5, 0);
+			this.IItemsFilterCBTable.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.IItemsFilterCBTable.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.AddColumns;
+			this.IItemsFilterCBTable.Location = new System.Drawing.Point(3, 27);
+			this.IItemsFilterCBTable.Name = "ItemsFilterCBTable";
+			this.IItemsFilterCBTable.RowCount = 1;
+			this.IItemsFilterCBTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.IItemsFilterCBTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
+			this.IItemsFilterCBTable.Size = new System.Drawing.Size(738, 23);
+			this.IItemsFilterCBTable.TabIndex = 32;
 			// 
 			// ItemFilterConsumptionCheckBox
 			// 
@@ -980,7 +980,7 @@ namespace Foreman
 			this.keyNodesExportButton.TabIndex = 31;
 			this.keyNodesExportButton.Text = "Export CSV";
 			this.keyNodesExportButton.UseVisualStyleBackColor = true;
-			this.keyNodesExportButton.Click += new System.EventHandler(this.keyNodesExportButton_Click);
+			this.keyNodesExportButton.Click += new System.EventHandler(this.KeyNodesExportButton_Click);
 			// 
 			// tableLayoutPanel1
 			// 
@@ -1142,19 +1142,19 @@ namespace Foreman
 			this.BuildingsTable.ResumeLayout(false);
 			this.BuildingsTable.PerformLayout();
 			this.BuildingsTabControl.ResumeLayout(false);
-			this.AssemblersPage.ResumeLayout(false);
+			this.IAssemblersPage.ResumeLayout(false);
 			this.MinersPage.ResumeLayout(false);
 			this.PowersPage.ResumeLayout(false);
 			this.BeaconsPage.ResumeLayout(false);
-			this.ItemsTabPage.ResumeLayout(false);
-			this.ItemsTabPage.PerformLayout();
-			this.ItemsTable.ResumeLayout(false);
-			this.ItemsTable.PerformLayout();
-			this.ItemsTabControl.ResumeLayout(false);
+			this.IItemsTabPage.ResumeLayout(false);
+			this.IItemsTabPage.PerformLayout();
+			this.IItemsTable.ResumeLayout(false);
+			this.IItemsTable.PerformLayout();
+			this.IItemsTabControl.ResumeLayout(false);
 			this.tabPage4.ResumeLayout(false);
 			this.tabPage5.ResumeLayout(false);
-			this.ItemsFilterCBTable.ResumeLayout(false);
-			this.ItemsFilterCBTable.PerformLayout();
+			this.IItemsFilterCBTable.ResumeLayout(false);
+			this.IItemsFilterCBTable.PerformLayout();
 			this.KeyNodesTabPage.ResumeLayout(false);
 			this.KeyNodesTabPage.PerformLayout();
 			this.KeyNodesTable.ResumeLayout(false);
@@ -1171,14 +1171,14 @@ namespace Foreman
 
 		private System.Windows.Forms.TabControl MainTabControl;
 		private System.Windows.Forms.TabPage BuildingsTabPage;
-		private System.Windows.Forms.TabPage ItemsTabPage;
+		private System.Windows.Forms.TabPage IItemsTabPage;
 		private System.Windows.Forms.TabPage KeyNodesTabPage;
 		private System.Windows.Forms.TableLayoutPanel BuildingsTable;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.TabControl BuildingsTabControl;
-		private System.Windows.Forms.TabPage AssemblersPage;
+		private System.Windows.Forms.TabPage IAssemblersPage;
 		private System.Windows.Forms.ListView AssemblerListView;
-		private System.Windows.Forms.ColumnHeader AssemblersHeaderName;
+		private System.Windows.Forms.ColumnHeader IAssemblersHeaderName;
 		private System.Windows.Forms.TabPage MinersPage;
 		private System.Windows.Forms.ListView MinerListView;
 		private System.Windows.Forms.ColumnHeader MinerHeaderName;
@@ -1191,13 +1191,13 @@ namespace Foreman
 		private System.Windows.Forms.Label PowerConsumptionLabel;
 		private System.Windows.Forms.Label PowerProductionLabel;
 		private System.Windows.Forms.Label PowerNetLabel;
-		private System.Windows.Forms.TableLayoutPanel ItemsTable;
+		private System.Windows.Forms.TableLayoutPanel IItemsTable;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TabControl ItemsTabControl;
+		private System.Windows.Forms.TabControl IItemsTabControl;
 		private System.Windows.Forms.TabPage tabPage5;
-		private System.Windows.Forms.TextBox ItemsFilterTextBox;
+		private System.Windows.Forms.TextBox IItemsFilterTextBox;
 		private System.Windows.Forms.Button BuildingsExportButton;
-		private System.Windows.Forms.Button ItemsExportButton;
+		private System.Windows.Forms.Button IItemsExportButton;
 		private System.Windows.Forms.TableLayoutPanel KeyNodesTable;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox KeyNodesFilterTextBox;
@@ -1205,7 +1205,7 @@ namespace Foreman
 		private System.Windows.Forms.ListView KeyNodesListView;
 		private System.Windows.Forms.ColumnHeader KeyNodesHeaderType;
 		private System.Windows.Forms.ImageList IconList;
-		private System.Windows.Forms.TableLayoutPanel ItemsFilterCBTable;
+		private System.Windows.Forms.TableLayoutPanel IItemsFilterCBTable;
 		private System.Windows.Forms.CheckBox ItemFilterOutputOverproducedCheckBox;
 		private System.Windows.Forms.CheckBox ItemFilterOutputUnlinkedCheckBox;
 		private System.Windows.Forms.CheckBox ItemFilterOutputCheckBox;
@@ -1213,37 +1213,37 @@ namespace Foreman
 		private System.Windows.Forms.CheckBox ItemFilterInputCheckBox;
 		private System.Windows.Forms.CheckBox ItemFilterProductionCheckBox;
 		private System.Windows.Forms.TabPage tabPage4;
-		private System.Windows.Forms.ListView ItemsListView;
+		private System.Windows.Forms.ListView IItemsListView;
 		private System.Windows.Forms.ColumnHeader columnHeader1;
 		private System.Windows.Forms.CheckBox ItemFilterConsumptionCheckBox;
-		private System.Windows.Forms.ColumnHeader AssemblersHeaderPower;
-		private System.Windows.Forms.ColumnHeader AssemblersHeaderPowerB;
+		private System.Windows.Forms.ColumnHeader IAssemblersHeaderPower;
+		private System.Windows.Forms.ColumnHeader IAssemblersHeaderPowerB;
 		private System.Windows.Forms.ColumnHeader MinersHeaderPower;
 		private System.Windows.Forms.ColumnHeader MinersHeaderPowerB;
 		private System.Windows.Forms.ColumnHeader PowerHeaderPower;
 		private System.Windows.Forms.ColumnHeader PowerHeaderPowerB;
 		private System.Windows.Forms.ColumnHeader BeaconsHeaderPower;
-		private System.Windows.Forms.ColumnHeader AssemblersHeaderCounter;
+		private System.Windows.Forms.ColumnHeader IAssemblersHeaderCounter;
 		private System.Windows.Forms.ColumnHeader MinersHeaderCounter;
 		private System.Windows.Forms.ColumnHeader PowerHeaderCounter;
 		private System.Windows.Forms.ColumnHeader BeaconsHeaderCounter;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderName;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderIn;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderInUL;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderOut;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderOutUL;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderOverproduced;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderProduced;
-		private System.Windows.Forms.ColumnHeader ItemsHeaderConsumed;
-		private System.Windows.Forms.ListView FluidsListView;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderName;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderIn;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderInUL;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderOut;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderOutUL;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderOverproduced;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderProduced;
-		private System.Windows.Forms.ColumnHeader FluidsHeaderConsumed;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderName;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderIn;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderInUL;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderOut;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderOutUL;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderOverproduced;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderProduced;
+		private System.Windows.Forms.ColumnHeader IItemsHeaderConsumed;
+		private System.Windows.Forms.ListView IFluidsListView;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderName;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderIn;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderInUL;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderOut;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderOutUL;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderOverproduced;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderProduced;
+		private System.Windows.Forms.ColumnHeader IFluidsHeaderConsumed;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.CheckBox PassthroughNodeFilterCheckBox;
 		private System.Windows.Forms.CheckBox ConsumerNodeFilterCheckBox;

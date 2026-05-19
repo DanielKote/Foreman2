@@ -1,14 +1,12 @@
-﻿using Foreman.Graph;
+﻿using Foreman.DataCaching;
+using Foreman.Graph;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public class ErrorNoticeElement : GraphElement {
         private const int ErrorIconSize = 24;
         private static readonly Bitmap errorIcon = IconCache.GetIcon(Path.Combine("Graphics", "ErrorIcon.png"), 64);
@@ -33,7 +31,7 @@ namespace Foreman {
             graphics.DrawImage(errorIcon, trans.X, trans.Y, ErrorIconSize, ErrorIconSize);
         }
 
-        public override List<TooltipInfo>? GetToolTips(Point graph_point) {
+        public override List<TooltipInfo>? GetToolTips(Point graphPoint) {
             if (!Visible)
                 return null;
 
@@ -52,15 +50,16 @@ namespace Foreman {
             if (text == null || text.Count == 0)
                 return null;
 
-            List<TooltipInfo> tooltips = new List<TooltipInfo>();
-            TooltipInfo tti = new TooltipInfo();
-            tti.Direction = Direction.Up;
-            tti.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(0, Height / 2)));
-            tti.Text = "";
+            var tooltips = new List<TooltipInfo>();
+            var tti = new TooltipInfo {
+                Direction = Direction.Up,
+                ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(0, Height / 2))),
+                Text = ""
+            };
             bool solutionsAvailable = false;
             for (int i = 0; i < text.Count; i++) {
                 tti.Text += text[i] + "\n";
-                solutionsAvailable |= text[i].StartsWith(">"); //we use > as the start of something solvable, and ?> as the start of 'no solution'
+                solutionsAvailable |= text[i].StartsWith('>'); //we use > as the start of something solvable, and ?> as the start of 'no solution'
             }
             if (solutionsAvailable)
                 tti.Text += "\nLeft click to autoresolve.\nRight click for options.";
@@ -69,7 +68,7 @@ namespace Foreman {
             return tooltips;
         }
 
-        public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged) {
+        public override void MouseUp(Point graphPoint, MouseButtons button, bool wasDragged) {
             if (!Visible)
                 return;
 
@@ -107,7 +106,7 @@ namespace Foreman {
                             graphViewer.Graph.UpdateNodeValues();
                         })));
 
-                    RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
+                    RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graphPoint));
                 }
             }
         }

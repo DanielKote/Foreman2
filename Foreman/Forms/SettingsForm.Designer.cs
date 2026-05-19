@@ -1,4 +1,6 @@
-﻿namespace Foreman
+using Foreman.Controls;
+
+namespace Foreman
 {
     partial class SettingsForm
     {
@@ -43,7 +45,7 @@
             label4 = new System.Windows.Forms.Label();
             LoadEnabledFromSaveButton = new System.Windows.Forms.Button();
             EnabledObjectsTabControl = new System.Windows.Forms.TabControl();
-            AssemblersPage = new System.Windows.Forms.TabPage();
+            IAssemblersPage = new System.Windows.Forms.TabPage();
             AssemblerListView = new System.Windows.Forms.ListView();
             columnHeader4 = new System.Windows.Forms.ColumnHeader();
             IconList = new System.Windows.Forms.ImageList(components);
@@ -56,10 +58,10 @@
             BeaconsPage = new System.Windows.Forms.TabPage();
             BeaconListView = new System.Windows.Forms.ListView();
             columnHeader6 = new System.Windows.Forms.ColumnHeader();
-            ModulesPage = new System.Windows.Forms.TabPage();
+            IModulesPage = new System.Windows.Forms.TabPage();
             ModuleListView = new System.Windows.Forms.ListView();
             columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            RecipesPage = new System.Windows.Forms.TabPage();
+            IRecipesPage = new System.Windows.Forms.TabPage();
             RecipeListView = new System.Windows.Forms.ListView();
             columnHeader1 = new System.Windows.Forms.ColumnHeader();
             QualityPage = new System.Windows.Forms.TabPage();
@@ -142,12 +144,12 @@
             groupBox2.SuspendLayout();
             EnabledObjectsTable.SuspendLayout();
             EnabledObjectsTabControl.SuspendLayout();
-            AssemblersPage.SuspendLayout();
+            IAssemblersPage.SuspendLayout();
             MinersPage.SuspendLayout();
             PowersPage.SuspendLayout();
             BeaconsPage.SuspendLayout();
-            ModulesPage.SuspendLayout();
-            RecipesPage.SuspendLayout();
+            IModulesPage.SuspendLayout();
+            IRecipesPage.SuspendLayout();
             QualityPage.SuspendLayout();
             PresetsTable.SuspendLayout();
             CurrentPresetTable.SuspendLayout();
@@ -383,12 +385,12 @@
             // EnabledObjectsTabControl
             // 
             EnabledObjectsTable.SetColumnSpan(EnabledObjectsTabControl, 2);
-            EnabledObjectsTabControl.Controls.Add(AssemblersPage);
+            EnabledObjectsTabControl.Controls.Add(IAssemblersPage);
             EnabledObjectsTabControl.Controls.Add(MinersPage);
             EnabledObjectsTabControl.Controls.Add(PowersPage);
             EnabledObjectsTabControl.Controls.Add(BeaconsPage);
-            EnabledObjectsTabControl.Controls.Add(ModulesPage);
-            EnabledObjectsTabControl.Controls.Add(RecipesPage);
+            EnabledObjectsTabControl.Controls.Add(IModulesPage);
+            EnabledObjectsTabControl.Controls.Add(IRecipesPage);
             EnabledObjectsTabControl.Controls.Add(QualityPage);
             EnabledObjectsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             EnabledObjectsTabControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
@@ -400,16 +402,16 @@
             EnabledObjectsTabControl.Size = new System.Drawing.Size(605, 548);
             EnabledObjectsTabControl.TabIndex = 27;
             // 
-            // AssemblersPage
+            // IAssemblersPage
             // 
-            AssemblersPage.Controls.Add(AssemblerListView);
-            AssemblersPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            AssemblersPage.Location = new System.Drawing.Point(4, 26);
-            AssemblersPage.Name = "AssemblersPage";
-            AssemblersPage.Size = new System.Drawing.Size(597, 518);
-            AssemblersPage.TabIndex = 0;
-            AssemblersPage.Text = "Assemblers";
-            AssemblersPage.UseVisualStyleBackColor = true;
+            IAssemblersPage.Controls.Add(AssemblerListView);
+            IAssemblersPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            IAssemblersPage.Location = new System.Drawing.Point(4, 26);
+            IAssemblersPage.Name = "AssemblersPage";
+            IAssemblersPage.Size = new System.Drawing.Size(597, 518);
+            IAssemblersPage.TabIndex = 0;
+            IAssemblersPage.Text = "Assemblers";
+            IAssemblersPage.UseVisualStyleBackColor = true;
             // 
             // AssemblerListView
             // 
@@ -566,16 +568,16 @@
             columnHeader6.Text = "Name";
             columnHeader6.Width = 290;
             // 
-            // ModulesPage
+            // IModulesPage
             // 
-            ModulesPage.Controls.Add(ModuleListView);
-            ModulesPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
-            ModulesPage.Location = new System.Drawing.Point(4, 26);
-            ModulesPage.Name = "ModulesPage";
-            ModulesPage.Size = new System.Drawing.Size(597, 518);
-            ModulesPage.TabIndex = 3;
-            ModulesPage.Text = "Modules";
-            ModulesPage.UseVisualStyleBackColor = true;
+            IModulesPage.Controls.Add(ModuleListView);
+            IModulesPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            IModulesPage.Location = new System.Drawing.Point(4, 26);
+            IModulesPage.Name = "ModulesPage";
+            IModulesPage.Size = new System.Drawing.Size(597, 518);
+            IModulesPage.TabIndex = 3;
+            IModulesPage.Text = "Modules";
+            IModulesPage.UseVisualStyleBackColor = true;
             // 
             // ModuleListView
             // 
@@ -606,15 +608,15 @@
             columnHeader2.Text = "Name";
             columnHeader2.Width = 290;
             // 
-            // RecipesPage
+            // IRecipesPage
             // 
-            RecipesPage.Controls.Add(RecipeListView);
-            RecipesPage.Location = new System.Drawing.Point(4, 26);
-            RecipesPage.Name = "RecipesPage";
-            RecipesPage.Size = new System.Drawing.Size(597, 518);
-            RecipesPage.TabIndex = 4;
-            RecipesPage.Text = "Recipes";
-            RecipesPage.UseVisualStyleBackColor = true;
+            IRecipesPage.Controls.Add(RecipeListView);
+            IRecipesPage.Location = new System.Drawing.Point(4, 26);
+            IRecipesPage.Name = "RecipesPage";
+            IRecipesPage.Size = new System.Drawing.Size(597, 518);
+            IRecipesPage.TabIndex = 4;
+            IRecipesPage.Text = "Recipes";
+            IRecipesPage.UseVisualStyleBackColor = true;
             // 
             // RecipeListView
             // 
@@ -1709,12 +1711,12 @@
             EnabledObjectsTable.ResumeLayout(false);
             EnabledObjectsTable.PerformLayout();
             EnabledObjectsTabControl.ResumeLayout(false);
-            AssemblersPage.ResumeLayout(false);
+            IAssemblersPage.ResumeLayout(false);
             MinersPage.ResumeLayout(false);
             PowersPage.ResumeLayout(false);
             BeaconsPage.ResumeLayout(false);
-            ModulesPage.ResumeLayout(false);
-            RecipesPage.ResumeLayout(false);
+            IModulesPage.ResumeLayout(false);
+            IRecipesPage.ResumeLayout(false);
             QualityPage.ResumeLayout(false);
             PresetsTable.ResumeLayout(false);
             PresetsTable.PerformLayout();
@@ -1785,13 +1787,13 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TabControl EnabledObjectsTabControl;
-        private System.Windows.Forms.TabPage AssemblersPage;
+        private System.Windows.Forms.TabPage IAssemblersPage;
         private System.Windows.Forms.TabPage MinersPage;
-        private System.Windows.Forms.TabPage ModulesPage;
+        private System.Windows.Forms.TabPage IModulesPage;
         private System.Windows.Forms.Button LoadEnabledFromSaveButton;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox FilterTextBox;
-        private System.Windows.Forms.TabPage RecipesPage;
+        private System.Windows.Forms.TabPage IRecipesPage;
         private System.Windows.Forms.ListView RecipeListView;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ImageList IconList;

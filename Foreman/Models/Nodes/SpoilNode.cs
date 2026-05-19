@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.Serialization;
 
-namespace Foreman {
+namespace Foreman.Models.Nodes {
     public class SpoilNode : BaseNode {
         public enum Errors {
             Clean = 0b_0000_0000_0000,
@@ -22,7 +21,7 @@ namespace Foreman {
         private readonly BaseNodeController controller;
         public override BaseNodeController Controller { get { return controller; } }
 
-        public readonly ItemQualityPair InputItem;
+        public ItemQualityPair InputItem { get; }
         public ItemQualityPair OutputItem { get; internal set; }
 
         public override IEnumerable<ItemQualityPair> Inputs { get { yield return InputItem; } }
@@ -37,10 +36,9 @@ namespace Foreman {
         public override double DesiredRatePerSec => DesiredSetValue * (InputItem.Item?.StackSize ?? 1) / (InputItem.Quality is not null ? InputItem.Item?.GetItemSpoilageTime(InputItem.Quality) ?? 1 : 1);
 
         public SpoilNode(ProductionGraph graph, int nodeID, ItemQualityPair item) : this(graph, nodeID, item, item.Item?.SpoilResult) { }
-        public SpoilNode(ProductionGraph graph, int nodeID, ItemQualityPair item, Item? outputItem) : base(graph, nodeID) {
-            if (outputItem is null)
-                throw new ArgumentNullException(nameof(outputItem));
-            if (item.Quality is not Quality quality)
+        public SpoilNode(ProductionGraph graph, int nodeID, ItemQualityPair item, IItem? outputItem) : base(graph, nodeID) {
+            ArgumentNullException.ThrowIfNull(outputItem);
+            if (item.Quality is not IQuality quality)
                 throw new ArgumentException("Quality must be populated.", nameof(item));
             InputItem = item;
             OutputItem = new ItemQualityPair(outputItem, quality);
@@ -63,11 +61,7 @@ namespace Foreman {
             if (!AllLinksValid)
                 ErrorSet |= Errors.InvalidLinks;
 
-            if (ErrorSet != Errors.Clean) //warnings are NOT processed if error has been found. This makes sense (as an error is something that trumps warnings), plus guarantees we dont accidentally check statuses of missing objects (which rightfully dont exist in regular cache)
-                return NodeState.Error;
-            if (AllLinksConnected)
-                return NodeState.Clean;
-            return NodeState.MissingLink;
+            return ErrorSet != Errors.Clean ? NodeState.Error : AllLinksConnected ? NodeState.Clean : NodeState.MissingLink;
         }
 
         public override double GetConsumeRate(ItemQualityPair item) { return ActualRate; }
@@ -77,20 +71,20 @@ namespace Foreman {
         internal override double outputRateFor(ItemQualityPair item) { return 1; }
 
         public override List<string> GetErrors() {
-            List<string> errors = new List<string>();
+            var errors = new List<string>();
             if (InputItem.Item is null && InputItem.Quality is null && OutputItem.Item is null)
                 return errors;
 
             if ((ErrorSet & Errors.InputItemMissing) != 0)
-                errors.Add(string.Format("> Item \"{0}\" doesnt exist in preset!", InputItem.Item?.FriendlyName));
+                errors.Add(string.Format(DisplayCulture.Format, "> Item \"{0}\" doesnt exist in preset!", InputItem.Item?.FriendlyName));
             if ((ErrorSet & Errors.OutputItemMissing) != 0)
-                errors.Add(string.Format("> Spoilage Item \"{0}\" doesnt exist in preset!", OutputItem.Item?.FriendlyName));
+                errors.Add(string.Format(DisplayCulture.Format, "> Spoilage Item \"{0}\" doesnt exist in preset!", OutputItem.Item?.FriendlyName));
             if ((ErrorSet & Errors.ItemDoesntSpoil) != 0)
-                errors.Add(string.Format("> Item \"{0}\" doesnt spoil!", InputItem.Item?.FriendlyName));
+                errors.Add(string.Format(DisplayCulture.Format, "> Item \"{0}\" doesnt spoil!", InputItem.Item?.FriendlyName));
             if ((ErrorSet & Errors.InvalidSpoilResult) != 0)
-                errors.Add(string.Format("> Spoil result for item \"{0}\" doesnt match preset!", InputItem.Item?.FriendlyName));
+                errors.Add(string.Format(DisplayCulture.Format, "> Spoil result for item \"{0}\" doesnt match preset!", InputItem.Item?.FriendlyName));
             if ((ErrorSet & Errors.QualityMissing) != 0)
-                errors.Add(string.Format("> Quality \"{0}\" doesnt exist in preset!", InputItem.Quality?.FriendlyName));
+                errors.Add(string.Format(DisplayCulture.Format, "> Quality \"{0}\" doesnt exist in preset!", InputItem.Quality?.FriendlyName));
             if ((ErrorSet & Errors.InvalidLinks) != 0)
                 errors.Add("> Some links are invalid!");
             return errors;
@@ -101,7 +95,7 @@ namespace Foreman {
             return [];
         }
 
-        public override string ToString() => string.Format("Spoil node for: {0} ({2}) to {1} ({3})", InputItem.Item?.Name, OutputItem.Item?.Name, InputItem.Quality?.Name, OutputItem.Quality?.Name);
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "Spoil node for: {0} ({2}) to {1} ({3})", InputItem.Item?.Name, OutputItem.Item?.Name, InputItem.Quality?.Name, OutputItem.Quality?.Name);
     }
 
     public class SpoilNodeController : BaseNodeController {
@@ -110,7 +104,7 @@ namespace Foreman {
         internal SpoilNodeController(SpoilNode myNode) : base(myNode) { MyNode = myNode; }
 
         public void UpdateSpoilResult() {
-            if (MyNode.InputItem.Item?.SpoilResult is not Item spoilResult || MyNode.InputItem.Quality is not Quality quality)
+            if (MyNode.InputItem.Item?.SpoilResult is not IItem spoilResult || MyNode.InputItem.Quality is not IQuality quality)
                 return;
             var correctSpoilResult = new ItemQualityPair(spoilResult, quality);
             if (MyNode.OutputItem != correctSpoilResult) {

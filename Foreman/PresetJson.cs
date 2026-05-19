@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -11,9 +10,7 @@ namespace Foreman {
 
         public static JsonObject ParseObject(string json) {
             JsonNode? node = JsonNode.Parse(json) ?? throw new JsonException("Preset JSON root was null.");
-            if (node is not JsonObject obj)
-                throw new JsonException("Preset JSON root was not an object.");
-            return obj;
+            return node is not JsonObject obj ? throw new JsonException("Preset JSON root was not an object.") : obj;
         }
 
         /// <summary>Returns null when JSON is not an object; <see cref="JsonException"/> is expected and not logged.</summary>
@@ -45,24 +42,22 @@ namespace Foreman {
         public static bool? GetBool(JsonNode? node, params string[] path) => GetBoolValue(GetNode(node, path));
 
         public static int? GetInt32At(JsonNode? parent, string propertyName, int index) {
-            if (GetNode(parent, propertyName) is not JsonArray array || index < 0 || index >= array.Count)
-                return null;
-            return GetInt32Value(array[index]);
+            return GetNode(parent, propertyName) is not JsonArray array || index < 0 || index >= array.Count ? null : GetInt32Value(array[index]);
         }
 
         public static int CountArray(JsonNode? parent, string propertyName) =>
             GetNode(parent, propertyName) is JsonArray array ? array.Count : 0;
 
         public static string? GetStringValue(JsonNode? node) {
-            if (node is null)
-                return null;
-            return node.GetValueKind() switch {
-                JsonValueKind.String => node.GetValue<string>(),
-                JsonValueKind.Number => node.ToJsonString(),
-                JsonValueKind.True => "true",
-                JsonValueKind.False => "false",
-                _ => null
-            };
+            return node is null
+                ? null
+                : node.GetValueKind() switch {
+                    JsonValueKind.String => node.GetValue<string>(),
+                    JsonValueKind.Number => node.ToJsonString(),
+                    JsonValueKind.True => "true",
+                    JsonValueKind.False => "false",
+                    _ => null
+                };
         }
 
         public static int? GetInt32Value(JsonNode? node) {
@@ -70,11 +65,9 @@ namespace Foreman {
                 return null;
             if (node is JsonValue value && value.TryGetValue(out int i))
                 return i;
-            if (node is JsonValue value2 && value2.TryGetValue(out long l) && l >= int.MinValue && l <= int.MaxValue)
-                return (int)l;
-            if (node is JsonValue value3 && value3.TryGetValue(out double d))
-                return (int)d;
-            return null;
+            return node is JsonValue value2 && value2.TryGetValue(out long l) && l >= int.MinValue && l <= int.MaxValue
+                ? (int)l
+                : node is JsonValue value3 && value3.TryGetValue(out double d) ? (int)d : null;
         }
 
         public static double? GetDoubleValue(JsonNode? node) {
@@ -82,19 +75,13 @@ namespace Foreman {
                 return null;
             if (node is JsonValue value && value.TryGetValue(out double d))
                 return d;
-            if (node is JsonValue value2 && value2.TryGetValue(out long l))
-                return l;
-            if (node is JsonValue value3 && value3.TryGetValue(out int i))
-                return i;
-            return null;
+            return node is JsonValue value2 && value2.TryGetValue(out long l)
+                ? l
+                : node is JsonValue value3 && value3.TryGetValue(out int i) ? i : null;
         }
 
         public static bool? GetBoolValue(JsonNode? node) {
-            if (node is null)
-                return null;
-            if (node is JsonValue value && value.TryGetValue(out bool b))
-                return b;
-            return null;
+            return node is null ? null : node is JsonValue value && value.TryGetValue(out bool b) ? b : null;
         }
 
         public static IEnumerable<string> EnumerateStrings(JsonNode? parent, string propertyName) =>
@@ -143,7 +130,7 @@ namespace Foreman {
                 if (groupToken.Value is not JsonArray customArray)
                     continue;
 
-                JsonArray baseArray = basePreset[groupToken.Key] as JsonArray ?? new JsonArray();
+                JsonArray baseArray = basePreset[groupToken.Key] as JsonArray ?? [];
                 if (basePreset[groupToken.Key] is null)
                     basePreset[groupToken.Key] = baseArray;
 

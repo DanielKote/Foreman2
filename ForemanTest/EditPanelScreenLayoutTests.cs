@@ -1,4 +1,4 @@
-﻿using Foreman;
+﻿using Foreman.ProductionGraphView;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Drawing;
@@ -25,7 +25,7 @@ namespace ForemanTest {
             var offBottom = new Rectangle(200, 700, 400, 200);
             Rectangle clamped = EditPanelScreenLayout.ClampRectToViewer(offBottom, ViewerW, ViewerH, Margin);
 
-            Assert.IsTrue(clamped.Top < offBottom.Top);
+            Assert.IsLessThan(offBottom.Top, clamped.Top);
             Assert.AreEqual(ViewerH - Margin - offBottom.Height, clamped.Top);
         }
 
@@ -39,14 +39,14 @@ namespace ForemanTest {
 
         [TestMethod]
         public void GetShiftToFit_UnionOfTwoPanels_UsesSingleDeltaForBoth() {
-            Rectangle left = new Rectangle(50, 750, 472, 689);
-            Rectangle right = new Rectangle(left.Right + 5, 750, 300, 400);
-            Rectangle union = Rectangle.Union(left, right);
+            var left = new Rectangle(50, 750, 472, 689);
+            var right = new Rectangle(left.Right + 5, 750, 300, 400);
+            var union = Rectangle.Union(left, right);
             Point shift = EditPanelScreenLayout.GetShiftToFit(union, ViewerW, ViewerH, Margin);
 
-            Rectangle shiftedUnion = new Rectangle(union.X + shift.X, union.Y + shift.Y, union.Width, union.Height);
+            var shiftedUnion = new Rectangle(union.X + shift.X, union.Y + shift.Y, union.Width, union.Height);
             Assert.IsTrue(EditPanelScreenLayout.FitsViewer(shiftedUnion, ViewerW, ViewerH, Margin));
-            Assert.IsTrue(shift.Y < 0, "Tall union below the viewer should shift upward.");
+            Assert.IsLessThan(0, shift.Y, "Tall union below the viewer should shift upward.");
         }
 
         [TestMethod]

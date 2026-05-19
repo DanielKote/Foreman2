@@ -1,23 +1,24 @@
 ﻿using Google.OrTools.LinearSolver;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Foreman {
+using Solver_t = Google.OrTools.LinearSolver.Solver;
+
+namespace Foreman.Models.Solver {
     // A super thin wrapper around OrTools.LinearSolver to make up for its deficiences as a generated class.
     public class GoogleSolver {
-        private Solver solver;
-        private List<Variable> variables;
-        private List<Constraint> constraints;
+        private readonly Solver_t solver;
+        private readonly List<Variable> variables;
+        private readonly List<Constraint> constraints;
 
         public static GoogleSolver Create() {
             return new GoogleSolver();
         }
 
         public GoogleSolver() {
-            solver = Solver.CreateSolver("GLOP");
-            variables = new List<Variable>();
-            constraints = new List<Constraint>();
+            solver = Solver_t.CreateSolver("GLOP");
+            variables = [];
+            constraints = [];
         }
 
         public override string ToString() {
@@ -32,14 +33,14 @@ namespace Foreman {
                         line.Add(coefficient + " * " + variable.Name());
                     }
                 }
-                desc.AppendFormat("{0} → ({1}, {2})\n", string.Join(" + ", line), constraint.Lb(), constraint.Ub());
+                desc.AppendFormat(CultureInfo.InvariantCulture, "{0} → ({1}, {2})\n", string.Join(" + ", line), constraint.Lb(), constraint.Ub());
             }
             desc.AppendLine("");
             desc.AppendLine("");
             desc.AppendLine("== Variables");
 
             foreach (var variable in variables) {
-                desc.AppendFormat("{0} = {1}\n", variable.Name(), variable.SolutionValue());
+                desc.AppendFormat(CultureInfo.InvariantCulture, "{0} = {1}\n", variable.Name(), variable.SolutionValue());
             }
 
             return desc.ToString();
@@ -49,7 +50,7 @@ namespace Foreman {
             return solver.Objective();
         }
 
-        internal Solver.ResultStatus Solve() {
+        internal Solver_t.ResultStatus Solve() {
             return solver.Solve();
         }
 

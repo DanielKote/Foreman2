@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace Foreman {
-    class NativeMethods {
+    internal class NativeMethods {
         private const int LVM_FIRST = 0x1000;
         private const int LVM_SETITEMSTATE = LVM_FIRST + 43;
 
@@ -84,9 +84,10 @@ namespace Foreman {
         /// <param name="mask">Which bits of the value are to be set?</param>
         /// <param name="value">The value to be set</param>
         public static void SetItemState(ListView list, int itemIndex, int mask, int value) {
-            LVITEM lvItem = new LVITEM();
-            lvItem.stateMask = mask;
-            lvItem.state = value;
+            var lvItem = new LVITEM {
+                stateMask = mask,
+                state = value
+            };
             SendMessageLVItem(list.Handle, LVM_SETITEMSTATE, itemIndex, ref lvItem);
         }
     }

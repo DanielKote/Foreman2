@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.Serialization;
 
-namespace Foreman {
+namespace Foreman.Models.Nodes {
     public class SupplierNode : BaseNode {
         public enum Errors {
             Clean = 0b_0000_0000_0000,
@@ -24,9 +22,8 @@ namespace Foreman {
         private readonly BaseNodeController controller;
         public override BaseNodeController Controller { get { return controller; } }
 
-        public readonly ItemQualityPair SuppliedItem;
-
-        public override IEnumerable<ItemQualityPair> Inputs { get { return new ItemQualityPair[0]; } }
+        public ItemQualityPair SuppliedItem { get; }
+        public override IEnumerable<ItemQualityPair> Inputs { get { return []; } }
         public override IEnumerable<ItemQualityPair> Outputs { get { yield return SuppliedItem; } }
 
         public SupplierNode(ProductionGraph graph, int nodeID, ItemQualityPair item) : base(graph, nodeID) {
@@ -50,7 +47,7 @@ namespace Foreman {
         public override List<string> GetErrors() => ItemQualityNodeMessages.GetErrors(SuppliedItem, (int)ErrorSet);
         public override List<string> GetWarnings() => ItemQualityNodeMessages.GetWarnings(SuppliedItem, (int)WarningSet);
 
-        public override string ToString() => string.Format("Supply node for: {0} ({1})", SuppliedItem.Item?.Name, SuppliedItem.Quality?.Name);
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "Supply node for: {0} ({1})", SuppliedItem.Item?.Name, SuppliedItem.Quality?.Name);
     }
 
     public class SupplierNodeController : BaseNodeController {

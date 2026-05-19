@@ -1,5 +1,9 @@
 ﻿//#define VERBOSEDEBUG
 
+using Foreman.DataCaching;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using Foreman.Models.Solver;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,7 +12,7 @@ using System.Linq;
 
 namespace Foreman {
     public partial class ProductionGraph {
-        private int updateCounter = 0;
+        private int updateCounter;
         public void OptimizeGraphNodeValues() {
             foreach (var nodeGroup in GetConnectedComponents(false))
                 OptimiseNodeGroup(nodeGroup);
@@ -21,7 +25,7 @@ namespace Foreman {
             foreach (RecipeNode node in nodeGroup.Where(n => n is RecipeNode))
                 minRatio = Math.Min(minRatio, node.GetMinOutputRatio());
 
-            ProductionSolver solver = new ProductionSolver(PullOutputNodes, Math.Pow(10, PullOutputNodesPower), minRatio, Math.Pow(10, LowPriorityPower));
+            var solver = new ProductionSolver(PullOutputNodes, Math.Pow(10, PullOutputNodesPower), minRatio, Math.Pow(10, LowPriorityPower));
 
             foreach (BaseNode node in nodeGroup)
                 node.AddConstraints(solver);
@@ -36,8 +40,8 @@ namespace Foreman {
                 //Cyclic recipes with 'not enough provided' can lead to no-solution. Cyclic recipes with 'extra left' lead to an over-supply (solution found)
                 //using the pulloutputnodes option can result in an unbound solution (also null).
 
-                //ErrorLogging.LogLine(solver.ToString());
-                //Console.WriteLine(solver.ToString());
+                //ErrorLogging.LogLine(solver.ToString(CultureInfo.InvariantCulture));
+                //Console.WriteLine(solver.ToString(CultureInfo.InvariantCulture));
                 ErrorLogging.LogLine("Solver failed to find a solution for a connected node group");
             }
 
@@ -53,7 +57,7 @@ namespace Foreman {
     // easy to understand as a whole.
     public abstract partial class BaseNode {
         internal virtual void SetSolvedRate(double rate) {
-            //this is for all nodes but the recipe node. Recipe node overwrites this to set the factory count instead (as that is what the solver was solving for)
+            //this is for all nodes but the recipe node. IRecipe node overwrites this to set the factory count instead (as that is what the solver was solving for)
             ActualRatePerSec = rate;
             NodeValuesChanged?.Invoke(this, EventArgs.Empty);
             IsClean = true;
@@ -61,7 +65,7 @@ namespace Foreman {
 
         internal void AddConstraints(ProductionSolver solver) {
             if (this is RecipeNode rNode)
-                solver.AddRecipeNode(rNode, rNode.factoryRate()); //add node with minimization requirement on number of buildings
+                solver.AddRecipeNode(rNode, rNode.FactoryRate()); //add node with minimization requirement on number of buildings
             else
                 solver.AddNode(this); //add node without any minimization requirements
 
@@ -83,7 +87,7 @@ namespace Foreman {
             }
 
             //add in a forced 0 for passthrough nodes that have no inputs or no outputs (prevents such nodes from acting as 'free' inputs or outputs)
-            if (this is PassthroughNode pNode && (!InputLinks.Any() || !OutputLinks.Any()))
+            if (this is PassthroughNode pNode && (InputLinks.Count == 0 || OutputLinks.Count == 0))
                 solver.SetZero(pNode);
         }
 

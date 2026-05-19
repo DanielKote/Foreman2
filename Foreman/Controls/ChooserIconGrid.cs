@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Foreman.Controls;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -14,17 +15,20 @@ namespace Foreman {
         [Browsable(false)]
         public int TargetCellSize { get; private set; } = ChooserLayout.DesignCellPixels;
 
-        private readonly NFButton[,] buttons;
-        private bool iconButtonsReady;
+        private readonly NFButton[][] buttons;
+        private readonly bool iconButtonsReady;
         private int laidOutOuterWidth;
         private int laidOutOuterHeight;
 
-        public NFButton[,] Buttons => buttons;
+        public IReadOnlyCollection<IReadOnlyCollection<NFButton>> Buttons => buttons;
         public VScrollBar ScrollBar => scrollBar;
 
         public ChooserIconGrid() {
             InitializeComponent();
-            buttons = new NFButton[ColumnCount, VisibleRowCount];
+            buttons = new NFButton[ColumnCount][];
+            for (var i = 0; i < buttons.Length; ++i)
+                buttons[i] = new NFButton[VisibleRowCount];
+
             InitializeIconButtons();
             iconButtonsReady = true;
             if (IsInDesignMode)
@@ -37,7 +41,7 @@ namespace Foreman {
         private void InitializeIconButtons() {
             for (int row = 0; row < VisibleRowCount; row++) {
                 for (int column = 0; column < ColumnCount; column++) {
-                    NFButton button = new NFButton {
+                    var button = new NFButton {
                         BackgroundImageLayout = ImageLayout.Zoom,
                         UseVisualStyleBackColor = false,
                         FlatStyle = FlatStyle.Flat,
@@ -48,7 +52,7 @@ namespace Foreman {
                         Enabled = false,
                     };
                     button.FlatAppearance.BorderSize = 1;
-                    buttons[column, row] = button;
+                    buttons[column][row] = button;
                     gridSurface.Controls.Add(button);
                 }
             }
@@ -106,8 +110,8 @@ namespace Foreman {
                 ApplyDesignLayout();
         }
 
-        protected override void OnResize(EventArgs e) {
-            base.OnResize(e);
+        protected override void OnResize(EventArgs eventargs) {
+            base.OnResize(eventargs);
             if (!iconButtonsReady || TargetCellSize < 1 || laidOutOuterWidth < 1)
                 return;
             int gridWidth = TargetCellSize * ColumnCount;
@@ -131,8 +135,8 @@ namespace Foreman {
 
             for (int row = 0; row < VisibleRowCount; row++) {
                 for (int column = 0; column < ColumnCount; column++) {
-                    buttons[column, row].Bounds = new Rectangle(column * cellSize, row * cellSize, cellSize, cellSize);
-                    buttons[column, row].FlatAppearance.BorderSize = Math.Max(1, cellSize / 24);
+                    buttons[column][row].Bounds = new Rectangle(column * cellSize, row * cellSize, cellSize, cellSize);
+                    buttons[column][row].FlatAppearance.BorderSize = Math.Max(1, cellSize / 24);
                 }
             }
         }

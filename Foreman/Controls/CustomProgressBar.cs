@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
-    class CustomProgressBar : ProgressBar {
+namespace Foreman.Controls {
+    internal class CustomProgressBar : ProgressBar {
         //Property to hold the custom text
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string? CustomText { get; set; }
@@ -23,20 +23,19 @@ namespace Foreman {
             rect.Inflate(-3, -3);
             if (Value > 0) {
                 // As we doing this ourselves we need to draw the chunks on the progress bar
-                Rectangle clip = new Rectangle(rect.X, rect.Y, (int)Math.Round(((float)Value / Maximum) * rect.Width), rect.Height);
+                var clip = new Rectangle(rect.X, rect.Y, (int)Math.Round(((float)Value / Maximum) * rect.Width), rect.Height);
                 ProgressBarRenderer.DrawHorizontalChunks(g, clip);
             }
 
             // Set the Display text (Either a % amount or our custom text
             int percent = (int)(((double)this.Value / (double)this.Maximum) * 100);
-            string text = "(" + percent.ToString() + "%) " + CustomText;
+            string text = "(" + percent.ToString(DisplayCulture.Format) + "%) " + CustomText;
 
-            using (Font f = new Font(FontFamily.GenericSerif, 10)) {
+            using var f = new Font(FontFamily.GenericSerif, 10);
 
-                SizeF len = g.MeasureString(text, f);
-                Point location = new Point(Convert.ToInt32((Width / 2) - len.Width / 2), Convert.ToInt32((Height / 2) - len.Height / 2));
-                g.DrawString(text, f, Brushes.Black, location);
-            }
+            SizeF len = g.MeasureString(text, f);
+            var location = new Point(Convert.ToInt32((Width / 2) - len.Width / 2), Convert.ToInt32((Height / 2) - len.Height / 2));
+            g.DrawString(text, f, Brushes.Black, location);
         }
     }
 }

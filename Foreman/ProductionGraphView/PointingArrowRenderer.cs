@@ -2,8 +2,8 @@
 using System.Drawing;
 using System.Linq;
 
-namespace Foreman {
-    public class PointingArrowRenderer {
+namespace Foreman.ProductionGraphView {
+    public class PointingArrowRenderer(ProductionGraphViewer viewer) {
         private enum Border { Top, Bottom, Left, Right }
 
         public bool ShowErrorArrows { get; set; }
@@ -11,17 +11,15 @@ namespace Foreman {
         public bool ShowDisconnectedArrows { get; set; }
         public bool ShowOUNodeArrows { get; set; }
 
-        private static readonly Pen ErrorArrowPen = new Pen(Brushes.DarkRed, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-        private static readonly Pen WarningArrowPen = new Pen(Brushes.DarkOrange, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-        private static readonly Pen DisconnectedArrowPen = new Pen(Brushes.Goldenrod, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-        private static readonly Pen OUNodeArrowPen = new Pen(Brushes.Goldenrod, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
+        private static readonly Pen ErrorArrowPen = new(Brushes.DarkRed, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
+        private static readonly Pen WarningArrowPen = new(Brushes.DarkOrange, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
+        private static readonly Pen DisconnectedArrowPen = new(Brushes.Goldenrod, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
+        private static readonly Pen OUNodeArrowPen = new(Brushes.Goldenrod, ArrowScale) { StartCap = System.Drawing.Drawing2D.LineCap.Square, EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 
         private const int ArrowScale = 8;
         private const int Padding = 10;
 
-        private readonly ProductionGraphViewer Viewer;
-
-        public PointingArrowRenderer(ProductionGraphViewer viewer) { Viewer = viewer; }
+        private readonly ProductionGraphViewer Viewer = viewer;
 
         public void Paint(Graphics graphics, ProductionGraph graph) {
             if (ShowErrorArrows)
@@ -42,7 +40,7 @@ namespace Foreman {
             if (nodeOrigin.X > -Padding && nodeOrigin.X < Viewer.Width + Padding && nodeOrigin.Y > -Padding && nodeOrigin.Y < Viewer.Height + Padding) //roughly 'in bounds'
                 return;
 
-            Point center = new Point(Viewer.Width / 2, Viewer.Height / 2);
+            var center = new Point(Viewer.Width / 2, Viewer.Height / 2);
             Point borderPoint;
 
             if (nodeOrigin.Y < Padding) {
@@ -83,20 +81,19 @@ namespace Foreman {
             //if we are here, then there was no need to paint the arrow (within borders). Due to previous checks this shouldnt happen though.
         }
 
-        private void DrawArrow(Graphics graphics, Point origin, Point endpoint, float length, Pen arrowPen) {
-            SizeF sizedVector = new SizeF(origin.X - endpoint.X, origin.Y - endpoint.Y);
+        private static void DrawArrow(Graphics graphics, Point origin, Point endpoint, float length, Pen arrowPen) {
+            var sizedVector = new SizeF(origin.X - endpoint.X, origin.Y - endpoint.Y);
             float vectorLength = (float)Math.Sqrt(sizedVector.Width * sizedVector.Width + sizedVector.Height * sizedVector.Height);
             sizedVector = new SizeF(sizedVector.Width * length / vectorLength, sizedVector.Height * length / vectorLength);
             origin = Point.Add(endpoint, sizedVector.ToSize());
             graphics.DrawLine(arrowPen, origin, endpoint);
         }
 
-        private Point IntersectionPoint(Point a, Point b, int c, bool horizontal) //c is x if vertical line, and y if horizontal line
+        private static Point IntersectionPoint(Point a, Point b, int c, bool horizontal) //c is x if vertical line, and y if horizontal line
         {
-            if (horizontal)
-                return new Point(a.X + ((b.X - a.X) * (c - a.Y) / (b.Y - a.Y)), c);
-            else
-                return new Point(c, a.Y + ((b.Y - a.Y) * (c - a.X) / (b.X - a.X)));
+            return horizontal
+                ? new Point(a.X + ((b.X - a.X) * (c - a.Y) / (b.Y - a.Y)), c)
+                : new Point(c, a.Y + ((b.Y - a.Y) * (c - a.X) / (b.X - a.X)));
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Foreman.Serialization;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     /// <summary>Rectangle or ellipse annotation on the canvas.</summary>
     public class ShapeAnnotationElement : AnnotationElement {
         public enum ShapeType { Rectangle, Ellipse }
@@ -138,6 +139,7 @@ namespace Foreman {
         }
 
         public override void Dispose() {
+            GC.SuppressFinalize(this);
             _fillBrush?.Dispose();
             _borderPen?.Dispose();
             base.Dispose();

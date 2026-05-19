@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Foreman.ProductionGraphView.Elements;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Annotations {
     /// <summary>Bounds and pixel sizing for full-graph PNG export (nodes, links, and annotations).</summary>
     public static class GraphExportBounds {
         /// <summary>Padding around annotation-only exports (graph bounds already include node borders).</summary>
@@ -20,7 +21,7 @@ namespace Foreman {
                 annotation.Height);
 
         public static Rectangle Compute(Rectangle graphBounds, IEnumerable<Rectangle> annotationBounds) {
-            List<Rectangle> annotations = annotationBounds
+            var annotations = annotationBounds
                 .Where(r => r.Width > 0 && r.Height > 0)
                 .ToList();
 

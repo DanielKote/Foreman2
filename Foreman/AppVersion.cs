@@ -11,7 +11,7 @@ internal static class AppVersion {
 
     public static string ProductName => "Foreman " + SemVer;
 
-    static string ResolveSemVer() {
+    private static string ResolveSemVer() {
         var informational = Assembly.GetExecutingAssembly()
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
             .InformationalVersion;
@@ -19,10 +19,9 @@ internal static class AppVersion {
             return informational;
 
         var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-        if (assemblyVersion is null)
-            return "0.0.0";
-
-        return assemblyVersion.Revision > 0
+        return assemblyVersion is null
+            ? "0.0.0"
+            : assemblyVersion.Revision > 0
             ? $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}.{assemblyVersion.Revision}"
             : $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
     }

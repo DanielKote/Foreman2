@@ -1,17 +1,19 @@
-﻿using Foreman.Graph;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.Graph;
+using Foreman.Models;
+using Foreman.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public abstract class BaseNodeElement : GraphElement {
-        public bool Highlighted = false; //selection - note that this doesnt mean it is or isnt in selection (at least not during drag operation - ex: dragging a not-selection over a group of selected nodes will change their highlight status, but wont add them to the 'selected' set until you let go of the drag)
+        public bool Highlighted { get; set; } //selection - note that this doesnt mean it is or isnt in selection (at least not during drag operation - ex: dragging a not-selection over a group of selected nodes will change their highlight status, but wont add them to the 'selected' set until you let go of the drag)
         public INodeViewModel ViewModel { get; }
 
         public override int X { get { return ViewModel.Location.X; } set { Trace.Fail("Base node element location cant be set through X parameter! Use SetLocation(Point)"); } }
@@ -40,12 +42,14 @@ namespace Foreman {
         protected static readonly Brush selectionOverlayBrush = new SolidBrush(Color.FromArgb(100, 100, 100, 200));
 
         protected static readonly Brush TextBrush = Brushes.Black;
-        protected static readonly Font BaseFont = new Font(FontFamily.GenericSansSerif, 10f);
-        protected static readonly Font CounterBaseFont = new Font(FontFamily.GenericSansSerif, 14f);
-        protected static readonly Font TitleFont = new Font(FontFamily.GenericSansSerif, 9.2f, FontStyle.Bold);
+        protected static readonly Font BaseFont = new(FontFamily.GenericSansSerif, 10f);
+        protected static readonly Font CounterBaseFont = new(FontFamily.GenericSansSerif, 14f);
+        protected static readonly Font TitleFont = new(FontFamily.GenericSansSerif, 9.2f, FontStyle.Bold);
 
-        protected static StringFormat TitleFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
-        protected static StringFormat TextFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
+        private static readonly StringFormat titleFormat = new() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
+        private static readonly StringFormat textFormat = new() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
+        protected static StringFormat TitleFormat => titleFormat;
+        protected static StringFormat TextFormat => textFormat;
 
         //most values are attempted to fit the grid (6 * 2^n) - ex: 72 = 6 * (4+8)
         protected const int BaseSimpleHeight = 96; // 96 fits grid
@@ -57,9 +61,8 @@ namespace Foreman {
         protected const int MinWidth = WidthD * 6;
         protected const int BorderSpacing = 1; //the drawn node will be smaller by this in all directions (graph looks nicer if adjacent nodes have a slight gap between them)
 
-        protected List<ItemTabElement> InputTabs;
-        protected List<ItemTabElement> OutputTabs;
-
+        protected List<ItemTabElement> InputTabs { get; set; }
+        protected List<ItemTabElement> OutputTabs { get; set; }
         private Point MouseDownLocation; //location where the mouse click down first happened - in graph coordinates (used to ensure that any drag operation begins at the start, and not at the point (+- a few pixels) where the drag was officially registed as a drag and not just a mouse click.
         private Point MouseDownNodeLocation; //location of this node the moment the mouse click down first happened - in graph coordinates
         private bool DragStarted;
@@ -67,19 +70,19 @@ namespace Foreman {
         private bool NodeStateRequiresUpdate; //these are set by the events called from the node (as well as calling for invalidation). Any paint call checks for these, and if true resets them to false and calls the appropriate update functions
         private bool NodeValuesRequireUpdate; //this removes the need to manually update the nodes after any change, as well as not spamming update calls after every change (being based on paint refresh - aka: when it actually matters)
 
-        protected ErrorNoticeElement errorNotice;
-
+        protected ErrorNoticeElement errorNotice { get; set; }
         public BaseNodeElement(ProductionGraphViewer graphViewer, INodeViewModel viewModel) : base(graphViewer) {
             ViewModel = viewModel;
             DragStarted = false;
             ViewModel.NodeStateChanged += ViewModel_NodeStateChanged;
             ViewModel.NodeValuesChanged += ViewModel_NodeValuesChanged;
 
-            InputTabs = new List<ItemTabElement>();
-            OutputTabs = new List<ItemTabElement>();
+            InputTabs = [];
+            OutputTabs = [];
 
-            errorNotice = new ErrorNoticeElement(graphViewer, this);
-            errorNotice.Location = new Point(-Width / 2, -Height / 2);
+            errorNotice = new ErrorNoticeElement(graphViewer, this) {
+                Location = new Point(-Width / 2, -Height / 2)
+            };
             errorNotice.SetVisibility(false);
 
             //first stage item tab creation - absolutely necessary in the constructor due to the creation and simultaneous linking of nodes being possible (drag to new node for example).
@@ -112,8 +115,8 @@ namespace Foreman {
         }
 
         private void UpdateTabOrder() {
-            InputTabs = InputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Item?.Name).ThenBy(it => it.Item.Quality?.Level).ThenBy(it => it.Item.Quality?.Name).ToList(); //then by ensures same result no matter who came first
-            OutputTabs = OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Item?.Name).ThenBy(it => it.Item.Quality?.Level).ThenBy(it => it.Item.Quality?.Name).ToList();
+            InputTabs = [.. InputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Item?.Name).ThenBy(it => it.Item.Quality?.Level).ThenBy(it => it.Item.Quality?.Name)]; //then by ensures same result no matter who came first
+            OutputTabs = [.. OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Item?.Name).ThenBy(it => it.Item.Quality?.Level).ThenBy(it => it.Item.Quality?.Name)];
 
             int x = -GetIconWidths(OutputTabs) / 2;
             int y = ViewModel.NodeDirection == NodeDirection.Up ? (-Height / 2) + 1 : (Height / 2) - 1;
@@ -132,7 +135,7 @@ namespace Foreman {
             }
         }
 
-        protected int GetIconWidths(List<ItemTabElement> tabs) {
+        protected static int GetIconWidths(List<ItemTabElement> tabs) {
             int result = TabPadding;
             foreach (ItemTabElement tab in tabs)
                 result += tab.Bounds.Width + TabPadding;
@@ -145,7 +148,7 @@ namespace Foreman {
                 if (!graphViewer.Session.View.TryGetNode(link.SupplierId, out INodeViewModel? supplier) || supplier is null ||
                     !graphViewer.Session.View.TryGetNode(link.ConsumerId, out INodeViewModel? consumer) || consumer is null)
                     continue;
-                Point diff = Point.Subtract(supplier.Location, (Size)consumer.Location);
+                var diff = Point.Subtract(supplier.Location, (Size)consumer.Location);
                 total += Convert.ToInt32(Math.Atan2(tab.LinkType == LinkType.Input ? diff.X : -diff.X, diff.Y) * 1000 + (diff.Y > 0 ? 1 : 0)); //x needs to be flipped depending on which endpoint we are calculating for. y is absoluted to take care of down connections. slight addition in case of up connection ensures that 2 equal connections will prioritize the up over the down.
             }
             return total;
@@ -166,23 +169,20 @@ namespace Foreman {
             return InputTabs.First(it => it.Item == item);
         }
 
-        public override void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0) {
-            base.UpdateVisibility(graph_zone, xborder, yborder + 30); //account for the vertical item boxes
+        public override void UpdateVisibility(Rectangle graphZone, int xborder = 0, int yborder = 0) {
+            base.UpdateVisibility(graphZone, xborder, yborder + 30); //account for the vertical item boxes
         }
 
-        public override bool ContainsPoint(Point graph_point) {
+        public override bool ContainsPoint(Point graphPoint) {
             if (!Visible)
                 return false;
-            if (base.ContainsPoint(graph_point))
+            if (base.ContainsPoint(graphPoint))
                 return true;
 
             foreach (ItemTabElement tab in SubElements.OfType<ItemTabElement>())
-                if (tab.ContainsPoint(graph_point))
+                if (tab.ContainsPoint(graphPoint))
                     return true;
-            if (errorNotice.ContainsPoint(graph_point))
-                return true;
-
-            return false;
+            return errorNotice.ContainsPoint(graphPoint);
         }
 
         public override void PrePaint() {
@@ -231,10 +231,10 @@ namespace Foreman {
         protected abstract void DetailsDraw(Graphics graphics, Point trans); //draw the inside of the node.
         protected abstract Bitmap? NodeIcon();
 
-        public override List<TooltipInfo> GetToolTips(Point graph_point) {
-            var element = SubElements.FirstOrDefault(it => it.ContainsPoint(graph_point));
-            var subTooltips = element?.GetToolTips(graph_point) ?? null;
-            var myTooltips = GetMyToolTips(graph_point, subTooltips == null || subTooltips.Count == 0);
+        public override List<TooltipInfo> GetToolTips(Point graphPoint) {
+            var element = SubElements.FirstOrDefault(it => it.ContainsPoint(graphPoint));
+            var subTooltips = element?.GetToolTips(graphPoint) ?? null;
+            var myTooltips = GetMyToolTips(graphPoint, subTooltips == null || subTooltips.Count == 0);
 
             if (subTooltips != null)
                 myTooltips.AddRange(subTooltips);
@@ -242,33 +242,33 @@ namespace Foreman {
             return myTooltips;
         }
 
-        protected abstract List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive); //exclusive = true means no other tooltips are shown
+        protected abstract List<TooltipInfo> GetMyToolTips(Point graphPoint, bool exclusive); //exclusive = true means no other tooltips are shown
 
         protected static List<TooltipInfo> ExclusiveHelpTooltip(string text, bool exclusive) =>
             exclusive ? [new TooltipInfo { Text = text, Direction = Direction.None, ScreenLocation = new Point(10, 10) }] : [];
 
-        public override void MouseDown(Point graph_point, MouseButtons button) {
-            MouseDownLocation = graph_point;
+        public override void MouseDown(Point graphPoint, MouseButtons button) {
+            MouseDownLocation = graphPoint;
             MouseDownNodeLocation = new Point(X, Y);
 
             if (button == MouseButtons.Left)
                 graphViewer.MouseDownElement = this;
         }
 
-        public override void MouseUp(Point graph_point, MouseButtons button, bool wasDragged) {
+        public override void MouseUp(Point graphPoint, MouseButtons button, bool wasDragged) {
             DragStarted = false;
-            var subelement = SubElements.OfType<ItemTabElement>().FirstOrDefault(it => it.ContainsPoint(graph_point));
+            var subelement = SubElements.OfType<ItemTabElement>().FirstOrDefault(it => it.ContainsPoint(graphPoint));
             if (!wasDragged) {
                 if (subelement is not null)
-                    subelement.MouseUp(graph_point, button, false);
-                else if (errorNotice.ContainsPoint(graph_point))
-                    errorNotice.MouseUp(graph_point, button, false);
+                    subelement.MouseUp(graphPoint, button, false);
+                else if (errorNotice.ContainsPoint(graphPoint))
+                    errorNotice.MouseUp(graphPoint, button, false);
                 else
-                    MouseUpAction(graph_point, button);
+                    MouseUpAction(graphPoint, button);
             }
         }
 
-        protected virtual void MouseUpAction(Point graph_point, MouseButtons button) {
+        protected virtual void MouseUpAction(Point graphPoint, MouseButtons button) {
             if (button == MouseButtons.Left) {
                 graphViewer.EditNode(this);
             } else if (button == MouseButtons.Right) {
@@ -310,10 +310,10 @@ namespace Foreman {
                         })));
                 }
 
-                HashSet<ItemQualityPair> openInputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
-                HashSet<ItemQualityPair> openOutputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
-                HashSet<ItemQualityPair> availableInputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Select(t => t.Item)));
-                HashSet<ItemQualityPair> availableOutputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Select(t => t.Item)));
+                var openInputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
+                var openOutputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
+                var availableInputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Select(t => t.Item)));
+                var availableOutputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Select(t => t.Item)));
                 bool matchedIO = openInputs.Intersect(availableOutputs).Any();
                 bool matchedOI = openOutputs.Intersect(availableInputs).Any();
                 if (matchedIO || matchedOI) {
@@ -324,15 +324,15 @@ namespace Foreman {
                             new EventHandler((o, e) => {
                                 RightClickMenu.Close();
 
-                                Dictionary<NodeId, List<ItemQualityPair>> openInputNodes = new Dictionary<NodeId, List<ItemQualityPair>>();
+                                var openInputNodes = new Dictionary<NodeId, List<ItemQualityPair>>();
                                 foreach (BaseNodeElement node in graphViewer.SelectedNodes.Where(n => n.InputTabs.Any(t => !t.Links.Any())))
-                                    openInputNodes.Add(node.ViewModel.Id, node.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item).ToList());
+                                    openInputNodes.Add(node.ViewModel.Id, [.. node.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)]);
 
-                                Dictionary<ItemQualityPair, List<NodeId>> availableOutputNodes = new Dictionary<ItemQualityPair, List<NodeId>>();
+                                var availableOutputNodes = new Dictionary<ItemQualityPair, List<NodeId>>();
                                 foreach (BaseNodeElement element in graphViewer.SelectedNodes.Where(n => !openInputNodes.ContainsKey(n.ViewModel.Id))) {
                                     foreach (ItemQualityPair output in element.ViewModel.Outputs) {
                                         if (!availableOutputNodes.ContainsKey(output))
-                                            availableOutputNodes.Add(output, new List<NodeId>());
+                                            availableOutputNodes.Add(output, []);
                                         availableOutputNodes[output].Add(element.ViewModel.Id);
                                     }
                                 }
@@ -345,9 +345,9 @@ namespace Foreman {
                                             continue;
                                         NodeId supplierId = suppliers
                                             .OrderBy(id => {
-                                                if (!graphViewer.Session.View.TryGetNode(id, out INodeViewModel? supplierVm) || supplierVm is null)
-                                                    return int.MaxValue;
-                                                return Math.Abs(consumerVm.Location.X - supplierVm.Location.X) + Math.Abs(consumerVm.Location.Y - supplierVm.Location.Y);
+                                                return !graphViewer.Session.View.TryGetNode(id, out INodeViewModel? supplierVm) || supplierVm is null
+                                                    ? int.MaxValue
+                                                    : Math.Abs(consumerVm.Location.X - supplierVm.Location.X) + Math.Abs(consumerVm.Location.Y - supplierVm.Location.Y);
                                             })
                                             .First();
                                         if (supplierId.IsValid)
@@ -363,15 +363,15 @@ namespace Foreman {
                             new EventHandler((o, e) => {
                                 RightClickMenu.Close();
 
-                                Dictionary<NodeId, List<ItemQualityPair>> openOutputNodes = new Dictionary<NodeId, List<ItemQualityPair>>();
+                                var openOutputNodes = new Dictionary<NodeId, List<ItemQualityPair>>();
                                 foreach (BaseNodeElement node in graphViewer.SelectedNodes.Where(n => n.OutputTabs.Any(t => !t.Links.Any())))
-                                    openOutputNodes.Add(node.ViewModel.Id, node.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item).ToList());
+                                    openOutputNodes.Add(node.ViewModel.Id, [.. node.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)]);
 
-                                Dictionary<ItemQualityPair, List<NodeId>> availableInputNodes = new Dictionary<ItemQualityPair, List<NodeId>>();
+                                var availableInputNodes = new Dictionary<ItemQualityPair, List<NodeId>>();
                                 foreach (BaseNodeElement element in graphViewer.SelectedNodes.Where(n => !openOutputNodes.ContainsKey(n.ViewModel.Id))) {
                                     foreach (ItemQualityPair input in element.ViewModel.Inputs) {
                                         if (!availableInputNodes.ContainsKey(input))
-                                            availableInputNodes.Add(input, new List<NodeId>());
+                                            availableInputNodes.Add(input, []);
                                         availableInputNodes[input].Add(element.ViewModel.Id);
                                     }
                                 }
@@ -384,9 +384,9 @@ namespace Foreman {
                                             continue;
                                         NodeId consumerId = consumers
                                             .OrderBy(id => {
-                                                if (!graphViewer.Session.View.TryGetNode(id, out INodeViewModel? consumerVm) || consumerVm is null)
-                                                    return int.MaxValue;
-                                                return Math.Abs(supplierVm.Location.X - consumerVm.Location.X) + Math.Abs(supplierVm.Location.Y - consumerVm.Location.Y);
+                                                return !graphViewer.Session.View.TryGetNode(id, out INodeViewModel? consumerVm) || consumerVm is null
+                                                    ? int.MaxValue
+                                                    : Math.Abs(supplierVm.Location.X - consumerVm.Location.X) + Math.Abs(supplierVm.Location.Y - consumerVm.Location.Y);
                                             })
                                             .First();
                                         if (consumerId.IsValid)
@@ -436,13 +436,13 @@ namespace Foreman {
                 }
 
 
-                RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graph_point));
+                RightClickMenu.Show(graphViewer, graphViewer.GraphToScreen(graphPoint));
             }
         }
 
         protected virtual void AddRClickMenuOptions(bool nodeInSelection) { }
 
-        public override void Dragged(Point graph_point) {
+        public override void Dragged(Point graphPoint) {
             if (!DragStarted) {
                 ItemTabElement? draggedTab = null;
                 foreach (ItemTabElement tab in SubElements.OfType<ItemTabElement>())
@@ -455,10 +455,10 @@ namespace Foreman {
                 }
             } else //drag started -> proceed with dragging the node around
               {
-                Size offset = (Size)Point.Subtract(graph_point, (Size)MouseDownLocation);
+                var offset = (Size)Point.Subtract(graphPoint, (Size)MouseDownLocation);
                 Point newLocation = graphViewer.Grid.AlignToGrid(Point.Add(MouseDownNodeLocation, offset));
                 if (graphViewer.Grid.LockDragToAxis) {
-                    Point lockedDragOffset = Point.Subtract(graph_point, (Size)graphViewer.Grid.DragOrigin);
+                    var lockedDragOffset = Point.Subtract(graphPoint, (Size)graphViewer.Grid.DragOrigin);
 
                     if (Math.Abs(lockedDragOffset.X) > Math.Abs(lockedDragOffset.Y))
                         newLocation.Y = graphViewer.Grid.DragOrigin.Y;

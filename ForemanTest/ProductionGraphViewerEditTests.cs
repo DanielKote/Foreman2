@@ -1,5 +1,10 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
 using Foreman.Graph;
+using Foreman.Models;
+using Foreman.ProductionGraphView;
+using Foreman.ProductionGraphView.Elements;
+using Foreman.Serialization;
 using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,7 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
-using static Foreman.EditPanelViewportLayout;
+using static Foreman.ProductionGraphView.EditPanelViewportLayout;
 
 namespace ForemanTest {
     [TestClass]
@@ -76,7 +81,7 @@ namespace ForemanTest {
             using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(80, 250));
             NodeId recipeId = CreateTestRecipeNode(ctx, viewer, new Point(0, 450));
             Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(recipeId, out BaseNodeElement? element));
-            Assert.IsInstanceOfType(element, typeof(RecipeNodeElement));
+            Assert.IsInstanceOfType<RecipeNodeElement>(element);
             Assert.IsNotNull(element);
 
             Point viewBefore = viewer.ViewOffset;
@@ -91,7 +96,7 @@ namespace ForemanTest {
 
         private static void FloatingTooltipControl_UseControlLocation_PreservesPreplacedPanelLocation_Impl() {
             using var viewer = new ProductionGraphViewer { Size = new Size(ViewerWidth, ViewerHeight) };
-            var panel = new Panel { Size = new Size(200, 100), Location = new Point(30, 40) };
+            using var panel = new Panel { Size = new Size(200, 100), Location = new Point(30, 40) };
             Point expected = panel.Location;
             var tooltip = new FloatingTooltipControl(panel, Direction.Right, new Point(0, 0), viewer, showOverride: true, useControlLocation: true);
             try {
@@ -106,8 +111,8 @@ namespace ForemanTest {
             var ctx = GraphSessionTestHelper.CreateContext();
             TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
             using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
-            ItemQualityPair disconnectedRecipeAnchor = new ItemQualityPair("adding disconnected recipe");
-            Assert.IsFalse(disconnectedRecipeAnchor, "Add Recipe uses an empty item-quality sentinel.");
+            var disconnectedRecipeAnchor = new ItemQualityPair(/*"adding disconnected recipe"*/);
+            Assert.IsFalse(disconnectedRecipeAnchor, "Add IRecipe uses an empty item-quality sentinel.");
 
             try {
                 viewer.AddNewNode(new Point(10, 10), disconnectedRecipeAnchor, new Point(200, 150), NewNodeType.Disconnected);
@@ -118,14 +123,14 @@ namespace ForemanTest {
                 Assert.IsTrue(chooser.Visible && !chooser.IsDisposed,
                     "Recipe chooser should stay open after focusing the filter box.");
 
-                Recipe recipe = CreateTestRecipeDefinition(ctx);
+                RecipePrototype recipe = CreateTestRecipeDefinition(ctx);
                 int nodesBefore = viewer.Session.View.Nodes.Count;
 
                 SelectRecipeInChooser(chooser, recipe);
 
-                Assert.AreEqual(nodesBefore + 1, viewer.Session.View.Nodes.Count,
+                Assert.HasCount(nodesBefore + 1, viewer.Session.View.Nodes,
                     "Selecting a recipe from the disconnected chooser should add a recipe node.");
-                Assert.IsTrue(viewer.Session.View.Nodes.OfType<IRecipeNodeViewModel>().Any(),
+                Assert.IsNotEmpty(viewer.Session.View.Nodes.OfType<IRecipeNodeViewModel>(),
                     "The new node should be a recipe view model.");
             } finally {
                 viewer.ToolTipRenderer.ClearFloatingControls();
@@ -138,7 +143,7 @@ namespace ForemanTest {
             viewer.Size = new Size(900, 320);
             NodeId recipeId = CreateTestRecipeNode(ctx, viewer, new Point(0, 200));
             Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(recipeId, out BaseNodeElement? element));
-            Assert.IsInstanceOfType(element, typeof(RecipeNodeElement));
+            Assert.IsInstanceOfType<RecipeNodeElement>(element);
 
             try {
                 viewer.EditRecipeNode((RecipeNodeElement)element);
@@ -146,7 +151,7 @@ namespace ForemanTest {
                 Assert.IsNotNull(editPanel);
 
                 int maxHeight = viewer.ClientSize.Height - EditPanelScreenLayout.DefaultMargin * 2;
-                Assert.IsTrue(editPanel.Height <= maxHeight,
+                Assert.IsLessThanOrEqualTo(maxHeight, editPanel.Height,
                     $"Edit panel height {editPanel.Height} should not exceed viewer chrome ({maxHeight}px).");
 
                 Panel? scrollHost = editPanel.Controls.Find(ScrollHostName, false).OfType<Panel>().FirstOrDefault();
@@ -154,11 +159,11 @@ namespace ForemanTest {
                 Assert.IsTrue(scrollHost.AutoScroll);
 
                 Control content = scrollHost.Controls[0];
-                Assert.IsTrue(content.Height > scrollHost.ClientSize.Height,
+                Assert.IsGreaterThan(scrollHost.ClientSize.Height, content.Height,
                     "Recipe editor content should remain full height inside the capped viewport.");
                 Assert.IsTrue(scrollHost.VerticalScroll.Visible,
                     "A vertical scrollbar should appear when recipe editor content exceeds the viewer height.");
-                Assert.IsTrue(content.Width <= scrollHost.ClientSize.Width,
+                Assert.IsLessThanOrEqualTo(scrollHost.ClientSize.Width, content.Width,
                     "Recipe editor content should fit the viewport width beside the vertical scrollbar.");
             } finally {
                 viewer.ToolTipRenderer.ClearFloatingControls();
@@ -171,7 +176,7 @@ namespace ForemanTest {
             viewer.Size = new Size(900, 320);
             NodeId recipeId = CreateTestRecipeNode(ctx, viewer, new Point(0, 200));
             Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(recipeId, out BaseNodeElement? element));
-            Assert.IsInstanceOfType(element, typeof(RecipeNodeElement));
+            Assert.IsInstanceOfType<RecipeNodeElement>(element);
 
             try {
                 viewer.EditRecipeNode((RecipeNodeElement)element);
@@ -201,7 +206,7 @@ namespace ForemanTest {
                 Assert.IsNotNull(editPanel);
 
                 int maxHeight = viewer.ClientSize.Height - EditPanelScreenLayout.DefaultMargin * 2;
-                Assert.IsTrue(editPanel.Height <= maxHeight,
+                Assert.IsLessThanOrEqualTo(maxHeight, editPanel.Height,
                     $"Flow edit panel height {editPanel.Height} should fit inside the graph viewer.");
                 Assert.IsNotNull(editPanel.Controls.Find(ScrollHostName, false).FirstOrDefault());
             } finally {
@@ -237,29 +242,29 @@ namespace ForemanTest {
             MethodInfo? viewerMouseDown = typeof(ProductionGraphViewer).GetMethod(
                 "ProductionGraphViewer_MouseDown", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.IsNotNull(viewerMouseDown);
-            viewerMouseDown.Invoke(viewer, new object[] { viewer, new MouseEventArgs(MouseButtons.Left, 1, 500, 500, 0) });
+            viewerMouseDown.Invoke(viewer, [viewer, new MouseEventArgs(MouseButtons.Left, 1, 500, 500, 0)]);
             Assert.IsTrue(chooser.IsDisposed, "Clicking empty graph space should close the item chooser.");
 
             viewer.AddItem(new Point(10, 10), new Point(200, 150));
             chooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
             Assert.IsNotNull(chooser);
 
-            Item item = ctx.Item("iron").Item!;
-            var button = new Button { Tag = item };
-            var mouseUp = typeof(ItemChooserPanel).GetMethod("IRButton_MouseUp", BindingFlags.Instance | BindingFlags.NonPublic);
+            IItem item = ctx.Item("iron").Item!;
+            using var button = new Button { Tag = item };
+            var mouseUp = typeof(ItemChooserPanel).GetMethod("IRButtonMouseUp", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.IsNotNull(mouseUp);
-            mouseUp.Invoke(chooser, new object[] { button, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0) });
+            mouseUp.Invoke(chooser, [button, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0)]);
             Assert.IsTrue(chooser.IsDisposed, "Selecting an item should close the chooser without throwing.");
         }
 
-        private static void SelectRecipeInChooser(RecipeChooserPanel chooser, Recipe recipe) {
-            MethodInfo? mouseUp = typeof(RecipeChooserPanel).GetMethod("IRButton_MouseUp", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.IsNotNull(mouseUp, "RecipeChooserPanel.IRButton_MouseUp should exist.");
-            var recipeButton = new Button { Tag = recipe };
-            mouseUp.Invoke(chooser, new object[] { recipeButton, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0) });
+        private static void SelectRecipeInChooser(RecipeChooserPanel chooser, RecipePrototype recipe) {
+            MethodInfo? mouseUp = typeof(RecipeChooserPanel).GetMethod("IRButtonMouseUp", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(mouseUp, "RecipeChooserPanel.IRButtonMouseUp should exist.");
+            using var recipeButton = new Button { Tag = recipe };
+            mouseUp.Invoke(chooser, [recipeButton, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0)]);
         }
 
-        private static Recipe CreateTestRecipeDefinition(GraphSessionTestHelper.TestContext ctx) {
+        private static RecipePrototype CreateTestRecipeDefinition(GraphSessionTestHelper.TestContext ctx) {
             var recipe = new RecipePrototype(ctx.Cache, "test-disconnected-recipe", "Test Recipe", ctx.Subgroup, "z");
             TestPrototypeFactory.SetRecipeTime(recipe, 1);
             TestPrototypeFactory.LinkRecipeAndAssembler(recipe, TestPrototypeFactory.CreateTestAssembler(ctx.Cache));
@@ -289,7 +294,7 @@ namespace ForemanTest {
         }
 
         private static NodeId CreateTestRecipeNode(GraphSessionTestHelper.TestContext ctx, ProductionGraphViewer viewer, Point location) {
-            Recipe recipe = CreateTestRecipeDefinition(ctx);
+            RecipePrototype recipe = CreateTestRecipeDefinition(ctx);
             return viewer.Session.Editor.CreateRecipeNode(new RecipeQualityPair(recipe, ctx.Quality), location);
         }
 
@@ -302,11 +307,11 @@ namespace ForemanTest {
                 "Test requires a visible vertical scrollbar.");
 
             int scrollBarWidth = SystemInformation.VerticalScrollBarWidth;
-            Assert.IsTrue(editPanel.Width >= naturalContentWidth + scrollBarWidth,
+            Assert.IsGreaterThanOrEqualTo(naturalContentWidth + scrollBarWidth, editPanel.Width,
                 $"Edit panel width {editPanel.Width} should reserve {scrollBarWidth}px beside natural content width {naturalContentWidth}px.");
-            Assert.IsTrue(content.Width >= naturalContentWidth - 2,
+            Assert.IsGreaterThanOrEqualTo(naturalContentWidth - 2, content.Width,
                 $"Content width {content.Width} should not be squeezed below natural width {naturalContentWidth}px.");
-            Assert.IsTrue(content.Width <= scrollHost.ClientSize.Width,
+            Assert.IsLessThanOrEqualTo(scrollHost.ClientSize.Width, content.Width,
                 "Content should fit inside the scroll viewport client area.");
         }
 

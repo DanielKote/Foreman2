@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.Serialization;
 
-namespace Foreman {
+namespace Foreman.Models.Nodes {
     public class PassthroughNode : BaseNode {
         public enum Errors {
             Clean = 0b_0000_0000_0000,
@@ -15,13 +14,11 @@ namespace Foreman {
         private readonly BaseNodeController controller;
         public override BaseNodeController Controller { get { return controller; } }
 
-        public readonly ItemQualityPair PassthroughItem;
-
+        public ItemQualityPair PassthroughItem { get; }
         public override IEnumerable<ItemQualityPair> Inputs { get { yield return PassthroughItem; } }
         public override IEnumerable<ItemQualityPair> Outputs { get { yield return PassthroughItem; } }
 
-        public bool SimpleDraw;
-
+        public bool SimpleDraw { get; set; }
         public PassthroughNode(ProductionGraph graph, int nodeID, ItemQualityPair item) : base(graph, nodeID) {
             PassthroughItem = item;
             SimpleDraw = true;
@@ -34,12 +31,7 @@ namespace Foreman {
             if (!AllLinksValid)
                 ErrorSet |= Errors.InvalidLinks;
 
-            if (ErrorSet != Errors.Clean)
-                return NodeState.Error;
-
-            if (AllLinksConnected)
-                return NodeState.Clean;
-            return NodeState.MissingLink;
+            return ErrorSet != Errors.Clean ? NodeState.Error : AllLinksConnected ? NodeState.Clean : NodeState.MissingLink;
         }
 
         public override double GetConsumeRate(ItemQualityPair item) { return ActualRate; }
@@ -56,7 +48,7 @@ namespace Foreman {
             return [];
         }
 
-        public override string ToString() => string.Format("Passthrough node for: {0} ({1})", PassthroughItem.Item?.Name, PassthroughItem.Quality?.Name);
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "Passthrough node for: {0} ({1})", PassthroughItem.Item?.Name, PassthroughItem.Quality?.Name);
     }
 
     public class PassthroughNodeController : BaseNodeController {

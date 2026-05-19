@@ -1,22 +1,28 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.ProductionGraphView;
+using Foreman.Serialization;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 using static Foreman.NativeMethods;
 
 namespace Foreman {
     public partial class MainForm : Form {
         internal const string DefaultPreset = "Factorio 2.0 Vanilla";
-        internal string DefaultAppName;
-        private string? savefilePath = null;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        internal string DefaultAppName { get; set; }
+        private string? savefilePath;
         /// <summary>JSON snapshot after last successful load/save; used for dirty detection (round-trip serialize ≠ on-disk text).</summary>
-        private string? savefileBaselineJson = null;
+        private string? savefileBaselineJson;
 
         public MainForm() {
             InitializeComponent();
@@ -30,13 +36,13 @@ namespace Foreman {
 
         public void SetDarkMode() {
             int trueVal = 1;
-            DwmSetWindowAttribute(this.Handle, DwmWindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, ref trueVal, Marshal.SizeOf(typeof(int)));
+            _ = DwmSetWindowAttribute(this.Handle, DwmWindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, ref trueVal, Marshal.SizeOf<int>());
             ChangeTheme(Color.FromArgb(23, 23, 23), Color.FromArgb(124, 124, 124), this);
         }
 
         public void SetLightMode() {
             int falseVal = 0;
-            DwmSetWindowAttribute(this.Handle, DwmWindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, ref falseVal, Marshal.SizeOf(typeof(int)));
+            _ = DwmSetWindowAttribute(this.Handle, DwmWindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, ref falseVal, Marshal.SizeOf<int>());
             ChangeTheme(DefaultBackColor, DefaultForeColor, this);
         }
 
@@ -54,7 +60,7 @@ namespace Foreman {
                 if (component is Button b) {
                     b.UseVisualStyleBackColor = true;
                     b.FlatStyle = FlatStyle.Flat;
-                } else if (component is ProductionGraphViewer pgv) {
+                } else if (component is ProductionGraphViewer) {
                     GridManager.SetGridColors(bg, fg);
                 }
             }
@@ -157,7 +163,7 @@ namespace Foreman {
         }
 
         private void SaveGraphAs() {
-            SaveFileDialog dialog = new SaveFileDialog();
+            using SaveFileDialog dialog = new();
             dialog.DefaultExt = ".fjson";
             dialog.Filter = "Foreman files (*.fjson)|*.fjson|All files|*.*";
             if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
@@ -179,11 +185,11 @@ namespace Foreman {
                 Utf8File.WriteAllText(path, json);
                 savefilePath = path;
                 savefileBaselineJson = json;
-                this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+                this.Text = string.Format(DisplayCulture.Format, DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
                 return true;
             } catch (Exception exception) {
                 UserMessages.Show("Could not save this file. See log for more details");
-                ErrorLogging.LogException(exception, string.Format("Error saving file '{0}'", path));
+                ErrorLogging.LogException(exception, string.Format(CultureInfo.InvariantCulture, "Error saving file '{0}'", path));
                 return false;
             } finally {
             }
@@ -193,7 +199,7 @@ namespace Foreman {
             if (!TestGraphSavedStatus())
                 return;
 
-            OpenFileDialog dialog = new OpenFileDialog();
+            using var dialog = new OpenFileDialog();
             dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
             if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
                 Directory.CreateDirectory(Path.Combine(Application.StartupPath, "Saved Graphs"));
@@ -207,14 +213,20 @@ namespace Foreman {
 
         private async void LoadGraph(string path) {
             try {
-                await GraphViewer.LoadFromJson(Utf8File.ReadAllText(path), false, true);
-                savefilePath = path;
-                CaptureSaveBaseline();
+                await GraphViewer.LoadFromJson(Utf8File.ReadAllText(path), false, true).ConfigureAwait(false);
+                await this.InvokeOnUiThreadAsync(() => ApplyLoadedGraphUiState(path)).ConfigureAwait(false);
             } catch (Exception exception) {
-                UserMessages.Show(
-                    "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here.");
-                ErrorLogging.LogException(exception, string.Format("Error loading file '{0}'", path));
+                await this.InvokeOnUiThreadAsync(() => {
+                    UserMessages.Show(
+                        "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here.");
+                    ErrorLogging.LogException(exception, string.Format(CultureInfo.InvariantCulture, "Error loading file '{0}'", path));
+                }).ConfigureAwait(false);
             }
+        }
+
+        private void ApplyLoadedGraphUiState(string path) {
+            savefilePath = path;
+            CaptureSaveBaseline();
 
             RateOptionsDropDown.SelectedIndex = (int)GraphViewer.Graph.SelectedRateUnit;
             Properties.Settings.Default.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
@@ -225,7 +237,7 @@ namespace Foreman {
 
             Properties.Settings.Default.Save();
             GraphViewer.Invalidate();
-            this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+            Text = string.Format(DisplayCulture.Format, DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
         }
 
         private void NewGraph() {
@@ -248,7 +260,7 @@ namespace Foreman {
             }
 
             Properties.Settings.Default.Save();
-            this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+            this.Text = string.Format(DisplayCulture.Format, DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
         }
 
         private void CaptureSaveBaseline() {
@@ -257,7 +269,7 @@ namespace Foreman {
         }
 
         private void ImportGraph() {
-            OpenFileDialog dialog = new OpenFileDialog();
+            using var dialog = new OpenFileDialog();
             dialog.Filter = "Foreman files (*.fjson)|*.fjson|Old Foreman files (*.json)|*.json";
             if (!Directory.Exists(Path.Combine(Application.StartupPath, "Saved Graphs")))
                 Directory.CreateDirectory(Path.Combine(Application.StartupPath, "Saved Graphs"));
@@ -271,9 +283,7 @@ namespace Foreman {
 
         private void ImportGraph(string path) {
             try {
-                ProductionGraphSaveDocument? graphDocument = GraphSaveCodec.ReadGraphPayload(Utf8File.ReadAllText(path));
-                if (graphDocument is null)
-                    throw new Exception(
+                ProductionGraphSaveDocument? graphDocument = GraphSaveCodec.ReadGraphPayload(Utf8File.ReadAllText(path)) ?? throw new InvalidOperationException(
                     "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here.");
                 GraphViewer.ImportNodesFromDocument(
                     graphDocument,
@@ -281,7 +291,7 @@ namespace Foreman {
                     applySolverSettings: true);
             } catch (Exception exception) {
                 UserMessages.Show("Could not import this file. See log for more details.");
-                ErrorLogging.LogException(exception, string.Format("Error importing from file '{0}'", path));
+                ErrorLogging.LogException(exception, string.Format(CultureInfo.InvariantCulture, "Error importing from file '{0}'", path));
             }
         }
 
@@ -289,10 +299,7 @@ namespace Foreman {
             const string exitMsg = "The current graph hasn't been saved!\nIf you continue, you will lose it forever!";
             const string exitTitle = "Are you sure?";
             if (savefilePath == null) {
-                if (GraphViewer.Graph.Nodes.Any())
-                    return UserMessages.Show(exitMsg, exitTitle, MessageBoxButtons.OKCancel) == DialogResult.OK;
-                else
-                    return true;
+                return !GraphViewer.Graph.Nodes.Any() || UserMessages.Show(exitMsg, exitTitle, MessageBoxButtons.OKCancel) == DialogResult.OK;
             }
 
             if (!File.Exists(savefilePath))
@@ -316,8 +323,8 @@ namespace Foreman {
         //---------------------------------------------------------Settings/export/additem/addrecipe
 
         public static List<Preset>? GetValidPresetsList() {
-            List<Preset> presets = new List<Preset>();
-            List<string> existingPresetFiles = new List<string>();
+            var presets = new List<Preset>();
+            var existingPresetFiles = new List<string>();
             foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.pjson"))
                 if (File.Exists(Path.ChangeExtension(presetFile, "dat")))
                     existingPresetFiles.Add(Path.GetFileNameWithoutExtension(presetFile));
@@ -351,9 +358,9 @@ namespace Foreman {
                 return;
             }
 
-            SettingsForm.SettingsFormOptions options = new SettingsForm.SettingsFormOptions(cache);
-
-            options.Presets = GetValidPresetsList();
+            var options = new SettingsForm.SettingsFormOptions(cache) {
+                Presets = GetValidPresetsList()
+            };
             options.SelectedPreset = options.Presets?[0] ?? options.SelectedPreset;
 
             options.QualitySteps = GraphViewer.Graph.MaxQualitySteps;
@@ -385,12 +392,12 @@ namespace Foreman {
             options.AbbreviateSciPacks = Properties.Settings.Default.AbbreviateSciPacks;
 
             options.EnableExtraProductivityForNonMiners = GraphViewer.Graph.EnableExtraProductivityForNonMiners;
-            options.DEV_ShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
-            options.DEV_UseRecipeBWFilters = Properties.Settings.Default.UseRecipeBWfilters;
+            options.DevShowUnavailableItems = Properties.Settings.Default.ShowUnavailable;
+            options.DevUseRecipeBWFilters = Properties.Settings.Default.UseRecipeBWfilters;
 
-            options.Solver_LowPriorityPower = GraphViewer.Graph.LowPriorityPower;
-            options.Solver_PullConsumerNodes = GraphViewer.Graph.PullOutputNodes;
-            options.Solver_PullConsumerNodesPower = GraphViewer.Graph.PullOutputNodesPower;
+            options.SolverLowPriorityPower = GraphViewer.Graph.LowPriorityPower;
+            options.SolverPullConsumerNodes = GraphViewer.Graph.PullOutputNodes;
+            options.SolverPullConsumerNodesPower = GraphViewer.Graph.PullOutputNodesPower;
 
             options.EnabledObjects.UnionWith(cache.Recipes.Values.Where(r => r.Enabled));
             options.EnabledObjects.UnionWith(cache.Assemblers.Values.Where(r => r.Enabled));
@@ -398,101 +405,109 @@ namespace Foreman {
             options.EnabledObjects.UnionWith(cache.Modules.Values.Where(r => r.Enabled));
             options.EnabledObjects.UnionWith(cache.Qualities.Values.Where(r => r.Enabled));
 
-            using (SettingsForm form = new SettingsForm(options, this)) {
-                form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 50;
-                form.Top = this.Top + 50;
-                if (form.ShowDialog() == DialogResult.OK) {
-                    if (options.SelectedPreset != options.Presets?[0] || options.DEV_UseRecipeBWFilters != Properties.Settings.Default.UseRecipeBWfilters || options.RequireReload) //different preset or recipeBWFilter change -> need to reload datacache
-                    {
-                        Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset?.Name;
-                        Properties.Settings.Default.UseRecipeBWfilters = options.DEV_UseRecipeBWFilters;
+            using var form = new SettingsForm(options, this);
+            form.StartPosition = FormStartPosition.Manual;
+            form.Left = this.Left + 50;
+            form.Top = this.Top + 50;
+            if (form.ShowDialog() == DialogResult.OK) {
+                bool presetReloaded = options.SelectedPreset != options.Presets?[0] ||
+                    options.DevUseRecipeBWFilters != Properties.Settings.Default.UseRecipeBWfilters ||
+                    options.RequireReload;
+                if (presetReloaded) //different preset or recipeBWFilter change -> need to reload datacache
+                {
+                    Properties.Settings.Default.CurrentPresetName = form.Options.SelectedPreset?.Name;
+                    Properties.Settings.Default.UseRecipeBWfilters = options.DevUseRecipeBWFilters;
 
-                        await GraphViewer.ReloadGraphForCurrentPreset();
-                        this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
-                    } else //not loading a new preset -> update the enabled statuses
-                      {
-                        foreach (Recipe recipe in cache.Recipes.Values)
-                            recipe.Enabled = options.EnabledObjects.Contains(recipe);
-                        foreach (Assembler assembler in cache.Assemblers.Values)
-                            assembler.Enabled = options.EnabledObjects.Contains(assembler);
-                        foreach (Beacon beacon in cache.Beacons.Values)
-                            beacon.Enabled = options.EnabledObjects.Contains(beacon);
-                        foreach (Module module in cache.Modules.Values)
-                            module.Enabled = options.EnabledObjects.Contains(module);
-                        foreach (Quality quality in cache.Qualities.Values)
-                            quality.Enabled = options.EnabledObjects.Contains(quality);
-                        cache.DefaultQuality?.Enabled = true;
-                        cache.RocketAssembler?.Enabled = cache.Assemblers["rocket-silo"]?.Enabled ?? false;
-                    }
-
-                    GraphViewer.Graph.MaxQualitySteps = options.QualitySteps;
-
-                    GraphViewer.LevelOfDetail = options.LevelOfDetail;
-                    Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
-                    GraphViewer.NodeCountForSimpleView = options.NodeCountForSimpleView;
-                    Properties.Settings.Default.NodeCountForSimpleView = options.NodeCountForSimpleView;
-                    GraphViewer.IconsSize = options.IconsOnlyIconSize;
-                    Properties.Settings.Default.IconsSize = options.IconsOnlyIconSize;
-
-                    GraphViewer.ArrowsOnLinks = options.ArrowsOnLinks;
-                    Properties.Settings.Default.ArrowsOnLinks = options.ArrowsOnLinks;
-                    GraphViewer.Graph.DefaultToSimplePassthroughNodes = options.SimplePassthroughNodes;
-                    Properties.Settings.Default.SimplePassthroughNodes = options.SimplePassthroughNodes;
-                    GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
-                    Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
-                    GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;
-                    Properties.Settings.Default.ShowRecipeToolTip = options.ShowRecipeToolTip;
-                    GraphViewer.LockedRecipeEditPanelPosition = options.LockedRecipeEditPanelPosition;
-                    Properties.Settings.Default.LockedRecipeEditorPosition = options.LockedRecipeEditPanelPosition;
-                    GraphViewer.FlagOUSuppliedNodes = options.FlagOUSuppliedNodes;
-                    Properties.Settings.Default.FlagOUSuppliedNodes = options.FlagOUSuppliedNodes;
-
-                    Properties.Settings.Default.FlagDarkMode = options.FlagDarkMode;
-
-                    GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = options.DefaultAssemblerStyle;
-                    Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
-                    GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
-                    Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
-                    GraphViewer.Graph.DefaultNodeDirection = options.DefaultNodeDirection;
-                    Properties.Settings.Default.DefaultNodeDirection = (int)options.DefaultNodeDirection;
-                    GraphViewer.SmartNodeDirection = options.SmartNodeDirection;
-                    Properties.Settings.Default.SmartNodeDirection = options.SmartNodeDirection;
-
-                    GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
-                    Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;
-                    GraphViewer.ArrowRenderer.ShowWarningArrows = options.ShowWarningArrows;
-                    Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
-                    GraphViewer.ArrowRenderer.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
-                    Properties.Settings.Default.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
-                    GraphViewer.ArrowRenderer.ShowOUNodeArrows = options.ShowOUSuppliedArrows;
-                    Properties.Settings.Default.ShowOUSuppliedArrows = options.ShowOUSuppliedArrows;
-
-                    Properties.Settings.Default.RoundAssemblerCount = options.RoundAssemblerCount;
-                    Properties.Settings.Default.AbbreviateSciPacks = options.AbbreviateSciPacks;
-
-                    GraphViewer.Graph.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
-                    Properties.Settings.Default.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
-
-                    GraphViewer.Graph.LowPriorityPower = options.Solver_LowPriorityPower;
-                    GraphViewer.Graph.PullOutputNodesPower = options.Solver_PullConsumerNodesPower;
-                    GraphViewer.Graph.PullOutputNodes = options.Solver_PullConsumerNodes;
-
-                    Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
-                    Properties.Settings.Default.Save();
-
-                    GraphViewer.Graph.UpdateNodeMaxQualities();
-                    GraphViewer.Graph.UpdateNodeStates(true);
-                    GraphViewer.Graph.UpdateNodeValues();
-
-                    if (options.RequireReload)
-                        SettingsButton_Click(this, EventArgs.Empty);
+                    await GraphViewer.ReloadGraphForCurrentPreset().ConfigureAwait(false);
+                } else //not loading a new preset -> update the enabled statuses
+                  {
+                    foreach (IRecipe recipe in cache.Recipes.Values)
+                        recipe.Enabled = options.EnabledObjects.Contains(recipe);
+                    foreach (IAssembler assembler in cache.Assemblers.Values)
+                        assembler.Enabled = options.EnabledObjects.Contains(assembler);
+                    foreach (IBeacon beacon in cache.Beacons.Values)
+                        beacon.Enabled = options.EnabledObjects.Contains(beacon);
+                    foreach (IModule module in cache.Modules.Values)
+                        module.Enabled = options.EnabledObjects.Contains(module);
+                    foreach (IQuality quality in cache.Qualities.Values)
+                        quality.Enabled = options.EnabledObjects.Contains(quality);
+                    cache.DefaultQuality?.Enabled = true;
+                    cache.RocketAssembler?.Enabled = cache.Assemblers["rocket-silo"]?.Enabled ?? false;
                 }
+
+                await this.InvokeOnUiThreadAsync(() => ApplySettingsDialogChanges(options, presetReloaded)).ConfigureAwait(false);
             }
         }
 
+        private void ApplySettingsDialogChanges(SettingsForm.SettingsFormOptions options, bool presetReloaded) {
+            if (presetReloaded)
+                Text = string.Format(DisplayCulture.Format, DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+
+            GraphViewer.Graph.MaxQualitySteps = options.QualitySteps;
+
+            GraphViewer.LevelOfDetail = options.LevelOfDetail;
+            Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;
+            GraphViewer.NodeCountForSimpleView = options.NodeCountForSimpleView;
+            Properties.Settings.Default.NodeCountForSimpleView = options.NodeCountForSimpleView;
+            GraphViewer.IconsSize = options.IconsOnlyIconSize;
+            Properties.Settings.Default.IconsSize = options.IconsOnlyIconSize;
+
+            GraphViewer.ArrowsOnLinks = options.ArrowsOnLinks;
+            Properties.Settings.Default.ArrowsOnLinks = options.ArrowsOnLinks;
+            GraphViewer.Graph.DefaultToSimplePassthroughNodes = options.SimplePassthroughNodes;
+            Properties.Settings.Default.SimplePassthroughNodes = options.SimplePassthroughNodes;
+            GraphViewer.DynamicLinkWidth = options.DynamicLinkWidth;
+            Properties.Settings.Default.DynamicLineWidth = options.DynamicLinkWidth;
+            GraphViewer.ShowRecipeToolTip = options.ShowRecipeToolTip;
+            Properties.Settings.Default.ShowRecipeToolTip = options.ShowRecipeToolTip;
+            GraphViewer.LockedRecipeEditPanelPosition = options.LockedRecipeEditPanelPosition;
+            Properties.Settings.Default.LockedRecipeEditorPosition = options.LockedRecipeEditPanelPosition;
+            GraphViewer.FlagOUSuppliedNodes = options.FlagOUSuppliedNodes;
+            Properties.Settings.Default.FlagOUSuppliedNodes = options.FlagOUSuppliedNodes;
+
+            Properties.Settings.Default.FlagDarkMode = options.FlagDarkMode;
+
+            GraphViewer.Graph.AssemblerSelector.DefaultSelectionStyle = options.DefaultAssemblerStyle;
+            Properties.Settings.Default.DefaultAssemblerOption = (int)options.DefaultAssemblerStyle;
+            GraphViewer.Graph.ModuleSelector.DefaultSelectionStyle = options.DefaultModuleStyle;
+            Properties.Settings.Default.DefaultModuleOption = (int)options.DefaultModuleStyle;
+            GraphViewer.Graph.DefaultNodeDirection = options.DefaultNodeDirection;
+            Properties.Settings.Default.DefaultNodeDirection = (int)options.DefaultNodeDirection;
+            GraphViewer.SmartNodeDirection = options.SmartNodeDirection;
+            Properties.Settings.Default.SmartNodeDirection = options.SmartNodeDirection;
+
+            GraphViewer.ArrowRenderer.ShowErrorArrows = options.ShowErrorArrows;
+            Properties.Settings.Default.ShowErrorArrows = options.ShowErrorArrows;
+            GraphViewer.ArrowRenderer.ShowWarningArrows = options.ShowWarningArrows;
+            Properties.Settings.Default.ShowWarningArrows = options.ShowWarningArrows;
+            GraphViewer.ArrowRenderer.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
+            Properties.Settings.Default.ShowDisconnectedArrows = options.ShowDisconnectedArrows;
+            GraphViewer.ArrowRenderer.ShowOUNodeArrows = options.ShowOUSuppliedArrows;
+            Properties.Settings.Default.ShowOUSuppliedArrows = options.ShowOUSuppliedArrows;
+
+            Properties.Settings.Default.RoundAssemblerCount = options.RoundAssemblerCount;
+            Properties.Settings.Default.AbbreviateSciPacks = options.AbbreviateSciPacks;
+
+            GraphViewer.Graph.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
+            Properties.Settings.Default.EnableExtraProductivityForNonMiners = options.EnableExtraProductivityForNonMiners;
+
+            GraphViewer.Graph.LowPriorityPower = options.SolverLowPriorityPower;
+            GraphViewer.Graph.PullOutputNodesPower = options.SolverPullConsumerNodesPower;
+            GraphViewer.Graph.PullOutputNodes = options.SolverPullConsumerNodes;
+
+            Properties.Settings.Default.ShowUnavailable = options.DevShowUnavailableItems;
+            Properties.Settings.Default.Save();
+
+            GraphViewer.Graph.UpdateNodeMaxQualities();
+            GraphViewer.Graph.UpdateNodeStates(true);
+            GraphViewer.Graph.UpdateNodeValues();
+
+            if (options.RequireReload)
+                SettingsButton_Click(this, EventArgs.Empty);
+        }
+
         private void ExportImageButton_Click(object? sender, EventArgs e) {
-            ImageExportForm form = new ImageExportForm(GraphViewer);
+            using var form = new ImageExportForm(GraphViewer);
             form.StartPosition = FormStartPosition.Manual;
             form.Left = this.Left + 50;
             form.Top = this.Top + 50;
@@ -501,7 +516,7 @@ namespace Foreman {
 
         private void AddRecipeButton_Click(object? sender, EventArgs e) {
             Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-            GraphViewer.AddNewNode(new Point(15, 15), new ItemQualityPair("adding disconnected recipe node"), location, NewNodeType.Disconnected);
+            GraphViewer.AddNewNode(new Point(15, 15), new ItemQualityPair(/*"adding disconnected recipe node"*/), location, NewNodeType.Disconnected);
         }
 
         private void AddItemButton_Click(object? sender, EventArgs e) {
@@ -547,13 +562,11 @@ namespace Foreman {
         }
 
         private void GraphSummaryButton_Click(object? sender, EventArgs e) {
-            using (GraphSummaryForm form = new GraphSummaryForm(GraphViewer.Session, GraphViewer.Graph.GetRateName())) {
-                form.StartPosition = FormStartPosition.Manual;
-                form.Left = this.Left + 50;
-                form.Top = this.Top + 50;
-                form.ShowDialog();
-
-            }
+            using var form = new GraphSummaryForm(GraphViewer.Session, GraphViewer.Graph.GetRateName());
+            form.StartPosition = FormStartPosition.Manual;
+            form.Left = this.Left + 50;
+            form.Top = this.Top + 50;
+            form.ShowDialog();
         }
 
         //---------------------------------------------------------Gridlines
@@ -631,19 +644,19 @@ namespace Foreman {
         }
     }
 
-    public class Preset : IEquatable<Preset> {
-        public string Name { get; set; }
-        public bool IsCurrentlySelected { get; set; }
-        public bool IsDefaultPreset { get; set; }
-
-        public Preset(string name, bool isCurrentlySelected, bool isDefaultPreset) {
-            Name = name;
-            IsCurrentlySelected = isCurrentlySelected;
-            IsDefaultPreset = isDefaultPreset;
-        }
+    public class Preset(string name, bool isCurrentlySelected, bool isDefaultPreset) : IEquatable<Preset> {
+        public string Name { get; set; } = name;
+        public bool IsCurrentlySelected { get; set; } = isCurrentlySelected;
+        public bool IsDefaultPreset { get; set; } = isDefaultPreset;
 
         public bool Equals(Preset? other) {
             return this == other;
         }
+
+        public override bool Equals(object? obj) {
+            return Equals(obj as Preset);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Name);
     }
 }

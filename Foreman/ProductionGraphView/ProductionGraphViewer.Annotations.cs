@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using Foreman.ProductionGraphView.Annotations;
+using Foreman.ProductionGraphView.Elements;
+using Foreman.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -12,8 +16,8 @@ namespace Foreman {
             DashStyle = DashStyle.Dash
         };
 
-        private List<AnnotationElement> annotationElements = [];
-        private HashSet<AnnotationElement> selectedAnnotations = [];
+        private readonly List<AnnotationElement> annotationElements = [];
+        private readonly HashSet<AnnotationElement> selectedAnnotations = [];
         private bool inDrawShapeMode;
 
         public IReadOnlyCollection<AnnotationElement> SelectedAnnotations => selectedAnnotations;
@@ -27,7 +31,7 @@ namespace Foreman {
         }
 
         public IReadOnlyList<AnnotationSaveData> GetAnnotationSaveData() =>
-            annotationElements.Select(a => a.ToSaveData()).ToList();
+            [.. annotationElements.Select(a => a.ToSaveData())];
 
         /// <summary>Graph-space bounds for full-graph image export (nodes/links and annotations).</summary>
         public Rectangle GetExportBounds() =>
@@ -45,8 +49,14 @@ namespace Foreman {
                 dpiScale = DeviceDpi / (float)dpi;
 
             foreach (AnnotationSaveData data in annotations) {
-                if (TryCreateAnnotationFromSave(data, dpiScale, out AnnotationElement? ann))
-                    AddAnnotationElement(ann);
+                AnnotationElement? ann = null;
+                try {
+                    if (TryCreateAnnotationFromSave(data, dpiScale, out ann))
+                        AddAnnotationElement(ann);
+                    ann = null;
+                } finally {
+                    ann?.Dispose();
+                }
             }
         }
 
@@ -97,8 +107,9 @@ namespace Foreman {
         }
 
         public void AddTextAnnotation(Point graphPoint) {
-            var element = new TextAnnotationElement(this, graphPoint);
-            element.IsSelected = true;
+            var element = new TextAnnotationElement(this, graphPoint) {
+                IsSelected = true
+            };
             AddAnnotationElement(element);
 
             using var form = new TextPropertiesForm(element);
@@ -207,8 +218,14 @@ namespace Foreman {
 
             List<AnnotationElement> imported = [];
             foreach (AnnotationSaveData data in annotations) {
-                if (TryCreateAnnotationFromSave(data, dpiScale: 1f, out AnnotationElement? ann))
-                    imported.Add(ann);
+                AnnotationElement? ann = null;
+                try {
+                    if (TryCreateAnnotationFromSave(data, dpiScale: 1f, out ann))
+                        imported.Add(ann);
+                    ann = null;
+                } finally {
+                    ann?.Dispose();
+                }
             }
             if (imported.Count == 0)
                 return;
@@ -230,14 +247,20 @@ namespace Foreman {
 
         private void ImportAnnotationsWithOffset(IReadOnlyList<AnnotationSaveData> annotations, Size offset) {
             foreach (AnnotationSaveData data in annotations) {
-                if (!TryCreateAnnotationFromSave(data, dpiScale: 1f, out AnnotationElement? ann))
-                    continue;
+                AnnotationElement? ann = null;
+                try {
+                    if (!TryCreateAnnotationFromSave(data, dpiScale: 1f, out ann))
+                        continue;
 
-                ann.X += offset.Width;
-                ann.Y += offset.Height;
-                ann.IsSelected = true;
-                AddAnnotationElement(ann);
-                selectedAnnotations.Add(ann);
+                    ann.X += offset.Width;
+                    ann.Y += offset.Height;
+                    ann.IsSelected = true;
+                    AddAnnotationElement(ann);
+                    selectedAnnotations.Add(ann);
+                    ann = null;
+                } finally {
+                    ann?.Dispose();
+                }
             }
         }
 
@@ -288,7 +311,7 @@ namespace Foreman {
             return true;
         }
 
-        private void Annotation_OnMouseUpLeft(Point graph_location, GraphElement? element, bool viewBeingDragged) {
+        private void Annotation_OnMouseUpLeft(GraphElement? element, bool viewBeingDragged) {
             if (currentDragOperation == DragOperation.None && MouseDownElement is AnnotationElement clickedAnnotation) {
                 HandleMouseUpOnTrackedAnnotation(clickedAnnotation, viewBeingDragged);
                 return;
@@ -346,9 +369,7 @@ namespace Foreman {
         }
 
         private DragOperation Annotation_ResolveDragOperation(DragOperation proposed) {
-            if (inDrawShapeMode && proposed == DragOperation.Selection)
-                return DragOperation.DrawShape;
-            return proposed;
+            return inDrawShapeMode && proposed == DragOperation.Selection ? DragOperation.DrawShape : proposed;
         }
 
         private void Annotation_OnItemDrag(Point graph_location) {

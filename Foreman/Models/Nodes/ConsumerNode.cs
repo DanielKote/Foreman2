@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 
-namespace Foreman {
+namespace Foreman.Models.Nodes {
     public class ConsumerNode : BaseNode {
         public enum Errors {
             Clean = 0b_0000_0000_0000,
@@ -25,10 +22,9 @@ namespace Foreman {
         private readonly BaseNodeController controller;
         public override BaseNodeController Controller { get { return controller; } }
 
-        public readonly ItemQualityPair ConsumedItem;
-
+        public ItemQualityPair ConsumedItem { get; }
         public override IEnumerable<ItemQualityPair> Inputs { get { yield return ConsumedItem; } }
-        public override IEnumerable<ItemQualityPair> Outputs { get { return new ItemQualityPair[0]; } }
+        public override IEnumerable<ItemQualityPair> Outputs { get { return []; } }
 
         public ConsumerNode(ProductionGraph graph, int nodeID, ItemQualityPair item) : base(graph, nodeID) {
             ConsumedItem = item;
@@ -51,7 +47,7 @@ namespace Foreman {
         public override List<string> GetErrors() => ItemQualityNodeMessages.GetErrors(ConsumedItem, (int)ErrorSet);
         public override List<string> GetWarnings() => ItemQualityNodeMessages.GetWarnings(ConsumedItem, (int)WarningSet);
 
-        public override string ToString() => string.Format("Consumption node for: {0} ({1})", ConsumedItem.Item?.Name, ConsumedItem.Quality?.Name);
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "Consumption node for: {0} ({1})", ConsumedItem.Item?.Name, ConsumedItem.Quality?.Name);
     }
 
     public class ConsumerNodeController : BaseNodeController {

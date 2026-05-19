@@ -1,52 +1,46 @@
-﻿using Foreman.Graph;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Graph;
+using Foreman.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman {
     public partial class GraphSummaryForm : Form {
-        protected class ItemCounter {
-            public double Input { get; set; }
-            public double InputUnlinked { get; set; }
-            public double Output { get; set; }
-            public double OutputUnlinked { get; set; }
-            public double OutputOverflow { get; set; }
-            public double Production { get; set; }
-            public double Consumption { get; set; }
-
-            public ItemCounter(double i, double iu, double o, double ou, double oo, double p, double c) { Input = i; InputUnlinked = iu; Output = o; OutputUnlinked = ou; OutputOverflow = oo; Production = p; Consumption = c; }
+        protected class ItemCounter(double i, double iu, double o, double ou, double oo, double p, double c) {
+            public double Input { get; set; } = i; public double InputUnlinked { get; set; } = iu; public double Output { get; set; } = o; public double OutputUnlinked { get; set; } = ou; public double OutputOverflow { get; set; } = oo; public double Production { get; set; } = p; public double Consumption { get; set; } = c;
         }
 
 
-        private List<ListViewItem> unfilteredAssemblerList;
-        private List<ListViewItem> unfilteredMinerList;
-        private List<ListViewItem> unfilteredPowerList;
-        private List<ListViewItem> unfilteredBeaconList;
+        private readonly List<ListViewItem> unfilteredAssemblerList;
+        private readonly List<ListViewItem> unfilteredMinerList;
+        private readonly List<ListViewItem> unfilteredPowerList;
+        private readonly List<ListViewItem> unfilteredBeaconList;
 
-        private List<ListViewItem> unfilteredItemsList;
-        private List<ListViewItem> unfilteredFluidsList;
+        private readonly List<ListViewItem> unfilteredItemsList;
+        private readonly List<ListViewItem> unfilteredFluidsList;
 
-        private List<ListViewItem> unfilteredKeyNodesList;
+        private readonly List<ListViewItem> unfilteredKeyNodesList;
 
-        private List<ListViewItem> filteredAssemblerList;
-        private List<ListViewItem> filteredMinerList;
-        private List<ListViewItem> filteredPowerList;
-        private List<ListViewItem> filteredBeaconList;
+        private readonly List<ListViewItem> filteredAssemblerList;
+        private readonly List<ListViewItem> filteredMinerList;
+        private readonly List<ListViewItem> filteredPowerList;
+        private readonly List<ListViewItem> filteredBeaconList;
 
-        private List<ListViewItem> filteredItemsList;
-        private List<ListViewItem> filteredFluidsList;
+        private readonly List<ListViewItem> filteredItemsList;
+        private readonly List<ListViewItem> filteredFluidsList;
 
-        private List<ListViewItem> filteredKeyNodesList;
+        private readonly List<ListViewItem> filteredKeyNodesList;
 
-        private Dictionary<ListView, int> lastSortOrder; //int is +ve if sorted down, -ve if sorted up, |value| is the column # (starts from 1 due to 0 not having a sign) of the sort.
+        private readonly Dictionary<ListView, int> lastSortOrder; //int is +ve if sorted down, -ve if sorted up, |value| is the column # (starts from 1 due to 0 not having a sign) of the sort.
 
         private readonly string rateString;
 
@@ -63,42 +57,43 @@ namespace Foreman {
             MainForm.SetDoubleBuffered(MinerListView);
             MainForm.SetDoubleBuffered(PowerListView);
             MainForm.SetDoubleBuffered(BeaconListView);
-            MainForm.SetDoubleBuffered(ItemsListView);
-            MainForm.SetDoubleBuffered(FluidsListView);
+            MainForm.SetDoubleBuffered(IItemsListView);
+            MainForm.SetDoubleBuffered(IFluidsListView);
             MainForm.SetDoubleBuffered(KeyNodesListView);
 
-            unfilteredAssemblerList = new List<ListViewItem>();
-            unfilteredMinerList = new List<ListViewItem>();
-            unfilteredPowerList = new List<ListViewItem>();
-            unfilteredBeaconList = new List<ListViewItem>();
-            unfilteredItemsList = new List<ListViewItem>();
-            unfilteredFluidsList = new List<ListViewItem>();
-            unfilteredKeyNodesList = new List<ListViewItem>();
+            unfilteredAssemblerList = [];
+            unfilteredMinerList = [];
+            unfilteredPowerList = [];
+            unfilteredBeaconList = [];
+            unfilteredItemsList = [];
+            unfilteredFluidsList = [];
+            unfilteredKeyNodesList = [];
 
-            filteredAssemblerList = new List<ListViewItem>();
-            filteredMinerList = new List<ListViewItem>();
-            filteredPowerList = new List<ListViewItem>();
-            filteredBeaconList = new List<ListViewItem>();
-            filteredItemsList = new List<ListViewItem>();
-            filteredFluidsList = new List<ListViewItem>();
-            filteredKeyNodesList = new List<ListViewItem>();
+            filteredAssemblerList = [];
+            filteredMinerList = [];
+            filteredPowerList = [];
+            filteredBeaconList = [];
+            filteredItemsList = [];
+            filteredFluidsList = [];
+            filteredKeyNodesList = [];
 
-            lastSortOrder = new Dictionary<ListView, int>();
-            lastSortOrder.Add(AssemblerListView, 2);
-            lastSortOrder.Add(MinerListView, 2);
-            lastSortOrder.Add(PowerListView, 2);
-            lastSortOrder.Add(BeaconListView, 2);
-            lastSortOrder.Add(ItemsListView, 1);
-            lastSortOrder.Add(FluidsListView, 1);
-            lastSortOrder.Add(KeyNodesListView, 1);
+            lastSortOrder = new Dictionary<ListView, int> {
+                { AssemblerListView, 2 },
+                { MinerListView, 2 },
+                { PowerListView, 2 },
+                { BeaconListView, 2 },
+                { IItemsListView, 1 },
+                { IFluidsListView, 1 },
+                { KeyNodesListView, 1 }
+            };
 
             IconList.Images.Clear();
             IconList.Images.Add(DataCache.UnknownIcon);
 
-            ItemsTabPage.Text += " ( per " + rateString + ")";
+            IItemsTabPage.Text += " ( per " + rateString + ")";
             this.rateString = rateString;
 
-            IEnumerable<IRecipeNodeViewModel> recipeNodes = nodes.OfType<IRecipeNodeViewModel>();
+            IEnumerable<RecipeNodeViewModel> recipeNodes = nodes.OfType<RecipeNodeViewModel>();
 
             //lists
             LoadUnfilteredSelectedAssemblerList(recipeNodes.Where(r => r.SelectedAssembler.Assembler.EntityType == EntityType.Assembler), unfilteredAssemblerList);
@@ -136,22 +131,20 @@ namespace Foreman {
 
         //-------------------------------------------------------------------------------------------------------Initial list initialization
 
-        private void LoadUnfilteredSelectedAssemblerList(IEnumerable<IRecipeNodeViewModel> origin, List<ListViewItem> lviList) {
-            Dictionary<AssemblerQualityPair, int> buildingCounters = new Dictionary<AssemblerQualityPair, int>();
-            Dictionary<AssemblerQualityPair, Tuple<double, double>> buildingElectricalPower = new Dictionary<AssemblerQualityPair, Tuple<double, double>>(); //power for buildings, power for beacons)
+        private void LoadUnfilteredSelectedAssemblerList(IEnumerable<RecipeNodeViewModel> origin, List<ListViewItem> lviList) {
+            var buildingCounters = new Dictionary<AssemblerQualityPair, int>();
+            var buildingElectricalPower = new Dictionary<AssemblerQualityPair, Tuple<double, double>>(); //power for buildings, power for beacons)
 
-            foreach (IRecipeNodeViewModel rnode in origin) {
-                if (!buildingCounters.ContainsKey(rnode.SelectedAssembler)) {
-                    buildingCounters.Add(rnode.SelectedAssembler, 0);
+            foreach (RecipeNodeViewModel rnode in origin) {
+                if (buildingCounters.TryAdd(rnode.SelectedAssembler, 0))
                     buildingElectricalPower.Add(rnode.SelectedAssembler, new Tuple<double, double>(0, 0));
-                }
                 buildingCounters[rnode.SelectedAssembler] += (int)Math.Ceiling(rnode.ActualSetValue); //should probably check the validity of ceiling in case of near correct (ex: 1.0001 assemblers should really be counted as 1 instead of 2)
                 Tuple<double, double> oldValues = buildingElectricalPower[rnode.SelectedAssembler];
                 buildingElectricalPower[rnode.SelectedAssembler] = new Tuple<double, double>(oldValues.Item1 + rnode.GetTotalGeneratorElectricalProduction() + rnode.GetTotalAssemblerElectricalConsumption(), oldValues.Item2 + rnode.GetTotalBeaconElectricalConsumption());
             }
 
             foreach (AssemblerQualityPair assembler in buildingCounters.Keys.OrderByDescending(a => a.Assembler.Available).ThenBy(a => a.Assembler.FriendlyName).ThenBy(a => a.Quality.Level).ThenBy(a => a.Quality.FriendlyName)) {
-                ListViewItem lvItem = new ListViewItem();
+                var lvItem = new ListViewItem();
                 Bitmap? icon = assembler.Icon;
                 if (icon != null) {
                     IconList.Images.Add(icon);
@@ -160,7 +153,7 @@ namespace Foreman {
                     lvItem.ImageIndex = 0;
                 }
 
-                lvItem.Text = buildingCounters[assembler] >= 10000000 ? buildingCounters[assembler].ToString("0.##e0") : buildingCounters[assembler].ToString("N0");
+                lvItem.Text = buildingCounters[assembler] >= 10000000 ? buildingCounters[assembler].ToString("0.##e0", DisplayCulture.Format) : buildingCounters[assembler].ToString("N0", DisplayCulture.Format);
                 lvItem.Tag = assembler;
                 lvItem.Name = assembler.Assembler.Name + ":" + assembler.Quality.Name; //key
                 lvItem.BackColor = assembler.Assembler.Available ? AvailableObjectColor : UnavailableObjectColor;
@@ -171,21 +164,21 @@ namespace Foreman {
             }
         }
 
-        private void LoadUnfilteredBeaconList(IEnumerable<IRecipeNodeViewModel> origin, List<ListViewItem> lviList) {
-            Dictionary<BeaconQualityPair, int> beaconCounters = new Dictionary<BeaconQualityPair, int>();
+        private void LoadUnfilteredBeaconList(IEnumerable<RecipeNodeViewModel> origin, List<ListViewItem> lviList) {
+            var beaconCounters = new Dictionary<BeaconQualityPair, int>();
 
-            foreach (IRecipeNodeViewModel rnode in origin) {
+            foreach (RecipeNodeViewModel rnode in origin) {
                 if (!rnode.SelectedBeacon)
                     continue;
 
                 if (!beaconCounters.ContainsKey(rnode.SelectedBeacon))
-                    beaconCounters.Add(rnode.SelectedBeacon, 0);
+                    beaconCounters[rnode.SelectedBeacon] = 0;
                 beaconCounters[rnode.SelectedBeacon] += rnode.GetTotalBeacons();
             }
 
-            List<(BeaconQualityPair Pair, Beacon Beacon, Quality Quality)> sortedBeacons = new List<(BeaconQualityPair, Beacon, Quality)>();
+            List<(BeaconQualityPair Pair, IBeacon Beacon, IQuality Quality)> sortedBeacons = [];
             foreach (BeaconQualityPair pair in beaconCounters.Keys) {
-                if (pair is { Beacon: Beacon beaconEntity, Quality: Quality qualityEntity })
+                if (pair is { Beacon: IBeacon beaconEntity, Quality: IQuality qualityEntity })
                     sortedBeacons.Add((pair, beaconEntity, qualityEntity));
             }
             sortedBeacons.Sort((a, b) => {
@@ -196,13 +189,11 @@ namespace Foreman {
                 if (result != 0)
                     return result;
                 result = a.Quality.Level.CompareTo(b.Quality.Level);
-                if (result != 0)
-                    return result;
-                return string.Compare(a.Quality.FriendlyName, b.Quality.FriendlyName, StringComparison.Ordinal);
+                return result != 0 ? result : string.Compare(a.Quality.FriendlyName, b.Quality.FriendlyName, StringComparison.Ordinal);
             });
 
-            foreach ((BeaconQualityPair beacon, Beacon beaconEntity, Quality qualityEntity) in sortedBeacons) {
-                ListViewItem lvItem = new ListViewItem();
+            foreach ((BeaconQualityPair beacon, IBeacon beaconEntity, IQuality qualityEntity) in sortedBeacons) {
+                var lvItem = new ListViewItem();
                 Bitmap? icon = beacon.Icon;
                 if (icon != null) {
                     IconList.Images.Add(icon);
@@ -211,7 +202,7 @@ namespace Foreman {
                     lvItem.ImageIndex = 0;
                 }
 
-                lvItem.Text = beaconCounters[beacon].ToString();
+                lvItem.Text = beaconCounters[beacon].ToString(DisplayCulture.Format);
                 lvItem.Tag = beacon;
                 lvItem.Name = beaconEntity.Name + ":" + qualityEntity.Name; //key
                 lvItem.BackColor = beaconEntity.Available ? AvailableObjectColor : UnavailableObjectColor;
@@ -224,11 +215,11 @@ namespace Foreman {
 
         private void LoadUnfilteredItemLists(IEnumerable<INodeViewModel> nodes, bool fluids, List<ListViewItem> lviList) {
             //NOTE: throughput is initially calculatated as all non-overflow linked input & output of each recipe node. At the end we will add
-            Dictionary<ItemQualityPair, ItemCounter> itemCounters = new Dictionary<ItemQualityPair, ItemCounter>();
+            var itemCounters = new Dictionary<ItemQualityPair, ItemCounter>();
 
             foreach (INodeViewModel node in nodes) {
-                if (node is IRecipeNodeViewModel) {
-                    foreach (ItemQualityPair input in node.Inputs.Where(i => fluids.Equals(i.Item is Fluid))) {
+                if (node is RecipeNodeViewModel) {
+                    foreach (ItemQualityPair input in node.Inputs.Where(i => fluids.Equals(i.Item is IFluid))) {
                         if (!itemCounters.ContainsKey(input))
                             itemCounters.Add(input, new ItemCounter(0, 0, 0, 0, 0, 0, 0));
 
@@ -241,7 +232,7 @@ namespace Foreman {
                         }
                     }
 
-                    foreach (ItemQualityPair output in node.Outputs.Where(i => fluids.Equals(i.Item is Fluid))) {
+                    foreach (ItemQualityPair output in node.Outputs.Where(i => fluids.Equals(i.Item is IFluid))) {
                         if (!itemCounters.ContainsKey(output))
                             itemCounters.Add(output, new ItemCounter(0, 0, 0, 0, 0, 0, 0));
 
@@ -258,20 +249,20 @@ namespace Foreman {
                                 itemCounters[output].OutputOverflow += supplyRate - supplyUsedRate;
                         }
                     }
-                } else if (node is ISupplierNodeViewModel sNode && fluids.Equals(sNode.SuppliedItem.Item is Fluid)) {
+                } else if (node is ISupplierNodeViewModel sNode && fluids.Equals(sNode.SuppliedItem.Item is IFluid)) {
                     if (!itemCounters.ContainsKey(sNode.SuppliedItem))
                         itemCounters.Add(sNode.SuppliedItem, new ItemCounter(0, 0, 0, 0, 0, 0, 0));
                     itemCounters[sNode.SuppliedItem].Input += sNode.ActualRate;
-                } else if (node is IConsumerNodeViewModel cNode && fluids.Equals(cNode.ConsumedItem.Item is Fluid)) {
+                } else if (node is IConsumerNodeViewModel cNode && fluids.Equals(cNode.ConsumedItem.Item is IFluid)) {
                     if (!itemCounters.ContainsKey(cNode.ConsumedItem))
                         itemCounters.Add(cNode.ConsumedItem, new ItemCounter(0, 0, 0, 0, 0, 0, 0));
                     itemCounters[cNode.ConsumedItem].Output += cNode.ActualRate;
                 }
             }
 
-            List<(ItemQualityPair Pair, Item Item, Quality Quality)> sortedItems = new List<(ItemQualityPair, Item, Quality)>();
+            List<(ItemQualityPair Pair, IItem Item, IQuality Quality)> sortedItems = [];
             foreach (ItemQualityPair pair in itemCounters.Keys) {
-                if (pair is { Item: Item itemEntity, Quality: Quality qualityEntity })
+                if (pair is { Item: IItem itemEntity, Quality: IQuality qualityEntity })
                     sortedItems.Add((pair, itemEntity, qualityEntity));
             }
             sortedItems.Sort((a, b) => {
@@ -279,13 +270,11 @@ namespace Foreman {
                 if (result != 0)
                     return result;
                 result = a.Quality.Level.CompareTo(b.Quality.Level);
-                if (result != 0)
-                    return result;
-                return string.Compare(a.Quality.FriendlyName, b.Quality.FriendlyName, StringComparison.Ordinal);
+                return result != 0 ? result : string.Compare(a.Quality.FriendlyName, b.Quality.FriendlyName, StringComparison.Ordinal);
             });
 
-            foreach ((ItemQualityPair item, Item itemEntity, Quality qualityEntity) in sortedItems) {
-                ListViewItem lvItem = new ListViewItem();
+            foreach ((ItemQualityPair item, IItem itemEntity, IQuality qualityEntity) in sortedItems) {
+                var lvItem = new ListViewItem();
                 Bitmap? icon = item.Icon;
                 if (icon != null) {
                     IconList.Images.Add(icon);
@@ -311,7 +300,7 @@ namespace Foreman {
 
         private void LoadUnfilteredKeyNodesList(IEnumerable<INodeViewModel> origin, List<ListViewItem> lviList) {
             foreach (INodeViewModel node in origin) {
-                ListViewItem lvItem = new ListViewItem();
+                var lvItem = new ListViewItem();
 
                 Bitmap? icon;
                 string? nodeText;
@@ -328,7 +317,7 @@ namespace Foreman {
                     icon = pNode.PassthroughItem.Icon;
                     nodeText = pNode.PassthroughItem.FriendlyName;
                     nodeType = "Passthrough";
-                } else if (node is IRecipeNodeViewModel rNode) {
+                } else if (node is RecipeNodeViewModel rNode) {
                     icon = rNode.BaseRecipe.Icon;
                     nodeText = rNode.BaseRecipe.FriendlyName;
                     nodeType = "Recipe";
@@ -357,7 +346,7 @@ namespace Foreman {
                 lvItem.SubItems.Add(nodeText ?? string.Empty);
                 lvItem.SubItems.Add(node.KeyNodeTitle);
 
-                if (node is IRecipeNodeViewModel rrNode) {
+                if (node is RecipeNodeViewModel rrNode) {
                     lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = "-", Tag = (double)0 });
                     lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = GraphicsStuff.DoubleToString(rrNode.ActualSetValue), Tag = rrNode.ActualSetValue });
                 } else {
@@ -371,16 +360,16 @@ namespace Foreman {
         //-------------------------------------------------------------------------------------------------------Filter functions
 
         /// <summary>
-        /// Summary list rows store value-type tags (e.g. AssemblerQualityPair, ItemQualityPair), not DataObjectBase.
+        /// Summary list rows store value-type tags (e.g. AssemblerQualityPair, ItemQualityPair), not IDataObjectBase.
         /// Match the filter against visible text (primary column + subitems).
         /// </summary>
         private static bool ListViewItemRowContainsFilter(ListViewItem lvItem, string filterLower) {
             if (string.IsNullOrEmpty(filterLower))
                 return true;
-            if (lvItem.Text.IndexOf(filterLower, StringComparison.OrdinalIgnoreCase) >= 0)
+            if (lvItem.Text.Contains(filterLower, StringComparison.OrdinalIgnoreCase))
                 return true;
             for (int i = 0; i < lvItem.SubItems.Count; i++) {
-                if (lvItem.SubItems[i].Text.IndexOf(filterLower, StringComparison.OrdinalIgnoreCase) >= 0)
+                if (lvItem.SubItems[i].Text.Contains(filterLower, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
             return false;
@@ -394,7 +383,7 @@ namespace Foreman {
         }
 
         private void UpdateFilteredBuildingList(List<ListViewItem> unfilteredList, List<ListViewItem> filteredList, ListView owner) {
-            string filterString = BuildingsFilterTextBox.Text.ToLower();
+            string filterString = BuildingsFilterTextBox.Text.ToLowerInvariant();
 
             filteredList.Clear();
 
@@ -407,12 +396,12 @@ namespace Foreman {
         }
 
         private void UpdateFilteredItemsLists() {
-            UpdateFilteredItemsList(unfilteredItemsList, filteredItemsList, ItemsListView);
-            UpdateFilteredItemsList(unfilteredFluidsList, filteredFluidsList, FluidsListView);
+            UpdateFilteredItemsList(unfilteredItemsList, filteredItemsList, IItemsListView);
+            UpdateFilteredItemsList(unfilteredFluidsList, filteredFluidsList, IFluidsListView);
         }
 
         private void UpdateFilteredItemsList(List<ListViewItem> unfilteredList, List<ListViewItem> filteredList, ListView owner) {
-            string filterString = ItemsFilterTextBox.Text.ToLower();
+            string filterString = IItemsFilterTextBox.Text.ToLowerInvariant();
             bool includeInputs = ItemFilterInputCheckBox.Checked;
             bool includeInputUnlinked = ItemFilterInputUnlinkedCheckBox.Checked;
             bool includeOutputs = ItemFilterOutputCheckBox.Checked;
@@ -443,7 +432,7 @@ namespace Foreman {
         }
 
         private void UpdateFilteredKeyNodesList() {
-            string filterString = KeyNodesFilterTextBox.Text.ToLower();
+            string filterString = KeyNodesFilterTextBox.Text.ToLowerInvariant();
             bool includeSuppliers = SupplierNodeFilterCheckBox.Checked;
             bool includeConsumers = ConsumerNodeFilterCheckBox.Checked;
             bool includePassthrough = PassthroughNodeFilterCheckBox.Checked;
@@ -452,11 +441,11 @@ namespace Foreman {
             filteredKeyNodesList.Clear();
 
             foreach (ListViewItem lvItem in unfilteredKeyNodesList) {
-                if (string.IsNullOrEmpty(filterString) || lvItem.Text.ToLower().Contains(filterString) || lvItem.SubItems[1].Text.ToLower().Contains(filterString) || lvItem.SubItems[2].Text.ToLower().Contains(filterString)) {
+                if (string.IsNullOrEmpty(filterString) || lvItem.Text.Contains(filterString, StringComparison.OrdinalIgnoreCase) || lvItem.SubItems[1].Text.Contains(filterString, StringComparison.OrdinalIgnoreCase) || lvItem.SubItems[2].Text.Contains(filterString, StringComparison.OrdinalIgnoreCase)) {
                     if ((includeSuppliers && (lvItem.Tag is ISupplierNodeViewModel)) ||
                         (includeConsumers && (lvItem.Tag is IConsumerNodeViewModel)) ||
                         (includePassthrough && (lvItem.Tag is IPassthroughNodeViewModel)) ||
-                        (includeRecipe && (lvItem.Tag is IRecipeNodeViewModel))) {
+                        (includeRecipe && (lvItem.Tag is RecipeNodeViewModel))) {
                         filteredKeyNodesList.Add(lvItem);
                     }
                 }
@@ -472,15 +461,15 @@ namespace Foreman {
         private void MinerListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredMinerList[e.ItemIndex]; }
         private void PowerListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredPowerList[e.ItemIndex]; }
         private void BeaconListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredBeaconList[e.ItemIndex]; }
-        private void ItemsListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredItemsList[e.ItemIndex]; }
-        private void FluidsListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredFluidsList[e.ItemIndex]; }
+        private void IItemsListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredItemsList[e.ItemIndex]; }
+        private void IFluidsListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredFluidsList[e.ItemIndex]; }
         private void KeyNodesListView_RetrieveVirtualItem(object? sender, RetrieveVirtualItemEventArgs e) { e.Item = filteredKeyNodesList[e.ItemIndex]; }
 
         //-------------------------------------------------------------------------------------------------------Filter changed events
 
         private void BuildingsFilterTextBox_TextChanged(object? sender, EventArgs e) { UpdateFilteredBuildingLists(); }
 
-        private void ItemsFilterTextBox_TextChanged(object? sender, EventArgs e) { UpdateFilteredItemsLists(); }
+        private void IItemsFilterTextBox_TextChanged(object? sender, EventArgs e) { UpdateFilteredItemsLists(); }
         private void ItemFilterCheckBox_CheckedChanged(object? sender, EventArgs e) { UpdateFilteredItemsLists(); }
 
         private void KeyNodesFilterTextBox_TextChanged(object? sender, EventArgs e) { UpdateFilteredKeyNodesList(); }
@@ -498,13 +487,11 @@ namespace Foreman {
             lastSortOrder[owner] = reverseSortLamda * (column + 1);
 
             unfilteredList.Sort((a, b) => {
-                int result;
-                if (column == 0)
-                    result = -double.Parse(a.Text).CompareTo(double.Parse(b.Text));
-                else if (column == 1)
-                    result = a.SubItems[1].Text.ToLower().CompareTo(b.SubItems[1].Text.ToLower());
-                else
-                    result = a.SubItems[column].Tag is double aValue && b.SubItems[column].Tag is double bValue
+                var result = column == 0
+                    ? -double.Parse(a.Text, DisplayCulture.Format).CompareTo(double.Parse(b.Text, DisplayCulture.Format))
+                    : column == 1
+                    ? string.Compare(a.SubItems[1].Text, b.SubItems[1].Text, StringComparison.OrdinalIgnoreCase)
+                    : a.SubItems[column].Tag is double aValue && b.SubItems[column].Tag is double bValue
                         ? -aValue.CompareTo(bValue)
                         : 0;
 
@@ -523,19 +510,17 @@ namespace Foreman {
             owner.Invalidate();
         }
 
-        private void ItemsListView_ColumnClick(object? sender, ColumnClickEventArgs e) { ItemListView_ColumnSort(unfilteredItemsList, filteredItemsList, ItemsListView, e.Column); }
-        private void FluidsListView_ColumnClick(object? sender, ColumnClickEventArgs e) { ItemListView_ColumnSort(unfilteredFluidsList, filteredFluidsList, FluidsListView, e.Column); }
+        private void IItemsListView_ColumnClick(object? sender, ColumnClickEventArgs e) { ItemListView_ColumnSort(unfilteredItemsList, filteredItemsList, IItemsListView, e.Column); }
+        private void IFluidsListView_ColumnClick(object? sender, ColumnClickEventArgs e) { ItemListView_ColumnSort(unfilteredFluidsList, filteredFluidsList, IFluidsListView, e.Column); }
 
         private void ItemListView_ColumnSort(List<ListViewItem> unfilteredList, List<ListViewItem> filteredList, ListView owner, int column) {
             int reverseSortLamda = (lastSortOrder[owner] == column + 1) ? -1 : 1; //last sort was this very column -> this is now a reverse sort
             lastSortOrder[owner] = reverseSortLamda * (column + 1);
 
             unfilteredList.Sort((a, b) => {
-                int result;
-                if (column == 0)
-                    result = a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
-                else
-                    result = a.SubItems[column].Tag is double aValue && b.SubItems[column].Tag is double bValue
+                var result = column == 0
+                    ? string.Compare(a.SubItems[0].Text, b.SubItems[0].Text, StringComparison.OrdinalIgnoreCase)
+                    : a.SubItems[column].Tag is double aValue && b.SubItems[column].Tag is double bValue
                         ? -aValue.CompareTo(bValue)
                         : 0;
 
@@ -552,37 +537,35 @@ namespace Foreman {
 
         private void KeyNodesListView_ColumnClick(object? sender, ColumnClickEventArgs e) {
             const int maxDigits = 20;
-            Regex comparerRegex = new Regex(@"\d+", RegexOptions.Compiled);
-            Dictionary<string, string> stringComparerProcessedStrings = new Dictionary<string, string>();
+            var comparerRegex = ComparerRegex();
+            var stringComparerProcessedStrings = new Dictionary<string, string>();
             int NaturalCompareStrings(string a, string b) {
                 if (!stringComparerProcessedStrings.ContainsKey(a))
-                    stringComparerProcessedStrings.Add(a, comparerRegex.Replace(a.ToLower(), matcha => matcha.Value.PadLeft(maxDigits, '0')));
+                    stringComparerProcessedStrings.Add(a, comparerRegex.Replace(a.ToLowerInvariant(), matcha => matcha.Value.PadLeft(maxDigits, '0')));
                 if (!stringComparerProcessedStrings.ContainsKey(b))
-                    stringComparerProcessedStrings.Add(b, comparerRegex.Replace(b.ToLower(), matcha => matcha.Value.PadLeft(maxDigits, '0')));
+                    stringComparerProcessedStrings.Add(b, comparerRegex.Replace(b.ToLowerInvariant(), matcha => matcha.Value.PadLeft(maxDigits, '0')));
 
-                return stringComparerProcessedStrings[a].CompareTo(stringComparerProcessedStrings[b]);
+                return string.Compare(stringComparerProcessedStrings[a], stringComparerProcessedStrings[b], StringComparison.Ordinal);
             }
 
             int reverseSortLamda = (lastSortOrder[KeyNodesListView] == e.Column + 1) ? -1 : 1; //last sort was this very column -> this is now a reverse sort
             lastSortOrder[KeyNodesListView] = reverseSortLamda * (e.Column + 1);
 
             unfilteredKeyNodesList.Sort((a, b) => {
-                int result;
-                if (e.Column == 2)
-                    result = NaturalCompareStrings(a.SubItems[2].Text, b.SubItems[2].Text);
-                else if (e.Column < 3)
-                    result = a.SubItems[e.Column].Text.ToLower().CompareTo(b.SubItems[e.Column].Text.ToLower());
-                else
-                    result = a.SubItems[e.Column].Tag is double aValue && b.SubItems[e.Column].Tag is double bValue
+                var result = e.Column == 2
+                    ? NaturalCompareStrings(a.SubItems[2].Text, b.SubItems[2].Text)
+                    : e.Column < 3
+                    ? string.Compare(a.SubItems[e.Column].Text, b.SubItems[e.Column].Text, StringComparison.OrdinalIgnoreCase)
+                    : a.SubItems[e.Column].Tag is double aValue && b.SubItems[e.Column].Tag is double bValue
                         ? -aValue.CompareTo(bValue)
                         : 0;
 
                 if (result == 0 && e.Column != 2)
                     result = NaturalCompareStrings(a.SubItems[2].Text, b.SubItems[2].Text);
                 if (result == 0 && e.Column != 0)
-                    result = a.SubItems[0].Text.ToLower().CompareTo(b.SubItems[0].Text.ToLower());
+                    result = string.Compare(a.SubItems[0].Text, b.SubItems[0].Text, StringComparison.OrdinalIgnoreCase);
                 if (result == 0 && e.Column != 1)
-                    result = a.SubItems[1].Text.ToLower().CompareTo(b.SubItems[1].Text.ToLower());
+                    result = string.Compare(a.SubItems[1].Text, b.SubItems[1].Text, StringComparison.OrdinalIgnoreCase);
                 if (result == 0)
                     result = a.Tag is INodeViewModel nodeA && b.Tag is INodeViewModel nodeB
                         ? nodeA.Id.Value.CompareTo(nodeB.Id.Value)
@@ -596,70 +579,75 @@ namespace Foreman {
 
         //-------------------------------------------------------------------------------------------------------Export CSV functions
 
+        private static readonly string[] BuildingsExportAssemblerHeader = ["#", "Assembler", "Electrical power consumed by assemblers (in W)", "Electrical power consumed by beacons (in W)"];
+        private static readonly string[] BuildingsExportMinerHeader = ["#", "Miner", "Electrical power consumed by assemblers (in W)", "Electrical power consumed by beacons (in W)"];
+        private static readonly string[] BuildingsExportPowerHeader = ["#", "Power Building", "Electrical power generated (in W)", "Electrical power consumed (in W)"];
+        private static readonly string[] BuildingsExportBeaconHeader = ["#", "Beacon", "Electrical power consumed by beacons (in W)"];
+
         private void BuildingsExportButton_Click(object? sender, EventArgs e) {
             ExportCSV(
-                new List<ListViewItem>[] { filteredAssemblerList, filteredMinerList, filteredPowerList, filteredBeaconList },
-                new string[][] {
-                    new string[] { "#", "Assembler", "Electrical power consumed by assemblers (in W)", "Electrical power consumed by beacons (in W)" },
-                    new string[] { "#", "Miner", "Electrical power consumed by assemblers (in W)", "Electrical power consumed by beacons (in W)" },
-                    new string[] { "#", "Power Building", "Electrical power generated (in W)", "Electrical power consumed (in W)" },
-                    new string[] { "#", "Beacon", "Electrical power consumed by beacons (in W)" }
-                });
+                [filteredAssemblerList, filteredMinerList, filteredPowerList, filteredBeaconList],
+                [
+                    BuildingsExportAssemblerHeader,
+                    BuildingsExportMinerHeader,
+                    BuildingsExportPowerHeader,
+                    BuildingsExportBeaconHeader
+                ]);
         }
 
-        private void ItemsExportButton_Click(object? sender, EventArgs e) {
+        private void IItemsExportButton_Click(object? sender, EventArgs e) {
             ExportCSV(
-                new List<ListViewItem>[] { filteredItemsList, filteredFluidsList },
-                new string[][]
-                {
-                    new string[] {"Item", "Input (per "+rateString+")", "Input through un-linked recipe ingredients (per "+rateString+")", "Output (per " + rateString + ")", "Output through un-linked recipe products (per " + rateString + ")", "Output through overproduction (per " + rateString + ")", "Produced by recipe nodes (per " + rateString + ")", "Consumed by recipe nodes (per " + rateString + ")" },
-                    new string[] {"Fluid", "Input (per "+rateString+")", "Input through un-linked recipe ingredients (per "+rateString+")", "Output (per " + rateString + ")", "Output through un-linked recipe products (per " + rateString + ")", "Output through overproduction (per " + rateString + ")", "Produced by recipe nodes (per " + rateString + ")", "Consumed by recipe nodes (per " + rateString + ")" }
-                });
+                [filteredItemsList, filteredFluidsList],
+                [
+                    ["Item", "Input (per "+rateString+")", "Input through un-linked recipe ingredients (per "+rateString+")", "Output (per " + rateString + ")", "Output through un-linked recipe products (per " + rateString + ")", "Output through overproduction (per " + rateString + ")", "Produced by recipe nodes (per " + rateString + ")", "Consumed by recipe nodes (per " + rateString + ")"],
+                    ["Fluid", "Input (per "+rateString+")", "Input through un-linked recipe ingredients (per "+rateString+")", "Output (per " + rateString + ")", "Output through un-linked recipe products (per " + rateString + ")", "Output through overproduction (per " + rateString + ")", "Produced by recipe nodes (per " + rateString + ")", "Consumed by recipe nodes (per " + rateString + ")"]
+                ]);
         }
 
-        private void keyNodesExportButton_Click(object? sender, EventArgs e) {
+        private void KeyNodesExportButton_Click(object? sender, EventArgs e) {
             ExportCSV(
-                new List<ListViewItem>[] { filteredKeyNodesList },
-                new string[][]
-                {
-                    new string[] {"Node Type", "Node Details (item / recipe name)", "Node Title", "Throughput (for non-recipe nodes) (per " + rateString + ")", "Building Count (for recipe nodes)" }
-                });
+                [filteredKeyNodesList],
+                [
+                    ["Node Type", "Node Details (item / recipe name)", "Node Title", "Throughput (for non-recipe nodes) (per " + rateString + ")", "Building Count (for recipe nodes)"]
+                ]);
         }
 
-        private void ExportCSV(List<ListViewItem>[] inputList, string[][] columnNames) {
-            using (SaveFileDialog dialog = new SaveFileDialog()) {
-                dialog.AddExtension = true;
-                dialog.Filter = "CSV (*.csv)|*.csv";
-                dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Exported CSVs");
-                if (!Directory.Exists(dialog.InitialDirectory))
-                    Directory.CreateDirectory(dialog.InitialDirectory);
-                dialog.FileName = "foreman data.csv";
-                dialog.ValidateNames = true;
-                dialog.OverwritePrompt = true;
-                var result = dialog.ShowDialog();
+        private static void ExportCSV(List<ListViewItem>[] inputList, string[][] columnNames) {
+            using var dialog = new SaveFileDialog();
+            dialog.AddExtension = true;
+            dialog.Filter = "CSV (*.csv)|*.csv";
+            dialog.InitialDirectory = Path.Combine(Application.StartupPath, "Exported CSVs");
+            if (!Directory.Exists(dialog.InitialDirectory))
+                Directory.CreateDirectory(dialog.InitialDirectory);
+            dialog.FileName = "foreman data.csv";
+            dialog.ValidateNames = true;
+            dialog.OverwritePrompt = true;
+            var result = dialog.ShowDialog();
 
-                if (result == DialogResult.OK) {
-                    List<string[]> csvLines = new List<string[]>();
+            if (result == DialogResult.OK) {
+                var csvLines = new List<string[]>();
 
-                    for (int i = 0; i < inputList.Length; i++) {
-                        csvLines.Add(columnNames[i]);
-                        foreach (ListViewItem lvi in inputList[i]) {
-                            string[] cLine = new string[columnNames[i].Length];
-                            for (int j = 0; j < cLine.Length; j++)
-                                cLine[j] = (lvi.SubItems[j].Tag as string ?? lvi.SubItems[j].Text).Replace(",", "").Replace("\n", "; ").Replace("\t", "");
-                            csvLines.Add(cLine);
-                        }
-                        csvLines.Add([""]);
+                for (int i = 0; i < inputList.Length; i++) {
+                    csvLines.Add(columnNames[i]);
+                    foreach (ListViewItem lvi in inputList[i]) {
+                        string[] cLine = new string[columnNames[i].Length];
+                        for (int j = 0; j < cLine.Length; j++)
+                            cLine[j] = (lvi.SubItems[j].Tag as string ?? lvi.SubItems[j].Text).Replace(",", "").Replace("\n", "; ").Replace("\t", "");
+                        csvLines.Add(cLine);
                     }
-                    if (csvLines.Count > 0)
-                        csvLines.RemoveAt(csvLines.Count - 1);
-
-                    //export to csv.
-                    StringBuilder csvBuilder = new StringBuilder();
-                    csvLines.ForEach(line => { csvBuilder.AppendLine(string.Join(",", line)); });
-                    Utf8File.WriteAllText(dialog.FileName, csvBuilder.ToString());
+                    csvLines.Add([""]);
                 }
+                if (csvLines.Count > 0)
+                    csvLines.RemoveAt(csvLines.Count - 1);
+
+                //export to csv.
+                var csvBuilder = new StringBuilder();
+                csvLines.ForEach(line => { csvBuilder.AppendLine(string.Join(",", line)); });
+                Utf8File.WriteAllText(dialog.FileName, csvBuilder.ToString());
             }
         }
+
+        [GeneratedRegex(@"\d+", RegexOptions.Compiled)]
+        private static partial Regex ComparerRegex();
     }
 }

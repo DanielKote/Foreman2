@@ -1,4 +1,5 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,14 +26,14 @@ namespace ForemanTest.support {
             if (cache is not null && cache.PresetName == PresetName)
                 return cache;
 
-            await Gate.WaitAsync();
+            await Gate.WaitAsync().ConfigureAwait(false);
             try {
                 if (cache is null || cache.PresetName != PresetName) {
                     cache = new DataCache(filterRecipes);
                     await cache.LoadAllData(
                         new Preset(PresetName, true, true),
                         NullProgress.Instance,
-                        loadIcons: false);
+                        loadIcons: false).ConfigureAwait(false);
                 }
                 return cache;
             } finally {

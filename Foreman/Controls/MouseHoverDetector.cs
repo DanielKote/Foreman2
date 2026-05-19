@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.Controls {
     //https://social.msdn.microsoft.com/Forums/windows/en-US/0cc115ea-86cb-4dd0-924f-b5d74d22154c/resetting-the-mousehover-event-resetmouseeventargs-is-useless?forum=winforms
     //need some way of processing custom tool tips on an item list view with different tool tips being set whenever we switch tabs.
     //really not something easy to do, so the answer was to just show/hide them based on mouse-move events (plus whatever item we are currently hoving over)
@@ -13,17 +13,17 @@ namespace Foreman {
     //  - minimum distance moved before ending check
     //  - switch to non-static design (to allow for better control checks
     //  - optimization of hover calls (only calls the control that was last moused over, not a all-check of all controls)
-    public class MouseHoverDetector {
-        private Timer timer;
-        private Dictionary<Control, Info> items;
+    public class MouseHoverDetector : IDisposable {
+        private readonly Timer timer;
+        private readonly Dictionary<Control, Info> items;
         private Control? lastMouseMoveControl; //we will use this to ensure the hover start & end only happen to the given control
 
-        private TimeSpan HoverTime;
-        private TimeSpan ReshowTime;
-        private int HoverGraceDistance;
+        private readonly TimeSpan HoverTime;
+        private readonly TimeSpan ReshowTime;
+        private readonly int HoverGraceDistance;
 
         public MouseHoverDetector(int hoverTimeMilliseconds = 200, int reshowTimeMilliseconds = 200, int hoverGraceDistance = 15) {
-            items = new Dictionary<Control, Info>();
+            items = [];
             timer = new Timer { Enabled = false, Interval = 50 };
             timer.Tick += new EventHandler(timer_Tick);
             lastMouseMoveControl = null;
@@ -65,11 +65,11 @@ namespace Foreman {
         }
 
         private class Info {
-            public MouseEventHandler? HoverStartHandler;
-            public EventHandler? HoverEndHandler;
-            public DateTime LastMoveTime;
-            public bool IsHovering;
-            public Point HoverStartPoint;
+            public MouseEventHandler? HoverStartHandler { get; set; }
+            public EventHandler? HoverEndHandler { get; set; }
+            public DateTime LastMoveTime { get; set; }
+            public bool IsHovering { get; set; }
+            public Point HoverStartPoint { get; set; }
         }
 
         private void control_MouseMove(object? sender, MouseEventArgs e) {
@@ -110,6 +110,7 @@ namespace Foreman {
 
         public void Dispose() {
             timer.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

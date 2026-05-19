@@ -1,4 +1,7 @@
-﻿namespace Foreman.Graph {
+﻿using Foreman.Models;
+using Foreman.Models.Nodes;
+
+namespace Foreman.Graph {
     internal sealed class NodeLinkViewModel : INodeLinkViewModel {
         private readonly GraphEntityRegistry _registry;
         private readonly NodeLink _link;

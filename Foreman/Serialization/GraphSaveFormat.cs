@@ -1,4 +1,4 @@
-﻿namespace Foreman {
+﻿namespace Foreman.Serialization {
     /// <summary>JSON property names and object-type markers for Foreman graph save files.</summary>
     public static class GraphSaveFormat {
         /// <summary>Current .fjson schema version written by this build. Bump when the on-disk format changes.</summary>

@@ -1,25 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Models.Nodes;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     /// <summary>Collects preset entity names referenced by a graph fragment (for save/import).</summary>
     internal sealed class GraphIncludedSetCollector {
         public HashSet<string> Items { get; } = [];
         public HashSet<string> Assemblers { get; } = [];
         public HashSet<string> Modules { get; } = [];
         public HashSet<string> Beacons { get; } = [];
-        public HashSet<Recipe> Recipes { get; } = [];
-        public HashSet<Recipe> MissingRecipes { get; } = new(new RecipeNaInPrComparer());
-        public HashSet<PlantProcess> PlantProcesses { get; } = [];
-        public HashSet<PlantProcess> MissingPlantProcesses { get; } = new(new PlantNaInPrComparer());
+        public HashSet<IRecipe> Recipes { get; } = [];
+        public HashSet<IRecipe> MissingRecipes { get; } = new(new RecipeNaInPrComparer());
+        public HashSet<IPlantProcess> PlantProcesses { get; } = [];
+        public HashSet<IPlantProcess> MissingPlantProcesses { get; } = new(new PlantNaInPrComparer());
         public HashSet<KeyValuePair<string, int>> Qualities { get; } = [];
 
-        public void IncludeQuality(Quality? quality) {
+        public void IncludeQuality(IQuality? quality) {
             if (quality is not null)
                 Qualities.Add(new KeyValuePair<string, int>(quality.Name, quality.Level));
         }
 
-        public void CollectFromNodes(IEnumerable<BaseNode> nodes, Quality? defaultAssemblerQuality) {
+        public void CollectFromNodes(IEnumerable<BaseNode> nodes, IQuality? defaultAssemblerQuality) {
             if (defaultAssemblerQuality is not null)
                 IncludeQuality(defaultAssemblerQuality);
 

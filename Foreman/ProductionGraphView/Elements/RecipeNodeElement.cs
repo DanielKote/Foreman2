@@ -1,27 +1,29 @@
-﻿using Foreman.Graph;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Graph;
+using Foreman.Models;
+using Foreman.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public class RecipeNodeElement : BaseNodeElement {
         protected override Brush CleanBgBrush { get { return recipeBgBrush; } }
         private static readonly Brush recipeBgBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
-        private static readonly Pen productivityPen = new Pen(Brushes.DarkRed, 6);
-        private static readonly Pen productivityPlusPen = new Pen(productivityPen.Brush, 2);
-        private static readonly Pen extraProductivityPen = new Pen(Brushes.Crimson, 6);
+        private static readonly Pen productivityPen = new(Brushes.DarkRed, 6);
+        private static readonly Pen productivityPlusPen = new(productivityPen.Brush, 2);
+        private static readonly Pen extraProductivityPen = new(Brushes.Crimson, 6);
 
-        private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
+        private static readonly StringFormat textFormat = new() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
 
         private readonly AssemblerElement AssemblerElement;
         private readonly BeaconElement BeaconElement;
 
-        internal IRecipeNodeViewModel RecipeViewModel => (IRecipeNodeViewModel)ViewModel;
+        internal RecipeNodeViewModel RecipeViewModel => (RecipeNodeViewModel)ViewModel;
         private string RecipeName => RecipeViewModel.BaseRecipe.FriendlyName ?? "";
 
         private static bool OptionsCopyAssemblerDefault = true;
@@ -89,7 +91,7 @@ namespace Foreman {
             {
                 //text
                 bool overproducing = RecipeViewModel.IsOverproducing();
-                Rectangle textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (overproducing ? 32 : 27), (Width - 10 - 40), Height - (overproducing ? 64 : 54));
+                var textSlot = new Rectangle(trans.X - (Width / 2) + 40, trans.Y - (Height / 2) + (overproducing ? 32 : 27), (Width - 10 - 40), Height - (overproducing ? 64 : 54));
                 //graphics.DrawRectangle(devPen, textSlot);
                 int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
 
@@ -117,7 +119,7 @@ namespace Foreman {
 
         protected override void AddRClickMenuOptions(bool nodeInSelection) {
             if (nodeInSelection) {
-                List<IRecipeNodeViewModel> rNodes = graphViewer.SelectedNodes.OfType<RecipeNodeElement>().Select(ne => (IRecipeNodeViewModel)ne.ViewModel).ToList();
+                var rNodes = graphViewer.SelectedNodes.OfType<RecipeNodeElement>().Select(ne => (RecipeNodeViewModel)ne.ViewModel).ToList();
                 if (!rNodes.Contains(RecipeViewModel))
                     rNodes.Add(RecipeViewModel);
 
@@ -126,14 +128,14 @@ namespace Foreman {
                 RightClickMenu.Items.Add(new ToolStripMenuItem("Apply default assembler(s)", null,
                     new EventHandler((o, e) => {
                         RightClickMenu.Close();
-                        foreach (IRecipeNodeViewModel rNode in rNodes)
+                        foreach (RecipeNodeViewModel rNode in rNodes)
                             if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                 controller.AutoSetAssembler();
                     })));
                 RightClickMenu.Items.Add(new ToolStripMenuItem("Apply default modules", null,
                     new EventHandler((o, e) => {
                         RightClickMenu.Close();
-                        foreach (IRecipeNodeViewModel rNode in rNodes)
+                        foreach (RecipeNodeViewModel rNode in rNodes)
                             if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                 controller.AutoSetAssemblerModules();
                     })));
@@ -141,7 +143,7 @@ namespace Foreman {
                     RightClickMenu.Items.Add(new ToolStripMenuItem("Remove modules", null,
                         new EventHandler((o, e) => {
                             RightClickMenu.Close();
-                            foreach (IRecipeNodeViewModel rNode in rNodes)
+                            foreach (RecipeNodeViewModel rNode in rNodes)
                                 if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                     controller.RemoveAssemblerModules();
                         })));
@@ -149,7 +151,7 @@ namespace Foreman {
                     RightClickMenu.Items.Add(new ToolStripMenuItem("Remove beacons", null,
                         new EventHandler((o, e) => {
                             RightClickMenu.Close();
-                            foreach (IRecipeNodeViewModel rNode in rNodes)
+                            foreach (RecipeNodeViewModel rNode in rNodes)
                                 if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is RecipeNodeController controller)
                                     controller.ClearBeacon();
                         })));
@@ -157,100 +159,138 @@ namespace Foreman {
                 RightClickMenu.Items.Add(new ToolStripSeparator());
                 if (graphViewer.DCache is DataCache readCache) {
                     if (NodeCopyOptions.GetNodeCopyOptions(Clipboard.GetText(), readCache) is NodeCopyOptions pasteOptions
-                        && pasteOptions.Assembler.Assembler is Assembler pastedAssembler) {
-                        bool canPasteAssembler = rNodes.Any(rn => rn.BaseRecipe.Recipe is Recipe rnRecipe && rnRecipe.Assemblers.Contains(pastedAssembler));
-                        bool canPasteExtraProductivityMiners = rNodes.Any(rn => rn.SelectedAssembler.Assembler is Assembler sa && sa.EntityType == EntityType.Miner);
-                        bool canPasteExtraProductivityNonMiners = graphViewer.Graph.EnableExtraProductivityForNonMiners && rNodes.Any(rn => rn.SelectedAssembler.Assembler is Assembler sa && sa.EntityType != EntityType.Miner);
-                        bool canPasteFuel = pasteOptions.Fuel is Item pasteFuelOption && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe is Recipe rnRecipe && rnRecipe.Assemblers.Any(a => a.Fuels.Contains(pasteFuelOption))));
-                        bool canPasteModules = pasteOptions.AssemblerModules.Count > 0 && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe is Recipe rnRecipe && rnRecipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler is Assembler sa && sa.Modules.Count > 0 && sa.ModuleSlots > 0));
-                        bool canPasteBeacon = pasteOptions.Beacon && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe is Recipe rnRecipe && rnRecipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler is Assembler sa && sa.Modules.Count > 0));
+                        && pasteOptions.Assembler.Assembler is IAssembler pastedAssembler) {
+                        bool canPasteAssembler = rNodes.Any(rn => rn.BaseRecipe.Recipe is IRecipe rnRecipe && rnRecipe.Assemblers.Contains(pastedAssembler));
+                        bool canPasteExtraProductivityMiners = rNodes.Any(rn => rn.SelectedAssembler.Assembler is IAssembler sa && sa.EntityType == EntityType.Miner);
+                        bool canPasteExtraProductivityNonMiners = graphViewer.Graph.EnableExtraProductivityForNonMiners && rNodes.Any(rn => rn.SelectedAssembler.Assembler is IAssembler sa && sa.EntityType != EntityType.Miner);
+                        bool canPasteFuel = pasteOptions.Fuel is IItem pasteFuelOption && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe is IRecipe rnRecipe && rnRecipe.Assemblers.Any(a => a.Fuels.Contains(pasteFuelOption))));
+                        bool canPasteModules = pasteOptions.AssemblerModules.Count > 0 && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe is IRecipe rnRecipe && rnRecipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler is IAssembler sa && sa.Modules.Count > 0 && sa.ModuleSlots > 0));
+                        bool canPasteBeacon = pasteOptions.Beacon && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe is IRecipe rnRecipe && rnRecipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler is IAssembler sa && sa.Modules.Count > 0));
 
                         if (canPasteAssembler || canPasteFuel || canPasteModules || canPasteBeacon) {
                             RightClickMenu.ShowCheckMargin = true;
 
-                            ToolStripMenuItem assemblerCheck = new ToolStripMenuItem(pastedAssembler.GetEntityTypeName(false)) { CheckOnClick = true, Checked = canPasteAssembler && OptionsCopyAssemblerDefault, Enabled = canPasteAssembler, Tag = "CheckBox" };
-                            ToolStripMenuItem extraProductivityMinersCheck = new ToolStripMenuItem("Bonus Productivity (Miners)") { CheckOnClick = true, Checked = canPasteExtraProductivityMiners && OptionsCopyExtraProductivityMinersDefault, Enabled = canPasteExtraProductivityMiners, Tag = "CheckBox" };
-                            ToolStripMenuItem extraProductivityNonMinersCheck = new ToolStripMenuItem("Bonus Productivity (non-Miners)") { CheckOnClick = true, Checked = canPasteExtraProductivityNonMiners && OptionsCopyExtraProductivityNonMinersDefault, Enabled = canPasteExtraProductivityNonMiners, Tag = "CheckBox" };
-                            ToolStripMenuItem fuelCheck = new ToolStripMenuItem("Fuel") { CheckOnClick = true, Checked = canPasteFuel && OptionsCopyFuelDefault, Enabled = canPasteFuel, Tag = "CheckBox" };
-                            ToolStripMenuItem modulesCheck = new ToolStripMenuItem("Modules") { CheckOnClick = true, Checked = canPasteModules && OptionsCopyModulesDefault, Enabled = canPasteModules, Tag = "CheckBox" };
-                            ToolStripMenuItem beaconCheck = new ToolStripMenuItem("Beacon") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
-                            ToolStripMenuItem beaconModuleCheck = new ToolStripMenuItem("Beacon Modules") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconModulesDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
+                            var tsAssemblerCheck = new ToolStripMenuItem(pastedAssembler.GetEntityTypeName(false)) { CheckOnClick = true, Checked = canPasteAssembler && OptionsCopyAssemblerDefault, Enabled = canPasteAssembler, Tag = "CheckBox" };
+                            var tsExtraProductivityMinersCheck = new ToolStripMenuItem("Bonus Productivity (Miners)") { CheckOnClick = true, Checked = canPasteExtraProductivityMiners && OptionsCopyExtraProductivityMinersDefault, Enabled = canPasteExtraProductivityMiners, Tag = "CheckBox" };
+                            var tsExtraProductivityNonMinersCheck = new ToolStripMenuItem("Bonus Productivity (non-Miners)") { CheckOnClick = true, Checked = canPasteExtraProductivityNonMiners && OptionsCopyExtraProductivityNonMinersDefault, Enabled = canPasteExtraProductivityNonMiners, Tag = "CheckBox" };
+                            var tsFuelCheck = new ToolStripMenuItem("Fuel") { CheckOnClick = true, Checked = canPasteFuel && OptionsCopyFuelDefault, Enabled = canPasteFuel, Tag = "CheckBox" };
+                            var tsModulesCheck = new ToolStripMenuItem("Modules") { CheckOnClick = true, Checked = canPasteModules && OptionsCopyModulesDefault, Enabled = canPasteModules, Tag = "CheckBox" };
+                            var tsBeaconCheck = new ToolStripMenuItem("Beacon") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
+                            var tsBeaconModuleCheck = new ToolStripMenuItem("Beacon Modules") { CheckOnClick = true, Checked = canPasteBeacon && OptionsCopyBeaconModulesDefault, Enabled = canPasteBeacon, Tag = "CheckBox" };
 
-                            if (canPasteAssembler)
-                                RightClickMenu.Items.Add(assemblerCheck);
-                            if (canPasteExtraProductivityMiners)
-                                RightClickMenu.Items.Add(extraProductivityMinersCheck);
-                            if (canPasteExtraProductivityNonMiners)
-                                RightClickMenu.Items.Add(extraProductivityNonMinersCheck);
-                            if (canPasteFuel)
-                                RightClickMenu.Items.Add(fuelCheck);
-                            if (canPasteModules)
-                                RightClickMenu.Items.Add(modulesCheck);
-                            if (canPasteBeacon)
-                                RightClickMenu.Items.Add(beaconCheck);
-                            if (canPasteBeacon)
-                                RightClickMenu.Items.Add(beaconModuleCheck);
-                            RightClickMenu.Items.Add(new ToolStripSeparator());
-                            RightClickMenu.Items.Add(new ToolStripMenuItem("Paste selected options", null,
-                                new EventHandler((o, e) => {
-                                    RightClickMenu.Close();
-                                    if (canPasteAssembler)
-                                        OptionsCopyAssemblerDefault = assemblerCheck.Checked;
-                                    if (canPasteExtraProductivityMiners)
-                                        OptionsCopyExtraProductivityMinersDefault = extraProductivityMinersCheck.Checked;
-                                    if (canPasteExtraProductivityNonMiners)
-                                        OptionsCopyExtraProductivityNonMinersDefault = extraProductivityNonMinersCheck.Checked;
-                                    if (canPasteFuel)
-                                        OptionsCopyFuelDefault = fuelCheck.Checked;
-                                    if (canPasteModules)
-                                        OptionsCopyModulesDefault = modulesCheck.Checked;
-                                    if (canPasteBeacon)
-                                        OptionsCopyBeaconDefault = beaconCheck.Checked;
-                                    if (canPasteBeacon)
-                                        OptionsCopyBeaconModulesDefault = beaconCheck.Checked;
+                            try {
+                                var assemblerCheck = new WeakReference<ToolStripMenuItem>(tsAssemblerCheck);
+                                var extraProductivityMinersCheck = new WeakReference<ToolStripMenuItem>(tsExtraProductivityMinersCheck);
+                                var extraProductivityNonMinersCheck = new WeakReference<ToolStripMenuItem>(tsExtraProductivityNonMinersCheck);
+                                var fuelCheck = new WeakReference<ToolStripMenuItem>(tsFuelCheck);
+                                var modulesCheck = new WeakReference<ToolStripMenuItem>(tsModulesCheck);
+                                var beaconCheck = new WeakReference<ToolStripMenuItem>(tsBeaconCheck);
+                                var beaconModuleCheck = new WeakReference<ToolStripMenuItem>(tsBeaconModuleCheck);
+                                if (canPasteAssembler) {
+                                    RightClickMenu.Items.Add(tsAssemblerCheck);
+                                    tsAssemblerCheck = null;
+                                }
+                                if (canPasteExtraProductivityMiners) {
+                                    RightClickMenu.Items.Add(tsExtraProductivityMinersCheck);
+                                    tsExtraProductivityMinersCheck = null;
+                                }
+                                if (canPasteExtraProductivityNonMiners) {
+                                    RightClickMenu.Items.Add(tsExtraProductivityNonMinersCheck);
+                                    tsExtraProductivityNonMinersCheck = null;
+                                }
+                                if (canPasteFuel) {
+                                    RightClickMenu.Items.Add(tsFuelCheck);
+                                    tsFuelCheck = null;
+                                }
+                                if (canPasteModules) {
+                                    RightClickMenu.Items.Add(tsModulesCheck);
+                                    tsModulesCheck = null;
+                                }
+                                if (canPasteBeacon) {
+                                    RightClickMenu.Items.Add(tsBeaconCheck);
+                                    tsBeaconCheck = null;
+                                }
+                                if (canPasteBeacon) {
+                                    RightClickMenu.Items.Add(tsBeaconModuleCheck);
+                                    tsBeaconModuleCheck = null;
+                                }
+                                RightClickMenu.Items.Add(new ToolStripSeparator());
+                                RightClickMenu.Items.Add(new ToolStripMenuItem("Paste selected options", null,
+                                    new EventHandler((o, e) => {
+                                        RightClickMenu.Close();
+                                        assemblerCheck.TryGetTarget(out var tsAssembler);
+                                        extraProductivityMinersCheck.TryGetTarget(out var tsEpMiners);
+                                        extraProductivityNonMinersCheck.TryGetTarget(out var tsEpNonMiners);
+                                        fuelCheck.TryGetTarget(out var tsFuel);
+                                        modulesCheck.TryGetTarget(out var tsModules);
+                                        beaconCheck.TryGetTarget(out var tsBeacon);
+                                        beaconModuleCheck.TryGetTarget(out var tsBeaconModule);
+                                        if (canPasteAssembler && tsAssembler is not null)
+                                            OptionsCopyAssemblerDefault = tsAssembler.Checked;
+                                        if (canPasteExtraProductivityMiners && tsEpMiners is not null)
+                                            OptionsCopyExtraProductivityMinersDefault = tsEpMiners.Checked;
+                                        if (canPasteExtraProductivityNonMiners && tsEpNonMiners is not null)
+                                            OptionsCopyExtraProductivityNonMinersDefault = tsEpNonMiners.Checked;
+                                        if (canPasteFuel && tsFuel is not null)
+                                            OptionsCopyFuelDefault = tsFuel.Checked;
+                                        if (canPasteModules && tsModules is not null)
+                                            OptionsCopyModulesDefault = tsModules.Checked;
+                                        if (canPasteBeacon && tsBeacon is not null)
+                                            OptionsCopyBeaconDefault = tsBeacon.Checked;
+                                        if (canPasteBeacon && tsBeaconModule is not null)
+                                            OptionsCopyBeaconModulesDefault = tsBeaconModule.Checked;
 
-                                    foreach (IRecipeNodeViewModel rNode in rNodes) {
-                                        if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is not RecipeNodeController controller)
-                                            continue;
+                                        foreach (RecipeNodeViewModel rNode in rNodes) {
+                                            if (graphViewer.Session.Editor.RequestNodeController(rNode.Id) is not RecipeNodeController controller)
+                                                continue;
 
-                                        if (assemblerCheck.Checked && rNode.BaseRecipe.Recipe is Recipe nodeRecipe && nodeRecipe.Assemblers.Contains(pastedAssembler)) {
-                                            controller.SetAssembler(pasteOptions.Assembler);
-                                            if (rNode.SelectedAssembler.Assembler is Assembler selectedAssembler && selectedAssembler.EntityType == EntityType.Reactor)
-                                                controller.SetNeighbourCount(pasteOptions.NeighbourCount);
+                                            if (tsAssembler?.Checked is true && rNode.BaseRecipe.Recipe is IRecipe nodeRecipe && nodeRecipe.Assemblers.Contains(pastedAssembler)) {
+                                                controller.SetAssembler(pasteOptions.Assembler);
+                                                if (rNode.SelectedAssembler.Assembler is IAssembler selectedAssembler && selectedAssembler.EntityType == EntityType.Reactor)
+                                                    controller.SetNeighbourCount(pasteOptions.NeighbourCount);
+                                            }
+
+                                            if (tsEpMiners?.Checked is true && rNode.SelectedAssembler.Assembler is IAssembler minerAssembler && minerAssembler.EntityType == EntityType.Miner)
+                                                controller.SetExtraProductivityBonus(pasteOptions.ExtraProductivityBonus);
+                                            if (tsEpNonMiners?.Checked is true && rNode.SelectedAssembler.Assembler is IAssembler nonMinerAssembler && nonMinerAssembler.EntityType != EntityType.Miner)
+                                                controller.SetExtraProductivityBonus(pasteOptions.ExtraProductivityBonus);
+
+                                            if (tsFuel?.Checked is true && pasteOptions.Fuel is IItem pasteFuel && rNode.SelectedAssembler.Assembler is IAssembler fuelAssembler && fuelAssembler.Fuels.Contains(pasteFuel))
+                                                controller.SetFuel(pasteFuel);
+
+                                            if (tsModules?.Checked is true && rNode.SelectedAssembler.Assembler is IAssembler moduleAssembler && rNode.BaseRecipe.Recipe is IRecipe moduleRecipe) {
+                                                var acceptableAssemblerModules = new HashSet<IModule>(moduleRecipe.AssemblerModules.Intersect(moduleAssembler.Modules));
+                                                if (!pasteOptions.AssemblerModules.Any(module => module.Module is IModule copiedModule && !acceptableAssemblerModules.Contains(copiedModule)))
+                                                    controller.SetAssemblerModules(pasteOptions.AssemblerModules, true);
+                                            }
+
+                                            if (tsBeacon?.Checked is true && rNode.SelectedAssembler.Assembler is IAssembler beaconHostAssembler && rNode.BaseRecipe.Recipe is IRecipe beaconRecipe && beaconRecipe.AssemblerModules.Intersect(beaconHostAssembler.Modules).Any() && pasteOptions.Beacon) {
+                                                controller.SetBeacon(pasteOptions.Beacon);
+                                                controller.SetBeaconCount(pasteOptions.BeaconCount);
+                                                controller.SetBeaconsCont(pasteOptions.BeaconsConst);
+                                                controller.SetBeaconsPerAssembler(pasteOptions.BeaconsPerAssembler);
+                                            }
+
+                                            if (tsBeaconModule?.Checked is true && rNode.SelectedBeacon && rNode.SelectedBeacon.Beacon is IBeacon selectedBeacon && rNode.SelectedAssembler.Assembler is IAssembler beaconModuleHostAssembler && rNode.BaseRecipe.Recipe is IRecipe beaconModuleRecipe) {
+                                                var acceptableBeaconModules = new HashSet<IModule>(beaconModuleRecipe.AssemblerModules.Intersect(beaconModuleHostAssembler.Modules).Intersect(selectedBeacon.Modules));
+                                                if (!pasteOptions.BeaconModules.Any(module => module.Module is IModule copiedBeaconModule && !acceptableBeaconModules.Contains(copiedBeaconModule)))
+                                                    controller.SetBeaconModules(pasteOptions.BeaconModules, true);
+                                            }
                                         }
 
-                                        if (extraProductivityMinersCheck.Checked && rNode.SelectedAssembler.Assembler is Assembler minerAssembler && minerAssembler.EntityType == EntityType.Miner)
-                                            controller.SetExtraProductivityBonus(pasteOptions.ExtraProductivityBonus);
-                                        if (extraProductivityNonMinersCheck.Checked && rNode.SelectedAssembler.Assembler is Assembler nonMinerAssembler && nonMinerAssembler.EntityType != EntityType.Miner)
-                                            controller.SetExtraProductivityBonus(pasteOptions.ExtraProductivityBonus);
+                                        graphViewer.Graph.UpdateNodeValues();
+                                    })));
 
-                                        if (fuelCheck.Checked && pasteOptions.Fuel is Item pasteFuel && rNode.SelectedAssembler.Assembler is Assembler fuelAssembler && fuelAssembler.Fuels.Contains(pasteFuel))
-                                            controller.SetFuel(pasteFuel);
-
-                                        if (modulesCheck.Checked && rNode.SelectedAssembler.Assembler is Assembler moduleAssembler && rNode.BaseRecipe.Recipe is Recipe moduleRecipe) {
-                                            HashSet<Module> acceptableAssemblerModules = new HashSet<Module>(moduleRecipe.AssemblerModules.Intersect(moduleAssembler.Modules));
-                                            if (!pasteOptions.AssemblerModules.Any(module => module.Module is Module copiedModule && !acceptableAssemblerModules.Contains(copiedModule)))
-                                                controller.SetAssemblerModules(pasteOptions.AssemblerModules, true);
-                                        }
-
-                                        if (beaconCheck.Checked && rNode.SelectedAssembler.Assembler is Assembler beaconHostAssembler && rNode.BaseRecipe.Recipe is Recipe beaconRecipe && beaconRecipe.AssemblerModules.Intersect(beaconHostAssembler.Modules).Any() && pasteOptions.Beacon) {
-                                            controller.SetBeacon(pasteOptions.Beacon);
-                                            controller.SetBeaconCount(pasteOptions.BeaconCount);
-                                            controller.SetBeaconsCont(pasteOptions.BeaconsConst);
-                                            controller.SetBeaconsPerAssembler(pasteOptions.BeaconsPerAssembler);
-                                        }
-
-                                        if (beaconModuleCheck.Checked && rNode.SelectedBeacon && rNode.SelectedBeacon.Beacon is Beacon selectedBeacon && rNode.SelectedAssembler.Assembler is Assembler beaconModuleHostAssembler && rNode.BaseRecipe.Recipe is Recipe beaconModuleRecipe) {
-                                            HashSet<Module> acceptableBeaconModules = new HashSet<Module>(beaconModuleRecipe.AssemblerModules.Intersect(beaconModuleHostAssembler.Modules).Intersect(selectedBeacon.Modules));
-                                            if (!pasteOptions.BeaconModules.Any(module => module.Module is Module copiedBeaconModule && !acceptableBeaconModules.Contains(copiedBeaconModule)))
-                                                controller.SetBeaconModules(pasteOptions.BeaconModules, true);
-                                        }
-                                    }
-
-                                    graphViewer.Graph.UpdateNodeValues();
-                                })));
-
-                            RightClickMenu.Items.Add(new ToolStripSeparator());
+                                RightClickMenu.Items.Add(new ToolStripSeparator());
+                            } finally {
+                                tsAssemblerCheck?.Dispose();
+                                tsExtraProductivityMinersCheck?.Dispose();
+                                tsExtraProductivityNonMinersCheck?.Dispose();
+                                tsFuelCheck?.Dispose();
+                                tsModulesCheck?.Dispose();
+                                tsBeaconCheck?.Dispose();
+                                tsBeaconModuleCheck?.Dispose();
+                            }
                         }
                     }
                 }
@@ -265,26 +305,27 @@ namespace Foreman {
                 })));
         }
 
-        protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive) {
-            List<TooltipInfo> tooltips = new List<TooltipInfo>();
+        protected override List<TooltipInfo> GetMyToolTips(Point graphPoint, bool exclusive) {
+            var tooltips = new List<TooltipInfo>();
 
             if (graphViewer.ShowRecipeToolTip) {
-                if (RecipeViewModel.BaseRecipe.Recipe is Recipe recipe) {
-                    Recipe[] recipes = [recipe];
-                    TooltipInfo ttiRecipe = new TooltipInfo();
-                    ttiRecipe.Direction = Direction.Left;
-                    ttiRecipe.ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(Width / 2, 0)));
-                    ttiRecipe.ScreenSize = RecipePainter.GetSize(recipes);
-                    ttiRecipe.CustomDraw = (Graphics g, Point offset) => RecipePainter.Paint(recipes, g, offset);
+                if (RecipeViewModel.BaseRecipe.Recipe is IRecipe recipe) {
+                    IRecipe[] recipes = [recipe];
+                    var ttiRecipe = new TooltipInfo {
+                        Direction = Direction.Left,
+                        ScreenLocation = graphViewer.GraphToScreen(LocalToGraph(new Point(Width / 2, 0))),
+                        ScreenSize = RecipePainter.GetSize(recipes),
+                        CustomDraw = (g, offset) => RecipePainter.Paint(recipes, g, offset)
+                    };
                     tooltips.Add(ttiRecipe);
                 }
             }
 
-            string entityName = RecipeViewModel.SelectedAssembler.Assembler is Assembler helpAssembler
-                ? helpAssembler.GetEntityTypeName(false).ToLower()
+            string entityName = RecipeViewModel.SelectedAssembler.Assembler is IAssembler helpAssembler
+                ? helpAssembler.GetEntityTypeName(false).ToLowerInvariant()
                 : "assembler";
             tooltips.AddRange(ExclusiveHelpTooltip(
-                string.Format("Left click on this node to edit its {0}, modules, beacon, etc.\nRight click for options.", entityName),
+                string.Format(DisplayCulture.Format, "Left click on this node to edit its {0}, modules, beacon, etc.\nRight click for options.", entityName),
                 exclusive));
 
             return tooltips;

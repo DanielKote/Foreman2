@@ -3,9 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ForemanTest.support {
     [TestClass]
-    public sealed class ForemanTestAssemblySetup {
+    public static class ForemanTestAssemblySetup {
         [AssemblyInitialize]
-        public static void AssemblyInitialize(TestContext context) {
+        public static void AssemblyInitialize(TestContext _) {
             UserMessages.TestHandler = UserMessages.FailTestOnAnyMessage;
         }
 

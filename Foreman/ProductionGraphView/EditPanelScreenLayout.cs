@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView {
     /// <summary>Screen-space placement for floating node edit panels (no viewport pan).</summary>
     public static class EditPanelScreenLayout {
         public const int DefaultMargin = 25;

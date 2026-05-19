@@ -1,11 +1,10 @@
 ﻿using Foreman.Graph;
+using Foreman.Models;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public class LinkElement : BaseLinkElement {
         public INodeLinkViewModel ViewModel { get; private set; }
         public override ItemQualityPair Item { get { return ViewModel.Item; } protected set { } }
@@ -23,7 +22,7 @@ namespace Foreman {
             ItemTabElement? supplierTab = supplierElement.GetOutputLineItemTab(Item);
             ItemTabElement? consumerTab = consumerElement.GetInputLineItemTab(Item);
             if (supplierTab == null || consumerTab == null)
-                throw new InvalidOperationException(string.Format("Link element being created with one of the elements ({0}, {1}) not having the required item ({2})!", supplierElement, consumerElement, Item));
+                throw new InvalidOperationException(string.Format(DisplayCulture.Format, "Link element being created with one of the elements ({0}, {1}) not having the required item ({2})!", supplierElement, consumerElement, Item));
             SupplierTab = supplierTab;
             ConsumerTab = consumerTab;
 
@@ -32,14 +31,14 @@ namespace Foreman {
         }
 
         protected override Tuple<Point, Point> GetCurveEndpoints() {
-            if (SupplierElement is null || ConsumerElement is null || SupplierTab is null || ConsumerTab is null)
-                throw new InvalidOperationException("Link element is missing a connected node or item tab.");
-            return new Tuple<Point, Point>(iconOnlyDraw ? SupplierElement.Location : SupplierTab.GetConnectionPoint(), iconOnlyDraw ? ConsumerElement.Location : ConsumerTab.GetConnectionPoint());
+            return SupplierElement is null || ConsumerElement is null || SupplierTab is null || ConsumerTab is null
+                ? throw new InvalidOperationException("Link element is missing a connected node or item tab.")
+                : new Tuple<Point, Point>(iconOnlyDraw ? SupplierElement.Location : SupplierTab.GetConnectionPoint(), iconOnlyDraw ? ConsumerElement.Location : ConsumerTab.GetConnectionPoint());
         }
         protected override Tuple<NodeDirection, NodeDirection> GetEndpointDirections() {
-            if (SupplierElement is null || ConsumerElement is null)
-                throw new InvalidOperationException("Link element is missing a connected node.");
-            return new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, ConsumerElement.ViewModel.NodeDirection);
+            return SupplierElement is null || ConsumerElement is null
+                ? throw new InvalidOperationException("Link element is missing a connected node.")
+                : new Tuple<NodeDirection, NodeDirection>(SupplierElement.ViewModel.NodeDirection, ConsumerElement.ViewModel.NodeDirection);
         }
     }
 }

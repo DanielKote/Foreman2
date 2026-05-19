@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using Foreman.ProductionGraphView.Annotations;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -69,7 +71,7 @@ namespace Foreman {
 
         private void ExportBitmap(Rectangle bounds, float scale, Action<Graphics, Rectangle> configureTransform) {
             using Bitmap image = new(GraphExportBounds.ScaledWidth(bounds, scale), GraphExportBounds.ScaledHeight(bounds, scale));
-            using Graphics graphics = Graphics.FromImage(image);
+            using var graphics = Graphics.FromImage(image);
             graphics.ResetTransform();
             configureTransform(graphics, bounds);
             graphics.SmoothingMode = SmoothingMode.HighQuality;

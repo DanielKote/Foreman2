@@ -1,21 +1,22 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Foreman {
+namespace Foreman.Models {
     public class ModuleSelector {
         public enum Style { None, Speed, Productivity, ProductivityOnly, Efficiency, EfficiencyOnly }
-        public static readonly string[] StyleNames = new string[] { "None", "Speed", "Productivity", "Productivity Only", "Efficiency", "Efficiency Only" };
+        public static readonly string[] StyleNames = ["None", "Speed", "Productivity", "Productivity Only", "Efficiency", "Efficiency Only"];
 
         public Style DefaultSelectionStyle { get; set; }
 
         public ModuleSelector() { DefaultSelectionStyle = Style.None; }
 
-        public List<Module> GetModules(Assembler assembler, Recipe recipe) { return GetModules(assembler, recipe, DefaultSelectionStyle); }
-        public List<Module> GetModules(Assembler assembler, Recipe recipe, Style style) {
-            var moduleList = new List<Module>();
-            Module? bestModule = null;
-            Quality? quality = assembler.Owner.DefaultQuality;
+        public List<IModule> GetModules(IAssembler assembler, IRecipe recipe) { return GetModules(assembler, recipe, DefaultSelectionStyle); }
+        public static List<IModule> GetModules(IAssembler assembler, IRecipe recipe, Style style) {
+            var moduleList = new List<IModule>();
+            IModule? bestModule = null;
+            IQuality? quality = assembler.Owner.DefaultQuality;
             if (assembler == null || assembler.ModuleSlots == 0 || quality is null)
                 return moduleList;
 
@@ -33,21 +34,21 @@ namespace Foreman {
                     bestModule = assembler.Modules.Intersect(recipe.AssemblerModules).Where(m => m.Enabled && m.GetProductivityBonus(quality) != 0).OrderBy(m => ((m.GetProductivityBonus(quality) * 1000) + m.GetSpeedBonus(quality))).LastOrDefault();
                     break;
                 case Style.Efficiency:
-                    List<Module> speedModules = assembler.Modules.Intersect(recipe.AssemblerModules).Where(m => m.Enabled && m.GetSpeedBonus(quality) > 0).OrderByDescending(m => ((m.GetSpeedBonus(quality) * 1000) - m.GetConsumptionBonus(quality))).ToList(); //highest speed is first!
-                    List<Module> efficiencyModules = assembler.Modules.Intersect(recipe.AssemblerModules).Where(m => m.Enabled && m.GetConsumptionBonus(quality) < 0).OrderByDescending(m => ((m.GetConsumptionBonus(quality) * 1000) + m.GetSpeedBonus(quality))).ToList(); //highest consumption is first! (so worst->best effectivity)
+                    var speedModules = assembler.Modules.Intersect(recipe.AssemblerModules).Where(m => m.Enabled && m.GetSpeedBonus(quality) > 0).OrderByDescending(m => ((m.GetSpeedBonus(quality) * 1000) - m.GetConsumptionBonus(quality))).ToList(); //highest speed is first!
+                    var efficiencyModules = assembler.Modules.Intersect(recipe.AssemblerModules).Where(m => m.Enabled && m.GetConsumptionBonus(quality) < 0).OrderByDescending(m => ((m.GetConsumptionBonus(quality) * 1000) + m.GetSpeedBonus(quality))).ToList(); //highest consumption is first! (so worst->best effectivity)
                     List<ModulePermutator.Permutation> modulePermutations = ModulePermutator.GetOptimalEfficiencyPermutations(speedModules, efficiencyModules, assembler.ModuleSlots);
 
                     //return best module permutation that has the lowest consumption (max -80%), and the highest speed.
                     if (modulePermutations.Count > 0)
-                        return modulePermutations.OrderByDescending(p => p.ConsumptionBonus).ThenBy(p => p.SpeedBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.OfType<Module>().OrderBy(m => m.FriendlyName).ToList();
+                        return [.. modulePermutations.OrderByDescending(p => p.ConsumptionBonus).ThenBy(p => p.SpeedBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.OfType<IModule>().OrderBy(m => m.FriendlyName)];
                     return moduleList; //empty
                 case Style.EfficiencyOnly:
-                    List<Module> moduleOptions = assembler.Modules.Intersect(recipe.AssemblerModules).Where(m => m.Enabled && m.GetConsumptionBonus(quality) < 0).OrderByDescending(m => ((m.GetConsumptionBonus(quality) * 1000) - m.GetSpeedBonus(quality))).ToList();
-                    List<ModulePermutator.Permutation> modulePermutationsB = ModulePermutator.GetOptimalEfficiencyPermutations(new List<Module>(), moduleOptions, assembler.ModuleSlots);
+                    var moduleOptions = assembler.Modules.Intersect(recipe.AssemblerModules).Where(m => m.Enabled && m.GetConsumptionBonus(quality) < 0).OrderByDescending(m => ((m.GetConsumptionBonus(quality) * 1000) - m.GetSpeedBonus(quality))).ToList();
+                    List<ModulePermutator.Permutation> modulePermutationsB = ModulePermutator.GetOptimalEfficiencyPermutations([], moduleOptions, assembler.ModuleSlots);
 
                     //return best module permutation that has the lowest consumption (max -80%), and the lowest tier cost
                     if (modulePermutationsB.Count > 0)
-                        return modulePermutationsB.OrderByDescending(p => p.ConsumptionBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.OfType<Module>().OrderBy(m => m.FriendlyName).ToList();
+                        return [.. modulePermutationsB.OrderByDescending(p => p.ConsumptionBonus).ThenByDescending(p => p.SquaredTierValue).Last().Modules.OfType<IModule>().OrderBy(m => m.FriendlyName)];
                     return moduleList; //empty
                 case Style.None:
                 default:
@@ -62,18 +63,18 @@ namespace Foreman {
     }
 
     public static class ModulePermutator {
-        public struct Permutation {
-            public Module?[] Modules; //NOTE: a null module is possible! this means that this particular permutation isnt using all slots.
-            public double SpeedBonus;
-            public double ProductivityBonus;
-            public double ConsumptionBonus;
-            public double PollutionBonus;
-            public int SquaredTierValue; //total of all added modules tiers squared (ex: T1+T2+T3 would have a value of 1+4+9) ->usefull for solving for 'cheapest' option
+        public record struct Permutation {
+            public IReadOnlyCollection<IModule?> Modules { get; set; } = []; //NOTE: a null module is possible! this means that this particular permutation isnt using all slots.
+            public double SpeedBonus { get; set; }
+            public double ProductivityBonus { get; set; }
+            public double ConsumptionBonus { get; set; }
+            public double PollutionBonus { get; set; }
+            public int SquaredTierValue { get; set; } //total of all added modules tiers squared (ex: T1+T2+T3 would have a value of 1+4+9) ->usefull for solving for 'cheapest' option
 
-            public Permutation(Module?[] modules) {
+            public Permutation(IModule?[] modules) {
                 Modules = modules;
                 //ok, this is a bit jank, I admit. Still, quality completely messes up the module selector anyway :/
-                if (modules[0]?.Owner.DefaultQuality is not Quality quality)
+                if (modules[0]?.Owner.DefaultQuality is not IQuality quality)
                     return;
                 SpeedBonus = 0;
                 ProductivityBonus = 0;
@@ -97,8 +98,8 @@ namespace Foreman {
                 PollutionBonus = Math.Max(-0.8f, PollutionBonus);
             }
 
-            public override string ToString() {
-                string str = "Speed: " + SpeedBonus.ToString("P") + ", Productivity: " + ProductivityBonus.ToString("P") + ", Energy: " + ConsumptionBonus.ToString("P") + ", Pollution: " + PollutionBonus.ToString("P") + ", SqTierValue: " + SquaredTierValue + ", Modules: ";
+            public override readonly string ToString() {
+                string str = "Speed: " + SpeedBonus.ToString("P", DisplayCulture.Format) + ", Productivity: " + ProductivityBonus.ToString("P", DisplayCulture.Format) + ", Energy: " + ConsumptionBonus.ToString("P", DisplayCulture.Format) + ", Pollution: " + PollutionBonus.ToString("P", DisplayCulture.Format) + ", SqTierValue: " + SquaredTierValue + ", Modules: ";
                 foreach (var m in Modules) {
                     if (m != null)
                         str += m + ", ";
@@ -109,12 +110,12 @@ namespace Foreman {
             }
         }
 
-        public static List<Permutation> GetOptimalEfficiencyPermutations(List<Module> speedModules, List<Module> efficiencyModules, int moduleSlots) //the original approach of brute forcing things runs into a ceiling when using over 12 modules or 12 slots (I mean, its a combination -> factorials everywhere)
+        public static List<Permutation> GetOptimalEfficiencyPermutations(List<IModule> speedModules, List<IModule> efficiencyModules, int moduleSlots) //the original approach of brute forcing things runs into a ceiling when using over 12 modules or 12 slots (I mean, its a combination -> factorials everywhere)
         {
             //doe by a 'smart' approach: fill in the set with i of one type speed and (module slot - i) of one type efficiency, then refine by changing 1 of the speeds to a different module and 1 of the efficiencies to a different module.
             //so assume the ideal solution will be in the form (i - 1)* speedModule A + (1)* speedModuleB + (module slots - i - 1)* efficiencyModule A + (1) * efficiencyModuleB where speedModuleA and speedModuleB can be equal (same for efficiencyA and B)
-            List<Permutation> permutations = new List<Permutation>();
-            Module?[] permutation = new Module[moduleSlots];
+            var permutations = new List<Permutation>();
+            var permutation = new IModule?[moduleSlots];
 
 
             //permutation will be in the form [ 1 speedModuleB, n-1 amounts of speedModuleA, moduleslots-n-1 amounts of efficiencyModuleA, 1 efficiencyModuleB ] where n is between 1 and moduleslots - 1.
@@ -162,7 +163,7 @@ namespace Foreman {
             for (int i = 0; i < moduleSlots; i++)
                 permutation[i] = null;
             permutations.Add(new Permutation(permutation)); //no modules
-            foreach (Module module in efficiencyModules) {
+            foreach (IModule module in efficiencyModules) {
                 permutation[0] = module;
                 permutations.Add(new Permutation(permutation)); //1 module
             }

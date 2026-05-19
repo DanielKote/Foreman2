@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Foreman.DataCaching;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.Forms {
     /// <summary>Deduplicates bitmap references when populating the settings enabled-objects <see cref="ImageList"/>.</summary>
     internal sealed class EnabledObjectsIconIndex {
         private readonly ImageList iconList;

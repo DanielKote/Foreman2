@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     /// <summary>STJ wire shapes for Foreman graph .fjson (property names match on-disk format).</summary>
     internal sealed class ProductionGraphWire {
         public int Version { get; set; }

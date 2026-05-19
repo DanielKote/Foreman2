@@ -1,39 +1,36 @@
-﻿using Foreman.Graph;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Graph;
+using Foreman.Models.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Foreman {
-    static class LinkChecker {
+namespace Foreman.Models {
+    internal static class LinkChecker {
         public static bool IsPossibleConnection(ItemQualityPair item, INodeViewModel supplier, INodeViewModel consumer, IProductionGraphSession session) {
-            if (!session.TryGetDomainNode(supplier.Id, out BaseNode? supplierNode) || supplierNode is null
-                || !session.TryGetDomainNode(consumer.Id, out BaseNode? consumerNode) || consumerNode is null)
-                return false;
-            return IsPossibleConnection(item, supplierNode, consumerNode);
+            return session.TryGetDomainNode(supplier.Id, out BaseNode? supplierNode) && supplierNode is not null
+                && session.TryGetDomainNode(consumer.Id, out BaseNode? consumerNode) && consumerNode is not null && IsPossibleConnection(item, supplierNode, consumerNode);
         }
 
         public static bool IsPossibleConnection(ItemQualityPair item, BaseNode supplier, BaseNode consumer) {
             if (!supplier.Outputs.Contains(item) || !consumer.Inputs.Contains(item))
                 return false;
-            if (item.Item is not Fluid fluid || !fluid.IsTemperatureDependent)
+            if (item.Item is not IFluid fluid || !fluid.IsTemperatureDependent)
                 return true;
 
-            fRange supplierTempRange = GetTemperatureRange(fluid, supplier, LinkType.Output, true);
-            fRange consumerTempRange = GetTemperatureRange(fluid, consumer, LinkType.Input, true);
+            FRange supplierTempRange = GetTemperatureRange(fluid, supplier, LinkType.Output, true);
+            FRange consumerTempRange = GetTemperatureRange(fluid, consumer, LinkType.Input, true);
 
-            if (supplierTempRange.Ignore || consumerTempRange.Ignore)
-                return true;
-
-            return consumerTempRange.Contains(supplierTempRange);
+            return supplierTempRange.Ignore || consumerTempRange.Ignore || consumerTempRange.Contains(supplierTempRange);
         }
 
-        public static fRange GetTemperatureRange(Fluid? fluid, INodeViewModel? node, LinkType direction, bool includeSelf, IProductionGraphSession session) {
-            if (node is null || !session.TryGetDomainNode(node.Id, out BaseNode? domainNode) || domainNode is null)
-                return new fRange(0, 0, true);
-            return GetTemperatureRange(fluid, domainNode, direction, includeSelf);
+        public static FRange GetTemperatureRange(IFluid? fluid, INodeViewModel? node, LinkType direction, bool includeSelf, IProductionGraphSession session) {
+            return node is null || !session.TryGetDomainNode(node.Id, out BaseNode? domainNode) || domainNode is null
+                ? new FRange(0, 0, true)
+                : GetTemperatureRange(fluid, domainNode, direction, includeSelf);
         }
 
-        public static fRange GetTemperatureRange(Fluid? fluid, BaseNode? node, LinkType direction, bool includeSelf) {
+        public static FRange GetTemperatureRange(IFluid? fluid, BaseNode? node, LinkType direction, bool includeSelf) {
             //LinkType.Input : means we have a bunch of nodes ABOVE consuming the items, and we are connecting them to a single source
             //					SO: we need to check all directly-up connected recipes for min&max temp consumption. minTemp is set to be the maximum minTemp of each consumer, and maxTemp is set to be the minimum maxTemp of each consumer
             //					THIS CAN ALLOW FOR WRONG SIDE RANGES (ex: 20 -> 0 range), which means NO VALID TEMP WOULD WORK. Any valid producer must fit inside this consumer range.
@@ -51,7 +48,7 @@ namespace Foreman {
 
             bool gotOne = false;
 
-            HashSet<BaseNode> visitedNodes = new HashSet<BaseNode>();
+            var visitedNodes = new HashSet<BaseNode>();
             void Internal_GetMinMaxTempForNode(BaseNode? cNode) {
                 if (cNode is null || visitedNodes.Contains(cNode))
                     return;
@@ -70,7 +67,7 @@ namespace Foreman {
                             Internal_GetMinMaxTempForNode(supplier);
                 }
                 if (cNode is RecipeNode recipeNode && (cNode != node || includeSelf)) {
-                    Recipe recipe = recipeNode.RecipeDefinition;
+                    IRecipe recipe = recipeNode.RecipeDefinition;
                     if (direction == LinkType.Input && fluid is not null && recipe.IngredientSet.ContainsKey(fluid)) //have to check for ingredient inclusion due to fuel/fuel-remains
                     {
                         minTemp = Math.Max(minTemp, recipe.IngredientTemperatureMap[fluid].Min);
@@ -90,10 +87,7 @@ namespace Foreman {
             }
 
             Internal_GetMinMaxTempForNode(node);
-            if (gotOne)
-                return new fRange(minTemp, maxTemp, false);
-            else
-                return new fRange(0, 0, true);
+            return gotOne ? new FRange(minTemp, maxTemp, false) : new FRange(0, 0, true);
         }
     }
 }

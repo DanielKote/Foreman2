@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -8,9 +11,9 @@ using System.Runtime.CompilerServices;
 namespace Foreman.Graph {
     internal abstract class NodeViewModelBase : INodeViewModel {
         private readonly ProductionGraphSession _session;
-        protected readonly BaseNode Node;
-        private IReadOnlyList<INodeLinkViewModel> _inputLinks = Array.Empty<INodeLinkViewModel>();
-        private IReadOnlyList<INodeLinkViewModel> _outputLinks = Array.Empty<INodeLinkViewModel>();
+        protected BaseNode Node { get; }
+        private IReadOnlyList<INodeLinkViewModel> _inputLinks = [];
+        private IReadOnlyList<INodeLinkViewModel> _outputLinks = [];
 
         protected NodeViewModelBase(NodeId id, BaseNode node, ProductionGraphSession session) {
             Id = id;
@@ -56,12 +59,8 @@ namespace Foreman.Graph {
         public virtual List<string> GetWarnings() => Node.GetWarnings();
 
         internal void RefreshLinkViewModels() {
-            _inputLinks = Node.InputLinks
-                .Select(link => _session.GetOrCreateLinkViewModel(link))
-                .ToList();
-            _outputLinks = Node.OutputLinks
-                .Select(link => _session.GetOrCreateLinkViewModel(link))
-                .ToList();
+            _inputLinks = [.. Node.InputLinks.Select(link => _session.GetOrCreateLinkViewModel(link))];
+            _outputLinks = [.. Node.OutputLinks.Select(link => _session.GetOrCreateLinkViewModel(link))];
             RaisePropertyChanged(nameof(InputLinks));
             RaisePropertyChanged(nameof(OutputLinks));
         }
@@ -94,42 +93,38 @@ namespace Foreman.Graph {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    internal sealed class SupplierNodeViewModel : NodeViewModelBase, ISupplierNodeViewModel {
-        private readonly SupplierNode _supplierNode;
-        public SupplierNodeViewModel(NodeId id, SupplierNode node, ProductionGraphSession session)
-            : base(id, node, session) => _supplierNode = node;
+    internal sealed class SupplierNodeViewModel(NodeId id, SupplierNode node, ProductionGraphSession session) : NodeViewModelBase(id, node, session), ISupplierNodeViewModel {
+        private readonly SupplierNode _supplierNode = node;
+
         public override NodeType NodeType => NodeType.Supplier;
         public ItemQualityPair SuppliedItem => _supplierNode.SuppliedItem;
     }
 
-    internal sealed class ConsumerNodeViewModel : NodeViewModelBase, IConsumerNodeViewModel {
-        private readonly ConsumerNode _consumerNode;
-        public ConsumerNodeViewModel(NodeId id, ConsumerNode node, ProductionGraphSession session)
-            : base(id, node, session) => _consumerNode = node;
+    internal sealed class ConsumerNodeViewModel(NodeId id, ConsumerNode node, ProductionGraphSession session) : NodeViewModelBase(id, node, session), IConsumerNodeViewModel {
+        private readonly ConsumerNode _consumerNode = node;
+
         public override NodeType NodeType => NodeType.Consumer;
         public ItemQualityPair ConsumedItem => _consumerNode.ConsumedItem;
     }
 
-    internal sealed class PassthroughNodeViewModel : NodeViewModelBase, IPassthroughNodeViewModel {
-        private readonly PassthroughNode _passthroughNode;
-        public PassthroughNodeViewModel(NodeId id, PassthroughNode node, ProductionGraphSession session)
-            : base(id, node, session) => _passthroughNode = node;
+    internal sealed class PassthroughNodeViewModel(NodeId id, PassthroughNode node, ProductionGraphSession session) : NodeViewModelBase(id, node, session), IPassthroughNodeViewModel {
+        private readonly PassthroughNode _passthroughNode = node;
+
         public override NodeType NodeType => NodeType.Passthrough;
         public ItemQualityPair PassthroughItem => _passthroughNode.PassthroughItem;
         public bool SimpleDraw => _passthroughNode.SimpleDraw;
     }
 
-    internal sealed class RecipeNodeViewModel : NodeViewModelBase, IRecipeNodeViewModel {
-        private readonly RecipeNode _recipeNode;
-        public RecipeNodeViewModel(NodeId id, RecipeNode node, ProductionGraphSession session)
-            : base(id, node, session) => _recipeNode = node;
+    internal sealed class RecipeNodeViewModel(NodeId id, RecipeNode node, ProductionGraphSession session) : NodeViewModelBase(id, node, session), IRecipeNodeViewModel {
+        private readonly RecipeNode _recipeNode = node;
+
         public override NodeType NodeType => NodeType.Recipe;
         public bool LowPriority => _recipeNode.LowPriority;
         public uint MaxQualitySteps => _recipeNode.MaxQualitySteps;
         public RecipeQualityPair BaseRecipe => _recipeNode.BaseRecipe;
         public AssemblerQualityPair SelectedAssembler => _recipeNode.SelectedAssembler;
-        public Item? Fuel => _recipeNode.Fuel;
-        public Item? FuelRemains => _recipeNode.FuelRemains;
+        public IItem? Fuel => _recipeNode.Fuel;
+        public IItem? FuelRemains => _recipeNode.FuelRemains;
         public IReadOnlyList<ModuleQualityPair> AssemblerModules => _recipeNode.AssemblerModules;
         public BeaconQualityPair SelectedBeacon => _recipeNode.SelectedBeacon;
         public IReadOnlyList<ModuleQualityPair> BeaconModules => _recipeNode.BeaconModules;
@@ -159,22 +154,20 @@ namespace Foreman.Graph {
         public double GetTotalBeaconElectricalConsumption() => _recipeNode.GetTotalBeaconElectricalConsumption();
     }
 
-    internal sealed class SpoilNodeViewModel : NodeViewModelBase, ISpoilNodeViewModel {
-        private readonly SpoilNode _spoilNode;
-        public SpoilNodeViewModel(NodeId id, SpoilNode node, ProductionGraphSession session)
-            : base(id, node, session) => _spoilNode = node;
+    internal sealed class SpoilNodeViewModel(NodeId id, SpoilNode node, ProductionGraphSession session) : NodeViewModelBase(id, node, session), ISpoilNodeViewModel {
+        private readonly SpoilNode _spoilNode = node;
+
         public override NodeType NodeType => NodeType.Spoil;
         public ItemQualityPair InputItem => _spoilNode.InputItem;
         public ItemQualityPair OutputItem => _spoilNode.OutputItem;
     }
 
-    internal sealed class PlantNodeViewModel : NodeViewModelBase, IPlantNodeViewModel {
-        private readonly PlantNode _plantNode;
-        public PlantNodeViewModel(NodeId id, PlantNode node, ProductionGraphSession session)
-            : base(id, node, session) => _plantNode = node;
+    internal sealed class PlantNodeViewModel(NodeId id, PlantNode node, ProductionGraphSession session) : NodeViewModelBase(id, node, session), IPlantNodeViewModel {
+        private readonly PlantNode _plantNode = node;
+
         public override NodeType NodeType => NodeType.Plant;
         public ItemQualityPair Seed => _plantNode.Seed;
-        public PlantProcess PlantProcess => _plantNode.BasePlantProcess;
+        public IPlantProcess PlantProcess => _plantNode.BasePlantProcess;
     }
 
     internal static class NodeViewModelFactory {

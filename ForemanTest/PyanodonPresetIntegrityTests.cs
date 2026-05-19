@@ -1,4 +1,6 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
+using Foreman.DataCaching.Loading;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -17,7 +19,7 @@ namespace ForemanTest {
     public class PyanodonPresetIntegrityTests : ForemanTestBase {
         [TestMethod]
         public async Task Pyanodon_AllExportedCraftingRecipes_AreLoadedOrNeverCraftableInGame() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
 
             var missingCraftable = new List<string>();
             var missingNeverCraftable = new List<string>();
@@ -41,8 +43,8 @@ namespace ForemanTest {
                 missingCraftable,
                 "Exported recipes with crafting machines must be in DataCache");
 
-            Assert.IsTrue(
-                missingNeverCraftable.Count > 0,
+            Assert.IsNotEmpty(
+                missingNeverCraftable,
                 "Expected some never-craftable exported recipes (e.g. legacy combustion) to be omitted from cache.");
             Assert.IsTrue(
                 missingNeverCraftable.All(n => n.Contains("combustion", StringComparison.Ordinal)),
@@ -52,7 +54,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_CraftableExportedRecipes_HaveAssemblers() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
             var unlinked = new List<string>();
 
             foreach (JsonNode recipeNode in PresetJson.EnumerateArray(snapshot.Root, "recipes")) {
@@ -60,9 +62,9 @@ namespace ForemanTest {
                     continue;
                 if (!PresetCraftingCompatibility.RecipeHasCraftingMachine(recipeNode, category, snapshot.CategoryMachines))
                     continue;
-                if (!snapshot.Cache.Recipes.TryGetValue(name, out Recipe? recipe) || recipe is not RecipePrototype prototype)
+                if (!snapshot.Cache.Recipes.TryGetValue(name, out IRecipe? recipe) || recipe is not RecipePrototype prototype)
                     continue;
-                if (prototype.assemblers.Count == 0)
+                if (prototype.AssemblersInternal.Count == 0)
                     unlinked.Add(name);
             }
 
@@ -73,7 +75,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_HiddenExportedRecipes_WithMachines_AreInCache_DisabledByDefault() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
 
             int hiddenWithMachines = 0;
             int missing = 0;
@@ -88,7 +90,7 @@ namespace ForemanTest {
                     continue;
 
                 hiddenWithMachines++;
-                if (!snapshot.Cache.Recipes.TryGetValue(name, out Recipe? recipe) || recipe is not RecipePrototype prototype) {
+                if (!snapshot.Cache.Recipes.TryGetValue(name, out IRecipe? recipe) || recipe is not RecipePrototype prototype) {
                     missing++;
                     continue;
                 }
@@ -96,14 +98,14 @@ namespace ForemanTest {
                     notDisabled++;
             }
 
-            Assert.IsTrue(hiddenWithMachines > 1000, "Pyanodon export should include many hidden-but-craftable recipes.");
+            Assert.IsGreaterThan(1000, hiddenWithMachines, "Pyanodon export should include many hidden-but-craftable recipes.");
             Assert.AreEqual(0, missing, "Hidden recipes with crafting machines must remain in DataCache.");
             Assert.AreEqual(0, notDisabled, "Hidden recipes should start disabled (enable via Show Hidden).");
         }
 
         [TestMethod]
         public async Task Pyanodon_AllExportedItemsAndFluids_AreInCache() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
 
             var missingItems = PresetJson.EnumerateArray(snapshot.Root, "items")
                 .Select(i => PresetJson.GetString(i, "name"))
@@ -122,7 +124,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_AllExportedTechnologies_AreInCache() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
 
             var missing = PresetJson.EnumerateArray(snapshot.Root, "technologies")
                 .Select(t => PresetJson.GetString(t, "name"))
@@ -135,16 +137,16 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_HideFromPlayerCrafting_RecipesExcludePlayerAssembler() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
-            Assembler player = snapshot.Cache.PlayerAssembler ?? throw new AssertFailedException("Player assembler is required.");
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
+            IAssembler player = snapshot.Cache.PlayerAssembler ?? throw new AssertFailedException("Player assembler is required.");
 
             var wronglyLinked = PresetJson.EnumerateArray(snapshot.Root, "recipes")
                 .Where(r => PresetJson.GetBool(r, "hide_from_player_crafting") is true)
                 .Select(r => PresetJson.GetString(r, "name"))
                 .Where(n => n is not null &&
-                    snapshot.Cache.Recipes.TryGetValue(n, out Recipe? recipe) &&
+                    snapshot.Cache.Recipes.TryGetValue(n, out IRecipe? recipe) &&
                     recipe is RecipePrototype prototype &&
-                    prototype.assemblers.Any(a => ReferenceEquals(a, player)))
+                    prototype.AssemblersInternal.Any(a => ReferenceEquals(a, player)))
                 .Cast<string>()
                 .ToList();
 
@@ -155,7 +157,7 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_AllResources_HaveExtractionRecipesInCache() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
 
             var missing = PyanodonPresetTestSupport.EnumerateAllResources(snapshot.Root)
                 .Select(r => PresetJson.GetString(r, "name"))

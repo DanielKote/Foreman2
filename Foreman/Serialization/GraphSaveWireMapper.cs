@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace Foreman {
-    /// <summary>Maps STJ wire models ↔ <see cref="GraphSaveDocuments"/>.</summary>
+namespace Foreman.Serialization {
+    /// <summary>Maps STJ wire models ↔ <see cref="ProductionGraphSaveDocument"/>.</summary>
     internal static class GraphSaveWireMapper {
         public static ProductionGraphWire FromDocument(ProductionGraphSaveDocument document) => new() {
             Version = document.Version,
@@ -16,15 +18,15 @@ namespace Foreman {
             Solver_LowPriorityPower = document.Solver?.LowPriorityPower ?? 2,
             MaxQualitySteps = document.Solver?.MaxQualitySteps ?? 0,
             DefaultQuality = document.Solver?.DefaultQualityName ?? "normal",
-            IncludedItems = document.IncludedItems.ToList(),
-            IncludedRecipes = document.IncludedRecipes.Select(FromRecipeShort).ToList(),
-            IncludedPlantProcesses = document.IncludedPlantProcesses.Select(FromPlantShort).ToList(),
-            IncludedAssemblers = document.IncludedAssemblers.ToList(),
-            IncludedModules = document.IncludedModules.ToList(),
-            IncludedBeacons = document.IncludedBeacons.ToList(),
-            IncludedQualities = document.IncludedQualities.Select(q => new QualityEntryWire { Key = q.Key, Value = q.Value }).ToList(),
-            Nodes = document.Nodes.Select(FromNode).ToList(),
-            NodeLinks = document.Links.Select(FromLink).ToList()
+            IncludedItems = [.. document.IncludedItems],
+            IncludedRecipes = [.. document.IncludedRecipes.Select(FromRecipeShort)],
+            IncludedPlantProcesses = [.. document.IncludedPlantProcesses.Select(FromPlantShort)],
+            IncludedAssemblers = [.. document.IncludedAssemblers],
+            IncludedModules = [.. document.IncludedModules],
+            IncludedBeacons = [.. document.IncludedBeacons],
+            IncludedQualities = [.. document.IncludedQualities.Select(q => new QualityEntryWire { Key = q.Key, Value = q.Value })],
+            Nodes = [.. document.Nodes.Select(FromNode)],
+            NodeLinks = [.. document.Links.Select(FromLink)]
         };
 
         public static GraphViewerWire FromDocument(GraphViewerSaveDocument document) {
@@ -32,13 +34,13 @@ namespace Foreman {
                 Version = document.Version,
                 Object = GraphSaveFormat.ViewerObject,
                 SavedPresetName = document.SavedPresetName,
-                IncludedMods = document.IncludedMods.Select(m => m.Key + "|" + m.Value).ToList(),
+                IncludedMods = [.. document.IncludedMods.Select(m => m.Key + "|" + m.Value)],
                 ProductionGraph = FromDocument(document.ProductionGraph)
             };
             if (document.Ui is not null)
                 ApplyUi(wire, document.Ui);
             if (document.Annotations.Count > 0) {
-                wire.Annotations = document.Annotations.ToList();
+                wire.Annotations = [.. document.Annotations];
                 wire.AnnotationDpi = document.AnnotationDpi;
             }
             return wire;
@@ -52,8 +54,8 @@ namespace Foreman {
                 AssemblerQuality = document.AssemblerQualityName,
                 Neighbours = document.NeighbourCount,
                 ExtraProductivity = document.ExtraProductivityBonus,
-                AModules = document.AssemblerModules.Select(FromModule).ToList(),
-                BModules = document.BeaconModules.Select(FromModule).ToList(),
+                AModules = [.. document.AssemblerModules.Select(FromModule)],
+                BModules = [.. document.BeaconModules.Select(FromModule)],
                 Fuel = document.FuelName
             };
             if (document.BeaconName is not null && document.BeaconQualityName is not null) {
@@ -74,54 +76,52 @@ namespace Foreman {
         public static ProductionGraphSaveDocument ToProductionGraphDocument(ProductionGraphWire wire) => new() {
             Version = wire.Version,
             IncludedItems = wire.IncludedItems ?? [],
-            IncludedQualities = (wire.IncludedQualities ?? []).Select(q => new KeyValuePair<string, int>(q.Key ?? "", q.Value)).ToList(),
-            IncludedRecipes = (wire.IncludedRecipes ?? []).Select(ToRecipeShort).ToList(),
-            IncludedPlantProcesses = (wire.IncludedPlantProcesses ?? []).Select(ToPlantShort).ToList(),
+            IncludedQualities = [.. (wire.IncludedQualities ?? []).Select(q => new KeyValuePair<string, int>(q.Key ?? "", q.Value))],
+            IncludedRecipes = [.. (wire.IncludedRecipes ?? []).Select(ToRecipeShort)],
+            IncludedPlantProcesses = [.. (wire.IncludedPlantProcesses ?? []).Select(ToPlantShort)],
             IncludedAssemblers = wire.IncludedAssemblers ?? [],
             IncludedModules = wire.IncludedModules ?? [],
             IncludedBeacons = wire.IncludedBeacons ?? [],
             Solver = ToSolver(wire),
-            Nodes = (wire.Nodes ?? []).Select(ToNode).OfType<GraphNodeSaveData>().ToList(),
-            Links = (wire.NodeLinks ?? []).Select(ToLink).ToList()
+            Nodes = [.. (wire.Nodes ?? []).Select(ToNode).OfType<GraphNodeSaveData>()],
+            Links = [.. (wire.NodeLinks ?? []).Select(ToLink)]
         };
 
         public static GraphViewerSaveDocument ToViewerDocument(GraphViewerWire wire) {
-            if (wire.ProductionGraph is null)
-                throw new InvalidOperationException("Viewer save is missing ProductionGraph.");
-
-            return new GraphViewerSaveDocument {
-                Version = wire.Version,
-                SavedPresetName = wire.SavedPresetName,
-                IncludedMods = ParseModList(wire.IncludedMods),
-                ProductionGraph = ToProductionGraphDocument(wire.ProductionGraph),
-                Ui = ToViewerUi(wire),
-                Annotations = wire.Annotations ?? [],
-                AnnotationDpi = wire.AnnotationDpi ?? 96
-            };
+            return wire.ProductionGraph is null
+                ? throw new InvalidOperationException("Viewer save is missing ProductionGraph.")
+                : new GraphViewerSaveDocument {
+                    Version = wire.Version,
+                    SavedPresetName = wire.SavedPresetName,
+                    IncludedMods = ParseModList(wire.IncludedMods),
+                    ProductionGraph = ToProductionGraphDocument(wire.ProductionGraph),
+                    Ui = ToViewerUi(wire),
+                    Annotations = wire.Annotations ?? [],
+                    AnnotationDpi = wire.AnnotationDpi ?? 96
+                };
         }
 
         public static NodeCopyOptionsSaveDocument? ToNodeCopyOptionsDocument(NodeCopyOptionsWire wire) {
-            if (wire.Version != GraphSaveFormat.SaveFormatVersion
+            return wire.Version != GraphSaveFormat.SaveFormatVersion
                 || wire.Object != GraphSaveFormat.NodeCopyObject
                 || string.IsNullOrEmpty(wire.Assembler)
-                || string.IsNullOrEmpty(wire.AssemblerQuality))
-                return null;
-
-            return new NodeCopyOptionsSaveDocument {
-                Version = GraphSaveFormat.SaveFormatVersion,
-                AssemblerName = wire.Assembler,
-                AssemblerQualityName = wire.AssemblerQuality,
-                NeighbourCount = wire.Neighbours,
-                ExtraProductivityBonus = wire.ExtraProductivity,
-                AssemblerModules = (wire.AModules ?? []).Select(ToModuleSave).ToList(),
-                BeaconModules = (wire.BModules ?? []).Select(ToModuleSave).ToList(),
-                FuelName = wire.Fuel,
-                BeaconName = wire.Beacon,
-                BeaconQualityName = wire.BeaconQuality,
-                BeaconCount = wire.BeaconCount,
-                BeaconsPerAssembler = wire.BeaconsPA,
-                BeaconsConst = wire.BeaconsC
-            };
+                || string.IsNullOrEmpty(wire.AssemblerQuality)
+                ? null
+                : new NodeCopyOptionsSaveDocument {
+                    Version = GraphSaveFormat.SaveFormatVersion,
+                    AssemblerName = wire.Assembler,
+                    AssemblerQualityName = wire.AssemblerQuality,
+                    NeighbourCount = wire.Neighbours,
+                    ExtraProductivityBonus = wire.ExtraProductivity,
+                    AssemblerModules = [.. (wire.AModules ?? []).Select(ToModuleSave)],
+                    BeaconModules = [.. (wire.BModules ?? []).Select(ToModuleSave)],
+                    FuelName = wire.Fuel,
+                    BeaconName = wire.Beacon,
+                    BeaconQualityName = wire.BeaconQuality,
+                    BeaconCount = wire.BeaconCount,
+                    BeaconsPerAssembler = wire.BeaconsPA,
+                    BeaconsConst = wire.BeaconsC
+                };
         }
 
         public static KeyNodeClipboardSaveData? ToKeyNodeClipboard(KeyNodeClipboardWire wire) =>
@@ -129,16 +129,16 @@ namespace Foreman {
 
         private static void ApplyUi(GraphViewerWire wire, GraphViewerUiSaveData ui) {
             wire.Unit = (int)ui.Unit;
-            wire.ViewOffset = string.Format("{0}, {1}", ui.ViewOffset.X, ui.ViewOffset.Y);
+            wire.ViewOffset = string.Format(CultureInfo.InvariantCulture, "{0}, {1}", ui.ViewOffset.X, ui.ViewOffset.Y);
             wire.ViewScale = ui.ViewScale;
             wire.ExtraProdForNonMiners = ui.ExtraProdForNonMiners;
             wire.AssemblerSelectorStyle = (int)ui.AssemblerSelectorStyle;
             wire.ModuleSelectorStyle = (int)ui.ModuleSelectorStyle;
-            wire.FuelPriorityList = ui.FuelPriorityList.ToList();
-            wire.EnabledRecipes = ui.EnabledRecipes.ToList();
-            wire.EnabledAssemblers = ui.EnabledAssemblers.ToList();
-            wire.EnabledModules = ui.EnabledModules.ToList();
-            wire.EnabledBeacons = ui.EnabledBeacons.ToList();
+            wire.FuelPriorityList = [.. ui.FuelPriorityList];
+            wire.EnabledRecipes = [.. ui.EnabledRecipes];
+            wire.EnabledAssemblers = [.. ui.EnabledAssemblers];
+            wire.EnabledModules = [.. ui.EnabledModules];
+            wire.EnabledBeacons = [.. ui.EnabledBeacons];
             if (ui.OldImport)
                 wire.OldImport = true;
         }
@@ -243,12 +243,12 @@ namespace Foreman {
                     LowPriority = wire.LowPriority != 0,
                     AssemblerName = wire.Assembler ?? "",
                     AssemblerQualityName = wire.AssemblerQuality ?? "normal",
-                    AssemblerModules = (wire.AssemblerModules ?? []).Select(ToModuleSave).ToList(),
+                    AssemblerModules = [.. (wire.AssemblerModules ?? []).Select(ToModuleSave)],
                     FuelName = wire.Fuel,
                     BurntResultName = wire.Burnt,
                     BeaconName = wire.Beacon,
                     BeaconQualityName = wire.BeaconQuality,
-                    BeaconModules = (wire.BeaconModules ?? []).Select(ToModuleSave).ToList(),
+                    BeaconModules = [.. (wire.BeaconModules ?? []).Select(ToModuleSave)],
                     BeaconCount = wire.BeaconCount,
                     BeaconsPerAssembler = wire.BeaconsPerAssembler,
                     BeaconsConst = wire.BeaconsConst
@@ -260,7 +260,7 @@ namespace Foreman {
         private static NodeWire FromNode(GraphNodeSaveData node) {
             var wire = new NodeWire {
                 NodeID = node.NodeId,
-                Location = string.Format("{0}, {1}", node.Location.X, node.Location.Y),
+                Location = string.Format(CultureInfo.InvariantCulture, "{0}, {1}", node.Location.X, node.Location.Y),
                 NodeType = (int)node.NodeType,
                 RateType = (int)node.RateType,
                 Direction = (int)node.Direction
@@ -280,13 +280,13 @@ namespace Foreman {
                         wire.LowPriority = 1;
                     wire.Assembler = recipe.AssemblerName;
                     wire.AssemblerQuality = recipe.AssemblerQualityName;
-                    wire.AssemblerModules = recipe.AssemblerModules.Select(FromModule).ToList();
+                    wire.AssemblerModules = [.. recipe.AssemblerModules.Select(FromModule)];
                     wire.Fuel = recipe.FuelName;
                     wire.Burnt = recipe.BurntResultName;
                     if (recipe.BeaconName is not null && recipe.BeaconQualityName is not null) {
                         wire.Beacon = recipe.BeaconName;
                         wire.BeaconQuality = recipe.BeaconQualityName;
-                        wire.BeaconModules = recipe.BeaconModules.Select(FromModule).ToList();
+                        wire.BeaconModules = [.. recipe.BeaconModules.Select(FromModule)];
                         wire.BeaconCount = recipe.BeaconCount;
                         wire.BeaconsPerAssembler = recipe.BeaconsPerAssembler;
                         wire.BeaconsConst = recipe.BeaconsConst;
@@ -372,7 +372,7 @@ namespace Foreman {
         };
 
         private static Dictionary<string, string> ParseModList(List<string>? entries) {
-            Dictionary<string, string> modSet = new();
+            Dictionary<string, string> modSet = [];
             foreach (string entry in entries ?? []) {
                 string[] mod = entry.Split('|');
                 if (mod.Length >= 2)
@@ -383,9 +383,9 @@ namespace Foreman {
 
         private static Point ParsePoint(string? locationString) {
             string[] parts = locationString?.Split(',') ?? [];
-            if (parts.Length >= 2 && int.TryParse(parts[0].Trim(), out int x) && int.TryParse(parts[1].Trim(), out int y))
-                return new Point(x, y);
-            return Point.Empty;
+            return parts.Length >= 2 && int.TryParse(parts[0].Trim(), out int x) && int.TryParse(parts[1].Trim(), out int y)
+                ? new Point(x, y)
+                : Point.Empty;
         }
 
     }

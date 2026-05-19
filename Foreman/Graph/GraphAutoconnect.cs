@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Foreman.Models;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace Foreman.Graph {
     /// <summary>Connects unlinked node inputs to the nearest compatible output on another node.</summary>
     public static class GraphAutoconnect {
         public static int ConnectDisconnectedInputs(ProductionGraphSession session) {
-            if (session is null)
-                throw new ArgumentNullException(nameof(session));
+            ArgumentNullException.ThrowIfNull(session);
 
             IReadOnlyList<INodeViewModel> nodes = session.View.Nodes;
             var suppliersByItem = new Dictionary<ItemQualityPair, List<NodeId>>();
@@ -16,7 +15,7 @@ namespace Foreman.Graph {
             foreach (INodeViewModel node in nodes) {
                 foreach (ItemQualityPair output in node.Outputs) {
                     if (!suppliersByItem.TryGetValue(output, out List<NodeId>? supplierIds))
-                        suppliersByItem[output] = supplierIds = new List<NodeId>();
+                        suppliersByItem[output] = supplierIds = [];
                     supplierIds.Add(node.Id);
                 }
             }
@@ -48,11 +47,11 @@ namespace Foreman.Graph {
         }
 
         private static int ManhattanDistance(ProductionGraphSession session, NodeId a, NodeId b) {
-            if (!session.View.TryGetNode(a, out INodeViewModel? nodeA) || nodeA is null)
-                return int.MaxValue;
-            if (!session.View.TryGetNode(b, out INodeViewModel? nodeB) || nodeB is null)
-                return int.MaxValue;
-            return Math.Abs(nodeA.Location.X - nodeB.Location.X) + Math.Abs(nodeA.Location.Y - nodeB.Location.Y);
+            return !session.View.TryGetNode(a, out INodeViewModel? nodeA) || nodeA is null
+                ? int.MaxValue
+                : !session.View.TryGetNode(b, out INodeViewModel? nodeB) || nodeB is null
+                ? int.MaxValue
+                : Math.Abs(nodeA.Location.X - nodeB.Location.X) + Math.Abs(nodeA.Location.Y - nodeB.Location.Y);
         }
     }
 }

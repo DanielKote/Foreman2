@@ -1,4 +1,4 @@
-﻿using Foreman;
+﻿using Foreman.ProductionGraphView.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Drawing;
 
@@ -19,8 +19,8 @@ namespace ForemanTest.Annotations {
             using var font = new Font("Segoe UI", 14f, FontStyle.Bold, GraphicsUnit.Point);
             Size box = TextAnnotationLayout.MeasureBoxForText("Hello", font);
 
-            Assert.IsTrue(box.Width > TextAnnotationLayout.MinBoxWidth);
-            Assert.IsTrue(box.Height > TextAnnotationLayout.MinBoxHeight);
+            Assert.IsGreaterThan(TextAnnotationLayout.MinBoxWidth, box.Width);
+            Assert.IsGreaterThan(TextAnnotationLayout.MinBoxHeight, box.Height);
         }
 
         [TestMethod]

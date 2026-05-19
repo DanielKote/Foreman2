@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     /// <summary>JSON serialization for <see cref="AnnotationSaveData"/> (save files and clipboard).</summary>
     public static class AnnotationJson {
         public static AnnotationSaveData? Deserialize(JsonNode node) {
@@ -15,7 +15,7 @@ namespace Foreman {
         }
 
         public static IReadOnlyList<AnnotationSaveData> DeserializeList(JsonArray array) =>
-            array.OfType<JsonNode>().Select(static item => Deserialize(item)).OfType<AnnotationSaveData>().ToList();
+            [.. array.OfType<JsonNode>().Select(static item => Deserialize(item)).OfType<AnnotationSaveData>()];
 
         public static IReadOnlyList<AnnotationSaveData>? DeserializeListFromRoot(JsonNode? root, string propertyName = "Annotations") {
             if (root?[propertyName] is not JsonArray array || array.Count == 0)
@@ -25,7 +25,7 @@ namespace Foreman {
         }
 
         public static JsonNode? SerializeToNode(AnnotationSaveData data) =>
-            JsonSerializer.SerializeToNode(data, typeof(AnnotationSaveData), GraphSaveJsonOptions.Get(writeIndented: false));
+            JsonSerializer.SerializeToNode(data, GraphSaveJsonOptions.Get(writeIndented: false));
 
         public static JsonArray SerializeToArray(IEnumerable<AnnotationSaveData> annotations) =>
             new([.. annotations.Select(SerializeToNode).OfType<JsonNode>()]);

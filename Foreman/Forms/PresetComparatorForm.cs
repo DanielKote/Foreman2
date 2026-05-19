@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman {
@@ -14,6 +14,7 @@ namespace Foreman {
         private bool Comparing; //true means we loaded the presets and are displaying the comparison (preset switching disabled), false means we are selecting presets
         private DataCache? LeftCache;
         private DataCache? RightCache;
+        private readonly MouseHoverDetector MouseHoverDetector;
 
         //all of these are of array size 4 (representing the 4 lists) : Left Only (from LeftCache), Left (from LeftCache), Right(from RightCache), Right Only (from RightCache)
         //Left and Right ([1] and [2]) have the exact same length.
@@ -21,26 +22,26 @@ namespace Foreman {
         //the unfiltered selected tab list is set to equal one of the base lists based on which tab is selected.
         //the filtered selected tab list is further updated from the unfiltered tab list based on the filter string (and is the one used to populate the 4 item-lists)
         private List<object>[] unfilteredSelectedTabObjects;
-        private List<ListViewItem>[] unfilteredSelectedTabLVIs;
-        private List<ListViewItem>[] filteredSelectedTabLVIs;
+        private readonly List<ListViewItem>[] unfilteredSelectedTabLVIs;
+        private readonly List<ListViewItem>[] filteredSelectedTabLVIs;
 
-        private List<object>[] unfilteredModTabObjects; //strings
-        private List<object>[] unfilteredItemTabObjects; //Items
-        private List<object>[] unfilteredRecipeTabObjects; //Recipes
-        private List<object>[] unfilteredAssemblerTabObjects; //Assemblers
-        private List<object>[] unfilteredMinerTabObjects; //Assemblers (miners)
-        private List<object>[] unfilteredPowerTabObjects; //Assemblers (power generation)
-        private List<object>[] unfilteredBeaconTabObjects; //Beacons
-        private List<object>[] unfilteredModuleTabObjects; //Modules
-        private List<object>[][] tabSet; //just a helper array to set unfilteredSelectedTabObjects to the correct value without having to if/switch
+        private readonly List<object>[] unfilteredModTabObjects; //strings
+        private readonly List<object>[] unfilteredItemTabObjects; //Items
+        private readonly List<object>[] unfilteredRecipeTabObjects; //Recipes
+        private readonly List<object>[] unfilteredAssemblerTabObjects; //Assemblers
+        private readonly List<object>[] unfilteredMinerTabObjects; //Assemblers (miners)
+        private readonly List<object>[] unfilteredPowerTabObjects; //Assemblers (power generation)
+        private readonly List<object>[] unfilteredBeaconTabObjects; //Beacons
+        private readonly List<object>[] unfilteredModuleTabObjects; //Modules
+        private readonly List<object>[][] tabSet; //just a helper array to set unfilteredSelectedTabObjects to the correct value without having to if/switch
 
         private static readonly Color EqualBGColor = Color.White;
         private static readonly Color CloseEnoughBGColor = Color.Khaki;
         private static readonly Color DifferentGBColor = Color.Pink;
         private static readonly Color AvailableTextColor = Color.Black;
         private static readonly Color UnavailableTextColor = Color.DarkRed;
-        private static readonly Font AvailableTextFont = new Font(FontFamily.GenericSansSerif, 7.8f, FontStyle.Regular);
-        private static readonly Font UnavailableTextFont = new Font(FontFamily.GenericSansSerif, 7.8f, FontStyle.Italic);
+        private static readonly Font AvailableTextFont = new(FontFamily.GenericSansSerif, 7.8f, FontStyle.Regular);
+        private static readonly Font UnavailableTextFont = new(FontFamily.GenericSansSerif, 7.8f, FontStyle.Italic);
 
         public PresetComparatorForm() {
             Comparing = false;
@@ -54,24 +55,24 @@ namespace Foreman {
 
             TextToolTip.TextFont = new Font(FontFamily.GenericMonospace, 7.8f, FontStyle.Regular);
 
-            MouseHoverDetector mhDetector = new MouseHoverDetector(100, 200);
-            mhDetector.Add(LeftOnlyListView, ListView_StartHover, ListView_EndHover);
-            mhDetector.Add(LeftListView, ListView_StartHover, ListView_EndHover);
-            mhDetector.Add(RightListView, ListView_StartHover, ListView_EndHover);
-            mhDetector.Add(RightOnlyListView, ListView_StartHover, ListView_EndHover);
+            MouseHoverDetector = new MouseHoverDetector(100, 200);
+            MouseHoverDetector.Add(LeftOnlyListView, ListView_StartHover, ListView_EndHover);
+            MouseHoverDetector.Add(LeftListView, ListView_StartHover, ListView_EndHover);
+            MouseHoverDetector.Add(RightListView, ListView_StartHover, ListView_EndHover);
+            MouseHoverDetector.Add(RightOnlyListView, ListView_StartHover, ListView_EndHover);
 
             LoadPresetOptions();
 
-            unfilteredModTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-            unfilteredItemTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-            unfilteredRecipeTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-            unfilteredAssemblerTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-            unfilteredMinerTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-            unfilteredPowerTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-            unfilteredBeaconTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
-            unfilteredModuleTabObjects = new List<object>[] { new List<object>(), new List<object>(), new List<object>(), new List<object>() };
+            unfilteredModTabObjects = [[], [], [], []];
+            unfilteredItemTabObjects = [[], [], [], []];
+            unfilteredRecipeTabObjects = [[], [], [], []];
+            unfilteredAssemblerTabObjects = [[], [], [], []];
+            unfilteredMinerTabObjects = [[], [], [], []];
+            unfilteredPowerTabObjects = [[], [], [], []];
+            unfilteredBeaconTabObjects = [[], [], [], []];
+            unfilteredModuleTabObjects = [[], [], [], []];
 
-            tabSet = new List<object>[][] {
+            tabSet = [
                 unfilteredModTabObjects,
                 unfilteredItemTabObjects,
                 unfilteredRecipeTabObjects,
@@ -80,30 +81,30 @@ namespace Foreman {
                 unfilteredPowerTabObjects,
                 unfilteredBeaconTabObjects,
                 unfilteredModuleTabObjects
-            };
+            ];
 
             unfilteredSelectedTabObjects = tabSet[0];
 
-            unfilteredSelectedTabLVIs = new List<ListViewItem>[] { new List<ListViewItem>(), new List<ListViewItem>(), new List<ListViewItem>(), new List<ListViewItem>() };
-            filteredSelectedTabLVIs = new List<ListViewItem>[] { new List<ListViewItem>(), new List<ListViewItem>(), new List<ListViewItem>(), new List<ListViewItem>() };
+            unfilteredSelectedTabLVIs = [[], [], [], []];
+            filteredSelectedTabLVIs = [[], [], [], []];
 
         }
 
         private void LoadPresetOptions() {
-            List<string> existingPresetFiles = new List<string>();
+            var existingPresetFiles = new List<string>();
             foreach (string presetFile in Directory.GetFiles(Path.Combine(Application.StartupPath, "Presets"), "*.pjson"))
                 if (File.Exists(Path.ChangeExtension(presetFile, "dat")))
                     existingPresetFiles.Add(Path.GetFileNameWithoutExtension(presetFile));
             existingPresetFiles.Sort();
-            List<Preset> Presets = new List<Preset>();
+            var Presets = new List<Preset>();
             foreach (string presetFile in existingPresetFiles)
                 Presets.Add(new Preset(presetFile, false, false)); //we dont care about default or selected states here.
 
             if (existingPresetFiles.Count < 2)
                 this.Close();
 
-            LeftPresetSelectionBox.Items.AddRange(Presets.ToArray());
-            RightPresetSelectionBox.Items.AddRange(Presets.ToArray());
+            LeftPresetSelectionBox.Items.AddRange([.. Presets]);
+            RightPresetSelectionBox.Items.AddRange([.. Presets]);
             LeftPresetSelectionBox.SelectedIndex = 0;
             RightPresetSelectionBox.SelectedIndex = 1;
         }
@@ -131,17 +132,17 @@ namespace Foreman {
 
         private void ComparePresets() {
             //helpful inner function to process items, recipes, assemblers, miners, and modules (so... everything but mods)
-            void ProcessObject<T>(IReadOnlyDictionary<string, T>? leftCacheDictionary, IReadOnlyDictionary<string, T>? rightCacheDictionary, List<object>[]? outputLists) where T : DataObjectBase {
+            static void ProcessObject<T>(IReadOnlyDictionary<string, T>? leftCacheDictionary, IReadOnlyDictionary<string, T>? rightCacheDictionary, List<object>[]? outputLists) where T : IDataObjectBase {
                 if (leftCacheDictionary is null || rightCacheDictionary is null || outputLists is null)
                     return;
-                List<Tuple<T, T>> tempCenterSet = new List<Tuple<T, T>>();
-                foreach (var kvp in leftCacheDictionary.OrderByDescending(k => ((DataObjectBase)k.Value).Available).ThenBy(k => k.Key)) {
+                var tempCenterSet = new List<Tuple<T, T>>();
+                foreach (var kvp in leftCacheDictionary.OrderByDescending(k => ((IDataObjectBase)k.Value).Available).ThenBy(k => k.Key)) {
                     if (!rightCacheDictionary.ContainsKey(kvp.Key))
                         outputLists[0].Add(kvp.Value);
                     else
                         tempCenterSet.Add(new Tuple<T, T>(kvp.Value, rightCacheDictionary[kvp.Key]));
                 }
-                foreach (var kvp in rightCacheDictionary.OrderByDescending(k => ((DataObjectBase)k.Value).Available).ThenBy(k => k.Key)) {
+                foreach (var kvp in rightCacheDictionary.OrderByDescending(k => ((IDataObjectBase)k.Value).Available).ThenBy(k => k.Key)) {
                     if (!leftCacheDictionary.ContainsKey(kvp.Key))
                         outputLists[3].Add(kvp.Value);
                 }
@@ -149,9 +150,7 @@ namespace Foreman {
                 //sort the combined center lists together (since they must align)
                 tempCenterSet.Sort(delegate (Tuple<T, T> a, Tuple<T, T> b) {
                     int availableDiff = (a.Item1.Available || a.Item2.Available).CompareTo((b.Item1.Available || b.Item2.Available));
-                    if (availableDiff != 0)
-                        return -availableDiff;
-                    return a.Item1.Name.CompareTo(b.Item1.Name);
+                    return availableDiff != 0 ? -availableDiff : string.Compare(a.Item1.Name, b.Item1.Name, StringComparison.Ordinal);
                 });
                 foreach (Tuple<T, T> pair in tempCenterSet) {
                     outputLists[1].Add(pair.Item1);
@@ -164,14 +163,14 @@ namespace Foreman {
                 return;
 
             //step 1: load in left and right caches
-            using (DataLoadForm form = new DataLoadForm(leftPreset)) {
+            using (var form = new DataLoadForm(leftPreset)) {
                 form.StartPosition = FormStartPosition.Manual;
                 form.Left = this.Left + 150;
                 form.Top = this.Top + 100;
                 form.ShowDialog(); //LOAD FACTORIO DATA for left preset
                 LeftCache = form.GetDataCache();
             }
-            using (DataLoadForm form = new DataLoadForm(rightPreset)) {
+            using (var form = new DataLoadForm(rightPreset)) {
                 form.StartPosition = FormStartPosition.Manual;
                 form.Left = this.Left + 150;
                 form.Top = this.Top + 100;
@@ -195,7 +194,7 @@ namespace Foreman {
                     unfilteredModTabObjects[3].Add(kvp.Key + "_" + kvp.Value);
             }
             for (int i = 0; i < 4; i++)
-                unfilteredModTabObjects[i].Sort(delegate (object a, object b) { return ((string)a).CompareTo((string)b); });
+                unfilteredModTabObjects[i].Sort(delegate (object a, object b) { return string.Compare((string)a, (string)b, StringComparison.Ordinal); });
 
             //2.2: items, recipes, assemblers, miners, and modules
             ProcessObject(LeftCache?.Items, RightCache?.Items, unfilteredItemTabObjects);
@@ -224,8 +223,9 @@ namespace Foreman {
                 if (ComparisonTabControl.SelectedIndex == 0) //mod -> string type
                 {
                     foreach (object obj in unfilteredSelectedTabObjects[i]) {
-                        ListViewItem lvItem = new ListViewItem();
-                        lvItem.Text = (string)obj;
+                        var lvItem = new ListViewItem {
+                            Text = (string)obj
+                        };
                         lvItem.Tag = lvItem.Text;
                         lvItem.Name = lvItem.Text;
                         lvItem.ForeColor = AvailableTextColor;
@@ -233,11 +233,11 @@ namespace Foreman {
 
                         unfilteredSelectedTabLVIs[i].Add(lvItem);
                     }
-                } else //item,recipe,assembler,miner,beacon,module -> all are DataObjectBase types
+                } else //item,recipe,assembler,miner,beacon,module -> all are IDataObjectBase types
                   {
                     foreach (object obj in unfilteredSelectedTabObjects[i]) {
-                        ListViewItem lvItem = new ListViewItem();
-                        DataObjectBase doBase = (DataObjectBase)obj;
+                        var lvItem = new ListViewItem();
+                        var doBase = (IDataObjectBase)obj;
 
                         if (doBase.Icon != null) {
                             IconList.Images.Add(doBase.Icon);
@@ -250,7 +250,7 @@ namespace Foreman {
 
                         lvItem.Text = doBase.FriendlyName;
                         lvItem.Tag = doBase;
-                        lvItem.Name = doBase.Name.ToLower(); //we will use this to filter by (cant filter by friendly name as that can cause the middle 2 to desync)
+                        lvItem.Name = doBase.Name.ToLowerInvariant(); //we will use this to filter by (cant filter by friendly name as that can cause the middle 2 to desync)
                         unfilteredSelectedTabLVIs[i].Add(lvItem);
                     }
                 }
@@ -268,26 +268,26 @@ namespace Foreman {
                         similarInternals = similarNames; //if the are different, mark as red.
                         break;
                     case 1: //items
-                        similarInternals &= (l.Tag as Item)?.Available == (r.Tag as Item)?.Available;
+                        similarInternals &= (l.Tag as IItem)?.Available == (r.Tag as IItem)?.Available;
                         break;
 
                     case 2: //recipes
-                        var lRecipe = l.Tag as Recipe;
-                        var rRecipe = r.Tag as Recipe;
+                        var lRecipe = l.Tag as IRecipe;
+                        var rRecipe = r.Tag as IRecipe;
 
                         similarInternals = (lRecipe?.IngredientList.Count == rRecipe?.IngredientList.Count) && (lRecipe?.ProductList.Count == rRecipe?.ProductList.Count);
                         similarInternals &= (lRecipe?.Available == rRecipe?.Available);
                         bool exactInternals = similarInternals;
                         double scale = (rRecipe?.Time / lRecipe?.Time) ?? 0;
                         if (similarInternals) {
-                            foreach (Item lingredient in lRecipe?.IngredientList ?? []) {
+                            foreach (IItem lingredient in lRecipe?.IngredientList ?? []) {
                                 var ringredient = rRecipe?.IngredientList.FirstOrDefault(item => item.Name == lingredient.Name);
                                 similarInternals = similarInternals && ringredient is not null && lRecipe is not null && rRecipe is not null &&
                                     (Math.Abs((scale * lRecipe.IngredientSet[lingredient] / rRecipe.IngredientSet[ringredient]) - 1) < 0.001);
                                 // Roslyn isn't smart enough to figure out ringredient from similarInternals. Just check it again.
                                 exactInternals = exactInternals && similarInternals && ringredient is not null && (lRecipe?.IngredientSet[lingredient] == rRecipe?.IngredientSet[ringredient]);
                             }
-                            foreach (Item lproduct in lRecipe?.ProductList ?? []) {
+                            foreach (IItem lproduct in lRecipe?.ProductList ?? []) {
                                 if (similarInternals) {
                                     var rproduct = rRecipe?.ProductList.FirstOrDefault(item => item.Name == lproduct.Name);
                                     similarInternals = similarInternals && (rproduct != null) && lRecipe is not null && rRecipe is not null &&
@@ -303,20 +303,20 @@ namespace Foreman {
                     case 3: //assemblers
                     case 4: //miners
                     case 5: //power (aka: assemblers)
-                        var lAssembler = l.Tag as Assembler;
-                        var rAssembler = r.Tag as Assembler;
+                        var lAssembler = l.Tag as IAssembler;
+                        var rAssembler = r.Tag as IAssembler;
 
                         similarInternals = true; // (lAssembler.Speed == rAssembler.Speed && lAssembler.ModuleSlots == rAssembler.ModuleSlots);  //QUALITY UPDATE REQUIRED
                         break;
                     case 6: //beacons
-                        var lBeacon = l.Tag as Beacon;
-                        var rBeacon = r.Tag as Beacon;
+                        var lBeacon = l.Tag as IBeacon;
+                        var rBeacon = r.Tag as IBeacon;
 
                         similarInternals = (lBeacon?.ModuleSlots == rBeacon?.ModuleSlots);
                         break;
                     case 7: //modules
-                        var lModule = l.Tag as Module;
-                        var rModule = r.Tag as Module;
+                        var lModule = l.Tag as IModule;
+                        var rModule = r.Tag as IModule;
 
                         similarInternals = lModule is not null && rModule is not null &&
                             lModule.GetProductivityBonus() == rModule.GetProductivityBonus() &&
@@ -336,7 +336,7 @@ namespace Foreman {
         }
 
         private void UpdateFilteredLists() {
-            string filter = FilterTextBox.Text.ToLower();
+            string filter = FilterTextBox.Text.ToLowerInvariant();
             bool hideEqual = HideEqualObjectsCheckBox.Checked;
             bool hideSimilar = HideSimilarObjectsCheckBox.Checked;
             bool showUnavailable = ShowUnavailableCheckBox.Checked;
@@ -347,8 +347,8 @@ namespace Foreman {
                 filteredSelectedTabLVIs[i].Clear();
 
                 foreach (ListViewItem lvItem in unfilteredSelectedTabLVIs[i])
-                    if (showUnavailable || !(lvItem.Tag is DataObjectBase dObj) || dObj.Available)
-                        if (lvItem.Name.Contains(filter) || lvItem.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1)
+                    if (showUnavailable || lvItem.Tag is not IDataObjectBase dObj || dObj.Available)
+                        if (lvItem.Name.Contains(filter) || lvItem.Text.Contains(filter, StringComparison.OrdinalIgnoreCase))
                             filteredSelectedTabLVIs[i].Add(lvItem);
             }
 
@@ -357,16 +357,16 @@ namespace Foreman {
             filteredSelectedTabLVIs[2].Clear();
             for (int j = 0; j < unfilteredSelectedTabLVIs[1].Count; j++) //remember: [1] and [2] both have the EXACT same # of items)
             {
-                ListViewItem leftLVI = (ListViewItem)unfilteredSelectedTabLVIs[1][j];
-                ListViewItem rightLVI = (ListViewItem)unfilteredSelectedTabLVIs[2][j];
+                var leftLVI = (ListViewItem)unfilteredSelectedTabLVIs[1][j];
+                var rightLVI = (ListViewItem)unfilteredSelectedTabLVIs[2][j];
 
-                if (showUnavailable || !(leftLVI.Tag is DataObjectBase ldObj && rightLVI.Tag is DataObjectBase rdObj) || ldObj.Available || rdObj.Available) {
+                if (showUnavailable || !(leftLVI.Tag is IDataObjectBase ldObj && rightLVI.Tag is IDataObjectBase rdObj) || ldObj.Available || rdObj.Available) {
 
                     if (!(hideEqual && leftLVI.BackColor == EqualBGColor) && !(hideSimilar && leftLVI.BackColor == CloseEnoughBGColor) && (
                     leftLVI.Name.Contains(filter) ||
                     //rightLVI.Name.Contains(filter) //name of [1][j] and [2][j] are the same, dont have to check twice
-                    leftLVI.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1 ||
-                    rightLVI.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) != -1)) {
+                    leftLVI.Text.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                    rightLVI.Text.Contains(filter, StringComparison.OrdinalIgnoreCase))) {
                         filteredSelectedTabLVIs[1].Add(leftLVI);
                         filteredSelectedTabLVIs[2].Add(rightLVI);
                     }
@@ -449,7 +449,7 @@ namespace Foreman {
 
         private void ListView_StartHover(object? sender, MouseEventArgs e) {
             if (sender is ListView lv && lv.GetItemAt(e.Location.X, e.Location.Y) is ListViewItem lLVI) {
-                Point location = new Point(e.X + 15, e.Y);
+                var location = new Point(e.X + 15, e.Y);
                 ListViewItem? rLVI = null;
                 bool compareTypeTT = (sender == LeftListView || sender == RightListView);
                 if (compareTypeTT) {
@@ -457,52 +457,52 @@ namespace Foreman {
                     rLVI = RightListView.Items[lLVI.Index];
                 }
 
-                if (lLVI.Tag is Recipe recipe) {
-                    RecipeToolTip.SetRecipe(recipe, compareTypeTT ? (rLVI?.Tag as Recipe) : null);
+                if (lLVI.Tag is IRecipe recipe) {
+                    RecipeToolTip.SetRecipe(recipe, compareTypeTT ? (rLVI?.Tag as IRecipe) : null);
                     RecipeToolTip.Show(lv, location);
-                } else if (lLVI.Tag is Assembler assembler) //assembler, miner, or power
+                } else if (lLVI.Tag is IAssembler assembler) //assembler, miner, or power
                   {
                     string left = assembler.FriendlyName + "\n" +
-                        string.Format("   Speed:         {0}x\n", assembler.Owner.DefaultQuality is Quality q ? assembler.GetSpeed(q) : -12345) +  //QUALITY UPDATE REQUIRED
-                        string.Format("   Module Slots:  {0}", assembler.ModuleSlots);
+                        string.Format(DisplayCulture.Format, "   Speed:         {0}x\n", assembler.Owner.DefaultQuality is IQuality q ? assembler.GetSpeed(q) : -12345) +  //QUALITY UPDATE REQUIRED
+                        string.Format(DisplayCulture.Format, "   Module Slots:  {0}", assembler.ModuleSlots);
                     string right = "";
                     if (compareTypeTT) {
-                        var rassembler = rLVI?.Tag as Assembler;
+                        var rassembler = rLVI?.Tag as IAssembler;
                         right = rassembler?.FriendlyName + "\n" +
-                        string.Format("   Speed:         {0}x\n", assembler.Owner.DefaultQuality is Quality q2 ? rassembler?.GetSpeed(q2) : -12345) +  //QUALITY UPDATE REQUIRED
-                        string.Format("   Module Slots:  {0}", rassembler?.ModuleSlots);
+                        string.Format(DisplayCulture.Format, "   Speed:         {0}x\n", assembler.Owner.DefaultQuality is IQuality q2 ? rassembler?.GetSpeed(q2) : -12345) +  //QUALITY UPDATE REQUIRED
+                        string.Format(DisplayCulture.Format, "   Module Slots:  {0}", rassembler?.ModuleSlots);
                     }
 
                     TextToolTip.SetText(left, right);
                     TextToolTip.Show(lv, location);
-                } else if (lLVI.Tag is Beacon beacon) {
+                } else if (lLVI.Tag is IBeacon beacon) {
                     string left = beacon.FriendlyName + "\n" +
-                        string.Format("   Module Slots:  {0}", beacon.ModuleSlots);
+                        string.Format(DisplayCulture.Format, "   Module Slots:  {0}", beacon.ModuleSlots);
                     string right = "";
                     if (compareTypeTT) {
-                        var rbeacon = rLVI?.Tag as Beacon;
+                        var rbeacon = rLVI?.Tag as IBeacon;
                         right = rbeacon?.FriendlyName + "\n" +
-                            string.Format("   Module Slots:  {0}", rbeacon?.ModuleSlots);
+                            string.Format(DisplayCulture.Format, "   Module Slots:  {0}", rbeacon?.ModuleSlots);
                     }
 
                     TextToolTip.SetText(left, right);
                     TextToolTip.Show((Control)sender, location);
-                } else if (lLVI.Tag is Module module) {
+                } else if (lLVI.Tag is IModule module) {
                     string left = module.FriendlyName + "\n" +
-                        string.Format("   Productivity bonus: {0}\n", module.GetProductivityBonus().ToString("%0")) +
-                        string.Format("   Speed bonus:        {0}\n", module.GetSpeedBonus().ToString("%0")) +
-                        string.Format("   Efficiency bonus:   {0}\n", (-module.GetConsumptionBonus()).ToString("%0")) +
-                        string.Format("   Pollution bonus:    {0}", module.GetPolutionBonus().ToString("%0")) +
-                        string.Format("   Quality bonus:      {0}", module.GetQualityBonus().ToString("%0"));
+                        string.Format(DisplayCulture.Format, "   Productivity bonus: {0}\n", module.GetProductivityBonus().ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Speed bonus:        {0}\n", module.GetSpeedBonus().ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Efficiency bonus:   {0}\n", (-module.GetConsumptionBonus()).ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Pollution bonus:    {0}", module.GetPolutionBonus().ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Quality bonus:      {0}", module.GetQualityBonus().ToString("%0", DisplayCulture.Format));
                     string right = "";
                     if (compareTypeTT) {
-                        var rmodule = rLVI?.Tag as Module;
+                        var rmodule = rLVI?.Tag as IModule;
                         right = rmodule?.FriendlyName + "\n" +
-                        string.Format("   Productivity bonus: {0}\n", rmodule?.GetProductivityBonus().ToString("%0")) +
-                        string.Format("   Speed bonus:        {0}\n", rmodule?.GetSpeedBonus().ToString("%0")) +
-                        string.Format("   Efficiency bonus:   {0}\n", (-rmodule?.GetConsumptionBonus() ?? 0).ToString("%0")) +
-                        string.Format("   Pollution bonus:    {0}", rmodule?.GetPolutionBonus().ToString("%0")) +
-                        string.Format("   Quality bonus:      {0}", rmodule?.GetQualityBonus().ToString("%0"));
+                        string.Format(DisplayCulture.Format, "   Productivity bonus: {0}\n", rmodule?.GetProductivityBonus().ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Speed bonus:        {0}\n", rmodule?.GetSpeedBonus().ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Efficiency bonus:   {0}\n", (-rmodule?.GetConsumptionBonus() ?? 0).ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Pollution bonus:    {0}", rmodule?.GetPolutionBonus().ToString("%0", DisplayCulture.Format)) +
+                        string.Format(DisplayCulture.Format, "   Quality bonus:      {0}", rmodule?.GetQualityBonus().ToString("%0", DisplayCulture.Format));
                     }
                     TextToolTip.SetText(left, right);
                     TextToolTip.Show(lv, location);

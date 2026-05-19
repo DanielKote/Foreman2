@@ -1,5 +1,7 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
 using Foreman.Graph;
+using Foreman.Models;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.ComponentModel;
@@ -69,7 +71,7 @@ namespace ForemanTest.Graph {
 
             NodeId producerId = session.Editor.CreateRecipeNode(new RecipeQualityPair(producer, ctx.Quality), System.Drawing.Point.Empty);
             NodeId consumerId = session.Editor.CreateRecipeNode(new RecipeQualityPair(consumer, ctx.Quality), new System.Drawing.Point(120, 0));
-            ItemQualityPair steamPair = new ItemQualityPair(steam, ctx.Quality);
+            var steamPair = new ItemQualityPair(steam, ctx.Quality);
 
             INodeViewModel producerVm = session.View.Nodes.First(n => n.Id == producerId);
             INodeViewModel consumerVm = session.View.Nodes.First(n => n.Id == consumerId);
@@ -94,7 +96,7 @@ namespace ForemanTest.Graph {
 
             NodeId producerId = session.Editor.CreateRecipeNode(new RecipeQualityPair(producer, ctx.Quality), System.Drawing.Point.Empty);
             NodeId consumerId = session.Editor.CreateRecipeNode(new RecipeQualityPair(consumer, ctx.Quality), new System.Drawing.Point(120, 0));
-            ItemQualityPair steamPair = new ItemQualityPair(steam, ctx.Quality);
+            var steamPair = new ItemQualityPair(steam, ctx.Quality);
 
             INodeViewModel producerVm = session.View.Nodes.First(n => n.Id == producerId);
             INodeViewModel consumerVm = session.View.Nodes.First(n => n.Id == consumerId);
@@ -109,8 +111,8 @@ namespace ForemanTest.Graph {
             IRecipeNodeViewModel recipeVm = session.View.Nodes.OfType<IRecipeNodeViewModel>().First();
             Assert.IsTrue(session.TryGetDomainNode(recipeVm.Id, out BaseNode? recipeNode));
 
-            fRange viaVm = LinkChecker.GetTemperatureRange(null, recipeVm, LinkType.Output, true, session);
-            fRange viaDomain = LinkChecker.GetTemperatureRange(null, recipeNode, LinkType.Output, true);
+            FRange viaVm = LinkChecker.GetTemperatureRange(null, recipeVm, LinkType.Output, true, session);
+            FRange viaDomain = LinkChecker.GetTemperatureRange(null, recipeNode, LinkType.Output, true);
 
             Assert.AreEqual(viaDomain.Ignore, viaVm.Ignore);
             Assert.AreEqual(viaDomain.Min, viaVm.Min, 1e-9);
@@ -133,7 +135,7 @@ namespace ForemanTest.Graph {
 
             NodeId producerId = session.Editor.CreateRecipeNode(new RecipeQualityPair(producer, ctx.Quality), System.Drawing.Point.Empty);
             NodeId consumerId = session.Editor.CreateRecipeNode(new RecipeQualityPair(consumer, ctx.Quality), new System.Drawing.Point(120, 0));
-            ItemQualityPair steamPair = new ItemQualityPair(steam, ctx.Quality);
+            var steamPair = new ItemQualityPair(steam, ctx.Quality);
 
             LinkId linkId = session.Editor.CreateLink(producerId, consumerId, steamPair);
             Assert.IsTrue(session.View.TryGetLink(linkId, out INodeLinkViewModel? linkVm));
@@ -171,8 +173,8 @@ namespace ForemanTest.Graph {
             controller.SetKeyNode(true);
 
             Assert.IsTrue(recipeVm.KeyNode);
-            Assert.IsTrue(keyNodeChanges >= 1);
-            Assert.IsTrue(keyNodeTitleChanges >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, keyNodeChanges);
+            Assert.IsGreaterThanOrEqualTo(1, keyNodeTitleChanges);
         }
 
         [TestMethod]
@@ -193,7 +195,7 @@ namespace ForemanTest.Graph {
             controller.SetKeyNodeTitle("Main bus");
 
             Assert.AreEqual("Main bus", recipeVm.KeyNodeTitle);
-            Assert.IsTrue(titleChanges >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, titleChanges);
         }
     }
 }

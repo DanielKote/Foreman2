@@ -4,9 +4,7 @@ using System.Reflection;
 namespace ForemanTest.support {
     internal static class ReflectionTestHelper {
         internal static T Require<T>(T? value, string description) where T : class {
-            if (value is null)
-                throw new InvalidOperationException(description);
-            return value;
+            return value is null ? throw new InvalidOperationException(description) : value;
         }
 
         internal static object RequireInstance(object? value, string description) =>

@@ -1,5 +1,7 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
 using Foreman.Graph;
+using Foreman.Models.Nodes;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -47,8 +49,8 @@ namespace ForemanTest.Graph {
             INodeViewModel supplierVm = session.View.Nodes.OfType<ISupplierNodeViewModel>().First();
             IRecipeNodeViewModel recipeVm = session.View.Nodes.OfType<IRecipeNodeViewModel>().First();
 
-            Assert.IsInstanceOfType(session.Editor.RequestNodeController(supplierVm.Id), typeof(BaseNodeController));
-            Assert.IsInstanceOfType(session.Editor.RequestNodeController(recipeVm.Id), typeof(RecipeNodeController));
+            Assert.IsInstanceOfType<BaseNodeController>(session.Editor.RequestNodeController(supplierVm.Id));
+            Assert.IsInstanceOfType<RecipeNodeController>(session.Editor.RequestNodeController(recipeVm.Id));
         }
 
         [TestMethod]
@@ -59,7 +61,7 @@ namespace ForemanTest.Graph {
 
             IRecipeNodeViewModel viewModel = session.View.Nodes.OfType<IRecipeNodeViewModel>().First();
             Assert.IsTrue(session.TryGetDomainNode(viewModel.Id, out BaseNode? domainNode));
-            Assert.IsInstanceOfType(domainNode, typeof(RecipeNode));
+            Assert.IsInstanceOfType<RecipeNode>(domainNode);
             var recipeNode = (RecipeNode)domainNode;
 
             const double tolerance = 1e-9;

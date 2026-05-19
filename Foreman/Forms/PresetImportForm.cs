@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Foreman {
     public partial class PresetImportForm : Form {
-        private char[] ExtraChars = { '(', ')', '-', '_', '.', ' ' };
-        private CancellationTokenSource cts;
+        private readonly char[] ExtraChars = ['(', ')', '-', '_', '.', ' '];
+        private readonly CancellationTokenSource cts;
 
         public string NewPresetName { get; private set; }
         public bool ImportStarted { get; private set; }
@@ -26,7 +26,7 @@ namespace Foreman {
             InitializeComponent();
             PresetNameTextBox.Focus();
 
-            FactorioLocationComboBox.Items.AddRange(FactorioPathsProcessor.GetFactorioInstallLocations().ToArray());
+            FactorioLocationComboBox.Items.AddRange([.. FactorioPathsProcessor.GetFactorioInstallLocations()]);
             if (FactorioLocationComboBox.Items.Count > 0)
                 FactorioLocationComboBox.SelectedIndex = 0;
         }
@@ -48,30 +48,28 @@ namespace Foreman {
         }
 
         private void FactorioBrowseButton_Click(object? sender, EventArgs e) {
-            using (FolderBrowserDialog dialog = new FolderBrowserDialog()) {
-                if (Directory.Exists(FactorioLocationComboBox.Text))
-                    dialog.SelectedPath = FactorioLocationComboBox.Text;
+            using var dialog = new FolderBrowserDialog();
+            if (Directory.Exists(FactorioLocationComboBox.Text))
+                dialog.SelectedPath = FactorioLocationComboBox.Text;
 
-                if (dialog.ShowDialog() == DialogResult.OK) {
-                    if (FactorioPathsProcessor.TryNormalizeInstallPath(dialog.SelectedPath, out string installRoot))
-                        FactorioLocationComboBox.Text = installRoot;
-                    else
-                        UserMessages.Show("Selected directory doesnt seem to be a factorio install folder (it should at the very least have \"bin\" and \"data\" folders, along with a \"config-path.cfg\" file)");
-                }
+            if (dialog.ShowDialog() == DialogResult.OK) {
+                if (FactorioPathsProcessor.TryNormalizeInstallPath(dialog.SelectedPath, out string installRoot))
+                    FactorioLocationComboBox.Text = installRoot;
+                else
+                    UserMessages.Show("Selected directory doesnt seem to be a factorio install folder (it should at the very least have \"bin\" and \"data\" folders, along with a \"config-path.cfg\" file)");
             }
         }
 
         private void ModsBrowseButton_Click(object? sender, EventArgs e) {
-            using (FolderBrowserDialog dialog = new FolderBrowserDialog()) {
-                if (Directory.Exists(ModsLocationComboBox.Text))
-                    dialog.SelectedPath = ModsLocationComboBox.Text;
+            using var dialog = new FolderBrowserDialog();
+            if (Directory.Exists(ModsLocationComboBox.Text))
+                dialog.SelectedPath = ModsLocationComboBox.Text;
 
-                if (dialog.ShowDialog() == DialogResult.OK) {
-                    if (File.Exists(Path.Combine(dialog.SelectedPath, "mod-list.json")))
-                        ModsLocationComboBox.Text = dialog.SelectedPath;
-                    else
-                        UserMessages.Show("Selected directory doesnt seem to be a factorio mods folder (it should at the very least have \"mod-list.json\" file)");
-                }
+            if (dialog.ShowDialog() == DialogResult.OK) {
+                if (File.Exists(Path.Combine(dialog.SelectedPath, "mod-list.json")))
+                    ModsLocationComboBox.Text = dialog.SelectedPath;
+                else
+                    UserMessages.Show("Selected directory doesnt seem to be a factorio mods folder (it should at the very least have \"mod-list.json\" file)");
             }
         }
 
@@ -96,11 +94,11 @@ namespace Foreman {
             }
 
             var existingPresets = MainForm.GetValidPresetsList();
-            if (NewPresetName.ToLower() == MainForm.DefaultPreset.ToLower()) {
+            if (string.Equals(NewPresetName, MainForm.DefaultPreset, StringComparison.OrdinalIgnoreCase)) {
                 UserMessages.Show("Cant overwrite default preset!", "", MessageBoxButtons.OK);
                 CleanupFailedImport();
                 return;
-            } else if (existingPresets?.Any(p => p.Name.ToLower() == NewPresetName.ToLower()) is true) {
+            } else if (existingPresets?.Any(p => string.Equals(p.Name, NewPresetName, StringComparison.OrdinalIgnoreCase)) is true) {
                 if (UserMessages.Show("This preset name is already in use. Do you wish to overwrite?", "Confirm Overwrite", MessageBoxButtons.YesNo) != DialogResult.Yes) {
                     CleanupFailedImport();
                     return;
@@ -130,7 +128,7 @@ namespace Foreman {
                 return;
             }
 
-            FileVersionInfo factorioVersionInfo = FileVersionInfo.GetVersionInfo(factorioExePath);
+            var factorioVersionInfo = FileVersionInfo.GetVersionInfo(factorioExePath);
 
             string modsPath = ModsLocationComboBox.Text;
             if (string.IsNullOrEmpty(modsPath) || !File.Exists(Path.Combine(modsPath, "mod-list.json"))) {
@@ -147,29 +145,30 @@ namespace Foreman {
             var progress = new Progress<KeyValuePair<int, string>>(value => {
                 if (value.Key > ImportProgressBar.Value)
                     ImportProgressBar.Value = value.Key;
-                if (!String.IsNullOrEmpty(value.Value) && value.Value != ImportProgressBar.CustomText)
+                if (!string.IsNullOrEmpty(value.Value) && value.Value != ImportProgressBar.CustomText)
                     ImportProgressBar.CustomText = value.Value;
             }) as IProgress<KeyValuePair<int, string>>;
             var token = cts.Token;
 
 #if DEBUG
-            Stopwatch stopwatch = new Stopwatch();
+            var stopwatch = new Stopwatch();
             stopwatch.Start();
 #endif
             ImportStarted = true;
             string foremanModName = "foremanexport_" + factorioVersionInfo.ProductMajorPart + ".0.0";
-            NewPresetName = await ProcessPreset(installPath, foremanModName, modsPath, progress, token);
+            NewPresetName = await ProcessPreset(installPath, foremanModName, modsPath, progress, token).ConfigureAwait(false);
 #if DEBUG
-            Console.WriteLine(string.Format("Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0")));
-            ErrorLogging.LogLine(string.Format("Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0")));
+            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0", CultureInfo.InvariantCulture)));
+            ErrorLogging.LogLine(string.Format(CultureInfo.InvariantCulture, "Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0", CultureInfo.InvariantCulture)));
 #endif
 
             if (!string.IsNullOrEmpty(NewPresetName)) {
-                DialogResult = DialogResult.OK;
-                Close();
+                await this.InvokeOnUiThreadAsync(() => {
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }).ConfigureAwait(false);
             } else {
-                //CleanupFailedImport(); //should have already been done.
-                EnableProgressBar(false);
+                await this.InvokeOnUiThreadAsync(() => EnableProgressBar(false)).ConfigureAwait(false);
             }
 
         }
@@ -207,7 +206,7 @@ namespace Foreman {
                 progress.Report(new KeyValuePair<int, string>(10, "Running Factorio - creating test save."));
                 FactorioRunResult createRun = FactorioBenchmarkRunner.Run(
                     exePath,
-                    string.Format("--mod-directory \"{0}\" --create temp-save.zip", modsPath),
+                    string.Format(CultureInfo.InvariantCulture, "--mod-directory \"{0}\" --create temp-save.zip", modsPath),
                     token,
                     () => CleanupFailedImport(modsPath));
 
@@ -253,7 +252,7 @@ namespace Foreman {
                 progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
                 FactorioRunResult exportRun = FactorioBenchmarkRunner.Run(
                     exePath,
-                    string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath),
+                    string.Format(CultureInfo.InvariantCulture, "--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath),
                     token,
                     () => CleanupFailedImport(modsPath));
 
@@ -276,7 +275,7 @@ namespace Foreman {
                     UserMessages.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
                     CleanupFailedImport(modsPath);
                     return "";
-                } else if (resultString.IndexOf("<<<END-EXPORT-P1>>>") == -1 || resultString.IndexOf("<<<END-EXPORT-P2>>>") == -1) {
+                } else if (!resultString.Contains("<<<END-EXPORT-P1>>>", StringComparison.Ordinal) || !resultString.Contains("<<<END-EXPORT-P2>>>", StringComparison.Ordinal)) {
 #if DEBUG
                     Console.WriteLine(resultString);
 #endif
@@ -294,27 +293,27 @@ namespace Foreman {
                 Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "debugExporting.json"), resultString);
 #endif
 
-                string lnamesString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-LN>>>") + 23);
-                lnamesString = lnamesString.Substring(0, lnamesString.IndexOf("<<<END-EXPORT-LN>>>") - 2);
+                string lnamesString = resultString[(resultString.IndexOf("<<<START-EXPORT-LN>>>", StringComparison.Ordinal) + 23)..];
+                lnamesString = lnamesString[..(lnamesString.IndexOf("<<<END-EXPORT-LN>>>", StringComparison.Ordinal) - 2)];
                 lnamesString = lnamesString.Replace("\n", "").Replace("\r", "").Replace("<#~#>", "\n");
 
-                string iconString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P1>>>") + 23);
-                iconString = iconString.Substring(0, iconString.IndexOf("<<<END-EXPORT-P1>>>") - 2);
+                string iconString = resultString[(resultString.IndexOf("<<<START-EXPORT-P1>>>", StringComparison.Ordinal) + 23)..];
+                iconString = iconString[..(iconString.IndexOf("<<<END-EXPORT-P1>>>", StringComparison.Ordinal) - 2)];
 
-                string dataString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P2>>>") + 23);
-                dataString = dataString.Substring(0, dataString.IndexOf("<<<END-EXPORT-P2>>>") - 2);
+                string dataString = resultString[(resultString.IndexOf("<<<START-EXPORT-P2>>>", StringComparison.Ordinal) + 23)..];
+                dataString = dataString[..(dataString.IndexOf("<<<END-EXPORT-P2>>>", StringComparison.Ordinal) - 2)];
 
                 string[] lnames = lnamesString.Split('\n'); //keep empties - we know where they are!
-                Dictionary<string, string> localisedNames = new Dictionary<string, string>(); //this is the link between the 'lid' property and the localised names in dataString
+                var localisedNames = new Dictionary<string, string>(); //this is the link between the 'lid' property and the localised names in dataString
                 for (int i = 0; i < lnames.Length / 2; i++)
-                    localisedNames.Add('$' + i.ToString(), lnames[(i * 2) + 1].Replace("Unknown key: \"", "").Replace("\"", ""));
+                    localisedNames.Add('$' + i.ToString(CultureInfo.InvariantCulture), lnames[(i * 2) + 1].Replace("Unknown key: \"", "").Replace("\"", ""));
 
 #if DEBUG
                 Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_iconJObjectOut.json"), iconString.ToString());
                 Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "_dataJObjectOut.json"), dataString.ToString());
 #endif
-                JsonObject? iconJObject = null;
-                JsonObject? dataJObject = null;
+                JsonObject? iconJObject;
+                JsonObject? dataJObject;
                 try {
                     iconJObject = PresetJson.ParseObject(iconString);
                     dataJObject = PresetJson.ParseObject(dataString);
@@ -353,12 +352,12 @@ namespace Foreman {
                 }
 
                 //now we need to process icons. This is done by the IconProcessor.
-                Dictionary<string, string> modSet = new Dictionary<string, string>();
+                var modSet = new Dictionary<string, string>();
                 foreach (JsonNode objJToken in PresetJson.EnumerateArray(dataJObject, "mods"))
                     if (PresetJson.GetString(objJToken, "name") is string name && PresetJson.GetString(objJToken, "version") is string version)
-                        modSet.Add(name.ToLower(), version);
+                        modSet.Add(name.ToLowerInvariant(), version);
 
-                using (IconCacheProcessor icProcessor = new IconCacheProcessor()) {
+                using (var icProcessor = new IconCacheProcessor()) {
                     if (!icProcessor.PrepareModPaths(modSet, modsPath, Path.Combine(installPath, "data"), token)) {
                         if (!token.IsCancellationRequested) {
                             UserMessages.Show("Mod inconsistency detected. Try to see if launching Factorio gives an error?");
@@ -368,10 +367,10 @@ namespace Foreman {
                         return "";
                     }
 
-                    if (!await icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, token, 30, 100)) {
+                    if (!await icProcessor.CreateIconCache(iconJObject, Path.Combine(Application.StartupPath, presetPath + ".dat"), progress, 30, 100, token).ConfigureAwait(false)) {
                         if (!token.IsCancellationRequested) {
-                            ErrorLogging.LogLine(string.Format("{0}/{1} images were not found while processing icons.", icProcessor.FailedPathCount, icProcessor.TotalPathCount));
-                            if (UserMessages.Show(string.Format("{0}/{1} images that were processed for icons were not found and thus some icons are likely wrong/empty. Do you still wish to continue with the preset import?", icProcessor.FailedPathCount, icProcessor.TotalPathCount), "Confirm Preset Import", MessageBoxButtons.YesNo) != DialogResult.Yes) {
+                            ErrorLogging.LogLine(string.Format(CultureInfo.InvariantCulture, "{0}/{1} images were not found while processing icons.", icProcessor.FailedPathCount, icProcessor.TotalPathCount));
+                            if (UserMessages.Show(string.Format(DisplayCulture.Format, "{0}/{1} images that were processed for icons were not found and thus some icons are likely wrong/empty. Do you still wish to continue with the preset import?", icProcessor.FailedPathCount, icProcessor.TotalPathCount), "Confirm Preset Import", MessageBoxButtons.YesNo) != DialogResult.Yes) {
                                 CleanupFailedImport(modsPath, presetPath);
                                 return "";
                             }
@@ -384,7 +383,7 @@ namespace Foreman {
 
                 FactorioModListHelper.SetModState(modsPath, "foremanexport", enabled: false, removeFromListWhenDisabled: true);
                 return NewPresetName;
-            });
+            }).ConfigureAwait(false);
         }
 
         private static void WriteExportFailureLog(string output) =>
@@ -415,14 +414,14 @@ namespace Foreman {
             if (File.Exists(tempSavePath))
                 File.Delete(tempSavePath);
 
-            if (modsPath != "" && foremanModName != "" && Directory.Exists(Path.Combine(modsPath, foremanModName)))
+            if (!string.IsNullOrEmpty(modsPath) && !string.IsNullOrEmpty(foremanModName) && Directory.Exists(Path.Combine(modsPath, foremanModName)))
                 Directory.Delete(Path.Combine(modsPath, foremanModName), true);
 
-            if (presetPath != "" && foremanModName != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".pjson")))
+            if (!string.IsNullOrEmpty(presetPath) && !string.IsNullOrEmpty(foremanModName) && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".pjson")))
                 File.Delete(Path.Combine(Application.StartupPath, presetPath + ".pjson"));
-            if (presetPath != "" && foremanModName != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".json")))
+            if (!string.IsNullOrEmpty(presetPath) && !string.IsNullOrEmpty(foremanModName) && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".json")))
                 File.Delete(Path.Combine(Application.StartupPath, presetPath + ".json"));
-            if (presetPath != "" && foremanModName != "" && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".dat")))
+            if (!string.IsNullOrEmpty(presetPath) && !string.IsNullOrEmpty(foremanModName) && File.Exists(Path.Combine(Application.StartupPath, presetPath + ".dat")))
                 File.Delete(Path.Combine(Application.StartupPath, presetPath + ".dat"));
         }
 
@@ -436,12 +435,11 @@ namespace Foreman {
             }
 
             var existingPresets = MainForm.GetValidPresetsList();
-            if (filteredText.Length < 5)
-                PresetNameTextBox.BackColor = Color.Moccasin;
-            else if (existingPresets?.Any(p => p.Name.ToLower() == filteredText.ToLower()) is true)
-                PresetNameTextBox.BackColor = Color.Pink;
-            else
-                PresetNameTextBox.BackColor = Color.LightGreen;
+            PresetNameTextBox.BackColor = filteredText.Length < 5
+                ? Color.Moccasin
+                : existingPresets?.Any(p => string.Equals(p.Name, filteredText, StringComparison.OrdinalIgnoreCase)) is true
+                ? Color.Pink
+                : Color.LightGreen;
         }
     }
 }

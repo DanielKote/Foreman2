@@ -1,37 +1,31 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.ProductionGraphView.Elements;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman {
-    public class FloatingTooltipRenderer {
+namespace Foreman.ProductionGraphView {
+    public class FloatingTooltipRenderer(ProductionGraphViewer graphViewer) {
         private const int border = 2;
         private const int textPadding = 2;
         private const int arrowSize = 10;
 
-        private static readonly Font size10Font = new Font(FontFamily.GenericSansSerif, 10);
+        private static readonly Font size10Font = new(FontFamily.GenericSansSerif, 10);
         private static readonly Brush bgBrush = new SolidBrush(Color.FromArgb(65, 65, 65));
         private static readonly Brush borderBrush = Brushes.Black;
         private static readonly Brush textBrush = Brushes.White;
-        private static readonly StringFormat stringFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Near };
+        private static readonly StringFormat stringFormat = new() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Near };
 
-        private Dictionary<FloatingTooltipControl, bool> floatingTooltipControls;
-        private List<TooltipInfo> extraTooltips;
+        private readonly Dictionary<FloatingTooltipControl, bool> floatingTooltipControls = [];
+        private readonly List<TooltipInfo> extraTooltips = [];
 
-        private ProductionGraphViewer parent;
-
-        public FloatingTooltipRenderer(ProductionGraphViewer graphViewer) {
-            parent = graphViewer;
-
-            floatingTooltipControls = new Dictionary<FloatingTooltipControl, bool>();
-            extraTooltips = new List<TooltipInfo>();
-        }
+        private readonly ProductionGraphViewer parent = graphViewer;
 
         public void AddToolTip(FloatingTooltipControl tt, bool showOverride) { floatingTooltipControls.Add(tt, showOverride); }
         public void RemoveToolTip(FloatingTooltipControl tt) { floatingTooltipControls.Remove(tt); }
+        public bool ContainsTooltip(FloatingTooltipControl tt) => floatingTooltipControls.ContainsKey(tt);
         public void AddExtraToolTip(TooltipInfo tt) { extraTooltips.Add(tt); }
         public void ClearExtraToolTips() { extraTooltips.Clear(); }
 
@@ -60,28 +54,25 @@ namespace Foreman {
             }
         }
 
-        private void DrawTooltip(Point screenArrowPoint, Size size, Direction direction, Graphics graphics, string? text = null, Action<Graphics, Point>? custonDraw = null) //places the tool tip centered on the arrow
-        {
+        private static void DrawTooltip(Point screenArrowPoint, Size size, Direction direction, Graphics graphics, string? text = null, Action<Graphics, Point>? custonDraw = null) //places the tool tip centered on the arrow
+                {
             if (text != null) {
                 SizeF stringSize = graphics.MeasureString(text, size10Font);
                 size = new Size((int)stringSize.Width + (textPadding * 2), (int)stringSize.Height + (textPadding * 2));
             }
 
-            Rectangle rect;
-
-            if (direction == Direction.None)
-                rect = new Rectangle(screenArrowPoint, size);
-            else
-                rect = getTooltipScreenBounds(screenArrowPoint, size, direction);
+            var rect = direction == Direction.None
+                ? new Rectangle(screenArrowPoint, size)
+                : getTooltipScreenBounds(screenArrowPoint, size, direction);
 
             DrawTooltip(screenArrowPoint, rect, direction, graphics, text, custonDraw);
         }
 
 
-        private void DrawTooltip(Point screenArrowPoint, Rectangle bounds, Direction direction, Graphics graphics, string? text = null, Action<Graphics, Point>? customDraw = null) //places the tool tip based on the bounds provided
-        {
-            Point arrowPoint1 = new Point();
-            Point arrowPoint2 = new Point();
+        private static void DrawTooltip(Point screenArrowPoint, Rectangle bounds, Direction direction, Graphics graphics, string? text = null, Action<Graphics, Point>? customDraw = null) //places the tool tip based on the bounds provided
+                {
+            var arrowPoint1 = new Point();
+            var arrowPoint2 = new Point();
 
             switch (direction) {
                 case Direction.Down:
@@ -102,18 +93,16 @@ namespace Foreman {
                     break;
             }
 
-            Point[] points = new Point[] { screenArrowPoint, arrowPoint1, arrowPoint2 };
+            var points = new Point[] { screenArrowPoint, arrowPoint1, arrowPoint2 };
 
             graphics.FillPolygon(bgBrush, points);
             GraphicsStuff.FillRoundRect(bounds.X - border, bounds.Y - border, bounds.Width + border * 2, bounds.Height + border * 2, 3, graphics, borderBrush);
             GraphicsStuff.FillRoundRect(bounds.X, bounds.Y, bounds.Width, bounds.Height, 3, graphics, bgBrush);
 
             if (text != null) {
-                Point point;
-                if (stringFormat.Alignment == StringAlignment.Center)
-                    point = new Point(bounds.X + textPadding + bounds.Width / 2, bounds.Y + textPadding - 1 + bounds.Height / 2);
-                else
-                    point = new Point(bounds.X + textPadding, bounds.Y + textPadding - 1 + bounds.Height / 2);
+                var point = stringFormat.Alignment == StringAlignment.Center
+                    ? new Point(bounds.X + textPadding + bounds.Width / 2, bounds.Y + textPadding - 1 + bounds.Height / 2)
+                    : new Point(bounds.X + textPadding, bounds.Y + textPadding - 1 + bounds.Height / 2);
 
                 graphics.DrawString(text, size10Font, textBrush, point, stringFormat);
             }
@@ -122,8 +111,8 @@ namespace Foreman {
                 customDraw.Invoke(graphics, bounds.Location);
         }
 
-        public Rectangle getTooltipScreenBounds(Point screenArrowPoint, Size screenSize, Direction direction) {
-            Point centreOffset = new Point();
+        public static Rectangle getTooltipScreenBounds(Point screenArrowPoint, Size screenSize, Direction direction) {
+            var centreOffset = new Point();
             int arrowSize = 10;
 
             switch (direction) {

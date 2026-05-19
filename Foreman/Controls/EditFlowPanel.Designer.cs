@@ -1,4 +1,4 @@
-﻿namespace Foreman
+namespace Foreman
 {
     partial class EditFlowPanel
 	{

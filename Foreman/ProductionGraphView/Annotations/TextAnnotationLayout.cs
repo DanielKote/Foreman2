@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Foreman.ProductionGraphView.Elements;
+using System;
 using System.Drawing;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Annotations {
     /// <summary>Font/box sizing math for <see cref="TextAnnotationElement"/>.</summary>
     public static class TextAnnotationLayout {
         public const int DefaultPadding = 16;

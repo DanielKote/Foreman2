@@ -1,4 +1,5 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
@@ -25,17 +26,17 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task Pyanodon_OilBoiler_AndBoiler_LinkedToWaterSteam250() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
 
-            Assert.IsTrue(snapshot.Cache.Recipes.TryGetValue(WaterSteam250, out Recipe? recipe),
+            Assert.IsTrue(snapshot.Cache.Recipes.TryGetValue(WaterSteam250, out IRecipe? recipe),
                 $"DataCache should contain {WaterSteam250} after preset load.");
             Assert.IsTrue(snapshot.Cache.Assemblers.ContainsKey("oil-boiler-mk01"),
                 "oil-boiler-mk01 should load as an assembler when fluid boxes are exported correctly.");
 
             var assemblerNames = recipe!.Assemblers.Select(a => a.Name).ToHashSet();
-            Assert.IsTrue(assemblerNames.Contains("oil-boiler-mk01"),
+            Assert.Contains("oil-boiler-mk01", assemblerNames,
                 $"{WaterSteam250} should list the oil burner as an assembler option.");
-            Assert.IsTrue(assemblerNames.Contains("boiler"),
+            Assert.Contains("boiler", assemblerNames,
                 $"{WaterSteam250} should still list the regular boiler.");
         }
     }

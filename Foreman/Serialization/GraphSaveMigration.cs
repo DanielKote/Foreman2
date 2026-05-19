@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     /// <summary>Validates that graph save JSON is a supported version. Invalid JSON returns false without logging (caller treats as unsupported format).</summary>
     internal static class GraphSaveMigration {
         private static bool IsReadableVersion(int version) =>
@@ -19,17 +19,11 @@ namespace Foreman {
                 return false;
 
             try {
-                using JsonDocument doc = JsonDocument.Parse(json);
-                if (!doc.RootElement.TryGetProperty("ProductionGraph", out JsonElement graph)
-                    || graph.ValueKind != JsonValueKind.Object)
-                    return false;
-
-                if (!graph.TryGetProperty("Version", out JsonElement graphVersion)
-                    || graphVersion.ValueKind != JsonValueKind.Number
-                    || !IsReadableVersion(graphVersion.GetInt32()))
-                    return false;
-
-                return graph.TryGetProperty("Object", out JsonElement graphObject)
+                using var doc = JsonDocument.Parse(json);
+                return doc.RootElement.TryGetProperty("ProductionGraph", out JsonElement graph)
+                    && graph.ValueKind == JsonValueKind.Object && graph.TryGetProperty("Version", out JsonElement graphVersion)
+                    && graphVersion.ValueKind == JsonValueKind.Number
+                    && IsReadableVersion(graphVersion.GetInt32()) && graph.TryGetProperty("Object", out JsonElement graphObject)
                     && graphObject.ValueKind == JsonValueKind.String
                     && graphObject.GetString() == GraphSaveFormat.GraphObject;
             } catch (JsonException) {
@@ -41,7 +35,7 @@ namespace Foreman {
             version = 0;
             objectType = null;
             try {
-                using JsonDocument doc = JsonDocument.Parse(json);
+                using var doc = JsonDocument.Parse(json);
                 JsonElement root = doc.RootElement;
                 if (!root.TryGetProperty("Version", out JsonElement versionElement)
                     || versionElement.ValueKind != JsonValueKind.Number

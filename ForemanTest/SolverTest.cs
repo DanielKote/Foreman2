@@ -1,5 +1,4 @@
-﻿using Foreman;
-using ForemanTest.support;
+﻿using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -110,7 +109,7 @@ namespace ForemanTest {
             data.Solve();
 
             var production = data.SupplyRate("Plate");
-            Assert.IsTrue(production == 10, "Suppliers misproduced: " + production);
+            Assert.AreEqual(10, production, "Suppliers misproduced: " + production);
         }
 
         [TestMethod]
@@ -156,7 +155,7 @@ namespace ForemanTest {
 
             builder.Link(
                 builder.Supply("Ore"),
-                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(10),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).SetTarget(10),
                 builder.Consumer("Plate")
             );
 
@@ -188,7 +187,7 @@ namespace ForemanTest {
             var builder = GraphBuilder.Create();
 
             builder.Link(
-                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(10)
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).SetTarget(10)
             );
 
             var data = builder.Build();
@@ -242,7 +241,7 @@ namespace ForemanTest {
             var builder = GraphBuilder.Create();
 
             var fixer = builder.Recipe("fixer").Input("Broken", 5).Output("Fixed", 5);
-            var breaker = builder.Recipe("breaker").Input("Fixed", 1).Output("Broken", 1).Target(10);
+            var breaker = builder.Recipe("breaker").Input("Fixed", 1).Output("Broken", 1).SetTarget(10);
             builder.Link(fixer, breaker);
             builder.Link(breaker, fixer);
 
@@ -276,7 +275,7 @@ namespace ForemanTest {
 
             builder.Link(
                 builder.Supply("Ore"),
-                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Efficiency(0.25),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).SetEfficiency(0.25),
                 builder.Consumer("Plate").Target(10)
             );
 
@@ -350,7 +349,7 @@ namespace ForemanTest {
 
             builder.Link(
                 builder.Supply("Ore"),
-                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(15),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).SetTarget(15),
                 builder.Consumer("Plate").Target(10)
             );
 
@@ -370,7 +369,7 @@ namespace ForemanTest {
 
             builder.Link(
                 builder.Supply("Ore"),
-                builder.Recipe().Input("Ore", 1).Output("Plate", 1).Target(5),
+                builder.Recipe().Input("Ore", 1).Output("Plate", 1).SetTarget(5),
                 builder.Consumer("Plate").Target(10)
             );
 
@@ -427,8 +426,8 @@ namespace ForemanTest {
             var builderA = GraphBuilder.Create();
             var builderB = GraphBuilder.Create();
 
-            GraphBuilder[] builders = { builderA, builderB };
-            bool[] addPassthroughs = { false, true };
+            GraphBuilder[] builders = [builderA, builderB];
+            bool[] addPassthroughs = [false, true];
 
             foreach (var tuple in builders.Zip(addPassthroughs, (a, b) => Tuple.Create(a, b))) {
                 var builder = tuple.Item1;
@@ -471,7 +470,7 @@ namespace ForemanTest {
                     );
                 }
 
-                GraphBuilder.RecipeBuilder[] recipes = { refining, heavyCracking, lightCracking };
+                GraphBuilder.RecipeBuilder[] recipes = [refining, heavyCracking, lightCracking];
                 foreach (var x in recipes) {
                     builder.Link(
                         waterSupply,
@@ -502,7 +501,7 @@ namespace ForemanTest {
             AssertFloatsAreEqual(dataA.SupplyRate("Oil"), dataB.SupplyRate("Oil"));
         }
 
-        private void AssertFloatsAreEqual(double expected, double actual) {
+        private static void AssertFloatsAreEqual(double expected, double actual) {
             Assert.AreEqual(expected, actual, 0.0001);
         }
     }

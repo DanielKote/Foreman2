@@ -1,5 +1,9 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
 using Foreman.Graph;
+using Foreman.Models;
+using Foreman.ProductionGraphView.Elements;
+using Foreman.Serialization;
 using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,7 +25,7 @@ namespace ForemanTest {
             BeaconPrototype beacon = CreateTestBeacon(ctx, beaconModuleSlots);
             ModulePrototype module = CreateTestSpeedModule(ctx);
             WireModuleForBeaconRecipe(ctx, beacon, module);
-            Recipe recipe = CreateBeaconCapableRecipe(ctx, module);
+            RecipePrototype recipe = CreateBeaconCapableRecipe(ctx, module);
 
             using var viewer = new ProductionGraphViewer {
                 DCache = ctx.Cache,
@@ -33,18 +37,18 @@ namespace ForemanTest {
 
             NodeId recipeId = viewer.Session.Editor.CreateRecipeNode(new RecipeQualityPair(recipe, ctx.Quality), new Point(0, 0));
             Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(recipeId, out BaseNodeElement? nodeElement));
-            Assert.IsInstanceOfType(nodeElement, typeof(RecipeNodeElement));
+            Assert.IsInstanceOfType<RecipeNodeElement>(nodeElement);
             var recipeElement = (RecipeNodeElement)nodeElement!;
 
             var nodeController = viewer.Session.Editor.RequestNodeController(recipeId);
-            Assert.IsInstanceOfType(nodeController, typeof(RecipeNodeController));
+            Assert.IsInstanceOfType<RecipeNodeController>(nodeController);
             var controller = (RecipeNodeController)nodeController!;
             controller.SetBeacon(new BeaconQualityPair(beacon, ctx.Quality));
             var modulePair = new ModuleQualityPair(module, ctx.Quality);
             for (int i = 0; i < moduleCount; i++)
                 controller.AddBeaconModule(modulePair);
 
-            Assert.AreEqual(moduleCount, recipeElement.RecipeViewModel.BeaconModules.Count,
+            Assert.HasCount(moduleCount, recipeElement.RecipeViewModel.BeaconModules,
                 "Test setup should place the node in the >6 module circle-drawing path.");
 
             BeaconElement beaconElement = recipeElement.SubElements.OfType<BeaconElement>().Single();
@@ -57,9 +61,10 @@ namespace ForemanTest {
         }
 
         private static BeaconPrototype CreateTestBeacon(GraphSessionTestHelper.TestContext ctx, int moduleSlots) {
-            var beacon = new BeaconPrototype(ctx.Cache, "§§test:beacon-many-slots", "Test Beacon", EnergySource.Electric);
-            beacon.ModuleSlots = moduleSlots;
-            beacon.energyConsumption[ctx.Quality] = 1000;
+            var beacon = new BeaconPrototype(ctx.Cache, "§§test:beacon-many-slots", "Test Beacon", EnergySource.Electric) {
+                ModuleSlots = moduleSlots
+            };
+            beacon.EnergyConsumptionInternal[ctx.Quality] = 1000;
             TestDataCacheHelper.RegisterBeacon(ctx.Cache, beacon);
             return beacon;
         }
@@ -76,25 +81,25 @@ namespace ForemanTest {
             GraphSessionTestHelper.TestContext ctx,
             BeaconPrototype beacon,
             ModulePrototype module) {
-            Assembler assembler = TestPrototypeFactory.CreateTestAssembler(ctx.Cache);
+            AssemblerPrototype assembler = TestPrototypeFactory.CreateTestAssembler(ctx.Cache);
             TestDataCacheHelper.RegisterAssembler(ctx.Cache, assembler);
-            ((AssemblerPrototype)assembler).modules.Add(module);
-            beacon.modules.Add(module);
-            module.assemblers.Add((AssemblerPrototype)assembler);
-            module.beacons.Add(beacon);
+            ((AssemblerPrototype)assembler).ModulesInternal.Add(module);
+            beacon.ModulesInternal.Add(module);
+            module.AssemblersInternal.Add((AssemblerPrototype)assembler);
+            module.BeaconsInternal.Add(beacon);
         }
 
-        private static Recipe CreateBeaconCapableRecipe(GraphSessionTestHelper.TestContext ctx, ModulePrototype module) {
+        private static RecipePrototype CreateBeaconCapableRecipe(GraphSessionTestHelper.TestContext ctx, ModulePrototype module) {
             var recipe = new RecipePrototype(ctx.Cache, "§§test:beacon-recipe", "Beacon Recipe", ctx.Subgroup, "z");
             TestPrototypeFactory.SetRecipeTime(recipe, 1);
-            Assembler assembler = TestPrototypeFactory.CreateTestAssembler(ctx.Cache);
+            AssemblerPrototype assembler = TestPrototypeFactory.CreateTestAssembler(ctx.Cache);
             if (!ctx.Cache.Assemblers.ContainsKey(assembler.Name))
                 TestDataCacheHelper.RegisterAssembler(ctx.Cache, assembler);
             TestPrototypeFactory.LinkRecipeAndAssembler(recipe, assembler);
-            recipe.beaconModules.Add(module);
-            recipe.assemblerModules.Add(module);
-            ((AssemblerPrototype)assembler).modules.Add(module);
-            module.recipes.Add(recipe);
+            recipe.BeaconModulesInternal.Add(module);
+            recipe.AssemblerModulesInternal.Add(module);
+            ((AssemblerPrototype)assembler).ModulesInternal.Add(module);
+            module.RecipesInternal.Add(recipe);
 
             var ore = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, "beacon-test-ore");
             var plate = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, "beacon-test-plate");

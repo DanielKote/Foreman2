@@ -1,9 +1,10 @@
 ﻿using Foreman;
+using Foreman.ProductionGraphView.Elements;
+using Foreman.Serialization;
 using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Drawing;
-using System.Linq;
 
 namespace ForemanTest.Annotations {
     [TestClass]
@@ -19,7 +20,7 @@ namespace ForemanTest.Annotations {
 
         private static void FitBoxToTextAtCenter_PreservesCenter_Impl() {
             using var viewer = CreateViewer();
-            var annotation = new TextAnnotationElement(viewer, new Point(100, 200));
+            using var annotation = new TextAnnotationElement(viewer, new Point(100, 200));
             annotation.Text = "Hello";
 
             int centerX = annotation.X;
@@ -32,13 +33,13 @@ namespace ForemanTest.Annotations {
 
             Assert.AreEqual(centerX, annotation.X);
             Assert.AreEqual(centerY, annotation.Y);
-            Assert.IsTrue(annotation.Width >= widthBefore);
-            Assert.IsTrue(annotation.Height >= heightBefore);
+            Assert.IsGreaterThanOrEqualTo(widthBefore, annotation.Width);
+            Assert.IsGreaterThanOrEqualTo(heightBefore, annotation.Height);
         }
 
         private static void SetFontSizeInPoints_GrowsBoxWhenFitted_Impl() {
             using var viewer = CreateViewer();
-            var annotation = new TextAnnotationElement(viewer, new Point(50, 50));
+            using var annotation = new TextAnnotationElement(viewer, new Point(50, 50));
             annotation.Text = "Scale me";
             annotation.FitBoxToTextAtCenter();
 
@@ -46,7 +47,7 @@ namespace ForemanTest.Annotations {
             annotation.SetFontSizeInPoints(28f);
             annotation.FitBoxToTextAtCenter();
 
-            Assert.IsTrue(annotation.Width > widthAt14);
+            Assert.IsGreaterThan(widthAt14, annotation.Width);
             Assert.AreEqual(28f, annotation.TextFont.SizeInPoints, 0.01f);
         }
 

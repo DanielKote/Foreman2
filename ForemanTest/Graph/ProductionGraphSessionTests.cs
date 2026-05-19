@@ -1,5 +1,8 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
 using Foreman.Graph;
+using Foreman.Models;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,7 +30,7 @@ namespace ForemanTest.Graph {
             Assert.IsNotNull(vm);
             Assert.AreEqual(NodeType.Supplier, vm.NodeType);
             Assert.AreEqual(new System.Drawing.Point(10, 20), vm.Location);
-            Assert.IsInstanceOfType(vm, typeof(ISupplierNodeViewModel));
+            Assert.IsInstanceOfType<ISupplierNodeViewModel>(vm);
         }
 
         [TestMethod]
@@ -71,8 +74,8 @@ namespace ForemanTest.Graph {
             session.Editor.CreateSupplierNode(iron, new System.Drawing.Point(0, 0));
             graph.ClearGraph();
 
-            Assert.AreEqual(0, session.View.Nodes.Count);
-            Assert.AreEqual(0, session.View.Links.Count);
+            Assert.IsEmpty(session.View.Nodes);
+            Assert.IsEmpty(session.View.Links);
         }
 
         [TestMethod]
@@ -91,7 +94,7 @@ namespace ForemanTest.Graph {
 
             graph.UpdateNodeValues();
 
-            Assert.IsTrue(valuesChangedCount >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, valuesChangedCount);
         }
     }
 }

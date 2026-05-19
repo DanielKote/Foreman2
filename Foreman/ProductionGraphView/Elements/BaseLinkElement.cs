@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Foreman.Models;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public abstract class BaseLinkElement : GraphElement {
         public enum LineType { Simple, UShape, NShape }
 
@@ -24,10 +25,9 @@ namespace Foreman {
 
         public Rectangle CalculatedBounds { get; private set; }
 
-        protected bool iconOnlyDraw;
-
+        protected bool iconOnlyDraw { get; set; }
         private const int circlePull = 100;
-        private static CustomLineCap arrowCap = new AdjustableArrowCap(4, 3);
+        private static readonly CustomLineCap arrowCap = new AdjustableArrowCap(4, 3);
 
         public override Point Location //link elements are always considered to be located at 0,0 graph to simplify things, with their connection points being in graph-coordinates (no need to do any local transforms)
         {
@@ -42,14 +42,14 @@ namespace Foreman {
         }
         protected BaseLinkElement(ProductionGraphViewer graphViewer, BaseLinkElement masterLink) : base(graphViewer, masterLink) { LinkWidth = masterLink.Width; }
 
-        public override void UpdateVisibility(Rectangle graph_zone, int xborder, int yborder) {
+        public override void UpdateVisibility(Rectangle graphZone, int xborder, int yborder) {
             //NOTE: link element works in graph coordinates throughout (since Location is 0,0 for it - and it is always owned directly by the graph viewer). So we dont have to bother with graph to local conversions
             UpdateCurve();
             Visible =
-                         CalculatedBounds.X + CalculatedBounds.Width > graph_zone.X - xborder &&
-                        CalculatedBounds.X < graph_zone.X + graph_zone.Width + xborder &&
-                        CalculatedBounds.Y + CalculatedBounds.Height > graph_zone.Y - yborder &&
-                        CalculatedBounds.Y < graph_zone.Y + graph_zone.Height + yborder;
+                         CalculatedBounds.X + CalculatedBounds.Width > graphZone.X - xborder &&
+                        CalculatedBounds.X < graphZone.X + graphZone.Width + xborder &&
+                        CalculatedBounds.Y + CalculatedBounds.Height > graphZone.Y - yborder &&
+                        CalculatedBounds.Y < graphZone.Y + graphZone.Height + yborder;
         }
 
         protected abstract Tuple<Point, Point>? GetCurveEndpoints(); //supplier,consumer
@@ -169,7 +169,7 @@ namespace Foreman {
                 }
             }
         }
-        public override bool ContainsPoint(Point graph_point) {
+        public override bool ContainsPoint(Point graphPoint) {
             return false;
         }
 
@@ -179,24 +179,24 @@ namespace Foreman {
             iconOnlyDraw = (style == NodeDrawingStyle.IconsOnly);
             UpdateCurve();
 
-            using (Pen pen = new Pen(Item.Item.AverageColor, LinkWidth) { EndCap = LineCap.Round, StartCap = LineCap.Round }) {
-                if (graphViewer.ArrowsOnLinks && !graphViewer.DynamicLinkWidth && !iconOnlyDraw)
-                    pen.CustomEndCap = arrowCap;
+            using var pen = new Pen(Item.Item.AverageColor, LinkWidth) { EndCap = LineCap.Round, StartCap = LineCap.Round };
+            if (graphViewer.ArrowsOnLinks && !graphViewer.DynamicLinkWidth && !iconOnlyDraw)
+                pen.CustomEndCap = arrowCap;
 
-                switch (Type) {
-                    case LineType.Simple:
-                        graphics.DrawBeziers(pen, new Point[]
-                        {
+            switch (Type) {
+                case LineType.Simple:
+                    graphics.DrawBeziers(pen,
+                    [
                             supplierOrigin,
                             supplierPull,
 
                             consumerPull,
                             consumerOrigin
-                        });
-                        break;
-                    case LineType.UShape:
-                        graphics.DrawBeziers(pen, new Point[]
-                        {
+                    ]);
+                    break;
+                case LineType.UShape:
+                    graphics.DrawBeziers(pen,
+                    [
                             supplierOrigin,
                             supplierOrigin,
 
@@ -218,11 +218,11 @@ namespace Foreman {
 
                             consumerOrigin,
                             consumerOrigin
-                        });
-                        break;
-                    case LineType.NShape:
-                        graphics.DrawBeziers(pen, new Point[]
-                        {
+                    ]);
+                    break;
+                case LineType.NShape:
+                    graphics.DrawBeziers(pen,
+                    [
                             supplierOrigin,
                             pullN1,
 
@@ -252,10 +252,9 @@ namespace Foreman {
 
                             pullN8,
                             consumerOrigin
-                        });
-                        ;
-                        break;
-                }
+                    ]);
+                    ;
+                    break;
             }
         }
     }

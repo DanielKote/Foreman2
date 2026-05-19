@@ -1,30 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView {
     public enum Direction { Up, Down, Left, Right, None }
 
-    public struct TooltipInfo {
-        public TooltipInfo(Point screenLocation, Size screenSize, Direction direction, string text, Action<Graphics, Point> customDraw) {
-            ScreenLocation = screenLocation;
-            ScreenSize = screenSize;
-            Direction = direction;
-            Text = text;
-
-            CustomDraw = customDraw;
-        }
-
-        public Point ScreenLocation;
-        public Size ScreenSize;
-        public Direction Direction;
-        public string Text;
-        public Action<Graphics, Point> CustomDraw;
-    }
+    public record struct TooltipInfo(Point ScreenLocation, Size ScreenSize, Direction Direction, string Text, Action<Graphics, Point> CustomDraw);
 
     public class FloatingTooltipControl : IDisposable {
         public Control Control { get; private set; }
@@ -41,7 +22,7 @@ namespace Foreman {
 
             parent.ToolTipRenderer.AddToolTip(this, showOverride);
             parent.Controls.Add(control);
-            Rectangle ttRect = GraphViewer.ToolTipRenderer.getTooltipScreenBounds(parent.GraphToScreen(graphLocation), control.Size, direction);
+            Rectangle ttRect = FloatingTooltipRenderer.getTooltipScreenBounds(parent.GraphToScreen(graphLocation), control.Size, direction);
 
             if (!useControlLocation)
                 control.Location = ttRect.Location;
@@ -49,6 +30,7 @@ namespace Foreman {
         }
 
         public void Dispose() {
+            GC.SuppressFinalize(this);
             Control.Dispose();
             GraphViewer.ToolTipRenderer.RemoveToolTip(this);
             Closing?.Invoke(this, EventArgs.Empty);

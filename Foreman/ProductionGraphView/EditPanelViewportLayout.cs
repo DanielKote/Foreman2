@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView {
     /// <summary>Caps floating edit panels to the graph viewer and scrolls overflowing content.</summary>
     public static class EditPanelViewportLayout {
         public const string ScrollHostName = "viewportScrollHost";
@@ -32,9 +32,7 @@ namespace Foreman {
         public static Size MeasureContentSize(Control contentRoot) {
             contentRoot.PerformLayout();
             Size preferred = contentRoot.GetPreferredSize(Size.Empty);
-            if (preferred.Width > 0 && preferred.Height > 0)
-                return preferred;
-            return contentRoot.Size;
+            return preferred.Width > 0 && preferred.Height > 0 ? preferred : contentRoot.Size;
         }
 
         public static void Apply(UserControl editPanel, Control contentRoot, ProductionGraphViewer viewer) {

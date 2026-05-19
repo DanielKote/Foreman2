@@ -1,8 +1,8 @@
 ﻿using Foreman;
 using Foreman.Graph;
+using Foreman.Models.Nodes;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ForemanTest.Graph {
@@ -30,7 +30,7 @@ namespace ForemanTest.Graph {
 
             IRecipeNodeViewModel recipeVm = session.View.Nodes.OfType<IRecipeNodeViewModel>().First();
             Assert.IsTrue(session.TryGetDomainNode(recipeVm.Id, out BaseNode? domainNode));
-            Assert.IsInstanceOfType(domainNode, typeof(RecipeNode));
+            Assert.IsInstanceOfType<RecipeNode>(domainNode);
             var recipeNode = (RecipeNode)domainNode;
 
             CollectionAssert.AreEqual(recipeNode.GetErrors(), recipeVm.GetErrors());
@@ -43,9 +43,9 @@ namespace ForemanTest.Graph {
             var session = GraphSessionTestHelper.AttachSession(ctx.NewGraph());
             NodeId supplierId = session.Editor.CreateSupplierNode(ctx.Item("iron"), System.Drawing.Point.Empty);
 
-            ISupplierNodeViewModel supplierVm = (ISupplierNodeViewModel)session.View.Nodes.First(n => n.Id == supplierId);
+            var supplierVm = (ISupplierNodeViewModel)session.View.Nodes.First(n => n.Id == supplierId);
             Assert.IsTrue(session.TryGetDomainNode(supplierId, out BaseNode? domainNode));
-            Assert.IsInstanceOfType(domainNode, typeof(SupplierNode));
+            Assert.IsInstanceOfType<SupplierNode>(domainNode);
             var supplierNode = (SupplierNode)domainNode;
 
             CollectionAssert.AreEqual(supplierNode.GetErrors(), supplierVm.GetErrors());

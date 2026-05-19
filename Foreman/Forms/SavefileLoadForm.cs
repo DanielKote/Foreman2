@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
@@ -10,16 +14,16 @@ using System.Windows.Forms;
 namespace Foreman {
     public partial class SaveFileLoadForm : Form {
         private readonly DataCache DCache;
-        private readonly HashSet<DataObjectBase> EnabledObjects;
-        public SaveFileInfo? SaveFileInfo;
+        private readonly HashSet<IDataObjectBase> EnabledObjects;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public SaveFileInfo? SaveFileInfo { get; set; }
+        private readonly CancellationTokenSource cts;
 
-        private CancellationTokenSource cts;
-
-        private string DefaultSaveFileLocation;
+        private readonly string DefaultSaveFileLocation;
         private string saveFilePath;
         private string factorioPath;
 
-        public SaveFileLoadForm(DataCache cache, HashSet<DataObjectBase> enabledObjects) {
+        public SaveFileLoadForm(DataCache cache, HashSet<IDataObjectBase> enabledObjects) {
             DCache = cache;
             EnabledObjects = enabledObjects;
             SaveFileInfo = null;
@@ -36,7 +40,7 @@ namespace Foreman {
             if (string.IsNullOrEmpty(DefaultSaveFileLocation))
                 DefaultSaveFileLocation = "";
             string? tempUDirectory = DefaultSaveFileLocation;
-            while (!string.IsNullOrEmpty(tempUDirectory) && Path.GetFileName(tempUDirectory).ToLower() != "saves")
+            while (!string.IsNullOrEmpty(tempUDirectory) && !string.Equals(Path.GetFileName(tempUDirectory), "saves", StringComparison.OrdinalIgnoreCase))
                 tempUDirectory = Path.GetDirectoryName(tempUDirectory);
             if (!string.IsNullOrEmpty(tempUDirectory))
                 tempUDirectory = Path.GetDirectoryName(tempUDirectory); //done one more time to get the actual user directory, not the saves folder
@@ -59,7 +63,7 @@ namespace Foreman {
 #if DEBUG
             DateTime startTime = DateTime.Now;
 #endif
-            using (OpenFileDialog dialog = new OpenFileDialog()) {
+            using (var dialog = new OpenFileDialog()) {
                 dialog.InitialDirectory = DefaultSaveFileLocation;
                 dialog.Filter = "factorio saves (*.zip)|*.zip";
                 dialog.FilterIndex = 1;
@@ -77,10 +81,13 @@ namespace Foreman {
             }
 
             var token = cts.Token;
-            DialogResult = await LoadSaveFile(token); //OK: all good, data loaded, ABORT: error during loading, display error message, CANCEL: local error prior to load (message already displayed)
-            if (DialogResult == DialogResult.OK)
-                ProcessSaveData();
-            Close();
+            DialogResult loadResult = await LoadSaveFile(token).ConfigureAwait(false); //OK: all good, data loaded, ABORT: error during loading, display error message, CANCEL: local error prior to load (message already displayed)
+            await this.InvokeOnUiThreadAsync(() => {
+                DialogResult = loadResult;
+                if (DialogResult == DialogResult.OK)
+                    ProcessSaveData();
+                Close();
+            }).ConfigureAwait(false);
 
 #if DEBUG
             TimeSpan diff = DateTime.Now.Subtract(startTime);
@@ -95,16 +102,16 @@ namespace Foreman {
                 try {
                     //get factorio path
                     string? userDataPath = saveFilePath;
-                    while (!string.IsNullOrEmpty(userDataPath) && Path.GetFileName(userDataPath).ToLower() != "saves")
+                    while (!string.IsNullOrEmpty(userDataPath) && !string.Equals(Path.GetFileName(userDataPath), "saves", StringComparison.OrdinalIgnoreCase))
                         userDataPath = Path.GetDirectoryName(userDataPath);
                     userDataPath = Path.GetDirectoryName(userDataPath); //done one more time to get the actual user directory, not the saves folder
 
                     string currentLog = Path.Combine(userDataPath ?? "", "factorio-current.log");
                     string[] currentLogLines = Utf8File.ReadAllLines(currentLog);
                     foreach (string line in currentLogLines) {
-                        if (line.Contains("Program arguments")) {
-                            factorioPath = line.Substring(line.IndexOf("\"") + 1);
-                            factorioPath = factorioPath.Substring(0, factorioPath.IndexOf("\""));
+                        if (line.Contains("Program arguments", StringComparison.OrdinalIgnoreCase)) {
+                            factorioPath = line[(line.IndexOf('"') + 1)..];
+                            factorioPath = factorioPath[..factorioPath.IndexOf('"')];
                         }
                     }
 
@@ -129,7 +136,7 @@ namespace Foreman {
 
                     FactorioRunResult readRun = FactorioBenchmarkRunner.Run(
                         factorioPath,
-                        string.Format("--instrument-mod foremansavereader --benchmark \"{0}\" --benchmark-ticks 1 --benchmark-runs 1", Path.GetFileName(saveFilePath)),
+                        string.Format(CultureInfo.InvariantCulture, "--instrument-mod foremansavereader --benchmark \"{0}\" --benchmark-ticks 1 --benchmark-runs 1", Path.GetFileName(saveFilePath)),
                         token,
                         () => {
                             if (Directory.Exists(Path.Combine(modsPath, "foremansavereader_2.0.0")))
@@ -153,7 +160,7 @@ namespace Foreman {
                             "This is usually caused by a mod bug. See factorio-current.log in your Factorio user data folder.");
                         ErrorLogging.LogLine("Foreman save read: Factorio crash (exit code " + readRun.ExitCode + ").");
                         return DialogResult.Abort;
-                    } else if (resultString.IndexOf("<<<END-EXPORT-P0>>>") == -1) {
+                    } else if (!resultString.Contains("<<<END-EXPORT-P0>>>", StringComparison.Ordinal)) {
 #if DEBUG
                         Console.WriteLine(resultString);
 #endif
@@ -161,8 +168,8 @@ namespace Foreman {
                         return DialogResult.Abort;
                     }
                     //parse output
-                    string exportString = resultString.Substring(resultString.IndexOf("<<<START-EXPORT-P0>>>") + 23);
-                    exportString = exportString.Substring(0, exportString.IndexOf("<<<END-EXPORT-P0>>>") - 1);
+                    string exportString = resultString[(resultString.IndexOf("<<<START-EXPORT-P0>>>", StringComparison.Ordinal) + 23)..];
+                    exportString = exportString[..(exportString.IndexOf("<<<END-EXPORT-P0>>>", StringComparison.Ordinal) - 1)];
                     JsonObject export = PresetJson.ParseObject(exportString);
 
                     SaveFileInfo = new SaveFileInfo();
@@ -180,13 +187,13 @@ namespace Foreman {
                     Properties.Settings.Default.Save();
                     return DialogResult.OK;
                 } catch (Exception ex) {
-                    ErrorLogging.LogException(ex, string.Format("Error reading save file '{0}'", saveFilePath));
+                    ErrorLogging.LogException(ex, string.Format(CultureInfo.InvariantCulture, "Error reading save file '{0}'", saveFilePath));
                     if (!string.IsNullOrEmpty(modsPath) && Directory.Exists(Path.Combine(modsPath, "foremansavereader_2.0.0")))
                         Directory.Delete(Path.Combine(modsPath, "foremansavereader_2.0.0"), true);
                     SaveFileInfo = null;
                     return DialogResult.Abort;
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         private void ProcessSaveData() {
@@ -211,17 +218,17 @@ namespace Foreman {
                 if (!DCache.IncludedMods.ContainsKey(mod.Key))
                     newMods += mod.Key + ", ";
             }
-            missingMods = missingMods.Substring(0, missingMods.Length - 2);
+            missingMods = missingMods[..^2];
             if (missingMods == "\nMissing Mods")
                 missingMods = "";
-            wrongVersionMods = wrongVersionMods.Substring(0, wrongVersionMods.Length - 2);
+            wrongVersionMods = wrongVersionMods[..^2];
             if (wrongVersionMods == "\nWrong Version Mods")
                 wrongVersionMods = "";
-            newMods = newMods.Substring(0, newMods.Length - 2);
+            newMods = newMods[..^2];
             if (newMods == "\nAdded Mods")
                 newMods = "";
 
-            if (missingMods != "" || wrongVersionMods != "" || newMods != "")
+            if (!string.IsNullOrEmpty(missingMods) || !string.IsNullOrEmpty(wrongVersionMods) || !string.IsNullOrEmpty(newMods))
                 if (UserMessages.Show("selected save file mods do not match preset mods; out of {0} mods:" + missingMods + wrongVersionMods + newMods + "\nAre you sure you wish to use this save file?", "Save file mod inconsistencies found!", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
                     return;
 
@@ -230,32 +237,32 @@ namespace Foreman {
             if (DCache.PlayerAssembler is not null)
                 EnabledObjects.Add(DCache.PlayerAssembler);
 
-            foreach (Recipe recipe in DCache.Recipes.Values)
-                if (recipe.Name.StartsWith("§§") || (SaveFileInfo?.Recipes.ContainsKey(recipe.Name) is true && SaveFileInfo.Recipes[recipe.Name]))
+            foreach (IRecipe recipe in DCache.Recipes.Values)
+                if (recipe.Name.StartsWith("§§", StringComparison.Ordinal) || (SaveFileInfo?.Recipes.ContainsKey(recipe.Name) is true && SaveFileInfo.Recipes[recipe.Name]))
                     EnabledObjects.Add(recipe);
 
             //go through all the assemblers, beacons, and modules and add them to the enabled set if at least one of their associated items has at least one production recipe that is in the enabled set.
-            foreach (Assembler assembler in DCache.Assemblers.Values) {
+            foreach (IAssembler assembler in DCache.Assemblers.Values) {
                 bool enabled = false;
-                foreach (IReadOnlyCollection<Recipe> recipes in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
-                    foreach (Recipe recipe in recipes)
+                foreach (IReadOnlyCollection<IRecipe> recipes in assembler.AssociatedItems.Select(item => item.ProductionRecipes))
+                    foreach (IRecipe recipe in recipes)
                         enabled |= EnabledObjects.Contains(recipe);
                 if (enabled)
                     EnabledObjects.Add(assembler);
             }
 
-            foreach (Beacon beacon in DCache.Beacons.Values) {
+            foreach (IBeacon beacon in DCache.Beacons.Values) {
                 bool enabled = false;
-                foreach (IReadOnlyCollection<Recipe> recipes in beacon.AssociatedItems.Select(item => item.ProductionRecipes))
-                    foreach (Recipe recipe in recipes)
+                foreach (IReadOnlyCollection<IRecipe> recipes in beacon.AssociatedItems.Select(item => item.ProductionRecipes))
+                    foreach (IRecipe recipe in recipes)
                         enabled |= EnabledObjects.Contains(recipe);
                 if (enabled)
                     EnabledObjects.Add(beacon);
             }
 
-            foreach (Module module in DCache.Modules.Values) {
+            foreach (IModule module in DCache.Modules.Values) {
                 bool enabled = false;
-                foreach (Recipe recipe in module.AssociatedItem.ProductionRecipes)
+                foreach (IRecipe recipe in module.AssociatedItem.ProductionRecipes)
                     enabled |= EnabledObjects.Contains(recipe);
                 if (enabled)
                     EnabledObjects.Add(module);

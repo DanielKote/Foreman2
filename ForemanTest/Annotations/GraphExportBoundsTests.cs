@@ -1,4 +1,6 @@
 ﻿using Foreman;
+using Foreman.ProductionGraphView.Annotations;
+using Foreman.ProductionGraphView.Elements;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Drawing;
@@ -64,7 +66,13 @@ namespace ForemanTest.Annotations {
             using var viewer = new ProductionGraphViewer {
                 Size = new Size(800, 600),
             };
-            viewer.AddAnnotationElement(new ShapeAnnotationElement(viewer, new Point(120, 80), 100, 60));
+            ShapeAnnotationElement? sae = new(viewer, new Point(120, 80), 100, 60);
+            try {
+                viewer.AddAnnotationElement(sae);
+                sae = null;
+            } finally {
+                sae?.Dispose();
+            }
 
             Rectangle exportBounds = viewer.GetExportBounds();
             Assert.IsTrue(GraphExportBounds.IsExportable(exportBounds));
@@ -79,7 +87,7 @@ namespace ForemanTest.Annotations {
 
             using var stream = new MemoryStream();
             image.Save(stream, ImageFormat.Png);
-            Assert.IsTrue(stream.Length > 0);
+            Assert.IsGreaterThan(0, stream.Length);
         }
     }
 }

@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Foreman.ProductionGraphView.Elements;
+using System;
 using System.Drawing;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView {
     public class GridManager {
-        public int CurrentGridUnit = 0;
-        public int CurrentMajorGridUnit = 0;
-        public bool ShowGrid = false;
-        public bool LockDragToAxis = false;
-        public bool ShowZeroAxis = false;
-        public Point DragOrigin;
-
-        private static readonly Pen gridPen = new Pen(Color.FromArgb(230, 230, 230), 1);
-        private static Pen gridMPen = new Pen(Color.FromArgb(200, 200, 200), 1);
+        public int CurrentGridUnit { get; set; }
+        public int CurrentMajorGridUnit { get; set; }
+        public bool ShowGrid { get; set; }
+        public bool LockDragToAxis { get; set; }
+        public bool ShowZeroAxis { get; set; }
+        public Point DragOrigin { get; set; }
+        private static readonly Pen gridPen = new(Color.FromArgb(230, 230, 230), 1);
+        private static Pen gridMPen = new(Color.FromArgb(200, 200, 200), 1);
         private static Brush gridBrush = new SolidBrush(Color.FromArgb(240, 240, 240));
-        private static readonly Pen zeroAxisPen = new Pen(Color.FromArgb(140, 140, 140), 2);
-        private static readonly Pen lockedAxisPen = new Pen(Color.FromArgb(180, 80, 80), 4);
+        private static readonly Pen zeroAxisPen = new(Color.FromArgb(140, 140, 140), 2);
+        private static readonly Pen lockedAxisPen = new(Color.FromArgb(180, 80, 80), 4);
         private const int minGridWidth = 6;
 
         public GridManager() {

@@ -1,4 +1,7 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Serialization;
 using System.Collections.Generic;
 
 namespace ForemanTest.support {
@@ -11,14 +14,13 @@ namespace ForemanTest.support {
             graph.EnableExtraProductivityForNonMiners = ui.ExtraProdForNonMiners;
 
             foreach (string fuelType in ui.FuelPriorityList) {
-                if (cache.Items.TryGetValue(fuelType, out Item? fuelItem) && fuelItem is not null)
+                if (cache.Items.TryGetValue(fuelType, out IItem? fuelItem) && fuelItem is not null)
                     graph.FuelSelector.UseFuel(fuelItem);
             }
 
             ApplyEnabledList(cache.Beacons.Values, cache.Beacons, ui.EnabledBeacons, (b, e) => b.Enabled = e);
             ApplyEnabledList(cache.Assemblers.Values, cache.Assemblers, ui.EnabledAssemblers, (a, e) => a.Enabled = e);
-            if (cache.RocketAssembler is not null)
-                cache.RocketAssembler.Enabled = cache.Assemblers.TryGetValue("rocket-silo", out Assembler? silo) && silo?.Enabled == true;
+            cache.RocketAssembler?.Enabled = cache.Assemblers.TryGetValue("rocket-silo", out IAssembler? silo) && silo?.Enabled == true;
             ApplyEnabledList(cache.Modules.Values, cache.Modules, ui.EnabledModules, (m, e) => m.Enabled = e);
             ApplyEnabledList(cache.Recipes.Values, cache.Recipes, ui.EnabledRecipes, (r, e) => r.Enabled = e);
         }

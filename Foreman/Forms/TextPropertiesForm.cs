@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.ProductionGraphView.Elements;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -98,7 +99,7 @@ namespace Foreman {
         private void UpdateFontLabel() {
             if (_workingFont is null)
                 return;
-            FontPreviewLabel.Text = string.Format("{0}, {1}pt{2}{3}",
+            FontPreviewLabel.Text = string.Format(DisplayCulture.Format, "{0}, {1}pt{2}{3}",
                 _workingFont.FontFamily.Name,
                 (int)_workingFont.SizeInPoints,
                 _workingFont.Bold ? " Bold" : "",
@@ -137,7 +138,7 @@ namespace Foreman {
         }
 
         private void UpdateBackColorButton() {
-            Color display = Color.FromArgb(255, _element.BackColor.R, _element.BackColor.G, _element.BackColor.B);
+            var display = Color.FromArgb(255, _element.BackColor.R, _element.BackColor.G, _element.BackColor.B);
             BackColorButton.BackColor = display;
             BackColorButton.ForeColor = display.R + display.G + display.B > 382 ? Color.Black : Color.White;
         }

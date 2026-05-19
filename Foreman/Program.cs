@@ -1,25 +1,30 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using System;
+using System.Resources;
 using System.Windows.Forms;
 
+[assembly: NeutralResourcesLanguage("en")]
+
 namespace Foreman {
-    static class Program {
+    internal static class Program {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main() {
+        private static void Main() {
             UpgradeUserSettingsIfNeeded();
             ErrorLogging.ClearLog();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
-            Application.Run(new MainForm());
+            using var form = new MainForm();
+            Application.Run(form);
         }
 
         /// <summary>
         /// Each assembly version stores settings in a new folder; copy the previous version's values on first launch.
         /// </summary>
-        static void UpgradeUserSettingsIfNeeded() {
+        private static void UpgradeUserSettingsIfNeeded() {
             if (!Properties.Settings.Default.UpgradeRequired)
                 return;
 

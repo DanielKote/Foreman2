@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Foreman.Models.Nodes;
+using System.Collections.Generic;
 
 namespace Foreman.Graph {
     internal sealed class GraphEntityRegistry {
         private uint _epoch = 1;
         private int _nextLinkValue;
-        private readonly Dictionary<NodeId, BaseNode> _nodes = new();
-        private readonly Dictionary<LinkId, NodeLink> _links = new();
-        private readonly Dictionary<BaseNode, NodeId> _nodeToId = new();
-        private readonly Dictionary<NodeLink, LinkId> _linkToId = new();
+        private readonly Dictionary<NodeId, BaseNode> _nodes = [];
+        private readonly Dictionary<LinkId, NodeLink> _links = [];
+        private readonly Dictionary<BaseNode, NodeId> _nodeToId = [];
+        private readonly Dictionary<NodeLink, LinkId> _linkToId = [];
 
         public uint Epoch => _epoch;
 

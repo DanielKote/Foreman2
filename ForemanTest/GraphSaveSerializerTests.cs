@@ -1,7 +1,10 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Models.Nodes;
+using Foreman.ProductionGraphView;
+using Foreman.Serialization;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +15,7 @@ using System.Threading.Tasks;
 namespace ForemanTest {
     [TestClass]
     public class GraphSaveCodecTests : ForemanTestBase {
+        public TestContext? TestContext { get; set; }
         [TestMethod]
         public void SerializeProductionGraph_ProducesExpectedDocumentShape() {
             var data = BuildSimpleChain();
@@ -23,7 +27,7 @@ namespace ForemanTest {
             Assert.AreEqual(JsonValueKind.Array, json.GetProperty("Nodes").ValueKind);
             Assert.AreEqual(JsonValueKind.Array, json.GetProperty("NodeLinks").ValueKind);
             Assert.AreEqual(JsonValueKind.Array, json.GetProperty("IncludedItems").ValueKind);
-            Assert.IsTrue(json.GetProperty("IncludedItems").GetArrayLength() >= 2);
+            Assert.IsGreaterThanOrEqualTo(2, json.GetProperty("IncludedItems").GetArrayLength());
         }
 
         [TestMethod]
@@ -34,9 +38,9 @@ namespace ForemanTest {
                 GraphSaveCodec.WriteProductionGraphToString(data.Graph, writeIndented: false));
 
             Assert.IsNotNull(fromJson);
-            Assert.AreEqual(built.Nodes.Count, fromJson.Nodes.Count);
-            Assert.AreEqual(built.Links.Count, fromJson.Links.Count);
-            Assert.AreEqual(built.IncludedItems.Count, fromJson.IncludedItems.Count);
+            Assert.HasCount(built.Nodes.Count, fromJson.Nodes);
+            Assert.HasCount(built.Links.Count, fromJson.Links);
+            Assert.HasCount(built.IncludedItems.Count, fromJson.IncludedItems);
         }
 
         [TestMethod]
@@ -47,20 +51,20 @@ namespace ForemanTest {
             ProductionGraphSaveDocument? document = GraphSaveCodec.ReadProductionGraph(json);
 
             Assert.IsNotNull(document);
-            Assert.AreEqual(3, document.Nodes.Count);
-            Assert.AreEqual(2, document.Links.Count);
-            Assert.IsTrue(document.Nodes.Any(n => n is RecipeNodeSaveData));
-            Assert.IsTrue(document.Nodes.Any(n => n is SupplierNodeSaveData));
-            Assert.IsTrue(document.Nodes.Any(n => n is ConsumerNodeSaveData));
+            Assert.HasCount(3, document.Nodes);
+            Assert.HasCount(2, document.Links);
+            Assert.Contains(n => n is RecipeNodeSaveData, document.Nodes);
+            Assert.Contains(n => n is SupplierNodeSaveData, document.Nodes);
+            Assert.Contains(n => n is ConsumerNodeSaveData, document.Nodes);
             Assert.IsNotNull(document.Solver);
-            Assert.IsTrue(document.IncludedItems.Contains("Ore"));
-            Assert.IsTrue(document.IncludedItems.Contains("Plate"));
+            Assert.Contains("Ore", document.IncludedItems);
+            Assert.Contains("Plate", document.IncludedItems);
         }
 
         [TestMethod]
         public void GraphSaveCodec_ReadProductionGraph_InvalidObject_ReturnsNull() {
             var data = BuildSimpleChain();
-            JsonNode? parsed = JsonNode.Parse(GraphSaveCodec.WriteProductionGraphToString(data.Graph, writeIndented: false));
+            var parsed = JsonNode.Parse(GraphSaveCodec.WriteProductionGraphToString(data.Graph, writeIndented: false));
             Assert.IsNotNull(parsed);
             JsonNode json = parsed;
             json["Object"] = "NotAProductionGraph";
@@ -107,7 +111,7 @@ namespace ForemanTest {
 
             Assert.IsNotNull(restored);
             Assert.AreEqual(120, restored.AnnotationDpi);
-            Assert.AreEqual(2, restored.Annotations.Count);
+            Assert.HasCount(2, restored.Annotations);
 
             var text = restored.Annotations.OfType<TextAnnotationSaveData>().Single();
             Assert.AreEqual("Hello", text.Text);
@@ -130,7 +134,7 @@ namespace ForemanTest {
 
             ProductionGraphSaveDocument? payload = GraphSaveCodec.ReadGraphPayload(json);
             Assert.IsNotNull(payload);
-            Assert.AreEqual(3, payload.Nodes.Count);
+            Assert.HasCount(3, payload.Nodes);
         }
 
         [TestMethod]
@@ -142,16 +146,16 @@ namespace ForemanTest {
                 data.Graph.DeleteNode(node);
 
             var viaDocument = data.Graph.InsertNodesFromDocument(data.Cache, document, applySolverSettings: true);
-            Assert.AreEqual(3, viaDocument.newNodes.Count);
-            Assert.AreEqual(2, viaDocument.newLinks.Count);
+            Assert.HasCount(3, viaDocument.NewNodes);
+            Assert.HasCount(2, viaDocument.NewLinks);
 
             foreach (var node in data.Graph.Nodes.ToList())
                 data.Graph.DeleteNode(node);
 
             string fragmentJson = GraphSaveCodec.WriteProductionGraphDocumentToString(document, writeIndented: false);
             var viaFragment = data.Graph.InsertNodesFromFragment(data.Cache, fragmentJson, applySolverSettings: true);
-            Assert.AreEqual(3, viaFragment.newNodes.Count);
-            Assert.AreEqual(2, viaFragment.newLinks.Count);
+            Assert.HasCount(3, viaFragment.NewNodes);
+            Assert.HasCount(2, viaFragment.NewLinks);
         }
 
         [TestMethod]
@@ -162,11 +166,13 @@ namespace ForemanTest {
             Assert.AreEqual(first, second);
         }
 
+        private static readonly JsonSerializerOptions opts = new() { WriteIndented = true };
         [TestMethod]
         public async Task Flowchart_LoadedGraphSerialize_IsStableAndDiffersFromRawFile() {
             string path = FlowchartSample.ResolvePath();
-            string disk = File.ReadAllText(path);
-            var cache = await SpaceAgeDataCacheFixture.GetLoadedAsync();
+            Assert.IsNotNull(TestContext);
+            string disk = await File.ReadAllTextAsync(path, TestContext.CancellationToken).ConfigureAwait(false);
+            var cache = await SpaceAgeDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             GraphViewerSaveDocument? saveDocument = GraphSaveCodec.ReadViewer(disk);
             Assert.IsNotNull(saveDocument);
 
@@ -182,7 +188,7 @@ namespace ForemanTest {
             string diskGraph = saveDocument.ProductionGraph is not null
                 ? JsonSerializer.Serialize(
                     JsonDocument.Parse(disk).RootElement.GetProperty("ProductionGraph"),
-                    new JsonSerializerOptions { WriteIndented = true })
+                    opts)
                 : "";
             Assert.AreNotEqual(diskGraph, once,
                 "On-disk graph JSON may differ in array ordering from a round-trip; MainForm compares to a post-load baseline, not the raw file.");
@@ -202,11 +208,11 @@ namespace ForemanTest {
 
             var imported = data.Graph.InsertNodesFromDocument(data.Cache, document, applySolverSettings: true);
 
-            Assert.AreEqual(3, imported.newNodes.Count);
-            Assert.AreEqual(2, imported.newLinks.Count);
-            Assert.IsTrue(imported.newNodes.OfType<ConsumerNode>().Any());
-            Assert.IsTrue(imported.newNodes.OfType<RecipeNode>().Any());
-            Assert.IsTrue(imported.newNodes.OfType<SupplierNode>().Any());
+            Assert.HasCount(3, imported.NewNodes);
+            Assert.HasCount(2, imported.NewLinks);
+            Assert.IsNotEmpty(imported.NewNodes.OfType<ConsumerNode>());
+            Assert.IsNotEmpty(imported.NewNodes.OfType<RecipeNode>());
+            Assert.IsNotEmpty(imported.NewNodes.OfType<SupplierNode>());
             Assert.IsTrue(data.Graph.PullOutputNodes);
             Assert.AreEqual(42, data.Graph.PullOutputNodesPower);
             Assert.AreEqual(7, data.Graph.LowPriorityPower);
@@ -217,7 +223,7 @@ namespace ForemanTest {
             var data = BuildSimpleChain();
             var recipeNode = data.Graph.Nodes.OfType<RecipeNode>().Single();
 
-            data.Graph.SerializeNodeIdSet = new HashSet<int> { recipeNode.NodeID };
+            data.Graph.SerializeNodeIdSet = [recipeNode.NodeID];
             JsonElement json = JsonDocument.Parse(
                 GraphSaveCodec.WriteProductionGraphToString(data.Graph, writeIndented: false)).RootElement;
             data.Graph.SerializeNodeIdSet = null;
@@ -231,7 +237,7 @@ namespace ForemanTest {
             var data = BuildSimpleChain();
             var recipeNode = data.Graph.Nodes.OfType<RecipeNode>().Single();
             TestDataCacheHelper.RegisterQuality(data.Cache, recipeNode.SelectedAssembler.Quality);
-            TestDataCacheHelper.RegisterAssembler(data.Cache, recipeNode.SelectedAssembler.Assembler);
+            TestDataCacheHelper.RegisterAssembler(data.Cache, (AssemblerPrototype)recipeNode.SelectedAssembler.Assembler);
 
             NodeCopyOptionsSaveDocument built = GraphSaveCodec.BuildNodeCopyOptions(new NodeCopyOptions(recipeNode));
             NodeCopyOptionsSaveDocument? document = GraphSaveCodec.ReadNodeCopyOptions(
@@ -248,7 +254,7 @@ namespace ForemanTest {
             var data = BuildSimpleChain();
             var recipeNode = data.Graph.Nodes.OfType<RecipeNode>().Single();
             TestDataCacheHelper.RegisterQuality(data.Cache, recipeNode.SelectedAssembler.Quality);
-            TestDataCacheHelper.RegisterAssembler(data.Cache, recipeNode.SelectedAssembler.Assembler);
+            TestDataCacheHelper.RegisterAssembler(data.Cache, (AssemblerPrototype)recipeNode.SelectedAssembler.Assembler);
             var original = new NodeCopyOptions(recipeNode);
 
             var restored = NodeCopyOptions.GetNodeCopyOptions(

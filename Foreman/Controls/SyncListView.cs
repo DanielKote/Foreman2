@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.Controls {
     //pretty much this \/ . Didnt want to bother with something more complicated.
     //https://stackoverflow.com/questions/14726146/scrolling-list-view-when-another-list-view-is-scrolled
     //NOTE: using the 'sendmessage' approached failed, so had to switch to a 'set-top-index' approach
-    class SyncListView : FFListView {
+    internal class SyncListView : FFListView {
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public SyncListView? Buddy { get; set; }
 
@@ -48,7 +46,7 @@ namespace Foreman {
 
     }
 
-    class FFListView : ListView {
+    internal class FFListView : ListView {
         public FFListView() : base() {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
         }

@@ -1,4 +1,6 @@
-﻿using Foreman.Graph;
+﻿using Foreman.Controls;
+using Foreman.Graph;
+using Foreman.Models.Nodes;
 using System;
 using System.Windows.Forms;
 
@@ -61,7 +63,7 @@ namespace Foreman {
             UpdateFixedFlowInputDecimals(FixedFlowInput);
         }
 
-        private void UpdateFixedFlowInputDecimals(NumericUpDown nud) {
+        private static void UpdateFixedFlowInputDecimals(NumericUpDown nud) {
             int decimals = MathDecimals.GetDecimals(nud.Value);
             decimals = Math.Min(decimals, 4);
             nud.DecimalPlaces = decimals;

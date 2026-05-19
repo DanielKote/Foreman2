@@ -1,9 +1,14 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using Foreman.ProductionGraphView;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Foreman {
-    /// <summary>Maps live graph / viewer state to <see cref="GraphSaveDocuments"/> (inverse of <see cref="GraphSaveLoader"/>).</summary>
+namespace Foreman.Serialization {
+    /// <summary>Maps live graph / viewer state to <see cref="ProductionGraphSaveDocument"/> (inverse of <see cref="GraphSaveLoader"/>).</summary>
     public static class GraphSaveWriter {
         public static ProductionGraphSaveDocument WriteProductionGraph(ProductionGraph graph) {
             (IReadOnlyCollection<BaseNode> includedNodes, IReadOnlyCollection<NodeLink> includedLinks) = graph.GetFragmentForSerialization();
@@ -20,8 +25,8 @@ namespace Foreman {
                 IncludedModules = Sort(included.Modules),
                 IncludedBeacons = Sort(included.Beacons),
                 Solver = WriteSolver(graph),
-                Nodes = includedNodes.Select(WriteNode).ToList(),
-                Links = includedLinks.Select(WriteLink).ToList()
+                Nodes = [.. includedNodes.Select(WriteNode)],
+                Links = [.. includedLinks.Select(WriteLink)]
             };
         }
 
@@ -44,7 +49,7 @@ namespace Foreman {
             ExtraProdForNonMiners = viewer.Graph.EnableExtraProductivityForNonMiners,
             AssemblerSelectorStyle = viewer.Graph.AssemblerSelector.DefaultSelectionStyle,
             ModuleSelectorStyle = viewer.Graph.ModuleSelector.DefaultSelectionStyle,
-            FuelPriorityList = viewer.Graph.FuelSelector.FuelPriority.Select(i => i.Name).ToList(),
+            FuelPriorityList = [.. viewer.Graph.FuelSelector.FuelPriority.Select(i => i.Name)],
             EnabledRecipes = SortEnabled(cache.Recipes.Values),
             EnabledAssemblers = SortEnabled(cache.Assemblers.Values),
             EnabledModules = SortEnabled(cache.Modules.Values),
@@ -158,7 +163,7 @@ namespace Foreman {
 
         private static RecipeNodeSaveData WriteRecipeNode(NodeFields baseFields, RecipeNode rnode) {
             BeaconQualityPair beaconPair = rnode.SelectedBeacon;
-            bool hasBeacon = beaconPair.Beacon is Beacon && beaconPair.Quality is Quality;
+            bool hasBeacon = beaconPair.Beacon is not null && beaconPair.Quality is not null;
 
             return new RecipeNodeSaveData {
                 NodeId = baseFields.NodeId,
@@ -177,8 +182,8 @@ namespace Foreman {
                 AssemblerModules = WriteModules(rnode.AssemblerModules),
                 FuelName = rnode.Fuel?.Name,
                 BurntResultName = rnode.FuelRemains?.Name,
-                BeaconName = beaconPair.Beacon is Beacon beacon ? beacon.Name : null,
-                BeaconQualityName = beaconPair.Quality is Quality beaconQuality ? beaconQuality.Name : null,
+                BeaconName = beaconPair.Beacon is IBeacon beacon ? beacon.Name : null,
+                BeaconQualityName = beaconPair.Quality is IQuality beaconQuality ? beaconQuality.Name : null,
                 BeaconModules = hasBeacon ? WriteModules(rnode.BeaconModules) : [],
                 BeaconCount = hasBeacon ? rnode.BeaconCount : 0,
                 BeaconsPerAssembler = hasBeacon ? rnode.BeaconsPerAssembler : 0,
@@ -186,17 +191,17 @@ namespace Foreman {
             };
         }
 
-        private static IReadOnlyList<ModuleQualitySaveData> WriteModules(IEnumerable<ModuleQualityPair> modules) =>
-            modules.Select(m => new ModuleQualitySaveData(m.Module.Name, m.Quality.Name)).ToList();
+        private static List<ModuleQualitySaveData> WriteModules(IEnumerable<ModuleQualityPair> modules) =>
+            [.. modules.Select(m => new ModuleQualitySaveData(m.Module.Name, m.Quality.Name))];
 
         private static List<string> Sort(IEnumerable<string> names) =>
-            names.OrderBy(n => n, StringComparer.Ordinal).ToList();
+            [.. names.OrderBy(n => n, StringComparer.Ordinal)];
 
         private static List<KeyValuePair<string, int>> SortQualities(IEnumerable<KeyValuePair<string, int>> qualities) =>
-            qualities.OrderBy(q => q.Key, StringComparer.Ordinal).ToList();
+            [.. qualities.OrderBy(q => q.Key, StringComparer.Ordinal)];
 
-        private static List<string> SortEnabled<T>(IEnumerable<T> entities) where T : DataObjectBase =>
-            entities.Where(e => e.Enabled).Select(e => e.Name).OrderBy(n => n, StringComparer.Ordinal).ToList();
+        private static List<string> SortEnabled<T>(IEnumerable<T> entities) where T : IDataObjectBase =>
+            [.. entities.Where(e => e.Enabled).Select(e => e.Name).OrderBy(n => n, StringComparer.Ordinal)];
 
         private readonly record struct NodeFields(
             int NodeId,

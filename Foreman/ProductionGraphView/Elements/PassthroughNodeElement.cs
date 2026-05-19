@@ -1,16 +1,17 @@
-﻿using Foreman.Graph;
+﻿using Foreman.Controls;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Graph;
+using Foreman.Models.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public class PassthroughNodeElement : BaseNodeElement {
         protected override Brush CleanBgBrush { get { return passthroughBGBrush; } }
-        private static Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(200, 200, 200));
+        private static readonly Brush passthroughBGBrush = new SolidBrush(Color.FromArgb(200, 200, 200));
 
         private IPassthroughNodeViewModel PassthroughViewModel => (IPassthroughNodeViewModel)ViewModel;
         private string ItemName => PassthroughViewModel.PassthroughItem.FriendlyName ?? "";
@@ -30,9 +31,9 @@ namespace Foreman {
                 float maxLineWidth = PassthroughViewModel.InputLinks.Concat(PassthroughViewModel.OutputLinks).Select(l => graphViewer.GetLinkElement(l.Id)?.LinkWidth ?? 0).Max();
                 Point inputPoint = InputTabs[0].GetConnectionPoint();
                 Point outputPoint = OutputTabs[0].GetConnectionPoint();
-                if (PassthroughViewModel.PassthroughItem.Item is not Item passthroughItem)
+                if (PassthroughViewModel.PassthroughItem.Item is not IItem passthroughItem)
                     return;
-                using (Pen pen = new Pen(passthroughItem.AverageColor, maxLineWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
+                using (var pen = new Pen(passthroughItem.AverageColor, maxLineWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
                     graphics.DrawLine(pen, inputPoint, outputPoint);
                 if (style == NodeDrawingStyle.Regular) {
                     using (Brush brush = new SolidBrush(passthroughItem.AverageColor)) {
@@ -40,7 +41,7 @@ namespace Foreman {
                         graphics.FillEllipse(brush, inputPoint.X - 6, Math.Max(outputPoint.Y, inputPoint.Y) - 6 - (ItemTabElement.TabWidth / 2), 12, 12);
                     }
                     if (Highlighted)
-                        using (Pen pen = new Pen(selectionOverlayBrush, Math.Max(30, maxLineWidth + 10)) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
+                        using (var pen = new Pen(selectionOverlayBrush, Math.Max(30, maxLineWidth + 10)) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
                             graphics.DrawLine(pen, inputPoint, outputPoint);
                 }
             } else {
@@ -53,8 +54,8 @@ namespace Foreman {
         protected override void DetailsDraw(Graphics graphics, Point trans) {
             if (PassthroughViewModel.RateType == RateType.Manual) {
                 int yoffset = PassthroughViewModel.NodeDirection == NodeDirection.Up ? 28 : 32;
-                Rectangle titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 18);
-                Rectangle textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 18, titleSlot.Width, 20);
+                var titleSlot = new Rectangle(trans.X - (Width / 2) + 5, trans.Y - (Height / 2) + yoffset, Width - 10, 18);
+                var textSlot = new Rectangle(titleSlot.X, titleSlot.Y + 18, titleSlot.Width, 20);
                 //graphics.DrawRectangle(devPen, textSlot);
                 //graphics.DrawRectangle(devPen, titleSlot);
 
@@ -63,8 +64,8 @@ namespace Foreman {
             }
         }
 
-        protected override List<TooltipInfo> GetMyToolTips(Point graph_point, bool exclusive) =>
-            ExclusiveHelpTooltip(string.Format("Left click on this node to edit the throughput of {0}.\nRight click for options.", ItemName), exclusive);
+        protected override List<TooltipInfo> GetMyToolTips(Point graphPoint, bool exclusive) =>
+            ExclusiveHelpTooltip(string.Format(DisplayCulture.Format, "Left click on this node to edit the throughput of {0}.\nRight click for options.", ItemName), exclusive);
 
         protected override void AddRClickMenuOptions(bool nodeInSelection) {
             RightClickMenu.Items.Add(new ToolStripSeparator());

@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Foreman.DataCaching.DataTypes;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.Controls {
     public class CustomToolTip : ToolTip {
         private static readonly Color BackgroundColor = Color.FromArgb(65, 65, 65);
-        private static readonly Pen BorderPen = new Pen(new SolidBrush(Color.Black), 2);
-        private static readonly Pen BreakerPen = new Pen(new SolidBrush(Color.Black), 10);
+        private static readonly Pen BorderPen = new(new SolidBrush(Color.Black), 2);
+        private static readonly Pen BreakerPen = new(new SolidBrush(Color.Black), 10);
         private static readonly Brush TextBrush = new SolidBrush(Color.White);
 
         private string? displayedString;
@@ -64,8 +64,8 @@ namespace Foreman {
     }
 
     public class RecipeToolTip : ToolTip {
-        private Recipe? displayedRecipe;
-        private Recipe? comparedRecipe; //if given, we will display both displayed and compared as a 'VS' display
+        private IRecipe? displayedRecipe;
+        private IRecipe? comparedRecipe; //if given, we will display both displayed and compared as a 'VS' display
 
         public RecipeToolTip() {
             this.AutoPopDelay = 100000;
@@ -81,10 +81,10 @@ namespace Foreman {
 
         public void Show(IWin32Window window, Point location) { this.Show("-", window, location); }
 
-        public void SetRecipe(Recipe recipe, Recipe? comparedRecipe = null) { displayedRecipe = recipe; this.comparedRecipe = comparedRecipe; }
+        public void SetRecipe(IRecipe recipe, IRecipe? comparedRecipe = null) { displayedRecipe = recipe; this.comparedRecipe = comparedRecipe; }
 
-        public static Size GetExpectedSize(Recipe? comparedRecipe, Recipe displayedRecipe) {
-            Recipe[] recipes = (comparedRecipe is null) ? [displayedRecipe] : [displayedRecipe, comparedRecipe];
+        public static Size GetExpectedSize(IRecipe? comparedRecipe, IRecipe displayedRecipe) {
+            IRecipe[] recipes = (comparedRecipe is null) ? [displayedRecipe] : [displayedRecipe, comparedRecipe];
             return RecipePainter.GetSize(recipes);
         }
 
@@ -100,16 +100,13 @@ namespace Foreman {
         private void OnDraw(object? sender, DrawToolTipEventArgs e) {
             if (displayedRecipe is null)
                 return;
-            using (Graphics g = e.Graphics) {
-                Recipe[] recipes = (comparedRecipe == null) ? [displayedRecipe] : [displayedRecipe, comparedRecipe];
-                RecipePainter.Paint(recipes, g, new Point(0, 0));
-            }
+            using Graphics g = e.Graphics;
+            IRecipe[] recipes = (comparedRecipe == null) ? [displayedRecipe] : [displayedRecipe, comparedRecipe];
+            RecipePainter.Paint(recipes, g, new Point(0, 0));
         }
 
-        public static int GetRecipeToolTipHeight(Recipe recipe) {
-            if (recipe == null)
-                return 110;
-            return RecipePainter.GetSize([recipe]).Height;
+        public static int GetRecipeToolTipHeight(IRecipe recipe) {
+            return recipe == null ? 110 : RecipePainter.GetSize([recipe]).Height;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿
+
 namespace Foreman
 {
     partial class PresetSelectionForm
@@ -33,8 +33,8 @@ namespace Foreman
 			this.PresetSelectionListView = new System.Windows.Forms.ListView();
 			this.NameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ModCColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemsCColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.RecipesCColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IItemsCColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.IRecipesCColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.blank = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
@@ -50,8 +50,8 @@ namespace Foreman
 			this.PresetSelectionListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.NameColumn,
             this.ModCColumn,
-            this.ItemsCColumn,
-            this.RecipesCColumn,
+            this.IItemsCColumn,
+            this.IRecipesCColumn,
             this.blank});
 			this.TextTable.SetColumnSpan(this.PresetSelectionListView, 2);
 			this.PresetSelectionListView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -80,15 +80,15 @@ namespace Foreman
 			this.ModCColumn.Text = "Mods (%)";
 			this.ModCColumn.Width = 55;
 			// 
-			// ItemsCColumn
+			// IItemsCColumn
 			// 
-			this.ItemsCColumn.Text = "Items (%)";
-			this.ItemsCColumn.Width = 54;
+			this.IItemsCColumn.Text = "Items (%)";
+			this.IItemsCColumn.Width = 54;
 			// 
-			// RecipesCColumn
+			// IRecipesCColumn
 			// 
-			this.RecipesCColumn.Text = "Recipes (%)";
-			this.RecipesCColumn.Width = 70;
+			this.IRecipesCColumn.Text = "Recipes (%)";
+			this.IRecipesCColumn.Width = 70;
 			// 
 			// blank
 			// 
@@ -204,8 +204,8 @@ namespace Foreman
         private System.Windows.Forms.ColumnHeader ModCColumn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ColumnHeader ItemsCColumn;
-        private System.Windows.Forms.ColumnHeader RecipesCColumn;
+        private System.Windows.Forms.ColumnHeader IItemsCColumn;
+        private System.Windows.Forms.ColumnHeader IRecipesCColumn;
         private System.Windows.Forms.Button CancellingButton;
         private System.Windows.Forms.Button ConfirmationButton;
         private System.Windows.Forms.ToolTip PresetToolTip;

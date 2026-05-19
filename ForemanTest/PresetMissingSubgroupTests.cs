@@ -1,4 +1,6 @@
-﻿using Foreman;
+﻿using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.DataCaching.Loading;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text.Json.Nodes;
@@ -22,9 +24,9 @@ namespace ForemanTest {
                 ["ingredient_to_weight_coefficient"] = 1
             };
 
-            loader.ProcessItem(itemJson, new(), new(), new(), new());
+            loader.ProcessItem(itemJson, []);
 
-            Assert.IsTrue(cache.Items.TryGetValue("item-cam", out Item? item));
+            Assert.IsTrue(cache.Items.TryGetValue("item-cam", out IItem? item));
             Assert.AreSame(store.MissingSubgroup, item!.MySubgroup);
         }
 
@@ -47,9 +49,9 @@ namespace ForemanTest {
                 ["ingredients"] = new JsonArray()
             };
 
-            loader.ProcessRecipe(recipeJson, new(), new(), new());
+            loader.ProcessRecipe(recipeJson, []);
 
-            Assert.IsTrue(cache.Recipes.TryGetValue("test-recipe-no-sg", out Recipe? recipe));
+            Assert.IsTrue(cache.Recipes.TryGetValue("test-recipe-no-sg", out IRecipe? recipe));
             Assert.AreSame(store.MissingSubgroup, recipe!.MySubgroup);
         }
     }

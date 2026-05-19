@@ -1,4 +1,6 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.Loading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +26,7 @@ namespace ForemanTest.support {
 
         public static async Task<(JsonObject Root, DataCache Cache)> LoadPresetAndCacheAsync() {
             JsonObject root = LoadPreparedPresetJson();
-            DataCache cache = await PyanodonDataCacheFixture.GetLoadedAsync();
+            DataCache cache = await PyanodonDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             return (root, cache);
         }
 
@@ -33,7 +35,7 @@ namespace ForemanTest.support {
             return new PyanodonPresetSnapshot(
                 root,
                 BuildCategoryMachines(root),
-                await PyanodonDataCacheFixture.GetLoadedAsync());
+                await PyanodonDataCacheFixture.GetLoadedAsync().ConfigureAwait(false));
         }
 
         public static void AssertEmpty(
@@ -78,18 +80,12 @@ namespace ForemanTest.support {
         }
     }
 
-    internal readonly struct PyanodonPresetSnapshot {
-        public JsonObject Root { get; }
-        public Dictionary<string, HashSet<string>> CategoryMachines { get; }
-        public DataCache Cache { get; }
-
-        public PyanodonPresetSnapshot(
-            JsonObject root,
-            Dictionary<string, HashSet<string>> categoryMachines,
-            DataCache cache) {
-            Root = root;
-            CategoryMachines = categoryMachines;
-            Cache = cache;
-        }
+    internal readonly struct PyanodonPresetSnapshot(
+        JsonObject root,
+        Dictionary<string, HashSet<string>> categoryMachines,
+        DataCache cache) {
+        public JsonObject Root { get; } = root;
+        public Dictionary<string, HashSet<string>> CategoryMachines { get; } = categoryMachines;
+        public DataCache Cache { get; } = cache;
     }
 }

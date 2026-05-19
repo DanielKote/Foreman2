@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using Foreman.ProductionGraphView;
+using System;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     /// <summary>
-    /// Graph .fjson pipeline: domain ↔ <see cref="GraphSaveDocuments"/> ↔ JSON text.
+    /// Graph .fjson pipeline: domain ↔ <see cref="GraphViewerSaveDocument"/> ↔ JSON text.
     /// Application code should use this type only.
-    /// Wire format uses System.Text.Json. Only <see cref="GraphSaveFormat.SaveFormatVersion"/> files are accepted on read.
+    /// Wire format uses System.Text.Json. Increment <see cref="GraphSaveFormat.SaveFormatVersion"/> when necessary.
     /// </summary>
     public static class GraphSaveCodec {
 
@@ -14,9 +16,9 @@ namespace Foreman {
             GraphSaveWriter.WriteProductionGraph(graph);
 
         public static GraphViewerSaveDocument BuildViewer(ProductionGraphViewer viewer) {
-            if (viewer.DCache is not DataCache cache)
-                throw new InvalidOperationException("Cannot serialize ProductionGraphViewer without a data cache.");
-            return GraphSaveWriter.WriteViewer(viewer, cache);
+            return viewer.DCache is not DataCache cache
+                ? throw new InvalidOperationException("Cannot serialize ProductionGraphViewer without a data cache.")
+                : GraphSaveWriter.WriteViewer(viewer, cache);
         }
 
         public static NodeCopyOptionsSaveDocument BuildNodeCopyOptions(NodeCopyOptions options) =>
@@ -35,11 +37,9 @@ namespace Foreman {
 
         /// <summary>Reads a production graph from a graph fragment, or from a full viewer save file.</summary>
         public static ProductionGraphSaveDocument? ReadGraphPayload(string json) {
-            if (ReadProductionGraph(json) is ProductionGraphSaveDocument graphDocument)
-                return graphDocument;
-            if (ReadViewer(json) is GraphViewerSaveDocument viewerDocument)
-                return viewerDocument.ProductionGraph;
-            return null;
+            return ReadProductionGraph(json) is ProductionGraphSaveDocument graphDocument
+                ? graphDocument
+                : ReadViewer(json) is GraphViewerSaveDocument viewerDocument ? viewerDocument.ProductionGraph : null;
         }
 
         public static NodeCopyOptionsSaveDocument? ReadNodeCopyOptions(string json) =>

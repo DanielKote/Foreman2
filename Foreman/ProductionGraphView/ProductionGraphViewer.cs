@@ -1,16 +1,20 @@
-﻿using Foreman.Graph;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Graph;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using Foreman.ProductionGraphView;
+using Foreman.ProductionGraphView.Annotations;
+using Foreman.ProductionGraphView.Elements;
+using Foreman.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -39,9 +43,12 @@ namespace Foreman {
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool TooltipsEnabled { get; set; }
         private bool SubwindowOpen; //used together with tooltip enabled -> if we open up an item/recipe/assembler window, this will halt tooltip show.
-        public bool DynamicLinkWidth = false;
-        public bool LockedRecipeEditPanelPosition = true;
-        public bool FlagOUSuppliedNodes = false; //if true, will add a flag for over or under supplied nodes
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool DynamicLinkWidth { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool LockedRecipeEditPanelPosition { get; set; } = true;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool FlagOUSuppliedNodes { get; set; } //if true, will add a flag for over or under supplied nodes
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SmartNodeDirection { get; set; }
@@ -53,7 +60,7 @@ namespace Foreman {
         public FloatingTooltipRenderer ToolTipRenderer { get; private set; }
         public PointingArrowRenderer ArrowRenderer { get; private set; }
 
-        public Quality? LastAssemblerQuality { get; private set; } //quality of the last-edited recipe's assembler (used when placing new recipe nodes)
+        public IQuality? LastAssemblerQuality { get; private set; } //quality of the last-edited recipe's assembler (used when placing new recipe nodes)
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public GraphElement? MouseDownElement { get; set; }
@@ -72,30 +79,30 @@ namespace Foreman {
         private const int minLinkWidth = 3;
         private const int maxLinkWidth = 35;
 
-        private static readonly Pen pausedBorders = new Pen(Color.FromArgb(255, 80, 80), 5);
-        private static readonly Pen selectionPen = new Pen(Color.FromArgb(100, 100, 200), 2);
+        private static readonly Pen pausedBorders = new(Color.FromArgb(255, 80, 80), 5);
+        private static readonly Pen selectionPen = new(Color.FromArgb(100, 100, 200), 2);
 
-        private Dictionary<NodeId, BaseNodeElement> nodeElementDictionary;
-        private List<BaseNodeElement> nodeElements;
-        private Dictionary<LinkId, LinkElement> linkElementDictionary;
-        private List<LinkElement> linkElements;
+        private readonly Dictionary<NodeId, BaseNodeElement> nodeElementDictionary;
+        private readonly List<BaseNodeElement> nodeElements;
+        private readonly Dictionary<LinkId, LinkElement> linkElementDictionary;
+        private readonly List<LinkElement> linkElements;
         private DraggedLinkElement? draggedLinkElement;
 
         private Point mouseDownStartScreenPoint;
         private MouseButtons downButtons; //we use this to ensure that any mouse operations only count if they started on this panel
 
         private Point ViewDragOriginPoint;
-        private bool viewBeingDragged = false; //separate from dragOperation due to being able to drag view at all stages of dragOperation
+        private bool viewBeingDragged; //separate from dragOperation due to being able to drag view at all stages of dragOperation
 
         private DragOperation currentDragOperation = DragOperation.None;
 
         private Rectangle SelectionZone;
         private Point SelectionZoneOriginPoint;
 
-        private HashSet<BaseNodeElement> selectedNodes; //main list of selected nodes
-        private HashSet<BaseNodeElement> currentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
+        private readonly HashSet<BaseNodeElement> selectedNodes; //main list of selected nodes
+        private readonly HashSet<BaseNodeElement> currentSelectionNodes; //list of nodes currently under the selection zone (which can be added/removed/replace the full list)
 
-        private ContextMenuStrip rightClickMenu = new();
+        private readonly ContextMenuStrip rightClickMenu = new();
 
         public ProductionGraphViewer() {
             InitializeComponent();
@@ -126,13 +133,13 @@ namespace Foreman {
             ToolTipRenderer = new FloatingTooltipRenderer(this);
             ArrowRenderer = new PointingArrowRenderer(this);
 
-            nodeElementDictionary = new Dictionary<NodeId, BaseNodeElement>();
-            nodeElements = new List<BaseNodeElement>();
-            linkElementDictionary = new Dictionary<LinkId, LinkElement>();
-            linkElements = new List<LinkElement>();
+            nodeElementDictionary = [];
+            nodeElements = [];
+            linkElementDictionary = [];
+            linkElements = [];
 
-            selectedNodes = new HashSet<BaseNodeElement>();
-            currentSelectionNodes = new HashSet<BaseNodeElement>();
+            selectedNodes = [];
+            currentSelectionNodes = [];
 
             UpdateGraphBounds();
             Invalidate();
@@ -154,7 +161,7 @@ namespace Foreman {
             //							-> then we do a full element.containsPoint check which includes both the node and any added segments (such as item frames)
 
             for (int i = nodeElements.Count - 1; i >= 0; i--) {
-                Rectangle roughNodeZone = new Rectangle(nodeElements[i].X - nodeElements[i].Width / 2 - 50, nodeElements[i].Y - nodeElements[i].Height / 2 - 50, nodeElements[i].Width + 100, nodeElements[i].Height + 100);
+                var roughNodeZone = new Rectangle(nodeElements[i].X - nodeElements[i].Width / 2 - 50, nodeElements[i].Y - nodeElements[i].Height / 2 - 50, nodeElements[i].Width + 100, nodeElements[i].Height + 100);
                 if (roughNodeZone.Contains(point))
                     if (nodeElements[i].ContainsPoint(point))
                         return nodeElements[i];
@@ -182,13 +189,18 @@ namespace Foreman {
             }
 
             SubwindowOpen = true;
-            ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
-            itemChooser.ItemRequested += (o, itemRequestArgs) => {
-                AddNewNode(drawOrigin, itemRequestArgs.Item, newLocation, NewNodeType.Disconnected);
-            };
-            itemChooser.PanelClosed += (o, e) => { SubwindowOpen = false; };
+            var itemChooser = new ItemChooserPanel(this, drawOrigin);
+            try {
+                itemChooser.ItemRequested += (o, itemRequestArgs) => {
+                    AddNewNode(drawOrigin, itemRequestArgs.Item, newLocation, NewNodeType.Disconnected);
+                };
+                itemChooser.PanelClosed += (o, e) => { SubwindowOpen = false; };
 
-            itemChooser.Show();
+                itemChooser.Show();
+                itemChooser = null;
+            } finally {
+                itemChooser?.Dispose();
+            }
         }
 
         public void AddNewNode(Point drawOrigin, ItemQualityPair baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement? originElement = null, bool offsetLocationToItemTabLevel = false) {
@@ -205,24 +217,22 @@ namespace Foreman {
                 newLocation = Grid.AlignToGrid(newLocation);
 
             int lastNodeWidth = 0;
-            NodeDirection newNodeDirection;
-            if (originElement == null || !SmartNodeDirection)
-                newNodeDirection = Graph.DefaultNodeDirection;
-            else if (draggedLinkElement != null)
-                newNodeDirection = draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? originElement.ViewModel.NodeDirection :
-                    originElement.ViewModel.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
-            else
-                newNodeDirection = Graph.DefaultNodeDirection;
+            var newNodeDirection = originElement == null || !SmartNodeDirection
+                ? Graph.DefaultNodeDirection
+                : draggedLinkElement != null
+                ? draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? originElement.ViewModel.NodeDirection :
+                    originElement.ViewModel.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up
+                : Graph.DefaultNodeDirection;
 
             if ((Control.ModifierKeys & Keys.Control) == Keys.Control) //control key pressed -> we are making a passthrough node.
             {
-                ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Passthrough));
+                ProcessNodeRequest(null, new RecipeRequestEventArgs(NodeType.Passthrough));
                 DisposeLinkDrag();
                 Graph.UpdateNodeStates(false);
                 Invalidate();
             } else {
-                fRange tempRange = new fRange(0, 0, true);
-                if (baseItem && baseItem.Item is Fluid fluid && fluid.IsTemperatureDependent &&
+                var tempRange = new FRange(0, 0, true);
+                if (baseItem && baseItem.Item is IFluid fluid && fluid.IsTemperatureDependent &&
                     originElement is BaseNodeElement originForTemp) {
                     if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
                         tempRange = LinkChecker.GetTemperatureRange(fluid, originForTemp.ViewModel, LinkType.Output, true, Session);
@@ -230,27 +240,32 @@ namespace Foreman {
                         tempRange = LinkChecker.GetTemperatureRange(fluid, originForTemp.ViewModel, LinkType.Input, true, Session);
                 }
 
-                RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType); //QUALITY UPDATE
-                recipeChooser.RecipeRequested += ProcessNodeRequest;
-                recipeChooser.PanelClosed += (o, e) => {
-                    if (e.Option != IRChooserPanel.ChooserPanelCloseReason.RequiresItemSelection) {
-                        SubwindowOpen = false;
-                        DisposeLinkDrag();
-                        Graph.UpdateNodeStates(false);
-                        Invalidate();
-                    }
-                };
+                var recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType); //QUALITY UPDATE
+                try {
+                    recipeChooser.RecipeRequested += ProcessNodeRequest;
+                    recipeChooser.PanelClosed += (o, e) => {
+                        if (e.Option != IRChooserPanel.ChooserPanelCloseReason.RequiresItemSelection) {
+                            SubwindowOpen = false;
+                            DisposeLinkDrag();
+                            Graph.UpdateNodeStates(false);
+                            Invalidate();
+                        }
+                    };
 
-                SubwindowOpen = true;
-                recipeChooser.Show();
+                    SubwindowOpen = true;
+                    recipeChooser.Show();
+                    recipeChooser = null;
+                } finally {
+                    recipeChooser?.Dispose();
+                }
             }
             return; //end of this function
 
             //internal helper funtion: called upon a successfull selection of a recipe-selection screen (opened above)
-            void ProcessNodeRequest(object? o, RecipeRequestArgs recipeRequestArgs) {
+            void ProcessNodeRequest(object? o, RecipeRequestEventArgs recipeRequestArgs) {
                 NodeId newNodeId = NodeId.Invalid;
-                Item? itemNN = baseItem.Item;
-                Quality? qualityNN = baseItem.Quality;
+                IItem? itemNN = baseItem.Item;
+                IQuality? qualityNN = baseItem.Quality;
                 if (recipeRequestArgs.NodeType != NodeType.Recipe && (itemNN is null || qualityNN is null)) {
                     Trace.Fail("ProcessNodeRequest called without a valid base item");
                     return;
@@ -269,12 +284,12 @@ namespace Foreman {
                         FinalizeNodePosition(newNodeId);
                         break;
                     case NodeType.Spoil:
-                        if (itemNN is not Item spoilItem || qualityNN is not Quality spoilQuality) {
+                        if (itemNN is not IItem spoilItem || qualityNN is not IQuality spoilQuality) {
                             Trace.Fail("Spoil node request without a valid base item.");
                             break;
                         }
                         if (recipeRequestArgs.Direction == NodeDirection.Up) {
-                            if (spoilItem.SpoilResult is not Item spoilOutput) {
+                            if (spoilItem.SpoilResult is not IItem spoilOutput) {
                                 Trace.Fail("Spoil node request for item with no spoil result.");
                                 break;
                             }
@@ -286,32 +301,37 @@ namespace Foreman {
                         } else {
                             //need to open up an item selection window to select a given spoil origin
                             SubwindowOpen = true;
-                            ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin, spoilItem.SpoilOrigins);
-                            itemChooser.ItemRequested += (oo, itemRequestArgs) => {
-                                if (itemRequestArgs.Item is { Item: Item spoilOriginItem, Quality: Quality spoilOriginQuality }) {
-                                    newNodeId = Session.Editor.CreateSpoilNode(new ItemQualityPair(spoilOriginItem, spoilOriginQuality), spoilItem, newLocation);
-                                    FinalizeNodePosition(newNodeId);
-                                }
-                            };
-                            itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
-                            itemChooser.Show();
+                            var itemChooser = new ItemChooserPanel(this, drawOrigin, spoilItem.SpoilOrigins);
+                            try {
+                                itemChooser.ItemRequested += (oo, itemRequestArgs) => {
+                                    if (itemRequestArgs.Item is { Item: IItem spoilOriginItem, Quality: IQuality spoilOriginQuality }) {
+                                        newNodeId = Session.Editor.CreateSpoilNode(new ItemQualityPair(spoilOriginItem, spoilOriginQuality), spoilItem, newLocation);
+                                        FinalizeNodePosition(newNodeId);
+                                    }
+                                };
+                                itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
+                                itemChooser.Show();
+                                itemChooser = null;
+                            } finally {
+                                itemChooser?.Dispose();
+                            }
                         }
                         break;
                     case NodeType.Plant:
-                        if (itemNN is not Item plantItem || qualityNN is not Quality plantQuality) {
+                        if (itemNN is not IItem plantItem || qualityNN is not IQuality plantQuality) {
                             Trace.Fail("Plant node request without a valid base item.");
                             break;
                         }
                         if (recipeRequestArgs.Direction == NodeDirection.Up) {
-                            if (plantItem.PlantResult is not PlantProcess plantProcessUp) {
+                            if (plantItem.PlantResult is not IPlantProcess plantProcessUp) {
                                 Trace.Fail("Plant node request for item with no plant result.");
                                 break;
                             }
                             newNodeId = Session.Editor.CreatePlantNode(plantProcessUp, plantQuality, newLocation);
                             FinalizeNodePosition(newNodeId);
                         } else if (plantItem.PlantOrigins.Count == 1) {
-                            Item plantOriginItem = plantItem.PlantOrigins.ElementAt(0);
-                            if (plantOriginItem.PlantResult is not PlantProcess plantProcessSingle || cache.DefaultQuality is not Quality defaultPlantQuality) {
+                            IItem plantOriginItem = plantItem.PlantOrigins.ElementAt(0);
+                            if (plantOriginItem.PlantResult is not IPlantProcess plantProcessSingle || cache.DefaultQuality is not IQuality defaultPlantQuality) {
                                 Trace.Fail("Plant origin missing process or default quality.");
                                 break;
                             }
@@ -320,21 +340,26 @@ namespace Foreman {
                         } else {
                             //need to open up an item selection window to select a given spoil origin
                             SubwindowOpen = true;
-                            ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin, plantItem.PlantOrigins);
-                            itemChooser.ItemRequested += (oo, itemRequestArgs) => {
-                                if (itemRequestArgs.Item.Item?.PlantResult is not PlantProcess plantFromChooser || cache.DefaultQuality is not Quality dqChooser) {
-                                    Trace.Fail("Plant selection missing process or default quality.");
-                                    return;
-                                }
-                                newNodeId = Session.Editor.CreatePlantNode(plantFromChooser, dqChooser, newLocation);
-                                FinalizeNodePosition(newNodeId);
-                            };
-                            itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
-                            itemChooser.Show();
+                            var itemChooser = new ItemChooserPanel(this, drawOrigin, plantItem.PlantOrigins);
+                            try {
+                                itemChooser.ItemRequested += (oo, itemRequestArgs) => {
+                                    if (itemRequestArgs.Item.Item?.PlantResult is not IPlantProcess plantFromChooser || cache.DefaultQuality is not IQuality dqChooser) {
+                                        Trace.Fail("Plant selection missing process or default quality.");
+                                        return;
+                                    }
+                                    newNodeId = Session.Editor.CreatePlantNode(plantFromChooser, dqChooser, newLocation);
+                                    FinalizeNodePosition(newNodeId);
+                                };
+                                itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
+                                itemChooser.Show();
+                                itemChooser = null;
+                            } finally {
+                                itemChooser?.Dispose();
+                            }
                         }
                         break;
                     case NodeType.Recipe:
-                        if (!recipeRequestArgs.Recipe || recipeRequestArgs.Recipe.Recipe is not Recipe recipeDef) {
+                        if (!recipeRequestArgs.Recipe || recipeRequestArgs.Recipe.Recipe is not IRecipe recipeDef) {
                             Trace.Fail("Recipe request missing recipe definition.");
                             break;
                         }
@@ -342,27 +367,17 @@ namespace Foreman {
                         if ((nNodeType == NewNodeType.Consumer && itemNN is not null && !recipeDef.IngredientSet.ContainsKey(itemNN)) ||
                             (nNodeType == NewNodeType.Supplier && itemNN is not null && !recipeDef.ProductSet.ContainsKey(itemNN)) ||
                             (nNodeType == NewNodeType.Disconnected && baseItem && itemNN is not null && !recipeDef.IngredientSet.ContainsKey(itemNN) && !recipeDef.ProductSet.ContainsKey(itemNN))) {
-                            AssemblerSelector.Style style;
-                            switch (Graph.AssemblerSelector.DefaultSelectionStyle) {
-                                case AssemblerSelector.Style.Best:
-                                case AssemblerSelector.Style.BestBurner:
-                                case AssemblerSelector.Style.BestNonBurner:
-                                    style = AssemblerSelector.Style.BestBurner;
-                                    break;
-                                case AssemblerSelector.Style.Worst:
-                                case AssemblerSelector.Style.WorstBurner:
-                                case AssemblerSelector.Style.WorstNonBurner:
-                                default:
-                                    style = AssemblerSelector.Style.WorstBurner;
-                                    break;
-                            }
-                            List<Assembler> assemblerOptions = Graph.AssemblerSelector.GetOrderedAssemblerList(recipeDef, style);
+                            var style = Graph.AssemblerSelector.DefaultSelectionStyle switch {
+                                AssemblerSelector.Style.Best or AssemblerSelector.Style.BestBurner or AssemblerSelector.Style.BestNonBurner => AssemblerSelector.Style.BestBurner,
+                                _ => AssemblerSelector.Style.WorstBurner,
+                            };
+                            List<IAssembler> assemblerOptions = AssemblerSelector.GetOrderedAssemblerList(recipeDef, style);
 
                             if (Session.Editor.RequestNodeController(newNodeId) is not RecipeNodeController controller) {
                                 Trace.Fail("Recipe node has no controller.");
                                 break;
                             }
-                            if (Graph.DefaultAssemblerQuality is not Quality defAssyQuality) {
+                            if (Graph.DefaultAssemblerQuality is not IQuality defAssyQuality) {
                                 Trace.Fail("Default assembler quality is not set on the graph.");
                                 break;
                             }
@@ -419,16 +434,14 @@ namespace Foreman {
         }
 
         public void AddPassthroughNodesFromSelection(LinkType linkType, Size offset) {
-            List<BaseNodeElement> newPassthroughNodes = new List<BaseNodeElement>();
-            foreach (PassthroughNodeElement passthroughNode in selectedNodes) {
-                NodeDirection newNodeDirection;
-                if (!SmartNodeDirection)
-                    newNodeDirection = Graph.DefaultNodeDirection;
-                else if (draggedLinkElement != null)
-                    newNodeDirection = draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? passthroughNode.ViewModel.NodeDirection :
-                    passthroughNode.ViewModel.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
-                else
-                    newNodeDirection = Graph.DefaultNodeDirection;
+            var newPassthroughNodes = new List<BaseNodeElement>();
+            foreach (var passthroughNode in selectedNodes.OfType<PassthroughNodeElement>()) {
+                var newNodeDirection = !SmartNodeDirection
+                    ? Graph.DefaultNodeDirection
+                    : draggedLinkElement != null
+                    ? draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? passthroughNode.ViewModel.NodeDirection :
+                    passthroughNode.ViewModel.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up
+                    : Graph.DefaultNodeDirection;
 
                 ItemQualityPair passthroughItem = ((IPassthroughNodeViewModel)passthroughNode.ViewModel).PassthroughItem;
 
@@ -485,7 +498,7 @@ namespace Foreman {
         }
 
         public void SetSelectedPassthroughNodesSimpleDraw(bool simpleDraw) {
-            foreach (PassthroughNodeElement node in selectedNodes.Where(n => n is PassthroughNodeElement).ToList()) {
+            foreach (var node in selectedNodes.OfType<PassthroughNodeElement>()) {
                 if (Session.Editor.RequestNodeController(node.ViewModel.Id) is PassthroughNodeController passthroughController)
                     passthroughController.SetSimpleDraw(simpleDraw);
             }
@@ -504,48 +517,72 @@ namespace Foreman {
             SubwindowOpen = true;
             var editPanel = new EditFlowPanel(bNodeElement.ViewModel, this);
             editPanel.ApplyViewportBounds();
-            Point graphAnchor = new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y);
-            Rectangle panelRect = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(graphAnchor), editPanel.Size, Direction.Right);
+            var graphAnchor = new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y);
+            Rectangle panelRect = FloatingTooltipRenderer.getTooltipScreenBounds(GraphToScreen(graphAnchor), editPanel.Size, Direction.Right);
             editPanel.Location = panelRect.Location;
             PlaceFloatingPanels(panelRect, editPanel);
 
-            FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, graphAnchor, this, true, true);
-            fttc.Closing += (s, e) => {
-                SubwindowOpen = false;
-                Graph.UpdateNodeValues();
-            };
+            var fttc = new FloatingTooltipControl(editPanel, Direction.Right, graphAnchor, this, true, true);
+            try {
+                fttc.Closing += (s, e) => {
+                    SubwindowOpen = false;
+                    Graph.UpdateNodeValues();
+                };
+                if (ToolTipRenderer.ContainsTooltip(fttc))
+                    fttc = null;
+            } finally {
+                fttc?.Dispose();
+            }
         }
 
         public void EditRecipeNode(RecipeNodeElement rNodeElement) {
             SubwindowOpen = true;
-            if (rNodeElement.ViewModel is not IRecipeNodeViewModel recipeVm)
+            if (rNodeElement.ViewModel is not RecipeNodeViewModel recipeVm)
                 return;
-            if (recipeVm.BaseRecipe.Recipe is not Recipe baseRecipe)
+            if (recipeVm.BaseRecipe.Recipe is not IRecipe baseRecipe)
                 return;
             var editPanel = new EditRecipePanel(recipeVm, this);
             editPanel.ApplyViewportBounds();
-            RecipePanel recipePanel = new RecipePanel(new Recipe[] { baseRecipe });
-            Point leftAnchor = new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y);
-            Point rightAnchor = new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y);
+            var recipePanel = new RecipePanel([baseRecipe]);
+            var leftAnchor = new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y);
+            var rightAnchor = new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y);
 
             if (LockedRecipeEditPanelPosition) {
                 editPanel.Location = new Point(15, 15);
                 recipePanel.Location = new Point(editPanel.Location.X + editPanel.Width + 5, editPanel.Location.Y);
-                new FloatingTooltipControl(recipePanel, Direction.Left, rightAnchor, this, true, true);
-                FloatingTooltipControl editTooltip = new FloatingTooltipControl(editPanel, Direction.Right, leftAnchor, this, true, true);
-                editTooltip.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.RequestStateUpdate(); Graph.UpdateNodeValues(); };
+                var recipeTooltip = new FloatingTooltipControl(recipePanel, Direction.Left, rightAnchor, this, true, true);
+                var editTooltip = new FloatingTooltipControl(editPanel, Direction.Right, leftAnchor, this, true, true);
+                try {
+                    editTooltip.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.RequestStateUpdate(); Graph.UpdateNodeValues(); };
+                    if (ToolTipRenderer.ContainsTooltip(recipeTooltip))
+                        recipeTooltip = null;
+                    if (ToolTipRenderer.ContainsTooltip(editTooltip))
+                        editTooltip = null;
+                } finally {
+                    recipeTooltip?.Dispose();
+                    editTooltip?.Dispose();
+                }
                 return;
             }
 
-            Rectangle editRect = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(leftAnchor), editPanel.Size, Direction.Right);
-            Rectangle recipeRect = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(rightAnchor), recipePanel.Size, Direction.Left);
+            Rectangle editRect = FloatingTooltipRenderer.getTooltipScreenBounds(GraphToScreen(leftAnchor), editPanel.Size, Direction.Right);
+            Rectangle recipeRect = FloatingTooltipRenderer.getTooltipScreenBounds(GraphToScreen(rightAnchor), recipePanel.Size, Direction.Left);
             editPanel.Location = editRect.Location;
             recipePanel.Location = recipeRect.Location;
             PlaceFloatingPanels(Rectangle.Union(editRect, recipeRect), editPanel, recipePanel);
 
-            new FloatingTooltipControl(recipePanel, Direction.Left, rightAnchor, this, true, true);
-            FloatingTooltipControl fttc = new FloatingTooltipControl(editPanel, Direction.Right, leftAnchor, this, true, true);
-            fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.RequestStateUpdate(); Graph.UpdateNodeValues(); };
+            var recipeTooltip2 = new FloatingTooltipControl(recipePanel, Direction.Left, rightAnchor, this, true, true);
+            var fttc = new FloatingTooltipControl(editPanel, Direction.Right, leftAnchor, this, true, true);
+            try {
+                fttc.Closing += (s, e) => { SubwindowOpen = false; rNodeElement.RequestStateUpdate(); Graph.UpdateNodeValues(); };
+                if (ToolTipRenderer.ContainsTooltip(recipeTooltip2))
+                    recipeTooltip2 = null;
+                if (ToolTipRenderer.ContainsTooltip(fttc))
+                    fttc = null;
+            } finally {
+                recipeTooltip2?.Dispose();
+                fttc?.Dispose();
+            }
         }
 
         //----------------------------------------------Selection functions
@@ -659,7 +696,7 @@ namespace Foreman {
                 foreach (LinkElement element in linkElements) {
                     if (element.ConsumerElement is not BaseNodeElement consumerElement)
                         continue;
-                    if (element.Item.Item is Fluid linkFluid && !linkFluid.Name.StartsWith("§§")) //§§ is the foreman added special items (currently just §§heat). ignore them
+                    if (element.Item.Item is IFluid linkFluid && !linkFluid.Name.StartsWith("§§", StringComparison.Ordinal)) //§§ is the foreman added special items (currently just §§heat). ignore them
                         fluidMax = Math.Max(fluidMax, consumerElement.ViewModel.GetConsumeRate(element.Item));
                     else if (element.Item.Item is not null)
                         itemMax = Math.Max(itemMax, consumerElement.ViewModel.GetConsumeRate(element.Item));
@@ -668,10 +705,9 @@ namespace Foreman {
                 fluidMax += fluidMax == 0 ? 1 : 0;
 
                 foreach (LinkElement element in linkElements) {
-                    if (element.Item.Item is Fluid)
-                        element.LinkWidth = (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ViewModel.Throughput / fluidMax)), maxLinkWidth);
-                    else
-                        element.LinkWidth = (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ViewModel.Throughput / itemMax)), maxLinkWidth);
+                    element.LinkWidth = element.Item.Item is IFluid
+                        ? (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ViewModel.Throughput / fluidMax)), maxLinkWidth)
+                        : (float)Math.Min((minLinkWidth + (maxLinkWidth - minLinkWidth) * (element.ViewModel.Throughput / itemMax)), maxLinkWidth);
                 }
             } else {
                 foreach (LinkElement element in linkElements)
@@ -701,7 +737,7 @@ namespace Foreman {
                 int buildingCount = (int)Math.Ceiling(currentSelectionNodes.OfType<RecipeNodeElement>().Sum(n => n.ViewModel.ActualSetValue));
                 int beaconCount = currentSelectionNodes.OfType<RecipeNodeElement>().Sum(n => n.RecipeViewModel.GetTotalBeacons());
 
-                ToolTipRenderer.AddExtraToolTip(new TooltipInfo() { Text = string.Format("Power consumption: {0}\nPower production: {1}\nRecipe count: {2}\nBuilding count: {3}\nBeacon count: {4}", GraphicsStuff.DoubleToEnergy(pConsumption, "W"), GraphicsStuff.DoubleToEnergy(pProduction, "W"), recipeNodeCount, buildingCount, beaconCount), Direction = Direction.None, ScreenLocation = new Point(10, 10) });
+                ToolTipRenderer.AddExtraToolTip(new TooltipInfo() { Text = string.Format(DisplayCulture.Format, "Power consumption: {0}\nPower production: {1}\nRecipe count: {2}\nBuilding count: {3}\nBeacon count: {4}", GraphicsStuff.DoubleToEnergy(pConsumption, "W"), GraphicsStuff.DoubleToEnergy(pProduction, "W"), recipeNodeCount, buildingCount, beaconCount), Direction = Direction.None, ScreenLocation = new Point(10, 10) });
             }
 
             //everything below will be drawn directly on the screen instead of scaled/shifted based on graph
@@ -762,7 +798,7 @@ namespace Foreman {
                 GetNodeElement(link.ConsumerId) is not BaseNodeElement consumer)
                 return;
 
-            LinkElement element = new LinkElement(this, link, supplier, consumer);
+            var element = new LinkElement(this, link, supplier, consumer);
             linkElementDictionary.Add(link.Id, element);
             linkElements.Add(element);
 
@@ -784,21 +820,25 @@ namespace Foreman {
 
         private void Session_NodeViewModelAdded(object? sender, NodeViewModelEventArgs e) {
             BaseNodeElement? element = CreateNodeElement(e.ViewModel);
-            if (element is null) {
-                Trace.Fail("Unexpected node type created in graph.");
-                return;
+            try {
+                if (element is null) {
+                    Trace.Fail("Unexpected node type created in graph.");
+                    return;
+                }
+                nodeElementDictionary.Add(e.ViewModel.Id, element);
+                nodeElements.Add(element);
+                element = null;
+                Invalidate();
+            } finally {
+                element?.Dispose();
             }
-
-            nodeElementDictionary.Add(e.ViewModel.Id, element);
-            nodeElements.Add(element);
-            Invalidate();
         }
 
         private BaseNodeElement? CreateNodeElement(INodeViewModel viewModel) => viewModel switch {
             ISupplierNodeViewModel supplier => new SupplierNodeElement(this, supplier),
             IConsumerNodeViewModel consumer => new ConsumerNodeElement(this, consumer),
             IPassthroughNodeViewModel passthrough => new PassthroughNodeElement(this, passthrough),
-            IRecipeNodeViewModel recipe => new RecipeNodeElement(this, recipe),
+            RecipeNodeViewModel recipe => new RecipeNodeElement(this, recipe),
             ISpoilNodeViewModel spoil => new SpoilNodeElement(this, spoil),
             IPlantNodeViewModel plant => new PlantNodeElement(this, plant),
             _ => null,
@@ -859,7 +899,7 @@ namespace Foreman {
                         viewBeingDragged = false;
                     else if (currentDragOperation == DragOperation.None && element == null) //right click on an empty space -> show add item/recipe menu
                     {
-                        Point screenPoint = new Point(e.Location.X - 150, 15);
+                        var screenPoint = new Point(e.Location.X - 150, 15);
                         screenPoint.X = Math.Max(15, Math.Min(Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
 
                         rightClickMenu.Items.Clear();
@@ -869,7 +909,7 @@ namespace Foreman {
                             })));
                         rightClickMenu.Items.Add(new ToolStripMenuItem("Add Recipe", null,
                             new EventHandler((o, ee) => {
-                                AddNewNode(screenPoint, new ItemQualityPair("adding disconnected recipe"), ScreenToGraph(e.Location), NewNodeType.Disconnected);
+                                AddNewNode(screenPoint, new ItemQualityPair(/*"adding disconnected recipe"*/), ScreenToGraph(e.Location), NewNodeType.Disconnected);
                             })));
                         Annotation_AppendContextMenuItems(graph_location);
                         rightClickMenu.Show(this, e.Location);
@@ -921,7 +961,7 @@ namespace Foreman {
                             clickedNode.MouseUp(graph_location, e.Button, false);
                         }
                     } else {
-                        Annotation_OnMouseUpLeft(graph_location, element, viewBeingDragged);
+                        Annotation_OnMouseUpLeft(element, viewBeingDragged);
                         if (!viewBeingDragged)
                             element?.MouseUp(graph_location, e.Button, (currentDragOperation == DragOperation.Item));
                     }
@@ -944,7 +984,7 @@ namespace Foreman {
 
             switch (currentDragOperation) {
                 case DragOperation.None: //check for minimal distance to be considered a drag operation
-                    Point dragDiff = Point.Subtract(Control.MousePosition, (Size)mouseDownStartScreenPoint);
+                    var dragDiff = Point.Subtract(Control.MousePosition, (Size)mouseDownStartScreenPoint);
                     if (dragDiff.X * dragDiff.X + dragDiff.Y * dragDiff.Y > minDragDiff) {
                         if ((downButtons & MouseButtons.Middle) == MouseButtons.Middle || (downButtons & MouseButtons.Right) == MouseButtons.Right)
                             viewBeingDragged = true;
@@ -1050,7 +1090,7 @@ namespace Foreman {
             if (currentDragOperation == DragOperation.None) {
                 if ((e.KeyCode == Keys.C || e.KeyCode == Keys.X) && (e.Modifiers & Keys.Control) == Keys.Control) //copy or cut
                 {
-                    Graph.SerializeNodeIdSet = new HashSet<int>();
+                    Graph.SerializeNodeIdSet = [];
                     Graph.SerializeNodeIdSet.UnionWith(selectedNodes.Select(n => n.ViewModel.Id.Value));
 
                     string fragmentJson = GraphSaveCodec.WriteProductionGraphToString(Graph, writeIndented: false);
@@ -1239,15 +1279,14 @@ namespace Foreman {
             ViewScale = ui.ViewScale;
 
             foreach (string fuelType in ui.FuelPriorityList) {
-                if (cache.Items.TryGetValue(fuelType, out Item? fuelItem) && fuelItem is not null)
+                if (cache.Items.TryGetValue(fuelType, out IItem? fuelItem) && fuelItem is not null)
                     Graph.FuelSelector.UseFuel(fuelItem);
             }
 
             if (setEnablesFromJson) {
                 ApplyEnabledList(cache.Beacons.Values, cache.Beacons, ui.EnabledBeacons, (b, e) => b.Enabled = e);
                 ApplyEnabledList(cache.Assemblers.Values, cache.Assemblers, ui.EnabledAssemblers, (a, e) => a.Enabled = e);
-                if (cache.RocketAssembler is not null)
-                    cache.RocketAssembler.Enabled = cache.Assemblers.TryGetValue("rocket-silo", out Assembler? silo) && silo?.Enabled == true;
+                cache.RocketAssembler?.Enabled = cache.Assemblers.TryGetValue("rocket-silo", out IAssembler? silo) && silo?.Enabled == true;
                 ApplyEnabledList(cache.Modules.Values, cache.Modules, ui.EnabledModules, (m, e) => m.Enabled = e);
                 ApplyEnabledList(cache.Recipes.Values, cache.Recipes, ui.EnabledRecipes, (r, e) => r.Enabled = e);
             }
@@ -1267,7 +1306,7 @@ namespace Foreman {
         }
 
         public void ImportNodesFromFragment(string json, Point origin, bool applySolverSettings) {
-            if (DCache is not DataCache cache)
+            if (DCache is null)
                 return;
             ProductionGraphSaveDocument? document = GraphSaveCodec.ReadGraphPayload(json);
             if (document is null) {
@@ -1284,30 +1323,30 @@ namespace Foreman {
             if (DCache is not DataCache cache)
                 return;
 
-            ProductionGraph.NewNodeCollection newNodeCollection = Graph.InsertNodesFromDocument(cache, document, applySolverSettings); //NOTE: missing items & recipes may be added here!
-            if (newNodeCollection == null || newNodeCollection.newNodes.Count == 0)
+            ProductionGraph.NewNodeBatch newNodeCollection = Graph.InsertNodesFromDocument(cache, document, applySolverSettings); //NOTE: missing items & recipes may be added here!
+            if (newNodeCollection == null || newNodeCollection.NewNodes.Count == 0)
                 return;
 
             //update the locations of the new nodes to be centered around the mouse position (as opposed to wherever they were before)
             long xAve = 0;
             long yAve = 0;
-            foreach (BaseNode newNode in newNodeCollection.newNodes) {
+            foreach (BaseNode newNode in newNodeCollection.NewNodes) {
                 xAve += newNode.Location.X;
                 yAve += newNode.Location.Y;
             }
-            xAve /= newNodeCollection.newNodes.Count;
-            yAve /= newNodeCollection.newNodes.Count;
+            xAve /= newNodeCollection.NewNodes.Count;
+            yAve /= newNodeCollection.NewNodes.Count;
 
-            Point importCenter = new Point((int)xAve, (int)yAve);
-            Size offset = (Size)Grid.AlignToGrid(Point.Subtract(origin, (Size)importCenter));
-            foreach (BaseNode newNode in newNodeCollection.newNodes) {
+            var importCenter = new Point((int)xAve, (int)yAve);
+            var offset = (Size)Grid.AlignToGrid(Point.Subtract(origin, (Size)importCenter));
+            foreach (BaseNode newNode in newNodeCollection.NewNodes) {
                 if (Graph.RequestNodeController(newNode) is BaseNodeController importController)
                     importController.SetLocation(Point.Add(newNode.Location, offset));
             }
 
             //update the selection to be just the newly imported nodes
             ClearSelection();
-            foreach (BaseNode importedNode in newNodeCollection.newNodes) {
+            foreach (BaseNode importedNode in newNodeCollection.NewNodes) {
                 INodeViewModel? importedVm = Session.View.Nodes.FirstOrDefault(vm => vm.Id.Value == importedNode.NodeID);
                 if (importedVm is not null && nodeElementDictionary.TryGetValue(importedVm.Id, out BaseNodeElement? newNodeElement)) {
                     selectedNodes.Add(newNodeElement);
@@ -1322,7 +1361,7 @@ namespace Foreman {
 
         public void LoadPreset(Preset preset) {
             Form? ownerForm = ParentForm ?? FindForm();
-            using (DataLoadForm form = new DataLoadForm(preset)) {
+            using (var form = new DataLoadForm(preset)) {
                 form.StartPosition = FormStartPosition.Manual;
                 if (ownerForm is not null) {
                     form.Left = ownerForm.Left + 150;
@@ -1343,18 +1382,17 @@ namespace Foreman {
                 if (result == DialogResult.Abort) {
                     UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 2.0 Vanilla)");
                     Properties.Settings.Default.CurrentPresetName = MainForm.DefaultPreset;
-                    using (DataLoadForm form2 = new DataLoadForm(new Preset(MainForm.DefaultPreset, false, true))) {
-                        form2.StartPosition = FormStartPosition.Manual;
-                        if (ownerForm is not null) {
-                            form2.Left = ownerForm.Left + 150;
-                            form2.Top = ownerForm.Top + 200;
-                        }
-                        DialogResult result2 = form2.ShowDialog(); //LOAD default preset
-                        DCache?.Clear();
-                        DCache = form2.GetDataCache();
-                        if (result2 == DialogResult.Abort)
-                            UserMessages.Show("The default preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. No Preset is loaded!");
+                    using var form2 = new DataLoadForm(new Preset(MainForm.DefaultPreset, false, true));
+                    form2.StartPosition = FormStartPosition.Manual;
+                    if (ownerForm is not null) {
+                        form2.Left = ownerForm.Left + 150;
+                        form2.Top = ownerForm.Top + 200;
                     }
+                    DialogResult result2 = form2.ShowDialog(); //LOAD default preset
+                    DCache?.Clear();
+                    DCache = form2.GetDataCache();
+                    if (result2 == DialogResult.Abort)
+                        UserMessages.Show("The default preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. No Preset is loaded!");
                 }
                 GC.Collect(); //loaded a new data cache - the old one should be collected (data caches can be over 1gb in size due to icons, plus whatever was in the old graph)
             }
@@ -1367,97 +1405,108 @@ namespace Foreman {
 
         public async Task ReloadGraphForCurrentPreset() {
             GraphViewerSaveDocument saveState = GraphSaveCodec.BuildViewer(this);
-            await LoadFromSaveDocument(saveState, useFirstPreset: true, setEnablesFromJson: false);
+            await LoadFromSaveDocument(saveState, useFirstPreset: true, setEnablesFromJson: false).ConfigureAwait(false);
         }
 
         public async Task LoadFromJson(string json, bool useFirstPreset, bool setEnablesFromJson) {
             GraphViewerSaveDocument? saveDocument = GraphSaveCodec.ReadViewer(json);
             if (saveDocument is null) {
-                ShowCannotLoadSave(
-                        "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here.");
+                await this.InvokeOnUiThreadAsync(() =>
+                    ShowCannotLoadSave(
+                        "This save file is too old or corrupt. Try opening it in the previous Foreman release and saving it again, then open the new file here."))
+                    .ConfigureAwait(false);
                 return;
             }
-            await LoadFromSaveDocument(saveDocument, useFirstPreset, setEnablesFromJson);
+            await LoadFromSaveDocument(saveDocument, useFirstPreset, setEnablesFromJson).ConfigureAwait(false);
         }
 
         public async Task LoadFromSaveDocument(GraphViewerSaveDocument saveDocument, bool useFirstPreset, bool setEnablesFromJson) {
-            ProductionGraphSaveDocument productionGraph = saveDocument.ProductionGraph;
-            Dictionary<string, string> modSet = new Dictionary<string, string>(saveDocument.IncludedMods);
-            List<string> itemNames = productionGraph.IncludedItems.ToList();
-            List<string> assemblerNames = productionGraph.IncludedAssemblers.ToList();
-            List<string> qualityNames = productionGraph.IncludedQualities.Select(q => q.Key).ToList();
-            List<RecipeShort> recipeShorts = productionGraph.IncludedRecipes.ToList();
-            List<PlantShort> plantShorts = productionGraph.IncludedPlantProcesses.ToList();
-
-            //now - two options:
-            // a) we are told to use the first preset (basically, the selected preset) - so that is the only one added to the possible Presets
-            // b) we can choose preset - so go through each one and compare mod lists - ask to continue if
-            // the preset list will then be checked for compatibility based on recipes, and the one with least errors will be used.
-            // any errors will prompt a message box saying that 'incompatibility was found, but proceeding anyways'.
-            List<Preset>? allPresets = MainForm.GetValidPresetsList();
-            if (allPresets is null || allPresets.Count == 0)
+            Preset? chosenPreset = await ResolveChosenPresetAsync(saveDocument, useFirstPreset).ConfigureAwait(false);
+            if (chosenPreset is null)
                 return;
 
-            List<PresetErrorPackage> presetErrors = new List<PresetErrorPackage>();
+            await this.InvokeOnUiThreadAsync(() => ApplyLoadedSaveDocument(chosenPreset, saveDocument, setEnablesFromJson)).ConfigureAwait(false);
+        }
+
+        private async Task<Preset?> ResolveChosenPresetAsync(GraphViewerSaveDocument saveDocument, bool useFirstPreset) {
+            ProductionGraphSaveDocument productionGraph = saveDocument.ProductionGraph;
+            var modSet = new Dictionary<string, string>(saveDocument.IncludedMods);
+            var itemNames = productionGraph.IncludedItems.ToList();
+            var assemblerNames = productionGraph.IncludedAssemblers.ToList();
+            var qualityNames = productionGraph.IncludedQualities.Select(q => q.Key).ToList();
+            var recipeShorts = productionGraph.IncludedRecipes.ToList();
+            var plantShorts = productionGraph.IncludedPlantProcesses.ToList();
+
+            List<Preset>? allPresets = null;
+            await this.InvokeOnUiThreadAsync(() => allPresets = MainForm.GetValidPresetsList()).ConfigureAwait(false);
+            if (allPresets is null || allPresets.Count == 0)
+                return null;
+
+            var presetErrors = new List<PresetErrorPackage>();
             Preset? chosenPreset = null;
             if (useFirstPreset)
                 chosenPreset = allPresets[0];
             else {
-                //test for the preset specified in the json save
                 string? savedPresetName = saveDocument.SavedPresetName;
                 Preset? savedWPreset = savedPresetName is not null
                     ? allPresets.FirstOrDefault(p => p.Name == savedPresetName)
                     : null;
                 if (savedWPreset is not null) {
-                    PresetErrorPackage? errors = await PresetProcessor.TestPreset(savedWPreset, modSet, itemNames, assemblerNames, qualityNames, recipeShorts, plantShorts);
-                    if (errors is not null && errors.ErrorCount == 0) //no errors found here. We will then use this exact preset and not search for a different one
+                    PresetErrorPackage? errors = await PresetProcessor.TestPreset(savedWPreset, modSet, itemNames, qualityNames, recipeShorts, plantShorts).ConfigureAwait(false);
+                    if (errors is not null && errors.ErrorCount == 0)
                         chosenPreset = savedWPreset;
                     else {
-                        //errors found. even though the name fits, but the preset seems to be the wrong one. Proceed with searching for best-fit
                         if (errors is not null)
                             presetErrors.Add(errors);
                         allPresets.Remove(savedWPreset);
                     }
                 }
 
-                //havent found the preset, or it returned some errors (not good) -> have to search for best fit (and leave the decision to user if we have multiple)
                 if (chosenPreset is null) {
                     foreach (Preset preset in allPresets) {
-                        PresetErrorPackage? errors = await PresetProcessor.TestPreset(preset, modSet, itemNames, assemblerNames, qualityNames, recipeShorts, plantShorts);
+                        PresetErrorPackage? errors = await PresetProcessor.TestPreset(preset, modSet, itemNames, qualityNames, recipeShorts, plantShorts).ConfigureAwait(false);
                         if (errors is not null)
                             presetErrors.Add(errors);
                     }
 
-                    Form? ownerForm = ParentForm ?? FindForm();
-                    //show the menu to select the preferred preset
-                    using (PresetSelectionForm form = new PresetSelectionForm(presetErrors)) {
+                    Preset? dialogChoice = null;
+                    await this.InvokeOnUiThreadAsync(() => {
+                        Form? ownerForm = ParentForm ?? FindForm();
+                        using var form = new PresetSelectionForm(presetErrors);
                         form.StartPosition = FormStartPosition.Manual;
                         if (ownerForm is not null) {
                             form.Left = ownerForm.Left + 50;
                             form.Top = ownerForm.Top + 50;
                         }
 
-                        if (form.ShowDialog() != DialogResult.OK || form.ChosenPreset is null)
-                            return;
-                        chosenPreset = form.ChosenPreset;
-                        Properties.Settings.Default.CurrentPresetName = chosenPreset.Name;
+                        if (form.ShowDialog() == DialogResult.OK && form.ChosenPreset is not null) {
+                            dialogChoice = form.ChosenPreset;
+                            Properties.Settings.Default.CurrentPresetName = dialogChoice.Name;
+                            Properties.Settings.Default.Save();
+                        }
+                    }).ConfigureAwait(false);
+
+                    if (dialogChoice is null)
+                        return null;
+                    chosenPreset = dialogChoice;
+                } else if (chosenPreset.Name != Properties.Settings.Default.CurrentPresetName) {
+                    string previousPresetName = Properties.Settings.Default.CurrentPresetName;
+                    string newPresetName = chosenPreset.Name;
+                    await this.InvokeOnUiThreadAsync(() => {
+                        UserMessages.Show(string.Format(DisplayCulture.Format, "Loaded graph uses a different Preset.\nPreset switched from \"{0}\" to \"{1}\"", previousPresetName, newPresetName));
+                        Properties.Settings.Default.CurrentPresetName = newPresetName;
                         Properties.Settings.Default.Save();
-                    }
-                } else if (chosenPreset.Name != Properties.Settings.Default.CurrentPresetName) //we had to switch the preset to a new one (without the user having to select a preset from a list)
-                  {
-                    UserMessages.Show(string.Format("Loaded graph uses a different Preset.\nPreset switched from \"{0}\" to \"{1}\"", Properties.Settings.Default.CurrentPresetName, chosenPreset.Name));
-                    Properties.Settings.Default.CurrentPresetName = chosenPreset.Name;
-                    Properties.Settings.Default.Save();
+                    }).ConfigureAwait(false);
                 }
             }
 
-            if (chosenPreset is null)
-                return;
+            return chosenPreset;
+        }
 
-            //clear graph
+        private void ApplyLoadedSaveDocument(Preset chosenPreset, GraphViewerSaveDocument saveDocument, bool setEnablesFromJson) {
+            ProductionGraphSaveDocument productionGraph = saveDocument.ProductionGraph;
+
             ClearGraph();
-
-            //load new preset
             LoadPreset(chosenPreset);
 
             if (DCache is not DataCache cache) {
@@ -1470,23 +1519,21 @@ namespace Foreman {
 
             LoadAnnotationsFromSave(saveDocument.Annotations, saveDocument.AnnotationDpi);
 
-            ProductionGraph.NewNodeCollection collection = GraphSaveLoader.LoadProductionGraph(Graph, cache, productionGraph, applySolverSettings: true);
-            if (collection.newNodes.Count == 0 && productionGraph.Nodes.Count > 0) {
+            ProductionGraph.NewNodeBatch collection = GraphSaveLoader.LoadProductionGraph(Graph, cache, productionGraph, applySolverSettings: true);
+            if (collection.NewNodes.Count == 0 && productionGraph.Nodes.Count > 0) {
                 ShowCannotLoadSave("The production graph in this save could not be loaded (nodes failed to import).");
                 return;
             }
 
-            //check for old import
             if (saveDocument.Ui?.OldImport == true)
-                foreach (RecipeNode rNode in collection.newNodes.OfType<RecipeNode>()) {
+                foreach (RecipeNode rNode in collection.NewNodes.OfType<RecipeNode>()) {
                     if (Graph.RequestNodeController(rNode) is RecipeNodeController rnc)
                         rnc.AutoSetAssembler(AssemblerSelector.Style.BestNonBurner);
                 }
 
-            //upgrade graph & values
             UpdateGraphBounds();
             Graph.UpdateNodeValues();
-            this.Focus();
+            Focus();
             Invalidate();
         }
 

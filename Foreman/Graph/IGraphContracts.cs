@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
 namespace Foreman.Graph {
-    public sealed class NodeViewModelEventArgs : EventArgs {
-        public INodeViewModel ViewModel { get; }
-        public NodeViewModelEventArgs(INodeViewModel viewModel) => ViewModel = viewModel;
+    public sealed class NodeViewModelEventArgs(INodeViewModel viewModel) : EventArgs {
+        public INodeViewModel ViewModel { get; } = viewModel;
     }
 
-    public sealed class LinkViewModelEventArgs : EventArgs {
-        public INodeLinkViewModel ViewModel { get; }
-        public LinkViewModelEventArgs(INodeLinkViewModel viewModel) => ViewModel = viewModel;
+    public sealed class LinkViewModelEventArgs(INodeLinkViewModel viewModel) : EventArgs {
+        public INodeLinkViewModel ViewModel { get; } = viewModel;
     }
 
     public interface IGraphViewModel {
@@ -81,8 +82,8 @@ namespace Foreman.Graph {
         uint MaxQualitySteps { get; }
         RecipeQualityPair BaseRecipe { get; }
         AssemblerQualityPair SelectedAssembler { get; }
-        Item? Fuel { get; }
-        Item? FuelRemains { get; }
+        IItem? Fuel { get; }
+        IItem? FuelRemains { get; }
         IReadOnlyList<ModuleQualityPair> AssemblerModules { get; }
         BeaconQualityPair SelectedBeacon { get; }
         IReadOnlyList<ModuleQualityPair> BeaconModules { get; }
@@ -119,7 +120,7 @@ namespace Foreman.Graph {
 
     public interface IPlantNodeViewModel : INodeViewModel {
         ItemQualityPair Seed { get; }
-        PlantProcess PlantProcess { get; }
+        IPlantProcess PlantProcess { get; }
     }
 
     public interface IProductionGraphEditor {
@@ -128,8 +129,8 @@ namespace Foreman.Graph {
         NodeId CreateConsumerNode(ItemQualityPair item, Point location);
         NodeId CreatePassthroughNode(ItemQualityPair item, Point location);
         NodeId CreateRecipeNode(RecipeQualityPair recipe, Point location);
-        NodeId CreateSpoilNode(ItemQualityPair inputItem, Item outputItem, Point location);
-        NodeId CreatePlantNode(PlantProcess plantProcess, Quality quality, Point location);
+        NodeId CreateSpoilNode(ItemQualityPair inputItem, IItem outputItem, Point location);
+        NodeId CreatePlantNode(IPlantProcess plantProcess, IQuality quality, Point location);
         LinkId CreateLink(NodeId supplierId, NodeId consumerId, ItemQualityPair item);
         void DeleteNode(NodeId id);
         void DeleteLink(LinkId id);

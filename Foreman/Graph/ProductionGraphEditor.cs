@@ -1,15 +1,13 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using System;
 using System.Drawing;
 
 namespace Foreman.Graph {
-    internal sealed class ProductionGraphEditor : IProductionGraphEditor {
-        private readonly ProductionGraph _graph;
-        private readonly GraphEntityRegistry _registry;
-
-        public ProductionGraphEditor(ProductionGraph graph, GraphEntityRegistry registry) {
-            _graph = graph;
-            _registry = registry;
-        }
+    internal sealed class ProductionGraphEditor(ProductionGraph graph, GraphEntityRegistry registry) : IProductionGraphEditor {
+        private readonly ProductionGraph _graph = graph;
+        private readonly GraphEntityRegistry _registry = registry;
 
         public ProductionGraph Graph => _graph;
 
@@ -25,10 +23,10 @@ namespace Foreman.Graph {
         public NodeId CreateRecipeNode(RecipeQualityPair recipe, Point location) =>
             RegisterCreatedNode(_graph.CreateRecipeNode(recipe, location));
 
-        public NodeId CreateSpoilNode(ItemQualityPair inputItem, Item outputItem, Point location) =>
+        public NodeId CreateSpoilNode(ItemQualityPair inputItem, IItem outputItem, Point location) =>
             RegisterCreatedNode(_graph.CreateSpoilNode(inputItem, outputItem, location));
 
-        public NodeId CreatePlantNode(PlantProcess plantProcess, Quality quality, Point location) =>
+        public NodeId CreatePlantNode(IPlantProcess plantProcess, IQuality quality, Point location) =>
             RegisterCreatedNode(_graph.CreatePlantNode(plantProcess, quality, location));
 
         public LinkId CreateLink(NodeId supplierId, NodeId consumerId, ItemQualityPair item) {
@@ -60,15 +58,11 @@ namespace Foreman.Graph {
             RequestNodeController(id)?.SetDirection(direction);
 
         public BaseNodeController? RequestNodeController(NodeId id) {
-            if (!_registry.TryGetNode(id, out BaseNode? node) || node is null)
-                return null;
-            return _graph.RequestNodeController(node);
+            return !_registry.TryGetNode(id, out BaseNode? node) || node is null ? null : _graph.RequestNodeController(node);
         }
 
         private NodeId RegisterCreatedNode(BaseNode node) {
-            if (_registry.TryGetNodeId(node, out NodeId id))
-                return id;
-            return _registry.RegisterNode(node);
+            return _registry.TryGetNodeId(node, out NodeId id) ? id : _registry.RegisterNode(node);
         }
     }
 }

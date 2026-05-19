@@ -1,4 +1,4 @@
-﻿namespace Foreman {
+﻿namespace Foreman.Models.Nodes {
     /// <summary>Shared error/warning evaluation for supplier and consumer nodes (identical flag layout).</summary>
     internal static class ItemQualityNodeState {
         public static void Evaluate(

@@ -3,7 +3,7 @@ using System.IO;
 using ZstdSharp;
 
 namespace ForemanTest.support {
-    /// <summary>Prepares ZSTD-compressed preset assets for <see cref="PresetProcessor"/>.</summary>
+    /// <summary>Prepares ZSTD-compressed preset assets for tests.</summary>
     internal static class TestPresetAsset {
         public const string PyanodonPresetName = "Factorio 2.0 Pyanodon";
         public const string PyanodonCompressedFileName = PyanodonPresetName + ".pjson.zst";

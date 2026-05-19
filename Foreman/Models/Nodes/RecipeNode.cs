@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Xml.Schema;
 
 namespace Foreman {
     public partial class RecipeNode : BaseNode {
@@ -23,7 +25,7 @@ namespace Foreman {
 
             RQualityIsMissing = 0b_1000_0000_0000,
             AQualityIsMissing = 0b_0001_0000_0000_0000,
-            BQualityIsMissing = 0b_0010_000_0000_0000,
+            BQualityIsMissing = 0b_0010_0000_0000_0000,
             AModuleQualityIsMissing = 0b_0100_0000_0000_0000,
             BModuleQualityIsMissing = 0b_1000_0000_0000_0000,
 
@@ -61,37 +63,32 @@ namespace Foreman {
 
         public bool LowPriority { get; set; }
 
-        public readonly RecipeQualityPair BaseRecipe;
-        private readonly Recipe recipeDefinition;
-        private readonly Quality recipeQuality;
+        public RecipeQualityPair BaseRecipe { get; }
+        private readonly IRecipe recipeDefinition;
+        private readonly IQuality recipeQuality;
 
-        internal Recipe RecipeDefinition => recipeDefinition;
-        internal Quality RecipeQualityRef => recipeQuality;
+        internal IRecipe RecipeDefinition => recipeDefinition;
+        internal IQuality RecipeQualityRef => recipeQuality;
 
         private double neighbourCount;
         public double NeighbourCount { get { return neighbourCount; } set { if (neighbourCount != value) { neighbourCount = value; ioUpdateRequired = true; UpdateState(); OnNodeValuesChanged(); } } }
 
         private readonly DataCache RecipeOwner;
 
-        private AssemblerQualityPair assembler;
         public AssemblerQualityPair SelectedAssembler {
-            get { return assembler; }
-            set { if (value && assembler != value) { assembler = value; ioUpdateRequired = true; UpdateState(); OnNodeStateChanged(); } }
+            get;
+            set { if (value && field != value) { field = value; ioUpdateRequired = true; UpdateState(); OnNodeStateChanged(); } }
         }
-        public Item? Fuel {
-            get { return fuel; }
-            set { if (fuel != value) { fuel = value; fuelRemainsOverride = null; ioUpdateRequired = true; UpdateState(); OnNodeStateChanged(); } }
+        public IItem? Fuel {
+            get;
+            set { if (field != value) { field = value; fuelRemainsOverride = null; ioUpdateRequired = true; UpdateState(); OnNodeStateChanged(); } }
         }
-        public Item? FuelRemains {
+        public IItem? FuelRemains {
             get {
-                if (fuelRemainsOverride != null)
-                    return fuelRemainsOverride;
-                if (Fuel != null && Fuel.BurnResult != null)
-                    return Fuel.BurnResult;
-                return null;
+                return fuelRemainsOverride ?? (Fuel != null && Fuel.BurnResult != null ? Fuel.BurnResult : null);
             }
         }
-        public void SetBurntOverride(Item? item) {
+        public void SetBurntOverride(IItem? item) {
             if (Fuel == null || Fuel.BurnResult != item) {
                 fuelRemainsOverride = item;
                 ioUpdateRequired = true;
@@ -99,8 +96,8 @@ namespace Foreman {
                 OnNodeValuesChanged();
             }
         }
-        private Item? fuel;
-        private Item? fuelRemainsOverride; //returns as BurntItem if set (error import)
+
+        private IItem? fuelRemainsOverride; //returns as BurntItem if set (error import)
 
         private BeaconQualityPair selectedBeacon;
         public BeaconQualityPair SelectedBeacon { get { return selectedBeacon; } set { if (selectedBeacon != value) { selectedBeacon = value; ioUpdateRequired = true; UpdateState(); OnNodeValuesChanged(); } } }
@@ -113,8 +110,8 @@ namespace Foreman {
 
         public IReadOnlyList<ModuleQualityPair> AssemblerModules { get { return assemblerModules; } }
         public IReadOnlyList<ModuleQualityPair> BeaconModules { get { return beaconModules; } }
-        private List<ModuleQualityPair> assemblerModules;
-        private List<ModuleQualityPair> beaconModules;
+        private readonly List<ModuleQualityPair> assemblerModules;
+        private readonly List<ModuleQualityPair> beaconModules;
 
         //for recipe nodes, the SetValue is 'number of assemblers/entities'
         public override double ActualSetValue { get { return ActualRatePerSec * recipeDefinition.Time / (SelectedAssembler.Assembler.GetSpeed(SelectedAssembler.Quality) * GetSpeedMultiplier()); } }
@@ -131,19 +128,19 @@ namespace Foreman {
         private uint maxQualitySteps;
 
         public override IEnumerable<ItemQualityPair> Inputs { get { if (ioUpdateRequired) { UpdateInputsAndOutputs(); } return inputList; } }
-        private Dictionary<ItemQualityPair, double> inputSet;
-        private List<ItemQualityPair> inputList;
+        private readonly Dictionary<ItemQualityPair, double> inputSet;
+        private readonly List<ItemQualityPair> inputList;
 
         public override IEnumerable<ItemQualityPair> Outputs { get { if (ioUpdateRequired) { UpdateInputsAndOutputs(); } return outputList; } }
-        private Dictionary<ItemQualityPair, double> outputSet;
-        private List<ItemQualityPair> outputList;
+        private readonly Dictionary<ItemQualityPair, double> outputSet;
+        private readonly List<ItemQualityPair> outputList;
 
         public bool IsFuelPartOfRecipeInputs { get; private set; }
         public bool IsFuelRemainsPartOfRecipeOutputs { get; private set; }
 
         private bool ioUpdateRequired;
 
-        public RecipeNode(ProductionGraph graph, int nodeID, RecipeQualityPair recipe, Quality assemblerQuality) : base(graph, nodeID) {
+        public RecipeNode(ProductionGraph graph, int nodeID, RecipeQualityPair recipe, IQuality assemblerQuality) : base(graph, nodeID) {
             if (!recipe || recipe.Recipe is null || recipe.Quality is null)
                 throw new ArgumentException("Recipe and quality must be populated.", nameof(recipe));
             recipeDefinition = recipe.Recipe;
@@ -158,16 +155,16 @@ namespace Foreman {
 
             controller = new RecipeNodeController(this);
 
-            inputSet = new Dictionary<ItemQualityPair, double>();
-            inputList = new List<ItemQualityPair>();
-            outputSet = new Dictionary<ItemQualityPair, double>();
-            outputList = new List<ItemQualityPair>();
+            inputSet = [];
+            inputList = [];
+            outputSet = [];
+            outputList = [];
 
-            assemblerModules = new List<ModuleQualityPair>();
-            beaconModules = new List<ModuleQualityPair>();
+            assemblerModules = [];
+            beaconModules = [];
 
             SelectedAssembler = new AssemblerQualityPair(recipeDefinition.Assemblers.First(), assemblerQuality); //everything here works under the assumption that assember isnt null.
-            SelectedBeacon = new BeaconQualityPair("no beacon selected");
+            SelectedBeacon = new BeaconQualityPair();
             NeighbourCount = 0;
 
             BeaconCount = 0;
@@ -211,10 +208,10 @@ namespace Foreman {
             if (AssemblerModules.Any(m => m.Quality.IsMissing))
                 ErrorSet |= Errors.AModuleQualityIsMissing;
 
-            if (SelectedBeacon && SelectedBeacon.Beacon is Beacon beacon) {
+            if (SelectedBeacon && SelectedBeacon.Beacon is IBeacon beacon) {
                 if (beacon.IsMissing)
                     ErrorSet |= Errors.BeaconIsMissing;
-                if (SelectedBeacon.Quality is Quality beaconQuality && beaconQuality.IsMissing)
+                if (SelectedBeacon.Quality is IQuality beaconQuality && beaconQuality.IsMissing)
                     ErrorSet |= Errors.BQualityIsMissing;
                 if (BeaconModules.Any(m => m.Module.IsMissing))
                     ErrorSet |= Errors.BModuleIsMissing;
@@ -263,12 +260,12 @@ namespace Foreman {
             if (AssemblerModules.Any(m => !m.Quality.Enabled))
                 WarningSet |= Warnings.AModulesQualityIsDisabled;
 
-            if (SelectedBeacon && SelectedBeacon.Beacon is Beacon warningBeacon) {
+            if (SelectedBeacon && SelectedBeacon.Beacon is IBeacon warningBeacon) {
                 if (!warningBeacon.Enabled)
                     WarningSet |= Warnings.BeaconIsDisabled;
                 if (!warningBeacon.Available)
                     WarningSet |= Warnings.BeaconIsUnavailable;
-                if (SelectedBeacon.Quality is Quality warningBeaconQuality && !warningBeaconQuality.Enabled)
+                if (SelectedBeacon.Quality is IQuality warningBeaconQuality && !warningBeaconQuality.Enabled)
                     WarningSet |= Warnings.BeaconQualityIsDisabled;
             }
             if (BeaconModules.Any(m => !m.Module.Enabled))
@@ -278,14 +275,10 @@ namespace Foreman {
             if (BeaconModules.Any(m => !m.Quality.Enabled))
                 WarningSet |= Warnings.BModulesQualityIsDisabled;
 
-            if (SelectedAssembler.Assembler.IsTemperatureFluidBurner && !LinkChecker.GetTemperatureRange(Fuel as Fluid, this, LinkType.Output, false).IsPoint())
+            if (SelectedAssembler.Assembler.IsTemperatureFluidBurner && !LinkChecker.GetTemperatureRange(Fuel as IFluid, this, LinkType.Output, false).IsPoint())
                 WarningSet |= Warnings.TemeratureFluidBurnerInvalidLinks;
 
-            if (WarningSet != Warnings.Clean)
-                return NodeState.Warning;
-            if (AllLinksConnected)
-                return NodeState.Clean;
-            return NodeState.MissingLink;
+            return WarningSet != Warnings.Clean ? NodeState.Warning : AllLinksConnected ? NodeState.Clean : NodeState.MissingLink;
 
         }
 
@@ -297,8 +290,8 @@ namespace Foreman {
             //Inputs:
             inputSet.Clear();
             inputList.Clear();
-            foreach (Item item in recipeDefinition.IngredientList) {
-                ItemQualityPair inputItem = new ItemQualityPair(item, item is Fluid ? RecipeOwner.DefaultQuality ?? recipeQuality : recipeQuality);
+            foreach (IItem item in recipeDefinition.IngredientList) {
+                var inputItem = new ItemQualityPair(item, item is IFluid ? RecipeOwner.DefaultQuality ?? recipeQuality : recipeQuality);
                 double inputQuantity = recipeDefinition.IngredientSet[item];
 
                 inputList.Add(inputItem);
@@ -306,40 +299,40 @@ namespace Foreman {
             }
             if (Fuel is not null && RecipeOwner.DefaultQuality is not null) //provide the burner item if it isnt null or already part of recipe ingredients
             {
-                ItemQualityPair fuelIQP = new ItemQualityPair(Fuel, RecipeOwner.DefaultQuality);
+                var fuelIQP = new ItemQualityPair(Fuel, RecipeOwner.DefaultQuality);
                 if (!inputSet.ContainsKey(fuelIQP)) {
                     IsFuelPartOfRecipeInputs = false;
                     inputList.Add(fuelIQP);
-                    inputSet.Add(fuelIQP, inputRateForFuel());
+                    inputSet.Add(fuelIQP, InputRateForFuel());
                 } else {
                     IsFuelPartOfRecipeInputs = true;
-                    inputSet[fuelIQP] += inputRateForFuel();
+                    inputSet[fuelIQP] += InputRateForFuel();
                 }
             }
 
             //Outputs:
             outputSet.Clear();
             outputList.Clear();
-            foreach (Item item in recipeDefinition.ProductList) {
+            foreach (IItem item in recipeDefinition.ProductList) {
                 if (SelectedAssembler.Assembler.EntityType == EntityType.Reactor) {
-                    ItemQualityPair product = new ItemQualityPair(item, RecipeOwner.DefaultQuality ?? recipeQuality);
+                    var product = new ItemQualityPair(item, RecipeOwner.DefaultQuality ?? recipeQuality);
                     double amount = recipeDefinition.ProductSet[item] + (1 * SelectedAssembler.Assembler.NeighbourBonus * NeighbourCount);
                     outputList.Add(product);
                     outputSet.Add(product, amount);
                 } else {
                     double amount = recipeDefinition.ProductSet[item] + (recipeDefinition.ProductPSet[item] * GetProductivityBonus());
 
-                    if (item is Fluid) {
-                        ItemQualityPair fluidProduct = new ItemQualityPair(item, RecipeOwner.DefaultQuality ?? recipeQuality);
+                    if (item is IFluid) {
+                        var fluidProduct = new ItemQualityPair(item, RecipeOwner.DefaultQuality ?? recipeQuality);
                         outputList.Add(fluidProduct);
                         outputSet.Add(fluidProduct, amount);
                     } else {
-                        ItemQualityPair currentProduct = new ItemQualityPair(item, recipeQuality);
+                        var currentProduct = new ItemQualityPair(item, recipeQuality);
                         uint currentStep = 1;
                         outputList.Add(currentProduct);
                         outputSet.Add(currentProduct, amount);
                         double currentMultiplier = GetQualityMultiplier();
-                        while (currentStep < MaxQualitySteps && currentProduct.Quality is Quality stepQuality && stepQuality.NextQuality is Quality nextQuality) {
+                        while (currentStep < MaxQualitySteps && currentProduct.Quality is IQuality stepQuality && stepQuality.NextQuality is IQuality nextQuality) {
                             currentStep++;
                             ItemQualityPair lastProduct = currentProduct;
                             currentMultiplier *= stepQuality.NextProbability;
@@ -364,14 +357,14 @@ namespace Foreman {
             }
             if (FuelRemains != null) //provide the burnt item if it isnt null or already part of recipe ingredients
             {
-                ItemQualityPair fuelRemainsIQP = new ItemQualityPair(FuelRemains, RecipeOwner.DefaultQuality ?? recipeQuality);
+                var fuelRemainsIQP = new ItemQualityPair(FuelRemains, RecipeOwner.DefaultQuality ?? recipeQuality);
                 if (!outputSet.ContainsKey(fuelRemainsIQP)) {
                     IsFuelRemainsPartOfRecipeOutputs = false;
                     outputList.Add(fuelRemainsIQP);
-                    outputSet.Add(fuelRemainsIQP, inputRateForFuel());
+                    outputSet.Add(fuelRemainsIQP, InputRateForFuel());
                 } else {
                     IsFuelRemainsPartOfRecipeOutputs = true;
-                    outputSet[fuelRemainsIQP] += inputRateForFuel();
+                    outputSet[fuelRemainsIQP] += InputRateForFuel();
                 }
             }
 
@@ -402,12 +395,12 @@ namespace Foreman {
         public void AssemblerModulesRemoveAll(ModuleQualityPair module) { assemblerModules.RemoveAll(m => m == module); ioUpdateRequired = true; }
         public void AssemblerModulesClear() { assemblerModules.Clear(); ioUpdateRequired = true; }
 
-        // Beacon effectivity × count for module math; 0 when no beacon/quality.
+        // IBeacon effectivity × count for module math; 0 when no beacon/quality.
         private double BeaconTransmissionFromModules() {
             BeaconQualityPair b = SelectedBeacon;
-            if (b.Beacon is not Beacon beacon || b.Quality is not Quality quality)
-                return 0;
-            return beacon.GetBeaconEffectivity(quality, BeaconCount) * BeaconCount;
+            return b.Beacon is not IBeacon beacon || b.Quality is not IQuality quality
+                ? 0
+                : beacon.GetBeaconEffectivity(quality, BeaconCount) * BeaconCount;
         }
 
         //------------------------------------------------------------------------ multipliers (speed/productivity/consumption/pollution) & rates
@@ -484,16 +477,16 @@ namespace Foreman {
             return outputSet[item];
         }
 
-        internal double inputRateForFuel() {
+        internal double InputRateForFuel() {
             double temperature = double.NaN;
             if (SelectedAssembler.Assembler.IsTemperatureFluidBurner)
-                temperature = LinkChecker.GetTemperatureRange(Fuel as Fluid, this, LinkType.Output, false).Min;
+                temperature = LinkChecker.GetTemperatureRange(Fuel as IFluid, this, LinkType.Output, false).Min;
 
             //burner rate = recipe time (modified by speed bonus & assembler) * fuel consumption rate of assembler (modified by fuel, temperature, and consumption modifier)
             return (recipeDefinition.Time / (SelectedAssembler.Assembler.GetSpeed(SelectedAssembler.Quality) * GetSpeedMultiplier())) * SelectedAssembler.Assembler.GetBaseFuelConsumptionRate(Fuel, SelectedAssembler.Quality, temperature) * GetConsumptionMultiplier();
         }
 
-        internal double factoryRate() {
+        internal double FactoryRate() {
             return recipeDefinition.Time / (SelectedAssembler.Assembler.GetSpeed(SelectedAssembler.Quality) * GetSpeedMultiplier());
         }
 
@@ -504,7 +497,7 @@ namespace Foreman {
             return minValue;
         }
 
-        public override string ToString() { return string.Format("Recipe node for: {0} ({1})", recipeDefinition.Name, recipeQuality.Name); }
+        public override string ToString() { return string.Format(CultureInfo.InvariantCulture, "Recipe node for: {0} ({1})", recipeDefinition.Name, recipeQuality.Name); }
     }
 
     public class RecipeNodeController : BaseNodeController {
@@ -517,7 +510,7 @@ namespace Foreman {
         public override Dictionary<string, Action> GetErrorResolutions() {
             RecipeNode.Errors ErrorSet = MyNode.ErrorSet;
 
-            Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+            var resolutions = new Dictionary<string, Action>();
             if ((ErrorSet & RecipeNode.Errors.RecipeIsMissing) != 0)
                 resolutions.Add("Delete node", new Action(() => { this.Delete(); }));
             else {
@@ -544,7 +537,7 @@ namespace Foreman {
 
                 if ((ErrorSet & (RecipeNode.Errors.BModuleIsMissing | RecipeNode.Errors.BModuleLimitExceeded | RecipeNode.Errors.BModuleQualityIsMissing)) != 0)
                     resolutions.Add("Fix beacon modules", new Action(() => {
-                        if (MyNode.SelectedBeacon.Beacon is not Beacon beacon)
+                        if (MyNode.SelectedBeacon.Beacon is not IBeacon beacon)
                             return;
                         for (int i = MyNode.BeaconModules.Count - 1; i >= 0; i--)
                             if (MyNode.BeaconModules[i].Module.IsMissing || !MyNode.SelectedAssembler.Assembler.Modules.Contains(MyNode.BeaconModules[i].Module) || !MyNode.RecipeDefinition.AssemblerModules.Contains(MyNode.BeaconModules[i].Module) || !beacon.Modules.Contains(MyNode.BeaconModules[i].Module) || MyNode.BeaconModules[i].Quality.IsMissing)
@@ -563,7 +556,7 @@ namespace Foreman {
         public override Dictionary<string, Action> GetWarningResolutions() {
             RecipeNode.Warnings WarningSet = MyNode.WarningSet;
 
-            Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+            var resolutions = new Dictionary<string, Action>();
 
             if ((WarningSet & (RecipeNode.Warnings.AssemblerIsDisabled | RecipeNode.Warnings.AssemblerIsUnavailable | RecipeNode.Warnings.AssemblerQualityIsDisabled)) != 0 && (WarningSet & RecipeNode.Warnings.NoAvailableAssemblers) == 0)
                 resolutions.Add("Switch to enabled assembler", new Action(() => AutoSetAssembler()));
@@ -642,7 +635,7 @@ namespace Foreman {
 
         public void AutoSetAssembler() {
             var quality = (MyNode.SelectedAssembler.Quality.IsMissing || !MyNode.SelectedAssembler.Quality.Enabled) ? MyNode.SelectedAssembler.Assembler.Owner.DefaultQuality : MyNode.SelectedAssembler.Quality;
-            Assembler assembler = MyNode.MyGraph.AssemblerSelector.GetAssembler(MyNode.RecipeDefinition);
+            IAssembler assembler = MyNode.MyGraph.AssemblerSelector.GetAssembler(MyNode.RecipeDefinition);
 
             if (quality is not null)
                 SetAssembler(new AssemblerQualityPair(assembler, quality));
@@ -651,23 +644,23 @@ namespace Foreman {
 
         public void AutoSetAssembler(AssemblerSelector.Style style) {
             var quality = (MyNode.SelectedAssembler.Quality.IsMissing || !MyNode.SelectedAssembler.Quality.Enabled) ? MyNode.SelectedAssembler.Assembler.Owner.DefaultQuality : MyNode.SelectedAssembler.Quality;
-            Assembler assembler = MyNode.MyGraph.AssemblerSelector.GetAssembler(MyNode.RecipeDefinition, style);
+            IAssembler assembler = AssemblerSelector.GetAssembler(MyNode.RecipeDefinition, style);
 
             if (quality is not null)
                 SetAssembler(new AssemblerQualityPair(assembler, quality));
             AutoSetFuel();
         }
 
-        public void SetFuel(Item? fuel) {
+        public void SetFuel(IItem? fuel) {
             if (MyNode.Fuel != fuel || (MyNode.Fuel == null && MyNode.FuelRemains != null) || (MyNode.Fuel != null && MyNode.Fuel.BurnResult != MyNode.FuelRemains)) {
                 //have to remove any links to the burner/burnt item (if they exist) unless the item is also part of the recipe
                 if (MyNode.Fuel != null && !MyNode.IsFuelPartOfRecipeInputs && MyNode.Fuel.Owner.DefaultQuality is not null) {
-                    ItemQualityPair fuelIQP = new ItemQualityPair(MyNode.Fuel, MyNode.Fuel.Owner.DefaultQuality);
+                    var fuelIQP = new ItemQualityPair(MyNode.Fuel, MyNode.Fuel.Owner.DefaultQuality);
                     foreach (NodeLink link in MyNode.InputLinks.Where(link => link.Item == fuelIQP).ToList())
                         link.Controller.Delete();
                 }
                 if (MyNode.FuelRemains != null && !MyNode.IsFuelRemainsPartOfRecipeOutputs && MyNode.FuelRemains.Owner.DefaultQuality is not null) {
-                    ItemQualityPair fuelRemainsIQP = new ItemQualityPair(MyNode.FuelRemains, MyNode.FuelRemains.Owner.DefaultQuality);
+                    var fuelRemainsIQP = new ItemQualityPair(MyNode.FuelRemains, MyNode.FuelRemains.Owner.DefaultQuality);
                     foreach (NodeLink link in MyNode.OutputLinks.Where(link => link.Item == fuelRemainsIQP).ToList())
                         link.Controller.Delete();
                 }
@@ -683,7 +676,7 @@ namespace Foreman {
         }
 
         public void ClearBeacon() {
-            MyNode.SelectedBeacon = new BeaconQualityPair("clearing beacon");
+            MyNode.SelectedBeacon = new BeaconQualityPair(/*"clearing beacon"*/);
             MyNode.BeaconModulesClear();
             MyNode.BeaconCount = 0;
             MyNode.BeaconsPerAssembler = 0;
@@ -693,7 +686,7 @@ namespace Foreman {
 
         public void SetBeacon(BeaconQualityPair beacon) {
             if (!beacon) { ClearBeacon(); return; } //shouldnt be called - but whatever
-            if (beacon.Beacon is not Beacon beaconEntity) {
+            if (beacon.Beacon is not IBeacon beaconEntity) {
                 ClearBeacon();
                 return;
             }
@@ -746,7 +739,7 @@ namespace Foreman {
             MyNode.AssemblerModulesClear();
             if (modules != null) {
                 if (filterModules) {
-                    HashSet<Module> acceptableModules = new HashSet<Module>(MyNode.RecipeDefinition.AssemblerModules.Intersect(MyNode.SelectedAssembler.Assembler.Modules));
+                    var acceptableModules = new HashSet<IModule>(MyNode.RecipeDefinition.AssemblerModules.Intersect(MyNode.SelectedAssembler.Assembler.Modules));
                     foreach (ModuleQualityPair m in modules)
                         if (MyNode.AssemblerModules.Count < MyNode.SelectedAssembler.Assembler.ModuleSlots && acceptableModules.Contains(m.Module))
                             MyNode.AssemblerModulesAdd(m);
@@ -760,19 +753,19 @@ namespace Foreman {
             MyNode.AssemblerModulesClear();
             MyNode.AssemblerModulesAddRange(MyNode.MyGraph.ModuleSelector
                 .GetModules(MyNode.SelectedAssembler.Assembler, MyNode.RecipeDefinition)
-                .Select(i => i.Owner.DefaultQuality is Quality q ? (i, q) : ((Module, Quality)?)null)
-                .OfType<(Module Module, Quality Quality)>()
-                .Select(i => new ModuleQualityPair(i.Module, i.Quality)));
+                .Select(i => i.Owner.DefaultQuality is IQuality q ? (i, q) : ((IModule, IQuality)?)null)
+                .OfType<(IModule, IQuality)>()
+                .Select(i => new ModuleQualityPair(i.Item1, i.Item2)));
             MyNode.UpdateState();
         }
 
         public void AutoSetAssemblerModules(ModuleSelector.Style style) {
             MyNode.AssemblerModulesClear();
-            MyNode.AssemblerModulesAddRange(MyNode.MyGraph.ModuleSelector
+            MyNode.AssemblerModulesAddRange(ModuleSelector
                 .GetModules(MyNode.SelectedAssembler.Assembler, MyNode.RecipeDefinition, style)
-                .Select(i => i.Owner.DefaultQuality is Quality q ? (i, q) : ((Module, Quality)?)null)
-                .OfType<(Module Module, Quality Quality)>()
-                .Select(i => new ModuleQualityPair(i.Module, i.Quality)));
+                .Select(i => i.Owner.DefaultQuality is IQuality q ? (i, q) : ((IModule, IQuality)?)null)
+                .OfType<(IModule, IQuality)>()
+                .Select(i => new ModuleQualityPair(i.Item1, i.Item2)));
             MyNode.UpdateState();
         }
 
@@ -782,7 +775,7 @@ namespace Foreman {
         }
 
         public void AddBeaconModules(ModuleQualityPair module) {
-            if (MyNode.SelectedBeacon.Beacon is not Beacon beacon)
+            if (MyNode.SelectedBeacon.Beacon is not IBeacon beacon)
                 return;
             while (MyNode.BeaconModules.Count < beacon.ModuleSlots)
                 MyNode.BeaconModulesAdd(module);
@@ -804,9 +797,9 @@ namespace Foreman {
             MyNode.BeaconModulesClear();
             if (modules != null) {
                 if (filterModules) {
-                    if (MyNode.SelectedBeacon.Beacon is not Beacon beacon)
+                    if (MyNode.SelectedBeacon.Beacon is not IBeacon beacon)
                         return;
-                    HashSet<Module> acceptableModules = new HashSet<Module>(MyNode.RecipeDefinition.AssemblerModules.Intersect(MyNode.SelectedAssembler.Assembler.Modules).Intersect(beacon.Modules));
+                    var acceptableModules = new HashSet<IModule>(MyNode.RecipeDefinition.AssemblerModules.Intersect(MyNode.SelectedAssembler.Assembler.Modules).Intersect(beacon.Modules));
                     foreach (ModuleQualityPair m in modules)
                         if (MyNode.BeaconModules.Count < beacon.ModuleSlots && acceptableModules.Contains(m.Module))
                             MyNode.BeaconModulesAdd(m);

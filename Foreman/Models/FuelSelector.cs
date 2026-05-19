@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Foreman {
+namespace Foreman.Models {
     public class FuelSelector {
-        public IReadOnlyList<Item> FuelPriority { get { return fuelPriority; } }
-        private List<Item> fuelPriority;
+        public IReadOnlyList<IItem> FuelPriority { get { return fuelPriority; } }
+        private readonly List<IItem> fuelPriority;
 
-        public void LoadFuelPriority(List<Item> fuelList) {
-            foreach (Item fuel in fuelList)
+        public void LoadFuelPriority(List<IItem> fuelList) {
+            foreach (IItem fuel in fuelList)
                 UseFuel(fuel);
         }
 
@@ -16,7 +16,7 @@ namespace Foreman {
             fuelPriority.Clear();
         }
 
-        public void UseFuel(Item? fuel) {
+        public void UseFuel(IItem? fuel) {
             if (fuel == null)
                 return;
 
@@ -24,7 +24,7 @@ namespace Foreman {
             fuelPriority.Add(fuel);
         }
 
-        public Item? GetFuel(Assembler? assembler) {
+        public IItem? GetFuel(IAssembler? assembler) {
             if (assembler is null || !assembler.IsBurner)
                 return null;
 
@@ -43,7 +43,7 @@ namespace Foreman {
         }
 
         public FuelSelector() {
-            fuelPriority = new();
+            fuelPriority = [];
         }
     }
 }

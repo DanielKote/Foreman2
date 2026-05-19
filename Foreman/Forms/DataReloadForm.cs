@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.DataCaching;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using System.Windows.Forms;
+using DataCache = Foreman.DataCaching.DataCache;
 
 namespace Foreman {
     public partial class DataLoadForm : Form {
         private int currentPercent;
         private string currentText;
 
-        private Preset selectedPreset;
+        private readonly Preset selectedPreset;
         private DataCache? createdDataCache;
         private bool loadInProgress;
         private bool loadCompleted;
@@ -33,7 +34,7 @@ namespace Foreman {
                     currentPercent = value.Key;
                     progressBar.Value = value.Key;
                 }
-                if (!String.IsNullOrEmpty(value.Value) && value.Value != currentText) {
+                if (!string.IsNullOrEmpty(value.Value) && value.Value != currentText) {
                     currentText = value.Value;
                     Text = "Preparing Foreman: " + value.Value;
                 }
@@ -41,18 +42,22 @@ namespace Foreman {
 
             createdDataCache = new DataCache(Properties.Settings.Default.UseRecipeBWfilters);
             loadInProgress = true;
+            DialogResult loadResult = DialogResult.Abort;
             try {
-                await createdDataCache.LoadAllData(selectedPreset, progress);
+                await createdDataCache.LoadAllData(selectedPreset, progress).ConfigureAwait(false);
                 loadCompleted = true;
-                DialogResult = DialogResult.OK;
+                loadResult = DialogResult.OK;
             } catch (Exception ex) {
-                ErrorLogging.LogException(ex, string.Format("Failed to load preset '{0}'", selectedPreset.Name));
+                ErrorLogging.LogException(ex, string.Format(CultureInfo.InvariantCulture, "Failed to load preset '{0}'", selectedPreset.Name));
                 createdDataCache = new DataCache(true); //blank data cache in case of error.
-                DialogResult = DialogResult.Abort;
+                loadResult = DialogResult.Abort;
             } finally {
                 loadInProgress = false;
             }
-            Close();
+            await this.InvokeOnUiThreadAsync(() => {
+                DialogResult = loadResult;
+                Close();
+            }).ConfigureAwait(false);
 
 #if DEBUG
             TimeSpan diff = DateTime.Now.Subtract(startTime);

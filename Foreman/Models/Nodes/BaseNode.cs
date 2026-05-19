@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Foreman.Models;
+using Foreman.Models.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Xml.Schema;
 
 namespace Foreman {
     public enum RateType { Auto, Manual };
@@ -12,9 +12,8 @@ namespace Foreman {
 
     public abstract partial class BaseNode {
         public abstract BaseNodeController Controller { get; }
-        public readonly ProductionGraph MyGraph;
-        public readonly int NodeID;
-
+        public ProductionGraph MyGraph { get; }
+        public int NodeID { get; }
         public bool IsClean { get; protected set; } //if true then this node hasnt changed (internal values or links) since last solver solution
 
         private bool keyNode;
@@ -62,7 +61,7 @@ namespace Foreman {
         public virtual double ActualSetValue { get { return ActualRate; } }
         public virtual double DesiredSetValue { get { return DesiredRate; } set { DesiredRate = value; } }
         public virtual double MaxDesiredSetValue { get { return ProductionGraph.MaxSetFlow; } }
-        public virtual string SetValueDescription { get { return string.Format("Item Flowrate (per {0})", MyGraph.GetRateName()); } }
+        public virtual string SetValueDescription { get { return string.Format(DisplayCulture.Format, "Item Flowrate (per {0})", MyGraph.GetRateName()); } }
 
         public abstract IEnumerable<ItemQualityPair> Inputs { get; }
         public abstract IEnumerable<ItemQualityPair> Outputs { get; }
@@ -88,8 +87,8 @@ namespace Foreman {
             desiredRatePerSec = 0;
             Location = new Point(0, 0);
 
-            InputLinks = new List<NodeLink>();
-            OutputLinks = new List<NodeLink>();
+            InputLinks = [];
+            OutputLinks = [];
         }
 
         public bool AllLinksValid { get { return (InputLinks.Count(l => !l.IsValid) + OutputLinks.Count(l => !l.IsValid) == 0); } }
@@ -133,11 +132,7 @@ namespace Foreman {
 
             double producedRate = GetSupplyRate(item);
             double supplyUsedRate = GetSupplyUsedRate(item);
-            if ((producedRate == 0 && supplyUsedRate == 0) || (producedRate < 0.0001 && supplyUsedRate < 0.0001))
-                return false;
-            if (supplyUsedRate == 0 && producedRate != 0)
-                return true;
-            return ((producedRate - supplyUsedRate) / supplyUsedRate) > ((producedRate > 1 && supplyUsedRate > 1) ? 0.001f : 0.01f);
+            return (producedRate != 0 || supplyUsedRate != 0) && (producedRate >= 0.0001 || supplyUsedRate >= 0.0001) && (supplyUsedRate == 0 && producedRate != 0 || ((producedRate - supplyUsedRate) / supplyUsedRate) > ((producedRate > 1 && supplyUsedRate > 1) ? 0.001f : 0.01f));
         }
 
         public bool ManualRateNotMet() {
@@ -149,14 +144,10 @@ namespace Foreman {
 
     }
 
-    public abstract class BaseNodeController {
-        private readonly BaseNode MyNode;
+    public abstract class BaseNodeController(BaseNode myNode) {
+        private readonly BaseNode MyNode = myNode;
 
-        protected BaseNodeController(BaseNode myNode) {
-            MyNode = myNode;
-        }
-
-        public void SetKeyNode(bool keyNode) { MyNode.KeyNode = keyNode; if (keyNode) MyNode.KeyNodeTitle = MyNode.NodeID.ToString(); else MyNode.KeyNodeTitle = ""; }
+        public void SetKeyNode(bool keyNode) { MyNode.KeyNode = keyNode; MyNode.KeyNodeTitle = keyNode ? MyNode.NodeID.ToString(DisplayCulture.Format) : ""; }
         public void SetKeyNodeTitle(string title) { if (MyNode.KeyNode) MyNode.KeyNodeTitle = title; }
 
         public void SetLocation(Point location) { if (MyNode.Location != location) MyNode.Location = location; }
@@ -168,16 +159,14 @@ namespace Foreman {
         public void SetDirection(NodeDirection direction) { if (MyNode.NodeDirection != direction) MyNode.NodeDirection = direction; }
 
         public abstract Dictionary<string, Action> GetErrorResolutions();
-        public virtual Dictionary<string, Action> GetWarningResolutions() => new Dictionary<string, Action>();
+        public virtual Dictionary<string, Action> GetWarningResolutions() => [];
 
         protected Dictionary<string, Action> ErrorResolutionsDeleteOrFixLinks(bool deleteNode) {
-            if (deleteNode)
-                return new Dictionary<string, Action> { ["Delete node"] = Delete };
-            return GetInvalidConnectionResolutions();
+            return deleteNode ? new Dictionary<string, Action> { ["Delete node"] = Delete } : GetInvalidConnectionResolutions();
         }
 
         protected Dictionary<string, Action> ErrorResolutionsWithFixOrLinks(bool deleteNode, string? fixLabel, Action? fixAction) {
-            Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+            var resolutions = new Dictionary<string, Action>();
             if (deleteNode)
                 resolutions["Delete node"] = Delete;
             if (fixLabel is not null && fixAction is not null)
@@ -189,7 +178,7 @@ namespace Foreman {
         }
 
         protected Dictionary<string, Action> GetInvalidConnectionResolutions() {
-            Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
+            var resolutions = new Dictionary<string, Action>();
             if (!MyNode.AllLinksValid) {
                 resolutions.Add("Delete invalid links", new Action(() => {
                     foreach (NodeLink invalidLink in MyNode.InputLinks.Where(l => !l.IsValid).ToList())

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.Serialization;
-
-namespace Foreman {
+﻿namespace Foreman.Models.Nodes {
     public class NodeLink {
         private readonly NodeLinkController controller;
         public NodeLinkController Controller { get { return controller; } }
@@ -12,11 +8,9 @@ namespace Foreman {
         public double Throughput { get { return ThroughputPerSec * MyGraph.GetRateMultipler(); } }
         public bool IsValid { get; private set; }
 
-        public readonly ProductionGraph MyGraph;
-
-        public readonly BaseNode SupplierNode;
-        public readonly BaseNode ConsumerNode;
-
+        public ProductionGraph MyGraph { get; }
+        public BaseNode SupplierNode { get; }
+        public BaseNode ConsumerNode { get; }
         internal NodeLink(ProductionGraph myGraph, BaseNode supplier, BaseNode consumer, ItemQualityPair item) {
             MyGraph = myGraph;
             SupplierNode = supplier;
@@ -28,7 +22,7 @@ namespace Foreman {
             IsValid = LinkChecker.IsPossibleConnection(Item, SupplierNode, ConsumerNode); //only need to check once -> item & recipe temperatures cant change.
         }
 
-        public override string ToString() => string.Format("NodeLink for {0} ({1}) connecting {1} -> {2}", Item.Item?.Name, Item.Quality?.Name, SupplierNode.NodeID, ConsumerNode.NodeID);
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "NodeLink for {0} ({1}) connecting {1} -> {2}", Item.Item?.Name, Item.Quality?.Name, SupplierNode.NodeID, ConsumerNode.NodeID);
     }
 
     public class NodeLinkController {

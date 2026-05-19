@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foreman.DataCaching;
+using System;
 using System.IO;
 using System.Text.Json.Nodes;
 
@@ -6,9 +7,9 @@ namespace Foreman {
     internal static class FactorioModListHelper {
         public static void SetModState(string modsPath, string modName, bool enabled, bool removeFromListWhenDisabled = false) {
             string modListPath = Path.Combine(modsPath, "mod-list.json");
-            JsonObject modlist = File.Exists(modListPath) ? PresetJson.ParseObject(Utf8File.ReadAllText(modListPath)) : new JsonObject();
+            JsonObject modlist = File.Exists(modListPath) ? PresetJson.ParseObject(Utf8File.ReadAllText(modListPath)) : [];
             if (modlist["mods"] is not JsonArray modsArray) {
-                modsArray = new JsonArray();
+                modsArray = [];
                 modlist["mods"] = modsArray;
             }
 
@@ -28,7 +29,7 @@ namespace Foreman {
             try {
                 Utf8File.WriteAllText(modListPath, PresetJson.WriteIndented(modlist));
             } catch (Exception ex) {
-                ErrorLogging.LogException(ex, string.Format("Failed to update mod-list.json at {0}", modListPath));
+                ErrorLogging.LogException(ex, string.Format(CultureInfo.InvariantCulture, "Failed to update mod-list.json at {0}", modListPath));
             }
         }
     }

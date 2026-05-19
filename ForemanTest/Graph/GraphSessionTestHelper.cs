@@ -1,5 +1,8 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
 using Foreman.Graph;
+using Foreman.Models;
 using ForemanTest.support;
 using System;
 using System.Linq;
@@ -8,13 +11,13 @@ namespace ForemanTest.Graph {
     internal static class GraphSessionTestHelper {
         internal sealed class TestContext {
             public required DataCache Cache { get; init; }
-            public required Quality Quality { get; init; }
+            public required IQuality Quality { get; init; }
             public required SubgroupPrototype Subgroup { get; init; }
 
             public ItemQualityPair Item(string name) =>
-                new ItemQualityPair(TestDataCacheHelper.GetOrCreateItem(Cache, Subgroup, name), Quality);
+                new(TestDataCacheHelper.GetOrCreateItem(Cache, Subgroup, name), Quality);
 
-            public ProductionGraph NewGraph() => new ProductionGraph { DefaultAssemblerQuality = Quality };
+            public ProductionGraph NewGraph() => new() { DefaultAssemblerQuality = Quality };
         }
 
         internal static TestContext CreateContext() {
@@ -48,9 +51,9 @@ namespace ForemanTest.Graph {
             return builder.Build();
         }
 
-        internal static void WireSpoilChain(ItemPrototype input, ItemPrototype output, Quality quality) {
+        internal static void WireSpoilChain(ItemPrototype input, ItemPrototype output, IQuality quality) {
             input.SpoilResult = output;
-            output.spoilOrigins.Add(input);
+            output.SpoilOriginsInternal.Add(input);
             input.spoilageTimes[quality] = 60;
         }
 

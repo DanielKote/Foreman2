@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Foreman.DataCaching.DataTypes;
+using Foreman.Models.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,19 +10,19 @@ namespace Foreman {
         //------------------------------------------------------------------------ warning / errors functions
 
         public override List<string> GetErrors() {
-            List<string> output = new List<string>();
+            var output = new List<string>();
 
             if ((ErrorSet & RecipeNode.Errors.RecipeIsMissing) != 0) {
-                output.Add(string.Format("> Recipe \"{0}\" doesnt exist in preset!", recipeDefinition.FriendlyName));
+                output.Add(string.Format(DisplayCulture.Format, "> Recipe \"{0}\" doesnt exist in preset!", recipeDefinition.FriendlyName));
                 return output; //missing recipe is an automatic end -> we dont care about any other errors, since the only solution is to delete the node.
             }
             if ((ErrorSet & RecipeNode.Errors.RQualityIsMissing) != 0)
-                output.Add(string.Format("> Recipe's Quality \"{0}\" doesnt exist in preset!", recipeQuality.FriendlyName));
+                output.Add(string.Format(DisplayCulture.Format, "> Recipe's Quality \"{0}\" doesnt exist in preset!", recipeQuality.FriendlyName));
 
             if ((ErrorSet & RecipeNode.Errors.AssemblerIsMissing) != 0)
-                output.Add(string.Format("> Assembler \"{0}\" doesnt exist in preset!", SelectedAssembler.Assembler.FriendlyName));
+                output.Add(string.Format(DisplayCulture.Format, "> Assembler \"{0}\" doesnt exist in preset!", SelectedAssembler.Assembler.FriendlyName));
             if ((ErrorSet & RecipeNode.Errors.AQualityIsMissing) != 0)
-                output.Add(string.Format("> Assembler's Quality \"{0}\" doesnt exist in preset!", SelectedAssembler.Quality.FriendlyName));
+                output.Add(string.Format(DisplayCulture.Format, "> Assembler's Quality \"{0}\" doesnt exist in preset!", SelectedAssembler.Quality.FriendlyName));
 
             if ((ErrorSet & RecipeNode.Errors.BurnerNoFuelSet) != 0)
                 output.Add("> Burner Assembler has no fuel set!");
@@ -33,21 +35,21 @@ namespace Foreman {
             if ((ErrorSet & RecipeNode.Errors.AModuleIsMissing) != 0)
                 output.Add("> Some of the assembler modules dont exist in preset!");
             if ((ErrorSet & RecipeNode.Errors.AModuleLimitExceeded) != 0)
-                output.Add(string.Format("> Assembler has too many modules ({0}/{1})!", AssemblerModules.Count, SelectedAssembler.Assembler.ModuleSlots));
+                output.Add(string.Format(DisplayCulture.Format, "> Assembler has too many modules ({0}/{1})!", AssemblerModules.Count, SelectedAssembler.Assembler.ModuleSlots));
             if ((ErrorSet & RecipeNode.Errors.AModuleQualityIsMissing) != 0)
-                output.Add(string.Format("> Assembler's Module's Quality \"{0}\" doesnt exist in preset!", AssemblerModules.First(m => m.Quality.IsMissing).Quality.FriendlyName));
+                output.Add(string.Format(DisplayCulture.Format, "> Assembler's Module's Quality \"{0}\" doesnt exist in preset!", AssemblerModules.First(m => m.Quality.IsMissing).Quality.FriendlyName));
 
             if ((ErrorSet & RecipeNode.Errors.BeaconIsMissing) != 0)
-                output.Add(string.Format("> Beacon \"{0}\" doesnt exist in preset!", SelectedBeacon.Beacon?.FriendlyName ?? "(none)"));
+                output.Add(string.Format(DisplayCulture.Format, "> Beacon \"{0}\" doesnt exist in preset!", SelectedBeacon.Beacon?.FriendlyName ?? "(none)"));
             if ((ErrorSet & RecipeNode.Errors.BQualityIsMissing) != 0)
-                output.Add(string.Format("> Beacon's Quality \"{0}\" doesnt exist in preset!", SelectedBeacon.Quality?.FriendlyName ?? "(none)"));
+                output.Add(string.Format(DisplayCulture.Format, "> Beacon's Quality \"{0}\" doesnt exist in preset!", SelectedBeacon.Quality?.FriendlyName ?? "(none)"));
 
             if ((ErrorSet & RecipeNode.Errors.BModuleIsMissing) != 0)
                 output.Add("> Some of the beacon modules dont exist in preset!");
             if ((ErrorSet & RecipeNode.Errors.BModuleLimitExceeded) != 0)
                 output.Add("> Beacon has too many modules!");
             if ((ErrorSet & RecipeNode.Errors.BModuleQualityIsMissing) != 0)
-                output.Add(string.Format("> Beacon's Module's Quality \"{0}\" doesnt exist in preset!", BeaconModules.First(m => m.Quality.IsMissing).Quality.FriendlyName));
+                output.Add(string.Format(DisplayCulture.Format, "> Beacon's Module's Quality \"{0}\" doesnt exist in preset!", BeaconModules.First(m => m.Quality.IsMissing).Quality.FriendlyName));
 
             if ((ErrorSet & RecipeNode.Errors.InvalidLinks) != 0)
                 output.Add("> Some links are invalid!");
@@ -56,7 +58,7 @@ namespace Foreman {
         }
 
         public override List<string> GetWarnings() {
-            List<string> output = new List<string>();
+            var output = new List<string>();
 
             //recipe
             if ((WarningSet & RecipeNode.Warnings.RecipeIsDisabled) != 0)
@@ -107,7 +109,7 @@ namespace Foreman {
         public double GetGeneratorMinimumTemperature() {
             if (SelectedAssembler.Assembler.EntityType == EntityType.Generator) {
                 //minimum temperature accepted by generator is the largest of either the default temperature (at which point the power generation is 0 and it actually doesnt consume anything), or the set min temp
-                Fluid fluidBase = (Fluid)recipeDefinition.IngredientList[0]; //generators have 1 input & 0 output. only input is the fluid being consumed.
+                var fluidBase = (IFluid)recipeDefinition.IngredientList[0]; //generators have 1 input & 0 output. only input is the fluid being consumed.
                 return Math.Max(fluidBase.DefaultTemperature + 0.1, recipeDefinition.IngredientTemperatureMap[fluidBase].Min);
             }
             Trace.Fail("Cant ask for minimum generator temperature for a non-generator!");
@@ -127,7 +129,7 @@ namespace Foreman {
 
             return GetAverageIncomingTemperature(this, recipeDefinition.IngredientList[0]);
 
-            double GetAverageIncomingTemperature(BaseNode? node, Item item) {
+            double GetAverageIncomingTemperature(BaseNode? node, IItem item) {
                 if (node is PassthroughNode || node == this) {
                     double totalFlow = 0;
                     double totalTemperatureFlow = 0;
@@ -139,12 +141,9 @@ namespace Foreman {
                         totalTemperatureFlow += temperature * link.Throughput;
                         totalTemperature += temperature;
                     }
-                    if (totalFlow == 0) {
-                        if (node.InputLinks.Count == 0)
-                            return SelectedAssembler.Assembler.OperationTemperature;
-                        return totalTemperature / node.InputLinks.Count;
-                    }
-                    return totalTemperatureFlow / totalFlow;
+                    return totalFlow == 0
+                        ? node.InputLinks.Count == 0 ? SelectedAssembler.Assembler.OperationTemperature : totalTemperature / node.InputLinks.Count
+                        : totalTemperatureFlow / totalFlow;
                 }
                 if (node is SupplierNode)
                     return SelectedAssembler.Assembler.OperationTemperature; //assume supplier is optimal temperature (cant exactly set to infinity or something as that would just cause the final result to be infinity)
@@ -156,7 +155,7 @@ namespace Foreman {
         }
 
         public double GetGeneratorEffectivity() {
-            Fluid fluid = (Fluid)recipeDefinition.IngredientList[0];
+            var fluid = (IFluid)recipeDefinition.IngredientList[0];
             return Math.Min((GetGeneratorAverageTemperature() - fluid.DefaultTemperature) / (SelectedAssembler.Assembler.OperationTemperature - fluid.DefaultTemperature), 1);
         }
 
@@ -180,16 +179,16 @@ namespace Foreman {
         public double GetAssemblerPollutionProduction() //pollution/sec
         {
             //there are now multiple types of pollution, so not sure how to handle this (at least in terms of displaying it)
+            if (!SelectedAssembler)
+                return 0;
             return 0;// SelectedAssembler.Pollution * GetPollutionMultiplier() * GetAssemblerEnergyConsumption(); //pollution is counted in per energy //POLLUTION UPDATER REQUIRED
         }
 
         public double GetBeaconEnergyConsumption() //Watts
         {
-            if (!SelectedBeacon || SelectedBeacon.Beacon is not Beacon beacon || SelectedBeacon.Quality is not Quality quality)
-                return 0;
-            if (beacon.EnergySource != EnergySource.Electric)
-                return 0;
-            return beacon.GetEnergyProduction(quality) + beacon.GetEnergyDrain();
+            return !SelectedBeacon || SelectedBeacon.Beacon is not IBeacon beacon || SelectedBeacon.Quality is not IQuality quality
+                ? 0
+                : beacon.EnergySource != EnergySource.Electric ? 0 : beacon.GetEnergyProduction(quality) + beacon.GetEnergyDrain();
         }
 
         public double GetBeaconPollutionProduction() //pollution/sec
@@ -208,9 +207,7 @@ namespace Foreman {
 
         public double GetTotalAssemblerFuelConsumption() //fuel items / time unit
         {
-            if (Fuel == null)
-                return 0;
-            return MyGraph.GetRateMultipler() * inputRateForFuel();
+            return Fuel == null ? 0 : MyGraph.GetRateMultipler() * InputRateForFuel();
         }
 
         public double GetTotalAssemblerElectricalConsumption() // J/sec (W)
@@ -237,9 +234,7 @@ namespace Foreman {
 
         public double GetTotalBeaconElectricalConsumption() // J/sec (W)
         {
-            if (!SelectedBeacon)
-                return 0;
-            return GetTotalBeacons() * GetBeaconEnergyConsumption();
+            return !SelectedBeacon ? 0 : GetTotalBeacons() * GetBeaconEnergyConsumption();
         }
 
 

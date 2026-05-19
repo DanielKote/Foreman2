@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Foreman {
+namespace Foreman.Serialization {
     public sealed class ColorSaveData(byte a, byte r, byte g, byte b) {
         public byte A { get; } = a;
         public byte R { get; } = r;

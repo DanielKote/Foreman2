@@ -1,6 +1,6 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
 
 namespace ForemanTest {
@@ -32,8 +32,8 @@ namespace ForemanTest {
                 PresetExportFormat.ShowOutdatedWarningIfNeeded(dc);
             }
             Assert.IsNotNull(shown);
-            StringAssert.Contains(shown, "older version of Foreman");
-            StringAssert.Contains(shown, "Settings menu");
+            Assert.Contains("older version of Foreman", shown);
+            Assert.Contains("Settings menu", shown);
         }
 
         [TestMethod]

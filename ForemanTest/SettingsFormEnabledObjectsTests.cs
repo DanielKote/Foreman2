@@ -1,7 +1,11 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Forms;
 using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -47,7 +51,7 @@ namespace ForemanTest {
 
             ListView qualityListView = GetPrivateField<ListView>(form, "QualityListView");
             int qualityCount = GetPrivateField<List<ListViewItem>>(form, "unfilteredQualityList").Count;
-            Assert.IsTrue(qualityCount >= 2, "Test setup should include multiple qualities.");
+            Assert.IsGreaterThanOrEqualTo(2, qualityCount, "Test setup should include multiple qualities.");
 
             qualityListView.VirtualListSize = 999;
 
@@ -76,32 +80,33 @@ namespace ForemanTest {
             ImageList iconList = GetPrivateField<ImageList>(form, "IconList");
             List<ListViewItem> recipeItems = GetPrivateField<List<ListViewItem>>(form, "unfilteredRecipeList");
 
-            var ourRecipes = recipeItems.Where(i => i.Tag is Recipe r && r.Name.StartsWith("§§test:recipe-")).ToList();
-            Assert.AreEqual(3, ourRecipes.Count);
-            Assert.AreEqual(1, ourRecipes.Select(i => i.ImageIndex).Distinct().Count(),
+            var ourRecipes = recipeItems.Where(i => i.Tag is IRecipe r && r.Name.StartsWith("§§test:recipe-", StringComparison.Ordinal)).ToList();
+            Assert.HasCount(3, ourRecipes);
+            Assert.HasCount(1, ourRecipes.Select(i => i.ImageIndex).Distinct(),
                 "Recipes sharing a bitmap should share the same image index.");
-            Assert.IsTrue(iconList.Images.Count < ourRecipes.Count + 3,
+            Assert.IsLessThan(ourRecipes.Count + 3, iconList.Images.Count,
                 "Shared icons should not add one ImageList entry per recipe row.");
         }
 
         private static SettingsForm.SettingsFormOptions CreateSettingsOptions(GraphSessionTestHelper.TestContext ctx) {
-            var options = new SettingsForm.SettingsFormOptions(ctx.Cache);
-            options.Presets = new List<Preset> { new Preset(MainForm.DefaultPreset, true, true) };
+            var options = new SettingsForm.SettingsFormOptions(ctx.Cache) {
+                Presets = [new Preset(MainForm.DefaultPreset, true, true)]
+            };
             options.SelectedPreset = options.Presets[0];
             options.QualitySteps = 5;
             options.NodeCountForSimpleView = 300;
             options.IconsOnlyIconSize = 32;
-            options.Solver_LowPriorityPower = 1;
-            options.Solver_PullConsumerNodesPower = 1;
-            foreach (Recipe recipe in ctx.Cache.Recipes.Values.Where(r => r.Enabled))
+            options.SolverLowPriorityPower = 1;
+            options.SolverPullConsumerNodesPower = 1;
+            foreach (IRecipe recipe in ctx.Cache.Recipes.Values.Where(r => r.Enabled))
                 options.EnabledObjects.Add(recipe);
-            foreach (Assembler assembler in ctx.Cache.Assemblers.Values.Where(r => r.Enabled))
+            foreach (IAssembler assembler in ctx.Cache.Assemblers.Values.Where(r => r.Enabled))
                 options.EnabledObjects.Add(assembler);
-            foreach (Beacon beacon in ctx.Cache.Beacons.Values.Where(r => r.Enabled))
+            foreach (IBeacon beacon in ctx.Cache.Beacons.Values.Where(r => r.Enabled))
                 options.EnabledObjects.Add(beacon);
-            foreach (Foreman.Module module in ctx.Cache.Modules.Values.Where(r => r.Enabled))
+            foreach (IModule module in ctx.Cache.Modules.Values.Where(r => r.Enabled))
                 options.EnabledObjects.Add(module);
-            foreach (Quality quality in ctx.Cache.Qualities.Values.Where(r => r.Enabled))
+            foreach (IQuality quality in ctx.Cache.Qualities.Values.Where(r => r.Enabled))
                 options.EnabledObjects.Add(quality);
             return options;
         }

@@ -1,4 +1,6 @@
 ﻿
+using Foreman.Controls;
+
 namespace Foreman
 {
 	partial class SciencePacksLoadForm
@@ -33,7 +35,7 @@ namespace Foreman
 			this.CancellationButton = new System.Windows.Forms.Button();
 			this.ConfirmationButton = new System.Windows.Forms.Button();
 			this.SciencePackTable = new System.Windows.Forms.TableLayoutPanel();
-			this.ToolTip = new Foreman.CustomToolTip();
+			this.ToolTip = new Foreman.Controls.CustomToolTip();
 			this.MainTable.SuspendLayout();
 			this.SuspendLayout();
 			// 

@@ -1,4 +1,6 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ForemanTest {
     [TestClass]
-    public class DataCacheTests : ForemanTestBase {
+    public partial class DataCacheTests : ForemanTestBase {
         private const string VanillaPresetName = VanillaDataCacheFixture.PresetName;
 
         public TestContext? TestContext { get; set; }
@@ -51,8 +53,9 @@ namespace ForemanTest {
                     ForemanIconCacheFile.IsFoicFile(path),
                     $"{presetName}.dat is not FOIC format. Re-import the preset to regenerate icon caches before running tests.");
 
-                var icons = await ForemanIconCacheFile.ReadAsync(path);
-                Assert.IsTrue(icons.Count > 100, $"{presetName}: expected a large icon set, got {icons.Count}.");
+                Assert.IsNotNull(TestContext);
+                var icons = await ForemanIconCacheFile.ReadAsync(path, cancellationToken: TestContext.CancellationToken).ConfigureAwait(false);
+                Assert.IsGreaterThan(100, icons.Count, $"{presetName}: expected a large icon set, got {icons.Count}.");
                 Assert.IsTrue(icons.ContainsKey("icon.i.iron-plate"), $"{presetName}: missing icon.i.iron-plate.");
                 Assert.IsNotNull(icons["icon.i.iron-plate"].Icon, $"{presetName}: iron-plate icon bitmap is null.");
             }
@@ -86,7 +89,7 @@ namespace ForemanTest {
         public async Task TestPreset_Vanilla_ReturnsComparableErrorPackage() {
             var preset = new Preset(VanillaPresetName, true, true);
             var json = PresetProcessor.PrepPreset(preset);
-            var modList = PresetProcessor.ReadPresetInfo(preset).ModList ?? new Dictionary<string, string>();
+            var modList = PresetProcessor.ReadPresetInfo(preset).ModList ?? [];
             var itemNames = (json["items"] as JsonArray)?.Select(t => t?["name"]?.GetValue<string>()).OfType<string>().Take(50).ToList() ?? [];
             var entityNames = (json["entities"] as JsonArray)?.Select(t => t?["name"]?.GetValue<string>()).OfType<string>().Take(50).ToList() ?? [];
             var qualityNames = (json["qualities"] as JsonArray)?.Select(t => t?["name"]?.GetValue<string>()).OfType<string>().ToList() ?? [];
@@ -98,34 +101,34 @@ namespace ForemanTest {
                 .ToList() ?? [];
 
             var errors = await PresetProcessor.TestPreset(
-                preset, modList, itemNames, entityNames, qualityNames, recipeShorts, []);
+                preset, modList, itemNames, qualityNames, recipeShorts, []).ConfigureAwait(false);
 
             Assert.AreEqual(VanillaPresetName, errors.Preset.Name);
-            Assert.IsTrue(errors.ErrorCount >= 0);
+            Assert.IsGreaterThanOrEqualTo(0, errors.ErrorCount);
         }
 
         [TestMethod]
         public async Task TestPreset_Vanilla_KnownRecipeNotReportedMissing() {
             var preset = new Preset(VanillaPresetName, true, true);
-            var modList = PresetProcessor.ReadPresetInfo(preset).ModList ?? new Dictionary<string, string>();
+            var modList = PresetProcessor.ReadPresetInfo(preset).ModList ?? [];
             var errors = await PresetProcessor.TestPreset(
-                preset, modList, [], [], [], [new RecipeShort("iron-plate")], []);
+                preset, modList, [], [], [new RecipeShort("iron-plate")], []).ConfigureAwait(false);
 
-            Assert.IsFalse(errors.MissingRecipes.Contains("iron-plate"), "iron-plate should exist in the vanilla preset recipe set.");
+            Assert.DoesNotContain("iron-plate", errors.MissingRecipes, "iron-plate should exist in the vanilla preset recipe set.");
         }
 
         [TestMethod]
         public async Task TestPreset_Vanilla_BoilerPseudoRecipeMatchesDataCacheAmounts() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
-            Assert.IsTrue(cache.Recipes.TryGetValue("§§r:b:water:steam:165", out Recipe? boilerRecipe));
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
+            Assert.IsTrue(cache.Recipes.TryGetValue("§§r:b:water:steam:165", out IRecipe? boilerRecipe));
             var fromCache = new RecipeShort(boilerRecipe);
 
             var preset = new Preset(VanillaPresetName, true, true);
-            var modList = PresetProcessor.ReadPresetInfo(preset).ModList ?? new Dictionary<string, string>();
+            var modList = PresetProcessor.ReadPresetInfo(preset).ModList ?? [];
             var errors = await PresetProcessor.TestPreset(
-                preset, modList, [], [], [], [fromCache], []);
+                preset, modList, [], [], [fromCache], []).ConfigureAwait(false);
 
-            Assert.AreEqual(0, errors.IncorrectRecipes.Count,
+            Assert.IsEmpty(errors.IncorrectRecipes,
                 "Incorrect recipes: " + string.Join(", ", errors.IncorrectRecipes));
             Assert.AreEqual(600, fromCache.Products["steam"]);
         }
@@ -135,49 +138,51 @@ namespace ForemanTest {
         [TestMethod]
         public void ProcessImportedItemsSet_AddsMissingItemPlaceholder() {
             var cache = new DataCache(filterRecipes: false);
-            cache.ProcessImportedItemsSet(new[] { "nonexistent-test-item-xyzzy" });
-            Assert.IsTrue(cache.MissingItems.ContainsKey("nonexistent-test-item-xyzzy"));
+            const string itemName = "nonexistent-test-item-xyzzy";
+            cache.ProcessImportedItemsSet([itemName]);
+            Assert.IsTrue(cache.MissingItems.ContainsKey(itemName));
         }
 
         [TestMethod]
         public void ProcessImportedItemsSet_SkipsExistingAndDuplicateNames() {
             var cache = new DataCache(filterRecipes: false);
-            cache.ProcessImportedItemsSet(new[] { "import-a", "import-a" });
-            Assert.AreEqual(1, cache.MissingItems.Count);
-            cache.ProcessImportedItemsSet(new[] { "import-a" });
-            Assert.AreEqual(1, cache.MissingItems.Count);
+            const string itemName = "import-a";
+            cache.ProcessImportedItemsSet([itemName, itemName]);
+            Assert.HasCount(1, cache.MissingItems);
+            cache.ProcessImportedItemsSet([itemName]);
+            Assert.HasCount(1, cache.MissingItems);
         }
 
         [TestMethod]
         public void ProcessImportedAssemblersSet_AddsMissingAssembler() {
             var cache = new DataCache(filterRecipes: false);
-            cache.ProcessImportedAssemblersSet(new[] { "test-missing-assembler-xyzzy" });
+            cache.ProcessImportedAssemblersSet(["test-missing-assembler-xyzzy"]);
             Assert.IsTrue(cache.MissingAssemblers.ContainsKey("test-missing-assembler-xyzzy"));
         }
 
         [TestMethod]
         public void ProcessImportedModulesSet_AddsMissingModule() {
             var cache = new DataCache(filterRecipes: false);
-            cache.ProcessImportedModulesSet(new[] { "test-missing-module-xyzzy" });
+            cache.ProcessImportedModulesSet(["test-missing-module-xyzzy"]);
             Assert.IsTrue(cache.MissingModules.ContainsKey("test-missing-module-xyzzy"));
         }
 
         [TestMethod]
         public void ProcessImportedBeaconsSet_AddsMissingBeacon() {
             var cache = new DataCache(filterRecipes: false);
-            cache.ProcessImportedBeaconsSet(new[] { "test-missing-beacon-xyzzy" });
+            cache.ProcessImportedBeaconsSet(["test-missing-beacon-xyzzy"]);
             Assert.IsTrue(cache.MissingBeacons.ContainsKey("test-missing-beacon-xyzzy"));
         }
 
         [TestMethod]
         public async Task ProcessImportedQualitiesSet_MapsKnownQualityByLevel() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
-            var map = cache.ProcessImportedQualitiesSet(new[]
-            {
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
+            var map = cache.ProcessImportedQualitiesSet(
+            [
                 new KeyValuePair<string, int>("normal", 0)
-            });
+            ]);
             Assert.IsTrue(map.ContainsKey("normal"));
-            Assert.IsTrue(map.TryGetValue("normal", out Quality? normal));
+            Assert.IsTrue(map.TryGetValue("normal", out IQuality? normal));
             Assert.IsNotNull(normal);
             Assert.AreEqual(0, normal.Level);
         }
@@ -194,31 +199,31 @@ namespace ForemanTest {
             Assert.IsTrue(cache.Recipes.ContainsKey("§§r:h:heat-generation"));
             Assert.IsTrue(cache.Items.ContainsKey("§§i:heat"));
             Assert.IsTrue(cache.Groups.ContainsKey("§§g:extra_group"));
-            Assert.AreEqual(0, cache.Items.Count(i => !i.Key.StartsWith("§§")));
+            Assert.AreEqual(0, cache.Items.Count(i => !i.Key.StartsWith("§§", StringComparison.Ordinal)));
         }
 
         [TestMethod]
         public async Task Clear_AfterLoad_RemovesQualitiesSciencePacksAndMissingSets() {
             var cache = new DataCache(filterRecipes: true);
-            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false);
+            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false).ConfigureAwait(false);
             Assert.IsTrue(cache.Qualities.ContainsKey("normal"));
-            Assert.IsTrue(cache.SciencePacks.Count > 0);
+            Assert.IsNotEmpty(cache.SciencePacks);
 
             cache.Clear();
 
-            Assert.AreEqual(0, cache.Qualities.Count);
-            Assert.AreEqual(0, cache.MissingQualities.Count);
-            Assert.AreEqual(0, cache.SciencePacks.Count);
-            Assert.AreEqual(0, cache.SciencePackPrerequisites.Count);
-            Assert.AreEqual(0, cache.MissingRecipes.Count);
-            Assert.AreEqual(0, cache.MissingPlantProcesses.Count);
+            Assert.IsEmpty(cache.Qualities);
+            Assert.IsEmpty(cache.MissingQualities);
+            Assert.IsEmpty(cache.SciencePacks);
+            Assert.IsEmpty(cache.SciencePackPrerequisites);
+            Assert.IsEmpty(cache.MissingRecipes);
+            Assert.IsEmpty(cache.MissingPlantProcesses);
         }
 
         // --- full vanilla load (shared fixture) ---
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_LoadsCoreItemsWithoutIcons() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
 
             Assert.AreEqual(VanillaPresetName, cache.PresetName);
             Assert.IsTrue(cache.Items.ContainsKey("iron-plate"));
@@ -231,27 +236,27 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_IronPlateRecipeHasExpectedIoAndAssemblers() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
 
             var recipe = cache.Recipes["iron-plate"];
             Assert.IsTrue(recipe.IngredientSet.ContainsKey(cache.Items["iron-ore"]));
             Assert.IsTrue(recipe.ProductSet.ContainsKey(cache.Items["iron-plate"]));
-            Assert.IsTrue(recipe.Assemblers.Any(), "iron-plate should be craftable in at least one assembler.");
+            Assert.IsGreaterThan(0, recipe.Assemblers.Count, "iron-plate should be craftable in at least one assembler.");
             Assert.IsTrue(cache.Assemblers.ContainsKey("stone-furnace"));
-            Assert.IsTrue(recipe.Assemblers.Contains(cache.Assemblers["stone-furnace"]));
+            Assert.Contains(cache.Assemblers["stone-furnace"], recipe.Assemblers);
         }
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_SteamFluidAndWaterExist() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             Assert.IsTrue(cache.Items.ContainsKey("steam"));
-            Assert.IsTrue(cache.Items["steam"] is Fluid);
+            Assert.IsTrue(cache.Items["steam"] is IFluid);
             Assert.IsTrue(cache.Items.ContainsKey("water"));
         }
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_NuclearReactorAndSteamTurbineEnergyValues() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             Assert.IsNotNull(cache.DefaultQuality);
             var quality = cache.DefaultQuality;
             var reactor = cache.Assemblers["nuclear-reactor"];
@@ -265,35 +270,35 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_CollectionsHaveExpectedScale() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
-            Assert.IsTrue(cache.Items.Count > 100, $"Vanilla item count was {cache.Items.Count}.");
-            Assert.IsTrue(cache.Recipes.Count > 100, $"Vanilla recipe count was {cache.Recipes.Count}.");
-            Assert.IsTrue(cache.Assemblers.Count > 15, $"Vanilla assembler count was {cache.Assemblers.Count}.");
-            Assert.IsTrue(cache.Technologies.Count > 25, $"Vanilla technology count was {cache.Technologies.Count}.");
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
+            Assert.IsGreaterThan(100, cache.Items.Count, $"Vanilla item count was {cache.Items.Count}.");
+            Assert.IsGreaterThan(100, cache.Recipes.Count, $"Vanilla recipe count was {cache.Recipes.Count}.");
+            Assert.IsGreaterThan(15, cache.Assemblers.Count, $"Vanilla assembler count was {cache.Assemblers.Count}.");
+            Assert.IsGreaterThan(25, cache.Technologies.Count, $"Vanilla technology count was {cache.Technologies.Count}.");
         }
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_SciencePacksPopulatedAfterPostLoad() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
-            Assert.IsTrue(cache.SciencePacks.Count > 0);
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
+            Assert.IsNotEmpty(cache.SciencePacks);
             var automation = cache.Technologies["automation"];
-            Assert.IsTrue(automation.SciPackList.Count > 0);
+            Assert.IsNotEmpty(automation.SciPackList);
         }
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_AvailableRecipesAreSubsetOfAllRecipes() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             var availableNames = cache.AvailableRecipes.Select(r => r.Name).ToHashSet();
             foreach (var name in availableNames)
                 Assert.IsTrue(cache.Recipes.ContainsKey(name));
-            Assert.IsTrue(availableNames.Count < cache.Recipes.Count,
+            Assert.IsLessThan(cache.Recipes.Count, availableNames.Count,
                 "Some recipes should be marked unavailable after post-processing.");
         }
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_BarrelRecipesFilteredWhenRecipeListsEnabled() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync(filterRecipes: true);
-            var barrelSuffix = new Regex("-barrel$");
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync(filterRecipes: true).ConfigureAwait(false);
+            var barrelSuffix = BarrelSuffixRegex();
             foreach (var recipe in cache.Recipes.Values) {
                 if (recipe.Name == "empty-barrel")
                     continue;
@@ -307,36 +312,36 @@ namespace ForemanTest {
         public async Task LoadAllData_Vanilla_ReloadOnFreshCacheReplacesPresetName() {
             VanillaDataCacheFixture.Reset();
             var cache = new DataCache(filterRecipes: true);
-            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false);
+            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false).ConfigureAwait(false);
             Assert.AreEqual(VanillaPresetName, cache.PresetName);
             Assert.IsTrue(cache.Items.ContainsKey("iron-plate"));
 
             cache.Clear();
-            Assert.AreEqual(0, cache.Items.Count(i => !i.Key.StartsWith("§§")));
-            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false);
+            Assert.AreEqual(0, cache.Items.Count(i => !i.Key.StartsWith("§§", StringComparison.Ordinal)));
+            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false).ConfigureAwait(false);
             Assert.IsTrue(cache.Items.ContainsKey("iron-plate"));
         }
 
         [TestMethod]
         public async Task ProcessImportedQualitiesSet_CreatesMissingQualityWhenUnknown() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
-            var map = cache.ProcessImportedQualitiesSet(new[]
-            {
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
+            var map = cache.ProcessImportedQualitiesSet(
+            [
                 new KeyValuePair<string, int>("save-only-quality-tier-3", 3)
-            });
+            ]);
 
             Assert.IsTrue(map.ContainsKey("save-only-quality-tier-3"));
-            Assert.IsTrue(map.TryGetValue("save-only-quality-tier-3", out Quality? saveOnlyQuality));
+            Assert.IsTrue(map.TryGetValue("save-only-quality-tier-3", out IQuality? saveOnlyQuality));
             Assert.IsNotNull(saveOnlyQuality);
             Assert.IsTrue(saveOnlyQuality.IsMissing);
             Assert.AreEqual(3, saveOnlyQuality.Level);
-            Assert.IsTrue(cache.MissingQualities.Values.Any(q => q.Level == 3));
+            Assert.Contains(q => q.Level == 3, cache.MissingQualities.Values);
         }
 
         [TestMethod]
         public async Task ProcessImportedRecipesSet_LinksExistingRecipeByNameAndIo() {
             var cache = new DataCache(filterRecipes: true);
-            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false);
+            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false).ConfigureAwait(false);
             var ironPlate = cache.Recipes["iron-plate"];
             const long linkId = 424242L;
             var shortWithId = new RecipeShort(
@@ -346,18 +351,18 @@ namespace ForemanTest {
                 new Dictionary<string, double> { ["iron-ore"] = 1.0 },
                 new Dictionary<string, double> { ["iron-plate"] = 1.0 });
 
-            var links = cache.ProcessImportedRecipesSet(new[] { shortWithId });
+            var links = cache.ProcessImportedRecipesSet([shortWithId]);
 
-            Assert.AreEqual(1, links.Count);
+            Assert.HasCount(1, links);
             Assert.AreSame(ironPlate, links[linkId]);
-            Assert.AreEqual(0, cache.MissingRecipes.Count);
+            Assert.IsEmpty(cache.MissingRecipes);
         }
 
         [TestMethod]
         public async Task ProcessImportedRecipesSet_CreatesMissingRecipeWithKnownAndMissingItems() {
             var cache = new DataCache(filterRecipes: true);
-            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false);
-            cache.ProcessImportedItemsSet(new[] { "save-only-ingredient-xyzzy" });
+            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false).ConfigureAwait(false);
+            cache.ProcessImportedItemsSet(["save-only-ingredient-xyzzy"]);
 
             var shortFromSave = new RecipeShort(
                 "save-only-recipe-xyzzy",
@@ -366,23 +371,23 @@ namespace ForemanTest {
                 new Dictionary<string, double> { ["save-only-ingredient-xyzzy"] = 2.0, ["iron-ore"] = 1.0 },
                 new Dictionary<string, double> { ["iron-plate"] = 1.0 });
 
-            var links = cache.ProcessImportedRecipesSet(new[] { shortFromSave });
+            var links = cache.ProcessImportedRecipesSet([shortFromSave]);
 
-            Assert.IsTrue(links.TryGetValue(9001L, out Recipe? linkedRecipe));
+            Assert.IsTrue(links.TryGetValue(9001L, out IRecipe? linkedRecipe));
             Assert.IsNotNull(linkedRecipe);
             var missing = (RecipePrototype)linkedRecipe;
             Assert.IsTrue(missing.IsMissing);
             Assert.IsTrue(cache.MissingRecipes.ContainsKey(shortFromSave));
             Assert.IsTrue(missing.IngredientSet.ContainsKey(cache.Items["iron-ore"]));
             Assert.IsTrue(missing.IngredientSet.ContainsKey(cache.MissingItems["save-only-ingredient-xyzzy"]));
-            Assert.AreEqual(1, missing.Assemblers.Count);
+            Assert.HasCount(1, missing.Assemblers);
             Assert.IsTrue(missing.Assemblers.First().IsMissing);
         }
 
         [TestMethod]
         public async Task ProcessImportedRecipesSet_ReusesExistingMissingRecipeEntry() {
             var cache = new DataCache(filterRecipes: true);
-            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false);
+            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false).ConfigureAwait(false);
             var shortFromSave = new RecipeShort(
                 "save-only-recipe-dedupe",
                 77L,
@@ -390,17 +395,17 @@ namespace ForemanTest {
                 new Dictionary<string, double> { ["iron-ore"] = 1.0 },
                 new Dictionary<string, double> { ["iron-plate"] = 1.0 });
 
-            var first = cache.ProcessImportedRecipesSet(new[] { shortFromSave });
-            var second = cache.ProcessImportedRecipesSet(new[] { shortFromSave });
+            var first = cache.ProcessImportedRecipesSet([shortFromSave]);
+            var second = cache.ProcessImportedRecipesSet([shortFromSave]);
 
-            Assert.AreEqual(1, cache.MissingRecipes.Count);
+            Assert.HasCount(1, cache.MissingRecipes);
             Assert.AreSame(first[77L], second[77L]);
         }
 
         [TestMethod]
         public void ProcessImportedPlantProcessesSet_CreatesMissingWhenUnknown() {
             var cache = new DataCache(filterRecipes: false);
-            cache.ProcessImportedItemsSet(new[] { "iron-plate" });
+            cache.ProcessImportedItemsSet(["iron-plate"]);
 
             var shortFromSave = new PlantShort(
                 "save-only-plant-xyzzy",
@@ -408,11 +413,11 @@ namespace ForemanTest {
                 missing: true,
                 new Dictionary<string, double> { ["iron-plate"] = 1.0 });
 
-            var links = cache.ProcessImportedPlantProcessesSet(new[] { shortFromSave });
+            var links = cache.ProcessImportedPlantProcessesSet([shortFromSave]);
 
             Assert.AreEqual(55L, links.Single().Key);
             Assert.IsTrue(cache.MissingPlantProcesses.ContainsKey(shortFromSave));
-            Assert.IsTrue(links.TryGetValue(55L, out PlantProcess? linkedPlant));
+            Assert.IsTrue(links.TryGetValue(55L, out IPlantProcess? linkedPlant));
             Assert.IsNotNull(linkedPlant);
             Assert.IsTrue(linkedPlant.ProductSet.ContainsKey(cache.MissingItems["iron-plate"]));
         }
@@ -421,7 +426,7 @@ namespace ForemanTest {
         public async Task LoadAllData_WithoutRecipeFilter_BarrelRecipeStaysAvailable() {
             VanillaDataCacheFixture.Reset();
             var cache = new DataCache(filterRecipes: false);
-            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false);
+            await cache.LoadAllData(new Preset(VanillaPresetName, true, true), NullProgress.Instance, loadIcons: false).ConfigureAwait(false);
 
             Assert.IsTrue(cache.Recipes.ContainsKey("crude-oil-barrel"));
             Assert.IsTrue(cache.Recipes["crude-oil-barrel"].Available,
@@ -430,37 +435,44 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_DefaultQualityIsNormal() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             Assert.IsNotNull(cache.DefaultQuality);
             Assert.AreEqual("normal", cache.DefaultQuality.Name);
         }
 
         [TestMethod]
+        public async Task LoadAllData_Vanilla_DefaultQualityDisplaysAsNormal() {
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
+            Assert.IsNotNull(cache.DefaultQuality);
+            Assert.AreEqual("Normal", cache.DefaultQuality.FriendlyName);
+        }
+
+        [TestMethod]
         public async Task LoadAllData_Vanilla_PlayerAssemblerRegisteredAfterEntityLoad() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             Assert.IsNotNull(cache.PlayerAssembler);
             Assert.IsTrue(cache.Assemblers.ContainsKey(cache.PlayerAssembler.Name));
         }
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_RocketLaunchRecipeUsesRocketAssembler() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             Assert.IsNotNull(cache.RocketAssembler);
             var launchRecipe = cache.Recipes.Values
                 .FirstOrDefault(r => r.Name.StartsWith("§§r:rl:launch-", StringComparison.Ordinal));
             Assert.IsNotNull(launchRecipe, "PresetDataLoader should create rocket launch recipes after entity load.");
             Assert.IsNotNull(cache.RocketAssembler);
-            Assert.IsTrue(launchRecipe.Assemblers.Contains(cache.RocketAssembler));
+            Assert.Contains(cache.RocketAssembler, launchRecipe.Assemblers);
         }
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_SatelliteRocketLaunchProductsAndIngredients() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
-            Assert.IsTrue(cache.Recipes.TryGetValue("§§r:rl:launch-satellite", out Recipe? launchRecipe));
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
+            Assert.IsTrue(cache.Recipes.TryGetValue("§§r:rl:launch-satellite", out IRecipe? launchRecipe));
             Assert.IsNotNull(launchRecipe);
-            Assert.IsTrue(cache.Items.TryGetValue("satellite", out Item? satellite));
-            Assert.IsTrue(cache.Items.TryGetValue("space-science-pack", out Item? spaceScience));
-            Assert.IsTrue(cache.Items.TryGetValue("rocket-part", out Item? rocketPart));
+            Assert.IsTrue(cache.Items.TryGetValue("satellite", out IItem? satellite));
+            Assert.IsTrue(cache.Items.TryGetValue("space-science-pack", out IItem? spaceScience));
+            Assert.IsTrue(cache.Items.TryGetValue("rocket-part", out IItem? rocketPart));
 
             Assert.AreEqual(1, launchRecipe.IngredientSet[satellite]);
             Assert.AreEqual(100, launchRecipe.IngredientSet[rocketPart]);
@@ -469,11 +481,14 @@ namespace ForemanTest {
 
         [TestMethod]
         public async Task LoadAllData_Vanilla_ProductivityModuleLinkedToCraftingRecipes() {
-            var cache = await VanillaDataCacheFixture.GetLoadedAsync();
+            var cache = await VanillaDataCacheFixture.GetLoadedAsync().ConfigureAwait(false);
             Assert.IsTrue(cache.Modules.ContainsKey("productivity-module-3"));
             var module = (ModulePrototype)cache.Modules["productivity-module-3"];
-            Assert.IsTrue(module.Recipes.Count > 0, "Entity/module processing should attach productivity modules to eligible recipes.");
-            Assert.IsTrue(module.Recipes.Any(r => r.Name == "electronic-circuit"));
+            Assert.IsNotEmpty(module.Recipes, "Entity/module processing should attach productivity modules to eligible recipes.");
+            Assert.Contains(r => r.Name == "electronic-circuit", module.Recipes);
         }
+
+        [GeneratedRegex("-barrel$")]
+        private static partial Regex BarrelSuffixRegex();
     }
 }

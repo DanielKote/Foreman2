@@ -19,16 +19,21 @@ jobs:
         with:
           ref: ${{github.ref}}
           fetch-depth: 0
-      - name: Get Tag Info
-        id: ghd
-        uses: proudust/gh-describe@v2
-      - name: Extract Tag Version
+      - name: Get Tag Version
         id: tag
-        uses: bhowell2/github-substring-action@1.0.2
+        uses: actions/github-script@v9
         with:
-          value: ${{steps.ghd.outputs.tag}}
-          output_name: tag
-          index_of_str: v
+          script: |
+            let ret = '';
+            const options = {};
+            options.listeners = {
+              stdout: (data) => {
+                ret += data.toString();
+              }
+            };
+            await exec.exec('git', ['describe'], options);
+            return ret.substring(1).split('-')[0]
+          result-encoding: string
       - name: Install .NET
         uses: actions/setup-dotnet@v5.2.0
         with:
@@ -38,14 +43,14 @@ jobs:
       - name: Verify Formatting
         run: dotnet format --verify-no-changes
       - name: Build Foreman Snapshot
-        run: dotnet build Foreman -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:VersionSuffix=SNAPSHOT --configuration Release -r win-x64
+        run: dotnet build Foreman -p:VersionPrefix=${{steps.tag.outputs.result}} -p:VersionSuffix=SNAPSHOT --configuration Release -r win-x64
       - name: Test Foreman
         run: dotnet test --configuration Release -r win-x64
         timeout-minutes: 1
       - name: Package Foreman (Self-Contained)
-        run: dotnet publish Foreman --sc true -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:VersionSuffix=SNAPSHOT -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
+        run: dotnet publish Foreman --sc true -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.result}} -p:VersionSuffix=SNAPSHOT -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
       - name: Package Foreman (.NET Dependent)
-        run: dotnet publish Foreman --sc false -p:PublishSingleFile=true -o dist -p:VersionPrefix=${{steps.tag.outputs.tag}} -p:VersionSuffix=SNAPSHOT --configuration Release -r win-x64
+        run: dotnet publish Foreman --sc false -p:PublishSingleFile=true -o dist -p:VersionPrefix=${{steps.tag.outputs.result}} -p:VersionSuffix=SNAPSHOT --configuration Release -r win-x64
       - name: Archive Foreman (Self-Contained)
         uses: actions/upload-artifact@v4
         with:

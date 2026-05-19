@@ -1,16 +1,19 @@
-﻿using System;
+﻿using Foreman.Controls;
+using Foreman.ProductionGraphView;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace Foreman {
-    partial class IRChooserPanel {
-        private NFButton[,] IRButtons => iconGrid.Buttons;
+    public partial class IRChooserPanel {
+        private IReadOnlyCollection<IReadOnlyCollection<NFButton>> IRButtons => iconGrid.Buttons;
         private VScrollBar IRScrollBar => iconGrid.ScrollBar;
 
         private ScaledChooserMetrics scaledMetrics;
         private bool applyingViewerBounds;
 
-        private readonly struct ScaledChooserMetrics {
+        private readonly record struct ScaledChooserMetrics {
             public int DesignCell { get; init; }
             public int MinCell { get; init; }
             public int MinGroup { get; init; }
@@ -47,7 +50,7 @@ namespace Foreman {
             return scaledMetrics;
         }
 
-        private int GetScrollbarWidth() => ChooserLayout.GetVerticalScrollbarWidth();
+        private static int GetScrollbarWidth() => ChooserLayout.GetVerticalScrollbarWidth();
 
         private void ApplyGroupLayout(int groupButtonSize) {
             foreach (Control control in groupsPanel.Controls) {
@@ -107,9 +110,7 @@ namespace Foreman {
         }
 
         private int MeasureContentWidth() {
-            if (iconGrid.Visible)
-                return iconGrid.Width;
-            return MeasureHeaderIntrinsicMinWidth();
+            return iconGrid.Visible ? iconGrid.Width : MeasureHeaderIntrinsicMinWidth();
         }
 
         private static void SetFlowRowSize(FlowLayoutPanel row, int width) {
@@ -121,7 +122,7 @@ namespace Foreman {
         private void SyncChromeRowWidths(int contentWidth) {
             if (contentWidth < 1)
                 return;
-            FlowLayoutPanel[] rows = { headerStack, groupsPanel, nodeOptionsRowA, nodeOptionsRowB };
+            FlowLayoutPanel[] rows = [headerStack, groupsPanel, nodeOptionsRowA, nodeOptionsRowB];
             foreach (FlowLayoutPanel row in rows) {
                 if (row.Visible)
                     SetFlowRowSize(row, contentWidth);

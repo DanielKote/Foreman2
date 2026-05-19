@@ -1,5 +1,6 @@
-﻿using Foreman;
-using Foreman.Graph;
+﻿using Foreman.Graph;
+using Foreman.Models;
+using Foreman.Models.Nodes;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
@@ -22,8 +23,8 @@ namespace ForemanTest.Graph {
             Assert.AreEqual(1, created);
             session.View.TryGetNode(consumerId, out INodeViewModel? consumer);
             Assert.IsNotNull(consumer);
-            Assert.IsTrue(consumer.InputLinks.Any(link => link.Item == plate));
-            Assert.AreEqual(1, graph.NodeLinks.Count());
+            Assert.Contains(link => link.Item == plate, consumer.InputLinks);
+            Assert.HasCount(1, graph.NodeLinks);
         }
 
         [TestMethod]
@@ -38,7 +39,7 @@ namespace ForemanTest.Graph {
             int created = GraphAutoconnect.ConnectDisconnectedInputs(session);
 
             Assert.AreEqual(0, created);
-            Assert.AreEqual(0, graph.NodeLinks.Count());
+            Assert.IsEmpty(graph.NodeLinks);
         }
 
         [TestMethod]

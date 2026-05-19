@@ -1,24 +1,23 @@
-﻿using Foreman.Graph;
+﻿using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Graph;
+using Foreman.Models;
+using Foreman.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView {
     public class NodeCopyOptions {
-        public readonly AssemblerQualityPair Assembler;
-        public readonly IReadOnlyList<ModuleQualityPair> AssemblerModules;
-        public readonly Item? Fuel;
-        public readonly double NeighbourCount;
-        public readonly double ExtraProductivityBonus;
-
-        public readonly BeaconQualityPair Beacon;
-        public readonly IReadOnlyList<ModuleQualityPair> BeaconModules;
-        public readonly double BeaconCount;
-        public readonly double BeaconsPerAssembler;
-        public readonly double BeaconsConst;
-
+        public AssemblerQualityPair Assembler { get; }
+        public IReadOnlyList<ModuleQualityPair> AssemblerModules { get; }
+        public IItem? Fuel { get; }
+        public double NeighbourCount { get; }
+        public double ExtraProductivityBonus { get; }
+        public BeaconQualityPair Beacon { get; }
+        public IReadOnlyList<ModuleQualityPair> BeaconModules { get; }
+        public double BeaconCount { get; }
+        public double BeaconsPerAssembler { get; }
+        public double BeaconsConst { get; }
         public NodeCopyOptions(IRecipeNodeViewModel node) : this(
             node.SelectedAssembler,
             node.AssemblerModules,
@@ -48,7 +47,7 @@ namespace Foreman {
         private NodeCopyOptions(
             AssemblerQualityPair assembler,
             IReadOnlyList<ModuleQualityPair> assemblerModules,
-            Item? fuel,
+            IItem? fuel,
             BeaconQualityPair beacon,
             IReadOnlyList<ModuleQualityPair> beaconModules,
             double beaconCount,
@@ -57,10 +56,10 @@ namespace Foreman {
             double neighbourCount,
             double extraProductivityBonus) {
             Assembler = assembler;
-            AssemblerModules = new List<ModuleQualityPair>(assemblerModules);
+            AssemblerModules = [.. assemblerModules];
             Fuel = fuel;
             Beacon = beacon;
-            BeaconModules = new List<ModuleQualityPair>(beaconModules);
+            BeaconModules = [.. beaconModules];
             BeaconCount = beaconCount;
             BeaconsPerAssembler = beaconsPerAssembler;
             BeaconsConst = beaconsConst;
@@ -69,28 +68,28 @@ namespace Foreman {
         }
 
         internal static NodeCopyOptions? FromSaveDocument(NodeCopyOptionsSaveDocument document, DataCache cache) {
-            Quality? defaultQuality = cache.DefaultQuality;
+            IQuality? defaultQuality = cache.DefaultQuality;
 
-            if (!cache.Assemblers.TryGetValue(document.AssemblerName, out Assembler? assembler) || assembler is null)
+            if (!cache.Assemblers.TryGetValue(document.AssemblerName, out IAssembler? assembler) || assembler is null)
                 return null;
 
-            Quality? assemblerQuality = ResolveQuality(cache, document.AssemblerQualityName, defaultQuality);
+            IQuality? assemblerQuality = ResolveQuality(cache, document.AssemblerQualityName, defaultQuality);
             if (assemblerQuality is null)
                 return null;
 
             BeaconQualityPair beaconPair;
             if (document.BeaconName is not null) {
-                if (!cache.Beacons.TryGetValue(document.BeaconName, out Beacon? beacon) || beacon is null)
+                if (!cache.Beacons.TryGetValue(document.BeaconName, out IBeacon? beacon) || beacon is null)
                     return null;
-                Quality? beaconQuality = ResolveQuality(cache, document.BeaconQualityName ?? "", defaultQuality);
+                IQuality? beaconQuality = ResolveQuality(cache, document.BeaconQualityName ?? "", defaultQuality);
                 if (beaconQuality is null)
                     return null;
                 beaconPair = new BeaconQualityPair(beacon, beaconQuality);
             } else
-                beaconPair = new BeaconQualityPair("no beacon");
+                beaconPair = new BeaconQualityPair(/*"no beacon"*/);
 
-            Item? fuel = null;
-            if (document.FuelName is not null && cache.Items.TryGetValue(document.FuelName, out Item? fuelItem))
+            IItem? fuel = null;
+            if (document.FuelName is not null && cache.Items.TryGetValue(document.FuelName, out IItem? fuelItem))
                 fuel = fuelItem;
 
             return new NodeCopyOptions(
@@ -106,23 +105,21 @@ namespace Foreman {
                 document.BeaconName is not null ? document.BeaconsConst : 0);
         }
 
-        private static Quality? ResolveQuality(DataCache cache, string qualityName, Quality? defaultQuality) {
-            if (cache.Qualities.TryGetValue(qualityName, out Quality? quality))
-                return quality;
-            if (cache.MissingQualities.TryGetValue(qualityName, out quality))
-                return quality;
-            return defaultQuality;
+        private static IQuality? ResolveQuality(DataCache cache, string qualityName, IQuality? defaultQuality) {
+            return cache.Qualities.TryGetValue(qualityName, out IQuality? quality)
+                ? quality
+                : cache.MissingQualities.TryGetValue(qualityName, out quality) ? quality : defaultQuality;
         }
 
         private static List<ModuleQualityPair> ResolveModules(
             DataCache cache,
             IReadOnlyList<ModuleQualitySaveData> modules,
-            Quality? defaultQuality) {
+            IQuality? defaultQuality) {
             List<ModuleQualityPair> result = [];
             foreach (ModuleQualitySaveData moduleData in modules) {
-                if (!cache.Modules.TryGetValue(moduleData.ModuleName, out Module? module) || module is null)
+                if (!cache.Modules.TryGetValue(moduleData.ModuleName, out IModule? module) || module is null)
                     continue;
-                Quality? quality = ResolveQuality(cache, moduleData.QualityName, defaultQuality);
+                IQuality? quality = ResolveQuality(cache, moduleData.QualityName, defaultQuality);
                 if (quality is null)
                     continue;
                 result.Add(new ModuleQualityPair(module, quality));
@@ -130,7 +127,7 @@ namespace Foreman {
             return result;
         }
 
-        private NodeCopyOptions(AssemblerQualityPair assembler, List<ModuleQualityPair> assemblerModules, double neighbourCount, double extraProductivityBonus, Item? fuel, BeaconQualityPair beacon, List<ModuleQualityPair> beaconModules, double beaconCount, double beaconsPerA, double beaconsCont) {
+        private NodeCopyOptions(AssemblerQualityPair assembler, List<ModuleQualityPair> assemblerModules, double neighbourCount, double extraProductivityBonus, IItem? fuel, BeaconQualityPair beacon, List<ModuleQualityPair> beaconModules, double beaconCount, double beaconsPerA, double beaconsCont) {
             Assembler = assembler;
             AssemblerModules = assemblerModules;
             Fuel = fuel;

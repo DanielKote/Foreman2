@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Foreman.Serialization;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Annotations {
     /// <summary>Reads and writes annotation payloads embedded in graph clipboard JSON.</summary>
     public static class AnnotationClipboardCodec {
         public static IReadOnlyList<AnnotationSaveData>? ReadAnnotations(string json) {
             try {
-                JsonNode? root = JsonNode.Parse(json);
+                var root = JsonNode.Parse(json);
                 return AnnotationJson.DeserializeListFromRoot(root);
             } catch (JsonException) {
                 return null;

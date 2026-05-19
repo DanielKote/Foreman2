@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.Controls {
     /// <summary>96 DPI design-time metrics for the item/recipe chooser (scaled at runtime).</summary>
     internal static class ChooserLayout {
         public const float BaselineDpi = 96f;

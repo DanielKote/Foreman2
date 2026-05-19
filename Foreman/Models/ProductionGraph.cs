@@ -1,39 +1,36 @@
-﻿using Google.OrTools.LinearSolver;
+﻿using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.Models;
+using Foreman.Models.Nodes;
+using Foreman.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Foreman {
     public enum NodeType { Supplier, Consumer, Passthrough, Recipe, Spoil, Plant }
     public enum LinkType { Input, Output }
 
-    public class NodeEventArgs : EventArgs {
-        public BaseNode Node { get; }
-        public NodeEventArgs(BaseNode node) => Node = node;
+    public class NodeEventArgs(BaseNode node) : EventArgs {
+        public BaseNode Node { get; } = node;
     }
-    public class NodeLinkEventArgs : EventArgs {
-        public NodeLink Link { get; }
-        public NodeLinkEventArgs(NodeLink link) => Link = link;
+    public class NodeLinkEventArgs(NodeLink link) : EventArgs {
+        public NodeLink Link { get; } = link;
     }
 
     public partial class ProductionGraph {
-        public class NewNodeCollection {
-            public List<BaseNode> newNodes { get; } = new();
-            public List<NodeLink> newLinks { get; } = new();
+        public class NewNodeBatch {
+            public List<BaseNode> NewNodes { get; } = [];
+            public List<NodeLink> NewLinks { get; } = [];
         }
 
         //public DataCache DCache { get; private set; }
 
         public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
-        public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
-        private static readonly float[] RateMultiplier = new float[] { 1f, 60f, 300f, 600f, 1800f, 3600f }; //, 21600f, 43200f, 86400f };
+        public static readonly string[] RateUnitNames = ["1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour"]; //, "6 hours", "12 hours", "24 hours" };
+        private static readonly float[] RateMultiplier = [1f, 60f, 300f, 600f, 1800f, 3600f]; //, 21600f, 43200f, 86400f };
 
         public RateUnit SelectedRateUnit { get; set; }
         public float GetRateMultipler() { return RateMultiplier[(int)SelectedRateUnit]; } //the amount of assemblers required will be multipled by the rate multipler when displaying.
@@ -90,7 +87,7 @@ namespace Foreman {
             }
         }
 
-        public Quality? DefaultAssemblerQuality { get; set; }
+        public IQuality? DefaultAssemblerQuality { get; set; }
 
         public event EventHandler<NodeEventArgs>? NodeAdded;
         public event EventHandler<NodeEventArgs>? NodeDeleted;
@@ -119,8 +116,8 @@ namespace Foreman {
             }
         }
 
-        private HashSet<BaseNode> nodes;
-        private HashSet<NodeLink> nodeLinks;
+        private readonly HashSet<BaseNode> nodes;
+        private readonly HashSet<NodeLink> nodeLinks;
         private int lastNodeID;
 
         public ProductionGraph() {
@@ -129,8 +126,8 @@ namespace Foreman {
             PullOutputNodesPower = 10;
             LowPriorityPower = 1e5;
 
-            nodes = new HashSet<BaseNode>();
-            nodeLinks = new HashSet<NodeLink>();
+            nodes = [];
+            nodeLinks = [];
             lastNodeID = 0;
 
             AssemblerSelector = new AssemblerSelector();
@@ -158,10 +155,10 @@ namespace Foreman {
         public PassthroughNode CreatePassthroughNode(ItemQualityPair item, Point location) =>
             (PassthroughNode)SetupNodeOfType(new PassthroughNode(this, lastNodeID++, item), location);
 
-        public SpoilNode CreateSpoilNode(ItemQualityPair inputItem, Item outputItem, Point location) =>
+        public SpoilNode CreateSpoilNode(ItemQualityPair inputItem, IItem outputItem, Point location) =>
             (SpoilNode)SetupNodeOfType(new SpoilNode(this, lastNodeID++, inputItem, outputItem), location);
 
-        public PlantNode CreatePlantNode(PlantProcess plantProcess, Quality quality, Point location) =>
+        public PlantNode CreatePlantNode(IPlantProcess plantProcess, IQuality quality, Point location) =>
             (PlantNode)SetupNodeOfType(new PlantNode(this, lastNodeID++, plantProcess, quality), location);
 
         public RecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location) =>
@@ -169,13 +166,14 @@ namespace Foreman {
 
         private RecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location, Action<RecipeNode>? nodeSetupAction) {
             if (DefaultAssemblerQuality is null)
-                throw new NullReferenceException(nameof(DefaultAssemblerQuality));
-            RecipeNode node = new RecipeNode(this, lastNodeID++, recipe, DefaultAssemblerQuality);
-            node.Location = location;
-            node.NodeDirection = DefaultNodeDirection;
+                throw new InvalidOperationException(nameof(DefaultAssemblerQuality));
+            var node = new RecipeNode(this, lastNodeID++, recipe, DefaultAssemblerQuality) {
+                Location = location,
+                NodeDirection = DefaultNodeDirection
+            };
             nodeSetupAction?.Invoke(node);
             if (nodeSetupAction == null) {
-                RecipeNodeController rnController = (RecipeNodeController)node.Controller;
+                var rnController = (RecipeNodeController)node.Controller;
                 rnController.AutoSetAssembler();
                 rnController.AutoSetAssemblerModules();
             }
@@ -187,11 +185,11 @@ namespace Foreman {
 
         public NodeLink CreateLink(BaseNode supplier, BaseNode consumer, ItemQualityPair item) {
             if (!nodes.Contains(supplier) || !nodes.Contains(consumer) || !supplier.Outputs.Contains(item) || !consumer.Inputs.Contains(item))
-                Trace.Fail(string.Format("Node link creation called with invalid parameters! consumer:{0}. supplier:{1}. item:{2}.", consumer, supplier, item));
+                Trace.Fail(string.Format(CultureInfo.InvariantCulture, "Node link creation called with invalid parameters! consumer:{0}. supplier:{1}. item:{2}.", consumer, supplier, item));
             if (supplier.OutputLinks.Any(l => l.Item == item && l.ConsumerNode == consumer))
                 return supplier.OutputLinks.First(l => l.Item == item && l.ConsumerNode == consumer);
 
-            NodeLink link = new NodeLink(this, supplier, consumer, item);
+            var link = new NodeLink(this, supplier, consumer, item);
             supplier.OutputLinks.Add(link);
             consumer.InputLinks.Add(link);
             LinkChangeUpdateImpactedNodeStates(link, LinkType.Input);
@@ -204,7 +202,7 @@ namespace Foreman {
 
         public void DeleteNode(BaseNode node) {
             if (!nodes.Contains(node))
-                Trace.Fail(string.Format("Node deletion called on a node ({0}) that isnt part of the graph!", node));
+                Trace.Fail(string.Format(CultureInfo.InvariantCulture, "Node deletion called on a node ({0}) that isnt part of the graph!", node));
 
             foreach (NodeLink link in node.InputLinks.ToList())
                 DeleteLink(link);
@@ -222,7 +220,7 @@ namespace Foreman {
 
         public void DeleteLink(NodeLink link) {
             if (!nodeLinks.Contains(link))
-                Trace.Fail(string.Format("Link deletion called with a link that isnt part of the graph!"));
+                Trace.Fail(string.Format(CultureInfo.InvariantCulture, "Link deletion called with a link that isnt part of the graph!"));
 
             link.ConsumerNode.InputLinks.Remove(link);
             link.SupplierNode.OutputLinks.Remove(link);
@@ -269,7 +267,7 @@ namespace Foreman {
         public IEnumerable<IEnumerable<BaseNode>> GetConnectedNodeGroups(bool includeCleanComponents) =>
             GetConnectedComponents(includeCleanComponents);
 
-        private IEnumerable<IEnumerable<BaseNode>> GetConnectedComponents(bool includeCleanComponents) //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving. Clean components refer to node groups where all the nodes inside the group havent had any changes since last solve operation
+        private List<HashSet<BaseNode>> GetConnectedComponents(bool includeCleanComponents) //used to break the graph into groups (in case there are multiple disconnected groups) for simpler solving. Clean components refer to node groups where all the nodes inside the group havent had any changes since last solve operation
         {
             //there is an optimized solution for connected components where we keep track of the various groups and modify them as each node/link is added/removed, but testing shows that this calculation below takes under 1ms even for larg 1000+ node graphs, so why bother.
 
@@ -278,13 +276,13 @@ namespace Foreman {
 
             List<HashSet<BaseNode>> connectedComponents = [];
 
-            while (unvisitedNodes.Any()) {
+            while (unvisitedNodes.Count > 0) {
                 HashSet<BaseNode> newSet = [];
                 bool allClean = true;
 
                 HashSet<BaseNode> toVisitNext = [unvisitedNodes.First()];
 
-                while (toVisitNext.Any()) {
+                while (toVisitNext.Count > 0) {
                     BaseNode currentNode = toVisitNext.First();
                     allClean &= currentNode.IsClean;
 
@@ -316,9 +314,9 @@ namespace Foreman {
             NodeValuesUpdated?.Invoke(this, EventArgs.Empty); //called even if no changes have been made in order to re-draw the graph (since something required a node value update - link deletion? node addition? whatever)
         }
 
-        private void LinkChangeUpdateImpactedNodeStates(NodeLink link, LinkType direction) //helper function to update all the impacted nodes after addition/removal of a given link. Basically we want to update any node connected to this link through passthrough nodes (or directly).
-        {
-            HashSet<NodeLink> visitedLinks = new HashSet<NodeLink>(); //to prevent a loop
+        private static void LinkChangeUpdateImpactedNodeStates(NodeLink link, LinkType direction) //helper function to update all the impacted nodes after addition/removal of a given link. Basically we want to update any node connected to this link through passthrough nodes (or directly).
+                {
+            var visitedLinks = new HashSet<NodeLink>(); //to prevent a loop
             void Internal_UpdateLinkedNodes(NodeLink ilink) {
                 if (visitedLinks.Contains(ilink))
                     return;
@@ -343,17 +341,15 @@ namespace Foreman {
 
         //----------------------------------------------Save/Load JSON functions
 
-        public NewNodeCollection InsertNodesFromDocument(
+        public NewNodeBatch InsertNodesFromDocument(
             DataCache cache,
             ProductionGraphSaveDocument document,
             bool applySolverSettings) =>
             GraphSaveLoader.LoadProductionGraph(this, cache, document, applySolverSettings);
 
-        public NewNodeCollection InsertNodesFromFragment(DataCache cache, string json, bool applySolverSettings) {
+        public NewNodeBatch InsertNodesFromFragment(DataCache cache, string json, bool applySolverSettings) {
             ProductionGraphSaveDocument? document = GraphSaveCodec.ReadGraphPayload(json);
-            if (document is null)
-                return new NewNodeCollection();
-            return InsertNodesFromDocument(cache, document, applySolverSettings);
+            return document is null ? new NewNodeBatch() : InsertNodesFromDocument(cache, document, applySolverSettings);
         }
 
         internal RecipeNode CreateRecipeNodeWithSetup(

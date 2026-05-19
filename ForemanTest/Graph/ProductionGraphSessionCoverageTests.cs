@@ -1,9 +1,11 @@
 ﻿using Foreman;
+using Foreman.DataCaching.DataTypes;
 using Foreman.Graph;
+using Foreman.Models;
+using Foreman.Serialization;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -18,11 +20,11 @@ namespace ForemanTest.Graph {
 
             var session = GraphSessionTestHelper.AttachSession(built.Graph);
 
-            Assert.AreEqual(domainNodeCount, session.View.Nodes.Count);
-            Assert.AreEqual(domainLinkCount, session.View.Links.Count);
-            Assert.IsTrue(session.View.Nodes.Any(n => n is IRecipeNodeViewModel));
-            Assert.IsTrue(session.View.Nodes.Any(n => n is ISupplierNodeViewModel));
-            Assert.IsTrue(session.View.Nodes.Any(n => n is IConsumerNodeViewModel));
+            Assert.HasCount(domainNodeCount, session.View.Nodes);
+            Assert.HasCount(domainLinkCount, session.View.Links);
+            Assert.Contains(n => n is IRecipeNodeViewModel, session.View.Nodes);
+            Assert.Contains(n => n is ISupplierNodeViewModel, session.View.Nodes);
+            Assert.Contains(n => n is IConsumerNodeViewModel, session.View.Nodes);
         }
 
         [TestMethod]
@@ -32,7 +34,7 @@ namespace ForemanTest.Graph {
             session.Attach();
             int countAfterFirst = session.View.Nodes.Count;
             session.Attach();
-            Assert.AreEqual(countAfterFirst, session.View.Nodes.Count);
+            Assert.HasCount(countAfterFirst, session.View.Nodes);
         }
 
         [TestMethod]
@@ -44,8 +46,8 @@ namespace ForemanTest.Graph {
 
             graph.CreateSupplierNode(ctx.Item("iron"), Point.Empty);
 
-            Assert.AreEqual(1, graph.Nodes.Count());
-            Assert.AreEqual(0, session.View.Nodes.Count);
+            Assert.HasCount(1, graph.Nodes);
+            Assert.IsEmpty(session.View.Nodes);
         }
 
         [TestMethod]
@@ -56,12 +58,12 @@ namespace ForemanTest.Graph {
             var graph = new ProductionGraph { DefaultAssemblerQuality = built.Graph.DefaultAssemblerQuality };
 
             var session = GraphSessionTestHelper.AttachSession(graph);
-            ProductionGraph.NewNodeCollection imported = GraphSaveLoader.LoadProductionGraph(
+            ProductionGraph.NewNodeBatch imported = GraphSaveLoader.LoadProductionGraph(
                 graph, built.Cache, document, applySolverSettings: true);
 
-            Assert.AreEqual(imported.newNodes.Count, session.View.Nodes.Count);
-            Assert.AreEqual(imported.newLinks.Count, session.View.Links.Count);
-            foreach (BaseNode importedNode in imported.newNodes) {
+            Assert.HasCount(imported.NewNodes.Count, session.View.Nodes);
+            Assert.HasCount(imported.NewLinks.Count, session.View.Links);
+            foreach (BaseNode importedNode in imported.NewNodes) {
                 INodeViewModel? vm = session.View.Nodes.FirstOrDefault(n => n.Id.Value == importedNode.NodeID);
                 Assert.IsNotNull(vm, $"Missing view model for node id {importedNode.NodeID}.");
             }
@@ -87,10 +89,10 @@ namespace ForemanTest.Graph {
             recipe.InternalOneWayAddProduct(plateItem, 1, 0);
             NodeId recipeId = session.Editor.CreateRecipeNode(new RecipeQualityPair(recipe, ctx.Quality), new Point(150, 0));
 
-            Assert.IsInstanceOfType(GetVm(session, supplierId), typeof(ISupplierNodeViewModel));
-            Assert.IsInstanceOfType(GetVm(session, consumerId), typeof(IConsumerNodeViewModel));
-            Assert.IsInstanceOfType(GetVm(session, passthroughId), typeof(IPassthroughNodeViewModel));
-            Assert.IsInstanceOfType(GetVm(session, recipeId), typeof(IRecipeNodeViewModel));
+            Assert.IsInstanceOfType<ISupplierNodeViewModel>(GetVm(session, supplierId));
+            Assert.IsInstanceOfType<IConsumerNodeViewModel>(GetVm(session, consumerId));
+            Assert.IsInstanceOfType<IPassthroughNodeViewModel>(GetVm(session, passthroughId));
+            Assert.IsInstanceOfType<IRecipeNodeViewModel>(GetVm(session, recipeId));
         }
 
         [TestMethod]
@@ -102,7 +104,7 @@ namespace ForemanTest.Graph {
             GraphSessionTestHelper.WireSpoilChain(fresh, spoiled, ctx.Quality);
 
             NodeId spoilId = session.Editor.CreateSpoilNode(ctx.Item("fresh"), spoiled, new Point(0, 0));
-            Assert.IsInstanceOfType(GetVm(session, spoilId), typeof(ISpoilNodeViewModel));
+            Assert.IsInstanceOfType<ISpoilNodeViewModel>(GetVm(session, spoilId));
         }
 
         [TestMethod]
@@ -111,7 +113,7 @@ namespace ForemanTest.Graph {
             var session = GraphSessionTestHelper.AttachSession(ctx.NewGraph());
             PlantProcessPrototype plantProcess = GraphSessionTestHelper.CreatePlantProcess(ctx, "seed", "crop");
             NodeId plantId = session.Editor.CreatePlantNode(plantProcess, ctx.Quality, new Point(0, 0));
-            Assert.IsInstanceOfType(GetVm(session, plantId), typeof(IPlantNodeViewModel));
+            Assert.IsInstanceOfType<IPlantNodeViewModel>(GetVm(session, plantId));
         }
 
         [TestMethod]
@@ -121,11 +123,11 @@ namespace ForemanTest.Graph {
 
             IRecipeNodeViewModel recipeVm = session.View.Nodes.OfType<IRecipeNodeViewModel>().First();
             Assert.IsTrue(session.TryGetDomainNode(recipeVm.Id, out BaseNode? domainNode));
-            Assert.IsInstanceOfType(domainNode, typeof(RecipeNode));
+            Assert.IsInstanceOfType<RecipeNode>(domainNode);
 
-            Recipe? viewRecipe = recipeVm.BaseRecipe.Recipe;
-            Assert.IsInstanceOfType(domainNode, typeof(RecipeNode));
-            Recipe? domainRecipe = ((RecipeNode)domainNode).BaseRecipe.Recipe;
+            IRecipe? viewRecipe = recipeVm.BaseRecipe.Recipe;
+            Assert.IsInstanceOfType<RecipeNode>(domainNode);
+            IRecipe? domainRecipe = ((RecipeNode)domainNode).BaseRecipe.Recipe;
             Assert.IsNotNull(viewRecipe);
             Assert.IsNotNull(domainRecipe);
             Assert.AreEqual(viewRecipe.Name, domainRecipe.Name);
@@ -163,14 +165,14 @@ namespace ForemanTest.Graph {
             NodeId consumerId = session.Editor.CreateConsumerNode(item, new Point(80, 0));
             LinkId linkId = session.Editor.CreateLink(supplierId, consumerId, item);
 
-            IConsumerNodeViewModel consumerVm = (IConsumerNodeViewModel)GetVm(session, consumerId);
-            Assert.AreEqual(1, consumerVm.InputLinks.Count);
+            var consumerVm = (IConsumerNodeViewModel)GetVm(session, consumerId);
+            Assert.HasCount(1, consumerVm.InputLinks);
 
             session.Editor.DeleteLink(linkId);
 
             Assert.IsFalse(session.View.TryGetLink(linkId, out _));
-            Assert.AreEqual(0, consumerVm.InputLinks.Count);
-            Assert.AreEqual(0, ((ISupplierNodeViewModel)GetVm(session, supplierId)).OutputLinks.Count);
+            Assert.IsEmpty(consumerVm.InputLinks);
+            Assert.IsEmpty(((ISupplierNodeViewModel)GetVm(session, supplierId)).OutputLinks);
         }
 
         [TestMethod]
@@ -229,11 +231,11 @@ namespace ForemanTest.Graph {
             Assert.AreEqual(1, linksRemoved);
 
             session.Editor.DeleteNode(supplierId);
-            Assert.IsTrue(nodesRemoved >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, nodesRemoved);
 
             session.Graph.ClearGraph();
             Assert.AreEqual(1, cleared);
-            Assert.AreEqual(0, session.View.Nodes.Count);
+            Assert.IsEmpty(session.View.Nodes);
         }
 
         [TestMethod]
@@ -250,7 +252,7 @@ namespace ForemanTest.Graph {
 
             session.Editor.CreateLink(supplierId, consumerId, item);
 
-            Assert.IsTrue(stateChanges >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, stateChanges);
             Assert.AreEqual(NodeState.Clean, consumerVm.State);
         }
 
@@ -267,15 +269,15 @@ namespace ForemanTest.Graph {
             GraphSaveTestUi.ApplyViewerUiToGraph(saveDocument, SpaceAgeDataCacheFixture.GetLoadedAsync().GetAwaiter().GetResult(), graph);
 
             var session = GraphSessionTestHelper.AttachSession(graph);
-            ProductionGraph.NewNodeCollection imported = GraphSaveLoader.LoadProductionGraph(
+            ProductionGraph.NewNodeBatch imported = GraphSaveLoader.LoadProductionGraph(
                 graph,
                 SpaceAgeDataCacheFixture.GetLoadedAsync().GetAwaiter().GetResult(),
                 saveDocument.ProductionGraph,
                 applySolverSettings: true);
 
-            Assert.AreEqual(imported.newNodes.Count, session.View.Nodes.Count);
-            Assert.AreEqual(imported.newLinks.Count, session.View.Links.Count);
-            Assert.AreEqual(saveDocument.ProductionGraph.Nodes.Count, session.View.Nodes.Count);
+            Assert.HasCount(imported.NewNodes.Count, session.View.Nodes);
+            Assert.HasCount(imported.NewLinks.Count, session.View.Links);
+            Assert.HasCount(saveDocument.ProductionGraph.Nodes.Count, session.View.Nodes);
         }
 
         private static INodeViewModel GetVm(ProductionGraphSession session, NodeId id) {

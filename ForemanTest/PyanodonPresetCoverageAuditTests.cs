@@ -1,4 +1,7 @@
 ﻿using Foreman;
+using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
+using Foreman.DataCaching.Loading;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -13,7 +16,7 @@ namespace ForemanTest {
     public class PyanodonPresetCoverageAuditTests : ForemanTestBase {
         [TestMethod]
         public async Task Pyanodon_Audit_WritePresetVsCacheReport() {
-            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync();
+            var snapshot = await PyanodonPresetTestSupport.LoadSnapshotAsync().ConfigureAwait(false);
 
             WriteSectionCounts(snapshot.Root, snapshot.Cache);
             WriteRecipeCoverage(snapshot.Root, snapshot.Cache);
@@ -22,7 +25,7 @@ namespace ForemanTest {
             WriteBarrelFilterImpact(snapshot.Root, snapshot.Cache);
             WriteChooserRelevantGaps(snapshot.Root, snapshot.Cache);
 
-            Assert.IsTrue(snapshot.Cache.Recipes.Count > 0, "Audit requires a loaded cache.");
+            Assert.IsNotEmpty(snapshot.Cache.Recipes, "Audit requires a loaded cache.");
         }
 
         private static void WriteSectionCounts(JsonObject root, DataCache cache) {
@@ -31,7 +34,7 @@ namespace ForemanTest {
             Console.WriteLine($"groups:         json={CountArray(root, "groups")}  cache={cache.Groups.Count}");
             Console.WriteLine($"subgroups:      json={CountArray(root, "subgroups")}  cache={cache.Subgroups.Count}");
             Console.WriteLine($"qualities:      json={CountArray(root, "qualities")}  cache={cache.Qualities.Count}");
-            Console.WriteLine($"fluids:         json={CountArray(root, "fluids")}  cache_fluids={cache.Items.Values.Count(i => i is Fluid)}");
+            Console.WriteLine($"fluids:         json={CountArray(root, "fluids")}  cache_fluids={cache.Items.Values.Count(i => i is IFluid)}");
             Console.WriteLine($"items:          json={CountArray(root, "items")}  cache_items={cache.Items.Count}");
             Console.WriteLine($"modules:        json={CountArray(root, "modules")}  cache={cache.Modules.Count}");
             Console.WriteLine($"recipes:        json={CountArray(root, "recipes")}  cache={cache.Recipes.Count}");
@@ -61,7 +64,7 @@ namespace ForemanTest {
             int unavailable = cache.Recipes.Count - available;
             int noAssembler = cache.Recipes.Values
                 .OfType<RecipePrototype>()
-                .Count(r => r.assemblers.Count == 0);
+                .Count(r => r.AssemblersInternal.Count == 0);
 
             Console.WriteLine();
             Console.WriteLine("=== Recipes ===");
@@ -85,7 +88,7 @@ namespace ForemanTest {
                 if (PresetJson.GetString(resource, "name") is not string name)
                     continue;
 
-                if (!cache.Recipes.TryGetValue(ExtractionRecipeTestSupport.ExtractionRecipeName(name), out Recipe? recipe)) {
+                if (!cache.Recipes.TryGetValue(ExtractionRecipeTestSupport.ExtractionRecipeName(name), out IRecipe? recipe)) {
                     missingExtraction.Add(name);
                     continue;
                 }
@@ -109,8 +112,8 @@ namespace ForemanTest {
                 .Where(r => !r.Available)
                 .ToList();
 
-            int noUnlockTech = unavailable.Count(r => r.myUnlockTechnologies.Count == 0);
-            int noAssembler = unavailable.Count(r => r.assemblers.Count == 0);
+            int noUnlockTech = unavailable.Count(r => r.MyUnlockTechnologiesInternal.Count == 0);
+            int noAssembler = unavailable.Count(r => r.AssemblersInternal.Count == 0);
             int barrelLike = unavailable.Count(r => DataCacheRecipeFilters.BlackList.Any(rx => rx.IsMatch(r.Name)));
 
             Console.WriteLine();
@@ -132,7 +135,7 @@ namespace ForemanTest {
                 .ToList();
 
             int barrelUnavailable = barrelRecipesInJson.Count(n =>
-                cache.Recipes.TryGetValue(n, out Recipe? r) && !r.Available);
+                cache.Recipes.TryGetValue(n, out IRecipe? r) && !r.Available);
 
             Console.WriteLine();
             Console.WriteLine("=== Barreling filter (UseRecipeBWLists=true in tests) ===");

@@ -1,4 +1,5 @@
-﻿using Foreman;
+﻿using Foreman.ProductionGraphView.Annotations;
+using Foreman.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,8 +50,8 @@ namespace ForemanTest.Annotations {
 
             IReadOnlyList<AnnotationSaveData>? restored = AnnotationClipboardCodec.ReadAnnotations(merged);
             Assert.IsNotNull(restored);
-            Assert.AreEqual(1, restored.Count);
-            Assert.IsInstanceOfType(restored[0], typeof(ShapeAnnotationSaveData));
+            Assert.HasCount(1, restored);
+            Assert.IsInstanceOfType<ShapeAnnotationSaveData>(restored[0]);
         }
 
         [TestMethod]

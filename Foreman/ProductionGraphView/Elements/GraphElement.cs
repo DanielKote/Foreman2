@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Foreman {
+namespace Foreman.ProductionGraphView.Elements {
     public abstract class GraphElement : IDisposable {
         public List<GraphElement> SubElements { get; private set; }
 
@@ -27,12 +27,10 @@ namespace Foreman {
         }
 
         public virtual bool Visible { get; protected set; }
-        protected readonly ProductionGraphViewer graphViewer;
-        protected readonly GraphElement? myParent;
-
-        protected ContextMenuStrip RightClickMenu;
-
-        protected static readonly Pen devPen = new Pen(new SolidBrush(Color.OrangeRed), 1);
+        protected ProductionGraphViewer graphViewer { get; }
+        protected GraphElement? myParent { get; }
+        protected ContextMenuStrip RightClickMenu { get; set; }
+        protected static readonly Pen devPen = new(new SolidBrush(Color.OrangeRed), 1);
 
         public GraphElement(ProductionGraphViewer graphViewer, GraphElement? parent = null) {
             this.graphViewer = graphViewer;
@@ -40,9 +38,10 @@ namespace Foreman {
             if (myParent != null)
                 myParent.SubElements.Add(this);
 
-            RightClickMenu = new ContextMenuStrip();
-            RightClickMenu.ShowItemToolTips = false;
-            RightClickMenu.ShowImageMargin = false;
+            RightClickMenu = new ContextMenuStrip {
+                ShowItemToolTips = false,
+                ShowImageMargin = false
+            };
             RightClickMenu.Closing += (o, e) => {
                 if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
                     e.Cancel = true; //we will handle closing from item clicking within the items themselves
@@ -52,41 +51,35 @@ namespace Foreman {
                 }
             };
 
-            SubElements = new List<GraphElement>();
+            SubElements = [];
             Visible = true;
         }
 
-        public Point GraphToLocal(Point graph_point) //converts the point (in graph coordinates) to the local (0,0 is the center of this element's bound) point
+        public Point GraphToLocal(Point graphPoint) //converts the point (in graph coordinates) to the local (0,0 is the center of this element's bound) point
         {
-            if (myParent == null) //owned by graphViewer
-                return Point.Subtract(graph_point, (Size)Location);
-            else //subelement of some element
-                return Point.Subtract(myParent.GraphToLocal(graph_point), (Size)Location);
+            return myParent == null
+                ? Point.Subtract(graphPoint, (Size)Location)
+                : Point.Subtract(myParent.GraphToLocal(graphPoint), (Size)Location);
         }
 
-        public Point LocalToGraph(Point local_point) {
-            if (myParent == null) //owned by graphViewer
-                return Point.Add(local_point, (Size)Location);
-            else //subelement of some element
-                return Point.Add(myParent.LocalToGraph(local_point), (Size)Location);
+        public Point LocalToGraph(Point localPoint) {
+            return myParent == null ? Point.Add(localPoint, (Size)Location) : Point.Add(myParent.LocalToGraph(localPoint), (Size)Location);
         }
 
-        public bool IntersectsWithZone(Rectangle graph_zone, int xborder, int yborder) {
-            Point local_graph_zone_origin = GraphToLocal(graph_zone.Location);
-            return (Width / 2) > local_graph_zone_origin.X - xborder &&
-                    -(Width / 2) < local_graph_zone_origin.X + graph_zone.Width + xborder &&
-                     (Height / 2) > local_graph_zone_origin.Y - yborder &&
-                    -(Height / 2) < local_graph_zone_origin.Y + graph_zone.Height + yborder;
+        public bool IntersectsWithZone(Rectangle graphZone, int xborder, int yborder) {
+            Point local_graphZone_origin = GraphToLocal(graphZone.Location);
+            return (Width / 2) > local_graphZone_origin.X - xborder &&
+                    -(Width / 2) < local_graphZone_origin.X + graphZone.Width + xborder &&
+                     (Height / 2) > local_graphZone_origin.Y - yborder &&
+                    -(Height / 2) < local_graphZone_origin.Y + graphZone.Height + yborder;
         }
 
-        public virtual void UpdateVisibility(Rectangle graph_zone, int xborder = 0, int yborder = 0) {
-            Visible = IntersectsWithZone(graph_zone, xborder, yborder);
+        public virtual void UpdateVisibility(Rectangle graphZone, int xborder = 0, int yborder = 0) {
+            Visible = IntersectsWithZone(graphZone, xborder, yborder);
         }
 
-        public virtual bool ContainsPoint(Point graph_point) {
-            if (!Visible)
-                return false;
-            return Bounds.Contains(GraphToLocal(graph_point));
+        public virtual bool ContainsPoint(Point graphPoint) {
+            return Visible && Bounds.Contains(GraphToLocal(graphPoint));
         }
 
         public virtual void PrePaint() { }
@@ -103,13 +96,14 @@ namespace Foreman {
 
         protected abstract void Draw(Graphics graphics, NodeDrawingStyle style);
 
-        public virtual List<TooltipInfo>? GetToolTips(Point graph_point) => [];
-        public virtual void MouseMoved(Point graph_point) { }
-        public virtual void MouseDown(Point graph_point, MouseButtons button) { }
-        public virtual void MouseUp(Point graph_point, MouseButtons button, bool wasDragged) { }
-        public virtual void Dragged(Point graph_point) { }
+        public virtual List<TooltipInfo>? GetToolTips(Point graphPoint) => [];
+        public virtual void MouseMoved(Point graphPoint) { }
+        public virtual void MouseDown(Point graphPoint, MouseButtons button) { }
+        public virtual void MouseUp(Point graphPoint, MouseButtons button, bool wasDragged) { }
+        public virtual void Dragged(Point graphPoint) { }
 
         public virtual void Dispose() {
+            GC.SuppressFinalize(this);
             foreach (GraphElement element in SubElements.ToArray())
                 element.Dispose();
             SubElements.Clear();
@@ -121,14 +115,14 @@ namespace Foreman {
             graphViewer.Invalidate();
         }
 
-        internal string BuildingQuantityToText(double quantity) {
+        internal static string BuildingQuantityToText(double quantity) {
             string text = "";
             if (quantity >= 10000)
-                text += quantity.ToString("0.##e0");
+                text += quantity.ToString("0.##e0", DisplayCulture.Format);
             else if (Properties.Settings.Default.RoundAssemblerCount)
-                text += Math.Ceiling(quantity).ToString("0");
+                text += Math.Ceiling(quantity).ToString("0", DisplayCulture.Format);
             else if (quantity >= 0.1)
-                text += quantity.ToString("0.#");
+                text += quantity.ToString("0.#", DisplayCulture.Format);
             else if (quantity != 0)
                 text += "<0.1";
             else

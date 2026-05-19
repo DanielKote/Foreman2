@@ -1,4 +1,5 @@
-﻿using Foreman;
+﻿using Foreman.DataCaching;
+using Foreman.DataCaching.DataTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ForemanTest.support {
@@ -11,7 +12,7 @@ namespace ForemanTest.support {
             string resourceItemName,
             out RecipePrototype? recipe) {
             recipe = null;
-            if (!cache.Recipes.TryGetValue(ExtractionRecipeName(resourceItemName), out Recipe? found) ||
+            if (!cache.Recipes.TryGetValue(ExtractionRecipeName(resourceItemName), out IRecipe? found) ||
                 found is not RecipePrototype prototype)
                 return false;
 
