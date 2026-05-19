@@ -144,7 +144,14 @@ namespace Foreman {
 
             //make available all _store.Qualities that are within the defaultquality chain
             Quality? cQuality = _store.DefaultQuality;
+            var defaultChainVisited = new HashSet<Quality>();
             while (cQuality is not null) {
+                if (!defaultChainVisited.Add(cQuality)) {
+                    ErrorLogging.LogLine(
+                        "Cyclic quality chain detected while applying default-quality availability at \"" +
+                        cQuality.Name + "\"; stopping chain walk.");
+                    break;
+                }
                 ((QualityPrototype)cQuality).Available = cQuality.Enabled;
                 cQuality = cQuality.NextQuality;
             }
@@ -154,9 +161,17 @@ namespace Foreman {
             foreach (Quality quality in _store.Qualities.Values) {
                 currentChain = 1;
                 currentQuality = quality;
+                var chainVisited = new HashSet<Quality> { currentQuality };
                 while (currentQuality.NextQuality != null && currentQuality.NextProbability != 0) {
+                    Quality next = currentQuality.NextQuality;
+                    if (!chainVisited.Add(next)) {
+                        ErrorLogging.LogLine(
+                            "Cyclic quality chain detected while measuring chain length at \"" +
+                            next.Name + "\"; chain length truncated.");
+                        break;
+                    }
                     currentChain++;
-                    currentQuality = currentQuality.NextQuality;
+                    currentQuality = next;
                 }
                 _store.QualityMaxChainLength = Math.Max(_store.QualityMaxChainLength, currentChain);
             }

@@ -51,6 +51,9 @@ namespace ForemanTest.support {
             setter.Invoke(cache, new object[] { presetName });
         }
 
+        internal static DataCacheStore RequireStore(DataCache cache) =>
+            (DataCacheStore)GetDataCacheStore(cache);
+
         private static object GetDataCacheStore(DataCache cache) =>
             ReflectionTestHelper.RequireInstance(
                 ReflectionTestHelper.RequireField(typeof(DataCache), "_store", BindingFlags.Instance | BindingFlags.NonPublic)

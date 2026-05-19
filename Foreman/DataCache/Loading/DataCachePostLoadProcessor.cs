@@ -214,45 +214,8 @@ namespace Foreman {
                 if (recipe.myUnlockTechnologies.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0 && !recipe.Name.StartsWith("§§"))) //§§ denotes foreman added _store.Recipes. ignored during this pass (but not during the assembler check pass)
                     recipe.Available = false;
 
-            //step 4 (loop) switch any recipe with no available _store.Assemblers to unavailable, switch any useless item to unavailable (no available recipe produces it, it isnt used by any available recipe / only by incineration _store.Recipes
-            bool clean = false;
-            while (!clean) {
-                clean = true;
-
-                //4.1: mark any recipe with no available _store.Assemblers to unavailable.
-                foreach (RecipePrototype recipe in _store.Recipes.Values.Where(r => r.Available && !r.Assemblers.Any(a => a.Available || (a as AssemblerPrototype) == _store.PlayerAssembler || (a as AssemblerPrototype) == _store.RocketAssembler))) {
-                    recipe.Available = false;
-                    clean = false;
-                }
-
-                //4.2: mark any useless _store.Items as unavailable (nothing/unavailable _store.Recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable _store.Recipes, only produced by a itself->itself recipe)
-                //this will also update assembler availability status for those whose _store.Items become unavailable automatically.
-                //note: while this gets rid of those annoying 'burn/incinerate' auto-generated _store.Recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those _store.Items as 'available'
-                //good example from vanilla: most of the 'garbage' _store.Items such as 'item-unknown' and 'electric-energy-interface' are removed as their only _store.Recipes are 'recycle to themselves', but 'heat interface' isnt removed as its only recipe is a 'recycle into several parts' (so nothing we can do about it)
-                foreach (ItemPrototype item in _store.Items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available && !(r.IngredientList.Count == 1 && r.IngredientList[0] == i))).Cast<ItemPrototype>()) {
-
-
-                    bool useful = false;
-
-                    foreach (RecipePrototype r in item.consumptionRecipes.Where(r => r.Available))
-                        useful |= (r.ingredientList.Count > 1 || r.productList.Count > 1 || (r.productList.Count == 1 && r.productList[0] != item)); //recipe with multiple _store.Items coming in or some ingredients coming out (that arent itself) -> not an incineration type
-
-                    if (!useful && !item.Name.StartsWith("§§")) {
-                        item.Available = false;
-                        clean = false;
-                        foreach (RecipePrototype r in item.consumptionRecipes) //from above these _store.Recipes are all item->nothing
-                            r.Available = false;
-                    }
-                }
-                //4.3: go over the item list one more time and ensure that if an item that is available has any growth or spoil results then they are also available (edge case: item grows or spoils into something that has no _store.Recipes aka: unavailable, but it should be available even though its only 'use' is as a spoil or grow result)
-                foreach (ItemPrototype item in _store.Items.Values.Where(i => !i.Available).Cast<ItemPrototype>()) {
-                    bool useful = false;
-                    useful |= item.spoilOrigins.Count(i => i.Available) > 0;
-                    useful |= item.plantOrigins.Count(i => i.Available) > 0;
-                    item.Available = useful;
-                }
-
-            }
+            //step 4 (loop): recipe/assembler propagation, useless items, spoil/plant results — see ItemAvailabilityFixpoint
+            ItemAvailabilityFixpoint.Run(_store);
 
             //step 5: set the 'default' enabled statuses of _store.Recipes,_store.Assemblers,_store.Modules & _store.Beacons to their available status.
             foreach (RecipePrototype recipe in _store.Recipes.Values)

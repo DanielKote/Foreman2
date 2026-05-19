@@ -11,6 +11,8 @@ namespace Foreman {
 
         private Preset selectedPreset;
         private DataCache? createdDataCache;
+        private bool loadInProgress;
+        private bool loadCompleted;
 
         public DataLoadForm(Preset preset) {
             currentPercent = 0;
@@ -38,13 +40,17 @@ namespace Foreman {
             }) as IProgress<KeyValuePair<int, string>>;
 
             createdDataCache = new DataCache(Properties.Settings.Default.UseRecipeBWfilters);
+            loadInProgress = true;
             try {
                 await createdDataCache.LoadAllData(selectedPreset, progress);
+                loadCompleted = true;
                 DialogResult = DialogResult.OK;
             } catch (Exception ex) {
                 ErrorLogging.LogException(ex, string.Format("Failed to load preset '{0}'", selectedPreset.Name));
                 createdDataCache = new DataCache(true); //blank data cache in case of error.
                 DialogResult = DialogResult.Abort;
+            } finally {
+                loadInProgress = false;
             }
             Close();
 
@@ -57,6 +63,18 @@ namespace Foreman {
 
         public DataCache? GetDataCache() {
             return createdDataCache;
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e) {
+            if (loadInProgress && !loadCompleted) {
+                UserMessages.Show(
+                    "Preset loading is still in progress.\n\n" +
+                    "If you close this window now, Foreman may use an incomplete set of items and recipes.",
+                    "Preset load interrupted",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            base.OnFormClosing(e);
         }
     }
 }
