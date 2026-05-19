@@ -28,1272 +28,1273 @@ namespace Foreman
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
-            this.AutoAssemblersOption = new System.Windows.Forms.RadioButton();
-            this.FixedAssemblersOption = new System.Windows.Forms.RadioButton();
-            this.AssemblerInfoTable = new System.Windows.Forms.TableLayoutPanel();
-            this.AssemblerQualityPercentLabel = new System.Windows.Forms.Label();
-            this.AssemblerQualityTitleLabel = new System.Windows.Forms.Label();
-            this.ExtraProductivityLabel = new System.Windows.Forms.Label();
-            this.AssemblerPollutionLabel = new System.Windows.Forms.Label();
-            this.AssemblerEnergyTitleLabel = new System.Windows.Forms.Label();
-            this.AssemblerPollutionPercentLabel = new System.Windows.Forms.Label();
-            this.AssemblerSpeedTitleLabel = new System.Windows.Forms.Label();
-            this.AssemblerProductivityPercentLabel = new System.Windows.Forms.Label();
-            this.AssemblerProductivityTitleLabel = new System.Windows.Forms.Label();
-            this.AssemblerSpeedPercentLabel = new System.Windows.Forms.Label();
-            this.AssemblerPollutionTitleLabel = new System.Windows.Forms.Label();
-            this.AssemblerEnergyPercentLabel = new System.Windows.Forms.Label();
-            this.AssemblerEnergyLabel = new System.Windows.Forms.Label();
-            this.AssemblerSpeedLabel = new System.Windows.Forms.Label();
-            this.NeighboursLabel = new System.Windows.Forms.Label();
-            this.GeneratorTemperatureLabel = new System.Windows.Forms.Label();
-            this.NeighbourInput = new System.Windows.Forms.NumericUpDown();
-            this.GeneratorTemperatureRangeLabel = new System.Windows.Forms.Label();
-            this.ExtraProductivityInput = new System.Windows.Forms.NumericUpDown();
-            this.AModuleOptionsLabel = new System.Windows.Forms.Label();
-            this.AModulesLabel = new System.Windows.Forms.Label();
-            this.AssemblerRateLabel = new System.Windows.Forms.Label();
-            this.AssemblerTitle = new System.Windows.Forms.Label();
-            this.MainTable = new System.Windows.Forms.TableLayoutPanel();
-            this.BeaconTable = new System.Windows.Forms.TableLayoutPanel();
-            this.BModulesChoicePanel = new System.Windows.Forms.Panel();
-            this.BModulesChoiceTable = new System.Windows.Forms.TableLayoutPanel();
-            this.BeaconInfoTable = new System.Windows.Forms.TableLayoutPanel();
-            this.label3 = new System.Windows.Forms.Label();
-            this.TotalBeaconEnergyLabel = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
-            this.BeaconEfficiencyLabel = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.BeaconModuleCountLabel = new System.Windows.Forms.Label();
-            this.BeaconEnergyLabel = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.TotalBeaconsLabel = new System.Windows.Forms.Label();
-            this.SelectedBModulesPanel = new System.Windows.Forms.Panel();
-            this.SelectedBModulesTable = new System.Windows.Forms.TableLayoutPanel();
-            this.BModulesLabel = new System.Windows.Forms.Label();
-            this.BeaconTitle = new System.Windows.Forms.Label();
-            this.BModuleOptionsLabel = new System.Windows.Forms.Label();
-            this.BeaconChoicePanel = new System.Windows.Forms.Panel();
-            this.BeaconChoiceTable = new System.Windows.Forms.TableLayoutPanel();
-            this.BeaconValuesTable = new System.Windows.Forms.TableLayoutPanel();
-            this.ConstantBeaconInput = new System.Windows.Forms.NumericUpDown();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.BeaconCountInput = new System.Windows.Forms.NumericUpDown();
-            this.BeaconsPerAssemblerInput = new System.Windows.Forms.NumericUpDown();
-            this.SelectedBeaconIcon = new System.Windows.Forms.PictureBox();
-            this.AssemblerTable = new System.Windows.Forms.TableLayoutPanel();
-            this.FuelOptionsPanel = new System.Windows.Forms.Panel();
-            this.FuelOptionsTable = new System.Windows.Forms.TableLayoutPanel();
-            this.FuelTitle = new System.Windows.Forms.Label();
-            this.AModulesChoicePanel = new System.Windows.Forms.Panel();
-            this.AModulesChoiceTable = new System.Windows.Forms.TableLayoutPanel();
-            this.AssemblerChoicePanel = new System.Windows.Forms.Panel();
-            this.AssemblerChoiceTable = new System.Windows.Forms.TableLayoutPanel();
-            this.SelectedAModulesPanel = new System.Windows.Forms.Panel();
-            this.SelectedAModulesTable = new System.Windows.Forms.TableLayoutPanel();
-            this.SelectedAssemblerIcon = new System.Windows.Forms.PictureBox();
-            this.SelectedFuelIcon = new System.Windows.Forms.PictureBox();
-            this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
-            this.QualitySelectorLabel = new System.Windows.Forms.Label();
-            this.KeyNodeTitleInput = new System.Windows.Forms.TextBox();
-            this.KeyNodeCheckBox = new System.Windows.Forms.CheckBox();
-            this.FixedAssemblerInput = new System.Windows.Forms.NumericUpDown();
-            this.LowPriorityCheckBox = new System.Windows.Forms.CheckBox();
-            this.KeyNodeTitleLabel = new System.Windows.Forms.Label();
-            this.QualitySelector = new System.Windows.Forms.ComboBox();
-            this.ToolTip = new Foreman.CustomToolTip();
-            this.AssemblerInfoTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).BeginInit();
-            this.MainTable.SuspendLayout();
-            this.BeaconTable.SuspendLayout();
-            this.BModulesChoicePanel.SuspendLayout();
-            this.BeaconInfoTable.SuspendLayout();
-            this.SelectedBModulesPanel.SuspendLayout();
-            this.BeaconChoicePanel.SuspendLayout();
-            this.BeaconValuesTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ConstantBeaconInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconCountInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconsPerAssemblerInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedBeaconIcon)).BeginInit();
-            this.AssemblerTable.SuspendLayout();
-            this.FuelOptionsPanel.SuspendLayout();
-            this.AModulesChoicePanel.SuspendLayout();
-            this.AssemblerChoicePanel.SuspendLayout();
-            this.SelectedAModulesPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedAssemblerIcon)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedFuelIcon)).BeginInit();
-            this.RateOptionsTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FixedAssemblerInput)).BeginInit();
-            this.SuspendLayout();
+        private void InitializeComponent() {
+            AutoAssemblersOption = new System.Windows.Forms.RadioButton();
+            FixedAssemblersOption = new System.Windows.Forms.RadioButton();
+            AssemblerInfoTable = new System.Windows.Forms.TableLayoutPanel();
+            AssemblerQualityPercentLabel = new System.Windows.Forms.Label();
+            AssemblerQualityTitleLabel = new System.Windows.Forms.Label();
+            ExtraProductivityLabel = new System.Windows.Forms.Label();
+            AssemblerPollutionLabel = new System.Windows.Forms.Label();
+            AssemblerEnergyTitleLabel = new System.Windows.Forms.Label();
+            AssemblerPollutionPercentLabel = new System.Windows.Forms.Label();
+            AssemblerSpeedTitleLabel = new System.Windows.Forms.Label();
+            AssemblerProductivityPercentLabel = new System.Windows.Forms.Label();
+            AssemblerProductivityTitleLabel = new System.Windows.Forms.Label();
+            AssemblerSpeedPercentLabel = new System.Windows.Forms.Label();
+            AssemblerPollutionTitleLabel = new System.Windows.Forms.Label();
+            AssemblerEnergyPercentLabel = new System.Windows.Forms.Label();
+            AssemblerEnergyLabel = new System.Windows.Forms.Label();
+            AssemblerSpeedLabel = new System.Windows.Forms.Label();
+            NeighboursLabel = new System.Windows.Forms.Label();
+            GeneratorTemperatureLabel = new System.Windows.Forms.Label();
+            NeighbourInput = new System.Windows.Forms.NumericUpDown();
+            GeneratorTemperatureRangeLabel = new System.Windows.Forms.Label();
+            ExtraProductivityInput = new System.Windows.Forms.NumericUpDown();
+            AModuleOptionsLabel = new System.Windows.Forms.Label();
+            AModulesLabel = new System.Windows.Forms.Label();
+            AssemblerRateLabel = new System.Windows.Forms.Label();
+            AssemblerTitle = new System.Windows.Forms.Label();
+            MainTable = new System.Windows.Forms.TableLayoutPanel();
+            BeaconTable = new System.Windows.Forms.TableLayoutPanel();
+            BModulesChoicePanel = new System.Windows.Forms.Panel();
+            BModulesChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+            BeaconInfoTable = new System.Windows.Forms.TableLayoutPanel();
+            label3 = new System.Windows.Forms.Label();
+            TotalBeaconEnergyLabel = new System.Windows.Forms.Label();
+            label14 = new System.Windows.Forms.Label();
+            label16 = new System.Windows.Forms.Label();
+            BeaconEfficiencyLabel = new System.Windows.Forms.Label();
+            label18 = new System.Windows.Forms.Label();
+            BeaconModuleCountLabel = new System.Windows.Forms.Label();
+            BeaconEnergyLabel = new System.Windows.Forms.Label();
+            label20 = new System.Windows.Forms.Label();
+            TotalBeaconsLabel = new System.Windows.Forms.Label();
+            SelectedBModulesPanel = new System.Windows.Forms.Panel();
+            SelectedBModulesTable = new System.Windows.Forms.TableLayoutPanel();
+            BModulesLabel = new System.Windows.Forms.Label();
+            BeaconTitle = new System.Windows.Forms.Label();
+            BModuleOptionsLabel = new System.Windows.Forms.Label();
+            BeaconChoicePanel = new System.Windows.Forms.Panel();
+            BeaconChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+            BeaconValuesTable = new System.Windows.Forms.TableLayoutPanel();
+            ConstantBeaconInput = new System.Windows.Forms.NumericUpDown();
+            label8 = new System.Windows.Forms.Label();
+            label9 = new System.Windows.Forms.Label();
+            label10 = new System.Windows.Forms.Label();
+            BeaconCountInput = new System.Windows.Forms.NumericUpDown();
+            BeaconsPerAssemblerInput = new System.Windows.Forms.NumericUpDown();
+            SelectedBeaconIcon = new System.Windows.Forms.PictureBox();
+            AssemblerTable = new System.Windows.Forms.TableLayoutPanel();
+            FuelOptionsPanel = new System.Windows.Forms.Panel();
+            FuelOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+            FuelTitle = new System.Windows.Forms.Label();
+            AModulesChoicePanel = new System.Windows.Forms.Panel();
+            AModulesChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+            AssemblerChoicePanel = new System.Windows.Forms.Panel();
+            AssemblerChoiceTable = new System.Windows.Forms.TableLayoutPanel();
+            SelectedAModulesPanel = new System.Windows.Forms.Panel();
+            SelectedAModulesTable = new System.Windows.Forms.TableLayoutPanel();
+            SelectedAssemblerIcon = new System.Windows.Forms.PictureBox();
+            SelectedFuelIcon = new System.Windows.Forms.PictureBox();
+            RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+            QualitySelectorLabel = new System.Windows.Forms.Label();
+            KeyNodeTitleInput = new System.Windows.Forms.TextBox();
+            KeyNodeCheckBox = new System.Windows.Forms.CheckBox();
+            FixedAssemblerInput = new System.Windows.Forms.NumericUpDown();
+            LowPriorityCheckBox = new System.Windows.Forms.CheckBox();
+            KeyNodeTitleLabel = new System.Windows.Forms.Label();
+            QualitySelector = new System.Windows.Forms.ComboBox();
+            ToolTip = new CustomToolTip();
+            AssemblerInfoTable.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)NeighbourInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ExtraProductivityInput).BeginInit();
+            MainTable.SuspendLayout();
+            BeaconTable.SuspendLayout();
+            BModulesChoicePanel.SuspendLayout();
+            BeaconInfoTable.SuspendLayout();
+            SelectedBModulesPanel.SuspendLayout();
+            BeaconChoicePanel.SuspendLayout();
+            BeaconValuesTable.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)ConstantBeaconInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)BeaconCountInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)BeaconsPerAssemblerInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)SelectedBeaconIcon).BeginInit();
+            AssemblerTable.SuspendLayout();
+            FuelOptionsPanel.SuspendLayout();
+            AModulesChoicePanel.SuspendLayout();
+            AssemblerChoicePanel.SuspendLayout();
+            SelectedAModulesPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)SelectedAssemblerIcon).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)SelectedFuelIcon).BeginInit();
+            RateOptionsTable.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)FixedAssemblerInput).BeginInit();
+            SuspendLayout();
             // 
             // AutoAssemblersOption
             // 
-            this.AutoAssemblersOption.AutoSize = true;
-            this.AutoAssemblersOption.Checked = true;
-            this.AutoAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AutoAssemblersOption.Location = new System.Drawing.Point(260, 3);
-            this.AutoAssemblersOption.Name = "AutoAssemblersOption";
-            this.AutoAssemblersOption.Size = new System.Drawing.Size(47, 20);
-            this.AutoAssemblersOption.TabIndex = 0;
-            this.AutoAssemblersOption.TabStop = true;
-            this.AutoAssemblersOption.Text = "Auto";
-            this.AutoAssemblersOption.UseVisualStyleBackColor = true;
+            AutoAssemblersOption.AutoSize = true;
+            AutoAssemblersOption.Checked = true;
+            AutoAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
+            AutoAssemblersOption.Location = new Point(307, 5);
+            AutoAssemblersOption.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            AutoAssemblersOption.Name = "AutoAssemblersOption";
+            AutoAssemblersOption.Size = new Size(62, 27);
+            AutoAssemblersOption.TabIndex = 0;
+            AutoAssemblersOption.TabStop = true;
+            AutoAssemblersOption.Text = "Auto";
+            AutoAssemblersOption.UseVisualStyleBackColor = true;
             // 
             // FixedAssemblersOption
             // 
-            this.FixedAssemblersOption.AutoSize = true;
-            this.FixedAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FixedAssemblersOption.Location = new System.Drawing.Point(313, 3);
-            this.FixedAssemblersOption.Name = "FixedAssemblersOption";
-            this.FixedAssemblersOption.Size = new System.Drawing.Size(50, 20);
-            this.FixedAssemblersOption.TabIndex = 1;
-            this.FixedAssemblersOption.Text = "Fixed";
-            this.FixedAssemblersOption.UseVisualStyleBackColor = true;
+            FixedAssemblersOption.AutoSize = true;
+            FixedAssemblersOption.Dock = System.Windows.Forms.DockStyle.Fill;
+            FixedAssemblersOption.Location = new Point(377, 5);
+            FixedAssemblersOption.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            FixedAssemblersOption.Name = "FixedAssemblersOption";
+            FixedAssemblersOption.Size = new Size(106, 27);
+            FixedAssemblersOption.TabIndex = 1;
+            FixedAssemblersOption.Text = "Fixed";
+            FixedAssemblersOption.UseVisualStyleBackColor = true;
             // 
             // AssemblerInfoTable
             // 
-            this.AssemblerInfoTable.AutoSize = true;
-            this.AssemblerInfoTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.AssemblerInfoTable.ColumnCount = 4;
-            this.AssemblerTable.SetColumnSpan(this.AssemblerInfoTable, 2);
-            this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 70F));
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerQualityPercentLabel, 1, 4);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerQualityTitleLabel, 0, 4);
-            this.AssemblerInfoTable.Controls.Add(this.ExtraProductivityLabel, 0, 7);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerPollutionLabel, 2, 3);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerEnergyTitleLabel, 0, 0);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerPollutionPercentLabel, 1, 3);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerSpeedTitleLabel, 0, 1);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerProductivityPercentLabel, 1, 2);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerProductivityTitleLabel, 0, 2);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerSpeedPercentLabel, 1, 1);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerPollutionTitleLabel, 0, 3);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerEnergyPercentLabel, 1, 0);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerEnergyLabel, 2, 0);
-            this.AssemblerInfoTable.Controls.Add(this.AssemblerSpeedLabel, 2, 1);
-            this.AssemblerInfoTable.Controls.Add(this.NeighboursLabel, 0, 6);
-            this.AssemblerInfoTable.Controls.Add(this.GeneratorTemperatureLabel, 0, 5);
-            this.AssemblerInfoTable.Controls.Add(this.NeighbourInput, 3, 6);
-            this.AssemblerInfoTable.Controls.Add(this.GeneratorTemperatureRangeLabel, 1, 5);
-            this.AssemblerInfoTable.Controls.Add(this.ExtraProductivityInput, 3, 7);
-            this.AssemblerInfoTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.AssemblerInfoTable.Location = new System.Drawing.Point(154, 39);
-            this.AssemblerInfoTable.Margin = new System.Windows.Forms.Padding(2, 7, 2, 2);
-            this.AssemblerInfoTable.Name = "AssemblerInfoTable";
-            this.AssemblerInfoTable.RowCount = 8;
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.AssemblerInfoTable.Size = new System.Drawing.Size(310, 147);
-            this.AssemblerInfoTable.TabIndex = 9;
+            AssemblerInfoTable.AutoSize = true;
+            AssemblerInfoTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            AssemblerInfoTable.ColumnCount = 4;
+            AssemblerTable.SetColumnSpan(AssemblerInfoTable, 2);
+            AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            AssemblerInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 93F));
+            AssemblerInfoTable.Controls.Add(AssemblerQualityPercentLabel, 1, 4);
+            AssemblerInfoTable.Controls.Add(AssemblerQualityTitleLabel, 0, 4);
+            AssemblerInfoTable.Controls.Add(ExtraProductivityLabel, 0, 7);
+            AssemblerInfoTable.Controls.Add(AssemblerPollutionLabel, 2, 3);
+            AssemblerInfoTable.Controls.Add(AssemblerEnergyTitleLabel, 0, 0);
+            AssemblerInfoTable.Controls.Add(AssemblerPollutionPercentLabel, 1, 3);
+            AssemblerInfoTable.Controls.Add(AssemblerSpeedTitleLabel, 0, 1);
+            AssemblerInfoTable.Controls.Add(AssemblerProductivityPercentLabel, 1, 2);
+            AssemblerInfoTable.Controls.Add(AssemblerProductivityTitleLabel, 0, 2);
+            AssemblerInfoTable.Controls.Add(AssemblerSpeedPercentLabel, 1, 1);
+            AssemblerInfoTable.Controls.Add(AssemblerPollutionTitleLabel, 0, 3);
+            AssemblerInfoTable.Controls.Add(AssemblerEnergyPercentLabel, 1, 0);
+            AssemblerInfoTable.Controls.Add(AssemblerEnergyLabel, 2, 0);
+            AssemblerInfoTable.Controls.Add(AssemblerSpeedLabel, 2, 1);
+            AssemblerInfoTable.Controls.Add(NeighboursLabel, 0, 6);
+            AssemblerInfoTable.Controls.Add(GeneratorTemperatureLabel, 0, 5);
+            AssemblerInfoTable.Controls.Add(NeighbourInput, 3, 6);
+            AssemblerInfoTable.Controls.Add(GeneratorTemperatureRangeLabel, 1, 5);
+            AssemblerInfoTable.Controls.Add(ExtraProductivityInput, 3, 7);
+            AssemblerInfoTable.Dock = System.Windows.Forms.DockStyle.Top;
+            AssemblerInfoTable.Location = new Point(204, 65);
+            AssemblerInfoTable.Margin = new System.Windows.Forms.Padding(3, 11, 3, 3);
+            AssemblerInfoTable.Name = "AssemblerInfoTable";
+            AssemblerInfoTable.RowCount = 8;
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            AssemblerInfoTable.Size = new Size(413, 225);
+            AssemblerInfoTable.TabIndex = 9;
             // 
             // AssemblerQualityPercentLabel
             // 
-            this.AssemblerQualityPercentLabel.AutoSize = true;
-            this.AssemblerQualityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerQualityPercentLabel.Location = new System.Drawing.Point(103, 61);
-            this.AssemblerQualityPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
-            this.AssemblerQualityPercentLabel.Name = "AssemblerQualityPercentLabel";
-            this.AssemblerQualityPercentLabel.Size = new System.Drawing.Size(45, 18);
-            this.AssemblerQualityPercentLabel.TabIndex = 20;
-            this.AssemblerQualityPercentLabel.Text = "0%";
+            AssemblerQualityPercentLabel.AutoSize = true;
+            AssemblerQualityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerQualityPercentLabel.Location = new Point(141, 98);
+            AssemblerQualityPercentLabel.Margin = new System.Windows.Forms.Padding(1, 2, 7, 2);
+            AssemblerQualityPercentLabel.Name = "AssemblerQualityPercentLabel";
+            AssemblerQualityPercentLabel.Size = new Size(61, 27);
+            AssemblerQualityPercentLabel.TabIndex = 20;
+            AssemblerQualityPercentLabel.Text = "0%";
             // 
             // AssemblerQualityTitleLabel
             // 
-            this.AssemblerQualityTitleLabel.AutoSize = true;
-            this.AssemblerQualityTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerQualityTitleLabel.Location = new System.Drawing.Point(1, 61);
-            this.AssemblerQualityTitleLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerQualityTitleLabel.Name = "AssemblerQualityTitleLabel";
-            this.AssemblerQualityTitleLabel.Size = new System.Drawing.Size(100, 18);
-            this.AssemblerQualityTitleLabel.TabIndex = 19;
-            this.AssemblerQualityTitleLabel.Text = "Quality:";
+            AssemblerQualityTitleLabel.AutoSize = true;
+            AssemblerQualityTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerQualityTitleLabel.Location = new Point(1, 98);
+            AssemblerQualityTitleLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerQualityTitleLabel.Name = "AssemblerQualityTitleLabel";
+            AssemblerQualityTitleLabel.Size = new Size(138, 27);
+            AssemblerQualityTitleLabel.TabIndex = 19;
+            AssemblerQualityTitleLabel.Text = "Quality:";
             // 
             // ExtraProductivityLabel
             // 
-            this.ExtraProductivityLabel.AutoSize = true;
-            this.AssemblerInfoTable.SetColumnSpan(this.ExtraProductivityLabel, 3);
-            this.ExtraProductivityLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ExtraProductivityLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.ExtraProductivityLabel.Location = new System.Drawing.Point(3, 121);
-            this.ExtraProductivityLabel.Name = "ExtraProductivityLabel";
-            this.ExtraProductivityLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.ExtraProductivityLabel.Size = new System.Drawing.Size(234, 26);
-            this.ExtraProductivityLabel.TabIndex = 17;
-            this.ExtraProductivityLabel.Text = "Extra Productivity Bonus (%):";
-            this.ExtraProductivityLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            ExtraProductivityLabel.AutoSize = true;
+            AssemblerInfoTable.SetColumnSpan(ExtraProductivityLabel, 3);
+            ExtraProductivityLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            ExtraProductivityLabel.Font = new Font("Microsoft Sans Serif", 10F);
+            ExtraProductivityLabel.Location = new Point(4, 188);
+            ExtraProductivityLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            ExtraProductivityLabel.Name = "ExtraProductivityLabel";
+            ExtraProductivityLabel.Padding = new System.Windows.Forms.Padding(13, 0, 0, 0);
+            ExtraProductivityLabel.Size = new Size(312, 37);
+            ExtraProductivityLabel.TabIndex = 17;
+            ExtraProductivityLabel.Text = "Extra Productivity Bonus (%):";
+            ExtraProductivityLabel.TextAlign = ContentAlignment.MiddleRight;
             // 
             // AssemblerPollutionLabel
             // 
-            this.AssemblerPollutionLabel.AutoSize = true;
-            this.AssemblerInfoTable.SetColumnSpan(this.AssemblerPollutionLabel, 2);
-            this.AssemblerPollutionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerPollutionLabel.Location = new System.Drawing.Point(154, 46);
-            this.AssemblerPollutionLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerPollutionLabel.Name = "AssemblerPollutionLabel";
-            this.AssemblerPollutionLabel.Size = new System.Drawing.Size(155, 13);
-            this.AssemblerPollutionLabel.TabIndex = 12;
-            this.AssemblerPollutionLabel.Text = "12/min";
-            this.AssemblerPollutionLabel.Visible = false;
+            AssemblerPollutionLabel.AutoSize = true;
+            AssemblerInfoTable.SetColumnSpan(AssemblerPollutionLabel, 2);
+            AssemblerPollutionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerPollutionLabel.Location = new Point(210, 74);
+            AssemblerPollutionLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerPollutionLabel.Name = "AssemblerPollutionLabel";
+            AssemblerPollutionLabel.Size = new Size(202, 20);
+            AssemblerPollutionLabel.TabIndex = 12;
+            AssemblerPollutionLabel.Text = "12/min";
+            AssemblerPollutionLabel.Visible = false;
             // 
             // AssemblerEnergyTitleLabel
             // 
-            this.AssemblerEnergyTitleLabel.AutoSize = true;
-            this.AssemblerEnergyTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerEnergyTitleLabel.Location = new System.Drawing.Point(1, 1);
-            this.AssemblerEnergyTitleLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerEnergyTitleLabel.Name = "AssemblerEnergyTitleLabel";
-            this.AssemblerEnergyTitleLabel.Size = new System.Drawing.Size(100, 13);
-            this.AssemblerEnergyTitleLabel.TabIndex = 1;
-            this.AssemblerEnergyTitleLabel.Text = "Energy:";
+            AssemblerEnergyTitleLabel.AutoSize = true;
+            AssemblerEnergyTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerEnergyTitleLabel.Location = new Point(1, 2);
+            AssemblerEnergyTitleLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerEnergyTitleLabel.Name = "AssemblerEnergyTitleLabel";
+            AssemblerEnergyTitleLabel.Size = new Size(138, 20);
+            AssemblerEnergyTitleLabel.TabIndex = 1;
+            AssemblerEnergyTitleLabel.Text = "Energy:";
             // 
             // AssemblerPollutionPercentLabel
             // 
-            this.AssemblerPollutionPercentLabel.AutoSize = true;
-            this.AssemblerPollutionPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerPollutionPercentLabel.Location = new System.Drawing.Point(103, 46);
-            this.AssemblerPollutionPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
-            this.AssemblerPollutionPercentLabel.Name = "AssemblerPollutionPercentLabel";
-            this.AssemblerPollutionPercentLabel.Size = new System.Drawing.Size(45, 13);
-            this.AssemblerPollutionPercentLabel.TabIndex = 8;
-            this.AssemblerPollutionPercentLabel.Text = "2000%";
+            AssemblerPollutionPercentLabel.AutoSize = true;
+            AssemblerPollutionPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerPollutionPercentLabel.Location = new Point(141, 74);
+            AssemblerPollutionPercentLabel.Margin = new System.Windows.Forms.Padding(1, 2, 7, 2);
+            AssemblerPollutionPercentLabel.Name = "AssemblerPollutionPercentLabel";
+            AssemblerPollutionPercentLabel.Size = new Size(61, 20);
+            AssemblerPollutionPercentLabel.TabIndex = 8;
+            AssemblerPollutionPercentLabel.Text = "2000%";
             // 
             // AssemblerSpeedTitleLabel
             // 
-            this.AssemblerSpeedTitleLabel.AutoSize = true;
-            this.AssemblerSpeedTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerSpeedTitleLabel.Location = new System.Drawing.Point(1, 16);
-            this.AssemblerSpeedTitleLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerSpeedTitleLabel.Name = "AssemblerSpeedTitleLabel";
-            this.AssemblerSpeedTitleLabel.Size = new System.Drawing.Size(100, 13);
-            this.AssemblerSpeedTitleLabel.TabIndex = 2;
-            this.AssemblerSpeedTitleLabel.Text = "Speed:";
+            AssemblerSpeedTitleLabel.AutoSize = true;
+            AssemblerSpeedTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerSpeedTitleLabel.Location = new Point(1, 26);
+            AssemblerSpeedTitleLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerSpeedTitleLabel.Name = "AssemblerSpeedTitleLabel";
+            AssemblerSpeedTitleLabel.Size = new Size(138, 20);
+            AssemblerSpeedTitleLabel.TabIndex = 2;
+            AssemblerSpeedTitleLabel.Text = "Speed:";
             // 
             // AssemblerProductivityPercentLabel
             // 
-            this.AssemblerProductivityPercentLabel.AutoSize = true;
-            this.AssemblerProductivityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerProductivityPercentLabel.Location = new System.Drawing.Point(103, 31);
-            this.AssemblerProductivityPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
-            this.AssemblerProductivityPercentLabel.Name = "AssemblerProductivityPercentLabel";
-            this.AssemblerProductivityPercentLabel.Size = new System.Drawing.Size(45, 13);
-            this.AssemblerProductivityPercentLabel.TabIndex = 7;
-            this.AssemblerProductivityPercentLabel.Text = "100%";
+            AssemblerProductivityPercentLabel.AutoSize = true;
+            AssemblerProductivityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerProductivityPercentLabel.Location = new Point(141, 50);
+            AssemblerProductivityPercentLabel.Margin = new System.Windows.Forms.Padding(1, 2, 7, 2);
+            AssemblerProductivityPercentLabel.Name = "AssemblerProductivityPercentLabel";
+            AssemblerProductivityPercentLabel.Size = new Size(61, 20);
+            AssemblerProductivityPercentLabel.TabIndex = 7;
+            AssemblerProductivityPercentLabel.Text = "100%";
             // 
             // AssemblerProductivityTitleLabel
             // 
-            this.AssemblerProductivityTitleLabel.AutoSize = true;
-            this.AssemblerProductivityTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerProductivityTitleLabel.Location = new System.Drawing.Point(1, 31);
-            this.AssemblerProductivityTitleLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerProductivityTitleLabel.Name = "AssemblerProductivityTitleLabel";
-            this.AssemblerProductivityTitleLabel.Size = new System.Drawing.Size(100, 13);
-            this.AssemblerProductivityTitleLabel.TabIndex = 3;
-            this.AssemblerProductivityTitleLabel.Text = "Productivity:  ";
+            AssemblerProductivityTitleLabel.AutoSize = true;
+            AssemblerProductivityTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerProductivityTitleLabel.Location = new Point(1, 50);
+            AssemblerProductivityTitleLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerProductivityTitleLabel.Name = "AssemblerProductivityTitleLabel";
+            AssemblerProductivityTitleLabel.Size = new Size(138, 20);
+            AssemblerProductivityTitleLabel.TabIndex = 3;
+            AssemblerProductivityTitleLabel.Text = "Productivity:  ";
             // 
             // AssemblerSpeedPercentLabel
             // 
-            this.AssemblerSpeedPercentLabel.AutoSize = true;
-            this.AssemblerSpeedPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerSpeedPercentLabel.Location = new System.Drawing.Point(103, 16);
-            this.AssemblerSpeedPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
-            this.AssemblerSpeedPercentLabel.Name = "AssemblerSpeedPercentLabel";
-            this.AssemblerSpeedPercentLabel.Size = new System.Drawing.Size(45, 13);
-            this.AssemblerSpeedPercentLabel.TabIndex = 6;
-            this.AssemblerSpeedPercentLabel.Text = "-80%";
+            AssemblerSpeedPercentLabel.AutoSize = true;
+            AssemblerSpeedPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerSpeedPercentLabel.Location = new Point(141, 26);
+            AssemblerSpeedPercentLabel.Margin = new System.Windows.Forms.Padding(1, 2, 7, 2);
+            AssemblerSpeedPercentLabel.Name = "AssemblerSpeedPercentLabel";
+            AssemblerSpeedPercentLabel.Size = new Size(61, 20);
+            AssemblerSpeedPercentLabel.TabIndex = 6;
+            AssemblerSpeedPercentLabel.Text = "-80%";
             // 
             // AssemblerPollutionTitleLabel
             // 
-            this.AssemblerPollutionTitleLabel.AutoSize = true;
-            this.AssemblerPollutionTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerPollutionTitleLabel.Location = new System.Drawing.Point(1, 46);
-            this.AssemblerPollutionTitleLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerPollutionTitleLabel.Name = "AssemblerPollutionTitleLabel";
-            this.AssemblerPollutionTitleLabel.Size = new System.Drawing.Size(100, 13);
-            this.AssemblerPollutionTitleLabel.TabIndex = 4;
-            this.AssemblerPollutionTitleLabel.Text = "Pollution:";
+            AssemblerPollutionTitleLabel.AutoSize = true;
+            AssemblerPollutionTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerPollutionTitleLabel.Location = new Point(1, 74);
+            AssemblerPollutionTitleLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerPollutionTitleLabel.Name = "AssemblerPollutionTitleLabel";
+            AssemblerPollutionTitleLabel.Size = new Size(138, 20);
+            AssemblerPollutionTitleLabel.TabIndex = 4;
+            AssemblerPollutionTitleLabel.Text = "Pollution:";
             // 
             // AssemblerEnergyPercentLabel
             // 
-            this.AssemblerEnergyPercentLabel.AutoSize = true;
-            this.AssemblerEnergyPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerEnergyPercentLabel.Location = new System.Drawing.Point(103, 1);
-            this.AssemblerEnergyPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
-            this.AssemblerEnergyPercentLabel.Name = "AssemblerEnergyPercentLabel";
-            this.AssemblerEnergyPercentLabel.Size = new System.Drawing.Size(45, 13);
-            this.AssemblerEnergyPercentLabel.TabIndex = 5;
-            this.AssemblerEnergyPercentLabel.Text = "10000%";
+            AssemblerEnergyPercentLabel.AutoSize = true;
+            AssemblerEnergyPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerEnergyPercentLabel.Location = new Point(141, 2);
+            AssemblerEnergyPercentLabel.Margin = new System.Windows.Forms.Padding(1, 2, 7, 2);
+            AssemblerEnergyPercentLabel.Name = "AssemblerEnergyPercentLabel";
+            AssemblerEnergyPercentLabel.Size = new Size(61, 20);
+            AssemblerEnergyPercentLabel.TabIndex = 5;
+            AssemblerEnergyPercentLabel.Text = "10000%";
             // 
             // AssemblerEnergyLabel
             // 
-            this.AssemblerEnergyLabel.AutoSize = true;
-            this.AssemblerInfoTable.SetColumnSpan(this.AssemblerEnergyLabel, 2);
-            this.AssemblerEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerEnergyLabel.Location = new System.Drawing.Point(154, 1);
-            this.AssemblerEnergyLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerEnergyLabel.Name = "AssemblerEnergyLabel";
-            this.AssemblerEnergyLabel.Size = new System.Drawing.Size(155, 13);
-            this.AssemblerEnergyLabel.TabIndex = 9;
-            this.AssemblerEnergyLabel.Text = "5MJ";
+            AssemblerEnergyLabel.AutoSize = true;
+            AssemblerInfoTable.SetColumnSpan(AssemblerEnergyLabel, 2);
+            AssemblerEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerEnergyLabel.Location = new Point(210, 2);
+            AssemblerEnergyLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerEnergyLabel.Name = "AssemblerEnergyLabel";
+            AssemblerEnergyLabel.Size = new Size(202, 20);
+            AssemblerEnergyLabel.TabIndex = 9;
+            AssemblerEnergyLabel.Text = "5MJ";
             // 
             // AssemblerSpeedLabel
             // 
-            this.AssemblerSpeedLabel.AutoSize = true;
-            this.AssemblerInfoTable.SetColumnSpan(this.AssemblerSpeedLabel, 2);
-            this.AssemblerSpeedLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerSpeedLabel.Location = new System.Drawing.Point(154, 16);
-            this.AssemblerSpeedLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerSpeedLabel.Name = "AssemblerSpeedLabel";
-            this.AssemblerSpeedLabel.Size = new System.Drawing.Size(155, 13);
-            this.AssemblerSpeedLabel.TabIndex = 10;
-            this.AssemblerSpeedLabel.Text = "128.5";
+            AssemblerSpeedLabel.AutoSize = true;
+            AssemblerInfoTable.SetColumnSpan(AssemblerSpeedLabel, 2);
+            AssemblerSpeedLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerSpeedLabel.Location = new Point(210, 26);
+            AssemblerSpeedLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            AssemblerSpeedLabel.Name = "AssemblerSpeedLabel";
+            AssemblerSpeedLabel.Size = new Size(202, 20);
+            AssemblerSpeedLabel.TabIndex = 10;
+            AssemblerSpeedLabel.Text = "128.5";
             // 
             // NeighboursLabel
             // 
-            this.NeighboursLabel.AutoSize = true;
-            this.AssemblerInfoTable.SetColumnSpan(this.NeighboursLabel, 3);
-            this.NeighboursLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.NeighboursLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.NeighboursLabel.Location = new System.Drawing.Point(3, 95);
-            this.NeighboursLabel.Name = "NeighboursLabel";
-            this.NeighboursLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.NeighboursLabel.Size = new System.Drawing.Size(234, 26);
-            this.NeighboursLabel.TabIndex = 13;
-            this.NeighboursLabel.Text = "Average # of neighbours:";
-            this.NeighboursLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            NeighboursLabel.AutoSize = true;
+            AssemblerInfoTable.SetColumnSpan(NeighboursLabel, 3);
+            NeighboursLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            NeighboursLabel.Font = new Font("Microsoft Sans Serif", 10F);
+            NeighboursLabel.Location = new Point(4, 151);
+            NeighboursLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            NeighboursLabel.Name = "NeighboursLabel";
+            NeighboursLabel.Padding = new System.Windows.Forms.Padding(13, 0, 0, 0);
+            NeighboursLabel.Size = new Size(312, 37);
+            NeighboursLabel.TabIndex = 13;
+            NeighboursLabel.Text = "Average # of neighbours:";
+            NeighboursLabel.TextAlign = ContentAlignment.MiddleRight;
             // 
             // GeneratorTemperatureLabel
             // 
-            this.GeneratorTemperatureLabel.AutoSize = true;
-            this.GeneratorTemperatureLabel.Location = new System.Drawing.Point(1, 81);
-            this.GeneratorTemperatureLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.GeneratorTemperatureLabel.Name = "GeneratorTemperatureLabel";
-            this.GeneratorTemperatureLabel.Size = new System.Drawing.Size(100, 13);
-            this.GeneratorTemperatureLabel.TabIndex = 15;
-            this.GeneratorTemperatureLabel.Text = "Temperature range:";
-            this.GeneratorTemperatureLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.GeneratorTemperatureLabel.Visible = false;
+            GeneratorTemperatureLabel.AutoSize = true;
+            GeneratorTemperatureLabel.Location = new Point(1, 129);
+            GeneratorTemperatureLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            GeneratorTemperatureLabel.Name = "GeneratorTemperatureLabel";
+            GeneratorTemperatureLabel.Size = new Size(138, 20);
+            GeneratorTemperatureLabel.TabIndex = 15;
+            GeneratorTemperatureLabel.Text = "Temperature range:";
+            GeneratorTemperatureLabel.TextAlign = ContentAlignment.MiddleLeft;
+            GeneratorTemperatureLabel.Visible = false;
             // 
             // NeighbourInput
             // 
-            this.NeighbourInput.DecimalPlaces = 2;
-            this.NeighbourInput.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.NeighbourInput.Location = new System.Drawing.Point(243, 98);
-            this.NeighbourInput.Name = "NeighbourInput";
-            this.NeighbourInput.Size = new System.Drawing.Size(64, 20);
-            this.NeighbourInput.TabIndex = 14;
+            NeighbourInput.DecimalPlaces = 2;
+            NeighbourInput.Increment = new decimal(new int[] { 5, 0, 0, 131072 });
+            NeighbourInput.Location = new Point(324, 156);
+            NeighbourInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            NeighbourInput.Name = "NeighbourInput";
+            NeighbourInput.Size = new Size(85, 27);
+            NeighbourInput.TabIndex = 14;
             // 
             // GeneratorTemperatureRangeLabel
             // 
-            this.GeneratorTemperatureRangeLabel.AutoSize = true;
-            this.AssemblerInfoTable.SetColumnSpan(this.GeneratorTemperatureRangeLabel, 3);
-            this.GeneratorTemperatureRangeLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GeneratorTemperatureRangeLabel.Location = new System.Drawing.Point(103, 81);
-            this.GeneratorTemperatureRangeLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.GeneratorTemperatureRangeLabel.Name = "GeneratorTemperatureRangeLabel";
-            this.GeneratorTemperatureRangeLabel.Size = new System.Drawing.Size(206, 13);
-            this.GeneratorTemperatureRangeLabel.TabIndex = 16;
-            this.GeneratorTemperatureRangeLabel.Text = "100*c - 150*c";
-            this.GeneratorTemperatureRangeLabel.Visible = false;
+            GeneratorTemperatureRangeLabel.AutoSize = true;
+            AssemblerInfoTable.SetColumnSpan(GeneratorTemperatureRangeLabel, 3);
+            GeneratorTemperatureRangeLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            GeneratorTemperatureRangeLabel.Location = new Point(141, 129);
+            GeneratorTemperatureRangeLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            GeneratorTemperatureRangeLabel.Name = "GeneratorTemperatureRangeLabel";
+            GeneratorTemperatureRangeLabel.Size = new Size(271, 20);
+            GeneratorTemperatureRangeLabel.TabIndex = 16;
+            GeneratorTemperatureRangeLabel.Text = "100*c - 150*c";
+            GeneratorTemperatureRangeLabel.Visible = false;
             // 
             // ExtraProductivityInput
             // 
-            this.ExtraProductivityInput.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.ExtraProductivityInput.Location = new System.Drawing.Point(243, 124);
-            this.ExtraProductivityInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.ExtraProductivityInput.Name = "ExtraProductivityInput";
-            this.ExtraProductivityInput.Size = new System.Drawing.Size(64, 20);
-            this.ExtraProductivityInput.TabIndex = 18;
+            ExtraProductivityInput.Increment = new decimal(new int[] { 10, 0, 0, 0 });
+            ExtraProductivityInput.Location = new Point(324, 193);
+            ExtraProductivityInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            ExtraProductivityInput.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            ExtraProductivityInput.Name = "ExtraProductivityInput";
+            ExtraProductivityInput.Size = new Size(85, 27);
+            ExtraProductivityInput.TabIndex = 18;
             // 
             // AModuleOptionsLabel
             // 
-            this.AModuleOptionsLabel.AutoSize = true;
-            this.AModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.AssemblerTable.SetColumnSpan(this.AModuleOptionsLabel, 2);
-            this.AModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AModuleOptionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.AModuleOptionsLabel.Location = new System.Drawing.Point(152, 268);
-            this.AModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.AModuleOptionsLabel.Name = "AModuleOptionsLabel";
-            this.AModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(3);
-            this.AModuleOptionsLabel.Size = new System.Drawing.Size(314, 23);
-            this.AModuleOptionsLabel.TabIndex = 13;
-            this.AModuleOptionsLabel.Text = "Module Options:";
+            AModuleOptionsLabel.AutoSize = true;
+            AModuleOptionsLabel.BackColor = Color.FromArgb(40, 40, 40);
+            AssemblerTable.SetColumnSpan(AModuleOptionsLabel, 2);
+            AModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AModuleOptionsLabel.Font = new Font("Microsoft Sans Serif", 10F);
+            AModuleOptionsLabel.Location = new Point(201, 419);
+            AModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
+            AModuleOptionsLabel.Name = "AModuleOptionsLabel";
+            AModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            AModuleOptionsLabel.Size = new Size(419, 30);
+            AModuleOptionsLabel.TabIndex = 13;
+            AModuleOptionsLabel.Text = "Module Options:";
             // 
             // AModulesLabel
             // 
-            this.AModulesLabel.AutoSize = true;
-            this.AModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.AModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AModulesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.AModulesLabel.Location = new System.Drawing.Point(0, 268);
-            this.AModulesLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.AModulesLabel.Name = "AModulesLabel";
-            this.AModulesLabel.Padding = new System.Windows.Forms.Padding(3);
-            this.AModulesLabel.Size = new System.Drawing.Size(152, 23);
-            this.AModulesLabel.TabIndex = 12;
-            this.AModulesLabel.Text = "Modules:";
+            AModulesLabel.AutoSize = true;
+            AModulesLabel.BackColor = Color.FromArgb(40, 40, 40);
+            AModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AModulesLabel.Font = new Font("Microsoft Sans Serif", 10F);
+            AModulesLabel.Location = new Point(0, 419);
+            AModulesLabel.Margin = new System.Windows.Forms.Padding(0);
+            AModulesLabel.Name = "AModulesLabel";
+            AModulesLabel.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            AModulesLabel.Size = new Size(201, 30);
+            AModulesLabel.TabIndex = 12;
+            AModulesLabel.Text = "Modules:";
             // 
             // AssemblerRateLabel
             // 
-            this.AssemblerRateLabel.AutoSize = true;
-            this.AssemblerRateLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerRateLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
-            this.AssemblerRateLabel.Location = new System.Drawing.Point(3, 1);
-            this.AssemblerRateLabel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
-            this.AssemblerRateLabel.Name = "AssemblerRateLabel";
-            this.AssemblerRateLabel.Size = new System.Drawing.Size(203, 22);
-            this.AssemblerRateLabel.TabIndex = 3;
-            this.AssemblerRateLabel.Text = "# of Assemblers:";
-            this.AssemblerRateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            AssemblerRateLabel.AutoSize = true;
+            AssemblerRateLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerRateLabel.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold);
+            AssemblerRateLabel.Location = new Point(4, 2);
+            AssemblerRateLabel.Margin = new System.Windows.Forms.Padding(4, 2, 4, 5);
+            AssemblerRateLabel.Name = "AssemblerRateLabel";
+            AssemblerRateLabel.Size = new Size(228, 30);
+            AssemblerRateLabel.TabIndex = 3;
+            AssemblerRateLabel.Text = "# of Assemblers:";
+            AssemblerRateLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // AssemblerTitle
             // 
-            this.AssemblerTitle.AutoSize = true;
-            this.AssemblerTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.AssemblerTable.SetColumnSpan(this.AssemblerTitle, 2);
-            this.AssemblerTitle.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
-            this.AssemblerTitle.Location = new System.Drawing.Point(0, 0);
-            this.AssemblerTitle.Margin = new System.Windows.Forms.Padding(0);
-            this.AssemblerTitle.Name = "AssemblerTitle";
-            this.AssemblerTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
-            this.AssemblerTitle.Size = new System.Drawing.Size(434, 32);
-            this.AssemblerTitle.TabIndex = 0;
-            this.AssemblerTitle.Text = "Assembler: (Space factory #2)";
+            AssemblerTitle.AutoSize = true;
+            AssemblerTitle.BackColor = Color.FromArgb(40, 40, 40);
+            AssemblerTable.SetColumnSpan(AssemblerTitle, 2);
+            AssemblerTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerTitle.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold);
+            AssemblerTitle.Location = new Point(0, 0);
+            AssemblerTitle.Margin = new System.Windows.Forms.Padding(0);
+            AssemblerTitle.Name = "AssemblerTitle";
+            AssemblerTitle.Padding = new System.Windows.Forms.Padding(4, 9, 4, 14);
+            AssemblerTitle.Size = new Size(577, 54);
+            AssemblerTitle.TabIndex = 0;
+            AssemblerTitle.Text = "Assembler: (Space factory #2)";
             // 
             // MainTable
             // 
-            this.MainTable.AutoSize = true;
-            this.MainTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.MainTable.ColumnCount = 1;
-            this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.MainTable.Controls.Add(this.BeaconTable, 0, 2);
-            this.MainTable.Controls.Add(this.AssemblerTable, 0, 1);
-            this.MainTable.Controls.Add(this.RateOptionsTable, 0, 0);
-            this.MainTable.Location = new System.Drawing.Point(0, 0);
-            this.MainTable.Margin = new System.Windows.Forms.Padding(0);
-            this.MainTable.Name = "MainTable";
-            this.MainTable.RowCount = 3;
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.Size = new System.Drawing.Size(472, 689);
-            this.MainTable.TabIndex = 17;
+            MainTable.AutoSize = true;
+            MainTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            MainTable.ColumnCount = 1;
+            MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            MainTable.Controls.Add(BeaconTable, 0, 2);
+            MainTable.Controls.Add(AssemblerTable, 0, 1);
+            MainTable.Controls.Add(RateOptionsTable, 0, 0);
+            MainTable.Location = new Point(0, 0);
+            MainTable.Margin = new System.Windows.Forms.Padding(0);
+            MainTable.Name = "MainTable";
+            MainTable.RowCount = 3;
+            MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            MainTable.Size = new Size(628, 1057);
+            MainTable.TabIndex = 17;
             // 
             // BeaconTable
             // 
-            this.BeaconTable.AutoSize = true;
-            this.BeaconTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BeaconTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
-            this.BeaconTable.ColumnCount = 4;
-            this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.BeaconTable.Controls.Add(this.BModulesChoicePanel, 1, 3);
-            this.BeaconTable.Controls.Add(this.BeaconInfoTable, 1, 1);
-            this.BeaconTable.Controls.Add(this.SelectedBModulesPanel, 0, 3);
-            this.BeaconTable.Controls.Add(this.BModulesLabel, 0, 2);
-            this.BeaconTable.Controls.Add(this.BeaconTitle, 0, 0);
-            this.BeaconTable.Controls.Add(this.BModuleOptionsLabel, 1, 2);
-            this.BeaconTable.Controls.Add(this.BeaconChoicePanel, 0, 1);
-            this.BeaconTable.Controls.Add(this.BeaconValuesTable, 2, 1);
-            this.BeaconTable.Controls.Add(this.SelectedBeaconIcon, 3, 0);
-            this.BeaconTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconTable.Location = new System.Drawing.Point(3, 464);
-            this.BeaconTable.Name = "BeaconTable";
-            this.BeaconTable.RowCount = 4;
-            this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.BeaconTable.Size = new System.Drawing.Size(466, 222);
-            this.BeaconTable.TabIndex = 21;
+            BeaconTable.AutoSize = true;
+            BeaconTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            BeaconTable.BackColor = Color.FromArgb(65, 65, 65);
+            BeaconTable.ColumnCount = 4;
+            BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            BeaconTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 43F));
+            BeaconTable.Controls.Add(BModulesChoicePanel, 1, 3);
+            BeaconTable.Controls.Add(BeaconInfoTable, 1, 1);
+            BeaconTable.Controls.Add(SelectedBModulesPanel, 0, 3);
+            BeaconTable.Controls.Add(BModulesLabel, 0, 2);
+            BeaconTable.Controls.Add(BeaconTitle, 0, 0);
+            BeaconTable.Controls.Add(BModuleOptionsLabel, 1, 2);
+            BeaconTable.Controls.Add(BeaconChoicePanel, 0, 1);
+            BeaconTable.Controls.Add(BeaconValuesTable, 2, 1);
+            BeaconTable.Controls.Add(SelectedBeaconIcon, 3, 0);
+            BeaconTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            BeaconTable.Location = new Point(4, 708);
+            BeaconTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BeaconTable.Name = "BeaconTable";
+            BeaconTable.RowCount = 4;
+            BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            BeaconTable.Size = new Size(620, 344);
+            BeaconTable.TabIndex = 21;
             // 
             // BModulesChoicePanel
             // 
-            this.BModulesChoicePanel.AutoScroll = true;
-            this.BModulesChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.BeaconTable.SetColumnSpan(this.BModulesChoicePanel, 3);
-            this.BModulesChoicePanel.Controls.Add(this.BModulesChoiceTable);
-            this.BModulesChoicePanel.Location = new System.Drawing.Point(155, 147);
-            this.BModulesChoicePanel.Name = "BModulesChoicePanel";
-            this.BModulesChoicePanel.Size = new System.Drawing.Size(308, 72);
-            this.BModulesChoicePanel.TabIndex = 20;
+            BModulesChoicePanel.AutoScroll = true;
+            BModulesChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            BeaconTable.SetColumnSpan(BModulesChoicePanel, 3);
+            BModulesChoicePanel.Controls.Add(BModulesChoiceTable);
+            BModulesChoicePanel.Location = new Point(205, 230);
+            BModulesChoicePanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BModulesChoicePanel.Name = "BModulesChoicePanel";
+            BModulesChoicePanel.Size = new Size(409, 109);
+            BModulesChoicePanel.TabIndex = 20;
             // 
             // BModulesChoiceTable
             // 
-            this.BModulesChoiceTable.AutoSize = true;
-            this.BModulesChoiceTable.ColumnCount = 10;
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.BModulesChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.BModulesChoiceTable.Location = new System.Drawing.Point(0, 0);
-            this.BModulesChoiceTable.Name = "BModulesChoiceTable";
-            this.BModulesChoiceTable.RowCount = 1;
-            this.BModulesChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.BModulesChoiceTable.Size = new System.Drawing.Size(304, 32);
-            this.BModulesChoiceTable.TabIndex = 0;
+            BModulesChoiceTable.AutoSize = true;
+            BModulesChoiceTable.ColumnCount = 10;
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            BModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            BModulesChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+            BModulesChoiceTable.Location = new Point(0, 0);
+            BModulesChoiceTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BModulesChoiceTable.Name = "BModulesChoiceTable";
+            BModulesChoiceTable.RowCount = 1;
+            BModulesChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            BModulesChoiceTable.Size = new Size(405, 49);
+            BModulesChoiceTable.TabIndex = 0;
             // 
             // BeaconInfoTable
             // 
-            this.BeaconInfoTable.AutoSize = true;
-            this.BeaconInfoTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BeaconInfoTable.ColumnCount = 2;
-            this.BeaconInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            this.BeaconInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.BeaconInfoTable.Controls.Add(this.label3, 0, 5);
-            this.BeaconInfoTable.Controls.Add(this.TotalBeaconEnergyLabel, 0, 5);
-            this.BeaconInfoTable.Controls.Add(this.label14, 0, 0);
-            this.BeaconInfoTable.Controls.Add(this.label16, 0, 1);
-            this.BeaconInfoTable.Controls.Add(this.BeaconEfficiencyLabel, 1, 2);
-            this.BeaconInfoTable.Controls.Add(this.label18, 0, 2);
-            this.BeaconInfoTable.Controls.Add(this.BeaconModuleCountLabel, 1, 1);
-            this.BeaconInfoTable.Controls.Add(this.BeaconEnergyLabel, 1, 0);
-            this.BeaconInfoTable.Controls.Add(this.label20, 0, 4);
-            this.BeaconInfoTable.Controls.Add(this.TotalBeaconsLabel, 1, 4);
-            this.BeaconInfoTable.Dock = System.Windows.Forms.DockStyle.Left;
-            this.BeaconInfoTable.Location = new System.Drawing.Point(154, 34);
-            this.BeaconInfoTable.Margin = new System.Windows.Forms.Padding(2);
-            this.BeaconInfoTable.Name = "BeaconInfoTable";
-            this.BeaconInfoTable.RowCount = 6;
-            this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
-            this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BeaconInfoTable.Size = new System.Drawing.Size(121, 85);
-            this.BeaconInfoTable.TabIndex = 9;
+            BeaconInfoTable.AutoSize = true;
+            BeaconInfoTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            BeaconInfoTable.ColumnCount = 2;
+            BeaconInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 107F));
+            BeaconInfoTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            BeaconInfoTable.Controls.Add(label3, 0, 5);
+            BeaconInfoTable.Controls.Add(TotalBeaconEnergyLabel, 0, 5);
+            BeaconInfoTable.Controls.Add(label14, 0, 0);
+            BeaconInfoTable.Controls.Add(label16, 0, 1);
+            BeaconInfoTable.Controls.Add(BeaconEfficiencyLabel, 1, 2);
+            BeaconInfoTable.Controls.Add(label18, 0, 2);
+            BeaconInfoTable.Controls.Add(BeaconModuleCountLabel, 1, 1);
+            BeaconInfoTable.Controls.Add(BeaconEnergyLabel, 1, 0);
+            BeaconInfoTable.Controls.Add(label20, 0, 4);
+            BeaconInfoTable.Controls.Add(TotalBeaconsLabel, 1, 4);
+            BeaconInfoTable.Dock = System.Windows.Forms.DockStyle.Left;
+            BeaconInfoTable.Location = new Point(204, 57);
+            BeaconInfoTable.Name = "BeaconInfoTable";
+            BeaconInfoTable.RowCount = 6;
+            BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 15F));
+            BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            BeaconInfoTable.Size = new Size(160, 135);
+            BeaconInfoTable.TabIndex = 9;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label3.Location = new System.Drawing.Point(1, 71);
-            this.label3.Margin = new System.Windows.Forms.Padding(1);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(78, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Total Energy:";
+            label3.AutoSize = true;
+            label3.Dock = System.Windows.Forms.DockStyle.Fill;
+            label3.Location = new Point(1, 113);
+            label3.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            label3.Name = "label3";
+            label3.Size = new Size(105, 20);
+            label3.TabIndex = 10;
+            label3.Text = "Total Energy:";
             // 
             // TotalBeaconEnergyLabel
             // 
-            this.TotalBeaconEnergyLabel.AutoSize = true;
-            this.TotalBeaconEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TotalBeaconEnergyLabel.Location = new System.Drawing.Point(81, 71);
-            this.TotalBeaconEnergyLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.TotalBeaconEnergyLabel.Name = "TotalBeaconEnergyLabel";
-            this.TotalBeaconEnergyLabel.Size = new System.Drawing.Size(39, 13);
-            this.TotalBeaconEnergyLabel.TabIndex = 9;
-            this.TotalBeaconEnergyLabel.Text = "200MJ";
+            TotalBeaconEnergyLabel.AutoSize = true;
+            TotalBeaconEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            TotalBeaconEnergyLabel.Location = new Point(108, 113);
+            TotalBeaconEnergyLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            TotalBeaconEnergyLabel.Name = "TotalBeaconEnergyLabel";
+            TotalBeaconEnergyLabel.Size = new Size(51, 20);
+            TotalBeaconEnergyLabel.TabIndex = 9;
+            TotalBeaconEnergyLabel.Text = "200MJ";
             // 
             // label14
             // 
-            this.label14.AutoSize = true;
-            this.label14.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label14.Location = new System.Drawing.Point(1, 1);
-            this.label14.Margin = new System.Windows.Forms.Padding(1);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(78, 13);
-            this.label14.TabIndex = 1;
-            this.label14.Text = "Energy:";
+            label14.AutoSize = true;
+            label14.Dock = System.Windows.Forms.DockStyle.Fill;
+            label14.Location = new Point(1, 2);
+            label14.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            label14.Name = "label14";
+            label14.Size = new Size(105, 20);
+            label14.TabIndex = 1;
+            label14.Text = "Energy:";
             // 
             // label16
             // 
-            this.label16.AutoSize = true;
-            this.label16.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label16.Location = new System.Drawing.Point(1, 16);
-            this.label16.Margin = new System.Windows.Forms.Padding(1);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(78, 13);
-            this.label16.TabIndex = 2;
-            this.label16.Text = "Modules:";
+            label16.AutoSize = true;
+            label16.Dock = System.Windows.Forms.DockStyle.Fill;
+            label16.Location = new Point(1, 26);
+            label16.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            label16.Name = "label16";
+            label16.Size = new Size(105, 20);
+            label16.TabIndex = 2;
+            label16.Text = "Modules:";
             // 
             // BeaconEfficiencyLabel
             // 
-            this.BeaconEfficiencyLabel.AutoSize = true;
-            this.BeaconEfficiencyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconEfficiencyLabel.Location = new System.Drawing.Point(81, 31);
-            this.BeaconEfficiencyLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.BeaconEfficiencyLabel.Name = "BeaconEfficiencyLabel";
-            this.BeaconEfficiencyLabel.Size = new System.Drawing.Size(39, 13);
-            this.BeaconEfficiencyLabel.TabIndex = 7;
-            this.BeaconEfficiencyLabel.Text = "50%";
+            BeaconEfficiencyLabel.AutoSize = true;
+            BeaconEfficiencyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            BeaconEfficiencyLabel.Location = new Point(108, 50);
+            BeaconEfficiencyLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            BeaconEfficiencyLabel.Name = "BeaconEfficiencyLabel";
+            BeaconEfficiencyLabel.Size = new Size(51, 20);
+            BeaconEfficiencyLabel.TabIndex = 7;
+            BeaconEfficiencyLabel.Text = "50%";
             // 
             // label18
             // 
-            this.label18.AutoSize = true;
-            this.label18.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label18.Location = new System.Drawing.Point(1, 31);
-            this.label18.Margin = new System.Windows.Forms.Padding(1);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(78, 13);
-            this.label18.TabIndex = 3;
-            this.label18.Text = "Efficiency:";
+            label18.AutoSize = true;
+            label18.Dock = System.Windows.Forms.DockStyle.Fill;
+            label18.Location = new Point(1, 50);
+            label18.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            label18.Name = "label18";
+            label18.Size = new Size(105, 20);
+            label18.TabIndex = 3;
+            label18.Text = "Efficiency:";
             // 
             // BeaconModuleCountLabel
             // 
-            this.BeaconModuleCountLabel.AutoSize = true;
-            this.BeaconModuleCountLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconModuleCountLabel.Location = new System.Drawing.Point(81, 16);
-            this.BeaconModuleCountLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.BeaconModuleCountLabel.Name = "BeaconModuleCountLabel";
-            this.BeaconModuleCountLabel.Size = new System.Drawing.Size(39, 13);
-            this.BeaconModuleCountLabel.TabIndex = 6;
-            this.BeaconModuleCountLabel.Text = "4";
+            BeaconModuleCountLabel.AutoSize = true;
+            BeaconModuleCountLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            BeaconModuleCountLabel.Location = new Point(108, 26);
+            BeaconModuleCountLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            BeaconModuleCountLabel.Name = "BeaconModuleCountLabel";
+            BeaconModuleCountLabel.Size = new Size(51, 20);
+            BeaconModuleCountLabel.TabIndex = 6;
+            BeaconModuleCountLabel.Text = "4";
             // 
             // BeaconEnergyLabel
             // 
-            this.BeaconEnergyLabel.AutoSize = true;
-            this.BeaconEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconEnergyLabel.Location = new System.Drawing.Point(81, 1);
-            this.BeaconEnergyLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.BeaconEnergyLabel.Name = "BeaconEnergyLabel";
-            this.BeaconEnergyLabel.Size = new System.Drawing.Size(39, 13);
-            this.BeaconEnergyLabel.TabIndex = 5;
-            this.BeaconEnergyLabel.Text = "10MJ";
+            BeaconEnergyLabel.AutoSize = true;
+            BeaconEnergyLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            BeaconEnergyLabel.Location = new Point(108, 2);
+            BeaconEnergyLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            BeaconEnergyLabel.Name = "BeaconEnergyLabel";
+            BeaconEnergyLabel.Size = new Size(51, 20);
+            BeaconEnergyLabel.TabIndex = 5;
+            BeaconEnergyLabel.Text = "10MJ";
             // 
             // label20
             // 
-            this.label20.AutoSize = true;
-            this.label20.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label20.Location = new System.Drawing.Point(1, 56);
-            this.label20.Margin = new System.Windows.Forms.Padding(1);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(78, 13);
-            this.label20.TabIndex = 4;
-            this.label20.Text = "#Beacons:";
+            label20.AutoSize = true;
+            label20.Dock = System.Windows.Forms.DockStyle.Fill;
+            label20.Location = new Point(1, 89);
+            label20.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            label20.Name = "label20";
+            label20.Size = new Size(105, 20);
+            label20.TabIndex = 4;
+            label20.Text = "#Beacons:";
             // 
             // TotalBeaconsLabel
             // 
-            this.TotalBeaconsLabel.AutoSize = true;
-            this.TotalBeaconsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TotalBeaconsLabel.Location = new System.Drawing.Point(81, 56);
-            this.TotalBeaconsLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.TotalBeaconsLabel.Name = "TotalBeaconsLabel";
-            this.TotalBeaconsLabel.Size = new System.Drawing.Size(39, 13);
-            this.TotalBeaconsLabel.TabIndex = 8;
-            this.TotalBeaconsLabel.Text = "250";
+            TotalBeaconsLabel.AutoSize = true;
+            TotalBeaconsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            TotalBeaconsLabel.Location = new Point(108, 89);
+            TotalBeaconsLabel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            TotalBeaconsLabel.Name = "TotalBeaconsLabel";
+            TotalBeaconsLabel.Size = new Size(51, 20);
+            TotalBeaconsLabel.TabIndex = 8;
+            TotalBeaconsLabel.Text = "250";
             // 
             // SelectedBModulesPanel
             // 
-            this.SelectedBModulesPanel.AutoScroll = true;
-            this.SelectedBModulesPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.SelectedBModulesPanel.Controls.Add(this.SelectedBModulesTable);
-            this.SelectedBModulesPanel.Location = new System.Drawing.Point(3, 147);
-            this.SelectedBModulesPanel.Margin = new System.Windows.Forms.Padding(3, 3, 13, 3);
-            this.SelectedBModulesPanel.Name = "SelectedBModulesPanel";
-            this.SelectedBModulesPanel.Size = new System.Drawing.Size(136, 72);
-            this.SelectedBModulesPanel.TabIndex = 19;
+            SelectedBModulesPanel.AutoScroll = true;
+            SelectedBModulesPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            SelectedBModulesPanel.Controls.Add(SelectedBModulesTable);
+            SelectedBModulesPanel.Location = new Point(4, 230);
+            SelectedBModulesPanel.Margin = new System.Windows.Forms.Padding(4, 5, 17, 5);
+            SelectedBModulesPanel.Name = "SelectedBModulesPanel";
+            SelectedBModulesPanel.Size = new Size(180, 109);
+            SelectedBModulesPanel.TabIndex = 19;
             // 
             // SelectedBModulesTable
             // 
-            this.SelectedBModulesTable.AutoSize = true;
-            this.SelectedBModulesTable.ColumnCount = 5;
-            this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.SelectedBModulesTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.SelectedBModulesTable.Location = new System.Drawing.Point(0, 0);
-            this.SelectedBModulesTable.Name = "SelectedBModulesTable";
-            this.SelectedBModulesTable.RowCount = 1;
-            this.SelectedBModulesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.SelectedBModulesTable.Size = new System.Drawing.Size(132, 32);
-            this.SelectedBModulesTable.TabIndex = 0;
+            SelectedBModulesTable.AutoSize = true;
+            SelectedBModulesTable.ColumnCount = 5;
+            SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedBModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            SelectedBModulesTable.Dock = System.Windows.Forms.DockStyle.Top;
+            SelectedBModulesTable.Location = new Point(0, 0);
+            SelectedBModulesTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            SelectedBModulesTable.Name = "SelectedBModulesTable";
+            SelectedBModulesTable.RowCount = 1;
+            SelectedBModulesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            SelectedBModulesTable.Size = new Size(176, 49);
+            SelectedBModulesTable.TabIndex = 0;
             // 
             // BModulesLabel
             // 
-            this.BModulesLabel.AutoSize = true;
-            this.BModulesLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.BModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BModulesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.BModulesLabel.Location = new System.Drawing.Point(0, 121);
-            this.BModulesLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.BModulesLabel.Name = "BModulesLabel";
-            this.BModulesLabel.Padding = new System.Windows.Forms.Padding(3);
-            this.BModulesLabel.Size = new System.Drawing.Size(152, 23);
-            this.BModulesLabel.TabIndex = 12;
-            this.BModulesLabel.Text = "Modules:";
+            BModulesLabel.AutoSize = true;
+            BModulesLabel.BackColor = Color.FromArgb(40, 40, 40);
+            BModulesLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            BModulesLabel.Font = new Font("Microsoft Sans Serif", 10F);
+            BModulesLabel.Location = new Point(0, 195);
+            BModulesLabel.Margin = new System.Windows.Forms.Padding(0);
+            BModulesLabel.Name = "BModulesLabel";
+            BModulesLabel.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BModulesLabel.Size = new Size(201, 30);
+            BModulesLabel.TabIndex = 12;
+            BModulesLabel.Text = "Modules:";
             // 
             // BeaconTitle
             // 
-            this.BeaconTitle.AutoSize = true;
-            this.BeaconTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.BeaconTable.SetColumnSpan(this.BeaconTitle, 3);
-            this.BeaconTitle.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
-            this.BeaconTitle.Location = new System.Drawing.Point(0, 0);
-            this.BeaconTitle.Margin = new System.Windows.Forms.Padding(0);
-            this.BeaconTitle.Name = "BeaconTitle";
-            this.BeaconTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
-            this.BeaconTitle.Size = new System.Drawing.Size(434, 32);
-            this.BeaconTitle.TabIndex = 0;
-            this.BeaconTitle.Text = "Beacon: (Beacon 2)";
+            BeaconTitle.AutoSize = true;
+            BeaconTitle.BackColor = Color.FromArgb(40, 40, 40);
+            BeaconTable.SetColumnSpan(BeaconTitle, 3);
+            BeaconTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+            BeaconTitle.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold);
+            BeaconTitle.Location = new Point(0, 0);
+            BeaconTitle.Margin = new System.Windows.Forms.Padding(0);
+            BeaconTitle.Name = "BeaconTitle";
+            BeaconTitle.Padding = new System.Windows.Forms.Padding(4, 9, 4, 14);
+            BeaconTitle.Size = new Size(577, 54);
+            BeaconTitle.TabIndex = 0;
+            BeaconTitle.Text = "Beacon: (Beacon 2)";
             // 
             // BModuleOptionsLabel
             // 
-            this.BModuleOptionsLabel.AutoSize = true;
-            this.BModuleOptionsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.BeaconTable.SetColumnSpan(this.BModuleOptionsLabel, 3);
-            this.BModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BModuleOptionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.BModuleOptionsLabel.Location = new System.Drawing.Point(152, 121);
-            this.BModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.BModuleOptionsLabel.Name = "BModuleOptionsLabel";
-            this.BModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(3);
-            this.BModuleOptionsLabel.Size = new System.Drawing.Size(314, 23);
-            this.BModuleOptionsLabel.TabIndex = 13;
-            this.BModuleOptionsLabel.Text = "Module Options:";
+            BModuleOptionsLabel.AutoSize = true;
+            BModuleOptionsLabel.BackColor = Color.FromArgb(40, 40, 40);
+            BeaconTable.SetColumnSpan(BModuleOptionsLabel, 3);
+            BModuleOptionsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            BModuleOptionsLabel.Font = new Font("Microsoft Sans Serif", 10F);
+            BModuleOptionsLabel.Location = new Point(201, 195);
+            BModuleOptionsLabel.Margin = new System.Windows.Forms.Padding(0);
+            BModuleOptionsLabel.Name = "BModuleOptionsLabel";
+            BModuleOptionsLabel.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BModuleOptionsLabel.Size = new Size(419, 30);
+            BModuleOptionsLabel.TabIndex = 13;
+            BModuleOptionsLabel.Text = "Module Options:";
             // 
             // BeaconChoicePanel
             // 
-            this.BeaconChoicePanel.AutoScroll = true;
-            this.BeaconChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.BeaconChoicePanel.Controls.Add(this.BeaconChoiceTable);
-            this.BeaconChoicePanel.Location = new System.Drawing.Point(3, 35);
-            this.BeaconChoicePanel.Margin = new System.Windows.Forms.Padding(3, 3, 13, 3);
-            this.BeaconChoicePanel.Name = "BeaconChoicePanel";
-            this.BeaconChoicePanel.Size = new System.Drawing.Size(136, 72);
-            this.BeaconChoicePanel.TabIndex = 18;
+            BeaconChoicePanel.AutoScroll = true;
+            BeaconChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            BeaconChoicePanel.Controls.Add(BeaconChoiceTable);
+            BeaconChoicePanel.Location = new Point(4, 59);
+            BeaconChoicePanel.Margin = new System.Windows.Forms.Padding(4, 5, 17, 5);
+            BeaconChoicePanel.Name = "BeaconChoicePanel";
+            BeaconChoicePanel.Size = new Size(180, 109);
+            BeaconChoicePanel.TabIndex = 18;
             // 
             // BeaconChoiceTable
             // 
-            this.BeaconChoiceTable.AutoSize = true;
-            this.BeaconChoiceTable.ColumnCount = 5;
-            this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.BeaconChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.BeaconChoiceTable.Location = new System.Drawing.Point(0, 0);
-            this.BeaconChoiceTable.Name = "BeaconChoiceTable";
-            this.BeaconChoiceTable.RowCount = 1;
-            this.BeaconChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.BeaconChoiceTable.Size = new System.Drawing.Size(132, 32);
-            this.BeaconChoiceTable.TabIndex = 0;
+            BeaconChoiceTable.AutoSize = true;
+            BeaconChoiceTable.ColumnCount = 5;
+            BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            BeaconChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            BeaconChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+            BeaconChoiceTable.Location = new Point(0, 0);
+            BeaconChoiceTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BeaconChoiceTable.Name = "BeaconChoiceTable";
+            BeaconChoiceTable.RowCount = 1;
+            BeaconChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            BeaconChoiceTable.Size = new Size(176, 49);
+            BeaconChoiceTable.TabIndex = 0;
             // 
             // BeaconValuesTable
             // 
-            this.BeaconValuesTable.AutoSize = true;
-            this.BeaconValuesTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BeaconValuesTable.ColumnCount = 2;
-            this.BeaconTable.SetColumnSpan(this.BeaconValuesTable, 2);
-            this.BeaconValuesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.BeaconValuesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-            this.BeaconValuesTable.Controls.Add(this.ConstantBeaconInput, 1, 2);
-            this.BeaconValuesTable.Controls.Add(this.label8, 0, 0);
-            this.BeaconValuesTable.Controls.Add(this.label9, 0, 1);
-            this.BeaconValuesTable.Controls.Add(this.label10, 0, 2);
-            this.BeaconValuesTable.Controls.Add(this.BeaconCountInput, 1, 0);
-            this.BeaconValuesTable.Controls.Add(this.BeaconsPerAssemblerInput, 1, 1);
-            this.BeaconValuesTable.Dock = System.Windows.Forms.DockStyle.Right;
-            this.BeaconValuesTable.Location = new System.Drawing.Point(336, 35);
-            this.BeaconValuesTable.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
-            this.BeaconValuesTable.Name = "BeaconValuesTable";
-            this.BeaconValuesTable.RowCount = 3;
-            this.BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33332F));
-            this.BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
-            this.BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
-            this.BeaconValuesTable.Size = new System.Drawing.Size(127, 83);
-            this.BeaconValuesTable.TabIndex = 21;
+            BeaconValuesTable.AutoSize = true;
+            BeaconValuesTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            BeaconValuesTable.ColumnCount = 2;
+            BeaconTable.SetColumnSpan(BeaconValuesTable, 2);
+            BeaconValuesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            BeaconValuesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            BeaconValuesTable.Controls.Add(ConstantBeaconInput, 1, 2);
+            BeaconValuesTable.Controls.Add(label8, 0, 0);
+            BeaconValuesTable.Controls.Add(label9, 0, 1);
+            BeaconValuesTable.Controls.Add(label10, 0, 2);
+            BeaconValuesTable.Controls.Add(BeaconCountInput, 1, 0);
+            BeaconValuesTable.Controls.Add(BeaconsPerAssemblerInput, 1, 1);
+            BeaconValuesTable.Dock = System.Windows.Forms.DockStyle.Right;
+            BeaconValuesTable.Location = new Point(443, 59);
+            BeaconValuesTable.Margin = new System.Windows.Forms.Padding(13, 5, 4, 5);
+            BeaconValuesTable.Name = "BeaconValuesTable";
+            BeaconValuesTable.RowCount = 3;
+            BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33332F));
+            BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            BeaconValuesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            BeaconValuesTable.Size = new Size(173, 131);
+            BeaconValuesTable.TabIndex = 21;
             // 
             // ConstantBeaconInput
             // 
-            this.ConstantBeaconInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ConstantBeaconInput.Location = new System.Drawing.Point(70, 57);
-            this.ConstantBeaconInput.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.ConstantBeaconInput.Name = "ConstantBeaconInput";
-            this.ConstantBeaconInput.Size = new System.Drawing.Size(54, 20);
-            this.ConstantBeaconInput.TabIndex = 5;
+            ConstantBeaconInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            ConstantBeaconInput.Location = new Point(97, 91);
+            ConstantBeaconInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            ConstantBeaconInput.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            ConstantBeaconInput.Name = "ConstantBeaconInput";
+            ConstantBeaconInput.Size = new Size(72, 27);
+            ConstantBeaconInput.TabIndex = 5;
             // 
             // label8
             // 
-            this.label8.AutoSize = true;
-            this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(2, 2);
-            this.label8.Margin = new System.Windows.Forms.Padding(2);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(63, 23);
-            this.label8.TabIndex = 0;
-            this.label8.Text = "# Beacons:";
-            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            label8.AutoSize = true;
+            label8.Dock = System.Windows.Forms.DockStyle.Fill;
+            label8.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label8.Location = new Point(3, 3);
+            label8.Margin = new System.Windows.Forms.Padding(3);
+            label8.Name = "label8";
+            label8.Size = new Size(87, 37);
+            label8.TabIndex = 0;
+            label8.Text = "# Beacons:";
+            label8.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label9
             // 
-            this.label9.AutoSize = true;
-            this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label9.Location = new System.Drawing.Point(2, 29);
-            this.label9.Margin = new System.Windows.Forms.Padding(2);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(63, 23);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "/Assembler:";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            label9.AutoSize = true;
+            label9.Dock = System.Windows.Forms.DockStyle.Fill;
+            label9.Location = new Point(3, 46);
+            label9.Margin = new System.Windows.Forms.Padding(3);
+            label9.Name = "label9";
+            label9.Size = new Size(87, 37);
+            label9.TabIndex = 1;
+            label9.Text = "/Assembler:";
+            label9.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label10
             // 
-            this.label10.AutoSize = true;
-            this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label10.Location = new System.Drawing.Point(2, 56);
-            this.label10.Margin = new System.Windows.Forms.Padding(2);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(63, 25);
-            this.label10.TabIndex = 2;
-            this.label10.Text = "Additional:";
-            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            label10.AutoSize = true;
+            label10.Dock = System.Windows.Forms.DockStyle.Fill;
+            label10.Location = new Point(3, 89);
+            label10.Margin = new System.Windows.Forms.Padding(3);
+            label10.Name = "label10";
+            label10.Size = new Size(87, 39);
+            label10.TabIndex = 2;
+            label10.Text = "Additional:";
+            label10.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // BeaconCountInput
             // 
-            this.BeaconCountInput.DecimalPlaces = 2;
-            this.BeaconCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconCountInput.Location = new System.Drawing.Point(70, 3);
-            this.BeaconCountInput.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.BeaconCountInput.Name = "BeaconCountInput";
-            this.BeaconCountInput.Size = new System.Drawing.Size(54, 20);
-            this.BeaconCountInput.TabIndex = 3;
+            BeaconCountInput.DecimalPlaces = 2;
+            BeaconCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            BeaconCountInput.Location = new Point(97, 5);
+            BeaconCountInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BeaconCountInput.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            BeaconCountInput.Name = "BeaconCountInput";
+            BeaconCountInput.Size = new Size(72, 27);
+            BeaconCountInput.TabIndex = 3;
             // 
             // BeaconsPerAssemblerInput
             // 
-            this.BeaconsPerAssemblerInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconsPerAssemblerInput.Location = new System.Drawing.Point(70, 30);
-            this.BeaconsPerAssemblerInput.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.BeaconsPerAssemblerInput.Name = "BeaconsPerAssemblerInput";
-            this.BeaconsPerAssemblerInput.Size = new System.Drawing.Size(54, 20);
-            this.BeaconsPerAssemblerInput.TabIndex = 4;
+            BeaconsPerAssemblerInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            BeaconsPerAssemblerInput.Location = new Point(97, 48);
+            BeaconsPerAssemblerInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            BeaconsPerAssemblerInput.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            BeaconsPerAssemblerInput.Name = "BeaconsPerAssemblerInput";
+            BeaconsPerAssemblerInput.Size = new Size(72, 27);
+            BeaconsPerAssemblerInput.TabIndex = 4;
             // 
             // SelectedBeaconIcon
             // 
-            this.SelectedBeaconIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.SelectedBeaconIcon.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelectedBeaconIcon.Location = new System.Drawing.Point(434, 0);
-            this.SelectedBeaconIcon.Margin = new System.Windows.Forms.Padding(0);
-            this.SelectedBeaconIcon.Name = "SelectedBeaconIcon";
-            this.SelectedBeaconIcon.Size = new System.Drawing.Size(32, 32);
-            this.SelectedBeaconIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.SelectedBeaconIcon.TabIndex = 22;
-            this.SelectedBeaconIcon.TabStop = false;
+            SelectedBeaconIcon.BackColor = Color.FromArgb(40, 40, 40);
+            SelectedBeaconIcon.Dock = System.Windows.Forms.DockStyle.Fill;
+            SelectedBeaconIcon.Location = new Point(577, 0);
+            SelectedBeaconIcon.Margin = new System.Windows.Forms.Padding(0);
+            SelectedBeaconIcon.Name = "SelectedBeaconIcon";
+            SelectedBeaconIcon.Size = new Size(43, 54);
+            SelectedBeaconIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            SelectedBeaconIcon.TabIndex = 22;
+            SelectedBeaconIcon.TabStop = false;
             // 
             // AssemblerTable
             // 
-            this.AssemblerTable.AutoSize = true;
-            this.AssemblerTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.AssemblerTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
-            this.AssemblerTable.ColumnCount = 3;
-            this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.AssemblerTable.Controls.Add(this.FuelOptionsPanel, 0, 3);
-            this.AssemblerTable.Controls.Add(this.FuelTitle, 0, 2);
-            this.AssemblerTable.Controls.Add(this.AModulesChoicePanel, 1, 5);
-            this.AssemblerTable.Controls.Add(this.AssemblerTitle, 0, 0);
-            this.AssemblerTable.Controls.Add(this.AssemblerChoicePanel, 0, 1);
-            this.AssemblerTable.Controls.Add(this.AssemblerInfoTable, 1, 1);
-            this.AssemblerTable.Controls.Add(this.SelectedAModulesPanel, 0, 5);
-            this.AssemblerTable.Controls.Add(this.AModulesLabel, 0, 4);
-            this.AssemblerTable.Controls.Add(this.AModuleOptionsLabel, 1, 4);
-            this.AssemblerTable.Controls.Add(this.SelectedAssemblerIcon, 2, 0);
-            this.AssemblerTable.Controls.Add(this.SelectedFuelIcon, 2, 2);
-            this.AssemblerTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerTable.Location = new System.Drawing.Point(3, 89);
-            this.AssemblerTable.Name = "AssemblerTable";
-            this.AssemblerTable.RowCount = 6;
-            this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.AssemblerTable.Size = new System.Drawing.Size(466, 369);
-            this.AssemblerTable.TabIndex = 20;
+            AssemblerTable.AutoSize = true;
+            AssemblerTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            AssemblerTable.BackColor = Color.FromArgb(65, 65, 65);
+            AssemblerTable.ColumnCount = 3;
+            AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            AssemblerTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 43F));
+            AssemblerTable.Controls.Add(FuelOptionsPanel, 0, 3);
+            AssemblerTable.Controls.Add(FuelTitle, 0, 2);
+            AssemblerTable.Controls.Add(AModulesChoicePanel, 1, 5);
+            AssemblerTable.Controls.Add(AssemblerTitle, 0, 0);
+            AssemblerTable.Controls.Add(AssemblerChoicePanel, 0, 1);
+            AssemblerTable.Controls.Add(AssemblerInfoTable, 1, 1);
+            AssemblerTable.Controls.Add(SelectedAModulesPanel, 0, 5);
+            AssemblerTable.Controls.Add(AModulesLabel, 0, 4);
+            AssemblerTable.Controls.Add(AModuleOptionsLabel, 1, 4);
+            AssemblerTable.Controls.Add(SelectedAssemblerIcon, 2, 0);
+            AssemblerTable.Controls.Add(SelectedFuelIcon, 2, 2);
+            AssemblerTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            AssemblerTable.Location = new Point(4, 130);
+            AssemblerTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            AssemblerTable.Name = "AssemblerTable";
+            AssemblerTable.RowCount = 6;
+            AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            AssemblerTable.Size = new Size(620, 568);
+            AssemblerTable.TabIndex = 20;
             // 
             // FuelOptionsPanel
             // 
-            this.FuelOptionsPanel.AutoScroll = true;
-            this.FuelOptionsPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.AssemblerTable.SetColumnSpan(this.FuelOptionsPanel, 3);
-            this.FuelOptionsPanel.Controls.Add(this.FuelOptionsTable);
-            this.FuelOptionsPanel.Location = new System.Drawing.Point(3, 223);
-            this.FuelOptionsPanel.Name = "FuelOptionsPanel";
-            this.FuelOptionsPanel.Size = new System.Drawing.Size(460, 42);
-            this.FuelOptionsPanel.TabIndex = 22;
+            FuelOptionsPanel.AutoScroll = true;
+            FuelOptionsPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            AssemblerTable.SetColumnSpan(FuelOptionsPanel, 3);
+            FuelOptionsPanel.Controls.Add(FuelOptionsTable);
+            FuelOptionsPanel.Location = new Point(4, 352);
+            FuelOptionsPanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            FuelOptionsPanel.Name = "FuelOptionsPanel";
+            FuelOptionsPanel.Size = new Size(612, 62);
+            FuelOptionsPanel.TabIndex = 22;
             // 
             // FuelOptionsTable
             // 
-            this.FuelOptionsTable.AutoSize = true;
-            this.FuelOptionsTable.ColumnCount = 14;
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
-            this.FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.FuelOptionsTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.FuelOptionsTable.Location = new System.Drawing.Point(0, 0);
-            this.FuelOptionsTable.Name = "FuelOptionsTable";
-            this.FuelOptionsTable.RowCount = 1;
-            this.FuelOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
-            this.FuelOptionsTable.Size = new System.Drawing.Size(456, 34);
-            this.FuelOptionsTable.TabIndex = 0;
+            FuelOptionsTable.AutoSize = true;
+            FuelOptionsTable.ColumnCount = 14;
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.692307F));
+            FuelOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            FuelOptionsTable.Dock = System.Windows.Forms.DockStyle.Top;
+            FuelOptionsTable.Location = new Point(0, 0);
+            FuelOptionsTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            FuelOptionsTable.Name = "FuelOptionsTable";
+            FuelOptionsTable.RowCount = 1;
+            FuelOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52F));
+            FuelOptionsTable.Size = new Size(608, 52);
+            FuelOptionsTable.TabIndex = 0;
             // 
             // FuelTitle
             // 
-            this.FuelTitle.AutoSize = true;
-            this.FuelTitle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.AssemblerTable.SetColumnSpan(this.FuelTitle, 2);
-            this.FuelTitle.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FuelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
-            this.FuelTitle.Location = new System.Drawing.Point(0, 188);
-            this.FuelTitle.Margin = new System.Windows.Forms.Padding(0);
-            this.FuelTitle.Name = "FuelTitle";
-            this.FuelTitle.Padding = new System.Windows.Forms.Padding(3, 6, 3, 9);
-            this.FuelTitle.Size = new System.Drawing.Size(434, 32);
-            this.FuelTitle.TabIndex = 21;
-            this.FuelTitle.Text = "Fuel: (Rockets)";
+            FuelTitle.AutoSize = true;
+            FuelTitle.BackColor = Color.FromArgb(40, 40, 40);
+            AssemblerTable.SetColumnSpan(FuelTitle, 2);
+            FuelTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+            FuelTitle.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold);
+            FuelTitle.Location = new Point(0, 293);
+            FuelTitle.Margin = new System.Windows.Forms.Padding(0);
+            FuelTitle.Name = "FuelTitle";
+            FuelTitle.Padding = new System.Windows.Forms.Padding(4, 9, 4, 14);
+            FuelTitle.Size = new Size(577, 54);
+            FuelTitle.TabIndex = 21;
+            FuelTitle.Text = "Fuel: (Rockets)";
             // 
             // AModulesChoicePanel
             // 
-            this.AModulesChoicePanel.AutoScroll = true;
-            this.AModulesChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.AssemblerTable.SetColumnSpan(this.AModulesChoicePanel, 2);
-            this.AModulesChoicePanel.Controls.Add(this.AModulesChoiceTable);
-            this.AModulesChoicePanel.Location = new System.Drawing.Point(155, 294);
-            this.AModulesChoicePanel.Name = "AModulesChoicePanel";
-            this.AModulesChoicePanel.Size = new System.Drawing.Size(308, 72);
-            this.AModulesChoicePanel.TabIndex = 20;
+            AModulesChoicePanel.AutoScroll = true;
+            AModulesChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            AssemblerTable.SetColumnSpan(AModulesChoicePanel, 2);
+            AModulesChoicePanel.Controls.Add(AModulesChoiceTable);
+            AModulesChoicePanel.Location = new Point(205, 454);
+            AModulesChoicePanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            AModulesChoicePanel.Name = "AModulesChoicePanel";
+            AModulesChoicePanel.Size = new Size(409, 109);
+            AModulesChoicePanel.TabIndex = 20;
             // 
             // AModulesChoiceTable
             // 
-            this.AModulesChoiceTable.AutoSize = true;
-            this.AModulesChoiceTable.ColumnCount = 10;
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.AModulesChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.AModulesChoiceTable.Location = new System.Drawing.Point(0, 0);
-            this.AModulesChoiceTable.Name = "AModulesChoiceTable";
-            this.AModulesChoiceTable.RowCount = 1;
-            this.AModulesChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.AModulesChoiceTable.Size = new System.Drawing.Size(304, 32);
-            this.AModulesChoiceTable.TabIndex = 0;
+            AModulesChoiceTable.AutoSize = true;
+            AModulesChoiceTable.ColumnCount = 10;
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            AModulesChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            AModulesChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+            AModulesChoiceTable.Location = new Point(0, 0);
+            AModulesChoiceTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            AModulesChoiceTable.Name = "AModulesChoiceTable";
+            AModulesChoiceTable.RowCount = 1;
+            AModulesChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            AModulesChoiceTable.Size = new Size(405, 49);
+            AModulesChoiceTable.TabIndex = 0;
             // 
             // AssemblerChoicePanel
             // 
-            this.AssemblerChoicePanel.AutoScroll = true;
-            this.AssemblerChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.AssemblerChoicePanel.Controls.Add(this.AssemblerChoiceTable);
-            this.AssemblerChoicePanel.Location = new System.Drawing.Point(3, 39);
-            this.AssemblerChoicePanel.Margin = new System.Windows.Forms.Padding(3, 7, 13, 3);
-            this.AssemblerChoicePanel.Name = "AssemblerChoicePanel";
-            this.AssemblerChoicePanel.Size = new System.Drawing.Size(136, 72);
-            this.AssemblerChoicePanel.TabIndex = 18;
+            AssemblerChoicePanel.AutoScroll = true;
+            AssemblerChoicePanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            AssemblerChoicePanel.Controls.Add(AssemblerChoiceTable);
+            AssemblerChoicePanel.Location = new Point(4, 65);
+            AssemblerChoicePanel.Margin = new System.Windows.Forms.Padding(4, 11, 17, 5);
+            AssemblerChoicePanel.Name = "AssemblerChoicePanel";
+            AssemblerChoicePanel.Size = new Size(180, 109);
+            AssemblerChoicePanel.TabIndex = 18;
             // 
             // AssemblerChoiceTable
             // 
-            this.AssemblerChoiceTable.AutoSize = true;
-            this.AssemblerChoiceTable.ColumnCount = 5;
-            this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.AssemblerChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.AssemblerChoiceTable.Location = new System.Drawing.Point(0, 0);
-            this.AssemblerChoiceTable.Name = "AssemblerChoiceTable";
-            this.AssemblerChoiceTable.RowCount = 1;
-            this.AssemblerChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.AssemblerChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.AssemblerChoiceTable.Size = new System.Drawing.Size(132, 32);
-            this.AssemblerChoiceTable.TabIndex = 0;
+            AssemblerChoiceTable.AutoSize = true;
+            AssemblerChoiceTable.ColumnCount = 5;
+            AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            AssemblerChoiceTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            AssemblerChoiceTable.Dock = System.Windows.Forms.DockStyle.Top;
+            AssemblerChoiceTable.Location = new Point(0, 0);
+            AssemblerChoiceTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            AssemblerChoiceTable.Name = "AssemblerChoiceTable";
+            AssemblerChoiceTable.RowCount = 1;
+            AssemblerChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            AssemblerChoiceTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            AssemblerChoiceTable.Size = new Size(176, 49);
+            AssemblerChoiceTable.TabIndex = 0;
             // 
             // SelectedAModulesPanel
             // 
-            this.SelectedAModulesPanel.AutoScroll = true;
-            this.SelectedAModulesPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.SelectedAModulesPanel.Controls.Add(this.SelectedAModulesTable);
-            this.SelectedAModulesPanel.Location = new System.Drawing.Point(3, 294);
-            this.SelectedAModulesPanel.Margin = new System.Windows.Forms.Padding(3, 3, 13, 3);
-            this.SelectedAModulesPanel.Name = "SelectedAModulesPanel";
-            this.SelectedAModulesPanel.Size = new System.Drawing.Size(136, 72);
-            this.SelectedAModulesPanel.TabIndex = 19;
+            SelectedAModulesPanel.AutoScroll = true;
+            SelectedAModulesPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            SelectedAModulesPanel.Controls.Add(SelectedAModulesTable);
+            SelectedAModulesPanel.Location = new Point(4, 454);
+            SelectedAModulesPanel.Margin = new System.Windows.Forms.Padding(4, 5, 17, 5);
+            SelectedAModulesPanel.Name = "SelectedAModulesPanel";
+            SelectedAModulesPanel.Size = new Size(180, 109);
+            SelectedAModulesPanel.TabIndex = 19;
             // 
             // SelectedAModulesTable
             // 
-            this.SelectedAModulesTable.AutoSize = true;
-            this.SelectedAModulesTable.ColumnCount = 5;
-            this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.SelectedAModulesTable.Dock = System.Windows.Forms.DockStyle.Top;
-            this.SelectedAModulesTable.Location = new System.Drawing.Point(0, 0);
-            this.SelectedAModulesTable.Name = "SelectedAModulesTable";
-            this.SelectedAModulesTable.RowCount = 1;
-            this.SelectedAModulesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.SelectedAModulesTable.Size = new System.Drawing.Size(132, 32);
-            this.SelectedAModulesTable.TabIndex = 0;
+            SelectedAModulesTable.AutoSize = true;
+            SelectedAModulesTable.ColumnCount = 5;
+            SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            SelectedAModulesTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            SelectedAModulesTable.Dock = System.Windows.Forms.DockStyle.Top;
+            SelectedAModulesTable.Location = new Point(0, 0);
+            SelectedAModulesTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            SelectedAModulesTable.Name = "SelectedAModulesTable";
+            SelectedAModulesTable.RowCount = 1;
+            SelectedAModulesTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            SelectedAModulesTable.Size = new Size(176, 49);
+            SelectedAModulesTable.TabIndex = 0;
             // 
             // SelectedAssemblerIcon
             // 
-            this.SelectedAssemblerIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.SelectedAssemblerIcon.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelectedAssemblerIcon.Location = new System.Drawing.Point(434, 0);
-            this.SelectedAssemblerIcon.Margin = new System.Windows.Forms.Padding(0);
-            this.SelectedAssemblerIcon.Name = "SelectedAssemblerIcon";
-            this.SelectedAssemblerIcon.Size = new System.Drawing.Size(32, 32);
-            this.SelectedAssemblerIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.SelectedAssemblerIcon.TabIndex = 23;
-            this.SelectedAssemblerIcon.TabStop = false;
+            SelectedAssemblerIcon.BackColor = Color.FromArgb(40, 40, 40);
+            SelectedAssemblerIcon.Dock = System.Windows.Forms.DockStyle.Fill;
+            SelectedAssemblerIcon.Location = new Point(577, 0);
+            SelectedAssemblerIcon.Margin = new System.Windows.Forms.Padding(0);
+            SelectedAssemblerIcon.Name = "SelectedAssemblerIcon";
+            SelectedAssemblerIcon.Size = new Size(43, 54);
+            SelectedAssemblerIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            SelectedAssemblerIcon.TabIndex = 23;
+            SelectedAssemblerIcon.TabStop = false;
             // 
             // SelectedFuelIcon
             // 
-            this.SelectedFuelIcon.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.SelectedFuelIcon.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelectedFuelIcon.Location = new System.Drawing.Point(434, 188);
-            this.SelectedFuelIcon.Margin = new System.Windows.Forms.Padding(0);
-            this.SelectedFuelIcon.Name = "SelectedFuelIcon";
-            this.SelectedFuelIcon.Size = new System.Drawing.Size(32, 32);
-            this.SelectedFuelIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.SelectedFuelIcon.TabIndex = 24;
-            this.SelectedFuelIcon.TabStop = false;
+            SelectedFuelIcon.BackColor = Color.FromArgb(40, 40, 40);
+            SelectedFuelIcon.Dock = System.Windows.Forms.DockStyle.Fill;
+            SelectedFuelIcon.Location = new Point(577, 293);
+            SelectedFuelIcon.Margin = new System.Windows.Forms.Padding(0);
+            SelectedFuelIcon.Name = "SelectedFuelIcon";
+            SelectedFuelIcon.Size = new Size(43, 54);
+            SelectedFuelIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            SelectedFuelIcon.TabIndex = 24;
+            SelectedFuelIcon.TabStop = false;
             // 
             // RateOptionsTable
             // 
-            this.RateOptionsTable.AutoSize = true;
-            this.RateOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.RateOptionsTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.RateOptionsTable.ColumnCount = 5;
-            this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.RateOptionsTable.Controls.Add(this.QualitySelectorLabel, 1, 2);
-            this.RateOptionsTable.Controls.Add(this.KeyNodeTitleInput, 2, 1);
-            this.RateOptionsTable.Controls.Add(this.KeyNodeCheckBox, 0, 1);
-            this.RateOptionsTable.Controls.Add(this.AssemblerRateLabel, 0, 0);
-            this.RateOptionsTable.Controls.Add(this.FixedAssemblersOption, 3, 0);
-            this.RateOptionsTable.Controls.Add(this.AutoAssemblersOption, 2, 0);
-            this.RateOptionsTable.Controls.Add(this.FixedAssemblerInput, 4, 0);
-            this.RateOptionsTable.Controls.Add(this.LowPriorityCheckBox, 0, 2);
-            this.RateOptionsTable.Controls.Add(this.KeyNodeTitleLabel, 1, 1);
-            this.RateOptionsTable.Controls.Add(this.QualitySelector, 2, 2);
-            this.RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
-            this.RateOptionsTable.Name = "RateOptionsTable";
-            this.RateOptionsTable.RowCount = 3;
-            this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.RateOptionsTable.Size = new System.Drawing.Size(466, 80);
-            this.RateOptionsTable.TabIndex = 18;
+            RateOptionsTable.AutoSize = true;
+            RateOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            RateOptionsTable.BackColor = Color.FromArgb(40, 40, 40);
+            RateOptionsTable.ColumnCount = 5;
+            RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 133F));
+            RateOptionsTable.Controls.Add(QualitySelectorLabel, 1, 2);
+            RateOptionsTable.Controls.Add(KeyNodeTitleInput, 2, 1);
+            RateOptionsTable.Controls.Add(KeyNodeCheckBox, 0, 1);
+            RateOptionsTable.Controls.Add(AssemblerRateLabel, 0, 0);
+            RateOptionsTable.Controls.Add(FixedAssemblersOption, 3, 0);
+            RateOptionsTable.Controls.Add(AutoAssemblersOption, 2, 0);
+            RateOptionsTable.Controls.Add(FixedAssemblerInput, 4, 0);
+            RateOptionsTable.Controls.Add(LowPriorityCheckBox, 0, 2);
+            RateOptionsTable.Controls.Add(KeyNodeTitleLabel, 1, 1);
+            RateOptionsTable.Controls.Add(QualitySelector, 2, 2);
+            RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            RateOptionsTable.Location = new Point(4, 5);
+            RateOptionsTable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            RateOptionsTable.Name = "RateOptionsTable";
+            RateOptionsTable.RowCount = 3;
+            RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            RateOptionsTable.Size = new Size(620, 115);
+            RateOptionsTable.TabIndex = 18;
             // 
             // QualitySelectorLabel
             // 
-            this.QualitySelectorLabel.AutoSize = true;
-            this.QualitySelectorLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.QualitySelectorLabel.Location = new System.Drawing.Point(212, 53);
-            this.QualitySelectorLabel.Name = "QualitySelectorLabel";
-            this.QualitySelectorLabel.Size = new System.Drawing.Size(42, 27);
-            this.QualitySelectorLabel.TabIndex = 26;
-            this.QualitySelectorLabel.Text = "Quality:";
-            this.QualitySelectorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            QualitySelectorLabel.AutoSize = true;
+            QualitySelectorLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            QualitySelectorLabel.Location = new Point(240, 77);
+            QualitySelectorLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            QualitySelectorLabel.Name = "QualitySelectorLabel";
+            QualitySelectorLabel.Size = new Size(59, 38);
+            QualitySelectorLabel.TabIndex = 26;
+            QualitySelectorLabel.Text = "Quality:";
+            QualitySelectorLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // KeyNodeTitleInput
             // 
-            this.RateOptionsTable.SetColumnSpan(this.KeyNodeTitleInput, 3);
-            this.KeyNodeTitleInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeTitleInput.Location = new System.Drawing.Point(260, 29);
-            this.KeyNodeTitleInput.MaxLength = 200;
-            this.KeyNodeTitleInput.Name = "KeyNodeTitleInput";
-            this.KeyNodeTitleInput.Size = new System.Drawing.Size(203, 20);
-            this.KeyNodeTitleInput.TabIndex = 23;
+            RateOptionsTable.SetColumnSpan(KeyNodeTitleInput, 3);
+            KeyNodeTitleInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            KeyNodeTitleInput.Location = new Point(307, 42);
+            KeyNodeTitleInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            KeyNodeTitleInput.MaxLength = 200;
+            KeyNodeTitleInput.Name = "KeyNodeTitleInput";
+            KeyNodeTitleInput.Size = new Size(309, 27);
+            KeyNodeTitleInput.TabIndex = 23;
             // 
             // KeyNodeCheckBox
             // 
-            this.KeyNodeCheckBox.AutoSize = true;
-            this.KeyNodeCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeCheckBox.Location = new System.Drawing.Point(23, 31);
-            this.KeyNodeCheckBox.Margin = new System.Windows.Forms.Padding(23, 5, 3, 5);
-            this.KeyNodeCheckBox.Name = "KeyNodeCheckBox";
-            this.KeyNodeCheckBox.Size = new System.Drawing.Size(183, 17);
-            this.KeyNodeCheckBox.TabIndex = 22;
-            this.KeyNodeCheckBox.Text = "Key Node";
-            this.KeyNodeCheckBox.UseVisualStyleBackColor = true;
+            KeyNodeCheckBox.AutoSize = true;
+            KeyNodeCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            KeyNodeCheckBox.Location = new Point(31, 45);
+            KeyNodeCheckBox.Margin = new System.Windows.Forms.Padding(31, 8, 4, 8);
+            KeyNodeCheckBox.Name = "KeyNodeCheckBox";
+            KeyNodeCheckBox.Size = new Size(201, 24);
+            KeyNodeCheckBox.TabIndex = 22;
+            KeyNodeCheckBox.Text = "Key Node";
+            KeyNodeCheckBox.UseVisualStyleBackColor = true;
             // 
             // FixedAssemblerInput
             // 
-            this.FixedAssemblerInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FixedAssemblerInput.Location = new System.Drawing.Point(369, 3);
-            this.FixedAssemblerInput.Name = "FixedAssemblerInput";
-            this.FixedAssemblerInput.Size = new System.Drawing.Size(94, 20);
-            this.FixedAssemblerInput.TabIndex = 4;
+            FixedAssemblerInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            FixedAssemblerInput.Location = new Point(491, 5);
+            FixedAssemblerInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            FixedAssemblerInput.Name = "FixedAssemblerInput";
+            FixedAssemblerInput.Size = new Size(125, 27);
+            FixedAssemblerInput.TabIndex = 4;
             // 
             // LowPriorityCheckBox
             // 
-            this.LowPriorityCheckBox.AutoSize = true;
-            this.LowPriorityCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LowPriorityCheckBox.Location = new System.Drawing.Point(23, 56);
-            this.LowPriorityCheckBox.Margin = new System.Windows.Forms.Padding(23, 3, 3, 3);
-            this.LowPriorityCheckBox.Name = "LowPriorityCheckBox";
-            this.LowPriorityCheckBox.Size = new System.Drawing.Size(183, 21);
-            this.LowPriorityCheckBox.TabIndex = 5;
-            this.LowPriorityCheckBox.Text = "Low Priority Recipe";
-            this.LowPriorityCheckBox.UseVisualStyleBackColor = true;
+            LowPriorityCheckBox.AutoSize = true;
+            LowPriorityCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            LowPriorityCheckBox.Location = new Point(31, 82);
+            LowPriorityCheckBox.Margin = new System.Windows.Forms.Padding(31, 5, 4, 5);
+            LowPriorityCheckBox.Name = "LowPriorityCheckBox";
+            LowPriorityCheckBox.Size = new Size(201, 28);
+            LowPriorityCheckBox.TabIndex = 5;
+            LowPriorityCheckBox.Text = "Low Priority Recipe";
+            LowPriorityCheckBox.UseVisualStyleBackColor = true;
             // 
             // KeyNodeTitleLabel
             // 
-            this.KeyNodeTitleLabel.AutoSize = true;
-            this.KeyNodeTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeTitleLabel.Location = new System.Drawing.Point(212, 26);
-            this.KeyNodeTitleLabel.Name = "KeyNodeTitleLabel";
-            this.KeyNodeTitleLabel.Size = new System.Drawing.Size(42, 27);
-            this.KeyNodeTitleLabel.TabIndex = 24;
-            this.KeyNodeTitleLabel.Text = "Title:";
-            this.KeyNodeTitleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            KeyNodeTitleLabel.AutoSize = true;
+            KeyNodeTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            KeyNodeTitleLabel.Location = new Point(240, 37);
+            KeyNodeTitleLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            KeyNodeTitleLabel.Name = "KeyNodeTitleLabel";
+            KeyNodeTitleLabel.Size = new Size(59, 40);
+            KeyNodeTitleLabel.TabIndex = 24;
+            KeyNodeTitleLabel.Text = "Title:";
+            KeyNodeTitleLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // QualitySelector
             // 
-            this.RateOptionsTable.SetColumnSpan(this.QualitySelector, 3);
-            this.QualitySelector.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.QualitySelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.QualitySelector.FormattingEnabled = true;
-            this.QualitySelector.Location = new System.Drawing.Point(260, 56);
-            this.QualitySelector.Name = "QualitySelector";
-            this.QualitySelector.Size = new System.Drawing.Size(203, 21);
-            this.QualitySelector.TabIndex = 25;
+            RateOptionsTable.SetColumnSpan(QualitySelector, 3);
+            QualitySelector.Dock = System.Windows.Forms.DockStyle.Fill;
+            QualitySelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            QualitySelector.FormattingEnabled = true;
+            QualitySelector.Location = new Point(307, 82);
+            QualitySelector.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            QualitySelector.Name = "QualitySelector";
+            QualitySelector.Size = new Size(309, 28);
+            QualitySelector.TabIndex = 25;
             // 
             // ToolTip
             // 
-            this.ToolTip.AutoPopDelay = 100000;
-            this.ToolTip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
-            this.ToolTip.ForeColor = System.Drawing.Color.White;
-            this.ToolTip.InitialDelay = 200;
-            this.ToolTip.OwnerDraw = true;
-            this.ToolTip.ReshowDelay = 100;
-            this.ToolTip.TextFont = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            ToolTip.AutoPopDelay = 100000;
+            ToolTip.BackColor = Color.FromArgb(65, 65, 65);
+            ToolTip.ForeColor = Color.White;
+            ToolTip.InitialDelay = 200;
+            ToolTip.OwnerDraw = true;
+            ToolTip.ReshowDelay = 100;
             // 
             // EditRecipePanel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BackColor = System.Drawing.Color.Black;
-            this.Controls.Add(this.MainTable);
-            this.DoubleBuffered = true;
-            this.ForeColor = System.Drawing.Color.White;
-            this.Name = "EditRecipePanel";
-            this.Size = new System.Drawing.Size(472, 689);
-            this.AssemblerInfoTable.ResumeLayout(false);
-            this.AssemblerInfoTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ExtraProductivityInput)).EndInit();
-            this.MainTable.ResumeLayout(false);
-            this.MainTable.PerformLayout();
-            this.BeaconTable.ResumeLayout(false);
-            this.BeaconTable.PerformLayout();
-            this.BModulesChoicePanel.ResumeLayout(false);
-            this.BModulesChoicePanel.PerformLayout();
-            this.BeaconInfoTable.ResumeLayout(false);
-            this.BeaconInfoTable.PerformLayout();
-            this.SelectedBModulesPanel.ResumeLayout(false);
-            this.SelectedBModulesPanel.PerformLayout();
-            this.BeaconChoicePanel.ResumeLayout(false);
-            this.BeaconChoicePanel.PerformLayout();
-            this.BeaconValuesTable.ResumeLayout(false);
-            this.BeaconValuesTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ConstantBeaconInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconCountInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BeaconsPerAssemblerInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedBeaconIcon)).EndInit();
-            this.AssemblerTable.ResumeLayout(false);
-            this.AssemblerTable.PerformLayout();
-            this.FuelOptionsPanel.ResumeLayout(false);
-            this.FuelOptionsPanel.PerformLayout();
-            this.AModulesChoicePanel.ResumeLayout(false);
-            this.AModulesChoicePanel.PerformLayout();
-            this.AssemblerChoicePanel.ResumeLayout(false);
-            this.AssemblerChoicePanel.PerformLayout();
-            this.SelectedAModulesPanel.ResumeLayout(false);
-            this.SelectedAModulesPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedAssemblerIcon)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SelectedFuelIcon)).EndInit();
-            this.RateOptionsTable.ResumeLayout(false);
-            this.RateOptionsTable.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FixedAssemblerInput)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoSize = true;
+            AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            BackColor = Color.Black;
+            Controls.Add(MainTable);
+            DoubleBuffered = true;
+            ForeColor = Color.White;
+            Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            Name = "EditRecipePanel";
+            Size = new Size(628, 1057);
+            AssemblerInfoTable.ResumeLayout(false);
+            AssemblerInfoTable.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)NeighbourInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ExtraProductivityInput).EndInit();
+            MainTable.ResumeLayout(false);
+            MainTable.PerformLayout();
+            BeaconTable.ResumeLayout(false);
+            BeaconTable.PerformLayout();
+            BModulesChoicePanel.ResumeLayout(false);
+            BModulesChoicePanel.PerformLayout();
+            BeaconInfoTable.ResumeLayout(false);
+            BeaconInfoTable.PerformLayout();
+            SelectedBModulesPanel.ResumeLayout(false);
+            SelectedBModulesPanel.PerformLayout();
+            BeaconChoicePanel.ResumeLayout(false);
+            BeaconChoicePanel.PerformLayout();
+            BeaconValuesTable.ResumeLayout(false);
+            BeaconValuesTable.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)ConstantBeaconInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)BeaconCountInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)BeaconsPerAssemblerInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)SelectedBeaconIcon).EndInit();
+            AssemblerTable.ResumeLayout(false);
+            AssemblerTable.PerformLayout();
+            FuelOptionsPanel.ResumeLayout(false);
+            FuelOptionsPanel.PerformLayout();
+            AModulesChoicePanel.ResumeLayout(false);
+            AModulesChoicePanel.PerformLayout();
+            AssemblerChoicePanel.ResumeLayout(false);
+            AssemblerChoicePanel.PerformLayout();
+            SelectedAModulesPanel.ResumeLayout(false);
+            SelectedAModulesPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)SelectedAssemblerIcon).EndInit();
+            ((System.ComponentModel.ISupportInitialize)SelectedFuelIcon).EndInit();
+            RateOptionsTable.ResumeLayout(false);
+            RateOptionsTable.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)FixedAssemblerInput).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
