@@ -36,6 +36,8 @@ namespace Foreman {
             SimplePassthroughNodesCheckBox.CheckedChanged += SimplePassthroughNodesCheckBox_CheckedChanged;
             KeyNodeCheckBox.CheckedChanged += KeyNodeCheckBox_CheckedChanged;
             KeyNodeTitleInput.TextChanged += KeyNodeTitleInput_TextChanged;
+
+            ApplyViewportBounds();
         }
 
         private void InitializeRates() {
@@ -90,6 +92,7 @@ namespace Foreman {
             KeyNodeTitleInput.Visible = nodeData.KeyNode;
             KeyNodeTitleInput.Text = nodeData.KeyNodeTitle;
             myGraphViewer.Invalidate();
+            ApplyViewportBounds();
         }
 
         private void KeyNodeTitleInput_TextChanged(object? sender, EventArgs e) {

@@ -499,7 +499,8 @@ namespace Foreman {
             }
 
             SubwindowOpen = true;
-            Control editPanel = new EditFlowPanel(bNodeElement.ViewModel, this);
+            var editPanel = new EditFlowPanel(bNodeElement.ViewModel, this);
+            editPanel.ApplyViewportBounds();
             Point graphAnchor = new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y);
             Rectangle panelRect = ToolTipRenderer.getTooltipScreenBounds(GraphToScreen(graphAnchor), editPanel.Size, Direction.Right);
             editPanel.Location = panelRect.Location;
@@ -518,7 +519,8 @@ namespace Foreman {
                 return;
             if (recipeVm.BaseRecipe.Recipe is not Recipe baseRecipe)
                 return;
-            Control editPanel = new EditRecipePanel(recipeVm, this);
+            var editPanel = new EditRecipePanel(recipeVm, this);
+            editPanel.ApplyViewportBounds();
             RecipePanel recipePanel = new RecipePanel(new Recipe[] { baseRecipe });
             Point leftAnchor = new Point(rNodeElement.X - (rNodeElement.Width / 2), rNodeElement.Y);
             Point rightAnchor = new Point(rNodeElement.X + (rNodeElement.Width / 2), rNodeElement.Y);

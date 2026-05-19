@@ -126,6 +126,7 @@ namespace Foreman {
 
             QualitySelector.SelectedIndexChanged += QualitySelector_SelectedIndexChanged;
 
+            ApplyViewportBounds();
         }
 
         private void OptionsPanel_MouseWheel(object? sender, MouseEventArgs e) {
@@ -207,6 +208,7 @@ namespace Foreman {
             //beacon panel
             SetupBeaconOptions();
             BeaconTable.Visible = (BeaconOptions.Count != 0);
+            RefreshViewportLayout();
         }
 
         private void SetupFuelOptions() {
@@ -672,6 +674,7 @@ namespace Foreman {
             KeyNodeTitleInput.Visible = nodeData.KeyNode;
             KeyNodeTitleInput.Text = nodeData.KeyNodeTitle;
             myGraphViewer.Invalidate();
+            RefreshViewportLayout();
         }
 
         private void KeyNodeTitleInput_TextChanged(object? sender, EventArgs e) {
@@ -741,6 +744,7 @@ namespace Foreman {
             SetupBeaconModuleOptions();
 
             myGraphViewer.Graph.DefaultAssemblerQuality = qualitySelectorIndexSet[QualitySelector.SelectedIndex];
+            RefreshViewportLayout();
         }
     }
 }

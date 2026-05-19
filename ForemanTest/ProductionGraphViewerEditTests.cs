@@ -8,6 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
+using static Foreman.EditPanelViewportLayout;
+
 namespace ForemanTest {
     [TestClass]
     [DoNotParallelize]
@@ -38,6 +40,14 @@ namespace ForemanTest {
         [TestMethod]
         public void ItemChooser_SizeMatchesContentAfterShow() =>
             StaTest.Run(ItemChooser_SizeMatchesContentAfterShow_Impl);
+
+        [TestMethod]
+        public void EditRecipePanel_HeightFitsViewerAndScrollsWhenContentIsTaller() =>
+            StaTest.Run(EditRecipePanel_HeightFitsViewerAndScrollsWhenContentIsTaller_Impl);
+
+        [TestMethod]
+        public void EditFlowPanel_HeightFitsShortViewer() =>
+            StaTest.Run(EditFlowPanel_HeightFitsShortViewer_Impl);
 
         private static void EditNode_DoesNotChangeViewOffset_WhenPanelsWouldClip_Impl() {
             var ctx = GraphSessionTestHelper.CreateContext();
@@ -113,6 +123,62 @@ namespace ForemanTest {
                     "Selecting a recipe from the disconnected chooser should add a recipe node.");
                 Assert.IsTrue(viewer.Session.View.Nodes.OfType<IRecipeNodeViewModel>().Any(),
                     "The new node should be a recipe view model.");
+            } finally {
+                viewer.ToolTipRenderer.ClearFloatingControls();
+            }
+        }
+
+        private static void EditRecipePanel_HeightFitsViewerAndScrollsWhenContentIsTaller_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+            viewer.Size = new Size(900, 320);
+            NodeId recipeId = CreateTestRecipeNode(ctx, viewer, new Point(0, 200));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(recipeId, out BaseNodeElement? element));
+            Assert.IsInstanceOfType(element, typeof(RecipeNodeElement));
+
+            try {
+                viewer.EditRecipeNode((RecipeNodeElement)element);
+                EditRecipePanel? editPanel = viewer.Controls.OfType<EditRecipePanel>().FirstOrDefault();
+                Assert.IsNotNull(editPanel);
+
+                int maxHeight = viewer.ClientSize.Height - EditPanelScreenLayout.DefaultMargin * 2;
+                Assert.IsTrue(editPanel.Height <= maxHeight,
+                    $"Edit panel height {editPanel.Height} should not exceed viewer chrome ({maxHeight}px).");
+
+                Panel? scrollHost = editPanel.Controls.Find(ScrollHostName, false).OfType<Panel>().FirstOrDefault();
+                Assert.IsNotNull(scrollHost, "Edit recipe panel should host content in a scroll viewport.");
+                Assert.IsTrue(scrollHost.AutoScroll);
+
+                Control content = scrollHost.Controls[0];
+                Assert.IsTrue(content.Height > scrollHost.ClientSize.Height,
+                    "Recipe editor content should remain full height inside the capped viewport.");
+                scrollHost.PerformLayout();
+                Assert.IsTrue(scrollHost.VerticalScroll.Visible,
+                    "A vertical scrollbar should appear when recipe editor content exceeds the viewer height.");
+                Assert.IsFalse(scrollHost.HorizontalScroll.Visible,
+                    "Reserving vertical scrollbar width should prevent a horizontal scrollbar.");
+            } finally {
+                viewer.ToolTipRenderer.ClearFloatingControls();
+            }
+        }
+
+        private static void EditFlowPanel_HeightFitsShortViewer_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+            viewer.Size = new Size(900, 280);
+            NodeId id = viewer.Session.Editor.CreateSupplierNode(ctx.Item("iron"), new Point(0, 200));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(id, out BaseNodeElement? element));
+            Assert.IsNotNull(element);
+
+            try {
+                viewer.EditNode(element);
+                EditFlowPanel? editPanel = viewer.Controls.OfType<EditFlowPanel>().FirstOrDefault();
+                Assert.IsNotNull(editPanel);
+
+                int maxHeight = viewer.ClientSize.Height - EditPanelScreenLayout.DefaultMargin * 2;
+                Assert.IsTrue(editPanel.Height <= maxHeight,
+                    $"Flow edit panel height {editPanel.Height} should fit inside the graph viewer.");
+                Assert.IsNotNull(editPanel.Controls.Find(ScrollHostName, false).FirstOrDefault());
             } finally {
                 viewer.ToolTipRenderer.ClearFloatingControls();
             }
