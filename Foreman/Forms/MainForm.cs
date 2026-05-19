@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -509,7 +510,7 @@ namespace Foreman {
         }
 
         private void HelpButton_Click(object? sender, EventArgs e) {
-            System.Diagnostics.Process.Start("https://github.com/DanielKote/Foreman2");
+            Process.Start(new ProcessStartInfo("https://github.com/DanielKote/Foreman2") { UseShellExecute = true });
         }
 
         //---------------------------------------------------------Key & Mouse events

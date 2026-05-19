@@ -36,8 +36,11 @@ namespace Foreman {
         }
 
         internal void RemoveRecipesWithoutAssemblers() {
-            // Enforce at least one assembler per recipe (player/rocket _store.Assemblers count; missing _store.Recipes are separate).
-            foreach (RecipePrototype recipe in _store.Recipes.Values.Where(r => r.Assemblers.Count == 0).ToList().Cast<RecipePrototype>()) {
+            // Drop only recipes that cannot be crafted in-game (no machine for any exported crafting category).
+            // Hidden recipes with machines stay in cache so the user can enable them via "Show Hidden".
+            foreach (RecipePrototype recipe in _store.Recipes.Values.OfType<RecipePrototype>().Where(r => r.Assemblers.Count == 0)) {
+                if (recipe.HasCraftingMachineInPreset)
+                    continue;
                 foreach (ItemPrototype ingredient in recipe.ingredientList)
                     ingredient.consumptionRecipes.Remove(recipe);
                 foreach (ItemPrototype product in recipe.productList)
@@ -219,7 +222,7 @@ namespace Foreman {
 
             //step 5: set the 'default' enabled statuses of _store.Recipes,_store.Assemblers,_store.Modules & _store.Beacons to their available status.
             foreach (RecipePrototype recipe in _store.Recipes.Values)
-                recipe.Enabled = recipe.Available;
+                recipe.Enabled = recipe.Available && !recipe.HiddenInGame;
             foreach (AssemblerPrototype assembler in _store.Assemblers.Values)
                 assembler.Enabled = assembler.Available;
             foreach (ModulePrototype module in _store.Modules.Values)

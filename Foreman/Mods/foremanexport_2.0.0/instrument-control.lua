@@ -1,6 +1,9 @@
 local etable = {}
 local qualityEnabled = 0
 
+-- Keep in sync with PresetExportFormat.CurrentVersion in Foreman (C#).
+local FOREMAN_EXPORT_VERSION = 1
+
 
 localindex = 0
 
@@ -14,14 +17,50 @@ local function ExportLocalisedString(lstring, index)
 end
 
 local function ProcessTemperature(temperature)
-	if temperature == nil then
-		return nil
-	elseif temperature == -math.huge then
+	if temperature == -math.huge then
 		return -1e100
 	elseif temperature == math.huge then
 		return 1e100
-	else
-		return temperature
+	end
+	return temperature
+end
+
+-- Boilers with fluid fuel (e.g. oil-boiler-mk01) have more than two fluid boxes; pick process in/out by role, not index.
+local function ExportBoilerFluids(entity, tentity)
+	tentity['target_temperature'] = ProcessTemperature(entity.target_temperature)
+
+	local fesp = entity.fluid_energy_source_prototype
+	local fuelFilter = fesp and fesp.fluid_box and fesp.fluid_box.filter and fesp.fluid_box.filter.name
+
+	local ingredient = nil
+	local product = nil
+	for _, fbox in pairs(entity.fluidbox_prototypes) do
+		if fbox.filter ~= nil then
+			local fname = fbox.filter.name
+			if fbox.production_type == 'output' then
+				if product == nil then
+					product = fname
+				end
+			elseif fbox.production_type == 'input' or fbox.production_type == 'input-output' then
+				if fname ~= fuelFilter and ingredient == nil then
+					ingredient = fname
+				end
+			end
+		end
+	end
+
+	if ingredient == nil and entity.fluidbox_prototypes[1] and entity.fluidbox_prototypes[1].filter then
+		ingredient = entity.fluidbox_prototypes[1].filter.name
+	end
+	if product == nil and entity.fluidbox_prototypes[2] and entity.fluidbox_prototypes[2].filter then
+		product = entity.fluidbox_prototypes[2].filter.name
+	end
+
+	if ingredient ~= nil then
+		tentity['fluid_ingredient'] = ingredient
+	end
+	if product ~= nil then
+		tentity['fluid_product'] = product
 	end
 end
 
@@ -145,6 +184,85 @@ local function ExportResearch()
 	etable['technologies'] = ttechnologies
 end
 
+local function CollectRecipeCraftingCategories(recipe)
+	local categories = {}
+	local seen = {}
+	local function add_category(cat)
+		if type(cat) == 'string' and cat ~= '' and seen[cat] == nil then
+			seen[cat] = true
+			table.insert(categories, cat)
+		end
+	end
+
+	-- category + additional_categories are what Factorio uses for has_category(); no need to scan every recipe-category prototype.
+	add_category(recipe.category)
+	if recipe.additional_categories ~= nil then
+		for _, cat in ipairs(recipe.additional_categories) do
+			add_category(cat)
+		end
+	end
+	return categories
+end
+
+local function EntityCraftingCategorySet(entity)
+	local machine_cats = {}
+	if entity.crafting_categories == nil then
+		return machine_cats
+	end
+	-- crafting_categories is dictionary[RecipeCategoryID -> true]; keys are category names.
+	-- Do not call recipe:has_category here — some keys are not accepted as RecipeCategoryID by the API.
+	for cat, _ in pairs(entity.crafting_categories) do
+		if type(cat) == 'string' and cat ~= '' then
+			machine_cats[cat] = true
+		elseif type(cat) == 'userdata' and cat.valid and cat.name ~= nil and cat.name ~= '' then
+			machine_cats[cat.name] = true
+		end
+	end
+	return machine_cats
+end
+
+local function CollectEntityCraftableRecipes(entity)
+	local craftable = {}
+	local machine_cats = EntityCraftingCategorySet(entity)
+	if next(machine_cats) == nil then
+		return craftable
+	end
+
+	for _, recipe in pairs(prototypes.recipe) do
+		for _, recipe_cat in ipairs(CollectRecipeCraftingCategories(recipe)) do
+			if machine_cats[recipe_cat] then
+				table.insert(craftable, recipe.name)
+				break
+			end
+		end
+	end
+	return craftable
+end
+
+local function ExportCraftingCategoryMachines()
+	etable['crafting_category_machines'] = {}
+	local used_categories = {}
+
+	for _, recipe in pairs(prototypes.recipe) do
+		for _, cat in ipairs(CollectRecipeCraftingCategories(recipe)) do
+			used_categories[cat] = true
+		end
+	end
+
+	for cat, _ in pairs(used_categories) do
+		-- get_entity_filtered returns a LuaCustomTable (userdata); use pairs(), not next().
+		local entities = prototypes.get_entity_filtered{{filter = 'crafting-category', crafting_category = cat}}
+		local names = {}
+		for entity_name, _ in pairs(entities) do
+			table.insert(names, entity_name)
+		end
+		if #names > 0 then
+			table.sort(names)
+			etable['crafting_category_machines'][cat] = names
+		end
+	end
+end
+
 local function ExportRecipes()
 	trecipes = {}
 	for _, recipe in pairs(prototypes.recipe) do
@@ -162,12 +280,24 @@ local function ExportRecipes()
 
 		trecipe['enabled'] = recipe.enabled
 		trecipe['category'] = recipe.category
+		trecipe['additional_categories'] = {}
+		if recipe.additional_categories ~= nil then
+			for _, cat in ipairs(recipe.additional_categories) do
+				table.insert(trecipe['additional_categories'], cat)
+			end
+		end
+		trecipe['crafting_categories'] = CollectRecipeCraftingCategories(recipe)
 		trecipe['energy'] = recipe.energy
 		trecipe['order'] = recipe.order
-		trecipe['subgroup'] = recipe.subgroup.name
+		if recipe.subgroup ~= nil then
+			trecipe['subgroup'] = recipe.subgroup.name
+		end
 
 		trecipe['maximum_productivity'] = recipe.maximum_productivity
 		trecipe['hide_from_player_crafting'] = recipe.hide_from_player_crafting
+		if recipe.hidden then
+			trecipe['hidden'] = true
+		end
 
 		trecipe['allowed_effects'] = recipe.allowed_effects
 
@@ -242,7 +372,9 @@ local function ExportItems()
 		titem['name'] = item.name
 		titem['icon_name'] = 'icon.i.'..item.name
 		titem['order'] = item.order
-		titem['subgroup'] = item.subgroup.name
+		if item.subgroup ~= nil then
+			titem['subgroup'] = item.subgroup.name
+		end
 		titem["stack_size"] = item.stackable and item.stack_size or 1
 		titem['weight'] = item.weight
 
@@ -304,7 +436,9 @@ local function ExportFluids()
 		tfluid['name'] = fluid.name
 		tfluid['icon_name'] = 'icon.i.'..fluid.name
 		tfluid['order'] = fluid.order
-		tfluid['subgroup'] = fluid.subgroup.name
+		if fluid.subgroup ~= nil then
+			tfluid['subgroup'] = fluid.subgroup.name
+		end
 		tfluid['default_temperature'] = ProcessTemperature(fluid.default_temperature)
 		tfluid['max_temperature'] = ProcessTemperature(fluid.max_temperature)
 		tfluid['gas_temperature'] = ProcessTemperature(fluid.gas_temperature)
@@ -427,6 +561,13 @@ local function ExportEntities()
 					table.insert(tentity['crafting_categories'], fname)
 				end
 			end
+			if entity.type == 'furnace' or entity.type == 'assembling-machine' or entity.type == 'rocket-silo' then
+				local craftable = CollectEntityCraftableRecipes(entity)
+				if #craftable > 0 then
+					table.sort(craftable)
+					tentity['craftable_recipes'] = craftable
+				end
+			end
 			if entity.resource_categories ~= nil then
 			tentity['resource_categories'] = {}
 				for fname, _ in pairs(entity.resource_categories) do
@@ -438,14 +579,7 @@ local function ExportEntities()
 			--fluid boxes for input/output of boiler & generator need to be processed (almost guaranteed to be 'steam' and 'water', but... tests have shown that we can heat up whatever we want)
 			--additinally we want count of fluid boxes in/out (for checking recipe validity)
 			if entity.type == 'boiler' then
-				tentity['target_temperature'] = ProcessTemperature(entity.target_temperature)
-
-				if entity.fluidbox_prototypes[1].filter ~= nil then
-					tentity['fluid_ingredient'] = entity.fluidbox_prototypes[1].filter.name
-				end
-				if entity.fluidbox_prototypes[2].filter ~= nil then
-					tentity['fluid_product'] = entity.fluidbox_prototypes[2].filter.name
-				end
+				ExportBoilerFluids(entity, tentity)
 			elseif entity.type == 'generator' then
 				tentity['full_power_temperature'] = ProcessTemperature(entity.maximum_temperature)
 				tentity['max_power_output'] = entity.max_power_output * 60
@@ -571,7 +705,8 @@ local function ExportResources()
 			tresource['resource_category'] = resource.resource_category
 			tresource['mining_time'] = resource.mineable_properties.mining_time
 			if resource.mineable_properties.required_fluid and resource.mineable_properties.fluid_amount then
-				tresource['required_fluid'] = resource.mineable_properties.required_fluid
+				local req_fluid = resource.mineable_properties.required_fluid
+				tresource['required_fluid'] = type(req_fluid) == "string" and req_fluid or req_fluid.name
 				tresource['fluid_amount'] = resource.mineable_properties.fluid_amount / 10;
 			end
 
@@ -660,6 +795,7 @@ script.on_nth_tick(1,
 	function()
 
 		etable['difficulty'] = {0,0}
+		etable['foreman_export_version'] = FOREMAN_EXPORT_VERSION
 
 		localised_print('<<<START-EXPORT-LN>>>')
 
@@ -677,6 +813,7 @@ script.on_nth_tick(1,
 		ExportWaterResources()
 		ExportGroups()
 		ExportSubGroups()
+		ExportCraftingCategoryMachines()
 
 		localised_print('<<<END-EXPORT-LN>>>')
 

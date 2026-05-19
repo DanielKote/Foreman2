@@ -1261,6 +1261,9 @@ namespace Foreman {
                     Graph.MaxQualitySteps = 5; //DCache.QualityMaxChainLength;
                 }
 
+                if (result == DialogResult.OK)
+                    PresetExportFormat.ShowOutdatedWarningIfNeeded(DCache);
+
                 if (result == DialogResult.Abort) {
                     UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 2.0 Vanilla)");
                     Properties.Settings.Default.CurrentPresetName = MainForm.DefaultPreset;

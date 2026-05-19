@@ -186,7 +186,7 @@ namespace Foreman {
                         JsonNode? productItemNode = PresetJson.EnumerateArray(jsonData, "items").FirstOrDefault(t => PresetJson.GetString(t, "name") == prodName);
                         double productStack = PresetJson.GetInt32(productItemNode, "stack_size") ?? 1;
                         if (inputSize * amount > productStack)
-                            inputSize = Math.Floor(productStack / amount);
+                            inputSize = Math.Max(1, Math.Floor(productStack / amount));
                     }
                     foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "rocket_launch_products")) {
                         double amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;

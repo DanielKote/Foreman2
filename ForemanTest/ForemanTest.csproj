@@ -45,6 +45,8 @@
     <None Include="..\Foreman\Presets\Factorio 2.0 Space Age.json" Link="Presets\Factorio 2.0 Space Age.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Foreman\Presets\Factorio 2.0 Space Age.json')" />
     <None Include="assets\Flowchart.fjson" CopyToOutputDirectory="PreserveNewest" Link="assets\Flowchart.fjson" />
     <None Include="assets\Seablock chart.fjson" CopyToOutputDirectory="PreserveNewest" Link="assets\Seablock chart.fjson" />
+    <None Include="assets\Factorio 2.0 Pyanodon.pjson.zst" CopyToOutputDirectory="PreserveNewest" Link="assets\Factorio 2.0 Pyanodon.pjson.zst" />
+    <None Include="assets\Factorio 2.0 SEKrastorio.pjson.zst" CopyToOutputDirectory="PreserveNewest" Link="assets\Factorio 2.0 SEKrastorio.pjson.zst" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foreman\Foreman.csproj" />

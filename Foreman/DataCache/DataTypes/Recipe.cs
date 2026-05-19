@@ -84,6 +84,9 @@ namespace Foreman {
 
         internal HashSet<TechnologyPrototype> myUnlockTechnologies { get; private set; }
 
+        /// <summary>All categories this recipe belongs to (primary, additional, and exported crafting_categories).</summary>
+        internal List<string> craftingCategoryKeys { get; private set; } = [];
+
         public bool IsMissing { get; private set; }
 
         public bool AllowConsumptionBonus { get; internal set; }
@@ -100,6 +103,12 @@ namespace Foreman {
         public long RecipeID { get; private set; }
 
         internal bool HideFromPlayerCrafting { get; set; }
+
+        /// <summary>Factorio <c>recipe.hidden</c> from export — recipe starts disabled; user can enable via chooser.</summary>
+        internal bool HiddenInGame { get; set; }
+
+        /// <summary>Export lists at least one entity for one of this recipe's crafting categories.</summary>
+        internal bool HasCraftingMachineInPreset { get; set; }
 
         public RecipePrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order) {
             RecipeID = lastRecipeID++;

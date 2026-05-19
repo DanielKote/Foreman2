@@ -3,7 +3,7 @@ using System.IO;
 
 namespace ForemanTest.support {
     internal static class TestAssets {
-        public const string AssetsFolder = "assets";
+        private const string AssetsFolder = "assets";
 
         public static string ResolvePath(string fileName) {
             string path = Path.Combine(AppContext.BaseDirectory, AssetsFolder, fileName);

@@ -293,12 +293,47 @@ namespace Foreman {
 
         internal void AssemblerAdditionalProcessing(JsonNode objJsonNode, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> craftingCategories) //recipe user
         {
-            foreach (var recipe in PresetJson.EnumerateStrings(objJsonNode, "crafting_categories")
-                .SelectMany(s => _session.CraftingCategories.TryGetValue(s, out var list) ? list : [])
-                .Where(recipe => TestRecipeEntityPipeFit(recipe, objJsonNode))) {
-                recipe.assemblers.Add(aEntity);
-                aEntity.recipes.Add(recipe);
+            LinkCraftableRecipesFromJson(objJsonNode, aEntity);
+            foreach (string machineCategory in PresetJson.EnumerateStrings(objJsonNode, "crafting_categories"))
+                LinkAssemblerRecipesForCategory(craftingCategories, machineCategory, aEntity);
+        }
+
+        private void LinkCraftableRecipesFromJson(JsonNode objJsonNode, AssemblerPrototype assembler) {
+            foreach (string recipeName in PresetJson.EnumerateStrings(objJsonNode, "craftable_recipes")) {
+                if (_store.Recipes.TryGetValue(recipeName, out Recipe? recipe) && recipe is RecipePrototype prototype)
+                    LinkRecipeToAssembler(prototype, assembler);
             }
+        }
+
+        private static void LinkAssemblerRecipesForCategory(
+            Dictionary<string, List<RecipePrototype>> craftingCategories,
+            string recipeCategory,
+            AssemblerPrototype assembler) {
+            if (!craftingCategories.TryGetValue(recipeCategory, out List<RecipePrototype>? recipes))
+                return;
+
+            foreach (RecipePrototype recipe in recipes)
+                LinkRecipeToAssembler(recipe, assembler);
+        }
+
+        internal void LinkRecipesToCraftingCategoryMachines() {
+            foreach (RecipePrototype recipe in _store.Recipes.Values.OfType<RecipePrototype>().Where(r => r.assemblers.Count == 0)) {
+                foreach (string category in recipe.craftingCategoryKeys) {
+                    if (!_session.CraftingCategoryMachines.TryGetValue(category, out HashSet<string>? entityNames))
+                        continue;
+                    foreach (string entityName in entityNames) {
+                        if (_store.Assemblers.TryGetValue(entityName, out Assembler? assembler) && assembler is AssemblerPrototype assemblerPrototype)
+                            LinkRecipeToAssembler(recipe, assemblerPrototype);
+                    }
+                }
+            }
+        }
+
+        private static void LinkRecipeToAssembler(RecipePrototype recipe, AssemblerPrototype assembler) {
+            if (recipe.assemblers.Contains(assembler))
+                return;
+            recipe.assemblers.Add(assembler);
+            assembler.recipes.Add(recipe);
         }
 
         internal void MinerAdditionalProcessing(JsonNode objJsonNode, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> resourceCategories, List<Recipe> miningWithFluidRecipes) //resource provider
@@ -306,8 +341,7 @@ namespace Foreman {
             foreach (var recipe in PresetJson.EnumerateStrings(objJsonNode, "resource_categories")
                 .SelectMany(s => _session.ResourceCategories.TryGetValue(s, out var list) ? list : [])
                 .Where(recipe => TestRecipeEntityPipeFit(recipe, objJsonNode))) {
-                if (!_session.MiningWithFluidRecipes.Contains(recipe))
-                    ProcessEntityRecipeTechlink(aEntity, recipe);
+                ProcessEntityRecipeTechlink(aEntity, recipe);
 
                 recipe.assemblers.Add(aEntity);
                 aEntity.recipes.Add(recipe);

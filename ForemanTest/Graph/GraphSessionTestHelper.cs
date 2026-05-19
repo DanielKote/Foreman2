@@ -2,6 +2,7 @@
 using Foreman.Graph;
 using ForemanTest.support;
 using System;
+using System.Linq;
 
 namespace ForemanTest.Graph {
     internal static class GraphSessionTestHelper {
@@ -22,6 +23,14 @@ namespace ForemanTest.Graph {
             var quality = new QualityPrototype(cache, "normal", "Normal", "a");
             TestDataCacheHelper.RegisterQuality(cache, quality);
             return new TestContext { Cache = cache, Quality = quality, Subgroup = subgroup };
+        }
+
+        internal static TestContext CreateContext(DataCache cache) {
+            if (cache.DefaultQuality is null)
+                throw new InvalidOperationException("DataCache must have DefaultQuality loaded.");
+            SubgroupPrototype subgroup = cache.Subgroups.Values.OfType<SubgroupPrototype>().FirstOrDefault()
+                ?? new SubgroupPrototype(cache, "§§test:subgroup", "z");
+            return new TestContext { Cache = cache, Quality = cache.DefaultQuality, Subgroup = subgroup };
         }
 
         internal static ProductionGraphSession AttachSession(ProductionGraph graph) {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Foreman {
     /// <summary>Transient dictionaries used only while parsing a preset JSON document.</summary>
@@ -15,5 +16,8 @@ namespace Foreman {
         public Dictionary<Item, string> SpoilResults { get; } = new();
         public Dictionary<Quality, string> NextQualities { get; } = new();
         public List<Recipe> MiningWithFluidRecipes { get; } = new();
+
+        /// <summary>Recipe category → entity names that can craft it (from export or entity crafting_categories).</summary>
+        public Dictionary<string, HashSet<string>> CraftingCategoryMachines { get; } = new(StringComparer.Ordinal);
     }
 }

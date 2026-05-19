@@ -202,18 +202,34 @@ namespace Foreman {
                     return "";
                 }
 
+                string tempSavePath = Path.Combine(Application.StartupPath, "temp-save.zip");
+
                 progress.Report(new KeyValuePair<int, string>(10, "Running Factorio - creating test save."));
-                string resultString = FactorioBenchmarkRunner.Run(
+                FactorioRunResult createRun = FactorioBenchmarkRunner.Run(
                     exePath,
                     string.Format("--mod-directory \"{0}\" --create temp-save.zip", modsPath),
                     token,
                     () => CleanupFailedImport(modsPath));
 
-                if (string.IsNullOrEmpty(resultString) && token.IsCancellationRequested)
+                if (string.IsNullOrEmpty(createRun.Output) && token.IsCancellationRequested)
                     return "";
 
-                if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
+                if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(createRun.Output)) {
                     UserMessages.Show("Foreman export could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment and let the export commence in peace!");
+                    CleanupFailedImport(modsPath);
+                    return "";
+                }
+
+                if (ReportFactorioCrashIfNeeded(createRun, "creating the test save for preset export", modsPath))
+                    return "";
+
+                if (!File.Exists(tempSavePath)) {
+                    UserMessages.Show(
+                        "Factorio did not create the test save (temp-save.zip) needed for preset export.\n\n" +
+                        "Factorio may have crashed or exited early. Check factorio-current.log in your Factorio user data folder " +
+                        "and try disabling mods until you can create a new game with the same mod list.");
+                    ErrorLogging.LogLine($"Foreman preset export: temp-save.zip missing after --create (exit code {createRun.ExitCode}).");
+                    WriteExportFailureLog(createRun.Output);
                     CleanupFailedImport(modsPath);
                     return "";
                 }
@@ -235,17 +251,22 @@ namespace Foreman {
                 }
 
                 progress.Report(new KeyValuePair<int, string>(20, "Running Factorio - foreman export scripts."));
-                resultString = FactorioBenchmarkRunner.Run(
+                FactorioRunResult exportRun = FactorioBenchmarkRunner.Run(
                     exePath,
                     string.Format("--mod-directory \"{0}\" --instrument-mod foremanexport --benchmark temp-save.zip --benchmark-ticks 1 --benchmark-runs 1", modsPath),
                     token,
                     () => CleanupFailedImport(modsPath));
 
+                string resultString = exportRun.Output;
+
                 if (string.IsNullOrEmpty(resultString) && token.IsCancellationRequested)
                     return "";
 
-                if (File.Exists("temp-save.zip"))
-                    File.Delete("temp-save.zip");
+                if (ReportFactorioCrashIfNeeded(exportRun, "running the preset export scripts", modsPath))
+                    return "";
+
+                if (File.Exists(tempSavePath))
+                    File.Delete(tempSavePath);
                 if (Directory.Exists(Path.Combine(modsPath, foremanModName)))
                     Directory.Delete(Path.Combine(modsPath, foremanModName), true);
 
@@ -259,9 +280,13 @@ namespace Foreman {
 #if DEBUG
                     Console.WriteLine(resultString);
 #endif
-                    UserMessages.Show("Foreman export could not be completed - possible mod conflict detected. Please run factorio and ensure it can successfully load to menu before retrying.");
+                    string failureMessage = resultString.Contains("temp-save.zip does not exist", StringComparison.Ordinal)
+                        ? "Foreman export could not finish because Factorio could not load the test save (temp-save.zip). " +
+                          "The save may not have been created in the previous step; check factorio-current.log for crashes or errors."
+                        : "Foreman export could not be completed - possible mod conflict detected. Please run Factorio and ensure it can successfully load to menu before retrying.";
+                    UserMessages.Show(failureMessage);
                     ErrorLogging.LogLine("Foreman export failed partway. Consult errorExporting.json for full output (and search for <<<END-EXPORT-P1>>> or <<<END-EXPORT-P2>>>, at least one of which is missing)");
-                    Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "errorExporting.json"), resultString);
+                    WriteExportFailureLog(resultString);
                     CleanupFailedImport(modsPath);
                     return "";
                 }
@@ -362,14 +387,33 @@ namespace Foreman {
             });
         }
 
+        private static void WriteExportFailureLog(string output) =>
+            Utf8File.WriteAllText(Path.Combine(Application.StartupPath, "errorExporting.json"), output);
+
+        private bool ReportFactorioCrashIfNeeded(FactorioRunResult run, string phaseDescription, string modsPath) {
+            if (!run.Crashed)
+                return false;
+
+            UserMessages.Show(
+                "Factorio crashed while " + phaseDescription + ".\n\n" +
+                "This is usually caused by a bug in one of your enabled mods, not by Foreman. " +
+                "Open factorio-current.log in your Factorio user data folder for details, " +
+                "then try disabling mods until Factorio can start a new game with the same mod list.");
+            ErrorLogging.LogLine("Foreman preset export: Factorio crash during " + phaseDescription + " (exit code " + run.ExitCode + ").");
+            WriteExportFailureLog(run.Output);
+            CleanupFailedImport(modsPath);
+            return true;
+        }
+
         private void CleanupFailedImport(string modsPath = "", string presetPath = "", string foremanModName = "") {
             if (!string.IsNullOrEmpty(modsPath))
                 FactorioModListHelper.SetModState(modsPath, "foremanexport", enabled: false, removeFromListWhenDisabled: true);
 
             NewPresetName = "";
 
-            if (File.Exists("temp-save.zip"))
-                File.Delete("temp-save.zip");
+            string tempSavePath = Path.Combine(Application.StartupPath, "temp-save.zip");
+            if (File.Exists(tempSavePath))
+                File.Delete(tempSavePath);
 
             if (modsPath != "" && foremanModName != "" && Directory.Exists(Path.Combine(modsPath, foremanModName)))
                 Directory.Delete(Path.Combine(modsPath, foremanModName), true);

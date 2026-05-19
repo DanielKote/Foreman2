@@ -127,7 +127,7 @@ namespace Foreman {
 
                     FactorioModListHelper.SetModState(modsPath, "foremansavereader", enabled: true);
 
-                    string resultString = FactorioBenchmarkRunner.Run(
+                    FactorioRunResult readRun = FactorioBenchmarkRunner.Run(
                         factorioPath,
                         string.Format("--instrument-mod foremansavereader --benchmark \"{0}\" --benchmark-ticks 1 --benchmark-runs 1", Path.GetFileName(saveFilePath)),
                         token,
@@ -135,6 +135,8 @@ namespace Foreman {
                             if (Directory.Exists(Path.Combine(modsPath, "foremansavereader_2.0.0")))
                                 Directory.Delete(Path.Combine(modsPath, "foremansavereader_2.0.0"), true);
                         });
+
+                    string resultString = readRun.Output;
 
                     if (string.IsNullOrEmpty(resultString) && token.IsCancellationRequested)
                         return DialogResult.Cancel;
@@ -145,6 +147,12 @@ namespace Foreman {
                     if (FactorioBenchmarkRunner.IsAnotherInstanceRunning(resultString)) {
                         UserMessages.Show("File read could not be completed because this instance of Factorio is currently running. Please stop expanding the factory for just a brief moment...");
                         return DialogResult.Cancel;
+                    } else if (readRun.Crashed) {
+                        UserMessages.Show(
+                            "Factorio crashed while reading the save file.\n\n" +
+                            "This is usually caused by a mod bug. See factorio-current.log in your Factorio user data folder.");
+                        ErrorLogging.LogLine("Foreman save read: Factorio crash (exit code " + readRun.ExitCode + ").");
+                        return DialogResult.Abort;
                     } else if (resultString.IndexOf("<<<END-EXPORT-P0>>>") == -1) {
 #if DEBUG
                         Console.WriteLine(resultString);

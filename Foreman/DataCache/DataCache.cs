@@ -14,6 +14,7 @@ namespace Foreman {
         private readonly DataCacheImportHandlers _import;
 
         public string? PresetName { get; private set; }
+        public int Version { get; private set; }
 
         public IEnumerable<Group> AvailableGroups => _store.Groups.Values.Where(g => g.Available);
         public IEnumerable<Subgroup> AvailableSubgroups => _store.Subgroups.Values.Where(g => g.Available);
@@ -74,6 +75,7 @@ namespace Foreman {
             var session = new PresetLoadSession();
             PresetName = preset.Name;
             JsonObject jsonData = PresetProcessor.PrepPreset(preset);
+            Version = PresetJson.GetInt32(jsonData, PresetExportFormat.VersionPropertyName) ?? 0;
 
             _store.IconCache = loadIcons
                 ? await IconCache.LoadIconCache(Path.Combine(Application.StartupPath, "Presets", preset.Name + ".dat"), progress, 0, 90)
@@ -86,12 +88,16 @@ namespace Foreman {
                 var presetLoader = new PresetDataLoader(this, _store, session);
                 presetLoader.LoadFromJson(jsonData, _store.IconCache);
                 entityLoader.LoadEntities(jsonData, _store.IconCache);
+                entityLoader.LinkRecipesToCraftingCategoryMachines();
                 presetLoader.LoadRocketLaunches(jsonData);
-                entityLoader.LoadCharacter(PresetJson.EnumerateArray(jsonData, "entities").FirstOrDefault(a => PresetJson.GetString(a, "name") == "character"), session.CraftingCategories);
+                entityLoader.LoadCharacter(
+                    PresetJson.EnumerateArray(jsonData, "entities").FirstOrDefault(a => PresetJson.GetString(a, "name") == "character"),
+                    session.CraftingCategories);
 
                 if (_store.RocketAssembler is not null)
                     _store.Assemblers.Add(_store.RocketAssembler.Name, _store.RocketAssembler);
 
+                PresetCraftingCompatibility.FinalizeRecipeCraftingLinks(_store, session);
                 new DataCachePostLoadProcessor(this, _store).RunAfterPresetParsed();
 
                 progress.Report(new KeyValuePair<int, string>(98, "Finalizing..."));

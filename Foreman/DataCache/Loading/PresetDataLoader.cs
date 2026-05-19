@@ -19,7 +19,21 @@ namespace Foreman {
             _session = session;
         }
 
+        /// <summary>
+        /// Maps exported subgroup name to a loaded subgroup. When the export omits subgroup (valid for some
+        /// prototypes, e.g. cursor-only selection tools), falls back to <see cref="DataCacheStore.MissingSubgroup"/>.
+        /// Returns null when a subgroup name is present but unknown in the preset.
+        /// </summary>
+        private SubgroupPrototype? ResolvePresetSubgroup(JsonNode objJsonNode) {
+            if (PresetJson.GetString(objJsonNode, "subgroup") is not string subgroupStr)
+                return _store.MissingSubgroup;
+            return _store.Subgroups.TryGetValue(subgroupStr, out Subgroup? sg) && sg is SubgroupPrototype sgProto
+                ? sgProto
+                : null;
+        }
+
         public void LoadFromJson(JsonObject jsonData, Dictionary<string, IconColorPair> iconCache) {
+            LoadCraftingCategoryMachines(jsonData);
             foreach (JsonNode objJsonNode in PresetJson.EnumerateArray(jsonData, "mods"))
                 ProcessMod(objJsonNode);
             foreach (JsonNode objJsonNode in PresetJson.EnumerateArray(jsonData, "subgroups"))
@@ -180,14 +194,13 @@ namespace Foreman {
         internal void ProcessFluid(JsonNode objJsonNode, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories) {
             if (PresetJson.GetString(objJsonNode, "name") is not string name ||
                 PresetJson.GetString(objJsonNode, "localised_name") is not string localisedName ||
-                PresetJson.GetString(objJsonNode, "subgroup") is not string subgroupStr ||
                 PresetJson.GetString(objJsonNode, "order") is not string order ||
                 PresetJson.GetString(objJsonNode, "icon_name") is not string iconName ||
                 PresetJson.GetDouble(objJsonNode, "default_temperature") is not double defaultTemp ||
                 PresetJson.GetDouble(objJsonNode, "heat_capacity") is not double heatCapacity ||
                 PresetJson.GetDouble(objJsonNode, "gas_temperature") is not double gasTemp ||
                 PresetJson.GetDouble(objJsonNode, "max_temperature") is not double maxTemp ||
-                _store.Subgroups[subgroupStr] is not SubgroupPrototype sgProto)
+                ResolvePresetSubgroup(objJsonNode) is not SubgroupPrototype sgProto)
                 return;
             FluidPrototype item = new(_owner, name, localisedName, sgProto, order);
 
@@ -212,12 +225,11 @@ namespace Foreman {
             if (PresetJson.GetString(objJsonNode, "name") is not string name ||
                 _store.Items.ContainsKey(name) ||
                 PresetJson.GetString(objJsonNode, "localised_name") is not string localisedName ||
-                PresetJson.GetString(objJsonNode, "subgroup") is not string subgroupStr ||
                 PresetJson.GetString(objJsonNode, "order") is not string order ||
                 PresetJson.GetInt32(objJsonNode, "stack_size") is not int stackSize ||
                 PresetJson.GetDouble(objJsonNode, "weight") is not double weight ||
                 PresetJson.GetDouble(objJsonNode, "ingredient_to_weight_coefficient") is not double ingredientToWeightCoeff ||
-                _store.Subgroups[subgroupStr] is not SubgroupPrototype sgProto
+                ResolvePresetSubgroup(objJsonNode) is not SubgroupPrototype sgProto
                 ) //special handling for fluids which appear in both _store.Items & fluid lists (ex: fluid-unknown)
                 return;
 
@@ -328,11 +340,14 @@ namespace Foreman {
         internal void ProcessRecipe(JsonNode objJsonNode, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories, Dictionary<string, List<ModulePrototype>> moduleCategories) {
             if (PresetJson.GetString(objJsonNode, "name") is not string name ||
                 PresetJson.GetString(objJsonNode, "localised_name") is not string localisedName ||
-                PresetJson.GetString(objJsonNode, "subgroup") is not string subgroupStr ||
                 PresetJson.GetString(objJsonNode, "order") is not string order ||
-                PresetJson.GetString(objJsonNode, "category") is not string category)
+                PresetJson.GetString(objJsonNode, "category") is not string category ||
+                ResolvePresetSubgroup(objJsonNode) is not SubgroupPrototype sgProto)
                 return;
-            RecipePrototype recipe = new(_owner, name, localisedName, (SubgroupPrototype)_store.Subgroups[subgroupStr], order);
+            RecipePrototype recipe = new(_owner, name, localisedName, sgProto, order);
+
+            recipe.HiddenInGame = PresetJson.GetBool(objJsonNode, "hidden") is true;
+            recipe.HideFromPlayerCrafting = PresetJson.GetBool(objJsonNode, "hide_from_player_crafting") is true;
 
             recipe.Time = PresetJson.GetDouble(objJsonNode, "energy") ?? default;
             if (PresetJson.GetBool(objJsonNode, "enabled") is true && _store.StartingTech is not null) //due to the way the import of presets happens, enabled at this stage means the recipe is available without any research necessary (aka: available at start)
@@ -341,10 +356,8 @@ namespace Foreman {
                 _store.StartingTech.unlockedRecipes.Add(recipe);
             }
 
-            if (_session.CraftingCategories.TryGetValue(category, out var list))
-                list.Add(recipe);
-            else
-                _session.CraftingCategories.Add(category, [recipe]);
+            foreach (string craftingCategory in PresetCraftingCompatibility.CollectRecipeCraftingCategories(objJsonNode, category))
+                AddRecipeToCraftingCategory(craftingCategory, recipe);
 
             if (PresetJson.GetString(objJsonNode, "icon_name") is string iconName && iconCache.TryGetValue(iconName, out var icp))
                 recipe.SetIconAndColor(icp);
@@ -454,7 +467,7 @@ namespace Foreman {
             recipe.Time = PresetJson.GetDouble(objJsonNode, "mining_time") ?? 0;
 
             foreach (JsonNode productJsonNode in PresetJson.EnumerateArray(objJsonNode, "products")) {
-                if (PresetJson.GetString(productJsonNode, "name") is not string prodName || !_store.Items.ContainsKey(name) || PresetJson.GetDouble(productJsonNode, "amount") <= 0)
+                if (PresetJson.GetString(productJsonNode, "name") is not string prodName || !_store.Items.ContainsKey(prodName) || PresetJson.GetDouble(productJsonNode, "amount") <= 0)
                     continue;
                 ItemPrototype product = (ItemPrototype)_store.Items[prodName];
                 var amount = PresetJson.GetDouble(productJsonNode, "amount") ?? default;
@@ -468,10 +481,14 @@ namespace Foreman {
             }
 
             if (PresetJson.GetString(objJsonNode, "required_fluid") is string requiredFluid && PresetJson.GetDouble(objJsonNode, "fluid_amount") is double fluidAmount && fluidAmount != 0) {
-                ItemPrototype reqLiquid = (ItemPrototype)_store.Items[requiredFluid];
-                recipe.InternalOneWayAddIngredient(reqLiquid, fluidAmount);
-                reqLiquid.consumptionRecipes.Add(recipe);
-                _session.MiningWithFluidRecipes.Add(recipe);
+                if (_store.Items.TryGetValue(requiredFluid, out Item? fluidItem) && fluidItem is ItemPrototype reqLiquid) {
+                    recipe.InternalOneWayAddIngredient(reqLiquid, fluidAmount);
+                    reqLiquid.consumptionRecipes.Add(recipe);
+                    _session.MiningWithFluidRecipes.Add(recipe);
+                } else {
+                    ErrorLogging.LogLine(
+                        $"ProcessResource: required_fluid '{requiredFluid}' for resource '{name}' was not found in items — fluid ingredient omitted.");
+                }
             }
 
             foreach (ModulePrototype module in _store.Modules.Values.Cast<ModulePrototype>()) //we will let the assembler sort out which module can be used with this recipe
@@ -595,7 +612,7 @@ namespace Foreman {
                     continue;
 
                 if (inputSize * amount > product.StackSize)
-                    inputSize = Math.Floor(product.StackSize / amount);
+                    inputSize = Math.Max(1, Math.Floor(product.StackSize / amount));
 
                 amountPerLaunchItem.Add(product, amount);
 
@@ -623,6 +640,17 @@ namespace Foreman {
             _store.RocketAssembler.recipes.Add(recipe);
 
             _store.Recipes.Add(recipe.Name, recipe);
+        }
+
+        private void LoadCraftingCategoryMachines(JsonObject jsonData) =>
+            PresetCraftingCompatibility.CopyCraftingCategoryMachines(jsonData, _session.CraftingCategoryMachines);
+
+        private void AddRecipeToCraftingCategory(string category, RecipePrototype recipe) {
+            recipe.craftingCategoryKeys.Add(category);
+            if (_session.CraftingCategories.TryGetValue(category, out List<RecipePrototype>? list))
+                list.Add(recipe);
+            else
+                _session.CraftingCategories.Add(category, [recipe]);
         }
     }
 }
