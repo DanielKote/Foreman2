@@ -46,6 +46,10 @@ namespace ForemanTest {
             StaTest.Run(EditRecipePanel_HeightFitsViewerAndScrollsWhenContentIsTaller_Impl);
 
         [TestMethod]
+        public void EditRecipePanel_VerticalScrollbarDoesNotOverlapContent() =>
+            StaTest.Run(EditRecipePanel_VerticalScrollbarDoesNotOverlapContent_Impl);
+
+        [TestMethod]
         public void EditFlowPanel_HeightFitsShortViewer() =>
             StaTest.Run(EditFlowPanel_HeightFitsShortViewer_Impl);
 
@@ -152,11 +156,32 @@ namespace ForemanTest {
                 Control content = scrollHost.Controls[0];
                 Assert.IsTrue(content.Height > scrollHost.ClientSize.Height,
                     "Recipe editor content should remain full height inside the capped viewport.");
-                scrollHost.PerformLayout();
                 Assert.IsTrue(scrollHost.VerticalScroll.Visible,
                     "A vertical scrollbar should appear when recipe editor content exceeds the viewer height.");
-                Assert.IsFalse(scrollHost.HorizontalScroll.Visible,
-                    "Reserving vertical scrollbar width should prevent a horizontal scrollbar.");
+                Assert.IsTrue(content.Width <= scrollHost.ClientSize.Width,
+                    "Recipe editor content should fit the viewport width beside the vertical scrollbar.");
+            } finally {
+                viewer.ToolTipRenderer.ClearFloatingControls();
+            }
+        }
+
+        private static void EditRecipePanel_VerticalScrollbarDoesNotOverlapContent_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+            viewer.Size = new Size(900, 320);
+            NodeId recipeId = CreateTestRecipeNode(ctx, viewer, new Point(0, 200));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(recipeId, out BaseNodeElement? element));
+            Assert.IsInstanceOfType(element, typeof(RecipeNodeElement));
+
+            try {
+                viewer.EditRecipeNode((RecipeNodeElement)element);
+                EditRecipePanel? editPanel = viewer.Controls.OfType<EditRecipePanel>().FirstOrDefault();
+                Assert.IsNotNull(editPanel);
+
+                Panel scrollHost = editPanel.Controls.Find(ScrollHostName, false).OfType<Panel>().First();
+                Control content = scrollHost.Controls[0];
+                int naturalContentWidth = MeasureUnconstrainedContentWidth(content);
+                AssertVerticalScrollbarDoesNotOverlapContent(editPanel, scrollHost, content, naturalContentWidth);
             } finally {
                 viewer.ToolTipRenderer.ClearFloatingControls();
             }
@@ -266,6 +291,33 @@ namespace ForemanTest {
         private static NodeId CreateTestRecipeNode(GraphSessionTestHelper.TestContext ctx, ProductionGraphViewer viewer, Point location) {
             Recipe recipe = CreateTestRecipeDefinition(ctx);
             return viewer.Session.Editor.CreateRecipeNode(new RecipeQualityPair(recipe, ctx.Quality), location);
+        }
+
+        private static void AssertVerticalScrollbarDoesNotOverlapContent(
+            UserControl editPanel,
+            Panel scrollHost,
+            Control content,
+            int naturalContentWidth) {
+            Assert.IsTrue(scrollHost.VerticalScroll.Visible,
+                "Test requires a visible vertical scrollbar.");
+
+            int scrollBarWidth = SystemInformation.VerticalScrollBarWidth;
+            Assert.IsTrue(editPanel.Width >= naturalContentWidth + scrollBarWidth,
+                $"Edit panel width {editPanel.Width} should reserve {scrollBarWidth}px beside natural content width {naturalContentWidth}px.");
+            Assert.IsTrue(content.Width >= naturalContentWidth - 2,
+                $"Content width {content.Width} should not be squeezed below natural width {naturalContentWidth}px.");
+            Assert.IsTrue(content.Width <= scrollHost.ClientSize.Width,
+                "Content should fit inside the scroll viewport client area.");
+        }
+
+        private static int MeasureUnconstrainedContentWidth(Control content) {
+            Size previousMaximum = content.MaximumSize;
+            try {
+                content.MaximumSize = Size.Empty;
+                return EditPanelViewportLayout.MeasureContentSize(content).Width;
+            } finally {
+                content.MaximumSize = previousMaximum;
+            }
         }
 
         private static void AssertFloatingPanelsOnScreen(ProductionGraphViewer viewer) {

@@ -46,6 +46,7 @@ namespace Foreman {
             int scrollBarWidth = SystemInformation.VerticalScrollBarWidth;
 
             editPanel.AutoSize = false;
+            contentRoot.MaximumSize = Size.Empty;
             contentRoot.AutoSize = true;
             if (contentRoot is UserControl contentPanel)
                 contentPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -60,20 +61,17 @@ namespace Foreman {
             editPanel.Size = new Size(width, height);
             scrollHost.PerformLayout();
             LayoutScrollableContent(scrollHost, contentRoot);
-
-            if (needsVerticalScroll && scrollHost.HorizontalScroll.Visible) {
-                editPanel.Width = Math.Min(maxWidth, editPanel.Width + scrollBarWidth);
-                scrollHost.PerformLayout();
-                LayoutScrollableContent(scrollHost, contentRoot);
-            }
         }
 
         private static void LayoutScrollableContent(Panel scrollHost, Control contentRoot) {
             int contentWidth = Math.Max(1, scrollHost.ClientSize.Width);
+            contentRoot.MaximumSize = new Size(contentWidth, 0);
             contentRoot.Width = contentWidth;
             contentRoot.PerformLayout();
             Size natural = MeasureContentSize(contentRoot);
-            contentRoot.Size = new Size(contentWidth, Math.Max(1, natural.Height));
+            int contentHeight = Math.Max(1, natural.Height);
+            contentRoot.Size = new Size(contentWidth, contentHeight);
+            scrollHost.AutoScrollMinSize = new Size(contentWidth, contentHeight);
         }
     }
 }
