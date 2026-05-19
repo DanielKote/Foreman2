@@ -209,21 +209,20 @@ namespace Foreman {
         }
 
         private void LoadUnfilteredLists() {
-            IconList.Images.Clear();
-            IconList.Images.Add(DataCache.UnknownIcon);
+            var iconIndex = new EnabledObjectsIconIndex(IconList);
 
-            LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler), unfilteredAssemblerList);
-            LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner || a.EntityType == EntityType.OffshorePump), unfilteredMinerList);
-            LoadUnfilteredList(Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor), unfilteredPowerList);
-            LoadUnfilteredList(Options.DCache.Beacons.Values, unfilteredBeaconList);
-            LoadUnfilteredList(Options.DCache.Modules.Values, unfilteredModuleList);
-            LoadUnfilteredList(Options.DCache.Recipes.Values, unfilteredRecipeList);
-            LoadUnfilteredList(Options.DCache.Qualities.Values, unfilteredQualityList);
+            LoadUnfilteredList(iconIndex, Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Assembler), unfilteredAssemblerList);
+            LoadUnfilteredList(iconIndex, Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Miner || a.EntityType == EntityType.OffshorePump), unfilteredMinerList);
+            LoadUnfilteredList(iconIndex, Options.DCache.Assemblers.Values.Where(a => a.EntityType == EntityType.Boiler || a.EntityType == EntityType.BurnerGenerator || a.EntityType == EntityType.Generator || a.EntityType == EntityType.Reactor), unfilteredPowerList);
+            LoadUnfilteredList(iconIndex, Options.DCache.Beacons.Values, unfilteredBeaconList);
+            LoadUnfilteredList(iconIndex, Options.DCache.Modules.Values, unfilteredModuleList);
+            LoadUnfilteredList(iconIndex, Options.DCache.Recipes.Values, unfilteredRecipeList);
+            LoadUnfilteredList(iconIndex, Options.DCache.Qualities.Values, unfilteredQualityList);
 
             UpdateFilteredLists();
         }
 
-        private void LoadUnfilteredList(IEnumerable<DataObjectBase> origin, List<ListViewItem> lviList) {
+        private void LoadUnfilteredList(EnabledObjectsIconIndex iconIndex, IEnumerable<DataObjectBase> origin, List<ListViewItem> lviList) {
             IOrderedEnumerable<DataObjectBase> orderedList;
             if (origin is IEnumerable<Quality>)
                 orderedList = origin.OrderByDescending(a => a.Available).ThenBy(a => a);
@@ -232,12 +231,7 @@ namespace Foreman {
 
             foreach (DataObjectBase dObject in orderedList) {
                 ListViewItem lvItem = new ListViewItem();
-                if (dObject.Icon != null) {
-                    IconList.Images.Add(dObject.Icon);
-                    lvItem.ImageIndex = IconList.Images.Count - 1;
-                } else {
-                    lvItem.ImageIndex = 0;
-                }
+                lvItem.ImageIndex = iconIndex.GetImageIndex(dObject.Icon);
 
                 lvItem.Text = dObject.FriendlyName;
                 lvItem.Tag = dObject;
@@ -633,7 +627,7 @@ namespace Foreman {
 
             filteredQualityList.Clear();
             filteredQualityList.AddRange(unfilteredQualityList);
-            QualityListView.VirtualListSize += filteredQualityList.Count;
+            QualityListView.VirtualListSize = filteredQualityList.Count;
 
             foreach (ListViewItem item in unfilteredAssemblerList)
                 if (item.Tag is DataObjectBase dob)
