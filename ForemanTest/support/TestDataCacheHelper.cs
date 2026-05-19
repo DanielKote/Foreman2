@@ -31,6 +31,12 @@ namespace ForemanTest.support {
         public static void RegisterAssembler(DataCache cache, Assembler assembler) =>
             GetDictionary<string, Assembler>(cache, "Assemblers")[assembler.Name] = assembler;
 
+        public static void RegisterBeacon(DataCache cache, Beacon beacon) =>
+            GetDictionary<string, Beacon>(cache, "Beacons")[beacon.Name] = beacon;
+
+        public static void RegisterModule(DataCache cache, Foreman.Module module) =>
+            GetDictionary<string, Foreman.Module>(cache, "Modules")[module.Name] = module;
+
         public static void RegisterQuality(DataCache cache, Quality quality) {
             GetDictionary<string, Quality>(cache, "Qualities")[quality.Name] = quality;
             object store = GetDataCacheStore(cache);

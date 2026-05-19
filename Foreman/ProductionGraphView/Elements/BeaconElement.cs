@@ -63,11 +63,12 @@ namespace Foreman {
               {
                 for (int x = 0; x < 8; x++) {
                     for (int y = 0; y < 4; y++) {
-                        if (RecipeViewModel.BeaconModules.Count > (x * 4) + y) {
-                            Pen marker = RecipeViewModel.BeaconModules[(x * 7) + y].Module.GetProductivityBonus() > 0 ? prodModulePen :
-                                RecipeViewModel.BeaconModules[(x * 7) + y].Module.GetQualityBonus() > 0 ? qualityModulePen :
-                                RecipeViewModel.BeaconModules[(x * 7) + y].Module.GetConsumptionBonus() < 0 ? effModulePen :
-                                RecipeViewModel.BeaconModules[(x * 7) + y].Module.GetSpeedBonus() > 0 ? speedModulePen :
+                        int moduleIndex = (x * 4) + y;
+                        if (RecipeViewModel.BeaconModules.Count > moduleIndex) {
+                            Pen marker = RecipeViewModel.BeaconModules[moduleIndex].Module.GetProductivityBonus() > 0 ? prodModulePen :
+                                RecipeViewModel.BeaconModules[moduleIndex].Module.GetQualityBonus() > 0 ? qualityModulePen :
+                                RecipeViewModel.BeaconModules[moduleIndex].Module.GetConsumptionBonus() < 0 ? effModulePen :
+                                RecipeViewModel.BeaconModules[moduleIndex].Module.GetSpeedBonus() > 0 ? speedModulePen :
                                 unknownModulePen;
                             graphics.DrawEllipse(marker, trans.X + moduleOffset.X + (ModuleSpacing * 2) + ModuleIconSize - 5 - (x * 5), trans.Y + moduleOffset.Y + 2 + (y * 5), 2, 2);
                         }
