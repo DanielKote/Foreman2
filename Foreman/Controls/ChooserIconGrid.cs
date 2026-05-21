@@ -78,10 +78,24 @@ namespace Foreman {
         public void WireMouseWheel(MouseEventHandler handler) => gridSurface.MouseWheel += handler;
 
         /// <summary>Size the grid to fit the allotted area; returns the outer width (cells + scrollbar).</summary>
-        public int ApplyLayout(int availableGridHeight, int maxLayoutWidth, int designCellSize, int minCellSize, int scrollbarWidth) {
-            int cellByHeight = availableGridHeight / VisibleRowCount;
+        public int ApplyLayout(int availableGridHeight, int maxLayoutWidth, int designCellSize, int minCellSize, int scrollbarWidth, int minOuterWidth = 0) {
+            int minGridHeight = minCellSize * VisibleRowCount;
+            int cellByHeight = Math.Max(1, availableGridHeight / VisibleRowCount);
             int cellByWidth = Math.Max(1, (maxLayoutWidth - scrollbarWidth) / ColumnCount);
-            int cell = Math.Max(minCellSize, Math.Min(designCellSize, Math.Min(cellByHeight, cellByWidth)));
+            int cell = Math.Min(designCellSize, Math.Min(cellByHeight, cellByWidth));
+            if (availableGridHeight >= minGridHeight)
+                cell = Math.Max(minCellSize, cell);
+            else
+                cell = Math.Max(1, cell);
+
+            if (minOuterWidth > 0) {
+                int cellForMinOuter = (int)Math.Ceiling((minOuterWidth - scrollbarWidth) / (double)ColumnCount);
+                cellForMinOuter = Math.Max(minCellSize, Math.Min(designCellSize, cellForMinOuter));
+                if (cellForMinOuter * ColumnCount + scrollbarWidth <= maxLayoutWidth) {
+                    int cellByHeightCap = Math.Max(1, availableGridHeight / VisibleRowCount);
+                    cell = Math.Max(cell, Math.Min(cellForMinOuter, cellByHeightCap));
+                }
+            }
 
             TargetCellSize = cell;
             int gridHeight = cell * VisibleRowCount;
@@ -97,7 +111,7 @@ namespace Foreman {
             MaximumSize = new Size(outerWidth, gridHeight);
 
             ApplyCellGridBounds(gridWidth, gridHeight, scrollbarWidth);
-            ResumeLayout(true);
+            ResumeLayout(performLayout: false);
             return outerWidth;
         }
 

@@ -32,6 +32,7 @@ namespace Foreman {
             AsFuelCheckBox = new CheckBox();
             ItemIconPanel = new Panel();
             groupsPanel = new FlowLayoutPanel();
+            iconGridBand = new Panel();
             iconGrid = new ChooserIconGrid();
             nodeOptionsRowA = new FlowLayoutPanel();
             AddSupplyButton = new Button();
@@ -56,10 +57,12 @@ namespace Foreman {
             // 
             contentStack.Controls.Add(headerStack);
             contentStack.Controls.Add(groupsPanel);
-            contentStack.Controls.Add(iconGrid);
+            iconGridBand.Controls.Add(iconGrid);
+            contentStack.Controls.Add(iconGridBand);
             contentStack.Controls.Add(nodeOptionsRowA);
             contentStack.Controls.Add(nodeOptionsRowB);
             contentStack.AutoSize = false;
+            contentStack.BackColor = Color.DimGray;
             contentStack.FlowDirection = FlowDirection.TopDown;
             contentStack.Location = new Point(0, 0);
             contentStack.Margin = new Padding(0);
@@ -279,8 +282,10 @@ namespace Foreman {
             // 
             // groupsPanel
             // 
-            groupsPanel.AutoSize = true;
-            groupsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            groupsPanel.AutoSize = false;
+            groupsPanel.AutoSizeMode = AutoSizeMode.GrowOnly;
+            groupsPanel.FlowDirection = FlowDirection.LeftToRight;
+            groupsPanel.WrapContents = true;
             groupsPanel.BackColor = Color.DimGray;
             groupsPanel.Location = new Point(0, 195);
             groupsPanel.Margin = new Padding(0);
@@ -289,15 +294,25 @@ namespace Foreman {
             groupsPanel.Size = new Size(8, 5);
             groupsPanel.TabIndex = 1;
             // 
+            // iconGridBand
+            // 
+            iconGridBand.BackColor = Color.DimGray;
+            iconGridBand.Controls.Add(iconGrid);
+            iconGridBand.Location = new Point(0, 200);
+            iconGridBand.Margin = new Padding(0);
+            iconGridBand.Name = "iconGridBand";
+            iconGridBand.Size = new Size(421, 320);
+            iconGridBand.TabIndex = 2;
+            // 
             // iconGrid
             // 
             iconGrid.BackColor = Color.DimGray;
-            iconGrid.Location = new Point(0, 200);
+            iconGrid.Location = new Point(0, 0);
             iconGrid.Margin = new Padding(0);
             iconGrid.MinimumSize = new Size(421, 320);
             iconGrid.Name = "iconGrid";
             iconGrid.Size = new Size(421, 320);
-            iconGrid.TabIndex = 2;
+            iconGrid.TabIndex = 0;
             // 
             // nodeOptionsRowA
             // 
@@ -447,6 +462,7 @@ namespace Foreman {
         private FlowLayoutPanel filterRow;
         private FlowLayoutPanel optionRow;
         protected FlowLayoutPanel groupsPanel;
+        private Panel iconGridBand;
         protected ChooserIconGrid iconGrid;
         protected FlowLayoutPanel nodeOptionsRowA;
         protected FlowLayoutPanel nodeOptionsRowB;

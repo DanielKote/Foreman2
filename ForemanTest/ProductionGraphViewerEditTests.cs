@@ -1,5 +1,7 @@
 ﻿using Foreman;
+using Foreman.Controls;
 using Foreman.DataCaching.DataTypes;
+using Foreman.DataCaching.Loading;
 using Foreman.Graph;
 using Foreman.Models;
 using Foreman.ProductionGraphView;
@@ -45,6 +47,30 @@ namespace ForemanTest {
         [TestMethod]
         public void ItemChooser_SizeMatchesContentAfterShow() =>
             StaTest.Run(ItemChooser_SizeMatchesContentAfterShow_Impl);
+
+        [TestMethod]
+        public void ItemChooser_StaysFullyVisibleWhenOpenedNearViewerEdge() =>
+            StaTest.Run(ItemChooser_StaysFullyVisibleWhenOpenedNearViewerEdge_Impl);
+
+        [TestMethod]
+        public void RecipeChooser_FooterButtonsFitPanelWidth() =>
+            StaTest.Run(RecipeChooser_FooterButtonsFitPanelWidth_Impl);
+
+        [TestMethod]
+        public void RecipeChooser_FooterButtonsScaleWithViewerSize() =>
+            StaTest.Run(RecipeChooser_FooterButtonsScaleWithViewerSize_Impl);
+
+        [TestMethod]
+        public void RecipeChooser_HeaderAndFooterControlsFitPanelWidth() =>
+            StaTest.Run(RecipeChooser_HeaderAndFooterControlsFitPanelWidth_Impl);
+
+        [TestMethod]
+        public void RecipeChooser_RecipeOnlyCheckboxFitsPanelWidthOnShortViewer() =>
+            StaTest.Run(RecipeChooser_RecipeOnlyCheckboxFitsPanelWidthOnShortViewer_Impl);
+
+        [TestMethod]
+        public void RecipeChooser_ManyGroupsFitsViewportWithFooterVisible() =>
+            StaTest.Run(RecipeChooser_ManyGroupsFitsViewportWithFooterVisible_Impl);
 
         [TestMethod]
         public void EditRecipePanel_HeightFitsViewerAndScrollsWhenContentIsTaller() =>
@@ -222,19 +248,275 @@ namespace ForemanTest {
             }
         }
 
+        private static void ItemChooser_StaysFullyVisibleWhenOpenedNearViewerEdge_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+            viewer.Size = new Size(520, 560);
+
+            viewer.AddItem(new Point(460, 500), new Point(200, 150));
+            AssertFloatingPanelsOnScreen(viewer);
+        }
+
+        private static void SeedManyChooserGroups(GraphSessionTestHelper.TestContext ctx, int groupCount) {
+            DataCacheStore store = TestDataCacheHelper.RequireStore(ctx.Cache);
+            AssemblerPrototype assembler = TestPrototypeFactory.CreateTestAssembler(ctx.Cache);
+            for (int i = 0; i < groupCount; i++) {
+                var group = new GroupPrototype(ctx.Cache, $"§§t:g{i}", $"G{i}", $"{i:D4}");
+                var subgroup = new SubgroupPrototype(ctx.Cache, $"§§t:s{i}", "0") { MyGroupInternal = group };
+                group.SubgroupsInternal.Add(subgroup);
+                ItemPrototype item = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, $"t-item{i}");
+                var recipe = new RecipePrototype(ctx.Cache, $"§§t:r{i}", $"R{i}", subgroup, "0");
+                TestPrototypeFactory.SetRecipeTime(recipe, 1);
+                TestPrototypeFactory.LinkRecipeAndAssembler(recipe, assembler);
+                recipe.InternalOneWayAddIngredient(item, 1);
+                recipe.InternalOneWayAddProduct(item, 1, 0);
+                item.ConsumptionRecipesInternal.Add(recipe);
+                item.ProductionRecipesInternal.Add(recipe);
+                subgroup.ItemsInternal.Add(item);
+                subgroup.RecipesInternal.Add(recipe);
+                store.Groups[group.Name] = group;
+                store.Subgroups[subgroup.Name] = subgroup;
+                TestDataCacheHelper.RegisterRecipe(ctx.Cache, recipe);
+            }
+        }
+
+        private static void RecipeChooser_ManyGroupsFitsViewportWithFooterVisible_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            SeedManyChooserGroups(ctx, 24);
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+            viewer.CreateControl();
+            viewer.Size = new Size(900, 380);
+            viewer.PerformLayout();
+
+            viewer.AddItem(new Point(20, 20), new Point(200, 150));
+            viewer.PerformLayout();
+            Application.DoEvents();
+
+            ItemChooserPanel? itemChooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(itemChooser);
+            SelectItemInChooser(itemChooser, ctx.Item("t-item0"));
+
+            RecipeChooserPanel? chooser = viewer.Controls.OfType<RecipeChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+            MethodInfo? refreshBounds = typeof(IRChooserPanel).GetMethod("RefreshViewerBounds", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(refreshBounds);
+            refreshBounds.Invoke(chooser, null);
+            Application.DoEvents();
+
+            const int margin = EditPanelScreenLayout.DefaultMargin;
+            int maxPanelHeight = viewer.ClientSize.Height - margin * 2;
+            Assert.IsTrue(chooser.Height <= maxPanelHeight,
+                $"Recipe chooser height {chooser.Height} should fit a {viewer.ClientSize.Height}px-tall viewer (max content {maxPanelHeight}px).");
+
+            Button passThrough = GetChooserButton(chooser, "AddPassthroughButton");
+            Assert.IsTrue(passThrough.Visible);
+            Assert.IsTrue(passThrough.Bottom <= chooser.ClientSize.Height,
+                $"Pass-Through bottom ({passThrough.Bottom}) should be inside the panel ({chooser.ClientSize.Height}px).");
+
+            FlowLayoutPanel groups = GetGroupsPanel(chooser);
+            Assert.IsTrue(groups.Visible, "Recipe chooser should show category groups when the item has matching recipes.");
+            Assert.IsTrue(groups.Height > 20,
+                $"With many categories, groups panel height {groups.Height} should show a category strip (or scroll when capped).");
+            Assert.IsTrue(groups.Controls.Count >= 20,
+                "Seeded mod-style groups should populate the category strip.");
+
+            AssertFloatingPanelsOnScreen(viewer);
+        }
+
+        private static void SelectItemInChooser(ItemChooserPanel chooser, ItemQualityPair item) {
+            MethodInfo? mouseUp = typeof(ItemChooserPanel).GetMethod("IRButtonMouseUp", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(mouseUp);
+            using var button = new Button { Tag = item.Item };
+            mouseUp.Invoke(chooser, [button, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0)]);
+        }
+
+        private static FlowLayoutPanel GetGroupsPanel(IRChooserPanel chooser) {
+            FieldInfo? field = typeof(IRChooserPanel).GetField("groupsPanel", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field);
+            return (FlowLayoutPanel)field.GetValue(chooser)!;
+        }
+
+        private static void RecipeChooser_HeaderAndFooterControlsFitPanelWidth_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+
+            NodeId supplierId = viewer.Session.Editor.CreateSupplierNode(ctx.Item("iron"), new Point(100, 100));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(supplierId, out BaseNodeElement? supplier));
+            Assert.IsNotNull(supplier);
+
+            viewer.AddNewNode(new Point(10, 10), ctx.Item("iron"), new Point(300, 100), NewNodeType.Consumer, supplier);
+            RecipeChooserPanel? chooser = viewer.Controls.OfType<RecipeChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+
+            Button passThrough = GetChooserButton(chooser, "AddPassthroughButton");
+            CheckBox showHidden = GetChooserCheckBox(chooser, "ShowHiddenCheckBox");
+            Assert.IsTrue(passThrough.Visible);
+            Assert.IsLessThanOrEqualTo(chooser.ClientSize.Width, passThrough.Right,
+                $"Pass-Through button right ({passThrough.Right}) should fit in panel width ({chooser.ClientSize.Width}).");
+            Assert.IsLessThanOrEqualTo(chooser.ClientSize.Width, showHidden.Right,
+                $"Show-hidden checkbox right ({showHidden.Right}) should fit in panel width ({chooser.ClientSize.Width}).");
+            AssertFloatingPanelsOnScreen(viewer);
+        }
+
+        private static CheckBox GetChooserCheckBox(IRChooserPanel chooser, string name) {
+            FieldInfo? field = typeof(IRChooserPanel).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field, $"IRChooserPanel.{name} field should exist.");
+            return (CheckBox)field.GetValue(chooser)!;
+        }
+
+        private static void RecipeChooser_RecipeOnlyCheckboxFitsPanelWidthOnShortViewer_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+            viewer.Size = new Size(600, 280);
+
+            var disconnectedAnchor = new ItemQualityPair();
+            viewer.AddNewNode(new Point(10, 10), disconnectedAnchor, new Point(300, 100), NewNodeType.Disconnected);
+            RecipeChooserPanel? chooser = viewer.Controls.OfType<RecipeChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+
+            MethodInfo? refreshBounds = typeof(IRChooserPanel).GetMethod("RefreshViewerBounds", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(refreshBounds);
+            refreshBounds.Invoke(chooser, null);
+
+            CheckBox recipeOnly = GetChooserCheckBox(chooser, "RecipeNameOnlyFilterCheckBox");
+            Assert.IsTrue(recipeOnly.Visible, "Recipe Only filter should be shown on the full recipe chooser.");
+            Assert.IsLessThanOrEqualTo(chooser.ClientSize.Width, recipeOnly.Right,
+                $"Recipe Only checkbox right ({recipeOnly.Right}) should fit in panel width ({chooser.ClientSize.Width}) on a short viewer.");
+            AssertFloatingPanelsOnScreen(viewer);
+        }
+
+        private static void RecipeChooser_FooterButtonsScaleWithViewerSize_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+
+            NodeId supplierId = viewer.Session.Editor.CreateSupplierNode(ctx.Item("iron"), new Point(100, 100));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(supplierId, out BaseNodeElement? supplier));
+            Assert.IsNotNull(supplier);
+
+            viewer.AddNewNode(new Point(10, 10), ctx.Item("iron"), new Point(300, 100), NewNodeType.Consumer, supplier);
+            RecipeChooserPanel? chooser = viewer.Controls.OfType<RecipeChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+
+            MethodInfo? refreshBounds = typeof(IRChooserPanel).GetMethod("RefreshViewerBounds", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(refreshBounds);
+
+            Button passThrough = GetChooserButton(chooser, "AddPassthroughButton");
+            Assert.IsTrue(passThrough.Visible);
+
+            int designFooter = ChooserLayout.Scale(chooser, ChooserLayout.DesignFooterButtonHeightPixels);
+            int minFooter = ChooserLayout.Scale(chooser, ChooserLayout.DesignMinFooterButtonHeightPixels);
+            int designCell = ChooserLayout.Scale(chooser, ChooserLayout.DesignCellPixels);
+            float designFont = passThrough.Font.Size;
+            float minFont = designFont * ChooserLayout.DesignMinFooterButtonFontSizePoints
+                / ChooserLayout.DesignFooterButtonFontSizePoints;
+
+            (int Width, int Height)[] viewerSizes = [(1200, 800), (600, 360), (320, 240)];
+            int[] buttonHeights = new int[viewerSizes.Length];
+            float[] fontSizes = new float[viewerSizes.Length];
+            int[] cellSizes = new int[viewerSizes.Length];
+            for (int i = 0; i < viewerSizes.Length; i++) {
+                (int viewerWidth, int viewerHeight) = viewerSizes[i];
+                viewer.Size = new Size(viewerWidth, viewerHeight);
+                refreshBounds.Invoke(chooser, null);
+
+                ChooserIconGrid iconGrid = GetChooserIconGrid(chooser);
+                int cellSize = iconGrid.TargetCellSize;
+                int expectedHeight = ChooserLayout.FooterButtonHeightForCell(cellSize, designFooter, minFooter);
+                float expectedFont = ChooserLayout.FooterButtonFontSizeForCell(cellSize, designCell, designFont, minFont);
+                cellSizes[i] = cellSize;
+                buttonHeights[i] = passThrough.Height;
+                fontSizes[i] = passThrough.Font.Size;
+
+                Assert.IsFalse(passThrough.AutoSize,
+                    $"At viewer {viewerWidth}x{viewerHeight}, footer buttons should use explicit layout sizing.");
+                Assert.AreEqual(expectedHeight, passThrough.Height,
+                    $"At viewer {viewerWidth}x{viewerHeight}, footer height should track icon cell size {cellSize}px.");
+                Assert.AreEqual(expectedFont, passThrough.Font.Size, 0.05f,
+                    $"At viewer {viewerWidth}x{viewerHeight}, footer font should track icon cell size {cellSize}px.");
+                Assert.IsLessThanOrEqualTo(chooser.ClientSize.Height, passThrough.Bottom,
+                    $"At viewer {viewerWidth}x{viewerHeight}, Pass-Through bottom ({passThrough.Bottom}) should fit panel height ({chooser.ClientSize.Height}).");
+                Assert.IsLessThanOrEqualTo(chooser.ClientSize.Width, passThrough.Right,
+                    $"At viewer {viewerWidth}x{viewerHeight}, Pass-Through right ({passThrough.Right}) should fit panel width ({chooser.ClientSize.Width}).");
+            }
+
+            Assert.IsTrue(cellSizes[0] >= cellSizes[^1],
+                $"Icon cell size should not grow on shorter viewers (tall={cellSizes[0]}px, short={cellSizes[^1]}px).");
+            Assert.IsTrue(buttonHeights[0] >= buttonHeights[^1],
+                $"Footer button height should track cell shrink (tall={buttonHeights[0]}px, short={buttonHeights[^1]}px).");
+            Assert.IsTrue(cellSizes[0] > cellSizes[^1] && buttonHeights[0] > buttonHeights[^1],
+                $"Short viewer should shrink icon cells and footer buttons (cells {cellSizes[0]}→{cellSizes[^1]}, buttons {buttonHeights[0]}→{buttonHeights[^1]}).");
+            Assert.IsTrue(fontSizes[0] > fontSizes[^1],
+                $"Footer font should shrink on shorter viewers (tall={fontSizes[0]}, short={fontSizes[^1]}).");
+            AssertFloatingPanelsOnScreen(viewer);
+        }
+
+        private static ChooserIconGrid GetChooserIconGrid(IRChooserPanel chooser) {
+            FieldInfo? field = typeof(IRChooserPanel).GetField("iconGrid", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field, "IRChooserPanel.iconGrid field should exist.");
+            return (ChooserIconGrid)field.GetValue(chooser)!;
+        }
+
+        private static void RecipeChooser_FooterButtonsFitPanelWidth_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            var seed = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, "seed");
+            var spoiled = TestDataCacheHelper.GetOrCreateItem(ctx.Cache, ctx.Subgroup, "spoiled");
+            GraphSessionTestHelper.WireSpoilChain(seed, spoiled, ctx.Quality);
+            GraphSessionTestHelper.CreatePlantProcess(ctx, "seed", "crop");
+
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+            ItemQualityPair keyItem = ctx.Item("seed");
+            viewer.AddNewNode(new Point(10, 10), keyItem, new Point(200, 150), NewNodeType.Disconnected);
+
+            RecipeChooserPanel? chooser = viewer.Controls.OfType<RecipeChooserPanel>().FirstOrDefault();
+            Assert.IsNotNull(chooser);
+
+            FlowLayoutPanel rowB = GetNodeOptionsRowB(chooser);
+            Button addPlant = GetChooserButton(chooser, "AddPlantButton");
+            Assert.IsTrue(addPlant.Visible, "Plant button should be visible for a plantable seed item.");
+            Assert.IsLessThanOrEqualTo(rowB.ClientSize.Width, addPlant.Right,
+                $"AddPlantButton right edge ({addPlant.Right}) should fit inside row B width ({rowB.ClientSize.Width}).");
+            AssertFloatingPanelsOnScreen(viewer);
+        }
+
+        private static FlowLayoutPanel GetNodeOptionsRowB(IRChooserPanel chooser) {
+            FieldInfo? field = typeof(IRChooserPanel).GetField("nodeOptionsRowB", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field, "IRChooserPanel.nodeOptionsRowB field should exist.");
+            return (FlowLayoutPanel)field.GetValue(chooser)!;
+        }
+
+        private static Button GetChooserButton(IRChooserPanel chooser, string name) {
+            FieldInfo? field = typeof(IRChooserPanel).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field, $"IRChooserPanel.{name} field should exist.");
+            return (Button)field.GetValue(chooser)!;
+        }
+
         private static void ItemChooser_SizeMatchesContentAfterShow_Impl() {
             var ctx = GraphSessionTestHelper.CreateContext();
             TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
             using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
 
             viewer.AddItem(new Point(10, 10), new Point(200, 150));
+            viewer.PerformLayout();
+            Application.DoEvents();
             ItemChooserPanel? chooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
             Assert.IsNotNull(chooser);
 
-            Assert.AreEqual(chooser.Size, chooser.MaximumSize,
-                "Chooser should not reserve extra viewer-sized dead space.");
+            const int margin = EditPanelScreenLayout.DefaultMargin;
+            int maxPanelHeight = viewer.ClientSize.Height - margin * 2;
             Assert.IsTrue(chooser.Width >= 200 && chooser.Height >= 200,
                 "Chooser should have a usable size after Show().");
+            Assert.IsTrue(chooser.Height <= maxPanelHeight,
+                $"Chooser height {chooser.Height} should not exceed the graph viewer viewport ({maxPanelHeight}px).");
+            Assert.IsNull(chooser.Controls.Find(EditPanelViewportLayout.ScrollHostName, false).FirstOrDefault(),
+                "Chooser should shrink to fit the viewport instead of using a panel scrollbar.");
+            Assert.AreEqual(chooser.Size, chooser.MaximumSize,
+                "Chooser should size tightly to its content.");
             AssertFloatingPanelsOnScreen(viewer);
         }
 
@@ -394,7 +676,7 @@ namespace ForemanTest {
             const int margin = EditPanelScreenLayout.DefaultMargin;
             foreach (Control panel in viewer.Controls.Cast<Control>().Where(c => c.Visible)) {
                 Rectangle bounds = panel.Bounds;
-                Assert.IsTrue(EditPanelScreenLayout.FitsViewer(bounds, viewer.Width, viewer.Height, margin),
+                Assert.IsTrue(EditPanelScreenLayout.FitsViewer(bounds, viewer.ClientSize.Width, viewer.ClientSize.Height, margin),
                     $"Panel {panel.GetType().Name} at {bounds} should be fully inside the viewer.");
             }
         }

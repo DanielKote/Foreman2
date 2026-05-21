@@ -27,6 +27,9 @@ namespace Foreman {
         internal ChooserPanelCloseReason PanelCloseReason { get; set; }
         private bool isClosing;
         private EventHandler? viewerResizeHandler;
+        private System.Windows.Forms.Timer? viewerBoundsDebounceTimer;
+        private const int ViewerBoundsDebounceMilliseconds = 200;
+        private readonly Point desiredScreenOrigin;
 
         private static readonly Color SelectedGroupButtonBGColor = Color.SandyBrown;
         protected static readonly Color IRButtonDefaultColor = Color.FromArgb(255, 70, 70, 70);
@@ -91,7 +94,7 @@ namespace Foreman {
             IgnoreAssemblerCheckBox.Checked = Properties.Settings.Default.IgnoreAssemblerStatus;
             RecipeNameOnlyFilterCheckBox.Checked = Properties.Settings.Default.RecipeNameOnlyFilter;
 
-            this.Location = originPoint;
+            desiredScreenOrigin = originPoint;
         }
 
         protected override void OnDpiChangedAfterParent(EventArgs e) {
@@ -113,21 +116,68 @@ namespace Foreman {
             ShowHiddenCheckBox.CheckedChanged += new EventHandler(FilterCheckBoxCheckedChanged);
             IgnoreAssemblerCheckBox.CheckedChanged += new EventHandler(FilterCheckBoxCheckedChanged);
 
+            if (!IsHandleCreated)
+                CreateControl();
+
+            // Lay out at final size/position before parenting onto the graph viewer to avoid flashing
+            // designer-default child positions during the expensive bounds pass.
             Visible = true;
-            PGViewer.Controls.Add(this);
-            viewerResizeHandler ??= (_, _) => ApplyViewerBounds();
+            RefreshViewerBounds();
+
+            PGViewer.SuspendLayout();
+            try {
+                PGViewer.Controls.Add(this);
+            } finally {
+                PGViewer.ResumeLayout(false);
+            }
+
+            viewerResizeHandler ??= QueueViewerBoundsRefresh;
             PGViewer.Resize += viewerResizeHandler;
             BringToFront();
-            ApplyViewerBounds();
-            PGViewer.PerformLayout();
             FilterTextBox.Focus();
         }
 
+        private void QueueViewerBoundsRefresh(object? sender, EventArgs e) {
+            if (applyingViewerBounds || IsDisposed || !Visible || PGViewer == null)
+                return;
+            if (viewerBoundsDebounceTimer == null) {
+                viewerBoundsDebounceTimer = new System.Windows.Forms.Timer { Interval = ViewerBoundsDebounceMilliseconds };
+                viewerBoundsDebounceTimer.Tick += (_, _) => {
+                    viewerBoundsDebounceTimer!.Stop();
+                    RefreshViewerBounds();
+                };
+            }
+            viewerBoundsDebounceTimer.Stop();
+            viewerBoundsDebounceTimer.Start();
+        }
+
+        private void RefreshViewerBounds() {
+            if (refreshingViewerBounds || IsDisposed || !Visible || PGViewer == null)
+                return;
+            refreshingViewerBounds = true;
+            try {
+                ApplyViewerBounds();
+            } finally {
+                refreshingViewerBounds = false;
+            }
+        }
+
         private void DetachViewerResizeHandler() {
-            if (PGViewer != null && viewerResizeHandler != null) {
+            DisposeViewerBoundsDebounceTimer();
+            if (PGViewer == null)
+                return;
+            if (viewerResizeHandler != null) {
                 PGViewer.Resize -= viewerResizeHandler;
                 viewerResizeHandler = null;
             }
+        }
+
+        private void DisposeViewerBoundsDebounceTimer() {
+            if (viewerBoundsDebounceTimer == null)
+                return;
+            viewerBoundsDebounceTimer.Stop();
+            viewerBoundsDebounceTimer.Dispose();
+            viewerBoundsDebounceTimer = null;
         }
 
         //-----------------------------------------------------------------------------------------------------Button initialization & update
@@ -140,6 +190,8 @@ namespace Foreman {
             groupsPanel.Controls.Clear();
             GroupButtons.Clear();
             GroupButtonLinks.Clear();
+            groupsPanel.AutoSize = false;
+            groupsPanel.WrapContents = true;
 
             int groupButtonSize = ChooserLayout.Scale(this, ChooserLayout.DesignGroupIconPixels);
             for (int i = 0; i < SortedGroups.Count; i++) {
@@ -371,7 +423,10 @@ namespace Foreman {
             }
         }
 
-        protected virtual void IRChooserPanelDisposed(object? sender, EventArgs e) { }
+        protected virtual void IRChooserPanelDisposed(object? sender, EventArgs e) {
+            DisposeViewerBoundsDebounceTimer();
+            DisposeScaledFooterButtonFont();
+        }
 
     }
 

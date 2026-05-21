@@ -41,6 +41,14 @@ namespace Foreman.ProductionGraphView {
             foreach (Control panel in panels)
                 panel.Location = Point.Add(panel.Location, (Size)delta);
         }
+
+        /// <summary>Places a floating chooser near <paramref name="anchor"/> (client coords), then clamps to the viewer.</summary>
+        public static Point GetChooserTopLeft(Point anchor, Size panelSize, int viewerWidth, int viewerHeight, int margin = DefaultMargin) {
+            const int anchorInsetX = 24;
+            const int anchorInsetY = 16;
+            var desired = new Rectangle(anchor.X - anchorInsetX, anchor.Y - anchorInsetY, panelSize.Width, panelSize.Height);
+            return ClampRectToViewer(desired, viewerWidth, viewerHeight, margin).Location;
+        }
     }
 
 }

@@ -19,6 +19,10 @@ namespace Foreman.Controls {
         public const int DesignItemIconPixels = 40;
         public const int DesignMinCellPixels = 18;
         public const int DesignMinGroupIconPixels = 24;
+        public const int DesignFooterButtonHeightPixels = 38;
+        public const int DesignMinFooterButtonHeightPixels = 22;
+        public const float DesignFooterButtonFontSizePoints = 8.25f;
+        public const float DesignMinFooterButtonFontSizePoints = 6f;
         public const int DesignMinVisibleRows = 4;
 
         public static int DesignGridOuterWidth =>
@@ -42,6 +46,16 @@ namespace Foreman.Controls {
         public static int GroupIconSizeForCell(int cellSize, int designGroupSize, int minGroupSize) {
             int fromCell = (int)Math.Round(cellSize * (DesignGroupIconPixels / (float)DesignCellPixels));
             return Math.Min(designGroupSize, Math.Max(minGroupSize, fromCell));
+        }
+
+        public static int FooterButtonHeightForCell(int cellSize, int designFooterHeight, int minFooterHeight) {
+            int fromCell = (int)Math.Round(cellSize * (DesignFooterButtonHeightPixels / (float)DesignCellPixels));
+            return Math.Max(minFooterHeight, Math.Min(designFooterHeight, fromCell));
+        }
+
+        public static float FooterButtonFontSizeForCell(int cellSize, int designCellPixels, float designFontSize, float minFontSize) {
+            float fromCell = cellSize * (designFontSize / designCellPixels);
+            return Math.Max(minFontSize, Math.Min(designFontSize, fromCell));
         }
     }
 }

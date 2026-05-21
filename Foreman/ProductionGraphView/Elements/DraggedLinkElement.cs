@@ -123,8 +123,7 @@ namespace Foreman.ProductionGraphView.Elements {
                 graphViewer.AddPassthroughNodesFromSelection(StartConnectionType, (Size)Point.Subtract(EndpointLocation, (Size)originElement.Location));
             } else //at least one null -> this is an 'add new recipe' operation
               {
-                var screenPoint = new Point(graphViewer.GraphToScreen(graphPoint).X - 150, 15);
-                screenPoint.X = Math.Max(15, Math.Min(graphViewer.Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
+                Point screenPoint = graphViewer.GraphToScreen(graphPoint);
 
                 if (StartConnectionType == LinkType.Input && SupplierElement == null)
                     graphViewer.AddNewNode(screenPoint, Item, EndpointLocation, NewNodeType.Supplier, ConsumerElement, true);

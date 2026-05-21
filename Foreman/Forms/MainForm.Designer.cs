@@ -89,8 +89,7 @@ namespace Foreman
             // 
             this.GraphViewer.AllowDrop = true;
             this.GraphViewer.ArrowsOnLinks = false;
-            this.GraphViewer.AutoSize = true;
-            this.GraphViewer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.GraphViewer.AutoSize = false;
             this.GraphViewer.BackColor = System.Drawing.Color.White;
             this.GraphViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.GraphViewer.Dock = System.Windows.Forms.DockStyle.Fill;

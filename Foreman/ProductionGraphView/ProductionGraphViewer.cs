@@ -506,7 +506,8 @@ namespace Foreman {
         }
 
         private void PlaceFloatingPanels(Rectangle desiredBounds, params Control[] panels) =>
-            EditPanelScreenLayout.ShiftControlsToFit(desiredBounds, Width, Height, EditPanelScreenLayout.DefaultMargin, panels);
+            EditPanelScreenLayout.ShiftControlsToFit(
+                desiredBounds, ClientSize.Width, ClientSize.Height, EditPanelScreenLayout.DefaultMargin, panels);
 
         public void EditNode(BaseNodeElement bNodeElement) {
             if (bNodeElement is RecipeNodeElement rNodeElement) {
@@ -902,8 +903,7 @@ namespace Foreman {
                         viewBeingDragged = false;
                     else if (currentDragOperation == DragOperation.None && element == null) //right click on an empty space -> show add item/recipe menu
                     {
-                        var screenPoint = new Point(e.Location.X - 150, 15);
-                        screenPoint.X = Math.Max(15, Math.Min(Width - 650, screenPoint.X)); //want to position the recipe selector such that it is well visible.
+                        Point screenPoint = e.Location;
 
                         rightClickMenu.Items.Clear();
                         rightClickMenu.Items.Add(new ToolStripMenuItem("Add Item", null,

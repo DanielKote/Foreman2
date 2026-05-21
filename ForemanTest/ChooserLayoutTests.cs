@@ -1,5 +1,6 @@
 ﻿using Foreman;
 using Foreman.Controls;
+using Foreman.ProductionGraphView;
 using Foreman.Serialization;
 using ForemanTest.Graph;
 using ForemanTest.support;
@@ -31,6 +32,41 @@ namespace ForemanTest {
         [TestMethod]
         public void GroupIconSizeForCell_DoesNotExceedDesignGroup() {
             Assert.AreEqual(64, ChooserLayout.GroupIconSizeForCell(100, 64, 24));
+        }
+
+        [TestMethod]
+        public void FooterButtonHeightForCell_MatchesDesignRatioAtFullCell() {
+            Assert.AreEqual(38, ChooserLayout.FooterButtonHeightForCell(40, 38, 22));
+        }
+
+        [TestMethod]
+        public void FooterButtonHeightForCell_ScalesDownWithCell() {
+            Assert.AreEqual(28, ChooserLayout.FooterButtonHeightForCell(30, 38, 22));
+        }
+
+        [TestMethod]
+        public void FooterButtonHeightForCell_ClampsToMinimum() {
+            Assert.AreEqual(22, ChooserLayout.FooterButtonHeightForCell(10, 38, 22));
+        }
+
+        [TestMethod]
+        public void FooterButtonHeightForCell_DoesNotExceedDesignHeight() {
+            Assert.AreEqual(38, ChooserLayout.FooterButtonHeightForCell(100, 38, 22));
+        }
+
+        [TestMethod]
+        public void FooterButtonFontSizeForCell_MatchesDesignRatioAtFullCell() {
+            Assert.AreEqual(8.25f, ChooserLayout.FooterButtonFontSizeForCell(40, 40, 8.25f, 6f), 0.01f);
+        }
+
+        [TestMethod]
+        public void FooterButtonFontSizeForCell_ScalesDownWithCell() {
+            Assert.AreEqual(6.1875f, ChooserLayout.FooterButtonFontSizeForCell(30, 40, 8.25f, 6f), 0.01f);
+        }
+
+        [TestMethod]
+        public void FooterButtonFontSizeForCell_ClampsToMinimum() {
+            Assert.AreEqual(6f, ChooserLayout.FooterButtonFontSizeForCell(10, 40, 8.25f, 6f), 0.01f);
         }
 
         [TestMethod]
@@ -118,6 +154,38 @@ namespace ForemanTest {
         }
 
         [TestMethod]
+        public void ItemChooser_HeightFitsShortViewer() =>
+            StaTest.Run(ItemChooser_HeightFitsShortViewer_Impl);
+
+        private static void ItemChooser_HeightFitsShortViewer_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
+            const int margin = EditPanelScreenLayout.DefaultMargin;
+            (int Width, int Height)[] viewerSizes = [(1280, 720), (1024, 600), (900, 550), (800, 500)];
+
+            foreach ((int viewerWidth, int viewerHeight) in viewerSizes) {
+                using var viewer = new ProductionGraphViewer {
+                    DCache = ctx.Cache,
+                    Size = new Size(viewerWidth, viewerHeight),
+                };
+                viewer.ApplySaveUi(new GraphViewerUiSaveData { ViewOffset = Point.Empty, ViewScale = 1f }, ctx.Cache, setEnablesFromJson: false);
+                viewer.PerformLayout();
+                viewer.AddItem(new Point(20, 20), new Point(200, 150));
+                viewer.PerformLayout();
+                ItemChooserPanel? chooser = viewer.Controls.OfType<ItemChooserPanel>().FirstOrDefault();
+                Assert.IsNotNull(chooser);
+
+                int maxPanelHeight = viewer.ClientSize.Height - margin * 2;
+                Assert.IsLessThanOrEqualTo(maxPanelHeight, chooser.Height,
+                    $"At viewer {viewerWidth}x{viewerHeight}, chooser height {chooser.Height} should fit within {maxPanelHeight}px.");
+                Assert.IsTrue(EditPanelScreenLayout.FitsViewer(chooser.Bounds, viewer.ClientSize.Width, viewer.ClientSize.Height, margin),
+                    $"Chooser at {chooser.Bounds} should be fully visible in viewer client area {viewer.ClientSize}.");
+                Assert.IsNull(chooser.Controls.Find(EditPanelViewportLayout.ScrollHostName, false).FirstOrDefault(),
+                    "Chooser should shrink rather than add a panel scrollbar.");
+            }
+        }
+
+        [TestMethod]
         public void ItemChooser_NoRightDeadSpaceWhenViewerShrinks() =>
             StaTest.Run(ItemChooser_NoRightDeadSpaceWhenViewerShrinks_Impl);
 
@@ -138,37 +206,42 @@ namespace ForemanTest {
             foreach ((int viewerWidth, int viewerHeight) in viewerSizes) {
                 viewer.Size = new Size(viewerWidth, viewerHeight);
                 viewer.PerformLayout();
-                chooser.PerformLayout();
+                MethodInfo? refreshBounds = typeof(IRChooserPanel).GetMethod("RefreshViewerBounds", BindingFlags.Instance | BindingFlags.NonPublic);
+                Assert.IsNotNull(refreshBounds);
+                refreshBounds.Invoke(chooser, null);
 
                 FlowLayoutPanel contentStack = GetContentStack(chooser);
                 ChooserIconGrid iconGrid = GetIconGrid(chooser);
+                Panel iconGridBand = GetIconGridBand(chooser);
                 int deadSpace = MeasureChooserRightDeadSpace(chooser);
-                int gapBesideGrid = MeasureGapRightOfIconGrid(contentStack, iconGrid);
+                int gapBesideGrid = MeasureGapBesideIconGrid(iconGridBand, iconGrid);
+                int gridOffsetInBand = iconGrid.Left;
 
                 Assert.IsLessThanOrEqualTo(2, deadSpace,
-                    $"At viewer {viewerWidth}x{viewerHeight}, chooser had {deadSpace}px black bar past content " +
+                    $"At viewer {viewerWidth}x{viewerHeight}, chooser had {deadSpace}px unused space past content " +
                     $"(panel {chooser.Width}, stack {contentStack.Width}, grid {iconGrid.Width}).");
-                Assert.IsLessThanOrEqualTo(2, gapBesideGrid,
-                    $"At viewer {viewerWidth}x{viewerHeight}, {gapBesideGrid}px black bar sat to the right of the icon grid " +
-                    $"(stack {contentStack.Width}, grid right {iconGrid.Right}, header/min width mismatch).");
+                Assert.IsLessThanOrEqualTo(2, Math.Abs(gapBesideGrid - gridOffsetInBand * 2),
+                    $"At viewer {viewerWidth}x{viewerHeight}, icon grid should be centered in its dim-gray band " +
+                    $"(band {iconGridBand.Width}px, grid {iconGrid.Width}px, left offset {gridOffsetInBand}px).");
                 Assert.IsLessThanOrEqualTo(2, chooser.Width - contentStack.Width,
                     "Panel width should match the content stack.");
-                Assert.IsLessThanOrEqualTo(2, contentStack.Width - iconGrid.Width,
-                    "Content stack width should match the icon grid; extra width becomes a black strip beside the cells.");
+                Assert.AreEqual(Color.DimGray, iconGridBand.BackColor,
+                    "Space beside the square grid should use the dim-gray band, not the panel black.");
                 Assert.IsLessThanOrEqualTo(chooser.Width, chooser.MinimumSize.Width,
                     $"MinimumSize.Width ({chooser.MinimumSize.Width}) must not exceed actual width ({chooser.Width}).");
             }
         }
 
-        private static int MeasureGapRightOfIconGrid(FlowLayoutPanel contentStack, ChooserIconGrid iconGrid) {
-            if (!iconGrid.Visible)
+        private static int MeasureGapBesideIconGrid(Panel iconGridBand, ChooserIconGrid iconGrid) {
+            if (!iconGrid.Visible || !iconGridBand.Visible)
                 return 0;
-            int widestChromeRight = contentStack.Controls.Cast<Control>()
-                .Where(c => c.Visible && c != iconGrid)
-                .Select(c => c.Right)
-                .DefaultIfEmpty(0)
-                .Max();
-            return Math.Max(0, Math.Max(widestChromeRight, contentStack.Width) - iconGrid.Right);
+            return Math.Max(0, iconGridBand.Width - iconGrid.Width);
+        }
+
+        private static Panel GetIconGridBand(IRChooserPanel chooser) {
+            FieldInfo? field = typeof(IRChooserPanel).GetField("iconGridBand", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field, "IRChooserPanel.iconGridBand field should exist.");
+            return (Panel)field.GetValue(chooser)!;
         }
 
         private static int MeasureChooserRightDeadSpace(IRChooserPanel chooser) {
@@ -208,6 +281,26 @@ namespace ForemanTest {
             Assert.AreEqual(40, grid.Buttons.ElementAt(0).ElementAt(0).Width);
             Assert.AreEqual(40, grid.Buttons.ElementAt(0).ElementAt(0).Height);
             Assert.IsGreaterThanOrEqualTo(grid.Width - scrollbar, grid.ScrollBar.Left);
+        }
+
+        [TestMethod]
+        public void ChooserIconGrid_ApplyLayout_RoundsUpToMinOuterWidth() =>
+            StaTest.Run(ChooserIconGrid_ApplyLayout_RoundsUpToMinOuterWidth_Impl);
+
+        private static void ChooserIconGrid_ApplyLayout_RoundsUpToMinOuterWidth_Impl() {
+            using var grid = new ChooserIconGrid();
+            int scrollbar = SystemInformation.VerticalScrollBarWidth;
+            int outerWidth = grid.ApplyLayout(
+                availableGridHeight: ChooserIconGrid.VisibleRowCount * 40,
+                maxLayoutWidth: 270,
+                designCellSize: 40,
+                minCellSize: 18,
+                scrollbarWidth: scrollbar,
+                minOuterWidth: 251);
+
+            Assert.IsTrue(outerWidth >= 251,
+                $"Grid outer width {outerWidth} should meet chrome minimums that do not land on a cell boundary.");
+            Assert.IsTrue(outerWidth <= 270);
         }
 
         [TestMethod]
