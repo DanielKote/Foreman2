@@ -21,7 +21,7 @@ namespace Foreman.Models.Nodes {
         public bool SimpleDraw { get; set; }
         public PassthroughNode(ProductionGraph graph, int nodeID, ItemQualityPair item) : base(graph, nodeID) {
             PassthroughItem = item;
-            SimpleDraw = true;
+            SimpleDraw = graph.DefaultToSimplePassthroughNodes;
             controller = new PassthroughNodeController(this);
         }
 

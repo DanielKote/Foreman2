@@ -6,6 +6,7 @@ using ForemanTest.Graph;
 using ForemanTest.support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Drawing;
 using System.Linq;
 
 namespace ForemanTest {
@@ -75,6 +76,20 @@ namespace ForemanTest {
 
             Assert.Contains("Passthrough", node.ToString());
             Assert.IsFalse(node.ToString().StartsWith("Supply node", StringComparison.Ordinal));
+        }
+
+        [TestMethod]
+        public void Passthrough_NewNode_UsesGraphDefaultSimpleDraw() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            var graph = ctx.NewGraph();
+
+            graph.DefaultToSimplePassthroughNodes = false;
+            PassthroughNode plain = graph.CreatePassthroughNode(ctx.Item("belt"), Point.Empty);
+            Assert.IsFalse(plain.SimpleDraw);
+
+            graph.DefaultToSimplePassthroughNodes = true;
+            PassthroughNode simplified = graph.CreatePassthroughNode(ctx.Item("iron"), Point.Empty);
+            Assert.IsTrue(simplified.SimpleDraw);
         }
 
         [TestMethod]
