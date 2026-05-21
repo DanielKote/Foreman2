@@ -58,6 +58,14 @@ namespace ForemanTest {
         public void EditFlowPanel_HeightFitsShortViewer() =>
             StaTest.Run(EditFlowPanel_HeightFitsShortViewer_Impl);
 
+        [TestMethod]
+        public void MouseDown_OnAlreadySelectedNode_PreservesMultiSelection() =>
+            StaTest.Run(MouseDown_OnAlreadySelectedNode_PreservesMultiSelection_Impl);
+
+        [TestMethod]
+        public void MouseDown_OnUnselectedNode_ClearsExistingSelection() =>
+            StaTest.Run(MouseDown_OnUnselectedNode_ClearsExistingSelection_Impl);
+
         private static void EditNode_DoesNotChangeViewOffset_WhenPanelsWouldClip_Impl() {
             var ctx = GraphSessionTestHelper.CreateContext();
             using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(120, 300));
@@ -230,6 +238,49 @@ namespace ForemanTest {
             AssertFloatingPanelsOnScreen(viewer);
         }
 
+        private static void MouseDown_OnAlreadySelectedNode_PreservesMultiSelection_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+
+            NodeId id1 = viewer.Session.Editor.CreateSupplierNode(ctx.Item("iron"), new Point(100, 100));
+            NodeId id2 = viewer.Session.Editor.CreateSupplierNode(ctx.Item("copper"), new Point(300, 100));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(id1, out BaseNodeElement? node1));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(id2, out BaseNodeElement? node2));
+            Assert.IsNotNull(node1);
+            Assert.IsNotNull(node2);
+
+            SetViewerSelection(viewer, node1, node2);
+            Assert.AreEqual(2, viewer.SelectedNodes.Count);
+
+            InvokeViewerMouseDown(viewer, viewer.GraphToScreen(new Point(node1.X, node1.Y)));
+
+            Assert.AreEqual(2, viewer.SelectedNodes.Count);
+            Assert.IsTrue(node1.Highlighted);
+            Assert.IsTrue(node2.Highlighted);
+        }
+
+        private static void MouseDown_OnUnselectedNode_ClearsExistingSelection_Impl() {
+            var ctx = GraphSessionTestHelper.CreateContext();
+            using var viewer = CreateViewer(ctx, lockedRecipeEditor: false, viewOffset: new Point(0, 0));
+
+            NodeId id1 = viewer.Session.Editor.CreateSupplierNode(ctx.Item("iron"), new Point(100, 100));
+            NodeId id2 = viewer.Session.Editor.CreateSupplierNode(ctx.Item("copper"), new Point(300, 100));
+            NodeId id3 = viewer.Session.Editor.CreateSupplierNode(ctx.Item("plate"), new Point(500, 100));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(id1, out BaseNodeElement? node1));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(id2, out BaseNodeElement? node2));
+            Assert.IsTrue(viewer.NodeElementDictionary.TryGetValue(id3, out BaseNodeElement? node3));
+            Assert.IsNotNull(node1);
+            Assert.IsNotNull(node2);
+            Assert.IsNotNull(node3);
+
+            SetViewerSelection(viewer, node1, node2);
+            InvokeViewerMouseDown(viewer, viewer.GraphToScreen(new Point(node3.X, node3.Y)));
+
+            Assert.AreEqual(0, viewer.SelectedNodes.Count);
+            Assert.IsFalse(node1.Highlighted);
+            Assert.IsFalse(node2.Highlighted);
+        }
+
         private static void ItemChooser_ClosesOnGraphClick_AndSelectsWithoutException_Impl() {
             var ctx = GraphSessionTestHelper.CreateContext();
             TestDataCacheHelper.SetPresetName(ctx.Cache, "test-preset");
@@ -274,6 +325,20 @@ namespace ForemanTest {
             recipe.InternalOneWayAddIngredient(ore, 1);
             recipe.InternalOneWayAddProduct(plate, 1, 0);
             return recipe;
+        }
+
+        private static void SetViewerSelection(ProductionGraphViewer viewer, params BaseNodeElement[] nodes) {
+            MethodInfo? setSelection = typeof(ProductionGraphViewer).GetMethod(
+                "SetSelection", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(setSelection);
+            setSelection.Invoke(viewer, [nodes]);
+        }
+
+        private static void InvokeViewerMouseDown(ProductionGraphViewer viewer, Point clientLocation) {
+            MethodInfo? viewerMouseDown = typeof(ProductionGraphViewer).GetMethod(
+                "ProductionGraphViewer_MouseDown", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(viewerMouseDown);
+            viewerMouseDown.Invoke(viewer, [viewer, new MouseEventArgs(MouseButtons.Left, 1, clientLocation.X, clientLocation.Y, 0)]);
         }
 
         private static ProductionGraphViewer CreateViewer(

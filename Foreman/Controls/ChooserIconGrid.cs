@@ -52,6 +52,13 @@ namespace Foreman {
                         Enabled = false,
                     };
                     button.FlatAppearance.BorderSize = 1;
+                    button.BackgroundImageChanged += (sender, e) => _ = sender switch {
+                        NFButton btn => btn.FlatAppearance.BorderSize = btn.BackgroundImage switch {
+                            null => 1,
+                            _ => 0,
+                        },
+                        _ => default,
+                    };
                     buttons[column][row] = button;
                     gridSurface.Controls.Add(button);
                 }
@@ -135,8 +142,8 @@ namespace Foreman {
 
             for (int row = 0; row < VisibleRowCount; row++) {
                 for (int column = 0; column < ColumnCount; column++) {
-                    buttons[column][row].Bounds = new Rectangle(column * cellSize, row * cellSize, cellSize, cellSize);
-                    buttons[column][row].FlatAppearance.BorderSize = Math.Max(1, cellSize / 24);
+                    var btn = buttons[column][row];
+                    btn.Bounds = new Rectangle(column * cellSize, row * cellSize, cellSize, cellSize);
                 }
             }
         }

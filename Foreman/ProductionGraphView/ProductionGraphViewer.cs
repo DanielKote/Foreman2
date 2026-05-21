@@ -876,10 +876,13 @@ namespace Foreman {
                 SelectionZoneOriginPoint = graph_location;
                 SelectionZone = new Rectangle();
                 if ((Control.ModifierKeys & Keys.Control) == 0 && (Control.ModifierKeys & Keys.Alt) == 0) {
-                    foreach (BaseNodeElement ne in selectedNodes)
-                        ne.Highlighted = false;
-                    selectedNodes.Clear();
-                    ClearAnnotationSelection();
+                    bool keepGroupSelection = clickedElement is BaseNodeElement clickedNode && selectedNodes.Contains(clickedNode);
+                    if (!keepGroupSelection) {
+                        foreach (BaseNodeElement ne in selectedNodes)
+                            ne.Highlighted = false;
+                        selectedNodes.Clear();
+                        ClearAnnotationSelection();
+                    }
                 }
             }
         }

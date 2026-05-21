@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Foreman {
     public partial class SciencePacksLoadForm : Form {
         private readonly Dictionary<Button, bool> SciencePackButtons;
-        private static readonly Color EnabledPackBGColor = Color.DarkGreen;
+        private static readonly Color EnabledPackBGColor = Color.DeepSkyBlue;
         private static readonly Color DisabledPackBGColor = Color.DarkRed;
         private const int IconSize = 48; //actually a bit smaller due to button padding, but whatever.
         private const int MaxColumns = 14;
