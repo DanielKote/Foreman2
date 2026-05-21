@@ -43,9 +43,9 @@ jobs:
         run: dotnet test --configuration Release -r win-x64
         timeout-minutes: 1
       - name: Package Foreman (Self-Contained)
-        run: dotnet publish Foreman --sc true -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.result}} -p:IncludeSourceRevisionInInformationalVersion=false -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
+        run: dotnet publish Foreman --sc -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.result}} -p:IncludeSourceRevisionInInformationalVersion=false -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
       - name: Package Foreman (.NET Dependent)
-        run: dotnet publish Foreman --sc false -p:PublishSingleFile=true -o dist -p:VersionPrefix=${{steps.tag.outputs.result}} -p:IncludeSourceRevisionInInformationalVersion=false --configuration Release -r win-x64
+        run: dotnet publish Foreman --no-self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o dist -p:VersionPrefix=${{steps.tag.outputs.result}} -p:IncludeSourceRevisionInInformationalVersion=false --configuration Release -r win-x64
       - name: Archive Foreman (Self-Contained)
         run: Compress-Archive -Path distsc/* -DestinationPath ForemanSC.zip
       - name: Archive Foreman (.NET Dependent)

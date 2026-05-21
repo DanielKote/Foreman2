@@ -32,7 +32,7 @@ jobs:
               }
             };
             await exec.exec('git', ['describe'], options);
-            return ret.substring(1).split('-')[0]
+            return ret.substring(1).split('-')[0].trim()
           result-encoding: string
       - name: Install .NET
         uses: actions/setup-dotnet@v5.2.0
@@ -48,9 +48,9 @@ jobs:
         run: dotnet test --configuration Release -r win-x64
         timeout-minutes: 1
       - name: Package Foreman (Self-Contained)
-        run: dotnet publish Foreman --sc true -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.result}} -p:VersionSuffix=SNAPSHOT -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
+        run: dotnet publish Foreman --sc -p:PublishSingleFile=true -o distsc -p:VersionPrefix=${{steps.tag.outputs.result}} -p:VersionSuffix=SNAPSHOT -p:IncludeNativeLibrariesForSelfExtract=true --configuration Release -r win-x64
       - name: Package Foreman (.NET Dependent)
-        run: dotnet publish Foreman --sc false -p:PublishSingleFile=true -o dist -p:VersionPrefix=${{steps.tag.outputs.result}} -p:VersionSuffix=SNAPSHOT --configuration Release -r win-x64
+        run: dotnet publish Foreman --no-self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o dist -p:VersionPrefix=${{steps.tag.outputs.result}} -p:VersionSuffix=SNAPSHOT --configuration Release -r win-x64
       - name: Archive Foreman (Self-Contained)
         uses: actions/upload-artifact@v4
         with:
