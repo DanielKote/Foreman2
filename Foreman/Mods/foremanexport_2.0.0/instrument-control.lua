@@ -104,7 +104,7 @@ local function ProcessProductList(products)
 		tproduct['type'] = product.type
 
 		amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-		amount = amount * ((product.probability == nil) and 1 or product.probability)
+		amount = amount * (product.independent_probability * (product.shared_probability.max - product.shared_probability.min))
 		amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
 		if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
 		amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
@@ -195,11 +195,8 @@ local function CollectRecipeCraftingCategories(recipe)
 	end
 
 	-- category + additional_categories are what Factorio uses for has_category(); no need to scan every recipe-category prototype.
-	add_category(recipe.category)
-	if recipe.additional_categories ~= nil then
-		for _, cat in ipairs(recipe.additional_categories) do
-			add_category(cat)
-		end
+	for _, cat in ipairs(recipe.categories) do
+		add_category(cat)
 	end
 	return categories
 end
@@ -279,10 +276,11 @@ local function ExportRecipes()
 		end
 
 		trecipe['enabled'] = recipe.enabled
-		trecipe['category'] = recipe.category
 		trecipe['additional_categories'] = {}
-		if recipe.additional_categories ~= nil then
-			for _, cat in ipairs(recipe.additional_categories) do
+		for i, cat in ipairs(recipe.categories) do
+			if i == 1 then
+				trecipe['category'] = cat
+			else
 				table.insert(trecipe['additional_categories'], cat)
 			end
 		end
@@ -409,7 +407,7 @@ local function ExportItems()
 				tproduct['type'] = product.type
 
 				amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-				amount = amount * ( (product.probability == nil) and 1 or product.probability)
+				amount = amount * (product.independent_probability * (product.shared_probability.max - product.shared_probability.min))
 
 				tproduct['amount'] = amount
 
@@ -504,12 +502,12 @@ local function ExportEntities()
 			if entity.type == 'mining-drill' or entity.type == 'character' then
 				tentity['speed'] = entity.mining_speed
 			elseif entity.type == 'offshore-pump' then
-				tentity['speed'] = entity.pumping_speed
+				tentity['speed'] = entity.get_pumping_speed()
 			elseif entity.type == 'furnace' or entity.type == 'assembling-machine' or entity.type == 'rocket-silo' then
 				tentity['q_speed'] = ProcessQualityValue(entity.get_crafting_speed, 1)
 			end
 
-			if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_sec'] = entity.fluid_usage_per_tick * 60 end
+			if entity.get_fluid_usage_per_tick() ~= nil then tentity['fluid_usage_per_sec'] = entity.get_fluid_usage_per_tick() * 60 end
 
 			if entity.module_inventory_size ~= nil then tentity['module_inventory_size'] =  entity.module_inventory_size end
 			if entity.distribution_effectivity ~= nil then tentity['distribution_effectivity'] = entity.distribution_effectivity end
@@ -582,7 +580,7 @@ local function ExportEntities()
 				ExportBoilerFluids(entity, tentity)
 			elseif entity.type == 'generator' then
 				tentity['full_power_temperature'] = ProcessTemperature(entity.maximum_temperature)
-				tentity['max_power_output'] = entity.max_power_output * 60
+				tentity['max_power_output'] = entity.get_max_power_output() * 60
 
 				tentity['minimum_temperature'] = ProcessTemperature(entity.fluidbox_prototypes[1].minimum_temperature)
 				tentity['maximum_temperature'] = ProcessTemperature(entity.fluidbox_prototypes[1].maximum_temperature)

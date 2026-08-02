@@ -1,7 +1,7 @@
 {
   "name": "foremanexport",
   "version": "2.0.0",
-  "factorio_version": "2.0",
+  "factorio_version": "2.1",
   "title": "foremanexport",
   "author": "Me",
   "contact": "",
@@ -9,6 +9,6 @@
   "description": "temp mod to grab all the data for the current factorio setup. Should be automatically deleted after use (and doesnt impact gameplay anyway)",
   "dependencies": 
   [
-					"base >= 2.0.7"
+					"base >= 2.1.7"
 	]
 }
