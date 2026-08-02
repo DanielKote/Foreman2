@@ -103,6 +103,7 @@ namespace Foreman.DataCaching {
             folderLinks.Add("__base__", Path.Combine(dataPath, "base"));
             folderLinks.Add("__elevated-rails__", Path.Combine(dataPath, "elevated-rails"));
             folderLinks.Add("__quality__", Path.Combine(dataPath, "quality"));
+            folderLinks.Add("__recycler__", Path.Combine(dataPath, "recycler"));
             folderLinks.Add("__space-age__", Path.Combine(dataPath, "space-age"));
 
             return true;
