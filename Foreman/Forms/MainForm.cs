@@ -17,7 +17,7 @@ using static Foreman.NativeMethods;
 
 namespace Foreman {
     public partial class MainForm : Form {
-        internal const string DefaultPreset = "Factorio 2.0 Vanilla";
+        internal const string DefaultPreset = "Factorio 2.1 Vanilla";
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         internal string DefaultAppName { get; set; }
         private string? savefilePath;
@@ -331,11 +331,11 @@ namespace Foreman {
             existingPresetFiles.Sort();
 
             if (!existingPresetFiles.Contains(Properties.Settings.Default.CurrentPresetName)) {
-                UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to the default preset (Factorio 2.0 Vanilla)");
+                UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to the default preset (Factorio 2.1 Vanilla)");
                 Properties.Settings.Default.CurrentPresetName = DefaultPreset;
             }
             if (!existingPresetFiles.Contains(DefaultPreset)) {
-                UserMessages.Show("The default preset (Factorio 2.0 Vanilla) has been removed. Please re-install / re-download Foreman");
+                UserMessages.Show("The default preset (Factorio 2.1 Vanilla) has been removed. Please re-install / re-download Foreman");
                 Application.Exit();
                 return null;
             }

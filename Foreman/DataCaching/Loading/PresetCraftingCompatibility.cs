@@ -7,8 +7,14 @@ using System.Text.Json.Nodes;
 namespace Foreman.DataCaching.Loading {
     /// <summary>Preset JSON crafting categories and recipe↔machine linking helpers.</summary>
     internal static class PresetCraftingCompatibility {
-        public static IEnumerable<string> CollectRecipeCraftingCategories(JsonNode recipeJson, string primaryCategory) {
-            var categories = new HashSet<string>(StringComparer.Ordinal) { primaryCategory };
+        public static IEnumerable<string> CollectRecipeCraftingCategories(JsonNode recipeJson, string? primaryCategory = null) {
+            var categories = new HashSet<string>(StringComparer.Ordinal);
+            if (!string.IsNullOrEmpty(primaryCategory))
+                categories.Add(primaryCategory);
+            if (PresetJson.GetString(recipeJson, "category") is string legacyCategory)
+                categories.Add(legacyCategory);
+            foreach (string category in PresetJson.EnumerateStrings(recipeJson, "categories"))
+                categories.Add(category);
             foreach (string category in PresetJson.EnumerateStrings(recipeJson, "crafting_categories"))
                 categories.Add(category);
             foreach (string category in PresetJson.EnumerateStrings(recipeJson, "additional_categories"))
@@ -50,7 +56,7 @@ namespace Foreman.DataCaching.Loading {
 
         public static bool RecipeHasCraftingMachine(
             JsonNode recipeJson,
-            string primaryCategory,
+            string? primaryCategory,
             IReadOnlyDictionary<string, HashSet<string>> craftingCategoryMachines) =>
             RecipeHasCraftingMachine(CollectRecipeCraftingCategories(recipeJson, primaryCategory), craftingCategoryMachines);
 

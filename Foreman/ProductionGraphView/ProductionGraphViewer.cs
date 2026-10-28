@@ -1383,7 +1383,7 @@ namespace Foreman {
                     PresetExportFormat.ShowOutdatedWarningIfNeeded(DCache);
 
                 if (result == DialogResult.Abort) {
-                    UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 2.0 Vanilla)");
+                    UserMessages.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 2.1 Vanilla)");
                     Properties.Settings.Default.CurrentPresetName = MainForm.DefaultPreset;
                     using var form2 = new DataLoadForm(new Preset(MainForm.DefaultPreset, false, true));
                     form2.StartPosition = FormStartPosition.Manual;

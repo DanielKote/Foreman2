@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ForemanTest.support {
     /// <summary>Loads the vanilla preset once per test run (expensive).</summary>
     internal static class VanillaDataCacheFixture {
-        public const string PresetName = "Factorio 2.0 Vanilla";
+        public const string PresetName = "Factorio 2.1 Vanilla";
 
         private static readonly SemaphoreSlim Gate = new(1, 1);
         private static DataCache? cache;

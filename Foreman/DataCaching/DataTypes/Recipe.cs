@@ -101,7 +101,7 @@ namespace Foreman.DataCaching.DataTypes {
         private readonly HashSet<TechnologyPrototype> _myUnlockTechnologies;
         internal HashSet<TechnologyPrototype> MyUnlockTechnologiesInternal => _myUnlockTechnologies;
 
-        /// <summary>All categories this recipe belongs to (primary, additional, and exported crafting_categories).</summary>
+        /// <summary>All categories this recipe belongs to, from legacy and current preset exports.</summary>
         private readonly List<string> _craftingCategoryKeys = [];
         internal List<string> CraftingCategoryKeysInternal => _craftingCategoryKeys;
 

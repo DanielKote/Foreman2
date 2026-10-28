@@ -1,9 +1,9 @@
 {
-  "foreman_export_version": 1,
   "difficulty": [
     0,
     0
   ],
+  "foreman_export_version": 1,
   "mods": [
     {
       "name": "core",
@@ -11,7 +11,7 @@
     },
     {
       "name": "base",
-      "version": "2.0.76"
+      "version": "2.1.23"
     }
   ],
   "technologies": [
@@ -3622,7 +3622,7 @@
       "recipes": [
         "poison-capsule",
         "slowdown-capsule",
-        "combat-shotgun"
+        "piercing-shotgun-shell"
       ],
       "qualities": {},
       "research_unit_ingredients": [
@@ -3666,8 +3666,8 @@
         "uranium-ammo"
       ],
       "recipes": [
-        "piercing-shotgun-shell",
-        "cluster-grenade"
+        "cluster-grenade",
+        "combat-shotgun"
       ],
       "qualities": {},
       "research_unit_ingredients": [
@@ -6795,7 +6795,9 @@
       "icon_name": "icon.r.wooden-chest",
       "icon_alt_name": "icon.i.wooden-chest",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[items]-a[wooden-chest]",
       "subgroup": "storage",
@@ -6830,7 +6832,9 @@
       "icon_name": "icon.r.iron-chest",
       "icon_alt_name": "icon.i.iron-chest",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[items]-b[iron-chest]",
       "subgroup": "storage",
@@ -6865,7 +6869,9 @@
       "icon_name": "icon.r.steel-chest",
       "icon_alt_name": "icon.i.steel-chest",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[items]-c[steel-chest]",
       "subgroup": "storage",
@@ -6900,7 +6906,9 @@
       "icon_name": "icon.r.storage-tank",
       "icon_alt_name": "icon.i.storage-tank",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 3,
       "order": "b[fluid]-a[storage-tank]",
       "subgroup": "storage",
@@ -6940,7 +6948,9 @@
       "icon_name": "icon.r.transport-belt",
       "icon_alt_name": "icon.i.transport-belt",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[transport-belt]-a[transport-belt]",
       "subgroup": "belt",
@@ -6980,7 +6990,9 @@
       "icon_name": "icon.r.fast-transport-belt",
       "icon_alt_name": "icon.i.fast-transport-belt",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[transport-belt]-b[fast-transport-belt]",
       "subgroup": "belt",
@@ -7020,7 +7032,9 @@
       "icon_name": "icon.r.express-transport-belt",
       "icon_alt_name": "icon.i.express-transport-belt",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.5,
       "order": "a[transport-belt]-c[express-transport-belt]",
       "subgroup": "belt",
@@ -7065,7 +7079,9 @@
       "icon_name": "icon.r.underground-belt",
       "icon_alt_name": "icon.i.underground-belt",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1,
       "order": "b[underground-belt]-a[underground-belt]",
       "subgroup": "belt",
@@ -7105,7 +7121,9 @@
       "icon_name": "icon.r.fast-underground-belt",
       "icon_alt_name": "icon.i.fast-underground-belt",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "b[underground-belt]-b[fast-underground-belt]",
       "subgroup": "belt",
@@ -7145,7 +7163,9 @@
       "icon_name": "icon.r.express-underground-belt",
       "icon_alt_name": "icon.i.express-underground-belt",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 2,
       "order": "b[underground-belt]-c[express-underground-belt]",
       "subgroup": "belt",
@@ -7190,7 +7210,9 @@
       "icon_name": "icon.r.splitter",
       "icon_alt_name": "icon.i.splitter",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1,
       "order": "c[splitter]-a[splitter]",
       "subgroup": "belt",
@@ -7235,7 +7257,9 @@
       "icon_name": "icon.r.fast-splitter",
       "icon_alt_name": "icon.i.fast-splitter",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "c[splitter]-b[fast-splitter]",
       "subgroup": "belt",
@@ -7280,7 +7304,9 @@
       "icon_name": "icon.r.express-splitter",
       "icon_alt_name": "icon.i.express-splitter",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 2,
       "order": "c[splitter]-c[express-splitter]",
       "subgroup": "belt",
@@ -7330,12 +7356,15 @@
       "icon_name": "icon.r.loader",
       "icon_alt_name": "icon.i.loader",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1,
       "order": "d[loader]-a[basic-loader]",
       "subgroup": "belt",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
+      "hidden": true,
       "allowed_effects": {
         "consumption": true,
         "speed": true,
@@ -7385,12 +7414,15 @@
       "icon_name": "icon.r.fast-loader",
       "icon_alt_name": "icon.i.fast-loader",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 3,
       "order": "d[loader]-b[fast-loader]",
       "subgroup": "belt",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
+      "hidden": true,
       "allowed_effects": {
         "consumption": true,
         "speed": true,
@@ -7425,12 +7457,15 @@
       "icon_name": "icon.r.express-loader",
       "icon_alt_name": "icon.i.express-loader",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "d[loader]-c[express-loader]",
       "subgroup": "belt",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
+      "hidden": true,
       "allowed_effects": {
         "consumption": true,
         "speed": true,
@@ -7465,7 +7500,9 @@
       "icon_name": "icon.r.burner-inserter",
       "icon_alt_name": "icon.i.burner-inserter",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[burner-inserter]",
       "subgroup": "inserter",
@@ -7505,7 +7542,9 @@
       "icon_name": "icon.r.inserter",
       "icon_alt_name": "icon.i.inserter",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[inserter]",
       "subgroup": "inserter",
@@ -7550,7 +7589,9 @@
       "icon_name": "icon.r.long-handed-inserter",
       "icon_alt_name": "icon.i.long-handed-inserter",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "c[long-handed-inserter]",
       "subgroup": "inserter",
@@ -7595,7 +7636,9 @@
       "icon_name": "icon.r.fast-inserter",
       "icon_alt_name": "icon.i.fast-inserter",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "d[fast-inserter]",
       "subgroup": "inserter",
@@ -7640,7 +7683,9 @@
       "icon_name": "icon.r.bulk-inserter",
       "icon_alt_name": "icon.i.bulk-inserter",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "f[bulk-inserter]",
       "subgroup": "inserter",
@@ -7690,7 +7735,9 @@
       "icon_name": "icon.r.small-electric-pole",
       "icon_alt_name": "icon.i.small-electric-pole",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[energy]-a[small-electric-pole]",
       "subgroup": "energy-pipe-distribution",
@@ -7730,7 +7777,9 @@
       "icon_name": "icon.r.medium-electric-pole",
       "icon_alt_name": "icon.i.medium-electric-pole",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[energy]-b[medium-electric-pole]",
       "subgroup": "energy-pipe-distribution",
@@ -7775,7 +7824,9 @@
       "icon_name": "icon.r.big-electric-pole",
       "icon_alt_name": "icon.i.big-electric-pole",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[energy]-c[big-electric-pole]",
       "subgroup": "energy-pipe-distribution",
@@ -7820,7 +7871,9 @@
       "icon_name": "icon.r.substation",
       "icon_alt_name": "icon.i.substation",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[energy]-d[substation]",
       "subgroup": "energy-pipe-distribution",
@@ -7865,7 +7918,9 @@
       "icon_name": "icon.r.pipe",
       "icon_alt_name": "icon.i.pipe",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[pipe]-a[pipe]",
       "subgroup": "energy-pipe-distribution",
@@ -7900,7 +7955,9 @@
       "icon_name": "icon.r.pipe-to-ground",
       "icon_alt_name": "icon.i.pipe-to-ground",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[pipe]-b[pipe-to-ground]",
       "subgroup": "energy-pipe-distribution",
@@ -7940,7 +7997,9 @@
       "icon_name": "icon.r.pump",
       "icon_alt_name": "icon.i.pump",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "b[pipe]-c[pump]",
       "subgroup": "energy-pipe-distribution",
@@ -7985,7 +8044,9 @@
       "icon_name": "icon.r.rail",
       "icon_alt_name": "icon.i.rail",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[rail]-a[rail]",
       "subgroup": "train-transport",
@@ -8030,7 +8091,9 @@
       "icon_name": "icon.r.train-stop",
       "icon_alt_name": "icon.i.train-stop",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[train-automation]-a[train-stop]",
       "subgroup": "train-transport",
@@ -8080,7 +8143,9 @@
       "icon_name": "icon.r.rail-signal",
       "icon_alt_name": "icon.i.rail-signal",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[train-automation]-b[rail-signal]",
       "subgroup": "train-transport",
@@ -8120,7 +8185,9 @@
       "icon_name": "icon.r.rail-chain-signal",
       "icon_alt_name": "icon.i.rail-chain-signal",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[train-automation]-c[rail-chain-signal]",
       "subgroup": "train-transport",
@@ -8160,7 +8227,9 @@
       "icon_name": "icon.r.locomotive",
       "icon_alt_name": "icon.i.locomotive",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 4,
       "order": "c[rolling-stock]-a[locomotive]",
       "subgroup": "train-transport",
@@ -8205,7 +8274,9 @@
       "icon_name": "icon.r.cargo-wagon",
       "icon_alt_name": "icon.i.cargo-wagon",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1,
       "order": "c[rolling-stock]-b[cargo-wagon]",
       "subgroup": "train-transport",
@@ -8250,7 +8321,9 @@
       "icon_name": "icon.r.fluid-wagon",
       "icon_alt_name": "icon.i.fluid-wagon",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1.5,
       "order": "c[rolling-stock]-c[fluid-wagon]",
       "subgroup": "train-transport",
@@ -8300,7 +8373,9 @@
       "icon_name": "icon.r.artillery-wagon",
       "icon_alt_name": "icon.i.artillery-wagon",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 4,
       "order": "c[rolling-stock]-d[artillery-wagon]",
       "subgroup": "train-transport",
@@ -8355,7 +8430,9 @@
       "icon_name": "icon.r.car",
       "icon_alt_name": "icon.i.car",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "b[personal-transport]-a[car]",
       "subgroup": "transport",
@@ -8400,7 +8477,9 @@
       "icon_name": "icon.r.tank",
       "icon_alt_name": "icon.i.tank",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "b[personal-transport]-b[tank]",
       "subgroup": "transport",
@@ -8450,7 +8529,9 @@
       "icon_name": "icon.r.spidertron",
       "icon_alt_name": "icon.i.spidertron",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[personal-transport]-c[spidertron]-a[spider]",
       "subgroup": "transport",
@@ -8520,7 +8601,9 @@
       "icon_name": "icon.r.logistic-robot",
       "icon_alt_name": "icon.i.logistic-robot",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[robot]-a[logistic-robot]",
       "subgroup": "logistic-network",
@@ -8560,7 +8643,9 @@
       "icon_name": "icon.r.construction-robot",
       "icon_alt_name": "icon.i.construction-robot",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[robot]-b[construction-robot]",
       "subgroup": "logistic-network",
@@ -8600,7 +8685,9 @@
       "icon_name": "icon.r.active-provider-chest",
       "icon_alt_name": "icon.i.active-provider-chest",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[storage]-c[active-provider-chest]",
       "subgroup": "logistic-network",
@@ -8645,7 +8732,9 @@
       "icon_name": "icon.r.passive-provider-chest",
       "icon_alt_name": "icon.i.passive-provider-chest",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[storage]-c[passive-provider-chest]",
       "subgroup": "logistic-network",
@@ -8690,7 +8779,9 @@
       "icon_name": "icon.r.storage-chest",
       "icon_alt_name": "icon.i.storage-chest",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[storage]-c[storage-chest]",
       "subgroup": "logistic-network",
@@ -8735,7 +8826,9 @@
       "icon_name": "icon.r.buffer-chest",
       "icon_alt_name": "icon.i.buffer-chest",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[storage]-d[buffer-chest]",
       "subgroup": "logistic-network",
@@ -8780,7 +8873,9 @@
       "icon_name": "icon.r.requester-chest",
       "icon_alt_name": "icon.i.requester-chest",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[storage]-e[requester-chest]",
       "subgroup": "logistic-network",
@@ -8825,7 +8920,9 @@
       "icon_name": "icon.r.roboport",
       "icon_alt_name": "icon.i.roboport",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "c[signal]-a[roboport]",
       "subgroup": "logistic-network",
@@ -8870,7 +8967,9 @@
       "icon_name": "icon.r.small-lamp",
       "icon_alt_name": "icon.i.small-lamp",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[light]-a[small-lamp]",
       "subgroup": "circuit-network",
@@ -8915,7 +9014,9 @@
       "icon_name": "icon.r.arithmetic-combinator",
       "icon_alt_name": "icon.i.arithmetic-combinator",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "c[combinators]-a[arithmetic-combinator]",
       "subgroup": "circuit-network",
@@ -8955,7 +9056,9 @@
       "icon_name": "icon.r.decider-combinator",
       "icon_alt_name": "icon.i.decider-combinator",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "c[combinators]-b[decider-combinator]",
       "subgroup": "circuit-network",
@@ -8995,7 +9098,9 @@
       "icon_name": "icon.r.selector-combinator",
       "icon_alt_name": "icon.i.selector-combinator",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "c[combinators]-c[selector-combinator]",
       "subgroup": "circuit-network",
@@ -9035,7 +9140,9 @@
       "icon_name": "icon.r.constant-combinator",
       "icon_alt_name": "icon.i.constant-combinator",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "c[combinators]-d[constant-combinator]",
       "subgroup": "circuit-network",
@@ -9075,7 +9182,9 @@
       "icon_name": "icon.r.power-switch",
       "icon_alt_name": "icon.i.power-switch",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "d[other]-a[power-switch]",
       "subgroup": "circuit-network",
@@ -9120,7 +9229,9 @@
       "icon_name": "icon.r.programmable-speaker",
       "icon_alt_name": "icon.i.programmable-speaker",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "d[other]-b[programmable-speaker]",
       "subgroup": "circuit-network",
@@ -9170,7 +9281,9 @@
       "icon_name": "icon.r.display-panel",
       "icon_alt_name": "icon.i.display-panel",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "s[display-panel]",
       "subgroup": "circuit-network",
@@ -9210,7 +9323,9 @@
       "icon_name": "icon.r.stone-brick",
       "icon_alt_name": "icon.i.stone-brick",
       "enabled": true,
-      "category": "smelting",
+      "categories": [
+        "smelting"
+      ],
       "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "a[stone-brick]",
       "subgroup": "terrain",
@@ -9245,7 +9360,9 @@
       "icon_name": "icon.r.concrete",
       "icon_alt_name": "icon.i.concrete",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 10,
       "order": "b[concrete]-a[plain]",
       "subgroup": "terrain",
@@ -9290,7 +9407,9 @@
       "icon_name": "icon.r.hazard-concrete",
       "icon_alt_name": "icon.i.hazard-concrete",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.25,
       "order": "b[concrete]-b[hazard]",
       "subgroup": "terrain",
@@ -9325,7 +9444,9 @@
       "icon_name": "icon.r.refined-concrete",
       "icon_alt_name": "icon.i.refined-concrete",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 15,
       "order": "b[concrete]-c[refined]",
       "subgroup": "terrain",
@@ -9375,7 +9496,9 @@
       "icon_name": "icon.r.refined-hazard-concrete",
       "icon_alt_name": "icon.i.refined-hazard-concrete",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.25,
       "order": "b[concrete]-d[refined-hazard]",
       "subgroup": "terrain",
@@ -9410,7 +9533,9 @@
       "icon_name": "icon.r.landfill",
       "icon_alt_name": "icon.i.landfill",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "c[landfill]-a[dirt]",
       "subgroup": "terrain",
@@ -9445,7 +9570,9 @@
       "icon_name": "icon.r.cliff-explosives",
       "icon_alt_name": "icon.i.cliff-explosives",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "d[cliff-explosives]",
       "subgroup": "terrain",
@@ -9490,7 +9617,9 @@
       "icon_name": "icon.r.repair-pack",
       "icon_alt_name": "icon.i.repair-pack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[repair]-a[repair-pack]",
       "subgroup": "tool",
@@ -9530,7 +9659,9 @@
       "icon_name": "icon.r.boiler",
       "icon_alt_name": "icon.i.boiler",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[steam-power]-a[boiler]",
       "subgroup": "energy",
@@ -9570,7 +9701,9 @@
       "icon_name": "icon.r.steam-engine",
       "icon_alt_name": "icon.i.steam-engine",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[steam-power]-b[steam-engine]",
       "subgroup": "energy",
@@ -9615,7 +9748,9 @@
       "icon_name": "icon.r.solar-panel",
       "icon_alt_name": "icon.i.solar-panel",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "d[solar-panel]-a[solar-panel]",
       "subgroup": "energy",
@@ -9660,7 +9795,9 @@
       "icon_name": "icon.r.accumulator",
       "icon_alt_name": "icon.i.accumulator",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "e[accumulator]-a[accumulator]",
       "subgroup": "energy",
@@ -9700,7 +9837,9 @@
       "icon_name": "icon.r.nuclear-reactor",
       "icon_alt_name": "icon.i.nuclear-reactor",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "f[nuclear-energy]-a[reactor]",
       "subgroup": "energy",
@@ -9750,7 +9889,9 @@
       "icon_name": "icon.r.heat-pipe",
       "icon_alt_name": "icon.i.heat-pipe",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1,
       "order": "f[nuclear-energy]-b[heat-pipe]",
       "subgroup": "energy",
@@ -9790,7 +9931,9 @@
       "icon_name": "icon.r.heat-exchanger",
       "icon_alt_name": "icon.i.heat-exchanger",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 3,
       "order": "f[nuclear-energy]-c[heat-exchanger]",
       "subgroup": "energy",
@@ -9835,7 +9978,9 @@
       "icon_name": "icon.r.steam-turbine",
       "icon_alt_name": "icon.i.steam-turbine",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 3,
       "order": "f[nuclear-energy]-d[steam-turbine]",
       "subgroup": "energy",
@@ -9880,7 +10025,9 @@
       "icon_name": "icon.r.burner-mining-drill",
       "icon_alt_name": "icon.i.burner-mining-drill",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "a[items]-a[burner-mining-drill]",
       "subgroup": "extraction-machine",
@@ -9925,7 +10072,9 @@
       "icon_name": "icon.r.electric-mining-drill",
       "icon_alt_name": "icon.i.electric-mining-drill",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "a[items]-b[electric-mining-drill]",
       "subgroup": "extraction-machine",
@@ -9970,7 +10119,9 @@
       "icon_name": "icon.r.offshore-pump",
       "icon_alt_name": "icon.i.offshore-pump",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[fluids]-a[offshore-pump]",
       "subgroup": "extraction-machine",
@@ -10010,7 +10161,9 @@
       "icon_name": "icon.r.pumpjack",
       "icon_alt_name": "icon.i.pumpjack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "b[fluids]-b[pumpjack]",
       "subgroup": "extraction-machine",
@@ -10060,7 +10213,9 @@
       "icon_name": "icon.r.stone-furnace",
       "icon_alt_name": "icon.i.stone-furnace",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[stone-furnace]",
       "subgroup": "smelting-machine",
@@ -10095,7 +10250,9 @@
       "icon_name": "icon.r.steel-furnace",
       "icon_alt_name": "icon.i.steel-furnace",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 3,
       "order": "b[steel-furnace]",
       "subgroup": "smelting-machine",
@@ -10135,7 +10292,9 @@
       "icon_name": "icon.r.electric-furnace",
       "icon_alt_name": "icon.i.electric-furnace",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "c[electric-furnace]",
       "subgroup": "smelting-machine",
@@ -10180,7 +10339,9 @@
       "icon_name": "icon.r.assembling-machine-1",
       "icon_alt_name": "icon.i.assembling-machine-1",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[assembling-machine-1]",
       "subgroup": "production-machine",
@@ -10225,7 +10386,9 @@
       "icon_name": "icon.r.assembling-machine-2",
       "icon_alt_name": "icon.i.assembling-machine-2",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[assembling-machine-2]",
       "subgroup": "production-machine",
@@ -10275,7 +10438,9 @@
       "icon_name": "icon.r.assembling-machine-3",
       "icon_alt_name": "icon.i.assembling-machine-3",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "c[assembling-machine-3]",
       "subgroup": "production-machine",
@@ -10315,7 +10480,9 @@
       "icon_name": "icon.r.oil-refinery",
       "icon_alt_name": "icon.i.oil-refinery",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "d[refinery]",
       "subgroup": "production-machine",
@@ -10370,7 +10537,9 @@
       "icon_name": "icon.r.chemical-plant",
       "icon_alt_name": "icon.i.chemical-plant",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "e[chemical-plant]",
       "subgroup": "production-machine",
@@ -10420,7 +10589,9 @@
       "icon_name": "icon.r.centrifuge",
       "icon_alt_name": "icon.i.centrifuge",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 4,
       "order": "f[centrifuge]",
       "subgroup": "production-machine",
@@ -10470,7 +10641,9 @@
       "icon_name": "icon.r.lab",
       "icon_alt_name": "icon.i.lab",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 2,
       "order": "z[lab]",
       "subgroup": "production-machine",
@@ -10515,7 +10688,9 @@
       "icon_name": "icon.r.beacon",
       "icon_alt_name": "icon.i.beacon",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "a[beacon]",
       "subgroup": "module",
@@ -10565,7 +10740,9 @@
       "icon_name": "icon.r.speed-module",
       "icon_alt_name": "icon.i.speed-module",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "a[speed]-a[speed-module-1]",
       "subgroup": "module",
@@ -10605,7 +10782,9 @@
       "icon_name": "icon.r.speed-module-2",
       "icon_alt_name": "icon.i.speed-module-2",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 30,
       "order": "a[speed]-b[speed-module-2]",
       "subgroup": "module",
@@ -10650,7 +10829,9 @@
       "icon_name": "icon.r.speed-module-3",
       "icon_alt_name": "icon.i.speed-module-3",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 60,
       "order": "a[speed]-c[speed-module-3]",
       "subgroup": "module",
@@ -10695,7 +10876,9 @@
       "icon_name": "icon.r.efficiency-module",
       "icon_alt_name": "icon.i.efficiency-module",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "c[efficiency]-a[efficiency-module-1]",
       "subgroup": "module",
@@ -10735,7 +10918,9 @@
       "icon_name": "icon.r.efficiency-module-2",
       "icon_alt_name": "icon.i.efficiency-module-2",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 30,
       "order": "c[efficiency]-b[efficiency-module-2]",
       "subgroup": "module",
@@ -10780,7 +10965,9 @@
       "icon_name": "icon.r.efficiency-module-3",
       "icon_alt_name": "icon.i.efficiency-module-3",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 60,
       "order": "c[efficiency]-c[efficiency-module-3]",
       "subgroup": "module",
@@ -10825,7 +11012,9 @@
       "icon_name": "icon.r.productivity-module",
       "icon_alt_name": "icon.i.productivity-module",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "c[productivity]-a[productivity-module-1]",
       "subgroup": "module",
@@ -10865,7 +11054,9 @@
       "icon_name": "icon.r.productivity-module-2",
       "icon_alt_name": "icon.i.productivity-module-2",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 30,
       "order": "c[productivity]-b[productivity-module-2]",
       "subgroup": "module",
@@ -10910,7 +11101,9 @@
       "icon_name": "icon.r.productivity-module-3",
       "icon_alt_name": "icon.i.productivity-module-3",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 60,
       "order": "c[productivity]-c[productivity-module-3]",
       "subgroup": "module",
@@ -10955,7 +11148,9 @@
       "icon_name": "icon.r.rocket-silo",
       "icon_alt_name": "icon.i.rocket-silo",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 30,
       "order": "a[rocket-silo]",
       "subgroup": "space-related",
@@ -11010,9 +11205,11 @@
       "icon_name": "icon.r.cargo-landing-pad",
       "icon_alt_name": "icon.i.cargo-landing-pad",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 30,
-      "order": "c[cargo-landing-pad]",
+      "order": "c-a[cargo-landing-pad]",
       "subgroup": "space-related",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
@@ -11055,7 +11252,9 @@
       "icon_name": "icon.r.satellite",
       "icon_alt_name": "icon.i.satellite",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "d[rocket-parts]-e[satellite]",
       "subgroup": "space-related",
@@ -11115,7 +11314,9 @@
       "icon_name": "icon.r.basic-oil-processing",
       "icon_alt_name": "icon.i.petroleum-gas",
       "enabled": false,
-      "category": "oil-processing",
+      "categories": [
+        "oil-processing"
+      ],
       "energy": 5,
       "order": "a[oil-processing]-a[basic-oil-processing]",
       "subgroup": "fluid-recipes",
@@ -11150,7 +11351,9 @@
       "icon_name": "icon.r.advanced-oil-processing",
       "icon_alt_name": "icon.i.heavy-oil",
       "enabled": false,
-      "category": "oil-processing",
+      "categories": [
+        "oil-processing"
+      ],
       "energy": 5,
       "order": "a[oil-processing]-b[advanced-oil-processing]",
       "subgroup": "fluid-recipes",
@@ -11202,7 +11405,9 @@
       "icon_name": "icon.r.coal-liquefaction",
       "icon_alt_name": "icon.i.heavy-oil",
       "enabled": false,
-      "category": "oil-processing",
+      "categories": [
+        "oil-processing"
+      ],
       "energy": 5,
       "order": "a[oil-processing]-c[coal-liquefaction]",
       "subgroup": "fluid-recipes",
@@ -11259,7 +11464,9 @@
       "icon_name": "icon.r.heavy-oil-cracking",
       "icon_alt_name": "icon.i.light-oil",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 2,
       "order": "b[fluid-chemistry]-a[heavy-oil-cracking]",
       "subgroup": "fluid-recipes",
@@ -11299,7 +11506,9 @@
       "icon_name": "icon.r.light-oil-cracking",
       "icon_alt_name": "icon.i.petroleum-gas",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 2,
       "order": "b[fluid-chemistry]-b[light-oil-cracking]",
       "subgroup": "fluid-recipes",
@@ -11339,7 +11548,9 @@
       "icon_name": "icon.r.solid-fuel-from-petroleum-gas",
       "icon_alt_name": "icon.i.solid-fuel",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 1,
       "order": "b[fluid-chemistry]-c[solid-fuel-from-petroleum-gas]",
       "subgroup": "fluid-recipes",
@@ -11374,7 +11585,9 @@
       "icon_name": "icon.r.solid-fuel-from-light-oil",
       "icon_alt_name": "icon.i.solid-fuel",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 1,
       "order": "b[fluid-chemistry]-d[solid-fuel-from-light-oil]",
       "subgroup": "fluid-recipes",
@@ -11409,7 +11622,9 @@
       "icon_name": "icon.r.solid-fuel-from-heavy-oil",
       "icon_alt_name": "icon.i.solid-fuel",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 1,
       "order": "b[fluid-chemistry]-e[solid-fuel-from-heavy-oil]",
       "subgroup": "fluid-recipes",
@@ -11444,7 +11659,9 @@
       "icon_name": "icon.r.lubricant",
       "icon_alt_name": "icon.i.lubricant",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 1,
       "order": "c[oil-products]-a[lubricant]",
       "subgroup": "fluid-recipes",
@@ -11479,7 +11696,9 @@
       "icon_name": "icon.r.sulfuric-acid",
       "icon_alt_name": "icon.i.sulfuric-acid",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 1,
       "order": "c[oil-products]-b[sulfuric-acid]",
       "subgroup": "fluid-recipes",
@@ -11524,7 +11743,9 @@
       "icon_name": "icon.r.iron-plate",
       "icon_alt_name": "icon.i.iron-plate",
       "enabled": true,
-      "category": "smelting",
+      "categories": [
+        "smelting"
+      ],
       "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "a[smelting]-a[iron-plate]",
       "subgroup": "raw-material",
@@ -11559,7 +11780,9 @@
       "icon_name": "icon.r.copper-plate",
       "icon_alt_name": "icon.i.copper-plate",
       "enabled": true,
-      "category": "smelting",
+      "categories": [
+        "smelting"
+      ],
       "energy": 3.20000000000000017763568394002504646778106689453125,
       "order": "a[smelting]-b[copper-plate]",
       "subgroup": "raw-material",
@@ -11594,7 +11817,9 @@
       "icon_name": "icon.r.steel-plate",
       "icon_alt_name": "icon.i.steel-plate",
       "enabled": false,
-      "category": "smelting",
+      "categories": [
+        "smelting"
+      ],
       "energy": 16,
       "order": "a[smelting]-c[steel-plate]",
       "subgroup": "raw-material",
@@ -11629,7 +11854,9 @@
       "icon_name": "icon.r.plastic-bar",
       "icon_alt_name": "icon.i.plastic-bar",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 1,
       "order": "b[chemistry]-b[plastic-bar]",
       "subgroup": "raw-material",
@@ -11669,7 +11896,9 @@
       "icon_name": "icon.r.sulfur",
       "icon_alt_name": "icon.i.sulfur",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 1,
       "order": "b[chemistry]-c[sulfur]",
       "subgroup": "raw-material",
@@ -11709,7 +11938,9 @@
       "icon_name": "icon.r.battery",
       "icon_alt_name": "icon.i.battery",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 4,
       "order": "b[chemistry]-d[battery]",
       "subgroup": "raw-material",
@@ -11754,7 +11985,9 @@
       "icon_name": "icon.r.explosives",
       "icon_alt_name": "icon.i.explosives",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 4,
       "order": "b[chemistry]-e[explosives]",
       "subgroup": "raw-material",
@@ -11799,7 +12032,9 @@
       "icon_name": "icon.r.water-barrel",
       "icon_alt_name": "icon.i.water-barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-a[water]-a[water]",
       "subgroup": "fill-barrel",
@@ -11839,7 +12074,9 @@
       "icon_name": "icon.r.crude-oil-barrel",
       "icon_alt_name": "icon.i.crude-oil-barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-a[crude-oil]",
       "subgroup": "fill-barrel",
@@ -11879,7 +12116,9 @@
       "icon_name": "icon.r.petroleum-gas-barrel",
       "icon_alt_name": "icon.i.petroleum-gas-barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-b[petroleum-gas]",
       "subgroup": "fill-barrel",
@@ -11919,7 +12158,9 @@
       "icon_name": "icon.r.light-oil-barrel",
       "icon_alt_name": "icon.i.light-oil-barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-c[light-oil]",
       "subgroup": "fill-barrel",
@@ -11959,7 +12200,9 @@
       "icon_name": "icon.r.heavy-oil-barrel",
       "icon_alt_name": "icon.i.heavy-oil-barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-d[heavy-oil]",
       "subgroup": "fill-barrel",
@@ -11999,7 +12242,9 @@
       "icon_name": "icon.r.lubricant-barrel",
       "icon_alt_name": "icon.i.lubricant-barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-e[lubricant]",
       "subgroup": "fill-barrel",
@@ -12039,7 +12284,9 @@
       "icon_name": "icon.r.sulfuric-acid-barrel",
       "icon_alt_name": "icon.i.sulfuric-acid-barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-f[sulfuric-acid]",
       "subgroup": "fill-barrel",
@@ -12079,7 +12326,9 @@
       "icon_name": "icon.r.empty-water-barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-a[water]-a[water]",
       "subgroup": "empty-barrel",
@@ -12120,7 +12369,9 @@
       "icon_name": "icon.r.empty-crude-oil-barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-a[crude-oil]",
       "subgroup": "empty-barrel",
@@ -12161,7 +12412,9 @@
       "icon_name": "icon.r.empty-petroleum-gas-barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-b[petroleum-gas]",
       "subgroup": "empty-barrel",
@@ -12202,7 +12455,9 @@
       "icon_name": "icon.r.empty-light-oil-barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-c[light-oil]",
       "subgroup": "empty-barrel",
@@ -12243,7 +12498,9 @@
       "icon_name": "icon.r.empty-heavy-oil-barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-d[heavy-oil]",
       "subgroup": "empty-barrel",
@@ -12284,7 +12541,9 @@
       "icon_name": "icon.r.empty-lubricant-barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-e[lubricant]",
       "subgroup": "empty-barrel",
@@ -12325,7 +12584,9 @@
       "icon_name": "icon.r.empty-sulfuric-acid-barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 0.2,
       "order": "a[fluid]-b[oil]-f[sulfuric-acid]",
       "subgroup": "empty-barrel",
@@ -12366,7 +12627,9 @@
       "icon_name": "icon.r.iron-gear-wheel",
       "icon_alt_name": "icon.i.iron-gear-wheel",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[basic-intermediates]-a[iron-gear-wheel]",
       "subgroup": "intermediate-product",
@@ -12401,7 +12664,9 @@
       "icon_name": "icon.r.iron-stick",
       "icon_alt_name": "icon.i.iron-stick",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[basic-intermediates]-b[iron-stick]",
       "subgroup": "intermediate-product",
@@ -12436,7 +12701,9 @@
       "icon_name": "icon.r.copper-cable",
       "icon_alt_name": "icon.i.copper-cable",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[basic-intermediates]-c[copper-cable]",
       "subgroup": "intermediate-product",
@@ -12471,7 +12738,9 @@
       "icon_name": "icon.r.barrel",
       "icon_alt_name": "icon.i.barrel",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1,
       "order": "a[basic-intermediates]-d[empty-barrel]",
       "subgroup": "intermediate-product",
@@ -12506,7 +12775,9 @@
       "icon_name": "icon.r.electronic-circuit",
       "icon_alt_name": "icon.i.electronic-circuit",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "b[circuits]-a[electronic-circuit]",
       "subgroup": "intermediate-product",
@@ -12546,7 +12817,9 @@
       "icon_name": "icon.r.advanced-circuit",
       "icon_alt_name": "icon.i.advanced-circuit",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 6,
       "order": "b[circuits]-b[advanced-circuit]",
       "subgroup": "intermediate-product",
@@ -12591,7 +12864,9 @@
       "icon_name": "icon.r.processing-unit",
       "icon_alt_name": "icon.i.processing-unit",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 10,
       "order": "b[circuits]-c[processing-unit]",
       "subgroup": "intermediate-product",
@@ -12636,7 +12911,9 @@
       "icon_name": "icon.r.engine-unit",
       "icon_alt_name": "icon.i.engine-unit",
       "enabled": false,
-      "category": "advanced-crafting",
+      "categories": [
+        "advanced-crafting"
+      ],
       "energy": 10,
       "order": "c[advanced-intermediates]-a[engine-unit]",
       "subgroup": "intermediate-product",
@@ -12681,7 +12958,9 @@
       "icon_name": "icon.r.electric-engine-unit",
       "icon_alt_name": "icon.i.electric-engine-unit",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 10,
       "order": "c[advanced-intermediates]-b[electric-engine-unit]",
       "subgroup": "intermediate-product",
@@ -12726,7 +13005,9 @@
       "icon_name": "icon.r.flying-robot-frame",
       "icon_alt_name": "icon.i.flying-robot-frame",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 20,
       "order": "c[advanced-intermediates]-c[flying-robot-frame]",
       "subgroup": "intermediate-product",
@@ -12776,7 +13057,9 @@
       "icon_name": "icon.r.low-density-structure",
       "icon_alt_name": "icon.i.low-density-structure",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "d[rocket-parts]-a[low-density-structure]",
       "subgroup": "intermediate-product",
@@ -12821,7 +13104,9 @@
       "icon_name": "icon.r.rocket-fuel",
       "icon_alt_name": "icon.i.rocket-fuel",
       "enabled": false,
-      "category": "crafting-with-fluid",
+      "categories": [
+        "crafting-with-fluid"
+      ],
       "energy": 15,
       "order": "d[rocket-parts]-b[rocket-fuel]",
       "subgroup": "intermediate-product",
@@ -12861,7 +13146,9 @@
       "icon_name": "icon.r.rocket-part",
       "icon_alt_name": "icon.i.rocket-part",
       "enabled": false,
-      "category": "rocket-building",
+      "categories": [
+        "rocket-building"
+      ],
       "energy": 3,
       "order": "d[rocket-parts]-d[rocket-part]",
       "subgroup": "intermediate-product",
@@ -12906,7 +13193,9 @@
       "icon_name": "icon.r.uranium-processing",
       "icon_alt_name": "icon.i.uranium-235",
       "enabled": false,
-      "category": "centrifuging",
+      "categories": [
+        "centrifuging"
+      ],
       "energy": 12,
       "order": "a[uranium-processing]-a[uranium-processing]",
       "subgroup": "uranium-processing",
@@ -12930,14 +13219,14 @@
         {
           "name": "uranium-235",
           "type": "item",
-          "amount": 0.00700000000000000088817841970012523233890533447265625,
-          "p_amount": 0.00700000000000000088817841970012523233890533447265625
+          "amount": 1,
+          "p_amount": 1
         },
         {
           "name": "uranium-238",
           "type": "item",
-          "amount": 0.992999999999999971578290569595992565155029296875,
-          "p_amount": 0.992999999999999971578290569595992565155029296875
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Uranium processing"
@@ -12947,7 +13236,9 @@
       "icon_name": "icon.r.uranium-fuel-cell",
       "icon_alt_name": "icon.i.uranium-fuel-cell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[uranium-products]-a[uranium-fuel-cell]",
       "subgroup": "uranium-processing",
@@ -12992,7 +13283,9 @@
       "icon_name": "icon.r.nuclear-fuel-reprocessing",
       "icon_alt_name": "icon.i.uranium-238",
       "enabled": false,
-      "category": "centrifuging",
+      "categories": [
+        "centrifuging"
+      ],
       "energy": 60,
       "order": "b[uranium-products]-b[nuclear-fuel-reprocessing]",
       "subgroup": "uranium-processing",
@@ -13027,7 +13320,9 @@
       "icon_name": "icon.r.kovarex-enrichment-process",
       "icon_alt_name": "icon.i.uranium-235",
       "enabled": false,
-      "category": "centrifuging",
+      "categories": [
+        "centrifuging"
+      ],
       "energy": 60,
       "order": "b[uranium-products]-c[kovarex-enrichment-process]",
       "subgroup": "uranium-processing",
@@ -13073,7 +13368,9 @@
       "icon_name": "icon.r.nuclear-fuel",
       "icon_alt_name": "icon.i.nuclear-fuel",
       "enabled": false,
-      "category": "centrifuging",
+      "categories": [
+        "centrifuging"
+      ],
       "energy": 90,
       "order": "b[uranium-products]-d[nuclear-fuel]",
       "subgroup": "uranium-processing",
@@ -13113,7 +13410,9 @@
       "icon_name": "icon.r.automation-science-pack",
       "icon_alt_name": "icon.i.automation-science-pack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "a[automation-science-pack]",
       "subgroup": "science-pack",
@@ -13153,7 +13452,9 @@
       "icon_name": "icon.r.logistic-science-pack",
       "icon_alt_name": "icon.i.logistic-science-pack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 6,
       "order": "b[logistic-science-pack]",
       "subgroup": "science-pack",
@@ -13193,7 +13494,9 @@
       "icon_name": "icon.r.military-science-pack",
       "icon_alt_name": "icon.i.military-science-pack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "c[military-science-pack]",
       "subgroup": "science-pack",
@@ -13238,7 +13541,9 @@
       "icon_name": "icon.r.chemical-science-pack",
       "icon_alt_name": "icon.i.chemical-science-pack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 24,
       "order": "d[chemical-science-pack]",
       "subgroup": "science-pack",
@@ -13283,7 +13588,9 @@
       "icon_name": "icon.r.production-science-pack",
       "icon_alt_name": "icon.i.production-science-pack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 21,
       "order": "e[production-science-pack]",
       "subgroup": "science-pack",
@@ -13328,7 +13635,9 @@
       "icon_name": "icon.r.utility-science-pack",
       "icon_alt_name": "icon.i.utility-science-pack",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 21,
       "order": "f[utility-science-pack]",
       "subgroup": "science-pack",
@@ -13373,12 +13682,15 @@
       "icon_name": "icon.r.pistol",
       "icon_alt_name": "icon.i.pistol",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "a[basic-clips]-a[pistol]",
       "subgroup": "gun",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
+      "hidden": true,
       "allowed_effects": {
         "consumption": true,
         "speed": true,
@@ -13413,7 +13725,9 @@
       "icon_name": "icon.r.submachine-gun",
       "icon_alt_name": "icon.i.submachine-gun",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "a[basic-clips]-b[submachine-gun]",
       "subgroup": "gun",
@@ -13458,7 +13772,9 @@
       "icon_name": "icon.r.shotgun",
       "icon_alt_name": "icon.i.shotgun",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[shotgun]-a[basic]",
       "subgroup": "gun",
@@ -13508,7 +13824,9 @@
       "icon_name": "icon.r.combat-shotgun",
       "icon_alt_name": "icon.i.combat-shotgun",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[shotgun]-a[combat]",
       "subgroup": "gun",
@@ -13558,7 +13876,9 @@
       "icon_name": "icon.r.rocket-launcher",
       "icon_alt_name": "icon.i.rocket-launcher",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "d[rocket-launcher]",
       "subgroup": "gun",
@@ -13603,7 +13923,9 @@
       "icon_name": "icon.r.flamethrower",
       "icon_alt_name": "icon.i.flamethrower",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "e[flamethrower]",
       "subgroup": "gun",
@@ -13643,7 +13965,9 @@
       "icon_name": "icon.r.firearm-magazine",
       "icon_alt_name": "icon.i.firearm-magazine",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 1,
       "order": "a[basic-clips]-a[firearm-magazine]",
       "subgroup": "ammo",
@@ -13678,7 +14002,9 @@
       "icon_name": "icon.r.piercing-rounds-magazine",
       "icon_alt_name": "icon.i.piercing-rounds-magazine",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 6,
       "order": "a[basic-clips]-b[piercing-rounds-magazine]",
       "subgroup": "ammo",
@@ -13723,7 +14049,9 @@
       "icon_name": "icon.r.uranium-rounds-magazine",
       "icon_alt_name": "icon.i.uranium-rounds-magazine",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "a[basic-clips]-c[uranium-rounds-magazine]",
       "subgroup": "ammo",
@@ -13763,7 +14091,9 @@
       "icon_name": "icon.r.shotgun-shell",
       "icon_alt_name": "icon.i.shotgun-shell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 3,
       "order": "b[shotgun]-a[basic]",
       "subgroup": "ammo",
@@ -13803,7 +14133,9 @@
       "icon_name": "icon.r.piercing-shotgun-shell",
       "icon_alt_name": "icon.i.piercing-shotgun-shell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "b[shotgun]-b[piercing]",
       "subgroup": "ammo",
@@ -13820,12 +14152,12 @@
         {
           "name": "copper-plate",
           "type": "item",
-          "amount": 5
+          "amount": 2
         },
         {
           "name": "steel-plate",
           "type": "item",
-          "amount": 2
+          "amount": 1
         },
         {
           "name": "shotgun-shell",
@@ -13837,8 +14169,8 @@
         {
           "name": "piercing-shotgun-shell",
           "type": "item",
-          "amount": 1,
-          "p_amount": 1
+          "amount": 2,
+          "p_amount": 2
         }
       ],
       "localised_name": "Piercing shotgun shells"
@@ -13848,7 +14180,9 @@
       "icon_name": "icon.r.cannon-shell",
       "icon_alt_name": "icon.i.cannon-shell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "d[cannon-shell]-a[basic]",
       "subgroup": "ammo",
@@ -13893,7 +14227,9 @@
       "icon_name": "icon.r.explosive-cannon-shell",
       "icon_alt_name": "icon.i.explosive-cannon-shell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "d[cannon-shell]-c[explosive]",
       "subgroup": "ammo",
@@ -13938,7 +14274,9 @@
       "icon_name": "icon.r.uranium-cannon-shell",
       "icon_alt_name": "icon.i.uranium-cannon-shell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 12,
       "order": "d[cannon-shell]-c[uranium]",
       "subgroup": "ammo",
@@ -13978,7 +14316,9 @@
       "icon_name": "icon.r.explosive-uranium-cannon-shell",
       "icon_alt_name": "icon.i.explosive-uranium-cannon-shell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 12,
       "order": "d[explosive-cannon-shell]-c[uranium]",
       "subgroup": "ammo",
@@ -14018,7 +14358,9 @@
       "icon_name": "icon.r.artillery-shell",
       "icon_alt_name": "icon.i.artillery-shell",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "d[explosive-cannon-shell]-d[artillery]",
       "subgroup": "ammo",
@@ -14063,7 +14405,9 @@
       "icon_name": "icon.r.rocket",
       "icon_alt_name": "icon.i.rocket",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 4,
       "order": "d[rocket-launcher]-a[basic]",
       "subgroup": "ammo",
@@ -14103,7 +14447,9 @@
       "icon_name": "icon.r.explosive-rocket",
       "icon_alt_name": "icon.i.explosive-rocket",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "d[rocket-launcher]-b[explosive]",
       "subgroup": "ammo",
@@ -14143,7 +14489,9 @@
       "icon_name": "icon.r.atomic-bomb",
       "icon_alt_name": "icon.i.atomic-bomb",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 50,
       "order": "d[rocket-launcher]-d[atomic-bomb]",
       "subgroup": "ammo",
@@ -14188,7 +14536,9 @@
       "icon_name": "icon.r.flamethrower-ammo",
       "icon_alt_name": "icon.i.flamethrower-ammo",
       "enabled": false,
-      "category": "chemistry",
+      "categories": [
+        "chemistry"
+      ],
       "energy": 6,
       "order": "e[flamethrower]",
       "subgroup": "ammo",
@@ -14228,7 +14578,9 @@
       "icon_name": "icon.r.grenade",
       "icon_alt_name": "icon.i.grenade",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "a[grenade]-a[normal]",
       "subgroup": "capsule",
@@ -14268,7 +14620,9 @@
       "icon_name": "icon.r.cluster-grenade",
       "icon_alt_name": "icon.i.cluster-grenade",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "a[grenade]-b[cluster]",
       "subgroup": "capsule",
@@ -14313,7 +14667,9 @@
       "icon_name": "icon.r.poison-capsule",
       "icon_alt_name": "icon.i.poison-capsule",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "b[poison-capsule]",
       "subgroup": "capsule",
@@ -14358,7 +14714,9 @@
       "icon_name": "icon.r.slowdown-capsule",
       "icon_alt_name": "icon.i.slowdown-capsule",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "c[slowdown-capsule]",
       "subgroup": "capsule",
@@ -14403,7 +14761,9 @@
       "icon_name": "icon.r.defender-capsule",
       "icon_alt_name": "icon.i.defender-capsule",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "d[defender]-b[capsule]",
       "subgroup": "capsule",
@@ -14448,7 +14808,9 @@
       "icon_name": "icon.r.distractor-capsule",
       "icon_alt_name": "icon.i.distractor-capsule",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "e[distractor]-b[capsule]",
       "subgroup": "capsule",
@@ -14488,7 +14850,9 @@
       "icon_name": "icon.r.destroyer-capsule",
       "icon_alt_name": "icon.i.destroyer-capsule",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "f[destroyer]-b[capsule]",
       "subgroup": "capsule",
@@ -14528,7 +14892,9 @@
       "icon_name": "icon.r.light-armor",
       "icon_alt_name": "icon.i.light-armor",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 3,
       "order": "a[light-armor]",
       "subgroup": "armor",
@@ -14563,7 +14929,9 @@
       "icon_name": "icon.r.heavy-armor",
       "icon_alt_name": "icon.i.heavy-armor",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "b[heavy-armor]",
       "subgroup": "armor",
@@ -14603,7 +14971,9 @@
       "icon_name": "icon.r.modular-armor",
       "icon_alt_name": "icon.i.modular-armor",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 15,
       "order": "c[modular-armor]",
       "subgroup": "armor",
@@ -14643,7 +15013,9 @@
       "icon_name": "icon.r.power-armor",
       "icon_alt_name": "icon.i.power-armor",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 20,
       "order": "d[power-armor]",
       "subgroup": "armor",
@@ -14688,7 +15060,9 @@
       "icon_name": "icon.r.power-armor-mk2",
       "icon_alt_name": "icon.i.power-armor-mk2",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 25,
       "order": "e[power-armor-mk2]",
       "subgroup": "armor",
@@ -14743,7 +15117,9 @@
       "icon_name": "icon.r.solar-panel-equipment",
       "icon_alt_name": "icon.i.solar-panel-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "a[energy-source]-a[solar-panel]",
       "subgroup": "equipment",
@@ -14788,7 +15164,9 @@
       "icon_name": "icon.r.fission-reactor-equipment",
       "icon_alt_name": "icon.i.fission-reactor-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "a[energy-source]-b[fission-reactor]",
       "subgroup": "equipment",
@@ -14833,7 +15211,9 @@
       "icon_name": "icon.r.battery-equipment",
       "icon_alt_name": "icon.i.battery-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[battery]-a[battery-equipment]",
       "subgroup": "equipment",
@@ -14873,7 +15253,9 @@
       "icon_name": "icon.r.battery-mk2-equipment",
       "icon_alt_name": "icon.i.battery-mk2-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[battery]-b[battery-equipment-mk2]",
       "subgroup": "equipment",
@@ -14918,7 +15300,9 @@
       "icon_name": "icon.r.belt-immunity-equipment",
       "icon_alt_name": "icon.i.belt-immunity-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "c[belt-immunity]-a[belt-immunity]",
       "subgroup": "utility-equipment",
@@ -14958,7 +15342,9 @@
       "icon_name": "icon.r.exoskeleton-equipment",
       "icon_alt_name": "icon.i.exoskeleton-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "d[exoskeleton]-a[exoskeleton-equipment]",
       "subgroup": "utility-equipment",
@@ -15003,7 +15389,9 @@
       "icon_name": "icon.r.personal-roboport-equipment",
       "icon_alt_name": "icon.i.personal-roboport-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "e[robotics]-a[personal-roboport-equipment]",
       "subgroup": "utility-equipment",
@@ -15053,7 +15441,9 @@
       "icon_name": "icon.r.personal-roboport-mk2-equipment",
       "icon_alt_name": "icon.i.personal-roboport-mk2-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 20,
       "order": "e[robotics]-b[personal-roboport-mk2-equipment]",
       "subgroup": "utility-equipment",
@@ -15098,7 +15488,9 @@
       "icon_name": "icon.r.night-vision-equipment",
       "icon_alt_name": "icon.i.night-vision-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "f[night-vision]-a[night-vision-equipment]",
       "subgroup": "utility-equipment",
@@ -15138,7 +15530,9 @@
       "icon_name": "icon.r.energy-shield-equipment",
       "icon_alt_name": "icon.i.energy-shield-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "a[shield]-a[energy-shield-equipment]",
       "subgroup": "military-equipment",
@@ -15178,7 +15572,9 @@
       "icon_name": "icon.r.energy-shield-mk2-equipment",
       "icon_alt_name": "icon.i.energy-shield-mk2-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "a[shield]-b[energy-shield-equipment-mk2]",
       "subgroup": "military-equipment",
@@ -15223,7 +15619,9 @@
       "icon_name": "icon.r.personal-laser-defense-equipment",
       "icon_alt_name": "icon.i.personal-laser-defense-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[active-defense]-a[personal-laser-defense-equipment]",
       "subgroup": "military-equipment",
@@ -15268,7 +15666,9 @@
       "icon_name": "icon.r.discharge-defense-equipment",
       "icon_alt_name": "icon.i.discharge-defense-equipment",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 10,
       "order": "b[active-defense]-b[discharge-defense-equipment]-a[equipment]",
       "subgroup": "military-equipment",
@@ -15313,7 +15713,9 @@
       "icon_name": "icon.r.stone-wall",
       "icon_alt_name": "icon.i.stone-wall",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[stone-wall]-a[stone-wall]",
       "subgroup": "defensive-structure",
@@ -15348,7 +15750,9 @@
       "icon_name": "icon.r.gate",
       "icon_alt_name": "icon.i.gate",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "a[wall]-b[gate]",
       "subgroup": "defensive-structure",
@@ -15393,7 +15797,9 @@
       "icon_name": "icon.r.radar",
       "icon_alt_name": "icon.i.radar",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "d[radar]-a[radar]",
       "subgroup": "defensive-structure",
@@ -15438,7 +15844,9 @@
       "icon_name": "icon.r.land-mine",
       "icon_alt_name": "icon.i.land-mine",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 5,
       "order": "f[land-mine]",
       "subgroup": "defensive-structure",
@@ -15478,7 +15886,9 @@
       "icon_name": "icon.r.gun-turret",
       "icon_alt_name": "icon.i.gun-turret",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 8,
       "order": "b[turret]-a[gun-turret]",
       "subgroup": "turret",
@@ -15523,7 +15933,9 @@
       "icon_name": "icon.r.laser-turret",
       "icon_alt_name": "icon.i.laser-turret",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 20,
       "order": "b[turret]-b[laser-turret]",
       "subgroup": "turret",
@@ -15568,7 +15980,9 @@
       "icon_name": "icon.r.flamethrower-turret",
       "icon_alt_name": "icon.i.flamethrower-turret",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 20,
       "order": "b[turret]-c[flamethrower-turret]",
       "subgroup": "turret",
@@ -15618,7 +16032,9 @@
       "icon_name": "icon.r.artillery-turret",
       "icon_alt_name": "icon.i.artillery-turret",
       "enabled": false,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 40,
       "order": "b[turret]-d[artillery-turret]-a[turret]",
       "subgroup": "turret",
@@ -15668,7 +16084,9 @@
       "icon_name": "icon.r.parameter-0",
       "icon_alt_name": "icon.r.parameter-0",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15690,7 +16108,9 @@
       "icon_name": "icon.r.parameter-1",
       "icon_alt_name": "icon.r.parameter-1",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15712,7 +16132,9 @@
       "icon_name": "icon.r.parameter-2",
       "icon_alt_name": "icon.r.parameter-2",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15734,7 +16156,9 @@
       "icon_name": "icon.r.parameter-3",
       "icon_alt_name": "icon.r.parameter-3",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15756,7 +16180,9 @@
       "icon_name": "icon.r.parameter-4",
       "icon_alt_name": "icon.r.parameter-4",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15778,7 +16204,9 @@
       "icon_name": "icon.r.parameter-5",
       "icon_alt_name": "icon.r.parameter-5",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15800,7 +16228,9 @@
       "icon_name": "icon.r.parameter-6",
       "icon_alt_name": "icon.r.parameter-6",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15822,7 +16252,9 @@
       "icon_name": "icon.r.parameter-7",
       "icon_alt_name": "icon.r.parameter-7",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15844,7 +16276,9 @@
       "icon_name": "icon.r.parameter-8",
       "icon_alt_name": "icon.r.parameter-8",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15866,7 +16300,9 @@
       "icon_name": "icon.r.parameter-9",
       "icon_alt_name": "icon.r.parameter-9",
       "enabled": true,
-      "category": "parameters",
+      "categories": [
+        "parameters"
+      ],
       "energy": 0.5,
       "order": "a",
       "subgroup": "parameters",
@@ -15888,12 +16324,15 @@
       "icon_name": "icon.r.recipe-unknown",
       "icon_alt_name": "icon.r.recipe-unknown",
       "enabled": true,
-      "category": "crafting",
+      "categories": [
+        "crafting"
+      ],
       "energy": 0.5,
       "order": "",
       "subgroup": "other",
       "maximum_productivity": 3,
       "hide_from_player_crafting": false,
+      "hidden": true,
       "allowed_effects": {
         "consumption": true,
         "speed": true,
@@ -16824,7 +17263,7 @@
       "icon_name": "icon.i.centrifuge",
       "order": "f[centrifuge]",
       "subgroup": "production-machine",
-      "stack_size": 50,
+      "stack_size": 10,
       "weight": 662500,
       "ingredient_to_weight_coefficient": 0.5,
       "localised_name": "Centrifuge"
@@ -16962,7 +17401,7 @@
     {
       "name": "cargo-landing-pad",
       "icon_name": "icon.i.cargo-landing-pad",
-      "order": "c[cargo-landing-pad]",
+      "order": "c-a[cargo-landing-pad]",
       "subgroup": "space-related",
       "stack_size": 1,
       "weight": 1000000,
@@ -16994,7 +17433,9 @@
       "stack_size": 100,
       "weight": 2000,
       "ingredient_to_weight_coefficient": 0.5,
-      "fuel_category": "chemical",
+      "fuel_categories": [
+        "chemical"
+      ],
       "fuel_value": 2000000,
       "fuel_emissions_multiplier": 1,
       "localised_name": "Wood"
@@ -17007,7 +17448,9 @@
       "stack_size": 50,
       "weight": 2000,
       "ingredient_to_weight_coefficient": 0.5,
-      "fuel_category": "chemical",
+      "fuel_categories": [
+        "chemical"
+      ],
       "fuel_value": 4000000,
       "fuel_emissions_multiplier": 1,
       "localised_name": "Coal"
@@ -17100,7 +17543,9 @@
       "stack_size": 50,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "fuel_category": "chemical",
+      "fuel_categories": [
+        "chemical"
+      ],
       "fuel_value": 12000000,
       "fuel_emissions_multiplier": 1,
       "localised_name": "Solid fuel"
@@ -17333,7 +17778,9 @@
       "stack_size": 20,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "fuel_category": "chemical",
+      "fuel_categories": [
+        "chemical"
+      ],
       "fuel_value": 100000000,
       "fuel_emissions_multiplier": 1,
       "localised_name": "Rocket fuel"
@@ -17376,7 +17823,9 @@
       "stack_size": 50,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "fuel_category": "nuclear",
+      "fuel_categories": [
+        "nuclear"
+      ],
       "fuel_value": 8000000000,
       "fuel_emissions_multiplier": 1,
       "burnt_result": "depleted-uranium-fuel-cell",
@@ -17400,7 +17849,9 @@
       "stack_size": 1,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "fuel_category": "chemical",
+      "fuel_categories": [
+        "chemical"
+      ],
       "fuel_value": 1210000000,
       "fuel_emissions_multiplier": 1,
       "localised_name": "Nuclear fuel"
@@ -18296,6 +18747,16 @@
       "localised_name": "No item"
     },
     {
+      "name": "electric-energy-interface-equipment",
+      "icon_name": "icon.i.electric-energy-interface-equipment",
+      "order": "a[electric-energy-interface]-b[electric-energy-interface-equipment]",
+      "subgroup": "other",
+      "stack_size": 1,
+      "weight": 250000,
+      "ingredient_to_weight_coefficient": 0.5,
+      "localised_name": "Electric energy interface equipment"
+    },
+    {
       "name": "electric-energy-interface",
       "icon_name": "icon.i.electric-energy-interface",
       "order": "a[electric-energy-interface]-b[electric-energy-interface]",
@@ -18484,7 +18945,7 @@
       "order": "a[fluid]-a[water]-b[steam]",
       "subgroup": "fluid",
       "default_temperature": 15,
-      "max_temperature": 5000,
+      "max_temperature": 500,
       "gas_temperature": 15,
       "heat_capacity": 200,
       "localised_name": "Steam"
@@ -18687,10 +19148,10 @@
       "tier": 1,
       "module_effects": {
         "consumption": 0.5,
-        "speed": 0.20000000298023223876953125,
+        "speed": 0.2,
         "productivity": 0,
         "pollution": 0,
-        "quality": -0.100000001490116119384765625
+        "quality": -0.01
       },
       "localised_name": "Speed module"
     },
@@ -18702,11 +19163,11 @@
       "category": "speed",
       "tier": 2,
       "module_effects": {
-        "consumption": 0.60000002384185791015625,
-        "speed": 0.300000011920928955078125,
+        "consumption": 0.6,
+        "speed": 0.3,
         "productivity": 0,
         "pollution": 0,
-        "quality": -0.1500000059604644775390625
+        "quality": -0.015
       },
       "localised_name": "Speed module 2"
     },
@@ -18718,11 +19179,11 @@
       "category": "speed",
       "tier": 3,
       "module_effects": {
-        "consumption": 0.699999988079071044921875,
+        "consumption": 0.7,
         "speed": 0.5,
         "productivity": 0,
         "pollution": 0,
-        "quality": -0.25
+        "quality": -0.025
       },
       "localised_name": "Speed module 3"
     },
@@ -18734,7 +19195,7 @@
       "category": "efficiency",
       "tier": 1,
       "module_effects": {
-        "consumption": -0.300000011920928955078125,
+        "consumption": -0.3,
         "speed": 0,
         "productivity": 0,
         "pollution": 0,
@@ -18750,7 +19211,7 @@
       "category": "efficiency",
       "tier": 2,
       "module_effects": {
-        "consumption": -0.4000000059604644775390625,
+        "consumption": -0.4,
         "speed": 0,
         "productivity": 0,
         "pollution": 0,
@@ -18782,10 +19243,10 @@
       "category": "productivity",
       "tier": 1,
       "module_effects": {
-        "consumption": 0.4000000059604644775390625,
-        "speed": -0.0500000007450580596923828125,
-        "productivity": 0.039999999105930328369140625,
-        "pollution": 0.0500000007450580596923828125,
+        "consumption": 0.4,
+        "speed": -0.05,
+        "productivity": 0.04,
+        "pollution": 0.05,
         "quality": 0
       },
       "localised_name": "Productivity module"
@@ -18798,10 +19259,10 @@
       "category": "productivity",
       "tier": 2,
       "module_effects": {
-        "consumption": 0.60000002384185791015625,
-        "speed": -0.100000001490116119384765625,
-        "productivity": 0.0599999986588954925537109375,
-        "pollution": 0.070000000298023223876953125,
+        "consumption": 0.6,
+        "speed": -0.1,
+        "productivity": 0.06,
+        "pollution": 0.0700000000000000088817841970012523233890533447265625,
         "quality": 0
       },
       "localised_name": "Productivity module 2"
@@ -18814,10 +19275,10 @@
       "category": "productivity",
       "tier": 3,
       "module_effects": {
-        "consumption": 0.800000011920928955078125,
-        "speed": -0.1500000059604644775390625,
-        "productivity": 0.100000001490116119384765625,
-        "pollution": 0.100000001490116119384765625,
+        "consumption": 0.8,
+        "speed": -0.15,
+        "productivity": 0.1,
+        "pollution": 0.1,
         "quality": 0
       },
       "localised_name": "Productivity module 3"
@@ -18874,13 +19335,31 @@
       "icon_alt_name": "icon.i.steam-engine",
       "order": "z-b[steam-power]-b[steam-engine]",
       "type": "generator",
-      "fluid_usage_per_sec": 30,
+      "fluid_usage_per_sec": [
+        {
+          "quality": "normal",
+          "value": 0.5
+        },
+        {
+          "quality": "quality-unknown",
+          "value": 0.5
+        }
+      ],
       "module_inventory_size": 0,
       "items_to_place_this": [
         "steam-engine"
       ],
       "full_power_temperature": 165,
-      "max_power_output": 900000,
+      "get_max_power_output": [
+        {
+          "quality": "normal",
+          "value": 15000
+        },
+        {
+          "quality": "quality-unknown",
+          "value": 15000
+        }
+      ],
       "minimum_temperature": 100,
       "fluid_ingredient": "steam",
       "energy_usage": 0,
@@ -19007,13 +19486,31 @@
       "icon_alt_name": "icon.i.steam-turbine",
       "order": "z-f[nuclear-energy]-d[steam-turbine]",
       "type": "generator",
-      "fluid_usage_per_sec": 60,
+      "fluid_usage_per_sec": [
+        {
+          "quality": "normal",
+          "value": 1
+        },
+        {
+          "quality": "quality-unknown",
+          "value": 1
+        }
+      ],
       "module_inventory_size": 0,
       "items_to_place_this": [
         "steam-turbine"
       ],
       "full_power_temperature": 500,
-      "max_power_output": 5820000,
+      "get_max_power_output": [
+        {
+          "quality": "normal",
+          "value": 97000
+        },
+        {
+          "quality": "quality-unknown",
+          "value": 97000
+        }
+      ],
       "minimum_temperature": 100,
       "fluid_ingredient": "steam",
       "energy_usage": 0,
@@ -19185,7 +19682,16 @@
       "icon_alt_name": "icon.i.offshore-pump",
       "order": "z-b[fluids]-a[offshore-pump]",
       "type": "offshore-pump",
-      "speed": 20,
+      "speed": [
+        {
+          "quality": "normal",
+          "value": 20
+        },
+        {
+          "quality": "quality-unknown",
+          "value": 20
+        }
+      ],
       "module_inventory_size": 0,
       "items_to_place_this": [
         "offshore-pump"
@@ -19331,6 +19837,12 @@
       "crafting_categories": [
         "smelting"
       ],
+      "craftable_recipes": [
+        "copper-plate",
+        "iron-plate",
+        "steel-plate",
+        "stone-brick"
+      ],
       "in_pipes": 0,
       "in_pipe_filters": {},
       "out_pipes": 0,
@@ -19407,6 +19919,12 @@
       ],
       "crafting_categories": [
         "smelting"
+      ],
+      "craftable_recipes": [
+        "copper-plate",
+        "iron-plate",
+        "steel-plate",
+        "stone-brick"
       ],
       "in_pipes": 0,
       "in_pipe_filters": {},
@@ -19485,6 +20003,12 @@
       "crafting_categories": [
         "smelting"
       ],
+      "craftable_recipes": [
+        "copper-plate",
+        "iron-plate",
+        "steel-plate",
+        "stone-brick"
+      ],
       "in_pipes": 0,
       "in_pipe_filters": {},
       "out_pipes": 0,
@@ -19560,9 +20084,181 @@
       ],
       "crafting_categories": [
         "crafting",
-        "basic-crafting",
         "advanced-crafting",
         "parameters"
+      ],
+      "craftable_recipes": [
+        "accumulator",
+        "active-provider-chest",
+        "advanced-circuit",
+        "arithmetic-combinator",
+        "artillery-shell",
+        "artillery-turret",
+        "artillery-wagon",
+        "assembling-machine-1",
+        "assembling-machine-2",
+        "assembling-machine-3",
+        "atomic-bomb",
+        "automation-science-pack",
+        "barrel",
+        "battery-equipment",
+        "battery-mk2-equipment",
+        "beacon",
+        "belt-immunity-equipment",
+        "big-electric-pole",
+        "boiler",
+        "buffer-chest",
+        "bulk-inserter",
+        "burner-inserter",
+        "burner-mining-drill",
+        "cannon-shell",
+        "car",
+        "cargo-landing-pad",
+        "cargo-wagon",
+        "centrifuge",
+        "chemical-plant",
+        "chemical-science-pack",
+        "cliff-explosives",
+        "cluster-grenade",
+        "combat-shotgun",
+        "constant-combinator",
+        "construction-robot",
+        "copper-cable",
+        "decider-combinator",
+        "defender-capsule",
+        "destroyer-capsule",
+        "discharge-defense-equipment",
+        "display-panel",
+        "distractor-capsule",
+        "efficiency-module",
+        "efficiency-module-2",
+        "efficiency-module-3",
+        "electric-furnace",
+        "electric-mining-drill",
+        "electronic-circuit",
+        "energy-shield-equipment",
+        "energy-shield-mk2-equipment",
+        "engine-unit",
+        "exoskeleton-equipment",
+        "explosive-cannon-shell",
+        "explosive-rocket",
+        "explosive-uranium-cannon-shell",
+        "express-loader",
+        "fast-inserter",
+        "fast-loader",
+        "fast-splitter",
+        "fast-transport-belt",
+        "fast-underground-belt",
+        "firearm-magazine",
+        "fission-reactor-equipment",
+        "flamethrower",
+        "flamethrower-turret",
+        "fluid-wagon",
+        "flying-robot-frame",
+        "gate",
+        "grenade",
+        "gun-turret",
+        "hazard-concrete",
+        "heat-exchanger",
+        "heat-pipe",
+        "heavy-armor",
+        "inserter",
+        "iron-chest",
+        "iron-gear-wheel",
+        "iron-stick",
+        "lab",
+        "land-mine",
+        "landfill",
+        "laser-turret",
+        "light-armor",
+        "loader",
+        "locomotive",
+        "logistic-robot",
+        "logistic-science-pack",
+        "long-handed-inserter",
+        "low-density-structure",
+        "medium-electric-pole",
+        "military-science-pack",
+        "modular-armor",
+        "night-vision-equipment",
+        "nuclear-reactor",
+        "offshore-pump",
+        "oil-refinery",
+        "parameter-0",
+        "parameter-1",
+        "parameter-2",
+        "parameter-3",
+        "parameter-4",
+        "parameter-5",
+        "parameter-6",
+        "parameter-7",
+        "parameter-8",
+        "parameter-9",
+        "passive-provider-chest",
+        "personal-laser-defense-equipment",
+        "personal-roboport-equipment",
+        "personal-roboport-mk2-equipment",
+        "piercing-rounds-magazine",
+        "piercing-shotgun-shell",
+        "pipe",
+        "pipe-to-ground",
+        "pistol",
+        "poison-capsule",
+        "power-armor",
+        "power-armor-mk2",
+        "power-switch",
+        "production-science-pack",
+        "productivity-module",
+        "productivity-module-2",
+        "productivity-module-3",
+        "programmable-speaker",
+        "pump",
+        "pumpjack",
+        "radar",
+        "rail",
+        "rail-chain-signal",
+        "rail-signal",
+        "recipe-unknown",
+        "refined-hazard-concrete",
+        "repair-pack",
+        "requester-chest",
+        "roboport",
+        "rocket",
+        "rocket-launcher",
+        "rocket-silo",
+        "satellite",
+        "selector-combinator",
+        "shotgun",
+        "shotgun-shell",
+        "slowdown-capsule",
+        "small-electric-pole",
+        "small-lamp",
+        "solar-panel",
+        "solar-panel-equipment",
+        "speed-module",
+        "speed-module-2",
+        "speed-module-3",
+        "spidertron",
+        "splitter",
+        "steam-engine",
+        "steam-turbine",
+        "steel-chest",
+        "steel-furnace",
+        "stone-furnace",
+        "stone-wall",
+        "storage-chest",
+        "storage-tank",
+        "submachine-gun",
+        "substation",
+        "tank",
+        "train-stop",
+        "transport-belt",
+        "underground-belt",
+        "uranium-cannon-shell",
+        "uranium-fuel-cell",
+        "uranium-rounds-magazine",
+        "utility-science-pack",
+        "wooden-chest"
       ],
       "in_pipes": 0,
       "in_pipe_filters": {},
@@ -19638,11 +20334,205 @@
         "assembling-machine-2"
       ],
       "crafting_categories": [
-        "basic-crafting",
         "crafting",
         "advanced-crafting",
         "crafting-with-fluid",
         "parameters"
+      ],
+      "craftable_recipes": [
+        "accumulator",
+        "active-provider-chest",
+        "advanced-circuit",
+        "arithmetic-combinator",
+        "artillery-shell",
+        "artillery-turret",
+        "artillery-wagon",
+        "assembling-machine-1",
+        "assembling-machine-2",
+        "assembling-machine-3",
+        "atomic-bomb",
+        "automation-science-pack",
+        "barrel",
+        "battery-equipment",
+        "battery-mk2-equipment",
+        "beacon",
+        "belt-immunity-equipment",
+        "big-electric-pole",
+        "boiler",
+        "buffer-chest",
+        "bulk-inserter",
+        "burner-inserter",
+        "burner-mining-drill",
+        "cannon-shell",
+        "car",
+        "cargo-landing-pad",
+        "cargo-wagon",
+        "centrifuge",
+        "chemical-plant",
+        "chemical-science-pack",
+        "cliff-explosives",
+        "cluster-grenade",
+        "combat-shotgun",
+        "concrete",
+        "constant-combinator",
+        "construction-robot",
+        "copper-cable",
+        "crude-oil-barrel",
+        "decider-combinator",
+        "defender-capsule",
+        "destroyer-capsule",
+        "discharge-defense-equipment",
+        "display-panel",
+        "distractor-capsule",
+        "efficiency-module",
+        "efficiency-module-2",
+        "efficiency-module-3",
+        "electric-engine-unit",
+        "electric-furnace",
+        "electric-mining-drill",
+        "electronic-circuit",
+        "empty-crude-oil-barrel",
+        "empty-heavy-oil-barrel",
+        "empty-light-oil-barrel",
+        "empty-lubricant-barrel",
+        "empty-petroleum-gas-barrel",
+        "empty-sulfuric-acid-barrel",
+        "empty-water-barrel",
+        "energy-shield-equipment",
+        "energy-shield-mk2-equipment",
+        "engine-unit",
+        "exoskeleton-equipment",
+        "explosive-cannon-shell",
+        "explosive-rocket",
+        "explosive-uranium-cannon-shell",
+        "express-loader",
+        "express-splitter",
+        "express-transport-belt",
+        "express-underground-belt",
+        "fast-inserter",
+        "fast-loader",
+        "fast-splitter",
+        "fast-transport-belt",
+        "fast-underground-belt",
+        "firearm-magazine",
+        "fission-reactor-equipment",
+        "flamethrower",
+        "flamethrower-turret",
+        "fluid-wagon",
+        "flying-robot-frame",
+        "gate",
+        "grenade",
+        "gun-turret",
+        "hazard-concrete",
+        "heat-exchanger",
+        "heat-pipe",
+        "heavy-armor",
+        "heavy-oil-barrel",
+        "inserter",
+        "iron-chest",
+        "iron-gear-wheel",
+        "iron-stick",
+        "lab",
+        "land-mine",
+        "landfill",
+        "laser-turret",
+        "light-armor",
+        "light-oil-barrel",
+        "loader",
+        "locomotive",
+        "logistic-robot",
+        "logistic-science-pack",
+        "long-handed-inserter",
+        "low-density-structure",
+        "lubricant-barrel",
+        "medium-electric-pole",
+        "military-science-pack",
+        "modular-armor",
+        "night-vision-equipment",
+        "nuclear-reactor",
+        "offshore-pump",
+        "oil-refinery",
+        "parameter-0",
+        "parameter-1",
+        "parameter-2",
+        "parameter-3",
+        "parameter-4",
+        "parameter-5",
+        "parameter-6",
+        "parameter-7",
+        "parameter-8",
+        "parameter-9",
+        "passive-provider-chest",
+        "personal-laser-defense-equipment",
+        "personal-roboport-equipment",
+        "personal-roboport-mk2-equipment",
+        "petroleum-gas-barrel",
+        "piercing-rounds-magazine",
+        "piercing-shotgun-shell",
+        "pipe",
+        "pipe-to-ground",
+        "pistol",
+        "poison-capsule",
+        "power-armor",
+        "power-armor-mk2",
+        "power-switch",
+        "processing-unit",
+        "production-science-pack",
+        "productivity-module",
+        "productivity-module-2",
+        "productivity-module-3",
+        "programmable-speaker",
+        "pump",
+        "pumpjack",
+        "radar",
+        "rail",
+        "rail-chain-signal",
+        "rail-signal",
+        "recipe-unknown",
+        "refined-concrete",
+        "refined-hazard-concrete",
+        "repair-pack",
+        "requester-chest",
+        "roboport",
+        "rocket",
+        "rocket-fuel",
+        "rocket-launcher",
+        "rocket-silo",
+        "satellite",
+        "selector-combinator",
+        "shotgun",
+        "shotgun-shell",
+        "slowdown-capsule",
+        "small-electric-pole",
+        "small-lamp",
+        "solar-panel",
+        "solar-panel-equipment",
+        "speed-module",
+        "speed-module-2",
+        "speed-module-3",
+        "spidertron",
+        "splitter",
+        "steam-engine",
+        "steam-turbine",
+        "steel-chest",
+        "steel-furnace",
+        "stone-furnace",
+        "stone-wall",
+        "storage-chest",
+        "storage-tank",
+        "submachine-gun",
+        "substation",
+        "sulfuric-acid-barrel",
+        "tank",
+        "train-stop",
+        "transport-belt",
+        "underground-belt",
+        "uranium-cannon-shell",
+        "uranium-fuel-cell",
+        "uranium-rounds-magazine",
+        "utility-science-pack",
+        "water-barrel",
+        "wooden-chest"
       ],
       "in_pipes": 1,
       "in_pipe_filters": {},
@@ -19717,11 +20607,205 @@
         "assembling-machine-3"
       ],
       "crafting_categories": [
-        "basic-crafting",
         "crafting",
         "advanced-crafting",
         "crafting-with-fluid",
         "parameters"
+      ],
+      "craftable_recipes": [
+        "accumulator",
+        "active-provider-chest",
+        "advanced-circuit",
+        "arithmetic-combinator",
+        "artillery-shell",
+        "artillery-turret",
+        "artillery-wagon",
+        "assembling-machine-1",
+        "assembling-machine-2",
+        "assembling-machine-3",
+        "atomic-bomb",
+        "automation-science-pack",
+        "barrel",
+        "battery-equipment",
+        "battery-mk2-equipment",
+        "beacon",
+        "belt-immunity-equipment",
+        "big-electric-pole",
+        "boiler",
+        "buffer-chest",
+        "bulk-inserter",
+        "burner-inserter",
+        "burner-mining-drill",
+        "cannon-shell",
+        "car",
+        "cargo-landing-pad",
+        "cargo-wagon",
+        "centrifuge",
+        "chemical-plant",
+        "chemical-science-pack",
+        "cliff-explosives",
+        "cluster-grenade",
+        "combat-shotgun",
+        "concrete",
+        "constant-combinator",
+        "construction-robot",
+        "copper-cable",
+        "crude-oil-barrel",
+        "decider-combinator",
+        "defender-capsule",
+        "destroyer-capsule",
+        "discharge-defense-equipment",
+        "display-panel",
+        "distractor-capsule",
+        "efficiency-module",
+        "efficiency-module-2",
+        "efficiency-module-3",
+        "electric-engine-unit",
+        "electric-furnace",
+        "electric-mining-drill",
+        "electronic-circuit",
+        "empty-crude-oil-barrel",
+        "empty-heavy-oil-barrel",
+        "empty-light-oil-barrel",
+        "empty-lubricant-barrel",
+        "empty-petroleum-gas-barrel",
+        "empty-sulfuric-acid-barrel",
+        "empty-water-barrel",
+        "energy-shield-equipment",
+        "energy-shield-mk2-equipment",
+        "engine-unit",
+        "exoskeleton-equipment",
+        "explosive-cannon-shell",
+        "explosive-rocket",
+        "explosive-uranium-cannon-shell",
+        "express-loader",
+        "express-splitter",
+        "express-transport-belt",
+        "express-underground-belt",
+        "fast-inserter",
+        "fast-loader",
+        "fast-splitter",
+        "fast-transport-belt",
+        "fast-underground-belt",
+        "firearm-magazine",
+        "fission-reactor-equipment",
+        "flamethrower",
+        "flamethrower-turret",
+        "fluid-wagon",
+        "flying-robot-frame",
+        "gate",
+        "grenade",
+        "gun-turret",
+        "hazard-concrete",
+        "heat-exchanger",
+        "heat-pipe",
+        "heavy-armor",
+        "heavy-oil-barrel",
+        "inserter",
+        "iron-chest",
+        "iron-gear-wheel",
+        "iron-stick",
+        "lab",
+        "land-mine",
+        "landfill",
+        "laser-turret",
+        "light-armor",
+        "light-oil-barrel",
+        "loader",
+        "locomotive",
+        "logistic-robot",
+        "logistic-science-pack",
+        "long-handed-inserter",
+        "low-density-structure",
+        "lubricant-barrel",
+        "medium-electric-pole",
+        "military-science-pack",
+        "modular-armor",
+        "night-vision-equipment",
+        "nuclear-reactor",
+        "offshore-pump",
+        "oil-refinery",
+        "parameter-0",
+        "parameter-1",
+        "parameter-2",
+        "parameter-3",
+        "parameter-4",
+        "parameter-5",
+        "parameter-6",
+        "parameter-7",
+        "parameter-8",
+        "parameter-9",
+        "passive-provider-chest",
+        "personal-laser-defense-equipment",
+        "personal-roboport-equipment",
+        "personal-roboport-mk2-equipment",
+        "petroleum-gas-barrel",
+        "piercing-rounds-magazine",
+        "piercing-shotgun-shell",
+        "pipe",
+        "pipe-to-ground",
+        "pistol",
+        "poison-capsule",
+        "power-armor",
+        "power-armor-mk2",
+        "power-switch",
+        "processing-unit",
+        "production-science-pack",
+        "productivity-module",
+        "productivity-module-2",
+        "productivity-module-3",
+        "programmable-speaker",
+        "pump",
+        "pumpjack",
+        "radar",
+        "rail",
+        "rail-chain-signal",
+        "rail-signal",
+        "recipe-unknown",
+        "refined-concrete",
+        "refined-hazard-concrete",
+        "repair-pack",
+        "requester-chest",
+        "roboport",
+        "rocket",
+        "rocket-fuel",
+        "rocket-launcher",
+        "rocket-silo",
+        "satellite",
+        "selector-combinator",
+        "shotgun",
+        "shotgun-shell",
+        "slowdown-capsule",
+        "small-electric-pole",
+        "small-lamp",
+        "solar-panel",
+        "solar-panel-equipment",
+        "speed-module",
+        "speed-module-2",
+        "speed-module-3",
+        "spidertron",
+        "splitter",
+        "steam-engine",
+        "steam-turbine",
+        "steel-chest",
+        "steel-furnace",
+        "stone-furnace",
+        "stone-wall",
+        "storage-chest",
+        "storage-tank",
+        "submachine-gun",
+        "substation",
+        "sulfuric-acid-barrel",
+        "tank",
+        "train-stop",
+        "transport-belt",
+        "underground-belt",
+        "uranium-cannon-shell",
+        "uranium-fuel-cell",
+        "uranium-rounds-magazine",
+        "utility-science-pack",
+        "water-barrel",
+        "wooden-chest"
       ],
       "in_pipes": 1,
       "in_pipe_filters": {},
@@ -19799,6 +20883,21 @@
         "oil-processing",
         "parameters"
       ],
+      "craftable_recipes": [
+        "advanced-oil-processing",
+        "basic-oil-processing",
+        "coal-liquefaction",
+        "parameter-0",
+        "parameter-1",
+        "parameter-2",
+        "parameter-3",
+        "parameter-4",
+        "parameter-5",
+        "parameter-6",
+        "parameter-7",
+        "parameter-8",
+        "parameter-9"
+      ],
       "in_pipes": 2,
       "in_pipe_filters": {},
       "out_pipes": 3,
@@ -19875,6 +20974,30 @@
         "chemistry",
         "parameters"
       ],
+      "craftable_recipes": [
+        "battery",
+        "explosives",
+        "flamethrower-ammo",
+        "heavy-oil-cracking",
+        "light-oil-cracking",
+        "lubricant",
+        "parameter-0",
+        "parameter-1",
+        "parameter-2",
+        "parameter-3",
+        "parameter-4",
+        "parameter-5",
+        "parameter-6",
+        "parameter-7",
+        "parameter-8",
+        "parameter-9",
+        "plastic-bar",
+        "solid-fuel-from-heavy-oil",
+        "solid-fuel-from-light-oil",
+        "solid-fuel-from-petroleum-gas",
+        "sulfur",
+        "sulfuric-acid"
+      ],
       "in_pipes": 2,
       "in_pipe_filters": {},
       "out_pipes": 2,
@@ -19950,6 +21073,22 @@
       "crafting_categories": [
         "centrifuging",
         "parameters"
+      ],
+      "craftable_recipes": [
+        "kovarex-enrichment-process",
+        "nuclear-fuel",
+        "nuclear-fuel-reprocessing",
+        "parameter-0",
+        "parameter-1",
+        "parameter-2",
+        "parameter-3",
+        "parameter-4",
+        "parameter-5",
+        "parameter-6",
+        "parameter-7",
+        "parameter-8",
+        "parameter-9",
+        "uranium-processing"
       ],
       "in_pipes": 0,
       "in_pipe_filters": {},
@@ -20193,6 +21332,19 @@
         "rocket-building",
         "parameters"
       ],
+      "craftable_recipes": [
+        "parameter-0",
+        "parameter-1",
+        "parameter-2",
+        "parameter-3",
+        "parameter-4",
+        "parameter-5",
+        "parameter-6",
+        "parameter-7",
+        "parameter-8",
+        "parameter-9",
+        "rocket-part"
+      ],
       "in_pipes": 0,
       "in_pipe_filters": {},
       "out_pipes": 0,
@@ -20285,7 +21437,8 @@
       "module_inventory_size": 0,
       "items_to_place_this": {},
       "crafting_categories": [
-        "crafting"
+        "crafting",
+        "hand-crafting"
       ],
       "resource_categories": [
         "basic-solid"
@@ -21083,5 +22236,47 @@
       "name": "internal-process",
       "order": "z"
     }
-  ]
+  ],
+  "crafting_category_machines": {
+    "crafting": [
+      "assembling-machine-1",
+      "assembling-machine-2",
+      "assembling-machine-3"
+    ],
+    "crafting-with-fluid": [
+      "assembling-machine-2",
+      "assembling-machine-3"
+    ],
+    "smelting": [
+      "electric-furnace",
+      "steel-furnace",
+      "stone-furnace"
+    ],
+    "oil-processing": [
+      "oil-refinery"
+    ],
+    "chemistry": [
+      "chemical-plant"
+    ],
+    "advanced-crafting": [
+      "assembling-machine-1",
+      "assembling-machine-2",
+      "assembling-machine-3"
+    ],
+    "rocket-building": [
+      "rocket-silo"
+    ],
+    "centrifuging": [
+      "centrifuge"
+    ],
+    "parameters": [
+      "assembling-machine-1",
+      "assembling-machine-2",
+      "assembling-machine-3",
+      "centrifuge",
+      "chemical-plant",
+      "oil-refinery",
+      "rocket-silo"
+    ]
+  }
 }

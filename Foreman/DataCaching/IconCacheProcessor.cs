@@ -50,8 +50,9 @@ namespace Foreman.DataCaching {
             archiveFileLinks = [];
         }
 
-        public bool PrepareModPaths(Dictionary<string, string> modSet, string modsPath, string dataPath, CancellationToken token) {
+        public bool PrepareModPaths(Dictionary<string, string> modSet, string modsPath, string dataPath, CancellationToken token, out KeyValuePair<string, string>? missingMod) {
             ObjectDisposedException.ThrowIf(disposedValue, this);
+            missingMod = null;
             folderLinks.Clear();
             archiveFileLinks?.Clear();
             bitmapCache.Clear();
@@ -76,8 +77,10 @@ namespace Foreman.DataCaching {
                 else {
                     var foundFile = files.FirstOrDefault(f => Regex.IsMatch(Path.GetFileName(f).ToLowerInvariant(), string.Format(CultureInfo.InvariantCulture, "{0}_{1}.zip", mod.Key, versionMatch)));
                     if (foundFile == null) {
-                        if (!string.Equals(mod.Key, "core", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "base", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "elevated-rails", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "quality", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "space-age", StringComparison.OrdinalIgnoreCase))
+                        if (!string.Equals(mod.Key, "core", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "base", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "elevated-rails", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "quality", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "space-age", StringComparison.OrdinalIgnoreCase) && !string.Equals(mod.Key, "recycler", StringComparison.OrdinalIgnoreCase)) {
+                            missingMod = mod;
                             return false;
+                        }
                         continue;
                     }
 
@@ -103,7 +106,9 @@ namespace Foreman.DataCaching {
             folderLinks.Add("__base__", Path.Combine(dataPath, "base"));
             folderLinks.Add("__elevated-rails__", Path.Combine(dataPath, "elevated-rails"));
             folderLinks.Add("__quality__", Path.Combine(dataPath, "quality"));
+            folderLinks.Add("__recycler__", Path.Combine(dataPath, "recycler"));
             folderLinks.Add("__space-age__", Path.Combine(dataPath, "space-age"));
+            folderLinks.Add("__recycler__", Path.Combine(dataPath, "recycler"));
 
             return true;
         }

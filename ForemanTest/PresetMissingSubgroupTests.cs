@@ -31,6 +31,32 @@ namespace ForemanTest {
         }
 
         [TestMethod]
+        public void PresetDataLoader_ItemWithFuelCategories_AddsItemToEachCategory() {
+            var cache = new DataCache(filterRecipes: false);
+            DataCacheStore store = TestDataCacheHelper.RequireStore(cache);
+            var session = new PresetLoadSession();
+            var loader = new PresetDataLoader(cache, store, session);
+            var itemJson = new JsonObject {
+                ["name"] = "multi-fuel-item",
+                ["localised_name"] = "Multi Fuel Item",
+                ["order"] = "a",
+                ["stack_size"] = 1,
+                ["weight"] = 1,
+                ["ingredient_to_weight_coefficient"] = 1,
+                ["fuel_categories"] = new JsonArray("chemical", "nuclear"),
+                ["fuel_value"] = 100
+            };
+
+            loader.ProcessItem(itemJson, []);
+
+            Assert.IsTrue(session.FuelCategories.TryGetValue("chemical", out var chemicalItems));
+            Assert.IsTrue(session.FuelCategories.TryGetValue("nuclear", out var nuclearItems));
+            Assert.AreEqual("multi-fuel-item", chemicalItems![0].Name);
+            Assert.AreEqual("multi-fuel-item", nuclearItems![0].Name);
+            Assert.AreEqual(100, chemicalItems[0].FuelValue);
+        }
+
+        [TestMethod]
         public void PresetDataLoader_RecipeWithoutSubgroup_UsesMissingSubgroup() {
             var cache = new DataCache(filterRecipes: false);
             DataCacheStore store = TestDataCacheHelper.RequireStore(cache);

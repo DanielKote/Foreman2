@@ -22,6 +22,20 @@ namespace ForemanTest {
         }
 
         [TestMethod]
+        public void CollectRecipeCraftingCategories_ReadsFactorio21CategoriesWithoutLegacyCategory() {
+            var recipe = new JsonObject {
+                ["categories"] = new JsonArray(
+                    JsonValue.Create("chemistry"),
+                    JsonValue.Create("advanced-chemistry"),
+                    JsonValue.Create("chemistry"))
+            };
+
+            var categories = PresetCraftingCompatibility.CollectRecipeCraftingCategories(recipe).ToArray();
+            ICollection<string> expected = ["chemistry", "advanced-chemistry"];
+            CollectionAssert.AreEquivalent(expected as ICollection, categories);
+        }
+
+        [TestMethod]
         public void CollectRecipeCraftingCategories_IncludesPrimaryAndAdditionalWhenNoCraftingCategoriesArray() {
             var recipe = MinimalRecipeJson(
                 primaryCategory: "crafting",
@@ -41,12 +55,13 @@ namespace ForemanTest {
                 ["localised_name"] = "Test",
                 ["subgroup"] = "raw-resource",
                 ["order"] = "a",
-                ["category"] = primaryCategory,
                 ["energy"] = 1,
                 ["ingredients"] = new JsonArray(),
                 ["products"] = new JsonArray(),
             };
 
+            if (!string.IsNullOrEmpty(primaryCategory))
+                recipe["category"] = primaryCategory;
             if (craftingCategories is { Length: > 0 })
                 recipe["crafting_categories"] = new JsonArray(craftingCategories.Select(c => JsonValue.Create(c)).ToArray());
             if (additionalCategories is { Length: > 0 })

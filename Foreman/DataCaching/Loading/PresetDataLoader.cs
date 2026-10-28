@@ -239,16 +239,21 @@ namespace Foreman.DataCaching.Loading {
             item.Weight = weight;
             item.IngredientToWeightCoefficient = ingredientToWeightCoeff;
 
-            if (PresetJson.GetString(objJsonNode, "fuel_category") is string fuelCategory &&
+            List<string> fuelCategories = PresetJson.EnumerateStrings(objJsonNode, "fuel_categories").ToList();
+            if (fuelCategories.Count == 0 && PresetJson.GetString(objJsonNode, "fuel_category") is string legacyFuelCategory)
+                fuelCategories.Add(legacyFuelCategory);
+
+            if (fuelCategories.Count > 0 &&
                 PresetJson.GetDouble(objJsonNode, "fuel_value") is double fuelValue &&
-                fuelValue > 0) //factorio eliminates any 0fuel value fuel from the list (checked)
-            {
+                fuelValue > 0) { //factorio eliminates any 0fuel value fuel from the list (checked)
                 item.FuelValue = fuelValue;
                 item.PollutionMultiplier = PresetJson.GetDouble(objJsonNode, "fuel_emissions_multiplier") ?? 1;
 
-                if (!_session.FuelCategories.ContainsKey(fuelCategory))
-                    _session.FuelCategories.Add(fuelCategory, []);
-                _session.FuelCategories[fuelCategory].Add(item);
+                foreach (string fuelCategory in fuelCategories) {
+                    if (!_session.FuelCategories.ContainsKey(fuelCategory))
+                        _session.FuelCategories.Add(fuelCategory, []);
+                    _session.FuelCategories[fuelCategory].Add(item);
+                }
             }
             if (PresetJson.GetString(objJsonNode, "burnt_result") is string burntResult)
                 _session.BurnResults.Add(item, burntResult);
@@ -333,10 +338,13 @@ namespace Foreman.DataCaching.Loading {
         }
 
         internal void ProcessRecipe(JsonNode objJsonNode, Dictionary<string, IconColorPair> iconCache) {
+            string? primaryCategory = PresetJson.GetString(objJsonNode, "category")
+                ?? PresetJson.EnumerateStrings(objJsonNode, "categories").FirstOrDefault()
+                ?? PresetJson.EnumerateStrings(objJsonNode, "crafting_categories").FirstOrDefault();
             if (PresetJson.GetString(objJsonNode, "name") is not string name ||
                 PresetJson.GetString(objJsonNode, "localised_name") is not string localisedName ||
                 PresetJson.GetString(objJsonNode, "order") is not string order ||
-                PresetJson.GetString(objJsonNode, "category") is not string category ||
+                primaryCategory is null ||
                 ResolvePresetSubgroup(objJsonNode) is not SubgroupPrototype sgProto)
                 return;
             RecipePrototype recipe = new(_owner, name, localisedName, sgProto, order) {
@@ -351,7 +359,7 @@ namespace Foreman.DataCaching.Loading {
                 _store.StartingTech.UnlockedRecipesInternal.Add(recipe);
             }
 
-            foreach (string craftingCategory in PresetCraftingCompatibility.CollectRecipeCraftingCategories(objJsonNode, category))
+            foreach (string craftingCategory in PresetCraftingCompatibility.CollectRecipeCraftingCategories(objJsonNode, primaryCategory))
                 AddRecipeToCraftingCategory(craftingCategory, recipe);
 
             if (PresetJson.GetString(objJsonNode, "icon_name") is string iconName && iconCache.TryGetValue(iconName, out var icp))

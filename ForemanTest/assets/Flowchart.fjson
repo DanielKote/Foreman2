@@ -1,13 +1,13 @@
 {
   "Version": 8,
   "Object": "ProductionGraphViewer",
-  "SavedPresetName": "Factorio 2.0 Space Age",
+  "SavedPresetName": "Factorio 2.1 Space Age",
   "IncludedMods": [
     "core|1.0",
-    "base|2.0.76",
-    "elevated-rails|2.0.76",
-    "quality|2.0.76",
-    "space-age|2.0.76"
+    "base|2.1.23",
+    "elevated-rails|2.1.23",
+    "quality|2.1.23",
+    "space-age|2.1.23"
   ],
   "Unit": 1,
   "ViewOffset": "-39, -387",
@@ -752,7 +752,7 @@
         },
         "Products": {
           "iron-ore": 20.0,
-          "metallic-asteroid-chunk": 0.2
+          "metallic-asteroid-chunk": 0.3
         }
       },
       {
@@ -765,11 +765,11 @@
         "Products": {
           "ice": 3.0,
           "calcite": 2.0,
-          "oxide-asteroid-chunk": 0.05
+          "oxide-asteroid-chunk": 0.1
         }
       },
       {
-        "Name": "molten-iron",
+        "Name": "iron-ore-melting",
         "RecipeID": 1605,
         "isMissing": false,
         "Ingredients": {
@@ -800,7 +800,7 @@
         },
         "Products": {
           "ice": 5.0,
-          "oxide-asteroid-chunk": 0.2
+          "oxide-asteroid-chunk": 0.3
         }
       },
       {
@@ -812,7 +812,7 @@
         },
         "Products": {
           "carbon": 10.0,
-          "carbonic-asteroid-chunk": 0.2
+          "carbonic-asteroid-chunk": 0.3
         }
       },
       {
@@ -1187,7 +1187,7 @@
         }
       },
       {
-        "Name": "molten-copper",
+        "Name": "copper-ore-melting",
         "RecipeID": 1606,
         "isMissing": false,
         "Ingredients": {

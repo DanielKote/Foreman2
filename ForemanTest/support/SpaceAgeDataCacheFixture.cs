@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ForemanTest.support {
     /// <summary>Loads the Space Age preset once per test run (expensive).</summary>
     internal static class SpaceAgeDataCacheFixture {
-        public const string PresetName = "Factorio 2.0 Space Age";
+        public const string PresetName = "Factorio 2.1 Space Age";
 
         private static readonly SemaphoreSlim Gate = new(1, 1);
         private static DataCache? cache;

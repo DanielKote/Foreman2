@@ -231,7 +231,7 @@ namespace Foreman
             this.PresetNameTable.SetRowSpan(this.PresetNameTextBox, 2);
             this.PresetNameTextBox.Size = new System.Drawing.Size(269, 20);
             this.PresetNameTextBox.TabIndex = 0;
-            this.PresetNameTextBox.Text = "Factorio 2.0 Space Age";
+            this.PresetNameTextBox.Text = "Factorio 2.1 Space Age";
             this.PresetNameTextBox.TextChanged += new System.EventHandler(this.PresetNameTextBox_TextChanged);
             // 
             // label3

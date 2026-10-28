@@ -84,22 +84,22 @@
     <None Update="baseCustom.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Presets\Factorio 2.0 Space Age.dat">
+    <None Update="Presets\Factorio 2.1 Space Age.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Presets\Factorio 2.0 Space Age.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Presets\Factorio 2.0 Space Age.pjson">
+    <None Update="Presets\Factorio 2.1 Space Age.pjson">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Presets\Factorio 2.0 Vanilla.dat">
+    <None Update="Presets\Factorio 2.1 Vanilla.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Presets\Factorio 2.0 Vanilla.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Presets\Factorio 2.0 Vanilla.pjson">
+    <None Update="Presets\Factorio 2.1 Vanilla.pjson">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Properties\Settings.settings">

@@ -155,7 +155,7 @@ namespace Foreman {
             stopwatch.Start();
 #endif
             ImportStarted = true;
-            string foremanModName = "foremanexport_" + factorioVersionInfo.ProductMajorPart + ".0.0";
+            string foremanModName = "foremanexport_" + factorioVersionInfo.ProductMajorPart + "." + factorioVersionInfo.ProductMinorPart + ".0";
             NewPresetName = await ProcessPreset(installPath, foremanModName, modsPath, progress, token).ConfigureAwait(false);
 #if DEBUG
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Preset import time: {0} seconds.", (stopwatch.ElapsedMilliseconds / 1000).ToString("0.0", CultureInfo.InvariantCulture)));
@@ -358,10 +358,15 @@ namespace Foreman {
                         modSet.Add(name.ToLowerInvariant(), version);
 
                 using (var icProcessor = new IconCacheProcessor()) {
-                    if (!icProcessor.PrepareModPaths(modSet, modsPath, Path.Combine(installPath, "data"), token)) {
+                    if (!icProcessor.PrepareModPaths(modSet, modsPath, Path.Combine(installPath, "data"), token, out KeyValuePair<string, string>? missingMod)) {
                         if (!token.IsCancellationRequested) {
-                            UserMessages.Show("Mod inconsistency detected. Try to see if launching Factorio gives an error?");
-                            ErrorLogging.LogLine("Mod parsing failed - the list of mods provided could not be mapped to the existing mod folders & zip files.");
+                            string failureMessage = missingMod is KeyValuePair<string, string> mod
+                                ? string.Format(CultureInfo.InvariantCulture, "Mod inconsistency detected: mod '{0}' version '{1}' could not be found in the selected Factorio mods folder. Try launching Factorio to check for mod errors.", mod.Key, mod.Value)
+                                : "Mod inconsistency detected. Try to see if launching Factorio gives an error?";
+                            UserMessages.Show(failureMessage);
+                            ErrorLogging.LogLine(missingMod is KeyValuePair<string, string> missing
+                                ? string.Format(CultureInfo.InvariantCulture, "Mod parsing failed - mod '{0}' version '{1}' could not be mapped to an existing mod folder or zip file.", missing.Key, missing.Value)
+                                : "Mod parsing failed - the list of mods provided could not be mapped to the existing mod folders & zip files.");
                         }
                         CleanupFailedImport(modsPath, presetPath);
                         return "";
